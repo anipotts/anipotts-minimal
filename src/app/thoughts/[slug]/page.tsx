@@ -7,6 +7,7 @@ import FadeIn from "@/components/FadeIn";
 export const revalidate = 60;
 
 async function getThought(slug: string) {
+  if (!supabase) return null;
   const { data } = await supabase
     .from("thoughts")
     .select("*")
@@ -20,6 +21,23 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
   const thought = await getThought(slug);
 
   if (!thought) {
+    if (!supabase) {
+       return (
+        <div className="flex flex-col gap-8 pb-20">
+          <FadeIn>
+            <Link href="/thoughts" className="text-sm text-gray-500 hover:text-accent-400 transition-colors mb-8 inline-block">
+              ← back to thoughts
+            </Link>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <div className="p-6 border border-white/5 rounded-lg bg-white/5">
+              <h1 className="text-xl font-bold text-gray-200 mb-2">Thought Unavailable</h1>
+              <p className="text-gray-400">The thoughts database is currently offline (Dev Mode).</p>
+            </div>
+          </FadeIn>
+        </div>
+       );
+    }
     notFound();
   }
 

@@ -3,11 +3,13 @@
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const adminPassword = process.env.ADMIN_PASSWORD;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = (supabaseUrl && supabaseKey) 
+  ? createClient(supabaseUrl, supabaseKey) 
+  : null;
 
 export async function checkAuth() {
   const cookieStore = await cookies();
@@ -15,6 +17,9 @@ export async function checkAuth() {
 }
 
 export async function login(password: string) {
+  if (!adminPassword) {
+    return { success: false, error: "Admin password not configured on server" };
+  }
   if (password === adminPassword) {
     const cookieStore = await cookies();
     cookieStore.set("admin_session", "true", { httpOnly: true, secure: true, sameSite: "strict" });
@@ -29,12 +34,11 @@ export async function logout() {
 }
 
 export async function upsertThought(thought: any) {
+  if (!supabase) throw new Error("Supabase not configured");
+  
   const isAuth = await checkAuth();
   if (!isAuth) throw new Error("Unauthorized");
 
-  // Ensure slug is unique if new? Upsert handles it if PK is ID.
-  // If we want to update by slug, we need to make sure ID is present or slug is unique constraint.
-  
   const { data, error } = await supabase
     .from("thoughts")
     .upsert(thought)
@@ -46,6 +50,8 @@ export async function upsertThought(thought: any) {
 }
 
 export async function deleteThought(id: string) {
+  if (!supabase) throw new Error("Supabase not configured");
+
   const isAuth = await checkAuth();
   if (!isAuth) throw new Error("Unauthorized");
 
