@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  /* Dark mode only defaults */
+  --background: #020308;
+  --foreground: #e5e7eb; /* gray-200 */
+  
+  --card: #0a0a0a;
+  --card-foreground: #e5e7eb;
+
+  /* Font variables will be defined in layout.tsx */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
