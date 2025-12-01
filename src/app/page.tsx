@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import FadeIn from "@/components/FadeIn";
 
 async function getLatestThoughts() {
+  if (!supabase) return [];
   try {
     const { data } = await supabase
       .from("thoughts")
@@ -106,10 +107,14 @@ export default async function Home() {
       </FadeIn>
 
       {/* Latest Thoughts */}
-      {latestThoughts.length > 0 && (
-        <FadeIn delay={0.7}>
-          <section className="flex flex-col gap-8">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">latest thoughts</h2>
+      <FadeIn delay={0.7}>
+        <section className="flex flex-col gap-8">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">latest thoughts</h2>
+          {!supabase ? (
+            <div className="p-4 border border-white/5 rounded-lg bg-white/5">
+              <p className="text-gray-400 text-sm">Thoughts system is currently offline (Dev Mode).</p>
+            </div>
+          ) : latestThoughts.length > 0 ? (
             <div className="flex flex-col gap-6">
               {latestThoughts.map((thought: any) => (
                 <Link key={thought.slug} href={`/thoughts/${thought.slug}`} className="group block">
@@ -127,9 +132,11 @@ export default async function Home() {
                 </Link>
               ))}
             </div>
-          </section>
-        </FadeIn>
-      )}
+          ) : (
+             <p className="text-gray-500 italic">No thoughts published yet.</p>
+          )}
+        </section>
+      </FadeIn>
     </div>
   );
 }

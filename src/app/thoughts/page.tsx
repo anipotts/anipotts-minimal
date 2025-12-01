@@ -5,6 +5,7 @@ import FadeIn from "@/components/FadeIn";
 export const revalidate = 60;
 
 async function getThoughts() {
+  if (!supabase) return [];
   try {
     const { data } = await supabase
       .from("thoughts")
@@ -28,7 +29,14 @@ export default async function ThoughtsPage() {
       </FadeIn>
 
       <div className="flex flex-col gap-10">
-        {thoughts.length === 0 ? (
+        {!supabase ? (
+          <FadeIn delay={0.1}>
+            <div className="p-6 border border-white/5 rounded-lg bg-white/5 flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-gray-200">System Offline</h3>
+              <p className="text-gray-400">The thoughts database is currently unavailable in development mode.</p>
+            </div>
+          </FadeIn>
+        ) : thoughts.length === 0 ? (
           <FadeIn delay={0.1}>
             <p className="text-gray-500 italic">No thoughts published yet.</p>
           </FadeIn>

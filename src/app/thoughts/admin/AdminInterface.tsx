@@ -14,6 +14,7 @@ export default function AdminInterface() {
   }, []);
 
   const fetchThoughts = async () => {
+    if (!supabase) return;
     const { data } = await supabase
       .from("thoughts")
       .select("*")
