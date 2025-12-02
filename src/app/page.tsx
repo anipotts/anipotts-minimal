@@ -2,6 +2,7 @@ import Link from "next/link";
 import { projects } from "@/data/projects";
 import { supabase } from "@/lib/supabaseClient";
 import FadeIn from "@/components/FadeIn";
+import ProjectCard from "@/components/ProjectCard";
 
 async function getLatestThoughts() {
   if (!supabase) return [];
@@ -72,7 +73,7 @@ export default async function Home() {
           </FadeIn>
           <FadeIn delay={0.5}>
             <p>
-              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/">Range Media Partners</CompanyLink>, and launched several profitable PWAs (see below).
+              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/">Range Media Partners</CompanyLink>, and launched several profitable <a href="#selected-work" className="text-gray-200 hover:text-accent-400 font-medium underline decoration-white/30 underline-offset-4 transition-colors">PWAs</a> (see below).
             </p>
           </FadeIn>
         </div>
@@ -85,30 +86,10 @@ export default async function Home() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500">selected work</h2>
           </FadeIn>
         </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-12">
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
           {recentProjects.map((project, i) => (
             <FadeIn key={project.slug} delay={0.6 + (i * 0.1)}>
-              <Link href={`/work#${project.slug}`} className="group block">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="md:col-span-2 flex flex-col gap-2">
-                    <h3 className="text-lg font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{project.description}</p>
-                    <div className="flex gap-2 mt-1">
-                      {project.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-[10px] uppercase tracking-wider text-gray-500 border border-white/10 px-2 py-1 rounded-sm">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="md:col-span-1 flex flex-col md:items-end text-xs text-gray-500 uppercase tracking-wide gap-1">
-                    <span>{project.role}</span>
-                    <span>{project.duration}</span>
-                  </div>
-                </div>
-              </Link>
+              <ProjectCard project={project} />
             </FadeIn>
           ))}
         </div>
