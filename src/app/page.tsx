@@ -28,38 +28,36 @@ export default async function Home() {
       {/* Hero */}
       <section className="flex flex-col gap-6">
         <FadeIn>
-          <span className="text-sm text-gray-500 font-mono">AP / index</span>
+          <span className="text-sm text-gray-500">AP / index</span>
         </FadeIn>
         <FadeIn delay={0.1}>
-          <h1 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-gray-100">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-100">
             hi, i'm ani potts
           </h1>
         </FadeIn>
         <FadeIn delay={0.2}>
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl leading-relaxed">
-            i’m a swe who builds minimal interfaces for messy systems.
+            i’m a swe who works on clean interfaces for messy systems.
           </p>
         </FadeIn>
       </section>
 
       {/* About */}
-      <section className="flex flex-col gap-4 text-gray-300 leading-relaxed">
+      <section className="flex flex-col gap-6 text-gray-300 leading-relaxed max-w-2xl">
         <FadeIn delay={0.3}>
-          <div className="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-2 md:gap-4">
-            <span className="text-gray-500 text-sm md:text-base">right now →</span>
-            <p>building an internal research platform for PGI, for quants at UChicago, NYU, Princeton, Brown, etc.</p>
-          </div>
+          <p>
+            Right now, I'm building an internal research platform for PGI, serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
+          </p>
         </FadeIn>
         <FadeIn delay={0.4}>
-          <div className="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-2 md:gap-4">
-            <span className="text-gray-500 text-sm md:text-base">previously →</span>
-            <p>built internal analytics dashboards for Atlantic Records, scaled leads for DADA Digital, automated social media scraping for Range Media Partners, and launched a couple of profitable PWAs.</p>
-          </div>
+          <p>
+            Previously, I built internal analytics dashboards for Atlantic Records, scaled lead generation systems for DADA Digital, automated social media scraping for Range Media Partners, and launched several profitable PWAs.
+          </p>
         </FadeIn>
       </section>
 
       {/* Metrics */}
-      <FadeIn delay={0.5}>
+      {/* <FadeIn delay={0.5}>
         <section className="grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-white/5 py-8">
           {[
             { value: "10 days", label: "Average time from idea to MVP" },
@@ -73,7 +71,7 @@ export default async function Home() {
             </div>
           ))}
         </section>
-      </FadeIn>
+      </FadeIn> */}
 
       {/* Recent Work */}
       <FadeIn delay={0.6}>
@@ -84,10 +82,10 @@ export default async function Home() {
               <Link key={project.slug} href={`/work#${project.slug}`} className="group block">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-baseline justify-between">
-                    <h3 className="text-xl font-bold text-gray-200 group-hover:text-accent-400 transition-colors font-heading">
+                    <h3 className="text-xl font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
                       {project.title}
                     </h3>
-                    <span className="text-xs text-gray-500 font-mono hidden md:block">
+                    <span className="text-xs text-gray-500 hidden md:block">
                       {project.role} • {project.duration}
                     </span>
                   </div>
@@ -123,7 +121,7 @@ export default async function Home() {
                       <h3 className="text-lg font-medium text-gray-200 group-hover:text-accent-400 transition-colors">
                         {thought.title}
                       </h3>
-                      <span className="text-xs text-gray-500 font-mono">
+                      <span className="text-xs text-gray-500">
                         {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                       </span>
                     </div>

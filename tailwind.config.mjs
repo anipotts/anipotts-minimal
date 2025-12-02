@@ -19,8 +19,9 @@ export default {
         "card-foreground": "var(--card-foreground)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        heading: ["var(--font-space-grotesk)", "sans-serif"],
+        sans: ["var(--font-mono)", "monospace"], // Override sans to use mono
+        mono: ["var(--font-mono)", "monospace"],
+        heading: ["var(--font-mono)", "monospace"], // Override heading too
       },
     },
   },
