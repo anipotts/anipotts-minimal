@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 
 const navItems = [
   { name: "index", path: "/" },
@@ -27,16 +26,13 @@ export default function Navbar() {
             <Link 
               key={item.path} 
               href={item.path}
-              className={`relative transition-colors duration-300 ${isActive ? "text-accent-400" : "text-gray-400 hover:text-gray-200"}`}
+              className={`transition-colors duration-300 ${
+                isActive 
+                  ? "text-gray-200 underline decoration-white/30 underline-offset-4 hover:text-accent-400" 
+                  : "text-gray-400 hover:text-gray-200"
+              }`}
             >
               {item.name}
-              {isActive && (
-                <motion.div 
-                  layoutId="nav-underline"
-                  className="absolute -bottom-1 left-0 right-0 h-[1px] bg-accent-400"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
             </Link>
           );
         })}
