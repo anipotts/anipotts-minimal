@@ -72,7 +72,7 @@ export default async function Home() {
           </FadeIn>
           <FadeIn delay={0.5}>
             <p>
-              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/">Range Media Partners</CompanyLink>, and launched several profitable <a href="#selected-work" className="text-gray-200 hover:text-accent-400 font-medium underline decoration-white/30 underline-offset-4 transition-colors">PWAs</a> (see below).
+              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/">Range Media Partners</CompanyLink>, and launched several profitable PWAs (see below).
             </p>
           </FadeIn>
         </div>
