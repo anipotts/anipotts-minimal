@@ -1,5 +1,4 @@
 import FadeIn from "@/components/FadeIn";
-import StatusDot from "@/components/StatusDot";
 
 const socials = [
   { name: "email", value: "anirudhpottammal@nyu.edu", href: "mailto:anirudhpottammal@nyu.edu", label: "reach out" },
@@ -22,7 +21,6 @@ export default function ConnectPage() {
           <FadeIn delay={0.1}>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-signal-green">
-                <StatusDot />
                 <span>open to work</span>
               </div>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl">
