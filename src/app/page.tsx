@@ -24,117 +24,126 @@ export default async function Home() {
   const latestThoughts = await getLatestThoughts();
 
   return (
-    <div className="flex flex-col gap-16 md:gap-24 pb-20">
+    <div className="flex flex-col gap-20 pb-20">
       {/* Hero */}
-      <section className="flex flex-col gap-6">
-        <FadeIn>
-          <span className="text-sm text-gray-500">AP / index</span>
-        </FadeIn>
-        <FadeIn delay={0.1}>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-100">
-            hi, i'm ani potts
-          </h1>
-        </FadeIn>
-        <FadeIn delay={0.2}>
-          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl leading-relaxed">
-            i’m a swe who works on clean interfaces for messy systems.
-          </p>
-        </FadeIn>
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="col-span-1">
+          <FadeIn>
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-500">index</span>
+          </FadeIn>
+        </div>
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
+          <FadeIn delay={0.1}>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-100">
+              hi, i'm ani potts
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
+              i’m a swe who works on clean interfaces for messy systems.
+            </p>
+          </FadeIn>
+        </div>
       </section>
 
       {/* About */}
-      <section className="flex flex-col gap-6 text-gray-300 leading-relaxed max-w-2xl">
-        <FadeIn delay={0.3}>
-          <p>
-            Right now, I'm building an internal research platform for PGI, serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
-          </p>
-        </FadeIn>
-        <FadeIn delay={0.4}>
-          <p>
-            Previously, I built internal analytics dashboards for Atlantic Records, scaled lead generation systems for DADA Digital, automated social media scraping for Range Media Partners, and launched several profitable PWAs.
-          </p>
-        </FadeIn>
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="col-span-1">
+          <FadeIn delay={0.3}>
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-500">about</span>
+          </FadeIn>
+        </div>
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-6 text-gray-300 leading-relaxed">
+          <FadeIn delay={0.4}>
+            <p>
+              Right now, I'm building an internal research platform for PGI, serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.5}>
+            <p>
+              Previously, I built internal analytics dashboards for Atlantic Records, scaled lead generation systems for DADA Digital, automated social media scraping for Range Media Partners, and launched several profitable PWAs.
+            </p>
+          </FadeIn>
+        </div>
       </section>
 
-      {/* Metrics */}
-      {/* <FadeIn delay={0.5}>
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-white/5 py-8">
-          {[
-            { value: "10 days", label: "Average time from idea to MVP" },
-            { value: "50k+ users", label: "Served by platforms I’ve built" },
-            { value: "250k+ generated", label: "Revenue generated for clients" },
-            { value: "2.1m+ views", label: "Views on my projects" },
-          ].map((metric, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <span className="text-2xl md:text-3xl font-bold text-gray-100 font-heading">{metric.value}</span>
-              <span className="text-xs text-gray-500 uppercase tracking-wide">{metric.label}</span>
-            </div>
-          ))}
-        </section>
-      </FadeIn> */}
-
       {/* Recent Work */}
-      <FadeIn delay={0.6}>
-        <section className="flex flex-col gap-8">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">some recent work</h2>
-          <div className="flex flex-col gap-10">
-            {recentProjects.map((project) => (
-              <Link key={project.slug} href={`/work#${project.slug}`} className="group block">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-baseline justify-between">
-                    <h3 className="text-xl font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="col-span-1">
+          <FadeIn delay={0.6}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500">selected work</h2>
+          </FadeIn>
+        </div>
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-12">
+          {recentProjects.map((project, i) => (
+            <FadeIn key={project.slug} delay={0.6 + (i * 0.1)}>
+              <Link href={`/work#${project.slug}`} className="group block">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2 flex flex-col gap-2">
+                    <h3 className="text-lg font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
                       {project.title}
                     </h3>
-                    <span className="text-xs text-gray-500 hidden md:block">
-                      {project.role} • {project.duration}
-                    </span>
+                    <p className="text-gray-400 text-sm leading-relaxed">{project.description}</p>
+                    <div className="flex gap-2 mt-1">
+                      {project.tags.slice(0, 3).map(tag => (
+                        <span key={tag} className="text-[10px] uppercase tracking-wider text-gray-500 border border-white/10 px-2 py-1 rounded-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-gray-400 text-sm md:text-base">{project.description}</p>
-                  <div className="flex gap-2 mt-1">
-                    {project.tags.slice(0, 3).map(tag => (
-                      <span key={tag} className="text-xs text-gray-600 bg-white/5 px-2 py-1 rounded-sm">
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="md:col-span-1 flex flex-col md:items-end text-xs text-gray-500 uppercase tracking-wide gap-1">
+                    <span>{project.role}</span>
+                    <span>{project.duration}</span>
                   </div>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
-      </FadeIn>
+            </FadeIn>
+          ))}
+        </div>
+      </section>
 
       {/* Latest Thoughts */}
-      <FadeIn delay={0.7}>
-        <section className="flex flex-col gap-8">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">latest thoughts</h2>
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="col-span-1">
+          <FadeIn delay={0.8}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500">thoughts</h2>
+          </FadeIn>
+        </div>
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
           {!supabase ? (
-            <div className="p-4 border border-white/5 rounded-lg bg-white/5">
-              <p className="text-gray-400 text-sm">Thoughts system is currently offline (Dev Mode).</p>
-            </div>
+            <FadeIn delay={0.9}>
+              <div className="p-4 border border-white/5 rounded-sm bg-white/5">
+                <p className="text-gray-500 text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
+              </div>
+            </FadeIn>
           ) : latestThoughts.length > 0 ? (
-            <div className="flex flex-col gap-6">
-              {latestThoughts.map((thought: any) => (
-                <Link key={thought.slug} href={`/thoughts/${thought.slug}`} className="group block">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-baseline justify-between">
-                      <h3 className="text-lg font-medium text-gray-200 group-hover:text-accent-400 transition-colors">
+            latestThoughts.map((thought: any, i) => (
+              <FadeIn key={thought.slug} delay={0.9 + (i * 0.1)}>
+                <Link href={`/thoughts/${thought.slug}`} className="group block">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-baseline">
+                    <div className="md:col-span-2">
+                      <h3 className="text-base font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
                         {thought.title}
                       </h3>
-                      <span className="text-xs text-gray-500">
-                        {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{thought.summary}</p>
+                    </div>
+                    <div className="md:col-span-1 md:text-right">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide">
+                        {new Date(thought.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 line-clamp-2">{thought.summary}</p>
                   </div>
                 </Link>
-              ))}
-            </div>
+              </FadeIn>
+            ))
           ) : (
-             <p className="text-gray-500 italic">No thoughts published yet.</p>
+             <FadeIn delay={0.9}>
+               <p className="text-gray-500 italic text-sm">No thoughts published yet.</p>
+             </FadeIn>
           )}
-        </section>
-      </FadeIn>
+        </div>
+      </section>
     </div>
   );
 }
