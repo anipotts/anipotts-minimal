@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { projects } from "@/data/projects";
 import FadeIn from "@/components/FadeIn";
-import StatusDot from "@/components/StatusDot";
 import { motion, AnimatePresence } from "framer-motion";
 
 const categories = ["all", "ai", "product", "quant", "music"];
@@ -93,7 +92,6 @@ export default function WorkPage() {
                       <span>{project.year}</span>
                       <span>{project.role}</span>
                       <span className="flex items-center gap-2">
-                        {project.duration === "Ongoing" && <StatusDot />}
                         {project.duration}
                       </span>
                     </div>
