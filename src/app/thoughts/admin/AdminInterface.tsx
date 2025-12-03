@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FaCheck } from "react-icons/fa";
 import { upsertThought, deleteThought, logout, getAdminThoughts } from "../actions";
 import Editor from "@/components/Editor";
 
@@ -128,7 +129,7 @@ export default function AdminInterface() {
             
             <label className="flex items-center gap-3 text-gray-300 cursor-pointer p-3 rounded-lg hover:bg-white/5 transition-colors self-end">
               <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${editing.published ? "bg-accent-400 border-accent-400" : "border-gray-500"}`}>
-                {editing.published && <span className="text-black text-xs font-bold">✓</span>}
+                {editing.published && <span className="text-black text-xs font-bold"><FaCheck />  </span>}
               </div>
               <input
                 type="checkbox"
