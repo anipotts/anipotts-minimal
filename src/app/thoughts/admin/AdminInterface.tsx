@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { upsertThought, deleteThought, logout } from "../actions";
+import { upsertThought, deleteThought, logout, getAdminThoughts } from "../actions";
 
 export default function AdminInterface() {
   const [thoughts, setThoughts] = useState<any[]>([]);
@@ -14,11 +13,7 @@ export default function AdminInterface() {
   }, []);
 
   const fetchThoughts = async () => {
-    if (!supabase) return;
-    const { data } = await supabase
-      .from("thoughts")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const data = await getAdminThoughts();
     if (data) setThoughts(data);
   };
 

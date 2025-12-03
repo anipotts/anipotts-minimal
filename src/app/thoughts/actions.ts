@@ -33,6 +33,24 @@ export async function logout() {
   cookieStore.delete("admin_session");
 }
 
+export async function getAdminThoughts() {
+  if (!supabase) return [];
+  
+  const isAuth = await checkAuth();
+  if (!isAuth) return [];
+
+  const { data, error } = await supabase
+    .from("thoughts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching admin thoughts:", error);
+    return [];
+  }
+  return data;
+}
+
 export async function upsertThought(thought: any) {
   if (!supabase) throw new Error("Supabase not configured");
   
