@@ -23,7 +23,7 @@ async function getLatestThoughts() {
 }
 
 export default async function Home() {
-  const recentProjects = projects.slice(0, 3);
+  const recentProjects = projects.slice(0, 5);
   const latestThoughts = await getLatestThoughts();
 
   return (
@@ -46,7 +46,7 @@ export default async function Home() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
-              i'm a <span className="hidden md:inline">21 y/o </span>SWE based in NYC, who builds minimal interfaces for orchestration systems.
+              i'm a SWE based in NYC, who builds minimal interfaces for orchestrating complex systems.
             </p>
           </FadeIn>
         </div>
@@ -80,7 +80,7 @@ export default async function Home() {
         <div className="col-span-1">
           <FadeIn delay={0.5}>
             <span className="text-xs font-mono text-accent-400 tracking-widest uppercase">
-              selected work
+              past work
             </span>
           </FadeIn>
         </div>

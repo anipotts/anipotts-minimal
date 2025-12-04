@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/admin/AdminOverlay";
+import Waves from "@/components/Waves";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -31,8 +32,25 @@ export default function RootLayout({
           <body className="antialiased min-h-screen flex flex-col items-center bg-background text-foreground selection:bg-accent-400/20 selection:text-accent-400 font-mono overflow-x-hidden">
             
             {/* Ambient Background Effects */}
-            <div className="fixed inset-0 z-[-1] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
+            <div className="fixed inset-0 z-[-2] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
             <div className="fixed inset-0 z-[-1] opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
+            
+            {/* Waves Background */}
+            <div className="fixed inset-0 z-[-3] opacity-30 pointer-events-none">
+              <Waves
+                lineColor="rgba(255, 255, 255, 0.1)"
+                backgroundColor="transparent"
+                waveSpeedX={0.02}
+                waveSpeedY={0.01}
+                waveAmpX={40}
+                waveAmpY={20}
+                friction={0.9}
+                tension={0.01}
+                maxCursorMove={120}
+                xGap={12}
+                yGap={36}
+              />
+            </div>
 
             <div className="w-full min-h-screen p-2 md:p-8 lg:p-16 flex justify-center items-start md:items-center">
               
