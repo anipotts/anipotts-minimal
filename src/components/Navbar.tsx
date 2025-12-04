@@ -24,7 +24,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full flex flex-col md:flex-row md:items-center justify-between md:gap-28 py-8 md:py-12 mb-8 md:mb-16">
-      <Link href="/" className="text-lg font-bold tracking-tight whitespace-nowrap text-gray-100 hover:text-accent-400 transition-colors duration-300 mb-4 md:mb-0 font-heading">
+      <Link href="/" className="text-lg font-bold tracking-tight whitespace-nowrap text-accent-400 hover:text-accent-400/80 transition-colors duration-300 mb-4 md:mb-0 font-heading">
         ani potts
       </Link>
       
