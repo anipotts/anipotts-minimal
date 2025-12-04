@@ -39,7 +39,7 @@ export default function AdminLoginModal() {
             <span>ani@nyc</span>
           </div>
           <div className="font-mono text-[10px] text-gray-600">
-            uptime: {Math.floor(process.uptime() || 0)}s
+            uptime: {Math.floor(typeof window !== 'undefined' ? performance.now() / 1000 : 0)}s
           </div>
         </div>
         
