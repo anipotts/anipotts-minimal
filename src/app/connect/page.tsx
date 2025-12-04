@@ -5,10 +5,10 @@ import posthog from "posthog-js";
 
 const socials = [
   { name: "email", value: "anirudhpottammal@nyu.edu", href: "mailto:anirudhpottammal@nyu.edu", label: "reach out" },
-  { name: "x (twitter)", value: "@anirxdhp", href: "https://x.com/anipottsbuilds", label: "follow" },
+  { name: "x (twitter)", value: "@anipottsbuilds", href: "https://x.com/anipottsbuilds", label: "follow" },
   { name: "github", value: "anipotts", href: "https://github.com/anipotts", label: "code" },
-  { name: "instagram", value: "@anirxdhp", href: "https://instagram.com/ani_potts", label: "life" },
-  { name: "tiktok", value: "@anirxdhp", href: "https://tiktok.com/@anipots", label: "content" },
+  { name: "instagram", value: "@ani_potts", href: "https://instagram.com/ani_potts", label: "life" },
+  { name: "tiktok", value: "@anipotts", href: "https://tiktok.com/@anipotts", label: "content" },
 ];
 
 const handleSocialClick = (social: typeof socials[0]) => {
