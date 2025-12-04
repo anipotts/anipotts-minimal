@@ -29,7 +29,25 @@ export default async function Home() {
   return (
     <div className="flex flex-col gap-16 pb-20">
       
-      {/* Hero Section */}
+      {/* Index Section */}
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="col-span-1">
+          <FadeIn delay={0.0}>
+            <span className="text-xs font-mono text-accent-400 tracking-widest uppercase">
+              index
+            </span>
+          </FadeIn>
+        </div>
+        <div className="col-span-1 md:col-span-3">
+          <FadeIn delay={0.1}>
+            <h1 className="text-3xl md:text-4xl font-bold font-heading text-gray-100">
+              hi, i'm ani potts.
+            </h1>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* About Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1">
           <FadeIn delay={0.1}>
@@ -72,11 +90,6 @@ export default async function Home() {
               <ProjectCard project={project} />
             </FadeIn>
           ))}
-          <FadeIn delay={0.9}>
-            <Link href="/work" className="inline-block mt-4 text-sm font-mono text-gray-500 hover:text-accent-400 transition-colors">
-              ./view_all_projects.sh
-            </Link>
-          </FadeIn>
         </div>
       </section>
 
@@ -103,11 +116,6 @@ export default async function Home() {
               </p>
             </FadeIn>
           )}
-          <FadeIn delay={1.4}>
-            <Link href="/thoughts" className="inline-block mt-2 text-sm font-mono text-gray-500 hover:text-accent-400 transition-colors">
-              ./read_all_thoughts.sh
-            </Link>
-          </FadeIn>
         </div>
       </section>
 
