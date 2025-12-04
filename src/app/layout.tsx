@@ -38,7 +38,7 @@ export default function RootLayout({
             {/* Waves Background */}
             <div className="fixed inset-0 z-[-3] opacity-30 pointer-events-none">
               <Waves
-                lineColor="rgba(255, 255, 255, 0.1)"
+lineColor="rgba(167, 139, 250, 0.96)"
                 backgroundColor="transparent"
                 waveSpeedX={0.02}
                 waveSpeedY={0.01}
