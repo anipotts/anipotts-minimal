@@ -27,7 +27,7 @@ export default async function ThoughtsPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-gray-500">thoughts</h1>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">thoughts</h1>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-8">

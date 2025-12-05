@@ -20,19 +20,49 @@ export const projects: Project[] = [
     title: "PGI Research Portal",
     subtitle: "Macro research platform for quants.",
     description:
-      "Rebuilt PGI’s static site into a TypeScript PWA backed by Postgres, aggregating RSS feeds and cutting manual research overhead. Gives analysts mobile access to curated event signals.",
+      "Rebuilt PGI’s static site into a TypeScript PWA backed by Postgres, aggregating RSS feeds and cutting manual research overhead. Enables analysts to monitor macro catalysts and event signals directly from mobile.",
     year: "2025",
     category: "quant",
     role: "Chief Tech Officer",
     duration: "Fall 2025",
     tags: ["Next.js", "TypeScript", "Postgres", "TailwindCSS", "RSS"],
   },
+
+  {
+    slug: "hebbiani",
+    title: "Hebbiani",
+    subtitle: "Local cross-encoder reranking (inspired by Hebbia’s Matrix).",
+    description:
+      "A local, MIME-agnostic playground inspired by Hebbia’s Matrix—supporting cross-encoder reranking, late-interaction token matching, and multi-document search evaluation. Designed for reproducible backend search experiments without relying on cloud inference.",
+    year: "2025",
+    category: "ai",
+    role: "Creator",
+    duration: "Winter 2025",
+    tags: ["Python", "Jupyter", "Transformers", "Retrieval", "Reranking"],
+    links: {
+      repo: "https://github.com/anipotts/hebbiani",
+    },
+  },
+
+  {
+    slug: "hedgefund-cache-simulator",
+    title: "Document-Scoped Cache Simulator",
+    subtitle: "Caching optimization for simulated hedge-fund workflows.",
+    description:
+      "A Jupyter-based simulation exploring document-scoped caching policies, TTL strategies, and eviction behavior under hedge-fund-style research workloads. Models reuse distributions, cost reduction, and latency improvements for versioned documents at scale.",
+    year: "2025",
+    category: "quant",
+    role: "Research Engineer",
+    duration: "Fall 2025",
+    tags: ["Python", "NumPy", "Simulation", "Caching", "Distributed Systems"],
+  },
+
   {
     slug: "chainedchat",
     title: "ChainedChat",
     subtitle: "Multi-LLM workflow orchestration platform.",
     description:
-      "Built a full-stack app to intuitively chat with multiple LLMs, caching shared context to cut redundant token usage.",
+      "Built a full-stack platform for interacting with multiple LLMs in a single conversational workflow. Implements shared-context caching, multi-model routing, and intuitive UI for cost-efficient prompt chaining.",
     year: "2025",
     category: "ai",
     role: "Founder",
@@ -40,63 +70,75 @@ export const projects: Project[] = [
     tags: ["Next.js", "TypeScript", "Convex", "LangGraph", "Stripe", "TailwindCSS"],
     links: {
       live: "https://chained.chat",
-      repo: "https://github.com/…"  
+      repo: "https://github.com/…"
     },
   },
+
+  {
+    slug: "nyu-purity-test",
+    title: "NYU Purity Test",
+    subtitle: "A campus quiz taken by 3,000+ NYU students (200k+ visits).",
+    description:
+      "Designed and launched a high-traffic TypeScript web app that replicated a purity-style questionnaire tailored to NYU culture. Reached 3,000+ completions in under a week, demonstrating viral distribution and resilient client-side engineering under load.",
+    year: "2024",
+    category: "product",
+    role: "Creator",
+    duration: "Fall 2024",
+    tags: ["TypeScript", "React", "Next.js", "TailwindCSS", "Analytics"],
+    links: {
+      live: "https://nyu-purity-test.vercel.app", // replace with actual link
+      repo: "https://github.com/anipotts/nyu-rice-purity"
+    },
+  },
+
+  {
+    slug: "mimicry",
+    title: "mimicry",
+    subtitle: "IG Reel script extraction + content analysis workflow tool.",
+    description:
+      "A TypeScript workflow tool that parses IG reels from a single link, extracts transcripts, normalizes metadata, and runs lightweight analysis to identify hooks, pacing, and content structure. Built for creators exploring what makes reels go viral.",
+    year: "2024",
+    category: "ai",
+    role: "Engineer",
+    duration: "Summer 2024",
+    tags: ["TypeScript", "Next.js", "APIs", "Content Analysis"],
+    links: {
+      repo: "https://github.com/anipotts/mimicry"
+    },
+  },
+
   {
     slug: "underground-artist-ig-analytics",
     title: "IG Analytics Tool",
     subtitle: "Track viral posts from potential artists.",
     description:
-      "Automated daily scraping of +3k Instagram artists with robust retry logic, normalizing post, comment, and follower deltas into SQLite + streamlit dashboard.",
+      "Automated daily scraping of 3k+ Instagram artists with robust retry logic, normalizing post, comment, and follower deltas into a SQLite + Streamlit dashboard.",
     year: "2024",
     category: "music",
     role: "Software Engineer",
     duration: "Spring 2025",
     tags: ["Python", "Streamlit", "SQLite", "Instaloader", "Pandas"],
   },
+
   {
     slug: "habittracker-obh",
-    title: "Our Bad Habit Artist Scouting Platform",
-    subtitle: "Cross-platform artist growth tracking for Atlantic Records venture.",
+    title: "Artist Scouting Platform",
+    subtitle: "Cross-platform artist growth tracking for an Atlantic Records venture.",
     description:
-      "Built a Python + Streamlit tool aggregating Chartmetric, YouTube, TikTok, and Instagram signals to help A&R teams scout campaign-ready artists in targeted regions. Implemented geo-based matching to highlight cities where artists were gaining traction.",
+      "Aggregated Chartmetric, YouTube, TikTok, and Instagram signals into a centralized scouting dashboard. Implemented geo-based artist discovery to find emerging talent in targeted campaign markets.",
     year: "2024",
     category: "music",
     role: "Data Engineering Intern",
     duration: "Summer 2024",
     tags: ["Python", "Streamlit", "SQL", "APIs", "Data Pipelines"],
   },
-  {
-    slug: "dada-digital-frontends",
-    title: "DADA Digital Client Frontend Fixes",
-    subtitle: "Rapid frontend fixes and conversion-focused UI improvements.",
-    description:
-      "Shipped fast production updates for SMB client sites by debugging vague UI issues, improving cross-device responsiveness, and implementing custom JavaScript CTAs. Clarified conversion flows and tightened SEO structure under tight deadlines.",
-    year: "2024",
-    category: "product",
-    role: "Client Facing Frontend Developer",
-    duration: "Fall 2024",
-    tags: ["JavaScript", "TypeScript", "React", "HTML", "CSS", "SEO"],
-  },
-  {
-    slug: "quantercise",
-    title: "Quantercise",
-    subtitle: "Full-stack quant trading interview practice platform.",
-    description:
-      "Built a MERN-based quant interview prep platform with spaced repetition, calendar integrations, and personal analytics. Implemented CRUD, auth, dashboards, and job application tracking to help students prepare systematically for quant roles.",
-    year: "2023",
-    category: "quant",
-    role: "Full-Stack Developer",
-    duration: "Fall 2023",
-    tags: ["MongoDB", "Express", "React", "Node.js", "REST APIs", "TailwindCSS"],
-  },
+
   {
     slug: "options-pricing-sensitivity",
-    title: "Options Pricing and Sensitivity Analysis Tool",
-    subtitle: "Black–Scholes and binomial option pricing with volatility sweeps.",
+    title: "Options Pricing + Sensitivity Analysis",
+    subtitle: "Black–Scholes and binomial pricing with volatility sweeps.",
     description:
-      "Developed a Python tool to price European options using both Black–Scholes and binomial models, then analyze how prices move across volatility regimes. Outputs tabulated results to help understand Greeks and model behavior for different parameters.",
+      "Developed a Python tool to price European options using Black–Scholes and binomial models, analyzing how prices move across volatility regimes to illustrate Greeks and model behavior.",
     year: "2023",
     category: "quant",
     role: "Quant Developer",

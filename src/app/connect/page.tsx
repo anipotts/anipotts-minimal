@@ -9,6 +9,7 @@ const socials = [
   { name: "github", value: "anipotts", href: "https://github.com/anipotts", label: "code" },
   { name: "instagram", value: "@ani_potts", href: "https://instagram.com/ani_potts", label: "life" },
   { name: "tiktok", value: "@anipotts", href: "https://tiktok.com/@anipotts", label: "content" },
+  { name: "linkedin", value: "anipotts", href: "https://www.linkedin.com/in/anirudh-pottammal-01b186216/", label: "professional" },
 ];
 
 const handleSocialClick = (social: typeof socials[0]) => {
@@ -25,7 +26,7 @@ export default function ConnectPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-gray-500">connect</h1>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">connect</h1>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-12">
