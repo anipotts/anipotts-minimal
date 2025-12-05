@@ -255,6 +255,8 @@ export default function AdminInterface() {
                   </span>
                   <span className="w-0.5 h-0.5 rounded-full bg-gray-700"></span>
                   <span>{new Date(thought.created_at).toLocaleDateString()}</span>
+                  <span className="w-0.5 h-0.5 rounded-full bg-gray-700"></span>
+                  <span>{thought.views || 0} views</span>
                 </div>
               </div>
             </div>

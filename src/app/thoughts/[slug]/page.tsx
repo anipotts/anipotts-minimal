@@ -5,6 +5,8 @@ import ReactMarkdown from "react-markdown";
 import FadeIn from "@/components/FadeIn";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { headers } from "next/headers";
+import ViewCounter from "@/components/ViewCounter";
+import IncrementView from "@/components/IncrementView";
 
 export const revalidate = 60;
 
@@ -54,7 +56,7 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
           <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
             <div className="col-span-1">
               <FadeIn>
-                <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-accent-400 hover:text-accent-400 transition-colors">o
+                <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-accent-400 hover:text-accent-400 transition-colors">
                   back
                 </Link>
               </FadeIn>
@@ -75,6 +77,7 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="flex flex-col gap-12 pb-20">
+      <IncrementView slug={thought.slug} />
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1 flex flex-col gap-4">
           <FadeIn>
@@ -88,6 +91,9 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
               <time dateTime={thought.created_at} className="text-gray-300">
                 {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
               </time>
+              <div className="mt-2">
+                <ViewCounter slug={thought.slug} initialViews={thought.views} />
+              </div>
             </div>
           </FadeIn>
           {thought.tags && (

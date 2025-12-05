@@ -80,3 +80,27 @@ export async function deleteThought(id: string) {
 
   if (error) throw new Error(error.message);
 }
+
+export async function incrementThoughtViews(slug: string) {
+  if (!supabase) return;
+  
+  // Try RPC first (atomic increment)
+  const { error } = await supabase.rpc('increment_thought_views', { thought_slug: slug });
+  
+  if (error) {
+    // Fallback: Read-Modify-Write (not atomic, but works without custom SQL functions)
+    // Note: This requires the 'views' column to exist.
+    const { data: thought } = await supabase
+      .from('thoughts')
+      .select('views')
+      .eq('slug', slug)
+      .single();
+      
+    if (thought) {
+      await supabase
+        .from('thoughts')
+        .update({ views: (thought.views || 0) + 1 })
+        .eq('slug', slug);
+    }
+  }
+}
