@@ -27,31 +27,34 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={clsx(jetbrainsMono.variable, "dark")}>
-      <PostHogProvider>
-        <AdminProvider>
-          <body className="antialiased min-h-screen flex flex-col items-center bg-background text-foreground selection:bg-accent-400/20 selection:text-accent-400 font-mono overflow-x-hidden">
-            
-            {/* Ambient Background Effects */}
-            <div className="fixed inset-0 z-[-2] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
-            <div className="fixed inset-0 z-[-1] opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
-            
-            {/* Waves Background */}
-            <div className="fixed inset-0 z-[-3] opacity-30 pointer-events-none">
-              <Waves
-lineColor="rgba(167, 139, 250, 0.96)"
-                backgroundColor="transparent"
-                waveSpeedX={0.02}
-                waveSpeedY={0.01}
-                waveAmpX={40}
-                waveAmpY={20}
-                friction={0.9}
-                tension={0.01}
-                maxCursorMove={120}
-                xGap={12}
-                yGap={36}
-              />
-            </div>
+      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
+        
+        {/* Fixed Background Container */}
+        <div className="fixed inset-0 -z-10 min-h-[100svh] bg-background">
+          {/* Ambient Background Effects */}
+          <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
+          <div className="absolute inset-0 z-10 opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
+          
+          {/* Waves Animation */}
+          <div className="absolute inset-0 z-20 opacity-30 pointer-events-none">
+            <Waves
+              lineColor="rgba(167, 139, 250, 0.96)"
+              backgroundColor="transparent"
+              waveSpeedX={0.02}
+              waveSpeedY={0.01}
+              waveAmpX={40}
+              waveAmpY={20}
+              friction={0.9}
+              tension={0.01}
+              maxCursorMove={120}
+              xGap={12}
+              yGap={36}
+            />
+          </div>
+        </div>
 
+        <PostHogProvider>
+          <AdminProvider>
             <div className="w-full min-h-screen p-2 md:p-8 lg:p-16 flex justify-center items-start md:items-center">
               
               {/* Terminal Window Frame */}
@@ -112,9 +115,9 @@ lineColor="rgba(167, 139, 250, 0.96)"
             </div>
             
             <AdminOverlay />
-          </body>
-        </AdminProvider>
-      </PostHogProvider>
+          </AdminProvider>
+        </PostHogProvider>
+      </body>
     </html>
   );
 }
