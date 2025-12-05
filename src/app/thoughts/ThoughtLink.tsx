@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import posthog from "posthog-js";
+import ViewCounter from "@/components/ViewCounter";
 
 interface Thought {
   slug: string;
@@ -9,6 +10,7 @@ interface Thought {
   summary: string;
   tags?: string | string[];
   created_at: string;
+  views?: number;
 }
 
 export default function ThoughtLink({ thought }: { thought: Thought }) {
@@ -39,10 +41,11 @@ export default function ThoughtLink({ thought }: { thought: Thought }) {
             </div>
           )}
         </div>
-        <div className="md:col-span-1 md:text-right">
+        <div className="md:col-span-1 md:text-right flex flex-col md:items-end gap-1">
           <span className="text-xs text-gray-500 uppercase tracking-wide">
             {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </span>
+          <ViewCounter slug={thought.slug} initialViews={thought.views} />
         </div>
       </div>
     </Link>

@@ -11,7 +11,7 @@ async function getLatestThoughts() {
   try {
     const { data } = await supabase
       .from("thoughts")
-      .select("slug, title, summary, created_at")
+      .select("slug, title, summary, created_at, views")
       .eq("published", true)
       .order("created_at", { ascending: false })
       .limit(5);

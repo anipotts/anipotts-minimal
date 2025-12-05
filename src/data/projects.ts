@@ -26,6 +26,9 @@ export const projects: Project[] = [
     role: "Chief Tech Officer",
     duration: "Fall 2025",
     tags: ["Next.js", "TypeScript", "Postgres", "TailwindCSS", "RSS"],
+    links: {
+      live: "https://paragoninvestments.org"
+    },
   },
 
   {
@@ -70,7 +73,7 @@ export const projects: Project[] = [
     tags: ["Next.js", "TypeScript", "Convex", "LangGraph", "Stripe", "TailwindCSS"],
     links: {
       live: "https://chained.chat",
-      repo: "https://github.com/…"
+      repo: "https://github.com/anipotts/chained"
     },
   },
 
@@ -86,7 +89,7 @@ export const projects: Project[] = [
     duration: "Fall 2024",
     tags: ["TypeScript", "React", "Next.js", "TailwindCSS", "Analytics"],
     links: {
-      live: "https://nyu-purity-test.vercel.app", // replace with actual link
+      live: "https://nyupuritytest.com",
       repo: "https://github.com/anipotts/nyu-rice-purity"
     },
   },
@@ -109,8 +112,8 @@ export const projects: Project[] = [
 
   {
     slug: "underground-artist-ig-analytics",
-    title: "IG Analytics Tool",
-    subtitle: "Track viral posts from potential artists.",
+    title: "Instagram Scraper",
+    subtitle: "Tracks viral posts from 3k+ potential artists.",
     description:
       "Automated daily scraping of 3k+ Instagram artists with robust retry logic, normalizing post, comment, and follower deltas into a SQLite + Streamlit dashboard.",
     year: "2024",
@@ -122,7 +125,7 @@ export const projects: Project[] = [
 
   {
     slug: "habittracker-obh",
-    title: "Artist Scouting Platform",
+    title: "Artist Scouting Dashboard",
     subtitle: "Cross-platform artist growth tracking for an Atlantic Records venture.",
     description:
       "Aggregated Chartmetric, YouTube, TikTok, and Instagram signals into a centralized scouting dashboard. Implemented geo-based artist discovery to find emerging talent in targeted campaign markets.",
@@ -141,7 +144,7 @@ export const projects: Project[] = [
       "Developed a Python tool to price European options using Black–Scholes and binomial models, analyzing how prices move across volatility regimes to illustrate Greeks and model behavior.",
     year: "2023",
     category: "quant",
-    role: "Quant Developer",
+    role: "Developer",
     duration: "Spring 2023",
     tags: ["Python", "NumPy", "Pandas", "Quantitative Finance"],
     links: {
