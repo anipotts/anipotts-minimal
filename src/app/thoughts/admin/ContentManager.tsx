@@ -1,25 +1,18 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
-import { FaCheck, FaTerminal, FaCircle } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaCheck, FaCircle } from "react-icons/fa";
 import { upsertThought, deleteThought, getAdminThoughts } from "../actions";
 import Editor from "@/components/Editor";
 import posthog from "posthog-js";
-import { useAdmin } from "@/context/AdminContext";
 import Link from "next/link";
-import { checkAuth } from "../actions";
 
-export default function AdminInterface() {
-  const { logout } = useAdmin();
+export default function ContentManager() {
   const [thoughts, setThoughts] = useState<any[]>([]);
   const [editing, setEditing] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     fetchThoughts();
-    checkAuth().then(setIsAuthenticated);
   }, []);
 
   // Keyboard Navigation
@@ -115,23 +108,6 @@ export default function AdminInterface() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center border-b border-white/10 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-2 py-1 bg-green-500/10 border border-green-500/20 rounded text-green-400 text-xs font-mono uppercase tracking-wider">
-            <FaCircle className="w-2 h-2" />
-            <span>root</span>
-          </div>
-          <span className="text-xs text-gray-500 font-mono hidden md:inline">⌘+Shift+A to toggle</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <Link href="/thoughts" target="_blank" className="text-xs text-gray-500 hover:text-accent-400 font-mono flex items-center gap-1 transition-colors">
-            View all thoughts
-          </Link>
-          <button onClick={() => logout()} className="text-xs text-gray-500 hover:text-red-400 font-mono uppercase tracking-wider transition-colors">
-            Logout
-          </button>
-        </div>
-      </div>
 
       {editing ? (
         <form onSubmit={handleSave} className="flex flex-col gap-6 bg-white/5 p-8 rounded-xl border border-white/10 shadow-2xl">
@@ -268,25 +244,6 @@ export default function AdminInterface() {
       </div>
 
       {/* Live Status Footer */}
-      <div className="border-t border-white/10 pt-4 mt-4 flex justify-between items-center text-[10px] font-mono text-gray-600 uppercase tracking-wider">
-        <div className="flex gap-6">
-          <div className="flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "bg-green-500" : "bg-red-500"}`} />
-            <span>Supabase: {process.env.NEXT_PUBLIC_SUPABASE_URL ? "Connected" : "Error"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${isAuthenticated ? "bg-green-500" : "bg-red-500"}`} />
-            <span>Auth: {isAuthenticated ? "Valid" : "Invalid"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${posthog ? "bg-green-500" : "bg-gray-500"}`} />
-            <span>PostHog: Active</span>
-          </div>
-        </div>
-        <div>
-          v3.0.1-admin
-        </div>
-      </div>
     </div>
   );
 }

@@ -104,3 +104,34 @@ export async function incrementThoughtViews(slug: string) {
     }
   }
 }
+
+export async function getAdminStats() {
+  if (!supabase) return null;
+  
+  const isAuth = await checkAuth();
+  if (!isAuth) return null;
+
+  const { data: thoughts, error } = await supabase
+    .from("thoughts")
+    .select("id, title, slug, views, published, created_at")
+    .order("views", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching stats:", error);
+    return null;
+  }
+
+  const totalViews = thoughts.reduce((acc, t) => acc + (t.views || 0), 0);
+  const totalThoughts = thoughts.length;
+  const publishedCount = thoughts.filter(t => t.published).length;
+  const draftCount = totalThoughts - publishedCount;
+  const topThoughts = thoughts.slice(0, 5);
+
+  return {
+    totalViews,
+    totalThoughts,
+    publishedCount,
+    draftCount,
+    topThoughts
+  };
+}

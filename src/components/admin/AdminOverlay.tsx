@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import AdminLoginModal from "./AdminLoginModal";
-import AdminInterface from "@/app/thoughts/admin/AdminInterface";
+import AdminCommandCenter from "@/app/thoughts/admin/AdminCommandCenter";
 
 export default function AdminOverlay() {
   const { isModalOpen, isAdmin, toggleModal } = useAdmin();
@@ -31,18 +31,7 @@ export default function AdminOverlay() {
           >
             {isAdmin ? (
               <div className="p-6 md:p-10 flex flex-col gap-6">
-                {/* Quick Launch Palette */}
-                <div className="flex gap-2 p-2 bg-white/5 border border-white/5 rounded-lg overflow-x-auto">
-                  {["New Thought", "Jump to Draft", "Supabase", "PostHog"].map((action) => (
-                    <button 
-                      key={action}
-                      className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-gray-400 hover:text-accent-400 hover:bg-white/5 rounded transition-colors whitespace-nowrap"
-                    >
-                      {action}
-                    </button>
-                  ))}
-                </div>
-                <AdminInterface />
+                <AdminCommandCenter />
               </div>
             ) : (
               <div className="flex items-center justify-center min-h-[50vh]">

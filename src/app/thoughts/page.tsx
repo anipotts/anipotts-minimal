@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabaseClient";
 import FadeIn from "@/components/FadeIn";
 import ThoughtLink from "./ThoughtLink";
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 async function getThoughts() {
   if (!supabase) return [];
