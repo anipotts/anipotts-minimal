@@ -54,7 +54,7 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
           <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
             <div className="col-span-1">
               <FadeIn>
-                <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-accent-400 transition-colors">
+                <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-accent-400 hover:text-accent-400 transition-colors">o
                   back
                 </Link>
               </FadeIn>

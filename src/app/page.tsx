@@ -46,7 +46,7 @@ export default async function Home() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
-              i'm a SWE based in NYC, who builds minimal interfaces for orchestrating complex systems.
+              i'm a SWE based in NYC, who builds minimal interfaces to orchestrate complex systems.
             </p>
           </FadeIn>
         </div>
@@ -57,7 +57,7 @@ export default async function Home() {
         <div className="col-span-1">
           <FadeIn delay={0.3}>
             <span className="text-xs font-mono text-accent-400 tracking-widest uppercase">
-              about
+              about me
             </span>
           </FadeIn>
         </div>

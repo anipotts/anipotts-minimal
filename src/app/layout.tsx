@@ -8,6 +8,13 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import Waves from "@/components/Waves";
+import { WindowProvider } from "@/context/WindowContext";
+import WindowContainer from "@/components/window/WindowContainer";
+import WindowControls from "@/components/window/WindowControls";
+import TerminalPromptCentered from "@/components/window/TerminalPromptCentered";
+import MinimizedPill from "@/components/window/MinimizedPill";
+import WindowInner from "@/components/window/WindowInner";
+import WindowLayoutWrapper from "@/components/window/WindowLayoutWrapper";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -55,66 +62,52 @@ export default function RootLayout({
 
         <PostHogProvider>
           <AdminProvider>
-            <div className="w-full min-h-screen p-2 md:p-8 lg:p-16 flex justify-center items-start md:items-center">
-              
-              {/* Terminal Window Frame */}
-              <div className="w-full max-w-4xl bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl flex flex-col relative overflow-hidden ring-1 ring-white/5">
+            <WindowProvider>
+              <WindowLayoutWrapper>
                 
-                {/* Terminal Header Bar */}
-                <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
-                      <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
-                    </div>
-                    <span className="ml-3 text-[10px] md:text-xs text-gray-500 font-medium tracking-wide">
-                      ani@nyc:~/anipotts.com
-                    </span>
-                  </div>
-                  <div className="text-[10px] md:text-xs text-gray-600 font-mono">
-                    zsh • v3.0.1
-                  </div>
-                </div>
-
-                {/* Terminal Body */}
-                <div className="px-6 md:px-12 lg:px-16 flex flex-col min-h-[calc(100vh-8rem)] bg-black/40 relative">
+                {/* Dynamic Window Container */}
+                <WindowContainer>
                   
-                  {/* Navbar as Command Row */}
-                  <div className="relative z-10">
-                    <Navbar />
+                  {/* Terminal Header Bar */}
+                  <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
+                    <div className="flex items-center gap-2">
+                      <WindowControls />
+                      <span className="ml-3 text-[10px] md:text-xs text-gray-500 font-medium tracking-wide">
+                        ani@potts:~/anipotts.com
+                      </span>
+                    </div>
+                    <div className="text-[10px] md:text-xs text-gray-600 font-mono">
+                      zsh • v3.0.1
+                    </div>
                   </div>
 
-                  {/* Main Content Area */}
-                  <main className="flex-grow w-full relative z-10">
+                  {/* Terminal Body with Navbar/Footer handling */}
+                  <WindowInner>
                     {children}
-                  </main>
+                  </WindowInner>
 
-                  {/* Footer as System Status */}
-                  <div className="relative z-10 mt-auto pt-12">
-                    <Footer />
+                  {/* Terminal Status Bar */}
+                  <div className="border-t border-white/10 bg-white/5 px-4 py-1.5 flex justify-between items-center text-[10px] font-mono text-gray-500 select-none">
+                    <div className="flex gap-4">
+                      <span>NORMAL</span>
+                      <span>main</span>
+                      <span>utf-8</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <span>100%</span>
+                      <span>ln 1, col 1</span>
+                    </div>
                   </div>
+                </WindowContainer>
 
-                  {/* Subtle Grid Overlay inside terminal body */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-20" />
-                </div>
+                {/* Collapsed/Minimized States */}
+                <TerminalPromptCentered />
+                <MinimizedPill />
 
-                {/* Terminal Status Bar */}
-                <div className="border-t border-white/10 bg-white/5 px-4 py-1.5 flex justify-between items-center text-[10px] font-mono text-gray-500 select-none">
-                  <div className="flex gap-4">
-                    <span>NORMAL</span>
-                    <span>main</span>
-                    <span>utf-8</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <span>100%</span>
-                    <span>ln 1, col 1</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <AdminOverlay />
+              </WindowLayoutWrapper>
+              
+              <AdminOverlay />
+            </WindowProvider>
           </AdminProvider>
         </PostHogProvider>
       </body>
