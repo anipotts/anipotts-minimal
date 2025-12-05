@@ -125,7 +125,7 @@ export default function AdminInterface() {
         </div>
         <div className="flex items-center gap-6">
           <Link href="/thoughts" target="_blank" className="text-xs text-gray-500 hover:text-accent-400 font-mono flex items-center gap-1 transition-colors">
-            View live page ↗
+            View all thoughts
           </Link>
           <button onClick={() => logout()} className="text-xs text-gray-500 hover:text-red-400 font-mono uppercase tracking-wider transition-colors">
             Logout
