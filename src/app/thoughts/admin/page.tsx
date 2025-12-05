@@ -1,5 +1,5 @@
 import { checkAuth } from "../actions";
-import AdminInterface from "./AdminInterface";
+import AdminCommandCenter from "./AdminCommandCenter";
 import LoginForm from "./LoginForm";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 
@@ -23,7 +23,7 @@ export default async function AdminPage() {
 
   return (
     <div className="pb-20">
-      <AdminInterface />
+      <AdminCommandCenter />
     </div>
   );
 }

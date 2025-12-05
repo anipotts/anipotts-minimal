@@ -6,6 +6,8 @@ import CompanyLink from "@/components/CompanyLink";
 import ThoughtLink from "@/app/thoughts/ThoughtLink";
 import Link from "next/link";
 
+export const revalidate = 0;
+
 async function getLatestThoughts() {
   if (!supabase) return [];
   try {
