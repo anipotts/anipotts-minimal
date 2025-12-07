@@ -34,7 +34,7 @@ export default async function Home() {
       
       {/* Index Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1 hidden md:block">
+        <div className="col-span-1">
           <FadeIn delay={0.0}>
             <span className="text-xs font-mono text-accent-400 tracking-widest uppercase">
               index
