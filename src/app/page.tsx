@@ -4,6 +4,7 @@ import FadeIn from "@/components/FadeIn";
 import ProjectCard from "@/components/ProjectCard";
 import CompanyLink from "@/components/CompanyLink";
 import ThoughtLink from "@/app/thoughts/ThoughtLink";
+import FavoriteNumberHero from "@/components/FavoriteNumberHero";
 import Link from "next/link";
 
 export const revalidate = 0;
@@ -33,7 +34,7 @@ export default async function Home() {
       
       {/* Index Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
+        <div className="col-span-1 hidden md:block">
           <FadeIn delay={0.0}>
             <span className="text-xs font-mono text-accent-400 tracking-widest uppercase">
               index
@@ -50,7 +51,10 @@ export default async function Home() {
             <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
               i'm a SWE based in NYC, who builds minimal interfaces to orchestrate complex systems.
             </p>
-          </FadeIn>
+            </FadeIn>
+          {/* <FadeIn delay={0.25}>
+            <FavoriteNumberHero />
+          </FadeIn> */}
         </div>
       </section>
 
