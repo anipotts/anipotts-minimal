@@ -2,21 +2,12 @@
 
 import FadeIn from "@/components/FadeIn";
 import posthog from "posthog-js";
+import { socialLinks } from "@anipotts/lib/data";
 
-const socials = [
-  { name: "email", value: "contact@anipotts.com", href: "mailto:contact@anipotts.com", label: "reach out" },
-  { name: "x", value: "@anipottsbuilds", href: "https://x.com/anipottsbuilds", label: "follow" },
-  { name: "github", value: "anipotts", href: "https://github.com/anipotts", label: "code" },
-  { name: "instagram", value: "@anipottsbuilds", href: "https://instagram.com/anipottsbuilds", label: "life" },
-  { name: "tiktok", value: "@anipottsbuilds", href: "https://tiktok.com/@anipottsbuilds", label: "content" },
-  { name: "linkedin", value: "anipotts", href: "https://www.linkedin.com/in/anipotts", label: "professional" },
-];
-
-const handleSocialClick = (social: typeof socials[0]) => {
+const handleSocialClick = (name: string, url: string) => {
   posthog.capture('social_link_clicked', {
-    platform: social.name,
-    link_value: social.value,
-    href: social.href,
+    platform: name,
+    href: url,
   });
 };
 
@@ -56,14 +47,14 @@ export default function ConnectPage() {
         <div className="col-span-1 md:col-span-3">
           <FadeIn delay={0.2}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {socials.map((social) => (
+              {socialLinks.map((social) => (
                 <a
                   key={social.name}
-                  href={social.href}
+                  href={social.url}
                   target={social.name === "email" ? undefined : "_blank"}
                   rel={social.name === "email" ? undefined : "noopener noreferrer"}
                   className="group flex items-center justify-between p-4 border border-white/5 rounded-sm bg-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300"
-                  onClick={() => handleSocialClick(social)}
+                  onClick={() => handleSocialClick(social.name, social.url)}
                 >
                   <span className="text-xs uppercase tracking-widest text-gray-400 group-hover:text-accent-400 transition-colors">
                     {social.name}

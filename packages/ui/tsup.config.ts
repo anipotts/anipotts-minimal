@@ -10,6 +10,7 @@ export default defineConfig({
     "context/index": "src/context/index.ts",
     "hooks/index": "src/hooks/index.ts",
     "providers/index": "src/providers/index.ts",
+    "admin/index": "src/admin/index.ts",
   },
   format: ["esm"],
   dts: true,

@@ -1,10 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useAdmin } from "@/context/AdminContext";
-import posthog from "posthog-js";
-import { FaTerminal } from "react-icons/fa";
 
-export default function AdminLoginModal() {
+import { useState, useEffect } from "react";
+import { FaTerminal } from "react-icons/fa";
+import posthog from "posthog-js";
+import { useAdmin } from "./AdminProvider";
+
+/**
+ * Terminal-style login form for the admin overlay.
+ * Matches the macOS terminal aesthetic with blinking cursor and masked input.
+ */
+export function AdminLogin() {
   const { login } = useAdmin();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,14 +29,14 @@ export default function AdminLoginModal() {
     setLoading(true);
     setError("");
 
-    posthog.capture('admin_login_attempted');
+    posthog.capture("admin_login_attempted");
 
     try {
       const res = await login(password);
       if (!res.success) {
         setError(res.error || "ACCESS DENIED");
         setPassword("");
-        posthog.capture('admin_login_failed', { error: res.error });
+        posthog.capture("admin_login_failed", { error: res.error });
       }
     } catch (err) {
       setError("SYSTEM ERROR");
@@ -60,8 +65,12 @@ export default function AdminLoginModal() {
       {/* Terminal Body */}
       <div className="p-6 flex flex-col gap-4 min-h-[200px]">
         <div className="text-xs text-gray-500 leading-relaxed">
-          <p>Last login: {new Date().toLocaleString()} on ttys001</p>
-          <p className="mt-1">Authorized personnel only. All access attempts are logged.</p>
+          <p>
+            Last login: {new Date().toLocaleString()} on ttys001
+          </p>
+          <p className="mt-1">
+            Authorized personnel only. All access attempts are logged.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-2">
@@ -91,7 +100,9 @@ export default function AdminLoginModal() {
                   {"*".repeat(password.length)}
                 </span>
                 {/* Custom cursor */}
-                <span className={`w-2 h-4 bg-gray-500 ml-0.5 ${cursorVisible ? "opacity-100" : "opacity-0"}`} />
+                <span
+                  className={`w-2 h-4 bg-gray-500 ml-0.5 ${cursorVisible ? "opacity-100" : "opacity-0"}`}
+                />
               </div>
             </div>
           </div>
@@ -104,9 +115,7 @@ export default function AdminLoginModal() {
               </span>
             )}
             {error && (
-              <span className="text-xs text-red-500 font-bold">
-                {error}
-              </span>
+              <span className="text-xs text-red-500 font-bold">{error}</span>
             )}
           </div>
         </form>

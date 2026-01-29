@@ -1,5 +1,5 @@
 // Project types
-export type { Project, ProjectCategory } from "./project";
+export type { Project, ProjectCategory, ProjectStatus } from "./project";
 
 // Thought/blog types
 export type { Thought, ThoughtStats } from "./thought";

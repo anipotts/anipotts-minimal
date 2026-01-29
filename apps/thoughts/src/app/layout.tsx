@@ -16,6 +16,7 @@ import {
   Waves,
 } from "@anipotts/ui";
 import { AdminProvider } from "@/context/AdminContext";
+import AdminOverlay from "@/components/AdminOverlay";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -75,6 +76,7 @@ export default function RootLayout({
 
         <PostHogProvider>
           <AdminProvider>
+            <AdminOverlay />
             <WindowProvider>
             <WindowLayoutWrapper>
 

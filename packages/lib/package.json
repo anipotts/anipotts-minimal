@@ -23,6 +23,22 @@
     "./feature-flags": {
       "types": "./dist/feature-flags/index.d.ts",
       "import": "./dist/feature-flags/index.js"
+    },
+    "./data": {
+      "types": "./dist/data/index.d.ts",
+      "import": "./dist/data/index.js"
+    },
+    "./admin": {
+      "types": "./dist/admin/index.d.ts",
+      "import": "./dist/admin/index.js"
+    },
+    "./metrics": {
+      "types": "./dist/metrics/index.d.ts",
+      "import": "./dist/metrics/index.js"
+    },
+    "./status": {
+      "types": "./dist/status/index.d.ts",
+      "import": "./dist/status/index.js"
     }
   },
   "scripts": {
@@ -31,6 +47,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anipotts/types": "workspace:*",
     "@supabase/supabase-js": "^2.86.0",
     "clsx": "^2.1.1",
     "posthog-node": "^5.17.0",

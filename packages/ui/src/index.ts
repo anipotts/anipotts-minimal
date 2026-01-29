@@ -36,3 +36,7 @@ export { useDebounce } from "./hooks";
 // Providers
 export { PostHogProvider } from "./providers";
 export type { PostHogProviderProps } from "./providers";
+
+// Admin
+export { AdminProvider, useAdmin, AdminShell, AdminLogin } from "./admin";
+export type { AdminActions, AdminContextType } from "./admin";
