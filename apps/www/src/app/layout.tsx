@@ -27,48 +27,48 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://anipotts.com'),
+  metadataBase: new URL("https://anipotts.com"),
   title: {
-    default: 'Ani Potts | Software Engineer',
-    template: '%s | Ani Potts',
+    default: "Ani Potts",
+    template: "%s | Ani Potts",
   },
   description:
-    'Ani Potts (Anirudh Pottammal) is a software engineer based in NYC who builds minimal interfaces to orchestrate complex systems. NYU \'26.',
+    "Ani Potts (Anirudh Pottammal) is a software engineer based in NYC who builds minimal interfaces to orchestrate complex systems",
   keywords: [
-    'Ani Potts',
-    'Anirudh Pottammal',
-    'software engineer',
-    'NYC',
-    'developer',
-    'NYU',
+    "Ani Potts",
+    "Anirudh Pottammal",
+    "software engineer",
+    "NYC",
+    "developer",
+    "NYU",
   ],
-  authors: [{ name: 'Ani Potts', url: 'https://anipotts.com' }],
-  creator: 'Ani Potts',
+  authors: [{ name: "Ani Potts", url: "https://anipotts.com" }],
+  creator: "Ani Potts",
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://anipotts.com',
-    siteName: 'Ani Potts',
-    title: 'Ani Potts | Software Engineer',
+    type: "website",
+    locale: "en_US",
+    url: "https://anipotts.com",
+    siteName: "Ani Potts",
+    title: "Ani Potts",
     description:
-      'Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.',
+      "Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: 'Ani Potts - Software Engineer',
+        alt: "Ani Potts",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    creator: '@anipottsbuilds',
-    site: '@anipottsbuilds',
-    title: 'Ani Potts | Software Engineer',
+    card: "summary_large_image",
+    creator: "@anipottsbuilds",
+    site: "@anipottsbuilds",
+    title: "Ani Potts",
     description:
-      'Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.',
-    images: ['/og-image.png'],
+      "Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -76,29 +76,29 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   alternates: {
-    canonical: 'https://anipotts.com',
+    canonical: "https://anipotts.com",
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
   icons: {
     icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Ani Potts',
+    statusBarStyle: "black-translucent",
+    title: "Ani Potts",
   },
   other: {
-    'msapplication-TileColor': '#0a0a0a',
-    'msapplication-config': '/browserconfig.xml',
+    "msapplication-TileColor": "#0a0a0a",
+    "msapplication-config": "/browserconfig.xml",
   },
 };
 
@@ -113,13 +113,12 @@ export default function RootLayout({
         <PersonSchema />
       </head>
       <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
-
         {/* Fixed Background Container */}
         <div className="fixed inset-0 -z-10 min-h-[100svh] bg-background">
           {/* Ambient Background Effects */}
           <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
           <div className="absolute inset-0 z-10 opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
-          
+
           {/* Waves Animation */}
           <div className="hidden md:block absolute inset-0 z-20 opacity-30 pointer-events-none">
             <Waves
@@ -142,10 +141,8 @@ export default function RootLayout({
           <AdminProvider>
             <WindowProvider>
               <WindowLayoutWrapper>
-                
                 {/* Dynamic Window Container */}
                 <WindowContainer>
-                  
                   {/* Terminal Header Bar */}
                   <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
                     <div className="flex items-center gap-2">
@@ -158,9 +155,7 @@ export default function RootLayout({
                   </div>
 
                   {/* Terminal Body with Navbar/Footer handling */}
-                  <WindowInner>
-                    {children}
-                  </WindowInner>
+                  <WindowInner>{children}</WindowInner>
 
                   {/* Terminal Status Bar */}
                   <TerminalStatusBar />
@@ -169,9 +164,8 @@ export default function RootLayout({
                 {/* Collapsed/Minimized States */}
                 <TerminalPromptCentered />
                 <MinimizedPill />
-
               </WindowLayoutWrapper>
-              
+
               <AdminOverlay />
               <SubdomainNavigator />
             </WindowProvider>

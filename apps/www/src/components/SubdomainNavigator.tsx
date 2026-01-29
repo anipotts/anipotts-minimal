@@ -19,10 +19,10 @@ const SUBDOMAINS: SubdomainEntry[] = [
   { name: "dev", url: "https://dev.anipotts.com", desc: "tech stack & tools", status: "production", permissions: "drwxr-xr-x" },
   { name: "links", url: "https://links.anipotts.com", desc: "all my links", status: "production", permissions: "drwxr-xr-x" },
   { name: "updates", url: "https://updates.anipotts.com", desc: "changelog", status: "production", permissions: "drwxr-xr-x" },
-  { name: "metrics", url: "https://metrics.anipotts.com", desc: "engineering stats", status: "static", permissions: "dr-xr-xr-x" },
-  { name: "status", url: "https://status.anipotts.com", desc: "system uptime", status: "static", permissions: "dr-xr-xr-x" },
-  { name: "lab", url: "https://lab.anipotts.com", desc: "experiments", status: "static", permissions: "dr-xr-xr-x" },
-  { name: "docs", url: "https://docs.anipotts.com", desc: "documentation", status: "coming-soon", permissions: "drwx------" },
+  { name: "metrics", url: "https://metrics.anipotts.com", desc: "engineering stats", status: "production", permissions: "drwxr-xr-x" },
+  { name: "status", url: "https://status.anipotts.com", desc: "system uptime", status: "production", permissions: "drwxr-xr-x" },
+  { name: "lab", url: "https://lab.anipotts.com", desc: "experiments", status: "production", permissions: "drwxr-xr-x" },
+  { name: "docs", url: "https://docs.anipotts.com", desc: "documentation", status: "production", permissions: "dr-xr-xr-x" },
   { name: "cli", url: "https://cli.anipotts.com", desc: "terminal interface", status: "coming-soon", permissions: "drwx------" },
 ];
 

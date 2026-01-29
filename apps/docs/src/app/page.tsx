@@ -1,70 +1,125 @@
 import { FadeIn } from "@anipotts/ui";
-import { FaBook, FaCode, FaServer, FaExternalLinkAlt } from "react-icons/fa";
+import { FaBook, FaGithub, FaCubes, FaNetworkWired } from "react-icons/fa";
+import { subdomains, site } from "@anipotts/lib/data";
+import { projects } from "@anipotts/lib/data";
 
-const documentation = [
-  { name: "Quantercise API", description: "REST API for mental math challenges", status: "published", url: "/quantercise" },
-  { name: "ChainedChat Protocol", description: "Multi-agent orchestration spec", status: "draft", url: "/chained" },
-  { name: "Design System", description: "Component library documentation", status: "published", url: "/design" },
-];
-
-const systemDesigns = [
-  { name: "Real-time Scoring", description: "How Quantercise handles live scoring" },
-  { name: "Multi-agent Architecture", description: "ChainedChat's agent handoff system" },
-  { name: "Terminal UI", description: "Building the window state machine" },
-];
+const projectsWithDocs = projects.filter((p) => p.links?.repo);
 
 export default function DocsPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
       <FadeIn>
         <div className="border-b border-white/10 pb-6">
-          <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">Documentation</h1>
-          <p className="text-gray-500 text-sm">API references and system design documents</p>
+          <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
+            Documentation
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Architecture reference for the {site.domain} ecosystem
+          </p>
         </div>
       </FadeIn>
 
+      {/* Ecosystem map */}
       <FadeIn delay={0.1}>
         <div className="space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-gray-500 flex items-center gap-2">
-            <FaBook className="text-accent-400" />
-            API Documentation
+            <FaNetworkWired className="text-accent-400" />
+            Subdomains
           </h2>
-          {documentation.map((doc) => (
-            <a key={doc.name} href={doc.url} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/[0.07] hover:border-accent-400/20 transition-all group">
-              <div>
-                <h3 className="text-white font-medium group-hover:text-accent-400 transition-colors">{doc.name}</h3>
-                <p className="text-gray-500 text-sm">{doc.description}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`text-xs px-2 py-1 rounded ${doc.status === "published" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}`}>
-                  {doc.status}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            {subdomains.map((sub) => (
+              <a
+                key={sub.name}
+                href={sub.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg hover:border-accent-400/20 transition-all group"
+              >
+                <span className="text-accent-400 font-mono text-sm">
+                  {sub.name}
                 </span>
-                <FaExternalLinkAlt className="text-gray-600 group-hover:text-accent-400 transition-colors" />
-              </div>
-            </a>
-          ))}
+                <span className="text-gray-600 text-xs">{sub.desc}</span>
+              </a>
+            ))}
+          </div>
         </div>
       </FadeIn>
 
+      {/* Architecture overview */}
       <FadeIn delay={0.2}>
+        <div className="p-5 bg-white/5 border border-white/10 rounded-lg">
+          <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+            <FaCubes className="text-accent-400" />
+            Architecture
+          </h2>
+          <pre className="text-xs text-gray-400 font-mono overflow-x-auto leading-relaxed">
+{`anipotts.com/
+├── apps/
+│   ├── www          # Main site (anipotts.com)
+│   ├── thoughts     # Blog (thoughts.anipotts.com)
+│   ├── dev          # Tech stack (dev.anipotts.com)
+│   ├── links        # Link tree (links.anipotts.com)
+│   ├── updates      # Changelog (updates.anipotts.com)
+│   ├── metrics      # GitHub + WakaTime stats
+│   ├── status       # Service uptime monitoring
+│   ├── lab          # Experiments & open source
+│   ├── docs         # This page
+│   └── cli          # CLI tools (coming soon)
+├── packages/
+│   ├── ui           # Shared React components
+│   ├── lib          # Business logic & API clients
+│   ├── types        # Shared TypeScript types
+│   ├── config       # Shared configs (Tailwind, ESLint)
+│   └── styles       # Shared CSS (tokens, fonts)
+└── turbo.json       # Turborepo pipeline config`}
+          </pre>
+        </div>
+      </FadeIn>
+
+      {/* Project repos */}
+      <FadeIn delay={0.3}>
         <div className="space-y-3">
           <h2 className="text-xs uppercase tracking-widest text-gray-500 flex items-center gap-2">
-            <FaServer className="text-accent-400" />
-            System Design
+            <FaBook className="text-accent-400" />
+            Project Repos
           </h2>
-          {systemDesigns.map((design) => (
-            <div key={design.name} className="p-4 bg-white/5 border border-white/10 rounded-lg">
-              <h3 className="text-white font-medium">{design.name}</h3>
-              <p className="text-gray-500 text-sm">{design.description}</p>
-            </div>
-          ))}
+          <div className="space-y-2">
+            {projectsWithDocs.map((project) => (
+              <a
+                key={project.slug}
+                href={project.links!.repo!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg hover:border-accent-400/20 transition-all group"
+              >
+                <div>
+                  <span className="text-gray-300 text-sm font-medium group-hover:text-accent-400 transition-colors">
+                    {project.title}
+                  </span>
+                  <span className="text-gray-600 text-xs ml-2">
+                    {project.subtitle}
+                  </span>
+                </div>
+                <FaGithub className="text-gray-600 group-hover:text-accent-400 transition-colors" />
+              </a>
+            ))}
+          </div>
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.3}>
-        <div className="p-5 bg-accent-400/5 border border-accent-400/20 rounded-lg text-center">
-          <FaCode className="text-accent-400 text-2xl mx-auto mb-3" />
-          <p className="text-gray-400 text-sm">Documentation is work in progress. Check back soon!</p>
+      <FadeIn delay={0.4}>
+        <div className="text-center pt-4 border-t border-white/5">
+          <p className="text-xs text-gray-600">
+            Full documentation coming soon • Source on{" "}
+            <a
+              href={`https://github.com/${site.github}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent-400 hover:underline"
+            >
+              GitHub
+            </a>
+          </p>
         </div>
       </FadeIn>
     </div>

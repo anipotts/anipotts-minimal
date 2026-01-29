@@ -1,4 +1,5 @@
 export type ProjectCategory = "ai" | "product" | "quant" | "music" | "other";
+export type ProjectStatus = "live" | "in-progress" | "coming-soon";
 
 export interface Project {
   slug: string;
@@ -10,8 +11,12 @@ export interface Project {
   role: string;
   duration: string;
   tags: string[];
+  status?: ProjectStatus;
+  featured?: boolean;
+  icon?: "chrome";
   links?: {
     live?: string;
     repo?: string;
+    page?: string;
   };
 }
