@@ -2,27 +2,30 @@
 
 import { useState, useEffect, useMemo } from "react";
 
-export default function TerminalHeaderTitle() {
-  const text = "ani@potts:~/anipotts.com";
+export interface TerminalHeaderTitleProps {
+  defaultTitle?: string;
+}
+
+export function TerminalHeaderTitle({ defaultTitle = "ani@potts:~/anipotts.com" }: TerminalHeaderTitleProps) {
   const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      setDisplayedText(text.substring(0, index + 1));
+      setDisplayedText(defaultTitle.substring(0, index + 1));
       index++;
-      if (index === text.length) {
+      if (index === defaultTitle.length) {
         clearInterval(interval);
       }
     }, 30);
     return () => clearInterval(interval);
-  }, [text]);
+  }, [defaultTitle]);
 
   // Split at "~/" so the prefix (ani@potts:) can be hidden on mobile
   const splitIndex = useMemo(() => {
-    const idx = text.indexOf("~/");
+    const idx = defaultTitle.indexOf("~/");
     return idx > 0 ? idx : 0;
-  }, [text]);
+  }, [defaultTitle]);
 
   const displayedPrefix = displayedText.substring(0, Math.min(displayedText.length, splitIndex));
   const displayedPath = displayedText.substring(splitIndex);

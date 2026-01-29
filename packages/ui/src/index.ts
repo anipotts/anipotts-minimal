@@ -5,12 +5,17 @@ export {
   WindowLayoutWrapper,
   TerminalPromptCentered,
   MinimizedPill,
+  WindowInner,
+  TerminalHeaderTitle,
+  TerminalStatusBar,
 } from "./components/window";
 export type {
   WindowContainerProps,
   WindowLayoutWrapperProps,
   TerminalPromptCenteredProps,
   MinimizedPillProps,
+  WindowInnerProps,
+  TerminalHeaderTitleProps,
 } from "./components/window";
 
 // Animation components

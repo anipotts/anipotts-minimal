@@ -152,7 +152,7 @@ export default function RootLayout({
                       <TerminalHeaderTitle />
                     </div>
                     <div className="text-[10px] md:text-xs text-gray-600 font-mono">
-                      zsh • v3.0.1
+                      zsh<span className="hidden md:inline"> • v3.0.1</span>
                     </div>
                   </div>
 

@@ -46,7 +46,7 @@ export default function RootLayout({
           <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
           <div className="absolute inset-0 z-10 opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
           <div className="hidden md:block absolute inset-0 z-20 opacity-30 pointer-events-none">
-            <Waves lineColor="rgba(167, 139, 250, 0.96)" backgroundColor="transparent" waveSpeedX={0.02} waveSpeedY={0.01} waveAmpX={40} waveAmpY={20} friction={0.9} tension={0.01} maxCursorMove={120} xGap={12} yGap={36} />
+            <Waves lineColor="rgba(97, 171, 234, 0.96)" backgroundColor="transparent" waveSpeedX={0.02} waveSpeedY={0.01} waveAmpX={40} waveAmpY={20} friction={0.9} tension={0.01} maxCursorMove={120} xGap={12} yGap={36} />
           </div>
         </div>
 
@@ -57,9 +57,9 @@ export default function RootLayout({
                 <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
                   <div className="flex items-center gap-2">
                     <WindowControls />
-                    <TerminalHeaderTitle defaultTitle="status.anipotts.com" />
+                    <TerminalHeaderTitle defaultTitle="ani@potts:~/status.anipotts.com" />
                   </div>
-                  <div className="text-[10px] md:text-xs text-gray-600 font-mono">zsh</div>
+                  <div className="text-[10px] md:text-xs text-gray-600 font-mono">zsh<span className="hidden md:inline"> • v3.0.1</span></div>
                 </div>
                 <WindowInner showNavbar={false} showFooter={false}>{children}</WindowInner>
                 <TerminalStatusBar />

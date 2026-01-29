@@ -11,3 +11,11 @@ export type { TerminalPromptCenteredProps } from "./TerminalPromptCentered";
 
 export { MinimizedPill } from "./MinimizedPill";
 export type { MinimizedPillProps } from "./MinimizedPill";
+
+export { WindowInner } from "./WindowInner";
+export type { WindowInnerProps } from "./WindowInner";
+
+export { TerminalHeaderTitle } from "./TerminalHeaderTitle";
+export type { TerminalHeaderTitleProps } from "./TerminalHeaderTitle";
+
+export { TerminalStatusBar } from "./TerminalStatusBar";
