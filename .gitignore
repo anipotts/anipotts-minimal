@@ -10,3 +10,5 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .vercel
+.turbo
+next-env.d.ts

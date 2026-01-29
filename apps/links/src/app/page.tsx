@@ -60,8 +60,7 @@ export default function LinksPage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg hover:border-accent-400/20 transition-all"
               >
-                <span className="text-gray-300 text-sm">{project.name}</span>
-                <span className="text-gray-600 text-xs">{project.description}</span>
+                <span className="text-gray-300 text-sm">{project.name} {project.description}</span>
               </a>
             ))}
           </div>

@@ -58,7 +58,7 @@ export default function RootLayout({
           {/* Waves Animation */}
           <div className="hidden md:block absolute inset-0 z-20 opacity-30 pointer-events-none">
             <Waves
-              lineColor="rgba(167, 139, 250, 0.96)"
+              lineColor="rgba(97, 171, 234, 0.96)"
               backgroundColor="transparent"
               waveSpeedX={0.02}
               waveSpeedY={0.01}
@@ -85,10 +85,10 @@ export default function RootLayout({
                 <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
                   <div className="flex items-center gap-2">
                     <WindowControls />
-                    <TerminalHeaderTitle defaultTitle="thoughts.anipotts.com" />
+                    <TerminalHeaderTitle defaultTitle="ani@potts:~/thoughts.anipotts.com" />
                   </div>
                   <div className="text-[10px] md:text-xs text-gray-600 font-mono">
-                    zsh
+                    zsh<span className="hidden md:inline"> • v3.0.1</span>
                   </div>
                 </div>
 

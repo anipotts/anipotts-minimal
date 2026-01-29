@@ -69,7 +69,7 @@ body {
 }
 
 .prose a {
-  color: #a78bfa;
+  color: #61abea;
   text-decoration: none;
 }
 
@@ -91,7 +91,7 @@ body {
 }
 
 .prose blockquote {
-  border-left-color: #a78bfa;
+  border-left-color: #61abea;
   color: #9ca3af;
 }
 
@@ -140,12 +140,12 @@ body {
 
 .ql-snow .ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-  stroke: #a78bfa !important;
+  stroke: #61abea !important;
 }
 
 .ql-snow .ql-toolbar button:hover .ql-fill,
 .ql-snow .ql-toolbar button.ql-active .ql-fill {
-  fill: #a78bfa !important;
+  fill: #61abea !important;
 }
 
 .ql-snow .ql-picker-options {
@@ -161,5 +161,5 @@ body {
 
 .ql-snow .ql-picker-item:hover,
 .ql-snow .ql-picker-item.ql-selected {
-  color: #a78bfa !important;
+  color: #61abea !important;
 }
