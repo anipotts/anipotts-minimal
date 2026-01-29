@@ -18,6 +18,7 @@ import WindowLayoutWrapper from "@/components/window/WindowLayoutWrapper";
 import TerminalHeaderTitle from "@/components/window/TerminalHeaderTitle";
 import TerminalStatusBar from "@/components/window/TerminalStatusBar";
 import PersonSchema from "@/components/PersonSchema";
+import SubdomainNavigator from "@/components/SubdomainNavigator";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -172,6 +173,7 @@ export default function RootLayout({
               </WindowLayoutWrapper>
               
               <AdminOverlay />
+              <SubdomainNavigator />
             </WindowProvider>
           </AdminProvider>
         </PostHogProvider>
