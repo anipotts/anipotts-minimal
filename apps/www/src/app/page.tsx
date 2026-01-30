@@ -42,12 +42,12 @@ export default async function Home() {
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
           <FadeIn delay={0.1}>
-            <h1 className="text-3xl md:text-4xl font-bold font-heading text-gray-100">
+            <h1 className="text-3xl md:text-4xl font-bold font-heading text-heading">
               hi, i'm ani potts.
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
+            <p className="text-lg md:text-xl text-tertiary leading-relaxed">
               i'm a SWE based in NYC, who builds minimal interfaces to orchestrate complex systems.
             </p>
           </FadeIn>
@@ -63,7 +63,7 @@ export default async function Home() {
             </span>
           </FadeIn>
         </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-6 text-gray-300 leading-relaxed">
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-6 text-secondary leading-relaxed">
           <FadeIn delay={0.4}>
             <p>
               Right now, I'm building an investment research platform for <CompanyLink href="https://www.pgiuchicago.com/" companyName="PGI">PGI</CompanyLink>, serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
@@ -71,7 +71,7 @@ export default async function Home() {
           </FadeIn>
           <FadeIn delay={0.5}>
             <p>
-              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/" companyName="Atlantic Records">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/" companyName="Range Media Partners">Range Media Partners</CompanyLink>, and launched several profitable <a href="#selected-work" className="text-gray-200 hover:text-accent-400 font-medium underline decoration-white/30 underline-offset-4 transition-colors">PWAs</a> (see below).
+              Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/" companyName="Atlantic Records">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/" companyName="Range Media Partners">Range Media Partners</CompanyLink>, and launched several profitable <a href="#selected-work" className="text-body hover:text-accent-400 font-medium underline decoration-overlay-30 underline-offset-4 transition-colors">PWAs</a> (see below).
             </p>
           </FadeIn>
         </div>
@@ -113,7 +113,7 @@ export default async function Home() {
             ))
           ) : (
             <FadeIn delay={1.1}>
-              <p className="text-gray-500 font-mono text-sm italic">
+              <p className="text-muted font-mono text-sm italic">
                 // no thoughts published yet
               </p>
             </FadeIn>

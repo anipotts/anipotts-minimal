@@ -25,10 +25,10 @@ export default function ThoughtLink({ thought }: { thought: Thought }) {
     <Link href={`/thoughts/${thought.slug}`} className="group block" onClick={handleClick}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-baseline">
         <div className="md:col-span-2 flex flex-col gap-2">
-          <h2 className="text-xl font-bold text-gray-200 group-hover:text-accent-400 transition-colors">
+          <h2 className="text-xl font-bold text-body group-hover:text-accent-400 transition-colors">
             {thought.title}
           </h2>
-          <p className="text-gray-400 leading-relaxed line-clamp-2 text-sm md:text-base">
+          <p className="text-tertiary leading-relaxed line-clamp-2 text-sm md:text-base">
             {thought.summary}
           </p>
           {thought.tags && (
@@ -42,7 +42,7 @@ export default function ThoughtLink({ thought }: { thought: Thought }) {
           )}
         </div>
         <div className="md:col-span-1 md:text-right flex flex-col md:items-end gap-1">
-          <span className="text-xs text-gray-500 uppercase tracking-wide">
+          <span className="text-xs text-muted uppercase tracking-wide">
             {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </span>
           <ViewCounter slug={thought.slug} initialViews={thought.views} />

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anipotts/lib": "workspace:*",
+    "@anipotts/styles": "workspace:^",
     "@anipotts/types": "workspace:*",
     "@anipotts/ui": "workspace:*",
     "clsx": "^2.1.1",

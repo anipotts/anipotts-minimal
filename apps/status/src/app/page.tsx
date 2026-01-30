@@ -84,7 +84,7 @@ export default async function StatusPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-3xl mx-auto">
       <FadeIn>
-        <div className="flex items-center justify-between border-b border-white/10 pb-6">
+        <div className="flex items-center justify-between border-b border-border pb-6">
           <div>
             <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
               System Status
@@ -108,10 +108,10 @@ export default async function StatusPage() {
             </div>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+            <span className="text-[10px] text-muted uppercase tracking-wider">
               Last Checked
             </span>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-tertiary">
               {formatRelativeTime(lastChecked)}
             </p>
           </div>
@@ -121,27 +121,27 @@ export default async function StatusPage() {
       <div className="space-y-3">
         {services.map((service, i) => (
           <FadeIn key={service.serviceUrl} delay={i * 0.04}>
-            <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/[0.07] transition-colors">
+            <div className="flex items-center justify-between p-4 bg-input border border-border rounded-lg hover:bg-overlay-10 transition-colors">
               <div className="flex items-center gap-3">
-                <FaGlobe className="text-gray-500 flex-shrink-0" />
+                <FaGlobe className="text-muted flex-shrink-0" />
                 <div className="flex flex-col">
-                  <span className="text-gray-200 text-sm">
+                  <span className="text-body text-sm">
                     {service.serviceName}
                   </span>
                   {service.responseTimeMs > 0 && (
-                    <span className="text-[10px] text-gray-600 font-mono">
+                    <span className="text-[10px] text-faint font-mono">
                       {service.responseTimeMs}ms
                     </span>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-xs text-gray-500 hidden md:inline">
+                <span className="text-xs text-muted hidden md:inline">
                   {service.uptime24h}%
-                  <span className="text-gray-700 mx-1">·</span>
+                  <span className="text-faint mx-1">·</span>
                   7d: {service.uptime7d}%
                 </span>
-                <span className="text-xs text-gray-500 md:hidden">
+                <span className="text-xs text-muted md:hidden">
                   {service.uptime24h}%
                 </span>
                 {service.isUp ? (
@@ -162,8 +162,8 @@ export default async function StatusPage() {
       </div>
 
       <FadeIn delay={0.5}>
-        <div className="text-center pt-8 border-t border-white/5">
-          <p className="text-xs text-gray-600">
+        <div className="text-center pt-8 border-t border-border-subtle">
+          <p className="text-xs text-faint">
             HTTP health checks every 5 minutes • {monitoredCount} services
             monitored
           </p>

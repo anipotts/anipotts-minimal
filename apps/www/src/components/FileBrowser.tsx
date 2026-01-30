@@ -146,16 +146,16 @@ export default function FileBrowser({ isOpen, onClose }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute bottom-full right-0 mb-2 mx-4 md:mx-0 md:right-4 md:left-auto md:w-80 z-50 bg-black border border-white/10 rounded-md shadow-2xl overflow-hidden"
+          className="absolute bottom-full right-0 mb-2 mx-4 md:mx-0 md:right-4 md:left-auto md:w-80 z-50 bg-card border border-border rounded-md shadow-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 bg-white/5">
-            <span className="text-[10px] text-gray-500 font-mono">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle bg-input">
+            <span className="text-[10px] text-muted font-mono">
               ~/anipotts.com
             </span>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-300 transition-colors text-xs"
+              className="text-muted hover:text-secondary transition-colors text-xs"
               aria-label="Close"
             >
               [×]
@@ -169,25 +169,25 @@ export default function FileBrowser({ isOpen, onClose }: Props) {
                 {SECRET_MESSAGE}
               </pre>
             ) : output ? (
-              <div className="text-gray-400">{output}</div>
+              <div className="text-tertiary">{output}</div>
             ) : (
               <div className="flex flex-col gap-0.5">
                 {FILE_STRUCTURE.map((file) => (
                   <button
                     key={file.name}
                     onClick={() => handleFileClick(file)}
-                    className={`flex items-center gap-2 text-left hover:bg-white/5 px-1 py-0.5 rounded transition-colors ${
+                    className={`flex items-center gap-2 text-left hover:bg-input px-1 py-0.5 rounded transition-colors ${
                       file.path === pathname
                         ? "text-accent-400"
                         : file.secret
-                        ? "text-gray-600"
-                        : "text-gray-400"
+                        ? "text-faint"
+                        : "text-tertiary"
                     }`}
                   >
-                    <span className="text-gray-600 text-[9px] w-20">
+                    <span className="text-faint text-[9px] w-20">
                       {file.type === "dir" ? "drwxr-xr-x" : "-rw-r--r--"}
                     </span>
-                    <span className="text-gray-600 text-[9px]">ani</span>
+                    <span className="text-faint text-[9px]">ani</span>
                     <span
                       className={file.type === "dir" ? "text-accent-400" : ""}
                     >
@@ -205,7 +205,7 @@ export default function FileBrowser({ isOpen, onClose }: Props) {
           {/* Command Input */}
           <form
             onSubmit={handleSubmit}
-            className="border-t border-white/5 px-3 py-2"
+            className="border-t border-border-subtle px-3 py-2"
           >
             <div className="flex items-center gap-1 text-xs font-mono">
               <span className="text-accent-400">&gt;</span>
@@ -214,7 +214,7 @@ export default function FileBrowser({ isOpen, onClose }: Props) {
                 type="text"
                 value={command}
                 onChange={(e) => setCommand(e.target.value)}
-                className="flex-1 bg-transparent text-gray-300 outline-none placeholder:text-gray-600"
+                className="flex-1 bg-transparent text-secondary outline-none placeholder:text-faint"
                 placeholder="cd, ls, cat .secret"
                 autoComplete="off"
                 spellCheck={false}

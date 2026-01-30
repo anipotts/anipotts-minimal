@@ -39,7 +39,8 @@
     "./admin": {
       "types": "./dist/admin/index.d.ts",
       "import": "./dist/admin/index.js"
-    }
+    },
+    "./server": "./src/server/index.ts"
   },
   "scripts": {
     "build": "tsup",

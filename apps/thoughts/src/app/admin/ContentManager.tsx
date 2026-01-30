@@ -107,10 +107,10 @@ export default function ContentManager() {
   );
 
   return (
-    <div className="flex h-[75vh] border border-white/10 rounded-xl overflow-hidden bg-black/40 backdrop-blur-sm">
+    <div className="flex h-[75vh] border border-border rounded-xl overflow-hidden bg-[rgba(var(--overlay-invert),0.4)] backdrop-blur-sm">
       {/* Sidebar */}
-      <div className="w-64 border-r border-white/10 flex flex-col bg-black/20">
-        <div className="p-4 border-b border-white/10 flex flex-col gap-3">
+      <div className="w-64 border-r border-border flex flex-col bg-[rgba(var(--overlay-invert),0.2)]">
+        <div className="p-4 border-b border-border flex flex-col gap-3">
           <button
             onClick={startNew}
             className="w-full bg-accent-400/10 hover:bg-accent-400/20 text-accent-400 border border-accent-400/20 py-2 rounded text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
@@ -118,9 +118,9 @@ export default function ContentManager() {
             <FaPlus /> New Thought
           </button>
           <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs" />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-faint text-xs" />
             <input
-              className="w-full bg-black/40 border border-white/10 rounded py-1.5 pl-8 pr-2 text-xs text-gray-300 focus:border-accent-400/50 focus:outline-none"
+              className="w-full bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded py-1.5 pl-8 pr-2 text-xs text-secondary focus:border-accent-400/50 focus:outline-none"
               placeholder="Search..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -133,15 +133,15 @@ export default function ContentManager() {
             <div
               key={thought.id}
               onClick={() => setEditing(thought)}
-              className={`p-3 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors ${editing?.id === thought.id ? "bg-white/10 border-l-2 border-l-accent-400" : "border-l-2 border-l-transparent"}`}
+              className={`p-3 border-b border-border-subtle cursor-pointer hover:bg-input transition-colors ${editing?.id === thought.id ? "bg-overlay-10 border-l-2 border-l-accent-400" : "border-l-2 border-l-transparent"}`}
             >
               <div className="flex justify-between items-start mb-1">
-                <h4 className={`text-xs font-bold truncate pr-2 ${editing?.id === thought.id ? "text-white" : "text-gray-400"}`}>
+                <h4 className={`text-xs font-bold truncate pr-2 ${editing?.id === thought.id ? "text-white" : "text-tertiary"}`}>
                   {thought.title || "Untitled"}
                 </h4>
                 {thought.published && <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />}
               </div>
-              <div className="flex justify-between items-center text-[10px] text-gray-600 font-mono">
+              <div className="flex justify-between items-center text-[10px] text-faint font-mono">
                 <span className="truncate max-w-[100px]">{thought.slug}</span>
                 <span>{new Date(thought.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
               </div>
@@ -151,21 +151,21 @@ export default function ContentManager() {
       </div>
 
       {/* Main Editor Area */}
-      <div className="flex-grow flex flex-col bg-[#050505]">
+      <div className="flex-grow flex flex-col bg-card-darker">
         {editing ? (
           <>
             {/* Editor Header */}
-            <div className="h-14 border-b border-white/10 flex items-center justify-between px-6 bg-white/5">
+            <div className="h-14 border-b border-border flex items-center justify-between px-6 bg-input">
               <div className="flex items-center gap-4 flex-grow">
                 <div className="flex flex-col w-full">
                   <input
-                    className="bg-transparent text-sm font-bold text-white focus:outline-none w-full placeholder-gray-600"
+                    className="bg-transparent text-sm font-bold text-white focus:outline-none w-full placeholder-faint"
                     placeholder="Thought Title"
                     value={editing.title}
                     onChange={e => setEditing({ ...editing, title: e.target.value, slug: !editing.id ? e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') : editing.slug })}
                   />
                   <input
-                    className="bg-transparent text-xs text-gray-400 focus:outline-none w-full placeholder-gray-700 mt-1 font-mono"
+                    className="bg-transparent text-xs text-tertiary focus:outline-none w-full placeholder-faint mt-1 font-mono"
                     placeholder="Subtext / Summary (displayed under title)"
                     value={editing.summary || ""}
                     onChange={e => setEditing({ ...editing, summary: e.target.value })}
@@ -174,13 +174,13 @@ export default function ContentManager() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 mr-4">
-                  <span className={`text-[10px] uppercase tracking-wider ${unsavedChanges ? "text-yellow-500" : "text-gray-600"}`}>
+                  <span className={`text-[10px] uppercase tracking-wider ${unsavedChanges ? "text-yellow-500" : "text-faint"}`}>
                     {unsavedChanges ? "Unsaved" : "Saved"}
                   </span>
                 </div>
                 <button
                   onClick={() => handleDelete()}
-                  className="p-2 text-gray-500 hover:text-red-400 transition-colors"
+                  className="p-2 text-muted hover:text-red-400 transition-colors"
                   title="Delete"
                 >
                   <FaTrash />
@@ -188,7 +188,7 @@ export default function ContentManager() {
                 <button
                   onClick={(e) => handleSave(e)}
                   disabled={loading}
-                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded text-xs font-mono uppercase tracking-wider flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="bg-overlay-10 hover:bg-overlay-20 text-white px-4 py-1.5 rounded text-xs font-mono uppercase tracking-wider flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <FaSave /> {loading ? "Saving..." : "Save"}
                 </button>
@@ -196,9 +196,9 @@ export default function ContentManager() {
             </div>
 
             {/* Metadata Bar */}
-            <div className="px-6 py-3 border-b border-white/10 flex gap-4 items-center bg-black/20 flex-wrap">
+            <div className="px-6 py-3 border-b border-border flex gap-4 items-center bg-[rgba(var(--overlay-invert),0.2)] flex-wrap">
               <div className="flex items-center gap-2 min-w-[200px]">
-                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Slug:</span>
+                <span className="text-[10px] text-muted uppercase tracking-widest font-mono">Slug:</span>
                 <input
                   className="bg-transparent text-xs text-accent-400 font-mono focus:outline-none flex-grow"
                   value={editing.slug}
@@ -207,14 +207,14 @@ export default function ContentManager() {
                 />
               </div>
 
-              <div className="w-px h-4 bg-white/10" />
+              <div className="w-px h-4 bg-border" />
 
               {/* Tags Input */}
               <div className="flex items-center gap-2 flex-grow">
-                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Tags:</span>
+                <span className="text-[10px] text-muted uppercase tracking-widest font-mono">Tags:</span>
                 <div className="flex flex-wrap gap-2 items-center">
                   {(Array.isArray(editing.tags) ? editing.tags : []).map((tag: string) => (
-                    <span key={tag} className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded text-[10px] font-mono flex items-center gap-1">
+                    <span key={tag} className="bg-overlay-10 text-secondary px-1.5 py-0.5 rounded text-[10px] font-mono flex items-center gap-1">
                       {tag}
                       <button
                         onClick={() => setEditing({ ...editing, tags: editing.tags.filter((t: string) => t !== tag) })}
@@ -225,7 +225,7 @@ export default function ContentManager() {
                     </span>
                   ))}
                   <input
-                    className="bg-transparent text-xs text-gray-400 font-mono focus:outline-none min-w-[60px]"
+                    className="bg-transparent text-xs text-tertiary font-mono focus:outline-none min-w-[60px]"
                     placeholder="Add tag..."
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -244,7 +244,7 @@ export default function ContentManager() {
                 </div>
               </div>
 
-              <div className="w-px h-4 bg-white/10" />
+              <div className="w-px h-4 bg-border" />
 
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -253,7 +253,7 @@ export default function ContentManager() {
                   onChange={e => setEditing({ ...editing, published: e.target.checked })}
                   className="accent-accent-400"
                 />
-                <span className={`text-[10px] uppercase tracking-widest font-mono ${editing.published ? "text-green-400" : "text-gray-500"}`}>
+                <span className={`text-[10px] uppercase tracking-widest font-mono ${editing.published ? "text-green-400" : "text-muted"}`}>
                   {editing.published ? "Published" : "Draft"}
                 </span>
               </label>
@@ -268,9 +268,9 @@ export default function ContentManager() {
             </div>
           </>
         ) : (
-          <div className="flex-grow flex flex-col items-center justify-center text-gray-600 gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-2xl">
-              <FaCircle className="text-gray-700" />
+          <div className="flex-grow flex flex-col items-center justify-center text-faint gap-4">
+            <div className="w-16 h-16 rounded-full bg-input flex items-center justify-center text-2xl">
+              <FaCircle className="text-faint" />
             </div>
             <p className="font-mono text-xs uppercase tracking-widest">Select a thought or create new</p>
           </div>

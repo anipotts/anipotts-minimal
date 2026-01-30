@@ -33,13 +33,13 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh]">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
-        <h1 className="text-2xl font-bold font-heading text-gray-100">Admin Access</h1>
+        <h1 className="text-2xl font-bold font-heading text-heading">Admin Access</h1>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="bg-white/5 border border-white/10 p-2 rounded text-gray-200 focus:border-accent-400 outline-none"
+          className="bg-input border border-border p-2 rounded text-body focus:border-accent-400 outline-none"
         />
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button type="submit" className="bg-accent-400 text-black font-bold py-2 rounded hover:bg-accent-400/90 transition-colors">

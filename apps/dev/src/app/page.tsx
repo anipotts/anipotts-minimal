@@ -52,11 +52,11 @@ export default async function DevPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
       <FadeIn>
-        <div className="border-b border-white/10 pb-6">
+        <div className="border-b border-border pb-6">
           <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
             Development Setup
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted text-sm">
             The tools and technologies I use daily
           </p>
         </div>
@@ -64,12 +64,12 @@ export default async function DevPage() {
 
       {/* Language breakdown from GitHub */}
       <FadeIn delay={0.05}>
-        <div className="p-5 bg-white/5 border border-white/10 rounded-lg">
-          <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+        <div className="p-5 bg-input border border-border rounded-lg">
+          <h2 className="text-xs uppercase tracking-widest text-muted mb-4 flex items-center gap-2">
             <FaCode className="text-accent-400" />
             Languages
             {languages && (
-              <span className="text-gray-700 font-normal">
+              <span className="text-faint font-normal">
                 — {languages.repoCount} repos
               </span>
             )}
@@ -101,8 +101,8 @@ export default async function DevPage() {
                       className="w-2.5 h-2.5 rounded-full shrink-0"
                       style={{ backgroundColor: lang.color }}
                     />
-                    <span className="text-sm text-gray-300">{lang.name}</span>
-                    <span className="text-xs text-gray-600 font-mono">
+                    <span className="text-sm text-secondary">{lang.name}</span>
+                    <span className="text-xs text-faint font-mono">
                       {lang.percentage}%
                     </span>
                   </div>
@@ -110,7 +110,7 @@ export default async function DevPage() {
               </div>
 
               {/* Total code size */}
-              <p className="text-[10px] text-gray-700 mt-3 font-mono">
+              <p className="text-[10px] text-faint mt-3 font-mono">
                 {formatBytes(languages.totalBytes)} total across public repos
               </p>
             </>
@@ -119,7 +119,7 @@ export default async function DevPage() {
               {["TypeScript", "Python", "Go", "Rust"].map((lang) => (
                 <span
                   key={lang}
-                  className="px-3 py-1.5 bg-black/40 border border-white/10 rounded text-sm text-gray-300"
+                  className="px-3 py-1.5 bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded text-sm text-secondary"
                 >
                   {lang}
                 </span>
@@ -133,8 +133,8 @@ export default async function DevPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {categories.map((category, i) => (
           <FadeIn key={category.name} delay={0.1 + i * 0.08}>
-            <div className="p-5 bg-white/5 border border-white/10 rounded-lg hover:border-accent-400/20 transition-colors">
-              <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+            <div className="p-5 bg-input border border-border rounded-lg hover:border-accent-400/20 transition-colors">
+              <h2 className="text-xs uppercase tracking-widest text-muted mb-4 flex items-center gap-2">
                 <category.icon className="text-accent-400" />
                 {category.name}
               </h2>
@@ -142,7 +142,7 @@ export default async function DevPage() {
                 {category.items.map((item) => (
                   <span
                     key={item}
-                    className="px-3 py-1.5 bg-black/40 border border-white/10 rounded text-sm text-gray-300 hover:border-accent-400/30 hover:text-white transition-colors"
+                    className="px-3 py-1.5 bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded text-sm text-secondary hover:border-accent-400/30 hover:text-white transition-colors"
                   >
                     {item}
                   </span>
@@ -158,7 +158,7 @@ export default async function DevPage() {
           <h2 className="text-xs uppercase tracking-widest text-accent-400 mb-3">
             Terminal Config
           </h2>
-          <pre className="text-xs text-gray-400 font-mono overflow-x-auto">
+          <pre className="text-xs text-tertiary font-mono overflow-x-auto">
 {`# ~/.zshrc
 export EDITOR="nvim"
 alias c="claude"

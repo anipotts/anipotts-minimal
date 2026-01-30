@@ -6,6 +6,11 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
+          darker: "var(--card-darker)",
+        },
         accent: {
           DEFAULT: "#61ABEA", // ani-blue
           400: "#61ABEA",
@@ -14,8 +19,29 @@ export default {
           green: "#4ade80", // green-400
           red: "#ef4444",   // red-500
         },
-        card: "var(--card)",
-        "card-foreground": "var(--card-foreground)",
+        border: {
+          DEFAULT: "var(--border)",
+          subtle: "var(--border-subtle)",
+        },
+        ring: {
+          DEFAULT: "var(--ring)",
+        },
+        input: "var(--input-bg)",
+        heading: "var(--text-heading)",
+        body: "var(--text-body)",
+        secondary: "var(--text-secondary)",
+        tertiary: "var(--text-tertiary)",
+        muted: {
+          DEFAULT: "var(--text-muted)",
+          foreground: "var(--text-faint)",
+        },
+        faint: "var(--text-faint)",
+        overlay: {
+          5: "rgba(var(--overlay-base), 0.05)",
+          10: "rgba(var(--overlay-base), 0.10)",
+          20: "rgba(var(--overlay-base), 0.20)",
+          30: "rgba(var(--overlay-base), 0.30)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-mono)", "monospace"],

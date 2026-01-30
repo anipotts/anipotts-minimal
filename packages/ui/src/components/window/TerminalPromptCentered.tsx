@@ -57,21 +57,21 @@ export function TerminalPromptCentered({
             onClick={() => setWindowState("open")}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="pointer-events-auto group whitespace-nowrap relative flex items-center gap-3 px-6 py-3 bg-black/80 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl hover:bg-black/90 hover:border-white/20 transition-all w-[80%] md:w-[350px] justify-center"
+            className="pointer-events-auto group whitespace-nowrap relative flex items-center gap-3 px-6 py-3 bg-[rgba(var(--overlay-invert),0.8)] backdrop-blur-md border border-border rounded-xl shadow-2xl hover:bg-[rgba(var(--overlay-invert),0.9)] hover:border-overlay-20 transition-all w-[80%] md:w-[350px] justify-center"
             aria-label="Reopen interface"
           >
-            <div className="flex items-center gap-2 text-sm font-mono text-gray-400 group-hover:text-gray-200 transition-colors">
+            <div className="flex items-center gap-2 text-sm font-mono text-tertiary group-hover:text-body transition-colors">
               <span className="text-green-500">{promptPrefix}</span>
               <span> {promptText}</span>
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                className="w-1 h-4 bg-gray-400 block"
+                className="w-1 h-4 bg-tertiary block"
               />
             </div>
 
             {/* Hover Glow Effect */}
-            <div className="absolute inset-0 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity blur-md -z-10" />
+            <div className="absolute inset-0 rounded-full bg-overlay-5 opacity-0 group-hover:opacity-100 transition-opacity blur-md -z-10" />
           </button>
         </motion.div>
       )}

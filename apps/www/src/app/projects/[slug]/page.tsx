@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <FadeIn>
             <Link
               href="/work"
-              className="text-xs font-mono text-gray-500 hover:text-accent-400 transition-colors"
+              className="text-xs font-mono text-muted hover:text-accent-400 transition-colors"
             >
               ← back to work
             </Link>
@@ -47,14 +47,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
           <FadeIn delay={0.1}>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-100">{project.title}</h1>
+              <h1 className="text-2xl font-bold text-heading">{project.title}</h1>
               {project.status === "live" && (
                 <span className="text-[9px] uppercase tracking-wider text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded font-medium">
                   live
                 </span>
               )}
             </div>
-            <p className="text-gray-400 text-sm mt-2">{project.subtitle}</p>
+            <p className="text-tertiary text-sm mt-2">{project.subtitle}</p>
           </FadeIn>
 
           <FadeIn delay={0.2}>
@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[10px] uppercase tracking-wider text-gray-500 bg-white/5 px-2 py-1 rounded-sm"
+                  className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
                 >
                   {tag}
                 </span>
@@ -87,7 +87,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   href={project.links.repo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-200 hover:underline decoration-white/30 underline-offset-4"
+                  className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
                 >
                   ./view_source.git
                 </a>
@@ -108,7 +108,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
         <div className="col-span-1 md:col-span-3">
           <FadeIn delay={0.5}>
-            <p className="text-sm text-gray-300 leading-relaxed max-w-2xl">
+            <p className="text-sm text-secondary leading-relaxed max-w-2xl">
               {content?.overview || project.description}
             </p>
           </FadeIn>
@@ -128,11 +128,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
             {content.technical.map((section, i) => (
               <FadeIn key={section.title} delay={0.7 + i * 0.1}>
-                <div className="border-l border-white/10 pl-4">
-                  <h3 className="text-sm font-medium text-gray-200 mb-2">
+                <div className="border-l border-border pl-4">
+                  <h3 className="text-sm font-medium text-body mb-2">
                     {section.title}
                   </h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">
+                  <p className="text-sm text-tertiary leading-relaxed">
                     {section.content}
                   </p>
                 </div>
@@ -163,12 +163,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                           ? "text-green-500 bg-green-500/10"
                           : item.status === "in-progress"
                           ? "text-yellow-500 bg-yellow-500/10"
-                          : "text-gray-500 bg-gray-500/10"
+                          : "text-muted bg-gray-500/10"
                       }`}
                     >
                       {item.status === "done" ? "✓" : item.status === "in-progress" ? "→" : "○"}
                     </span>
-                    <span className={item.status === "done" ? "text-gray-500" : "text-gray-300"}>
+                    <span className={item.status === "done" ? "text-muted" : "text-secondary"}>
                       {item.text}
                     </span>
                   </div>
@@ -196,7 +196,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   <Link
                     key={thought.slug}
                     href={`/thoughts/${thought.slug}`}
-                    className="text-sm text-gray-400 hover:text-accent-400 transition-colors"
+                    className="text-sm text-tertiary hover:text-accent-400 transition-colors"
                   >
                     → {thought.title}
                   </Link>
