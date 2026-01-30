@@ -2,15 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-// Initialize Supabase Admin client to bypass RLS if needed, or just standard client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-// Ensure we have a client
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const body = await req.json();
     const { number } = body;
 
