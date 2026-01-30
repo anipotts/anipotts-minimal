@@ -146,7 +146,11 @@ export default function RootLayout({
                   </div>
 
                   {/* Terminal Body with Navbar/Footer handling */}
-                  <WindowInner>{children}</WindowInner>
+                  <WindowInner>
+                    <Navbar />
+                    {children}
+                    <Footer />
+                  </WindowInner>
 
                   {/* Terminal Status Bar */}
                   <TerminalStatusBar />
