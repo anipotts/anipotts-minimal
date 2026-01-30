@@ -24,10 +24,10 @@ export function MinimizedPill({ title = "ani potts" }: MinimizedPillProps) {
         >
           <button
             onClick={() => setWindowState("open")}
-            className="group flex items-center gap-2 px-4 py-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-lg hover:bg-black/90 hover:border-white/20 transition-all"
+            className="group flex items-center gap-2 px-4 py-2 bg-[rgba(var(--overlay-invert),0.8)] backdrop-blur-md border border-border rounded-lg shadow-lg hover:bg-[rgba(var(--overlay-invert),0.9)] hover:border-overlay-20 transition-all"
           >
             <div className="w-2 h-2 rounded-full bg-yellow-500/50 group-hover:bg-yellow-500 transition-colors" />
-            <span className="text-xs font-mono text-gray-400 group-hover:text-gray-200 transition-colors">
+            <span className="text-xs font-mono text-tertiary group-hover:text-body transition-colors">
               [ {title} — minimized ]
             </span>
           </button>

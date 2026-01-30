@@ -4,7 +4,9 @@
   "private": true,
   "exports": {
     "./globals.css": "./src/globals.css",
-    "./quill.css": "./src/quill.css",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./base.css": "./src/base.css",
+    "./prose.css": "./src/prose.css",
+    "./quill.css": "./src/quill.css"
   }
 }

@@ -50,8 +50,8 @@ export default function Navbar() {
                 onClick={() => handleNavClick(item)}
                 className={`transition-colors duration-300 ${
                   isActive
-                    ? "text-gray-200 underline decoration-white/30 underline-offset-4 hover:text-accent-400"
-                    : "text-gray-400 hover:text-gray-200"
+                    ? "text-body underline decoration-overlay-30 underline-offset-4 hover:text-accent-400"
+                    : "text-tertiary hover:text-body"
                 }`}
               >
                 {item.name}

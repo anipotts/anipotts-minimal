@@ -96,12 +96,12 @@ export default async function UpdatesPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-3xl mx-auto">
       <FadeIn>
-        <div className="flex items-center justify-between border-b border-white/10 pb-6">
+        <div className="flex items-center justify-between border-b border-border pb-6">
           <div>
             <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
               Recent Activity
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-muted text-sm">
               {totalCommits > 0
                 ? `${totalCommits} commits across ${repoCount} repos — last 30 days`
                 : "What I've been shipping"}
@@ -109,10 +109,10 @@ export default async function UpdatesPage() {
           </div>
           {fetchedAt && (
             <div className="text-right">
-              <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+              <span className="text-[10px] text-muted uppercase tracking-wider">
                 Updated
               </span>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-tertiary">
                 {formatRelativeTime(fetchedAt)}
               </p>
             </div>
@@ -127,24 +127,24 @@ export default async function UpdatesPage() {
               <div>
                 {/* Date header */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-medium text-gray-400">
+                  <span className="text-xs font-medium text-tertiary">
                     {formatDate(day.date)}
                   </span>
-                  <span className="text-[10px] text-gray-700 font-mono">
+                  <span className="text-[10px] text-faint font-mono">
                     {day.date}
                   </span>
                 </div>
 
                 {/* Repos for this date */}
-                <div className="space-y-3 ml-2 border-l border-white/10 pl-4">
+                <div className="space-y-3 ml-2 border-l border-border pl-4">
                   {day.repos.map((repo) => (
                     <div key={repo.name}>
                       <div className="flex items-center gap-2 mb-2">
                         <FaCodeBranch className="text-accent-400 text-xs" />
-                        <span className="text-sm text-gray-300 font-mono">
+                        <span className="text-sm text-secondary font-mono">
                           {repo.name}
                         </span>
-                        <span className="text-[10px] text-gray-600">
+                        <span className="text-[10px] text-faint">
                           {repo.commits.length} commit{repo.commits.length !== 1 ? "s" : ""}
                         </span>
                       </div>
@@ -152,10 +152,10 @@ export default async function UpdatesPage() {
                       <ul className="space-y-1 ml-4">
                         {repo.commits.map((commit) => (
                           <li key={commit.sha} className="flex items-start gap-2 group">
-                            <span className="text-[10px] text-gray-700 font-mono mt-0.5 shrink-0">
+                            <span className="text-[10px] text-faint font-mono mt-0.5 shrink-0">
                               {commit.sha}
                             </span>
-                            <span className="text-sm text-gray-400 leading-snug">
+                            <span className="text-sm text-tertiary leading-snug">
                               {commit.message}
                             </span>
                             <a
@@ -164,7 +164,7 @@ export default async function UpdatesPage() {
                               rel="noopener noreferrer"
                               className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
                             >
-                              <FaExternalLinkAlt className="text-[10px] text-gray-600 hover:text-accent-400" />
+                              <FaExternalLinkAlt className="text-[10px] text-faint hover:text-accent-400" />
                             </a>
                           </li>
                         ))}
@@ -185,10 +185,10 @@ export default async function UpdatesPage() {
                 <span className="px-2 py-1 bg-accent-400/10 text-accent-400 rounded text-xs font-mono">
                   v3.0.0
                 </span>
-                <span className="text-gray-500 text-xs">anipotts.com</span>
-                <span className="text-gray-600 text-xs">2025-01-05</span>
+                <span className="text-muted text-xs">anipotts.com</span>
+                <span className="text-faint text-xs">2025-01-05</span>
               </div>
-              <ul className="space-y-2 text-sm text-gray-300">
+              <ul className="space-y-2 text-sm text-secondary">
                 <li>Converted to Turborepo monorepo architecture</li>
                 <li>Added 10 subdomain apps</li>
                 <li>Shared UI component library</li>
@@ -199,8 +199,8 @@ export default async function UpdatesPage() {
       )}
 
       <FadeIn delay={0.5}>
-        <div className="text-center pt-4 border-t border-white/5">
-          <p className="text-xs text-gray-600">
+        <div className="text-center pt-4 border-t border-border-subtle">
+          <p className="text-xs text-faint">
             Synced from GitHub daily • Public repos only
           </p>
         </div>

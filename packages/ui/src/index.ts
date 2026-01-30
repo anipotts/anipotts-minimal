@@ -8,6 +8,7 @@ export {
   WindowInner,
   TerminalHeaderTitle,
   TerminalStatusBar,
+  ThemeToggle,
 } from "./components/window";
 export type {
   WindowContainerProps,
@@ -19,7 +20,7 @@ export type {
 } from "./components/window";
 
 // Animation components
-export { FadeIn, Waves } from "./components/animation";
+export { FadeIn, Waves, WavesBackground } from "./components/animation";
 export type { FadeInProps, WavesProps } from "./components/animation";
 
 // Feedback components
@@ -27,8 +28,8 @@ export { StatusDot } from "./components/feedback";
 export type { StatusDotProps } from "./components/feedback";
 
 // Context
-export { WindowProvider, useWindowState } from "./context";
-export type { WindowState } from "./context";
+export { WindowProvider, useWindowState, ThemeProvider, useTheme } from "./context";
+export type { WindowState, ThemeMode, ResolvedTheme } from "./context";
 
 // Hooks
 export { useDebounce } from "./hooks";

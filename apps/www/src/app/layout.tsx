@@ -3,20 +3,23 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import clsx from "clsx";
-import { PostHogProvider } from "@/components/PostHogProvider";
+import {
+  PostHogProvider,
+  ThemeProvider,
+  WindowProvider,
+  WindowContainer,
+  WindowControls,
+  WindowInner,
+  WindowLayoutWrapper,
+  TerminalHeaderTitle,
+  TerminalStatusBar,
+  TerminalPromptCentered,
+  MinimizedPill,
+  WavesBackground,
+} from "@anipotts/ui";
+import { ThemeScript } from "@anipotts/ui/server";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/admin/AdminOverlay";
-import Waves from "@/components/Waves";
-import { WindowProvider } from "@/context/WindowContext";
-import WindowContainer from "@/components/window/WindowContainer";
-import WindowControls from "@/components/window/WindowControls";
-import TerminalPromptCentered from "@/components/window/TerminalPromptCentered";
-import MinimizedPill from "@/components/window/MinimizedPill";
-import WindowInner from "@/components/window/WindowInner";
-import WindowLayoutWrapper from "@/components/window/WindowLayoutWrapper";
-import TerminalHeaderTitle from "@/components/window/TerminalHeaderTitle";
-import TerminalStatusBar from "@/components/window/TerminalStatusBar";
 import PersonSchema from "@/components/PersonSchema";
 import SubdomainNavigator from "@/components/SubdomainNavigator";
 
@@ -108,33 +111,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={clsx(jetbrainsMono.variable, "dark")}>
+    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <head>
+        <ThemeScript />
         <PersonSchema />
       </head>
       <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
+        <ThemeProvider>
         {/* Fixed Background Container */}
-        <div className="fixed inset-0 -z-10 min-h-[100svh] bg-background">
+        <div className="fixed inset-0 -z-10 min-h-svh bg-background">
           {/* Ambient Background Effects */}
-          <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-background to-background pointer-events-none" />
-          <div className="absolute inset-0 z-10 opacity-[0.03] bg-noise pointer-events-none mix-blend-overlay" />
+          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))" }} />
+          <div className="absolute inset-0 z-10 bg-noise pointer-events-none mix-blend-overlay" style={{ opacity: "var(--noise-opacity)" }} />
 
           {/* Waves Animation */}
-          <div className="hidden md:block absolute inset-0 z-20 opacity-30 pointer-events-none">
-            <Waves
-              lineColor="rgba(97, 171, 234, 0.96)"
-              backgroundColor="transparent"
-              waveSpeedX={0.02}
-              waveSpeedY={0.01}
-              waveAmpX={40}
-              waveAmpY={20}
-              friction={0.9}
-              tension={0.01}
-              maxCursorMove={120}
-              xGap={12}
-              yGap={36}
-            />
-          </div>
+          <WavesBackground />
         </div>
 
         <PostHogProvider>
@@ -144,12 +135,12 @@ export default function RootLayout({
                 {/* Dynamic Window Container */}
                 <WindowContainer>
                   {/* Terminal Header Bar */}
-                  <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 select-none">
+                  <div className="flex items-center justify-between px-4 py-2 bg-input border-b border-border-subtle select-none">
                     <div className="flex items-center gap-2">
                       <WindowControls />
                       <TerminalHeaderTitle />
                     </div>
-                    <div className="text-[10px] md:text-xs text-gray-600 font-mono">
+                    <div className="text-[10px] md:text-xs text-faint font-mono">
                       zsh<span className="hidden md:inline"> • v3.0.1</span>
                     </div>
                   </div>
@@ -171,6 +162,7 @@ export default function RootLayout({
             </WindowProvider>
           </AdminProvider>
         </PostHogProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

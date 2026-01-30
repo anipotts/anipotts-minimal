@@ -19,3 +19,5 @@ export { TerminalHeaderTitle } from "./TerminalHeaderTitle";
 export type { TerminalHeaderTitleProps } from "./TerminalHeaderTitle";
 
 export { TerminalStatusBar } from "./TerminalStatusBar";
+
+export { ThemeToggle } from "./ThemeToggle";

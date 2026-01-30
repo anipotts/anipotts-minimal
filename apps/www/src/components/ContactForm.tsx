@@ -48,7 +48,7 @@ export default function ContactForm() {
           <input
             id="name"
             required
-            className="bg-white/5 border border-white/10 rounded-sm p-2 text-sm text-gray-200 focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-gray-700"
+            className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
             placeholder="Your Name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -63,7 +63,7 @@ export default function ContactForm() {
             id="email"
             type="email"
             required
-            className="bg-white/5 border border-white/10 rounded-sm p-2 text-sm text-gray-200 focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-gray-700"
+            className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
             placeholder="Your Email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -80,7 +80,7 @@ export default function ContactForm() {
           id="message"
           required
           rows={4}
-          className="bg-white/5 border border-white/10 rounded-sm p-2 text-sm text-gray-200 focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-gray-700 resize-none"
+          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint resize-none"
           placeholder="Your Message"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}

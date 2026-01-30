@@ -31,7 +31,7 @@ export function TerminalHeaderTitle({ defaultTitle = "ani@potts:~/anipotts.com" 
   const displayedPath = displayedText.substring(splitIndex);
 
   return (
-    <span className="ml-3 text-[10px] md:text-xs text-gray-500 font-medium tracking-wide">
+    <span className="ml-3 text-[10px] md:text-xs text-muted font-medium tracking-wide">
       {splitIndex > 0 && <span className="hidden md:inline">{displayedPrefix}</span>}
       {displayedPath}
       <span className="animate-pulse">_</span>

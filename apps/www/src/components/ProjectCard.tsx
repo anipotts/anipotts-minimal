@@ -41,7 +41,7 @@ function StatusBadge({ status, featured }: { status?: string; featured?: boolean
   }
   if (status === "coming-soon") {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-gray-400 bg-gray-400/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[9px] uppercase tracking-wider text-tertiary bg-gray-400/10 px-1.5 py-0.5 rounded font-medium">
         coming soon
       </span>
     );
@@ -70,28 +70,28 @@ export default function ProjectCard({ project }: { project: Project }) {
       className={`
         group w-full cursor-pointer border-l-2 pl-4 pr-4 transition-all duration-300 ease-in-out
         ${isOpen
-          ? "py-6 border-accent-400 bg-white/[0.03] rounded-r-xl"
-          : "py-3 border-white/10 hover:border-white/30 hover:bg-white/[0.02]"
+          ? "py-6 border-accent-400 bg-[rgba(var(--overlay-base),0.03)] rounded-r-xl"
+          : "py-3 border-border hover:border-overlay-30 hover:bg-[rgba(var(--overlay-base),0.02)]"
         }
       `}
     >
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 font-mono text-sm">
-            <span className={isOpen ? "text-accent-400" : "text-gray-500 group-hover:text-gray-300"}>
+            <span className={isOpen ? "text-accent-400" : "text-muted group-hover:text-secondary"}>
               {isOpen ? "[-]" : "[+]"}
             </span>
             {project.icon === "chrome" && (
               <ChromeIcon className="w-4 h-4 flex-shrink-0" />
             )}
-            <h3 className={`font-bold ${isOpen ? "text-gray-100" : "text-gray-300 group-hover:text-gray-100"}`}>
+            <h3 className={`font-bold ${isOpen ? "text-heading" : "text-secondary group-hover:text-heading"}`}>
               {project.title}
             </h3>
             <StatusBadge status={project.status} featured={project.featured} />
           </div>
-          <p className="text-xs text-gray-500 pl-6">{project.subtitle}</p>
+          <p className="text-xs text-muted pl-6">{project.subtitle}</p>
         </div>
-        <span className="text-xs text-gray-600 font-mono">{project.year}</span>
+        <span className="text-xs text-faint font-mono">{project.year}</span>
       </div>
 
       <AnimatePresence>
@@ -104,13 +104,13 @@ export default function ProjectCard({ project }: { project: Project }) {
             className="overflow-hidden"
           >
             <div className="pl-6 pt-6 pb-2 flex flex-col gap-6">
-              <p className="text-sm text-gray-300 leading-relaxed max-w-2xl border-l border-white/10 pl-4">
+              <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
                 {project.description}
               </p>
               
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
-                  <span key={tag} className="text-[10px] uppercase tracking-wider text-gray-500 bg-white/5 px-2 py-1 rounded-sm">
+                  <span key={tag} className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm">
                     {tag}
                   </span>
                 ))}
@@ -143,7 +143,7 @@ export default function ProjectCard({ project }: { project: Project }) {
                       href={project.links.repo}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-gray-400 hover:text-gray-200 hover:underline decoration-white/30 underline-offset-4"
+                      className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
                       onClick={(e) => e.stopPropagation()}
                     >
                       ./view_source.git

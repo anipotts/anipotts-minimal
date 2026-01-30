@@ -43,11 +43,11 @@ export default function Editor({ value, onChange }: EditorProps) {
   };
 
   if (!isMounted) {
-    return <div className="h-64 bg-white/5 rounded-lg animate-pulse" />;
+    return <div className="h-64 bg-input rounded-lg animate-pulse" />;
   }
 
   return (
-    <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden flex flex-col">
+    <div className="bg-input rounded-lg border border-border overflow-hidden flex flex-col">
        <ReactQuill
          theme="snow"
          value={html}
@@ -61,7 +61,7 @@ export default function Editor({ value, onChange }: EditorProps) {
              ['clean']
            ],
          }}
-         className="text-gray-200 flex-grow"
+         className="text-body flex-grow"
        />
     </div>
   );

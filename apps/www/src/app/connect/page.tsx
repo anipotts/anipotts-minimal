@@ -29,7 +29,7 @@ export default function ConnectPage() {
               <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-signal-green">
                 <span>open to collaboration</span>
               </div>
-              <p className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl">
+              <p className="text-lg md:text-xl text-secondary leading-relaxed max-w-2xl">
                 If you're working with LLM orchestration systems and think I can help, feel free to reach out:
               </p>
             </div>
@@ -53,13 +53,13 @@ export default function ConnectPage() {
                   href={social.url}
                   target={social.name === "email" ? undefined : "_blank"}
                   rel={social.name === "email" ? undefined : "noopener noreferrer"}
-                  className="group flex items-center justify-between p-4 border border-white/5 rounded-sm bg-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300"
+                  className="group flex items-center justify-between p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-10 hover:border-border transition-all duration-300"
                   onClick={() => handleSocialClick(social.name, social.url)}
                 >
-                  <span className="text-xs uppercase tracking-widest text-gray-400 group-hover:text-accent-400 transition-colors">
+                  <span className="text-xs uppercase tracking-widest text-tertiary group-hover:text-accent-400 transition-colors">
                     {social.name}
                   </span>
-                  <span className="text-xs text-gray-600 group-hover:text-gray-400 transition-colors transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 duration-300">
+                  <span className="text-xs text-faint group-hover:text-tertiary transition-colors transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 duration-300">
                     ↗
                   </span>
                 </a>

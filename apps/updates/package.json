@@ -11,9 +11,10 @@
     "clean": "rm -rf .next .turbo node_modules"
   },
   "dependencies": {
-    "@anipotts/ui": "workspace:*",
     "@anipotts/lib": "workspace:*",
+    "@anipotts/styles": "workspace:^",
     "@anipotts/types": "workspace:*",
+    "@anipotts/ui": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
     "next": "^16.0.7",

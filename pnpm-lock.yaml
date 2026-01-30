@@ -23,6 +23,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -78,6 +81,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -133,6 +139,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -188,6 +197,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -243,6 +255,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -298,6 +313,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -353,6 +371,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -408,6 +429,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -472,6 +496,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -527,6 +554,9 @@ importers:
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@anipotts/styles':
+        specifier: workspace:^
+        version: link:../../packages/styles
       '@anipotts/types':
         specifier: workspace:*
         version: link:../../packages/types

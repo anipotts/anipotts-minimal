@@ -33,13 +33,13 @@ export default async function ThoughtsPage() {
         <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
           {!supabase ? (
             <FadeIn delay={0.1}>
-              <div className="p-4 border border-white/5 rounded-sm bg-white/5">
-                <p className="text-gray-500 text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
+              <div className="p-4 border border-border-subtle rounded-sm bg-input">
+                <p className="text-muted text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
               </div>
             </FadeIn>
           ) : thoughts.length === 0 ? (
             <FadeIn delay={0.1}>
-              <p className="text-gray-500 italic text-sm">No thoughts published yet.</p>
+              <p className="text-muted italic text-sm">No thoughts published yet.</p>
             </FadeIn>
           ) : (
             thoughts.map((thought: any, i) => (

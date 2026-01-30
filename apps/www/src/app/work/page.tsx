@@ -40,7 +40,7 @@ export default function WorkPage() {
                   className={`px-3 py-1 text-[10px] uppercase tracking-wider rounded-sm border transition-all duration-300 ${
                     filter === cat 
                       ? "border-accent-400 text-accent-400 bg-accent-400/10" 
-                      : "border-white/10 text-gray-500 hover:border-white/30 hover:text-gray-300"
+                      : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
                   }`}
                 >
                   {cat}

@@ -47,15 +47,15 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="w-full max-w-sm bg-[#0a0a0a] border border-white/10 rounded-md shadow-2xl overflow-hidden font-mono">
+    <div className="w-full max-w-sm bg-card border border-border rounded-md shadow-2xl overflow-hidden font-mono">
       {/* Terminal Header */}
-      <div className="bg-white/5 border-b border-white/5 px-4 py-2 flex items-center justify-between select-none">
+      <div className="bg-input border-b border-border-subtle px-4 py-2 flex items-center justify-between select-none">
         <div className="flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
           <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
         </div>
-        <div className="text-[10px] text-gray-500 flex items-center gap-1.5">
+        <div className="text-[10px] text-muted flex items-center gap-1.5">
           <FaTerminal className="text-xs" />
           <span>admin — -zsh</span>
         </div>
@@ -64,7 +64,7 @@ export function AdminLogin() {
 
       {/* Terminal Body */}
       <div className="p-6 flex flex-col gap-4 min-h-[200px]">
-        <div className="text-xs text-gray-500 leading-relaxed">
+        <div className="text-xs text-muted leading-relaxed">
           <p>
             Last login: {new Date().toLocaleString()} on ttys001
           </p>
@@ -77,11 +77,11 @@ export function AdminLogin() {
           <div className="flex items-center gap-2 text-sm">
             <span className="text-green-400">➜</span>
             <span className="text-blue-400">~</span>
-            <span className="text-gray-400">sudo authenticate</span>
+            <span className="text-tertiary">sudo authenticate</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm relative">
-            <span className="text-gray-500">[sudo] password for ani:</span>
+            <span className="text-muted">[sudo] password for ani:</span>
             <div className="relative flex-grow">
               <input
                 type="password"
@@ -96,12 +96,12 @@ export function AdminLogin() {
               />
               <div className="flex items-center">
                 {/* Masked password display */}
-                <span className="text-gray-200 tracking-widest">
+                <span className="text-body tracking-widest">
                   {"*".repeat(password.length)}
                 </span>
                 {/* Custom cursor */}
                 <span
-                  className={`w-2 h-4 bg-gray-500 ml-0.5 ${cursorVisible ? "opacity-100" : "opacity-0"}`}
+                  className={`w-2 h-4 bg-muted ml-0.5 ${cursorVisible ? "opacity-100" : "opacity-0"}`}
                 />
               </div>
             </div>

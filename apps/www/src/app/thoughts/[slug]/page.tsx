@@ -105,8 +105,8 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
             </div>
             <div className="col-span-1 md:col-span-3">
               <FadeIn delay={0.1}>
-                <div className="p-4 border border-white/5 rounded-sm bg-white/5">
-                  <p className="text-gray-500 text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
+                <div className="p-4 border border-border-subtle rounded-sm bg-input">
+                  <p className="text-muted text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
                 </div>
               </FadeIn>
             </div>
@@ -123,14 +123,14 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1 flex flex-col gap-4">
           <FadeIn>
-            <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-accent-400 transition-colors">
+            <Link href="/thoughts" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-accent-400 transition-colors">
               back to index
             </Link>
           </FadeIn>
           <FadeIn delay={0.1}>
-            <div className="flex flex-col gap-1 text-xs text-gray-500 uppercase tracking-wide mt-8">
+            <div className="flex flex-col gap-1 text-xs text-muted uppercase tracking-wide mt-8">
               <span>published</span>
-              <time dateTime={thought.created_at} className="text-gray-300">
+              <time dateTime={thought.created_at} className="text-secondary">
                 {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
               </time>
               <div className="mt-2">
@@ -141,7 +141,7 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
           {thought.tags && (
              <FadeIn delay={0.2}>
               <div className="flex flex-col gap-2 mt-4">
-                <span className="text-xs text-gray-500 uppercase tracking-wide">tags</span>
+                <span className="text-xs text-muted uppercase tracking-wide">tags</span>
                 <div className="flex flex-wrap gap-2">
                   {(Array.isArray(thought.tags) ? thought.tags : (typeof thought.tags === 'string' ? thought.tags.split(',') : [])).map((tag: string) => (
                     <span key={tag} className="text-[10px] uppercase tracking-wider text-accent-400 border border-accent-400/20 px-2 py-1 rounded-sm">
@@ -156,13 +156,13 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
 
         <div className="col-span-1 md:col-span-3">
           <FadeIn delay={0.1}>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-100 leading-tight mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-heading leading-tight mb-8">
               {thought.title}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="prose prose-invert prose-gray max-w-none prose-headings:font-bold prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-gray-500">
+            <div className="prose prose-invert prose-gray max-w-none prose-headings:font-bold prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted">
               <ReactMarkdown
                 components={{
                   img: ({ node, ...props }) => {

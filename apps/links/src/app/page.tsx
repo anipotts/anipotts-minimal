@@ -23,7 +23,7 @@ export default function LinksPage() {
           <FaTerminal className="text-accent-400" />
           <h1 className="text-2xl font-bold text-white">{site.name.toLowerCase()}</h1>
         </div>
-        <p className="text-gray-500 text-sm text-center mb-8">{site.title} in {site.location}</p>
+        <p className="text-muted text-sm text-center mb-8">{site.title} in {site.location}</p>
       </FadeIn>
 
       {/* Website link */}
@@ -33,14 +33,14 @@ export default function LinksPage() {
             href={site.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-accent-400/30 transition-all group"
+            className="flex items-center gap-4 p-4 bg-input border border-border rounded-lg hover:bg-overlay-10 hover:border-accent-400/30 transition-all group"
           >
-            <FaGlobe className="text-gray-400 group-hover:text-accent-400 transition-colors" />
+            <FaGlobe className="text-tertiary group-hover:text-accent-400 transition-colors" />
             <div className="flex-grow">
               <span className="text-white font-medium">Website</span>
-              <span className="text-gray-500 text-xs ml-2">{site.domain}</span>
+              <span className="text-muted text-xs ml-2">{site.domain}</span>
             </div>
-            <span className="text-gray-600 text-xs">→</span>
+            <span className="text-faint text-xs">→</span>
           </a>
         </FadeIn>
       </div>
@@ -55,14 +55,14 @@ export default function LinksPage() {
                 href={link.url}
                 target={link.name === "email" ? undefined : "_blank"}
                 rel={link.name === "email" ? undefined : "noopener noreferrer"}
-                className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-accent-400/30 transition-all group"
+                className="flex items-center gap-4 p-4 bg-input border border-border rounded-lg hover:bg-overlay-10 hover:border-accent-400/30 transition-all group"
               >
-                <Icon className="text-gray-400 group-hover:text-accent-400 transition-colors" />
+                <Icon className="text-tertiary group-hover:text-accent-400 transition-colors" />
                 <div className="flex-grow">
                   <span className="text-white font-medium capitalize">{link.name}</span>
-                  <span className="text-gray-500 text-xs ml-2">{link.description}</span>
+                  <span className="text-muted text-xs ml-2">{link.description}</span>
                 </div>
-                <span className="text-gray-600 text-xs">→</span>
+                <span className="text-faint text-xs">→</span>
               </a>
             </FadeIn>
           );
@@ -72,7 +72,7 @@ export default function LinksPage() {
       {/* Projects */}
       <FadeIn delay={0.7}>
         <div className="w-full max-w-md">
-          <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <h2 className="text-xs uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
             <FaCode className="text-accent-400" />
             Projects
           </h2>
@@ -83,11 +83,11 @@ export default function LinksPage() {
                 href={project.links!.live!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded-lg hover:border-accent-400/20 transition-all"
+                className="flex items-center justify-between p-3 bg-[rgba(var(--overlay-invert),0.4)] border border-border-subtle rounded-lg hover:border-accent-400/20 transition-all"
               >
                 <div>
-                  <span className="text-gray-300 text-sm font-medium">{project.title}</span>
-                  <span className="text-gray-600 text-xs ml-2">{project.subtitle}</span>
+                  <span className="text-secondary text-sm font-medium">{project.title}</span>
+                  <span className="text-faint text-xs ml-2">{project.subtitle}</span>
                 </div>
               </a>
             ))}

@@ -1,8 +1,8 @@
 /* Custom Quill Styles for Admin Editor */
 .ql-toolbar.ql-snow {
   border: none !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--quill-toolbar-border) !important;
+  background: var(--quill-toolbar-bg);
   padding: 12px !important;
   border-radius: 8px 8px 0 0;
 }
@@ -11,39 +11,39 @@
   border: none !important;
   font-family: var(--font-mono) !important;
   font-size: 0.95rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--quill-container-bg);
   border-radius: 0 0 8px 8px;
 }
 
 .ql-editor {
   min-height: 400px;
-  color: #e5e7eb; /* gray-200 */
+  color: var(--quill-text);
   padding: 24px !important;
   line-height: 1.7;
 }
 
 .ql-editor.ql-blank::before {
-  color: rgba(255, 255, 255, 0.3) !important;
+  color: var(--quill-placeholder) !important;
   font-style: normal !important;
 }
 
 /* Toolbar Icons */
 .ql-stroke {
-  stroke: #6b7280 !important; /* gray-500 */
+  stroke: var(--quill-icon) !important;
   transition: stroke 0.2s;
 }
 
 .ql-fill {
-  fill: #6b7280 !important;
+  fill: var(--quill-icon) !important;
   transition: fill 0.2s;
 }
 
 .ql-picker {
-  color: #6b7280 !important;
+  color: var(--quill-icon) !important;
 }
 
 .ql-picker-label {
-  color: #6b7280 !important;
+  color: var(--quill-icon) !important;
 }
 
 /* Hover/Active States */
@@ -68,14 +68,14 @@
 
 /* Dropdowns */
 .ql-snow .ql-picker-options {
-  background-color: #1a1a1a !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  background-color: var(--quill-dropdown-bg) !important;
+  border: 1px solid var(--quill-toolbar-border) !important;
+  box-shadow: 0 10px 15px -3px var(--quill-dropdown-shadow) !important;
   border-radius: 6px !important;
 }
 
 .ql-snow .ql-picker-item {
-  color: #9ca3af !important;
+  color: var(--quill-item-text) !important;
 }
 
 .ql-snow .ql-picker-item:hover,

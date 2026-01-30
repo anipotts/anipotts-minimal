@@ -21,7 +21,7 @@ export default function CompanyLink({ href, children, companyName }: CompanyLink
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-gray-200 hover:text-accent-400 font-medium underline decoration-white/30 underline-offset-4 transition-colors"
+      className="text-body hover:text-accent-400 font-medium underline decoration-overlay-30 underline-offset-4 transition-colors"
       onClick={handleClick}
     >
       {children}

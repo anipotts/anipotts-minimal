@@ -145,7 +145,7 @@ export default function SubdomainNavigator() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-[9998] bg-[var(--backdrop-medium)] backdrop-blur-sm"
           />
 
           {/* Modal */}
@@ -155,21 +155,21 @@ export default function SubdomainNavigator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed top-[20%] left-1/2 -translate-x-1/2 z-[9999] w-full max-w-md bg-black border border-white/10 rounded-md shadow-2xl overflow-hidden"
+            className="fixed top-[20%] left-1/2 -translate-x-1/2 z-[9999] w-full max-w-md bg-card border border-border rounded-md shadow-2xl overflow-hidden"
           >
             {/* Terminal Header */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 bg-white/5">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle bg-input">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500 font-mono uppercase tracking-wider">
+                <span className="text-[10px] text-muted font-mono uppercase tracking-wider">
                   ssh hosts
                 </span>
-                <span className="text-[9px] text-gray-600 font-mono">
+                <span className="text-[9px] text-faint font-mono">
                   ~/.ssh/config
                 </span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-300 transition-colors text-xs"
+                className="text-muted hover:text-secondary transition-colors text-xs"
                 aria-label="Close"
               >
                 [x]
@@ -177,7 +177,7 @@ export default function SubdomainNavigator() {
             </div>
 
             {/* Search Input */}
-            <div className="border-b border-white/5 px-3 py-2">
+            <div className="border-b border-border-subtle px-3 py-2">
               <div className="flex items-center gap-1 text-xs font-mono">
                 <span className="text-accent-400">ssh</span>
                 <input
@@ -186,7 +186,7 @@ export default function SubdomainNavigator() {
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
                   onKeyDown={handleInputKeyDown}
-                  className="flex-1 bg-transparent text-gray-300 outline-none placeholder:text-gray-600"
+                  className="flex-1 bg-transparent text-secondary outline-none placeholder:text-faint"
                   placeholder="filter hosts..."
                   autoComplete="off"
                   spellCheck={false}
@@ -197,7 +197,7 @@ export default function SubdomainNavigator() {
             {/* Host List */}
             <div className="p-2 font-mono text-xs max-h-[320px] overflow-y-auto">
               {/* Column Headers */}
-              <div className="flex items-center gap-2 px-1 py-1 text-[9px] text-gray-600 border-b border-white/5 mb-1">
+              <div className="flex items-center gap-2 px-1 py-1 text-[9px] text-faint border-b border-border-subtle mb-1">
                 <span className="w-[70px]">permissions</span>
                 <span className="w-4 text-center">st</span>
                 <span className="w-6">user</span>
@@ -206,7 +206,7 @@ export default function SubdomainNavigator() {
               </div>
 
               {filtered.length === 0 ? (
-                <div className="text-gray-600 px-1 py-2">
+                <div className="text-faint px-1 py-2">
                   ssh: no matching hosts
                 </div>
               ) : (
@@ -217,25 +217,25 @@ export default function SubdomainNavigator() {
                       onClick={() => handleNavigate(entry)}
                       className={`flex items-center gap-2 text-left px-1 py-1 rounded transition-colors w-full ${
                         i === selectedIndex
-                          ? "bg-white/5 text-accent-400"
-                          : "text-gray-400 hover:bg-white/5"
+                          ? "bg-input text-accent-400"
+                          : "text-tertiary hover:bg-input"
                       }`}
                     >
-                      <span className="text-gray-600 text-[9px] w-[70px] shrink-0">
+                      <span className="text-faint text-[9px] w-[70px] shrink-0">
                         {entry.permissions}
                       </span>
                       <span className="w-4 flex justify-center shrink-0">
                         <StatusDot status={entry.status} />
                       </span>
-                      <span className="text-gray-600 text-[9px] w-6 shrink-0">
+                      <span className="text-faint text-[9px] w-6 shrink-0">
                         ani
                       </span>
                       <span className={`shrink-0 ${
-                        i === selectedIndex ? "text-accent-400" : "text-gray-300"
+                        i === selectedIndex ? "text-accent-400" : "text-secondary"
                       }`}>
                         {entry.name}/
                       </span>
-                      <span className="flex-1 text-right text-[9px] text-gray-600 truncate ml-2">
+                      <span className="flex-1 text-right text-[9px] text-faint truncate ml-2">
                         {entry.desc}
                       </span>
                     </button>
@@ -245,14 +245,14 @@ export default function SubdomainNavigator() {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-white/5 px-3 py-1.5 text-[9px] text-gray-600 font-mono flex justify-between">
+            <div className="border-t border-border-subtle px-3 py-1.5 text-[9px] text-faint font-mono flex justify-between">
               <span>{filtered.length} host{filtered.length !== 1 ? "s" : ""}</span>
               <span>
-                <span className="text-gray-500">ctrl+`</span> toggle
-                <span className="mx-1.5 text-gray-700">|</span>
-                <span className="text-gray-500">arrows</span> navigate
-                <span className="mx-1.5 text-gray-700">|</span>
-                <span className="text-gray-500">enter</span> open
+                <span className="text-muted">ctrl+`</span> toggle
+                <span className="mx-1.5 text-faint">|</span>
+                <span className="text-muted">arrows</span> navigate
+                <span className="mx-1.5 text-faint">|</span>
+                <span className="text-muted">enter</span> open
               </span>
             </div>
           </motion.div>

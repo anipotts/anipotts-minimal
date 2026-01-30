@@ -10,9 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anipotts/ui": "workspace:*",
     "@anipotts/lib": "workspace:*",
+    "@anipotts/styles": "workspace:^",
     "@anipotts/types": "workspace:*",
+    "@anipotts/ui": "workspace:*",
     "@supabase/supabase-js": "^2.86.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

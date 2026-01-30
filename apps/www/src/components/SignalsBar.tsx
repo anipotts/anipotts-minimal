@@ -33,18 +33,18 @@ export default function SignalsBar() {
   }, []);
 
   return (
-    <div className="w-full py-6 border-t border-white/5 mt-12 mb-4">
-      <div className="flex flex-row flex-wrap justify-between gap-x-8 gap-y-2 text-xs uppercase tracking-wider text-gray-500 font-mono">
+    <div className="w-full py-6 border-t border-border-subtle mt-12 mb-4">
+      <div className="flex flex-row flex-wrap justify-between gap-x-8 gap-y-2 text-xs uppercase tracking-wider text-muted font-mono">
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">base:</span>
-          <span className="text-gray-300">new york city</span>
+          <span className="text-faint">base:</span>
+          <span className="text-secondary">new york city</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">focus:</span>
-          <span className="text-gray-300">durable execution</span>
+          <span className="text-faint">focus:</span>
+          <span className="text-secondary">durable execution</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">market:</span>
+          <span className="text-faint">market:</span>
           <span className={marketStatus === "open" ? "text-[#4ade80]" : "text-[#ef4444]"}>
             {marketStatus}
           </span>

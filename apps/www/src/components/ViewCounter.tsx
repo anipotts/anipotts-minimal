@@ -41,7 +41,7 @@ export default function ViewCounter({
   }, [slug]);
 
   return (
-    <span className={`font-mono text-[10px] text-gray-500 flex items-center gap-1.5 ${className}`}>
+    <span className={`font-mono text-[10px] text-muted flex items-center gap-1.5 ${className}`}>
       <span className="w-1.5 h-1.5 rounded-full bg-accent-400/40 animate-pulse" />
       {views.toLocaleString()} views
     </span>

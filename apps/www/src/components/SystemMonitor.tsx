@@ -29,7 +29,7 @@ function AsciiBar({
   return (
     <span className="font-mono">
       <span className="text-accent-400">{"█".repeat(filled)}</span>
-      <span className="text-gray-700">{"░".repeat(empty)}</span>
+      <span className="text-faint">{"░".repeat(empty)}</span>
     </span>
   );
 }
@@ -130,16 +130,16 @@ export default function SystemMonitor({ isOpen, onClose }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute bottom-full right-0 mb-2 mx-4 md:mx-0 md:right-4 md:left-auto md:w-80 z-50 bg-black border border-white/10 rounded-md shadow-2xl overflow-hidden"
+          className="absolute bottom-full right-0 mb-2 mx-4 md:mx-0 md:right-4 md:left-auto md:w-80 z-50 bg-card border border-border rounded-md shadow-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 bg-white/5">
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-mono">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle bg-input">
+            <span className="text-[10px] text-muted uppercase tracking-wider font-mono">
               system monitor
             </span>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-300 transition-colors text-xs"
+              className="text-muted hover:text-secondary transition-colors text-xs"
               aria-label="Close"
             >
               [×]
@@ -149,44 +149,44 @@ export default function SystemMonitor({ isOpen, onClose }: Props) {
           {/* Metrics */}
           <div className="p-3 font-mono text-[10px] space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 w-8">CPU</span>
+              <span className="text-muted w-8">CPU</span>
               <AsciiBar value={displayMetrics.cpu} />
-              <span className="text-gray-500 w-8 text-right">
+              <span className="text-muted w-8 text-right">
                 {Math.round(displayMetrics.cpu)}%
               </span>
-              <span className="text-gray-600 text-[9px]">scroll</span>
+              <span className="text-faint text-[9px]">scroll</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 w-8">MEM</span>
+              <span className="text-muted w-8">MEM</span>
               <AsciiBar value={displayMetrics.mem} />
-              <span className="text-gray-500 w-8 text-right">
+              <span className="text-muted w-8 text-right">
                 {Math.round(displayMetrics.mem)}%
               </span>
-              <span className="text-gray-600 text-[9px]">pages</span>
+              <span className="text-faint text-[9px]">pages</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 w-8">NET</span>
+              <span className="text-muted w-8">NET</span>
               <AsciiBar value={displayMetrics.net} />
-              <span className="text-gray-500 w-8 text-right">
+              <span className="text-muted w-8 text-right">
                 {Math.round(displayMetrics.net)}%
               </span>
-              <span className="text-gray-600 text-[9px]">time</span>
+              <span className="text-faint text-[9px]">time</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 w-8">DISK</span>
+              <span className="text-muted w-8">DISK</span>
               <AsciiBar value={displayMetrics.disk} />
-              <span className="text-gray-500 w-8 text-right">
+              <span className="text-muted w-8 text-right">
                 {Math.round(displayMetrics.disk)}%
               </span>
-              <span className="text-gray-600 text-[9px]">projects</span>
+              <span className="text-faint text-[9px]">projects</span>
             </div>
           </div>
 
           {/* Process List */}
           {sortedPages.length > 0 && (
             <>
-              <div className="border-t border-white/5 px-3 py-1.5">
-                <div className="font-mono text-[9px] text-gray-600 flex">
+              <div className="border-t border-border-subtle px-3 py-1.5">
+                <div className="font-mono text-[9px] text-faint flex">
                   <span className="w-8">PID</span>
                   <span className="flex-1">COMMAND</span>
                   <span className="w-12 text-right">TIME</span>
@@ -196,13 +196,13 @@ export default function SystemMonitor({ isOpen, onClose }: Props) {
                 {sortedPages.slice(0, 5).map((page, i) => (
                   <div
                     key={page.path}
-                    className={`flex ${page.path === metrics.currentPage ? "text-accent-400" : "text-gray-400"}`}
+                    className={`flex ${page.path === metrics.currentPage ? "text-accent-400" : "text-tertiary"}`}
                   >
-                    <span className="w-8 text-gray-600">
+                    <span className="w-8 text-faint">
                       {String(i + 1).padStart(3, "0")}
                     </span>
                     <span className="flex-1 truncate">view_{page.name}</span>
-                    <span className="w-12 text-right text-gray-500">
+                    <span className="w-12 text-right text-muted">
                       {formatTime(Math.floor(page.totalTime / 1000))}
                     </span>
                   </div>
@@ -212,7 +212,7 @@ export default function SystemMonitor({ isOpen, onClose }: Props) {
           )}
 
           {/* Footer */}
-          <div className="border-t border-white/5 px-3 py-1.5 text-[9px] text-gray-600 font-mono flex justify-between">
+          <div className="border-t border-border-subtle px-3 py-1.5 text-[9px] text-faint font-mono flex justify-between">
             <span>uptime: {formatTime(metrics.timeOnSite)}</span>
             <span>{metrics.pagesVisited.length} processes</span>
           </div>

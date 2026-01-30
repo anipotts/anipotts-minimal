@@ -10,17 +10,17 @@ export default function CliPage() {
             <FaTerminal className="text-accent-400 text-3xl" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">CLI Tools</h1>
-          <p className="text-gray-500 mb-8">Command-line utilities for developers</p>
+          <p className="text-muted mb-8">Command-line utilities for developers</p>
         </div>
       </FadeIn>
 
       <FadeIn delay={0.1}>
-        <div className="w-full max-w-lg p-6 bg-white/5 border border-white/10 rounded-xl mb-6">
-          <div className="flex items-center gap-2 text-gray-500 text-xs mb-4">
+        <div className="w-full max-w-lg p-6 bg-input border border-border rounded-xl mb-6">
+          <div className="flex items-center gap-2 text-muted text-xs mb-4">
             <FaCog className="text-accent-400" />
             <span className="uppercase tracking-widest">Coming Soon</span>
           </div>
-          <pre className="text-sm text-gray-400 font-mono bg-black/40 p-4 rounded-lg overflow-x-auto">
+          <pre className="text-sm text-tertiary font-mono bg-[rgba(var(--overlay-invert),0.4)] p-4 rounded-lg overflow-x-auto">
 {`# Install (coming soon)
 npm install -g @anipotts/cli
 
@@ -35,7 +35,7 @@ ani metrics     # View coding metrics`}
 
       <FadeIn delay={0.2}>
         <div className="flex gap-4">
-          <a href="https://github.com/anipotts" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:border-accent-400/30 transition-all text-sm">
+          <a href="https://github.com/anipotts" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-input border border-border rounded-lg text-tertiary hover:text-white hover:border-accent-400/30 transition-all text-sm">
             <FaGithub />
             View Source
           </a>
@@ -47,7 +47,7 @@ ani metrics     # View coding metrics`}
       </FadeIn>
 
       <FadeIn delay={0.3}>
-        <p className="text-xs text-gray-600 mt-8 text-center">
+        <p className="text-xs text-faint mt-8 text-center">
           Subscribe to updates at <span className="text-accent-400">updates.anipotts.com</span>
         </p>
       </FadeIn>

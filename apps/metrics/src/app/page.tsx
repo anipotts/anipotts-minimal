@@ -129,11 +129,11 @@ export default async function MetricsPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
       <FadeIn>
-        <div className="border-b border-white/10 pb-6">
+        <div className="border-b border-border pb-6">
           <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
             Coding Metrics
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted text-sm">
             GitHub & WakaTime statistics
           </p>
         </div>
@@ -142,8 +142,8 @@ export default async function MetricsPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {statCards.map((stat, i) => (
           <FadeIn key={stat.label} delay={i * 0.08}>
-            <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-              <div className="flex items-center gap-2 text-gray-500 text-xs mb-2">
+            <div className="p-4 bg-input border border-border rounded-lg">
+              <div className="flex items-center gap-2 text-muted text-xs mb-2">
                 <stat.icon className="text-accent-400" />
                 {stat.label}
               </div>
@@ -157,18 +157,18 @@ export default async function MetricsPage() {
 
       {wakatime.topLanguages.length > 0 && (
         <FadeIn delay={0.5}>
-          <div className="p-6 bg-white/5 border border-white/10 rounded-lg">
-            <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4 flex items-center gap-2">
+          <div className="p-6 bg-input border border-border rounded-lg">
+            <h2 className="text-xs uppercase tracking-widest text-muted mb-4 flex items-center gap-2">
               <FaCode className="text-accent-400" />
               Top Languages (last 7 days)
             </h2>
             <div className="space-y-3">
               {wakatime.topLanguages.map((lang) => (
                 <div key={lang.name} className="flex items-center gap-3">
-                  <span className="w-24 text-sm text-gray-300 truncate">
+                  <span className="w-24 text-sm text-secondary truncate">
                     {lang.name}
                   </span>
-                  <div className="flex-grow h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="flex-grow h-2 bg-overlay-10 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -177,7 +177,7 @@ export default async function MetricsPage() {
                       }}
                     />
                   </div>
-                  <span className="w-14 text-xs text-gray-500 text-right">
+                  <span className="w-14 text-xs text-muted text-right">
                     {lang.percentage}%
                   </span>
                 </div>
@@ -188,11 +188,11 @@ export default async function MetricsPage() {
       )}
 
       <FadeIn delay={0.6}>
-        <div className="text-center pt-4 border-t border-white/5">
-          <p className="text-xs text-gray-600">
+        <div className="text-center pt-4 border-t border-border-subtle">
+          <p className="text-xs text-faint">
             Data from GitHub API & WakaTime
             {lastUpdated && (
-              <span className="ml-2 text-gray-700">
+              <span className="ml-2 text-faint">
                 · updated {formatRelativeTime(lastUpdated)}
               </span>
             )}
