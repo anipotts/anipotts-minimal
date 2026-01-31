@@ -15,6 +15,7 @@ import {
   TerminalHeader,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
+import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </WindowContainer>
               <TerminalPromptCentered /><MinimizedPill />
             </WindowLayoutWrapper>
+            <TerminalNavigator currentSubdomain="updates" />
           </WindowProvider>
         </PostHogProvider>
         </ThemeProvider>

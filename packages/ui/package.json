@@ -40,6 +40,10 @@
       "types": "./dist/admin/index.d.ts",
       "import": "./dist/admin/index.js"
     },
+    "./terminal-navigator": {
+      "types": "./dist/terminal-navigator/index.d.ts",
+      "import": "./dist/terminal-navigator/index.js"
+    },
     "./server": "./src/server/index.ts"
   },
   "scripts": {
