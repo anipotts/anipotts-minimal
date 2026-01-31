@@ -12,7 +12,14 @@ export const projects: Project[] = [
     category: "product",
     role: "Founder & Engineer",
     duration: "Ongoing",
-    tags: ["Next.js 15", "TypeScript", "Postgres", "AWS Lambda", "Monaco", "Stripe"],
+    tags: [
+      "Next.js 15",
+      "TypeScript",
+      "Postgres",
+      "AWS Lambda",
+      "Monaco",
+      "Stripe",
+    ],
     status: "live",
     featured: true,
     links: {
@@ -23,10 +30,10 @@ export const projects: Project[] = [
 
   {
     slug: "quantercise-extension",
-    title: "Mental Math Chrome Extension",
-    subtitle: "2-min timed drills for quant interview prep.",
+    title: "Mental Math",
+    subtitle: "Practice mental math drills in your browser.",
     description:
-      "Brings quantercise.com's mental math mode to the browser. Keyboard-driven, sound feedback, progress tracking. Vanilla JS, Manifest V3, zero external dependencies.",
+      "Practice mental math drills in your browser. Keyboard-driven, sound feedback, progress tracking. Vanilla JS, Manifest V3, zero external dependencies.",
     year: "2026",
     category: "product",
     role: "Creator",
@@ -43,7 +50,7 @@ export const projects: Project[] = [
   {
     slug: "pgi-research-platform",
     title: "PGI Research Portal",
-    subtitle: "Macro research platform for quants.",
+    subtitle: "Macro research platform for 300+ quants.",
     description:
       "Rebuilt PGI's static site into a TypeScript PWA backed by Postgres, aggregating RSS feeds and cutting manual research overhead. Enables analysts to monitor macro catalysts and event signals directly from mobile.",
     year: "2025",
@@ -67,7 +74,14 @@ export const projects: Project[] = [
     category: "ai",
     role: "Founder",
     duration: "Summer 2025",
-    tags: ["Next.js", "TypeScript", "Convex", "LangGraph", "Stripe", "TailwindCSS"],
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "Convex",
+      "LangGraph",
+      "Stripe",
+      "TailwindCSS",
+    ],
     status: "live",
     links: {
       live: "https://chained.chat",
@@ -80,7 +94,7 @@ export const projects: Project[] = [
     title: "NYU Purity Test",
     subtitle: "A campus quiz taken by 3,000+ NYU students (200k+ visits).",
     description:
-      "Designed and launched a high-traffic TypeScript web app that replicated a purity-style questionnaire tailored to NYU culture. Reached 3,000+ completions in under a week, demonstrating viral distribution and resilient client-side engineering under load.",
+      "Launched and marketed a TypeScript web app in 4 hours of a purity questionnaire tailored to NYU culture. Reached 1,000+ completions in under 17 hours.",
     year: "2024",
     category: "product",
     role: "Creator",
@@ -97,7 +111,8 @@ export const projects: Project[] = [
   {
     slug: "habittracker-obh",
     title: "Artist Scouting Dashboard",
-    subtitle: "Cross-platform artist growth tracking for an Atlantic Records venture.",
+    subtitle:
+      "Cross-platform artist growth tracking for an Atlantic Records venture.",
     description:
       "Aggregated Chartmetric, YouTube, TikTok, and Instagram signals into a centralized scouting dashboard. Implemented geo-based artist discovery to find emerging talent in targeted campaign markets.",
     year: "2024",

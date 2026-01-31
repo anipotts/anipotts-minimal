@@ -4,6 +4,8 @@
  * and REST API for commit counts and repo stats.
  */
 
+import { getLanguageColor } from "../utils/languages";
+
 interface ContributionDay {
   contributionCount: number;
   date: string;
@@ -229,32 +231,6 @@ export async function fetchGitHubStats(
   };
 }
 
-/** GitHub language colors (matches linguist). */
-const GITHUB_LANG_COLORS: Record<string, string> = {
-  TypeScript: "#3178c6",
-  JavaScript: "#f1e05a",
-  Python: "#3572A5",
-  Go: "#00ADD8",
-  Rust: "#dea584",
-  Java: "#b07219",
-  "C++": "#f34b7d",
-  C: "#555555",
-  Ruby: "#701516",
-  PHP: "#4F5D95",
-  Swift: "#F05138",
-  Kotlin: "#A97BFF",
-  HTML: "#e34c26",
-  CSS: "#563d7c",
-  SCSS: "#c6538c",
-  Shell: "#89e051",
-  Lua: "#000080",
-  Dockerfile: "#384d54",
-  Nix: "#7e7eff",
-  HCL: "#844fba",
-  Zig: "#ec915c",
-  MDX: "#fcb32c",
-};
-
 /**
  * Fetch aggregated language breakdown across all public repos.
  * Uses the per-repo `/languages` endpoint and sums bytes.
@@ -312,7 +288,7 @@ export async function fetchRepoLanguages(
     name,
     bytes,
     percentage: totalBytes > 0 ? Math.round((bytes / totalBytes) * 1000) / 10 : 0,
-    color: GITHUB_LANG_COLORS[name] ?? "#6b7280",
+    color: getLanguageColor(name),
   }));
 
   return {

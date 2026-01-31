@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { FadeIn } from "@anipotts/ui";
 import ThoughtLink from "@/components/ThoughtLink";
+import type { Thought } from "@anipotts/types";
 
 export const revalidate = 0;
 
@@ -43,7 +44,7 @@ export default async function ThoughtsPage() {
               <p className="text-muted italic text-sm">No thoughts published yet.</p>
             </FadeIn>
           ) : (
-            thoughts.map((thought: { slug: string; title: string; summary: string; created_at: string; tags: string[] }, i: number) => (
+            thoughts.map((thought: Thought, i: number) => (
               <FadeIn key={thought.slug} delay={i * 0.1}>
                 <ThoughtLink thought={thought} />
               </FadeIn>
