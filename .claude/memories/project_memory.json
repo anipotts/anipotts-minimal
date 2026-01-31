@@ -4,77 +4,35 @@
   "realtime_memories": [
     {
       "type": "architecture",
-      "content": "Turborepo monorepo with 9 subdomain apps (www, thoughts, dev, links, updates, metrics, status, lab, docs) and shared packages (ui, lib, types, config, styles). CLI app removed Jan 30. Three-layer shared system: @anipotts/lib (plain helpers) → @anipotts/ui (client components with callback props) → per-app actions.ts (thin 'use server' wrappers). Shared packages built with tsup. GitHub: https://github.com/anipotts/anipotts.com.",
-      "added_at": "2026-01-30T20:00:00.000000",
-      "source": "consolidated"
-    },
-    {
-      "type": "environment",
-      "content": "Required env vars: NEXT_PUBLIC_POSTHOG_KEY, NEXT_PUBLIC_POSTHOG_HOST, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, GITHUB_USERNAME, WAKATIME_API_KEY, CRON_SECRET. Dev: 'pnpm turbo dev --concurrency=15'. Build shared: 'pnpm --filter @anipotts/lib build && pnpm --filter @anipotts/ui build'. Vercel: pnpm 10.x, each app has its own vercel.json. Use printf (not echo) for env vars — echo adds trailing newline that breaks CRON_SECRET validation.",
-      "added_at": "2026-01-30T20:00:00.000000",
+      "content": "Turborepo monorepo with 9 subdomain apps (www, thoughts, dev, links, updates, metrics, status, lab, docs) and shared packages (ui, lib, types, config, styles). Three-layer shared system: @anipotts/lib (plain helpers) → @anipotts/ui (client components with callback props) → per-app actions.ts (thin 'use server' wrappers). Shared packages built with tsup. GitHub: https://github.com/anipotts/anipotts.com.",
+      "added_at": "2026-01-31T01:30:00.000000",
       "source": "consolidated"
     },
     {
       "type": "branding",
       "content": "Accent: #61ABEA (blue). Handles: @anipottsbuilds (social), @anipotts (GitHub/LinkedIn). Email: contact@anipotts.com. Bio: 'minimal interfaces to orchestrate complex systems'. Terminal header: 'ani@potts:~/[domain]' with responsive prefix hiding. Font: JetBrains Mono. Design tokens in packages/styles/src/tokens.css (light in :root, dark in .dark).",
-      "added_at": "2026-01-30T20:00:00.000000",
+      "added_at": "2026-01-31T01:30:00.000000",
       "source": "consolidated"
     },
     {
-      "type": "data_layer",
-      "content": "Shared data in @anipotts/lib with tsup multi-entry builds. Modules: data/ (projects, social, site, services, SITE_VERSION), admin/ (auth, thoughts CRUD with Partial<Thought> types), metrics/ (GitHub stats/languages/commits, WakaTime, Supabase cache), status/ (HTTP checker, Supabase persistence). Supabase tables: thoughts, metrics_cache (key-value JSONB), status_checks, favorite_numbers. Vercel Crons: metrics daily 6AM UTC, status every 5 min. Import Supabase via @anipotts/lib/supabase to avoid pnpm version mismatches.",
-      "added_at": "2026-01-30T20:00:00.000000",
+      "type": "data_and_env",
+      "content": "Shared data in @anipotts/lib with tsup multi-entry builds. Modules: data/ (projects, social, site with subdomains array, services, SITE_VERSION), admin/ (auth, thoughts CRUD), metrics/ (GitHub/WakaTime, Supabase cache), status/ (HTTP checker). Supabase tables: thoughts, metrics_cache, status_checks, favorite_numbers. Vercel Crons: metrics daily 6AM UTC, status every 5 min. Import Supabase via @anipotts/lib/supabase. Env vars: NEXT_PUBLIC_POSTHOG_KEY (www only), NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, WAKATIME_API_KEY, CRON_SECRET. Use printf (not echo) for env vars. Dev: 'pnpm turbo dev --concurrency=15'.",
+      "added_at": "2026-01-31T01:30:00.000000",
       "source": "consolidated"
     },
     {
       "type": "conventions",
-      "content": ".gitignore includes .turbo, next-env.d.ts, *.tsbuildinfo. SEO: robots.txt, sitemap.ts, Person schema, OG cards. SubdomainNavigator (Ctrl+`) on www. Admin accessed via Cmd+Shift+A, cookie-based auth per domain. ./server export uses source path (not dist) to avoid tsup dual-config issues. Shared next config in packages/config/next/base.ts — DO NOT use serverExternalPackages for framer-motion (breaks SSG prerendering useContext). Use turbopack.resolveAlias for node:fs stub instead.",
-      "added_at": "2026-01-30T20:00:00.000000",
+      "content": "Admin accessed via Cmd+Shift+A (hidden), cookie-based auth per domain. TerminalNavigator (Ctrl+`) on all 9 apps via @anipotts/ui/terminal-navigator — replaced old SubdomainNavigator modal (Jan 31). ./server export uses source path (not dist) to avoid tsup dual-config issues. Shared next config in packages/config/next/base.ts — DO NOT use serverExternalPackages for framer-motion (breaks SSG). Use turbopack.resolveAlias for node:fs stub. PostHog only configured on www Vercel project.",
+      "added_at": "2026-01-31T01:30:00.000000",
       "source": "consolidated"
     },
     {
       "type": "completed_work",
-      "content": "Ecosystem unification (Jan 29): shared data layer, admin system, real GitHub+WakaTime metrics, HTTP status monitoring, dynamic dev/updates pages, lab/docs cleanup. Light/dark/system theme (Jan 30): ThemeProvider + ThemeScript + ThemeToggle, CSS variable tokens, WavesBackground theme-aware. Deep cleanup (Jan 30): 8-phase plan completed — security fixes (cron auth, input validation), dead code removal (~1000 lines), dependency alignment (framer-motion 12.23.25 pinned, React 19.2.1), shared next config (baseNextConfig), layout dedup (TerminalBackground + TerminalHeader shared components, inline providers per layout), type safety (Thought types, PostHog guards, try/catch, generateMetadata for thoughts), accessibility (focus-visible, prefers-reduced-motion), CLI app removed. All 9 apps build + typecheck clean.",
-      "added_at": "2026-01-30T20:00:00.000000",
+      "content": "Jan 29: Ecosystem unification — shared data layer, admin system, real GitHub+WakaTime metrics, HTTP status monitoring. Jan 30: Light/dark/system theme (ThemeProvider + ThemeScript + ThemeToggle, CSS variable tokens). Deep cleanup — 10 parallel review agents → 8-phase plan: security fixes, dead code removal (~1000 lines), dependency alignment (framer-motion 12.23.25, React 19.2.1), shared next config, layout dedup, type safety, accessibility, CLI app removed. Jan 31: Terminal Navigator — slide-up interactive terminal replacing SubdomainNavigator, 12 commands (help, ls, cd, open, pwd, whoami, clear, echo, neofetch, ping, history, exit), tab completion, command history, spring animation, deployed to all 9 apps. All apps build + typecheck clean.",
+      "added_at": "2026-01-31T01:30:00.000000",
       "source": "consolidated"
-    },
-    {
-      "type": "claude_response",
-      "content": "Consolidated 11 memories down to 6. Removed noise (raw message captures, claude_response fragments, API key leak, truncated user messages) and merged completed work into a single timeline entry. Updat",
-      "added_at": "2026-01-30T21:48:17.064481",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "can you give me an accurate summary clearly of what was done from all the analysis and codecleanup parallel",
-      "added_at": "2026-01-30T21:48:17.064513",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "claude_response",
-      "content": "## Monorepo Deep Cleanup — Complete Summary\n\n10 parallel code review agents scanned all 10 apps and 5 packages. Their findings were consolidated into an 8-phase plan, all of which has been implemented",
-      "added_at": "2026-01-31T00:01:58.707703",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "can you do an analysis of which subdomains admin features don't work? And also make sure that for any subdomain or domain the admin interface is not accessible through like an admin tab button. It sho",
-      "added_at": "2026-01-31T00:01:58.707728",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "claude_response",
-      "content": "`★ Insight ─────────────────────────────────────`\n**PostHog is completely dark on all subdomains.** `NEXT_PUBLIC_POSTHOG_KEY` isn't set on any of the 8 Vercel subdomain projects — only www has it. Eve",
-      "added_at": "2026-01-31T00:17:31.613351",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "Implement the following plan: # Monorepo Deep Cleanup & Optimization Plan 10 parallel code review agents analyzed every file across all 10 apps and 5 shared packages. This plan consolidates their find",
-      "added_at": "2026-01-31T00:17:31.613450",
-      "source": "realtime_capture"
     }
   ],
   "created_at": "2026-01-05T21:51:27.232246",
-  "updated_at": "2026-01-31T00:17:31.613452"
+  "updated_at": "2026-01-31T01:30:00.000000"
 }

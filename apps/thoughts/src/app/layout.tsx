@@ -17,6 +17,7 @@ import {
 import { ThemeScript } from "@anipotts/ui/server";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/AdminOverlay";
+import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -89,6 +90,7 @@ export default function RootLayout({
               <MinimizedPill />
 
             </WindowLayoutWrapper>
+            <TerminalNavigator currentSubdomain="thoughts" />
           </WindowProvider>
           </AdminProvider>
         </PostHogProvider>

@@ -20,7 +20,7 @@ import { ThemeScript } from "@anipotts/ui/server";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import PersonSchema from "@/components/PersonSchema";
-import SubdomainNavigator from "@/components/SubdomainNavigator";
+import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -140,7 +140,7 @@ export default function RootLayout({
               </WindowLayoutWrapper>
 
               <AdminOverlay />
-              <SubdomainNavigator />
+              <TerminalNavigator currentSubdomain="www" />
             </WindowProvider>
           </AdminProvider>
         </PostHogProvider>

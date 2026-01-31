@@ -11,6 +11,7 @@ export default defineConfig({
     "hooks/index": "src/hooks/index.ts",
     "providers/index": "src/providers/index.ts",
     "admin/index": "src/admin/index.ts",
+    "terminal-navigator/index": "src/terminal-navigator/index.ts",
   },
   format: ["esm"],
   dts: true,
