@@ -49,6 +49,17 @@ export function TerminalNavigator({
     };
   }, [state]);
 
+  // Lock body scroll when terminal is open
+  useEffect(() => {
+    if (state.isOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [state.isOpen]);
+
   // Fire callbacks
   useEffect(() => {
     if (state.isOpen) {
@@ -165,7 +176,7 @@ export function TerminalNavigator({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[9998] bg-[var(--backdrop-medium)] backdrop-blur-sm"
+            className="fixed inset-0 z-[9998] bg-[var(--background)]"
           />
 
           {/* Terminal panel */}
