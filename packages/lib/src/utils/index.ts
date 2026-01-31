@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+export { LANGUAGE_COLORS, getLanguageColor } from "./languages";
+
 /**
  * Utility to merge Tailwind CSS classes with clsx
  * Handles conflicts and conditional classes elegantly

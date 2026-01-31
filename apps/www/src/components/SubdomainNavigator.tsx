@@ -23,7 +23,6 @@ const SUBDOMAINS: SubdomainEntry[] = [
   { name: "status", url: "https://status.anipotts.com", desc: "system uptime", status: "production", permissions: "drwxr-xr-x" },
   { name: "lab", url: "https://lab.anipotts.com", desc: "experiments", status: "production", permissions: "drwxr-xr-x" },
   { name: "docs", url: "https://docs.anipotts.com", desc: "documentation", status: "production", permissions: "dr-xr-xr-x" },
-  { name: "cli", url: "https://cli.anipotts.com", desc: "terminal interface", status: "coming-soon", permissions: "drwx------" },
 ];
 
 function StatusDot({ status }: { status: SubdomainStatus }) {
