@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  framer-motion: 12.23.25
+
 importers:
 
   .:
@@ -18,64 +21,6 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
-  apps/cli:
-    dependencies:
-      '@anipotts/lib':
-        specifier: workspace:*
-        version: link:../../packages/lib
-      '@anipotts/styles':
-        specifier: workspace:^
-        version: link:../../packages/styles
-      '@anipotts/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@anipotts/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      next:
-        specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.4(react@19.2.4)
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.5.0(react@19.2.4)
-    devDependencies:
-      '@anipotts/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@tailwindcss/postcss':
-        specifier: ^4.0.0
-        version: 4.1.18
-      '@types/node':
-        specifier: ^22.10.3
-        version: 22.19.7
-      '@types/react':
-        specifier: ^19.0.3
-        version: 19.2.9
-      '@types/react-dom':
-        specifier: ^19.0.2
-        version: 19.2.3(@types/react@19.2.9)
-      tailwindcss:
-        specifier: ^4.0.0
-        version: 4.1.18
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-
   apps/dev:
     dependencies:
       '@anipotts/lib':
@@ -84,32 +29,20 @@ importers:
       '@anipotts/styles':
         specifier: workspace:^
         version: link:../../packages/styles
-      '@anipotts/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -148,26 +81,17 @@ importers:
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -206,26 +130,17 @@ importers:
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -258,32 +173,23 @@ importers:
       '@anipotts/styles':
         specifier: workspace:^
         version: link:../../packages/styles
-      '@anipotts/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 12.23.25
+        version: 12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -322,26 +228,20 @@ importers:
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
-        specifier: ^1.194.4
+        specifier: ^1.300.0
         version: 1.335.3
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -380,26 +280,23 @@ importers:
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 12.23.25
+        version: 12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
-        specifier: ^1.194.4
+        specifier: ^1.300.0
         version: 1.335.3
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -441,29 +338,26 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.47.10
         version: 2.93.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 12.23.25
+        version: 12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
-        specifier: ^1.194.4
+        specifier: ^1.300.0
         version: 1.335.3
       posthog-node:
         specifier: ^4.3.2
         version: 4.18.0
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
       react-markdown:
         specifier: ^9.0.1
@@ -505,26 +399,17 @@ importers:
       '@anipotts/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      framer-motion:
-        specifier: ^11.15.0
-        version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      posthog-js:
-        specifier: ^1.194.4
-        version: 1.335.3
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.1
         version: 19.2.4(react@19.2.4)
       react-icons:
-        specifier: ^5.4.0
+        specifier: ^5.5.0
         version: 5.5.0(react@19.2.4)
     devDependencies:
       '@anipotts/config':
@@ -573,17 +458,14 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       framer-motion:
-        specifier: ^12.23.25
-        version: 12.29.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 12.23.25
+        version: 12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       lucide-react:
         specifier: ^0.555.0
         version: 0.555.0(react@19.2.4)
-      marked:
-        specifier: ^17.0.1
-        version: 17.0.1
       next:
         specifier: ^16.0.7
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
         specifier: ^1.300.0
         version: 1.335.3
@@ -602,18 +484,12 @@ importers:
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.2.9)(react@19.2.4)
-      react-quill-new:
-        specifier: ^3.6.0
-        version: 3.7.0(quill-delta@5.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       resend:
         specifier: ^6.5.2
         version: 6.8.0
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
-      turndown:
-        specifier: ^7.2.2
-        version: 7.2.2
     devDependencies:
       '@anipotts/config':
         specifier: workspace:*
@@ -624,9 +500,6 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.1.18)
-      '@types/marked':
-        specifier: ^5.0.2
-        version: 5.0.2
       '@types/node':
         specifier: ^20
         version: 20.19.30
@@ -636,15 +509,12 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.9)
-      '@types/turndown':
-        specifier: ^5.0.6
-        version: 5.0.6
       eslint:
         specifier: ^9
         version: 9.39.2(jiti@2.6.1)
       eslint-config-next:
         specifier: ^16.0.7
-        version: 16.1.5(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+        version: 16.1.5(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.1.18
@@ -665,7 +535,10 @@ importers:
         version: 9.39.2(jiti@2.6.1)
       eslint-config-next:
         specifier: ^16.0.7
-        version: 16.1.5(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+        version: 16.1.5(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      next:
+        specifier: ^16.0.0
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwindcss:
         specifier: ^4
         version: 4.1.18
@@ -711,18 +584,21 @@ importers:
 
   packages/ui:
     dependencies:
+      '@anipotts/lib':
+        specifier: workspace:*
+        version: link:../lib
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
       framer-motion:
-        specifier: ^12.23.25
-        version: 12.29.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 12.23.25
+        version: 12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       lucide-react:
         specifier: ^0.555.0
         version: 0.555.0(react@19.2.4)
       next:
         specifier: ^16.0.0
-        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
         specifier: ^1.300.0
         version: 1.335.3
@@ -1197,9 +1073,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@mixmark-io/domino@2.2.0':
-    resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
-
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
@@ -1653,9 +1526,6 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/marked@5.0.2':
-    resolution: {integrity: sha512-OucS4KMHhFzhz27KxmWg7J+kIYqyqoW5kdIEI319hqARQQUTqhao3M/F+uFnDXD0Rg72iDDZxZNxq5gvctmLlg==}
-
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -1681,9 +1551,6 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
-
-  '@types/turndown@5.0.6':
-    resolution: {integrity: sha512-ru00MoyeeouE5BX4gRL+6m/BsDfbRayOskWqUvh7CLGW+UXxHQItqALa38kKnOiZPqJrtzJUgAC2+F0rL1S4Pg==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -2314,17 +2181,11 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
 
-  eventemitter3@5.0.4:
-    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
-
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
-
-  fast-diff@1.3.0:
-    resolution: {integrity: sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==}
 
   fast-glob@3.3.1:
     resolution: {integrity: sha512-kNFPyjhh5cKjrUltxs+wFx+ZkbRaxxmZ+X0ZU31SOsxCEtP9VPgtq2teZw1DebupL5GmDaNQ6yKMMVcM41iqDg==}
@@ -2393,22 +2254,8 @@ packages:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
-  framer-motion@11.18.2:
-    resolution: {integrity: sha512-5F5Och7wrvtLVElIpclDT0CBzMVg3dL22B64aZwHtsIY8RB4mXICLrkajK4G9R+ieSAGcgrLeae2SeUTg2pr6w==}
-    peerDependencies:
-      '@emotion/is-prop-valid': '*'
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@emotion/is-prop-valid':
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-
-  framer-motion@12.29.2:
-    resolution: {integrity: sha512-lSNRzBJk4wuIy0emYQ/nfZ7eWhqud2umPKw2QAQki6uKhZPKm2hRQHeQoHTG9MIvfobb+A/LbEWPJU794ZUKrg==}
+  framer-motion@12.23.25:
+    resolution: {integrity: sha512-gUHGl2e4VG66jOcH0JHhuJQr6ZNwrET9g31ZG0xdXzT0CznP7fHX4P8Bcvuc4MiUB90ysNnWX2ukHRIggkl6hQ==}
     peerDependencies:
       '@emotion/is-prop-valid': '*'
       react: ^18.0.0 || ^19.0.0
@@ -2825,16 +2672,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash-es@4.17.23:
-    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
-
-  lodash.clonedeep@4.5.0:
-    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
-
-  lodash.isequal@4.5.0:
-    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
-    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
-
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -2858,11 +2695,6 @@ packages:
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
-
-  marked@17.0.1:
-    resolution: {integrity: sha512-boeBdiS0ghpWcSwoNm/jJBwdpFaMnZWRzjA6SkUMYb40SVaN1x7mmfGKp0jvexGcx+7y2La5zRZsYFZI6Qpypg==}
-    engines: {node: '>= 20'}
-    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -2984,14 +2816,8 @@ packages:
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
 
-  motion-dom@11.18.1:
-    resolution: {integrity: sha512-g76KvA001z+atjfxczdRtw/RXOM3OMSdd1f4DL77qCTF/+avrRJiawSG4yDibEQ215sr9kpinSlX2pCTJ9zbhw==}
-
   motion-dom@12.29.2:
     resolution: {integrity: sha512-/k+NuycVV8pykxyiTCoFzIVLA95Nb1BFIVvfSu9L50/6K6qNeAYtkxXILy/LRutt7AzaYDc2myj0wkCVVYAPPA==}
-
-  motion-utils@11.18.1:
-    resolution: {integrity: sha512-49Kt+HKjtbJKLtgO/LKj9Ld+6vw9BjH5d9sc40R/kVyH8GLAXgT42M2NnuPcJNuA3s9ZfZBUcwIgpmZWGEE+hA==}
 
   motion-utils@12.29.2:
     resolution: {integrity: sha512-G3kc34H2cX2gI63RqU+cZq+zWRRPSsNIOjpdl9TN4AQwC4sgwYPl/Q/Obf/d53nOm569T0fYK+tcoSV50BWx8A==}
@@ -3086,9 +2912,6 @@ packages:
   p-locate@5.0.0:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
-
-  parchment@3.0.0:
-    resolution: {integrity: sha512-HUrJFQ/StvgmXRcQ1ftY6VEZUq3jA2t9ncFN4F84J/vN0/FPpQF+8FKXb3l6fLces6q0uOHj6NJn+2xvZnxO6A==}
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -3209,14 +3032,6 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  quill-delta@5.1.0:
-    resolution: {integrity: sha512-X74oCeRI4/p0ucjb5Ma8adTXd9Scumz367kkMK5V/IatcX6A0vlgLgKbzXWy5nZmCGeNJm2oQX0d2Eqj+ZIlCA==}
-    engines: {node: '>= 12.0.0'}
-
-  quill@2.0.3:
-    resolution: {integrity: sha512-xEYQBqfYx/sfb33VJiKnSJp8ehloavImQ2A6564GAbqG55PGw1dAWUn1MUbQB62t0azawUS2CZZhWCjO8gRvTw==}
-    engines: {npm: '>=8.2.3'}
-
   react-dom@19.2.4:
     resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
     peerDependencies:
@@ -3241,13 +3056,6 @@ packages:
     peerDependencies:
       '@types/react': '>=18'
       react: '>=18'
-
-  react-quill-new@3.7.0:
-    resolution: {integrity: sha512-i5qz1WukIR84ktJrA2VMcZdkRrfOl/4TAK6ygMTX1/9Grcrgj0NW+LnoanBhuIbHaHJZwcvcWMBvSjUFsxQIQA==}
-    peerDependencies:
-      quill-delta: ^5.1.0
-      react: ^16 || ^17 || ^18 || ^19
-      react-dom: ^16 || ^17 || ^18 || ^19
 
   react@19.2.4:
     resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
@@ -3571,9 +3379,6 @@ packages:
   turbo@2.7.6:
     resolution: {integrity: sha512-PO9AvJLEsNLO+EYhF4zB+v10hOjsJe5kJW+S6tTbRv+TW7gf1Qer4mfjP9h3/y9h8ZiPvOrenxnEgDtFgaM5zw==}
     hasBin: true
-
-  turndown@7.2.2:
-    resolution: {integrity: sha512-1F7db8BiExOKxjSMU2b7if62D/XOyQyZbPKq/nUwopfgnHlqXHqQ0lvfUTeUIr1lZJzOPFn43dODyMSIfvWRKQ==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -4090,8 +3895,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@mixmark-io/domino@2.2.0': {}
-
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
       '@emnapi/core': 1.8.1
@@ -4466,8 +4269,6 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/marked@5.0.2': {}
-
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -4494,8 +4295,6 @@ snapshots:
 
   '@types/trusted-types@2.0.7':
     optional: true
-
-  '@types/turndown@5.0.6': {}
 
   '@types/unist@2.0.11': {}
 
@@ -5102,7 +4901,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.2(jiti@2.6.1))
@@ -5155,7 +4954,7 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -5195,7 +4994,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -5373,13 +5172,9 @@ snapshots:
 
   esutils@2.0.3: {}
 
-  eventemitter3@5.0.4: {}
-
   extend@3.0.2: {}
 
   fast-deep-equal@3.1.3: {}
-
-  fast-diff@1.3.0: {}
 
   fast-glob@3.3.1:
     dependencies:
@@ -5445,16 +5240,7 @@ snapshots:
       hasown: 2.0.2
       mime-types: 2.1.35
 
-  framer-motion@11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
-    dependencies:
-      motion-dom: 11.18.1
-      motion-utils: 11.18.1
-      tslib: 2.8.1
-    optionalDependencies:
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-
-  framer-motion@12.29.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  framer-motion@12.23.25(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       motion-dom: 12.29.2
       motion-utils: 12.29.2
@@ -5850,12 +5636,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash-es@4.17.23: {}
-
-  lodash.clonedeep@4.5.0: {}
-
-  lodash.isequal@4.5.0: {}
-
   lodash.merge@4.6.2: {}
 
   long@5.3.2: {}
@@ -5877,8 +5657,6 @@ snapshots:
   magic-string@0.30.21:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  marked@17.0.1: {}
 
   math-intrinsics@1.1.0: {}
 
@@ -6134,15 +5912,9 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.3
 
-  motion-dom@11.18.1:
-    dependencies:
-      motion-utils: 11.18.1
-
   motion-dom@12.29.2:
     dependencies:
       motion-utils: 12.29.2
-
-  motion-utils@11.18.1: {}
 
   motion-utils@12.29.2: {}
 
@@ -6160,7 +5932,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  next@16.1.5(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@next/env': 16.1.5
       '@swc/helpers': 0.5.15
@@ -6169,7 +5941,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      styled-jsx: 5.1.6(react@19.2.4)
+      styled-jsx: 5.1.6(@babel/core@7.28.6)(react@19.2.4)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.5
       '@next/swc-darwin-x64': 16.1.5
@@ -6251,8 +6023,6 @@ snapshots:
   p-locate@5.0.0:
     dependencies:
       p-limit: 3.1.0
-
-  parchment@3.0.0: {}
 
   parent-module@1.0.1:
     dependencies:
@@ -6379,19 +6149,6 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  quill-delta@5.1.0:
-    dependencies:
-      fast-diff: 1.3.0
-      lodash.clonedeep: 4.5.0
-      lodash.isequal: 4.5.0
-
-  quill@2.0.3:
-    dependencies:
-      eventemitter3: 5.0.4
-      lodash-es: 4.17.23
-      parchment: 3.0.0
-      quill-delta: 5.1.0
-
   react-dom@19.2.4(react@19.2.4):
     dependencies:
       react: 19.2.4
@@ -6438,14 +6195,6 @@ snapshots:
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  react-quill-new@3.7.0(quill-delta@5.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
-    dependencies:
-      lodash-es: 4.17.23
-      quill: 2.0.3
-      quill-delta: 5.1.0
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
 
   react@19.2.4: {}
 
@@ -6745,10 +6494,12 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.7
 
-  styled-jsx@5.1.6(react@19.2.4):
+  styled-jsx@5.1.6(@babel/core@7.28.6)(react@19.2.4):
     dependencies:
       client-only: 0.0.1
       react: 19.2.4
+    optionalDependencies:
+      '@babel/core': 7.28.6
 
   sucrase@3.35.1:
     dependencies:
@@ -6871,10 +6622,6 @@ snapshots:
       turbo-linux-arm64: 2.7.6
       turbo-windows-64: 2.7.6
       turbo-windows-arm64: 2.7.6
-
-  turndown@7.2.2:
-    dependencies:
-      '@mixmark-io/domino': 2.2.0
 
   type-check@0.4.0:
     dependencies:

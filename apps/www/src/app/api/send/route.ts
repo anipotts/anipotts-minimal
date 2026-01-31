@@ -13,6 +13,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || typeof name !== 'string' || name.length > 100 || typeof message !== 'string' || message.length > 5000) {
+      return NextResponse.json(
+        { error: 'Invalid input' },
+        { status: 400 }
+      );
+    }
+
     const data = await resend.emails.send({
       from: 'Contact Form <onboarding@resend.dev>', // Update this to your verified domain if you have one, e.g., contact@anipotts.com
       to: ['contact@anipotts.com'],

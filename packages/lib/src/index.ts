@@ -19,6 +19,9 @@ export {
   slugify,
 } from "./utils";
 
+// Constants
+export { SITE_VERSION } from "./constants";
+
 // Feature flags
 export {
   featureFlags,

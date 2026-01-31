@@ -1,20 +1,60 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaCircle, FaPlus, FaSearch, FaSave, FaTrash } from "react-icons/fa";
 import { upsertThought, deleteThought, getAdminThoughts } from "../actions";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import posthog from "posthog-js";
-import { useDebounce } from "@/hooks/useDebounce";
+import type { Thought } from "@anipotts/types";
+
+type EditableThought = Partial<Thought> & Pick<Thought, "title" | "slug" | "content" | "published" | "tags">;
 
 export default function ContentManager() {
-  const [thoughts, setThoughts] = useState<any[]>([]);
-  const [editing, setEditing] = useState<any>(null);
+  const [thoughts, setThoughts] = useState<Thought[]>([]);
+  const [editing, setEditing] = useState<EditableThought | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  const debouncedEditing = useDebounce(editing, 1000);
+  const fetchThoughts = async () => {
+    const data = await getAdminThoughts();
+    if (data) setThoughts(data as Thought[]);
+  };
+
+  const handleSave = useCallback(async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editing) return;
+
+    setLoading(true);
+    try {
+      const savedThought = await upsertThought(editing) as Thought;
+
+      if (typeof posthog?.capture === 'function') {
+        posthog.capture('thought_saved', {
+          thought_title: editing.title,
+          thought_slug: editing.slug,
+          is_new: !editing.id,
+          is_published: editing.published,
+        });
+      }
+
+      setThoughts(prev => {
+        const exists = prev.find(t => t.id === savedThought.id);
+        if (exists) return prev.map(t => t.id === savedThought.id ? savedThought : t);
+        return [savedThought, ...prev];
+      });
+
+      setEditing(savedThought);
+      setUnsavedChanges(false);
+    } catch (err) {
+      if (typeof posthog?.captureException === 'function') {
+        posthog.captureException(err);
+      }
+      alert("Error saving");
+      console.error(err);
+    }
+    setLoading(false);
+  }, [editing]);
 
   useEffect(() => {
     fetchThoughts();
@@ -35,43 +75,7 @@ export default function ContentManager() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [editing]);
-
-  const fetchThoughts = async () => {
-    const data = await getAdminThoughts();
-    if (data) setThoughts(data);
-  };
-
-  const handleSave = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!editing) return;
-
-    setLoading(true);
-    try {
-      const savedThought = await upsertThought(editing);
-
-      posthog.capture('thought_saved', {
-        thought_title: editing.title,
-        thought_slug: editing.slug,
-        is_new: !editing.id,
-        is_published: editing.published,
-      });
-
-      setThoughts(prev => {
-        const exists = prev.find(t => t.id === savedThought.id);
-        if (exists) return prev.map(t => t.id === savedThought.id ? savedThought : t);
-        return [savedThought, ...prev];
-      });
-
-      setEditing(savedThought);
-      setUnsavedChanges(false);
-    } catch (err) {
-      posthog.captureException(err);
-      alert("Error saving");
-      console.error(err);
-    }
-    setLoading(false);
-  };
+  }, [editing, handleSave]);
 
   const handleDelete = async () => {
     if (!editing || !editing.id) return;
@@ -79,7 +83,9 @@ export default function ContentManager() {
 
     try {
       await deleteThought(editing.id);
-      posthog.capture('thought_deleted', { thought_id: editing.id });
+      if (typeof posthog?.capture === 'function') {
+        posthog.capture('thought_deleted', { thought_id: editing.id });
+      }
 
       setThoughts(prev => prev.filter(t => t.id !== editing.id));
       setEditing(null);

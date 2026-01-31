@@ -20,18 +20,23 @@ async function getActivity(): Promise<{
     return { commits: [], fetchedAt: null };
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const cached = await getCacheValue<GitHubRecentActivity>(
-    supabase,
-    CACHE_KEYS.GITHUB_ACTIVITY,
-  );
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const cached = await getCacheValue<GitHubRecentActivity>(
+      supabase,
+      CACHE_KEYS.GITHUB_ACTIVITY,
+    );
 
-  if (!cached) return { commits: [], fetchedAt: null };
+    if (!cached) return { commits: [], fetchedAt: null };
 
-  return {
-    commits: cached.value.commits,
-    fetchedAt: cached.value.fetchedAt,
-  };
+    return {
+      commits: cached.value.commits,
+      fetchedAt: cached.value.fetchedAt,
+    };
+  } catch (e) {
+    console.error("Error fetching activity:", e);
+    return { commits: [], fetchedAt: null };
+  }
 }
 
 /** Group commits by date, then by repo within each date. */

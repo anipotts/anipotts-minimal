@@ -7,6 +7,9 @@ export { socialLinks, SOCIAL_HANDLE, CONTACT_EMAIL } from "./social";
 // Site metadata
 export { site, subdomains } from "./site";
 
+// Constants
+export { SITE_VERSION } from "../constants";
+
 // Monitored services
 export { monitoredServices } from "./services";
 export type { MonitoredService } from "./services";

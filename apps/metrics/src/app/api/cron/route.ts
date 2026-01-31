@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -100,9 +100,14 @@ export async function GET(request: Request) {
     results.wakatime = "skipped (no WAKATIME_API_KEY)";
   }
 
-  return NextResponse.json({
-    success: true,
-    results,
-    timestamp: new Date().toISOString(),
-  });
+  const hasErrors = Object.values(results).some((v) => v.startsWith("error"));
+
+  return NextResponse.json(
+    {
+      success: !hasErrors,
+      results,
+      timestamp: new Date().toISOString(),
+    },
+    hasErrors ? { status: 500 } : undefined,
+  );
 }

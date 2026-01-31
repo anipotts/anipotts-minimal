@@ -31,13 +31,18 @@ async function getLanguages(): Promise<GitHubLanguageBreakdown | null> {
 
   if (!supabaseUrl || !supabaseKey) return null;
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const cached = await getCacheValue<GitHubLanguageBreakdown>(
-    supabase,
-    CACHE_KEYS.GITHUB_LANGUAGES,
-  );
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const cached = await getCacheValue<GitHubLanguageBreakdown>(
+      supabase,
+      CACHE_KEYS.GITHUB_LANGUAGES,
+    );
 
-  return cached?.value ?? null;
+    return cached?.value ?? null;
+  } catch (e) {
+    console.error("Error fetching languages:", e);
+    return null;
+  }
 }
 
 function formatBytes(bytes: number): string {

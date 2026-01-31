@@ -4,53 +4,53 @@
   "realtime_memories": [
     {
       "type": "architecture",
-      "content": "Turborepo monorepo with 10 subdomain apps (www, thoughts, dev, links, updates, metrics, status, lab, docs, cli) and shared packages (ui, lib, types, config, styles). All 9 subdomains import from @anipotts/ui; www keeps local window components. Shared packages built with tsup. Three-layer shared system: @anipotts/lib (plain helpers) → @anipotts/ui (client components with callback props) → per-app actions.ts (thin 'use server' wrappers). GitHub: https://github.com/anipotts/anipotts.com.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": "Turborepo monorepo with 9 subdomain apps (www, thoughts, dev, links, updates, metrics, status, lab, docs) and shared packages (ui, lib, types, config, styles). CLI app removed Jan 30. Three-layer shared system: @anipotts/lib (plain helpers) → @anipotts/ui (client components with callback props) → per-app actions.ts (thin 'use server' wrappers). Shared packages built with tsup. GitHub: https://github.com/anipotts/anipotts.com.",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "environment",
-      "content": "Required env vars: NEXT_PUBLIC_POSTHOG_KEY, NEXT_PUBLIC_POSTHOG_HOST, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, GITHUB_USERNAME, WAKATIME_API_KEY, CRON_SECRET. Dev: 'pnpm turbo dev --concurrency=15'. Build shared: 'pnpm --filter @anipotts/lib build && pnpm --filter @anipotts/ui build'. Vercel: pnpm 10.x, each app has its own vercel.json. All 9 subdomains deployed to Vercel with custom domains.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": "Required env vars: NEXT_PUBLIC_POSTHOG_KEY, NEXT_PUBLIC_POSTHOG_HOST, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, GITHUB_USERNAME, WAKATIME_API_KEY, CRON_SECRET. Dev: 'pnpm turbo dev --concurrency=15'. Build shared: 'pnpm --filter @anipotts/lib build && pnpm --filter @anipotts/ui build'. Vercel: pnpm 10.x, each app has its own vercel.json. Use printf (not echo) for env vars — echo adds trailing newline that breaks CRON_SECRET validation.",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "branding",
-      "content": "Accent: #61ABEA (blue). Handles: @anipottsbuilds (social), @anipotts (GitHub/LinkedIn). Email: contact@anipotts.com. Bio: 'minimal interfaces to orchestrate complex systems'. Terminal header: 'ani@potts:~/[domain]' with responsive prefix hiding. Font: JetBrains Mono. Design tokens in packages/styles/src/tokens.css.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": "Accent: #61ABEA (blue). Handles: @anipottsbuilds (social), @anipotts (GitHub/LinkedIn). Email: contact@anipotts.com. Bio: 'minimal interfaces to orchestrate complex systems'. Terminal header: 'ani@potts:~/[domain]' with responsive prefix hiding. Font: JetBrains Mono. Design tokens in packages/styles/src/tokens.css (light in :root, dark in .dark).",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "data_layer",
-      "content": "Shared data in @anipotts/lib with tsup multi-entry builds. Modules: data/ (projects, social, site, services), admin/ (auth, thoughts CRUD), metrics/ (GitHub stats/languages/commits, WakaTime, Supabase cache), status/ (HTTP checker, Supabase persistence). Supabase tables: thoughts, metrics_cache (key-value JSONB), status_checks, favorite_numbers. Vercel Crons: metrics daily 6AM UTC, status every 5 min. Import Supabase via @anipotts/lib/supabase to avoid pnpm version mismatches.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": "Shared data in @anipotts/lib with tsup multi-entry builds. Modules: data/ (projects, social, site, services, SITE_VERSION), admin/ (auth, thoughts CRUD with Partial<Thought> types), metrics/ (GitHub stats/languages/commits, WakaTime, Supabase cache), status/ (HTTP checker, Supabase persistence). Supabase tables: thoughts, metrics_cache (key-value JSONB), status_checks, favorite_numbers. Vercel Crons: metrics daily 6AM UTC, status every 5 min. Import Supabase via @anipotts/lib/supabase to avoid pnpm version mismatches.",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "conventions",
-      "content": ".gitignore includes .turbo and next-env.d.ts. tsconfig uses jsx: preserve. SEO: robots.txt, sitemap.ts, Person schema, OG cards. Headshot: /images/ani-potts-headshot.png. SubdomainNavigator (Ctrl+`) on www shows all 9 subdomains with SSH config aesthetic. Admin accessed via Cmd+Shift+A, cookie-based auth per domain.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": ".gitignore includes .turbo, next-env.d.ts, *.tsbuildinfo. SEO: robots.txt, sitemap.ts, Person schema, OG cards. SubdomainNavigator (Ctrl+`) on www. Admin accessed via Cmd+Shift+A, cookie-based auth per domain. ./server export uses source path (not dist) to avoid tsup dual-config issues. Shared next config in packages/config/next/base.ts — DO NOT use serverExternalPackages for framer-motion (breaks SSG prerendering useContext). Use turbopack.resolveAlias for node:fs stub instead.",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "completed_work",
-      "content": "7-phase ecosystem unification completed: (1) shared data layer, (2) shared admin system with dependency inversion, (3) real metrics from GitHub+WakaTime APIs with cron, (4) real HTTP status monitoring with cron, (5) dynamic dev page with GitHub language bar + updates page with real commit activity, (6) lab/docs cleanup removing broken links and fake content, (7) www integration with updated SubdomainNavigator statuses. All apps typecheck cleanly.",
-      "added_at": "2026-01-29T18:00:00.000000",
+      "content": "Ecosystem unification (Jan 29): shared data layer, admin system, real GitHub+WakaTime metrics, HTTP status monitoring, dynamic dev/updates pages, lab/docs cleanup. Light/dark/system theme (Jan 30): ThemeProvider + ThemeScript + ThemeToggle, CSS variable tokens, WavesBackground theme-aware. Deep cleanup (Jan 30): 8-phase plan completed — security fixes (cron auth, input validation), dead code removal (~1000 lines), dependency alignment (framer-motion 12.23.25 pinned, React 19.2.1), shared next config (baseNextConfig), layout dedup (TerminalBackground + TerminalHeader shared components, inline providers per layout), type safety (Thought types, PostHog guards, try/catch, generateMetadata for thoughts), accessibility (focus-visible, prefers-reduced-motion), CLI app removed. All 9 apps build + typecheck clean.",
+      "added_at": "2026-01-30T20:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "claude_response",
-      "content": "\n\nAlready consolidated — the file has 6 clean memories, all signal. No action needed.",
-      "added_at": "2026-01-29T18:20:39.113254",
+      "content": "Consolidated 11 memories down to 6. Removed noise (raw message captures, claude_response fragments, API key leak, truncated user messages) and merged completed work into a single timeline entry. Updat",
+      "added_at": "2026-01-30T21:48:17.064481",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "<ide_opened_file>The user opened the file /Users/anipotts/code/active/websites/anipotts.com/tsconfig.json in the IDE. This may or may not be related to the current task.</ide_opened_file> great now ca",
-      "added_at": "2026-01-29T18:20:39.113324",
+      "content": "can you give me an accurate summary clearly of what was done from all the analysis and codecleanup parallel",
+      "added_at": "2026-01-30T21:48:17.064513",
       "source": "realtime_capture"
     }
   ],
   "created_at": "2026-01-05T21:51:27.232246",
-  "updated_at": "2026-01-29T18:20:39.113326"
+  "updated_at": "2026-01-30T21:48:46.313524"
 }

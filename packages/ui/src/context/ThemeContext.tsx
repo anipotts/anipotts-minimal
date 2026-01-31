@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { THEME_STORAGE_KEY } from "../theme-constants";
 
 export type ThemeMode = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
@@ -14,7 +15,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "anipotts-theme";
+const STORAGE_KEY = THEME_STORAGE_KEY;
 const CYCLE_ORDER: ThemeMode[] = ["dark", "light", "system"];
 
 function getSystemPreference(): ResolvedTheme {

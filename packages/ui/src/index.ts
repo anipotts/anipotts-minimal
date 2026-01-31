@@ -27,6 +27,9 @@ export type { FadeInProps, WavesProps } from "./components/animation";
 export { StatusDot } from "./components/feedback";
 export type { StatusDotProps } from "./components/feedback";
 
+// Layout components
+export { TerminalBackground, TerminalHeader } from "./components/layout";
+
 // Context
 export { WindowProvider, useWindowState, ThemeProvider, useTheme } from "./context";
 export type { WindowState, ThemeMode, ResolvedTheme } from "./context";

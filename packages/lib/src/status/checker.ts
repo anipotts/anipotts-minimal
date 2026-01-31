@@ -27,7 +27,7 @@ export async function checkService(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    let timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     let res = await fetch(url, {
       method: "HEAD",
@@ -35,8 +35,10 @@ export async function checkService(
       redirect: "follow",
     });
 
-    // Some servers reject HEAD — retry with GET
+    // Some servers reject HEAD — retry with GET (reset timeout)
     if (res.status === 405) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => controller.abort(), timeoutMs);
       res = await fetch(url, {
         method: "GET",
         signal: controller.signal,

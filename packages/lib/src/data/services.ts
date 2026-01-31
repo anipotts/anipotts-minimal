@@ -21,7 +21,6 @@ export const monitoredServices: MonitoredService[] = [
   { name: "status.anipotts.com", url: "https://status.anipotts.com", category: "anipotts" },
   { name: "lab.anipotts.com", url: "https://lab.anipotts.com", category: "anipotts" },
   { name: "docs.anipotts.com", url: "https://docs.anipotts.com", category: "anipotts" },
-  { name: "cli.anipotts.com", url: "https://cli.anipotts.com", category: "anipotts" },
 
   // external projects
   { name: "quantercise.com", url: "https://quantercise.com", category: "project" },

@@ -19,10 +19,14 @@
     "dev:status": "turbo dev --filter=@anipotts/status",
     "dev:updates": "turbo dev --filter=@anipotts/updates",
     "dev:lab": "turbo dev --filter=@anipotts/lab",
-    "dev:cli": "turbo dev --filter=@anipotts/cli",
     "dev:metrics": "turbo dev --filter=@anipotts/metrics",
     "dev:links": "turbo dev --filter=@anipotts/links",
     "dev:dev": "turbo dev --filter=@anipotts/dev"
+  },
+  "pnpm": {
+    "overrides": {
+      "framer-motion": "12.23.25"
+    }
   },
   "devDependencies": {
     "prettier": "^3.4.0",

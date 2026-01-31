@@ -16,8 +16,13 @@ export function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
 
-  // Blinking cursor effect
+  // Blinking cursor effect (respects prefers-reduced-motion)
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      setCursorVisible(true);
+      return;
+    }
     const interval = setInterval(() => {
       setCursorVisible((v) => !v);
     }, 530);

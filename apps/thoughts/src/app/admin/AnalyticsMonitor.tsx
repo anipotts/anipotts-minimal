@@ -5,7 +5,13 @@ import { getAdminStats } from "../actions";
 import { FaTerminal, FaServer, FaEye } from "react-icons/fa";
 
 export default function AnalyticsMonitor() {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<{
+    totalViews: number;
+    totalThoughts: number;
+    publishedCount: number;
+    draftCount: number;
+    topThoughts: { id: string; title: string; published: boolean; views: number }[];
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState<string[]>([]);
 
@@ -64,7 +70,7 @@ export default function AnalyticsMonitor() {
           <span className="uppercase tracking-widest">Top Performing Thoughts</span>
         </div>
         <div className="flex flex-col gap-2">
-          {stats?.topThoughts.map((thought: any, i: number) => (
+          {stats?.topThoughts.map((thought, i: number) => (
             <div key={thought.id} className="flex items-center justify-between p-2 hover:bg-input rounded transition-colors">
               <div className="flex items-center gap-3">
                 <span className="text-faint w-4">#{i + 1}</span>

@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import type { Thought } from "@anipotts/types";
 import {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
@@ -47,7 +48,7 @@ export async function getAdminThoughts() {
   return fetchAllThoughts(supabase);
 }
 
-export async function upsertThought(thought: Record<string, unknown>) {
+export async function upsertThought(thought: Partial<Thought>) {
   if (!supabase) throw new Error("Supabase not configured");
   const isAuth = await checkAuth();
   if (!isAuth) throw new Error("Unauthorized");
