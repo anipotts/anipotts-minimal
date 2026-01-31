@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -37,22 +37,30 @@ export async function GET(request: Request) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Check all monitored services
-  const checks = await checkAllServices(monitoredServices);
+  try {
+    // Check all monitored services
+    const checks = await checkAllServices(monitoredServices);
 
-  // Store results
-  await insertStatusChecks(supabase, checks);
+    // Store results
+    await insertStatusChecks(supabase, checks);
 
-  // Cleanup old checks (once per run, lightweight)
-  const deleted = await cleanupOldChecks(supabase, 30);
+    // Cleanup old checks (once per run, lightweight)
+    const deleted = await cleanupOldChecks(supabase, 30);
 
-  const summary = {
-    total: checks.length,
-    up: checks.filter((c) => c.isUp).length,
-    down: checks.filter((c) => !c.isUp).length,
-    cleaned: deleted,
-    timestamp: new Date().toISOString(),
-  };
+    const summary = {
+      total: checks.length,
+      up: checks.filter((c) => c.isUp).length,
+      down: checks.filter((c) => !c.isUp).length,
+      cleaned: deleted,
+      timestamp: new Date().toISOString(),
+    };
 
-  return NextResponse.json({ success: true, ...summary });
+    return NextResponse.json({ success: true, ...summary });
+  } catch (err) {
+    console.error("Status cron failed:", err);
+    return NextResponse.json(
+      { success: false, error: err instanceof Error ? err.message : "unknown" },
+      { status: 500 },
+    );
+  }
 }

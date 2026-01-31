@@ -37,7 +37,7 @@ export function WindowControls() {
       {/* Red - Collapse */}
       <button
         onClick={handleRedClick}
-        className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50 hover:bg-red-500 hover:border-red-600 transition-all flex items-center justify-center"
+        className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50 hover:bg-red-500 hover:border-red-600 transition-all flex items-center justify-center focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent outline-none"
         aria-label="Collapse"
       >
         <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-black/60 leading-none">
@@ -48,7 +48,7 @@ export function WindowControls() {
       {/* Yellow - Minimize */}
       <button
         onClick={handleYellowClick}
-        className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50 hover:bg-yellow-500 hover:border-yellow-600 transition-all flex items-center justify-center"
+        className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50 hover:bg-yellow-500 hover:border-yellow-600 transition-all flex items-center justify-center focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent outline-none"
         aria-label="Minimize"
       >
         <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-black/60 leading-none">
@@ -59,7 +59,7 @@ export function WindowControls() {
       {/* Green - Fullscreen */}
       <button
         onClick={handleGreenClick}
-        className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50 hover:bg-green-500 hover:border-green-600 transition-all flex items-center justify-center"
+        className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50 hover:bg-green-500 hover:border-green-600 transition-all flex items-center justify-center focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent outline-none"
         aria-label="Fullscreen"
       >
         <span className="opacity-0 group-hover:opacity-100 text-[6px] font-bold text-black/60 leading-none">

@@ -42,9 +42,6 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
-          {/* <label htmlFor="name" className="text-[10px] uppercase tracking-widest text-gray-500 font-mono">
-            Name
-          </label> */}
           <input
             id="name"
             required
@@ -56,9 +53,6 @@ export default function ContactForm() {
           />
         </div>
         <div className="flex flex-col gap-1">
-          {/* <label htmlFor="email" className="text-[10px] uppercase tracking-widest text-gray-500 font-mono">
-            Email
-          </label> */}
           <input
             id="email"
             type="email"
@@ -73,9 +67,6 @@ export default function ContactForm() {
       </div>
 
       <div className="flex flex-col gap-1">
-        {/* <label htmlFor="message" className="text-[10px] uppercase tracking-widest text-gray-500 font-mono">
-          Message
-        </label> */}
         <textarea
           id="message"
           required

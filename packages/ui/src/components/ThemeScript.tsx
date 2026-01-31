@@ -1,3 +1,5 @@
+import { THEME_STORAGE_KEY } from "../theme-constants";
+
 /**
  * Inline script to prevent flash of wrong theme (FOWT).
  * Reads localStorage before first paint and applies .dark class if needed.
@@ -7,7 +9,7 @@ export function ThemeScript() {
   const script = `
 (function(){
   try {
-    var t = localStorage.getItem('anipotts-theme');
+    var t = localStorage.getItem('${THEME_STORAGE_KEY}');
     var d = 'dark';
     if (t === 'light') d = '';
     else if (t === 'system') d = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';

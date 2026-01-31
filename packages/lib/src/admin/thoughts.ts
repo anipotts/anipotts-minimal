@@ -5,6 +5,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Thought } from "@anipotts/types";
 
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
 export async function fetchAllThoughts(supabase: SupabaseClient) {
@@ -23,7 +24,7 @@ export async function fetchAllThoughts(supabase: SupabaseClient) {
 /** Create or update a thought record. Returns the saved record. */
 export async function upsertThoughtRecord(
   supabase: SupabaseClient,
-  thought: Record<string, unknown>,
+  thought: Partial<Thought>,
 ) {
   const { data, error } = await supabase
     .from("thoughts")

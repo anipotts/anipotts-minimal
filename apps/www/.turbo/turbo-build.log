@@ -5,23 +5,34 @@
 ▲ Next.js 16.1.5 (Turbopack)
 
   Creating an optimized production build ...
-✓ Compiled successfully in 2.4s
+✓ Compiled successfully in 99s
   Running TypeScript ...
   Collecting page data using 10 workers ...
-Error: supabaseUrl is required.
-    at <unknown> (.next/server/chunks/e38a9_@supabase_supabase-js_dist_index_mjs_9070ad3b._.js:37:44854)
-    at new rs (.next/server/chunks/e38a9_@supabase_supabase-js_dist_index_mjs_9070ad3b._.js:37:45105)
-    at ri (.next/server/chunks/e38a9_@supabase_supabase-js_dist_index_mjs_9070ad3b._.js:37:48991)
-    at module evaluation (.next/server/chunks/5c56c_next_544e8209._.js:1:18508)
-    at instantiateModule (.next/server/chunks/[turbopack]_runtime.js:740:9)
-    at instantiateRuntimeModule (.next/server/chunks/[turbopack]_runtime.js:768:12)
-    at getOrInstantiateRuntimeModule (.next/server/chunks/[turbopack]_runtime.js:781:12)
-    at Object.m (.next/server/chunks/[turbopack]_runtime.js:790:18)
-    at Object.<anonymous> (.next/server/app/api/favorite-number/route.js:7:3)
+  Generating static pages using 10 workers (0/12) ...
+  Generating static pages using 10 workers (3/12) 
+  Generating static pages using 10 workers (6/12) 
+  Generating static pages using 10 workers (9/12) 
+✓ Generating static pages using 10 workers (12/12) in 869.4ms
+  Finalizing page optimization ...
 
-> Build error occurred
-Error: Failed to collect page data for /api/favorite-number
-    at ignore-listed frames {
-  type: 'Error'
-}
- ELIFECYCLE  Command failed with exit code 1.
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/favorite-number
+├ ƒ /api/send
+├ ○ /apple-icon.png
+├ ○ /connect
+├ ○ /icon.png
+├ ● /projects/[slug]
+│ └ /projects/quantercise
+├ ○ /sitemap.xml
+├ ƒ /thoughts
+├ ƒ /thoughts/[slug]
+├ ○ /thoughts/admin
+└ ○ /work
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

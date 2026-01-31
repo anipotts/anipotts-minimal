@@ -43,7 +43,7 @@ export default async function ThoughtsPage() {
               <p className="text-muted italic text-sm">No thoughts published yet.</p>
             </FadeIn>
           ) : (
-            thoughts.map((thought: any, i) => (
+            thoughts.map((thought: { slug: string; title: string; summary: string; created_at: string; tags: string[] }, i: number) => (
               <FadeIn key={thought.slug} delay={i * 0.1}>
                 <ThoughtLink thought={thought} />
               </FadeIn>

@@ -29,5 +29,4 @@ export const subdomains = [
   { name: "status", url: "https://status.anipotts.com", desc: "system uptime" },
   { name: "lab", url: "https://lab.anipotts.com", desc: "experiments" },
   { name: "docs", url: "https://docs.anipotts.com", desc: "documentation" },
-  { name: "cli", url: "https://cli.anipotts.com", desc: "terminal interface" },
 ] as const;

@@ -4,10 +4,8 @@ import baseConfig from "@anipotts/config/tailwind";
 export default {
   ...baseConfig,
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    // Include packages that use Tailwind
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
   ],
 };

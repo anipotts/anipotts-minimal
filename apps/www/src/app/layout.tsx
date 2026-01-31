@@ -8,14 +8,13 @@ import {
   ThemeProvider,
   WindowProvider,
   WindowContainer,
-  WindowControls,
   WindowInner,
   WindowLayoutWrapper,
-  TerminalHeaderTitle,
   TerminalStatusBar,
   TerminalPromptCentered,
   MinimizedPill,
-  WavesBackground,
+  TerminalBackground,
+  TerminalHeader,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
 import { AdminProvider } from "@/context/AdminContext";
@@ -118,45 +117,24 @@ export default function RootLayout({
       </head>
       <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
         <ThemeProvider>
-        {/* Fixed Background Container */}
-        <div className="fixed inset-0 -z-10 min-h-svh bg-background">
-          {/* Ambient Background Effects */}
-          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))" }} />
-          <div className="absolute inset-0 z-10 bg-noise pointer-events-none mix-blend-overlay" style={{ opacity: "var(--noise-opacity)" }} />
-
-          {/* Waves Animation */}
-          <WavesBackground />
-        </div>
+        <TerminalBackground />
 
         <PostHogProvider>
           <AdminProvider>
             <WindowProvider>
               <WindowLayoutWrapper>
-                {/* Dynamic Window Container */}
                 <WindowContainer>
-                  {/* Terminal Header Bar */}
-                  <div className="flex items-center justify-between px-4 py-2 bg-input border-b border-border-subtle select-none">
-                    <div className="flex items-center gap-2">
-                      <WindowControls />
-                      <TerminalHeaderTitle />
-                    </div>
-                    <div className="text-[10px] md:text-xs text-faint font-mono">
-                      zsh<span className="hidden md:inline"> • v3.0.1</span>
-                    </div>
-                  </div>
+                  <TerminalHeader />
 
-                  {/* Terminal Body with Navbar/Footer handling */}
                   <WindowInner>
                     <Navbar />
                     {children}
                     <Footer />
                   </WindowInner>
 
-                  {/* Terminal Status Bar */}
                   <TerminalStatusBar />
                 </WindowContainer>
 
-                {/* Collapsed/Minimized States */}
                 <TerminalPromptCentered />
                 <MinimizedPill />
               </WindowLayoutWrapper>

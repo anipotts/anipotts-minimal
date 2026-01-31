@@ -54,6 +54,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
+    "@anipotts/lib": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.555.0",
