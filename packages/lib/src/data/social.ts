@@ -41,6 +41,12 @@ export const socialLinks: SocialLink[] = [
     icon: "tiktok",
     description: "@anipottsbuilds",
   },
+  {
+    name: "mastodon",
+    url: "https://mastodon.social/@anipotts",
+    icon: "mastodon",
+    description: "@anipotts@mastodon.social",
+  },
 ];
 
 /** Social handle used across platforms */

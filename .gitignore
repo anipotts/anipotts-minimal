@@ -13,3 +13,5 @@ yarn-error.log*
 .turbo
 next-env.d.ts
 *.tsbuildinfo
+.typefully
+.claude/plans

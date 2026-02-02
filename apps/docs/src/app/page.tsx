@@ -63,8 +63,7 @@ export default function DocsPage() {
 │   ├── metrics      # GitHub + WakaTime stats
 │   ├── status       # Service uptime monitoring
 │   ├── lab          # Experiments & open source
-│   ├── docs         # This page
-│   └── cli          # CLI tools (coming soon)
+│   └── docs         # This page
 ├── packages/
 │   ├── ui           # Shared React components
 │   ├── lib          # Business logic & API clients

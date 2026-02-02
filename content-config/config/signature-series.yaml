@@ -1,0 +1,232 @@
+# Signature Series Definitions
+# Each series has specific atomization targets, voice modes, and artifact requirements
+
+series:
+  60s-fix:
+    name: "60s Fix"
+    description: "Quick Claude Code / AI tool tip. One problem, one solution, under 60 seconds."
+    frequency: "2x/week"
+    format: "short-video"
+    voice_mode: "spicy"
+    duration: "30-60 seconds"
+    artifact_required: true
+    artifact_type: "gist"  # quick code snippets, commands, configs
+    atomization_targets:
+      - platform: tiktok
+        template: tiktok-script.md
+        voice_mode: spicy
+        priority: primary
+      - platform: instagram
+        template: instagram-carousel.md  # reels version
+        voice_mode: casual
+        priority: primary
+      - platform: twitter
+        template: twitter-thread.md  # 3-5 tweet thread version
+        voice_mode: spicy
+        priority: primary
+      - platform: threads
+        template: null  # repurpose twitter content
+        voice_mode: casual
+        priority: secondary
+      - platform: bluesky
+        template: null  # repurpose twitter content
+        voice_mode: casual
+        priority: secondary
+      - platform: linkedin
+        template: linkedin-post.md  # professional writeup version
+        voice_mode: professional
+        priority: secondary
+      - platform: youtube
+        template: youtube-description.md  # shorts version
+        voice_mode: casual
+        priority: secondary
+    # NOT atomized to: medium, devto, substack, reddit (too short for long-form)
+    metrics:
+      target_views: 10000
+      target_engagement_rate: 0.05
+      key_metric: "saves + shares"
+
+  i-tried-it:
+    name: "I Tried It"
+    description: "Deep dive building something with AI tools. Show the full process, mistakes included."
+    frequency: "1x/week"
+    format: "long-form"
+    voice_mode: "casual"
+    duration: "3-10 minutes (video) or 1000-2000 words (written)"
+    artifact_required: true
+    artifact_type: "repo"  # full project repos
+    atomization_targets:
+      - platform: medium
+        template: medium-article.md
+        voice_mode: professional
+        priority: primary
+      - platform: devto
+        template: devto-article.md
+        voice_mode: professional
+        priority: primary
+      - platform: youtube
+        template: youtube-description.md
+        voice_mode: casual
+        priority: primary
+      - platform: twitter
+        template: twitter-thread.md  # 8-12 tweet thread
+        voice_mode: spicy
+        priority: primary
+      - platform: linkedin
+        template: linkedin-post.md
+        voice_mode: professional
+        priority: primary
+      - platform: substack
+        template: substack-section.md
+        voice_mode: casual
+        priority: primary
+      - platform: reddit
+        template: reddit-post.md
+        voice_mode: casual
+        priority: secondary
+      - platform: tiktok
+        template: tiktok-script.md  # highlight clip
+        voice_mode: spicy
+        priority: secondary
+      - platform: instagram
+        template: instagram-carousel.md  # carousel summary
+        voice_mode: casual
+        priority: secondary
+    # NOT atomized to: threads, bluesky (too deep for micro-content)
+    metrics:
+      target_views: 5000
+      target_engagement_rate: 0.08
+      key_metric: "comments + repo stars"
+
+  quick-tip:
+    name: "Quick Tip"
+    description: "Single-point micro tip. Text-first, no video required."
+    frequency: "1-2x/week (gap filler)"
+    format: "text"
+    voice_mode: "casual"
+    artifact_required: false  # optional but encouraged
+    artifact_type: "gist"
+    atomization_targets:
+      - platform: twitter
+        template: twitter-thread.md  # single tweet or 2-3 tweets
+        voice_mode: spicy
+        priority: primary
+      - platform: threads
+        template: null
+        voice_mode: casual
+        priority: primary
+      - platform: bluesky
+        template: null
+        voice_mode: casual
+        priority: primary
+      - platform: linkedin
+        template: linkedin-post.md
+        voice_mode: professional
+        priority: secondary
+    # NOT atomized to: video platforms, long-form platforms
+    metrics:
+      target_engagement_rate: 0.06
+      key_metric: "retweets + quotes"
+
+  stack-update:
+    name: "Stack / Tool Update"
+    description: "New feature, tool update, or stack change worth sharing."
+    frequency: "as-needed (gap filler)"
+    format: "text-or-short-video"
+    voice_mode: "casual"
+    artifact_required: false
+    artifact_type: "gist"
+    atomization_targets:
+      - platform: twitter
+        template: twitter-thread.md
+        voice_mode: spicy
+        priority: primary
+      - platform: linkedin
+        template: linkedin-post.md
+        voice_mode: professional
+        priority: primary
+      - platform: bluesky
+        template: null
+        voice_mode: casual
+        priority: secondary
+      - platform: threads
+        template: null
+        voice_mode: casual
+        priority: secondary
+      - platform: devto
+        template: devto-article.md
+        voice_mode: professional
+        priority: secondary
+    metrics:
+      target_engagement_rate: 0.04
+      key_metric: "bookmarks + clicks"
+
+  viral-reel:
+    name: "Viral Format Reel"
+    description: "Proven 100k-300k+ view format: face close to camera, 'claude code tip', screen recording proof. Under 30 seconds."
+    frequency: "1-2x/week (gap filler)"
+    format: "short-video"
+    voice_mode: "spicy"
+    duration: "15-30 seconds"
+    artifact_required: true
+    artifact_type: "gist"  # the command or code shown on screen
+    production_notes: |
+      - Film with face close to camera (portrait mode)
+      - Open with "claude code tip" or variant
+      - Cut to screen recording showing the thing
+      - Flash the result
+      - Total under 30 seconds
+      - Edit in Meta app (Instagram built-in editor)
+    atomization_targets:
+      - platform: tiktok
+        template: viral-reel-script.md  # dedicated viral template
+        voice_mode: spicy
+        priority: primary
+      - platform: instagram
+        template: viral-reel-script.md  # same format for reels
+        voice_mode: spicy
+        priority: primary
+      - platform: youtube
+        template: youtube-description.md  # shorts version
+        voice_mode: casual
+        priority: secondary
+      - platform: twitter
+        template: twitter-thread.md  # text + video embed tweet
+        voice_mode: spicy
+        priority: secondary
+    # NOT atomized to: long-form platforms, text-only platforms
+    metrics:
+      target_views: 100000
+      target_engagement_rate: 0.03
+      key_metric: "views + follows"
+
+# Weekly Production Targets
+weekly_targets:
+  originals: "4-5 pillar pieces"
+  total_posts: "15-25 atoms across all platforms"
+  breakdown:
+    - series: "60s-fix"
+      pillars: 2
+      estimated_atoms: "6-8"
+    - series: "i-tried-it"
+      pillars: 1
+      estimated_atoms: "6-9"
+    - series: "gap-fillers"
+      pillars: "1-2"
+      types: ["quick-tip", "stack-update", "viral-reel"]
+      estimated_atoms: "3-8"
+
+# Voice Mode Reference
+voice_modes:
+  spicy:
+    platforms: [twitter, tiktok]
+    description: "Maximum personality. Abbreviations (yk, ngl, tbh). Hot takes. Provocative hooks."
+    abbreviation_level: "high"
+  casual:
+    platforms: [threads, instagram, bluesky, youtube, substack]
+    description: "Conversational, friendly. Some abbreviations. Relatable tone."
+    abbreviation_level: "medium"
+  professional:
+    platforms: [linkedin, medium, devto]
+    description: "Polished but not corporate. Full words. Clear structure. Still sounds like a person."
+    abbreviation_level: "none"

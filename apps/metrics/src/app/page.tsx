@@ -115,6 +115,11 @@ export default async function MetricsPage() {
       icon: FaClock,
     },
     {
+      label: "Daily Average",
+      value: wakatime.dailyAverage,
+      icon: FaClock,
+    },
+    {
       label: "Public Repos",
       value: formatNumber(github.publicRepos),
       icon: FaGithub,
@@ -190,7 +195,10 @@ export default async function MetricsPage() {
       <FadeIn delay={0.6}>
         <div className="text-center pt-4 border-t border-border-subtle">
           <p className="text-xs text-faint">
-            Data from GitHub API & WakaTime
+            Data from{" "}
+            <a href="https://github.com/anipotts" target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">GitHub API</a>
+            {" & "}
+            <a href="https://wakatime.com/@anipotts" target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">WakaTime</a>
             {lastUpdated && (
               <span className="ml-2 text-faint">
                 · updated {formatRelativeTime(lastUpdated)}

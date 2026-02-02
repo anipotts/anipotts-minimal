@@ -1,10 +1,12 @@
 import { FadeIn } from "@anipotts/ui";
-import { socialLinks, liveProjects, site } from "@anipotts/lib/data";
+import { socialLinks, liveProjects, site, subdomains } from "@anipotts/lib/data";
 import {
   FaGithub, FaLinkedin, FaEnvelope, FaGlobe, FaCode, FaTerminal,
-  FaInstagram, FaTiktok,
+  FaInstagram, FaTiktok, FaNetworkWired,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+
+const ecosystemLinks = subdomains.filter((s) => s.name !== "www" && s.name !== "links");
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   email: FaEnvelope,
@@ -88,6 +90,32 @@ export default function LinksPage() {
                 <div>
                   <span className="text-secondary text-sm font-medium">{project.title}</span>
                   <span className="text-faint text-xs ml-2">{project.subtitle}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </FadeIn>
+
+      {/* Ecosystem */}
+      <FadeIn delay={0.9}>
+        <div className="w-full max-w-md">
+          <h2 className="text-xs uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
+            <FaNetworkWired className="text-accent-400" />
+            Ecosystem
+          </h2>
+          <div className="space-y-2">
+            {ecosystemLinks.map((sub) => (
+              <a
+                key={sub.name}
+                href={sub.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 bg-[rgba(var(--overlay-invert),0.4)] border border-border-subtle rounded-lg hover:border-accent-400/20 transition-all"
+              >
+                <div>
+                  <span className="text-secondary text-sm font-medium">{sub.name}</span>
+                  <span className="text-faint text-xs ml-2">{sub.desc}</span>
                 </div>
               </a>
             ))}
