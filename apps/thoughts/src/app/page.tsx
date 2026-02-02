@@ -32,7 +32,7 @@ export default async function ThoughtsPage() {
             <p className="text-xs text-muted mt-2">Technical writings and reflections</p>
           </FadeIn>
         </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+        <div className="col-span-1 md:col-span-3 flex flex-col divide-y divide-border-subtle">
           {!supabase ? (
             <FadeIn delay={0.1}>
               <div className="p-4 border border-border-subtle rounded-sm bg-input">
@@ -44,11 +44,16 @@ export default async function ThoughtsPage() {
               <p className="text-muted italic text-sm">No thoughts published yet.</p>
             </FadeIn>
           ) : (
-            thoughts.map((thought: Thought, i: number) => (
-              <FadeIn key={thought.slug} delay={i * 0.1}>
-                <ThoughtLink thought={thought} />
-              </FadeIn>
-            ))
+            thoughts.map((thought: Thought, i: number) => {
+              const readingTime = thought.content
+                ? Math.ceil(thought.content.split(/\s+/).length / 200)
+                : undefined;
+              return (
+                <FadeIn key={thought.slug} delay={i * 0.1} className="py-8 first:pt-0 last:pb-0">
+                  <ThoughtLink thought={thought} readingTime={readingTime} />
+                </FadeIn>
+              );
+            })
           )}
         </div>
       </section>

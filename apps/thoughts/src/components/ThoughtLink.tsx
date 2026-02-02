@@ -13,7 +13,7 @@ interface Thought {
   views?: number;
 }
 
-export default function ThoughtLink({ thought }: { thought: Thought }) {
+export default function ThoughtLink({ thought, readingTime }: { thought: Thought; readingTime?: number }) {
   const handleClick = () => {
     posthog.capture('thought_clicked', {
       thought_slug: thought.slug,
@@ -44,6 +44,9 @@ export default function ThoughtLink({ thought }: { thought: Thought }) {
         <div className="md:col-span-1 md:text-right flex flex-col md:items-end gap-1">
           <span className="text-xs text-muted uppercase tracking-wide">
             {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            {readingTime != null && (
+              <span className="text-faint ml-2">· {readingTime} min read</span>
+            )}
           </span>
           <ViewCounter slug={thought.slug} initialViews={thought.views} />
         </div>

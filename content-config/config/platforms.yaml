@@ -1,0 +1,162 @@
+# Platform Configuration
+
+platforms:
+  # Text-first platforms (via Typefully)
+  twitter:
+    enabled: true
+    handle: "@anipottsbuilds"
+    scheduler: typefully
+    char_limit: 280
+    thread_support: true
+    voice_mode: spicy
+    artifact_link_style: "reply-to-thread"
+
+  linkedin:
+    enabled: true
+    handle: "anipotts"
+    scheduler: typefully
+    char_limit: 3000
+    optimal_length: 1500
+    voice_mode: professional
+    artifact_link_style: "proof-link-before-hashtags"
+
+  threads:
+    enabled: true
+    handle: "@anipottsbuilds"
+    scheduler: typefully
+    char_limit: 500
+    voice_mode: casual
+    artifact_link_style: "mention-in-text"
+
+  bluesky:
+    enabled: true
+    handle: "@anipotts.bsky.social"
+    scheduler: typefully
+    char_limit: 300
+    voice_mode: casual
+    artifact_link_style: "direct-link"
+
+  mastodon:
+    enabled: true
+    handle: "@anipotts@mastodon.social"
+    url: "https://mastodon.social/@anipotts"
+    scheduler: typefully
+    char_limit: 500
+    voice_mode: casual
+    artifact_link_style: "direct-link"
+
+  # Video platforms (manual posting)
+  instagram:
+    enabled: true
+    handle: "@anipottsbuilds"
+    scheduler: manual
+    formats:
+      - carousel
+      - reel
+      - story
+    voice_mode: casual
+    artifact_link_style: "in-caption"
+
+  tiktok:
+    enabled: true
+    handle: "@anipottsbuilds"
+    scheduler: manual
+    optimal_duration: 45-60
+    voice_mode: spicy
+    artifact_link_style: "link-in-bio"
+
+  youtube:
+    enabled: true
+    handle: "@anipottsbuilds"
+    scheduler: manual
+    formats:
+      - shorts
+      - long_form
+    voice_mode: casual
+    artifact_link_style: "in-description"
+
+  # Long-form platforms (manual posting)
+  medium:
+    enabled: true
+    handle: "@anipotts"
+    scheduler: manual
+    canonical_to: thoughts.anipotts.com
+    voice_mode: professional
+    artifact_link_style: "resources-section"
+
+  devto:
+    enabled: true
+    handle: "@anipotts"
+    scheduler: manual
+    canonical_to: thoughts.anipotts.com
+    voice_mode: professional
+    artifact_link_style: "resources-section"
+
+  substack:
+    enabled: true
+    handle: "anipotts"
+    scheduler: manual
+    frequency: weekly
+    voice_mode: casual
+    artifact_link_style: "inline-links"
+
+  # Community platforms
+  reddit:
+    enabled: true
+    handle: "u/anipotts"
+    scheduler: manual
+    subreddits:
+      - r/ClaudeAI
+      - r/cursor
+      - r/LocalLLaMA
+      - r/SideProject
+    voice_mode: casual
+    artifact_link_style: "only-if-helpful"
+
+  discord:
+    enabled: true
+    scheduler: manual
+    voice_mode: casual
+    artifact_link_style: "direct-link"
+
+# Connected services
+integrations:
+  typefully:
+    social_set_id: 280784
+    platforms:
+      - twitter
+      - linkedin
+      - threads
+      - bluesky
+      - mastodon
+
+  blog:
+    url: https://thoughts.anipotts.com
+    admin: true
+    format: markdown
+
+  github:
+    gists: https://gist.github.com/anipotts
+    repos: https://github.com/anipotts
+
+# Content settings
+content:
+  pillar_location: pillars/
+  atom_location: atoms/
+  archive_location: archive/
+  artifact_location: artifacts/
+
+  mix:
+    claude_code_tips: 70
+    ugc: 10
+    other: 20
+
+# Schedule preferences
+schedule:
+  timezone: America/New_York
+
+  optimal_times:
+    twitter: ["08:00", "12:00", "17:00"]
+    linkedin: ["09:00"]
+    instagram: ["12:00", "19:00"]
+    tiktok: ["07:00", "12:00", "20:00"]

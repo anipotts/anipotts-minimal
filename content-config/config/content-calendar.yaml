@@ -1,0 +1,98 @@
+# Content Calendar — Series-Driven Weekly Schedule
+
+# Weekly deliverables tied to Signature Series
+weekly_deliverables:
+  target_originals: "4-5 pillars"
+  target_atoms: "15-25 posts across platforms"
+
+  schedule:
+    sunday:
+      - series: "60s-fix"
+        task: "write_pillar_and_film"
+        description: "Write 60s Fix #1 pillar, create gist artifact, film video"
+        output: "1 pillar + 1 gist"
+
+    monday:
+      - series: "60s-fix"
+        task: "atomize_and_schedule"
+        description: "Atomize 60s Fix #1 to target platforms, schedule via Typefully"
+        output: "5-7 atoms scheduled"
+      - series: "60s-fix"
+        task: "write_pillar_and_film"
+        description: "Write 60s Fix #2 pillar, create gist artifact, film video"
+        output: "1 pillar + 1 gist"
+
+    tuesday:
+      - series: "60s-fix"
+        task: "atomize_and_schedule"
+        description: "Atomize 60s Fix #2 to target platforms"
+        output: "5-7 atoms scheduled"
+      - series: "i-tried-it"
+        task: "build_and_write"
+        description: "Build the project, create repo artifact, start writing I Tried It pillar"
+        output: "1 repo + pillar draft"
+
+    wednesday:
+      - series: "i-tried-it"
+        task: "finish_and_film"
+        description: "Finish I Tried It pillar, film video walkthrough"
+        output: "1 completed pillar + video"
+      - series: "i-tried-it"
+        task: "atomize_and_schedule"
+        description: "Atomize I Tried It to target platforms"
+        output: "6-9 atoms scheduled"
+
+    thursday:
+      - series: "gap-filler"
+        task: "create_and_atomize"
+        description: "Quick Tip, Stack Update, or Viral Reel — check community queue for ideas"
+        types: ["quick-tip", "stack-update", "viral-reel"]
+        output: "1 pillar + 2-4 atoms"
+
+    friday:
+      - series: "gap-filler"
+        task: "create_and_atomize"
+        description: "Optional second gap filler if capacity allows"
+        types: ["quick-tip", "stack-update", "viral-reel"]
+        output: "0-1 pillar + 0-4 atoms"
+      - task: "review_week"
+        description: "Run /review-week command. Check delivery vs targets, artifact coverage, queue status."
+        output: "Weekly review report"
+
+    daily:
+      - task: "engage"
+        description: "15 min platform engagement (5-10 meaningful comments, 1-2 DMs)"
+      - task: "queue_capture"
+        description: "Check comments/DMs for community requests. Add to queue."
+
+# Posting frequency targets (derived from series atomization)
+posting_frequency:
+  twitter: "5-7/week"    # Every series hits Twitter
+  linkedin: "3-4/week"   # 60s Fix (2) + I Tried It (1) + gap fillers
+  threads: "3-4/week"    # 60s Fix (2) + Quick Tips
+  bluesky: "3-4/week"    # 60s Fix (2) + Quick Tips
+  instagram: "3-5/week"  # 60s Fix reels (2) + Viral Reels (1-2) + I Tried It carousel
+  tiktok: "3-5/week"     # 60s Fix (2) + Viral Reels (1-2) + I Tried It highlight
+  medium: "1/week"       # I Tried It deep dive
+  devto: "1/week"        # I Tried It deep dive
+  substack: "1/week"     # Weekly digest
+  reddit: "1-2/week"     # I Tried It + genuine engagement
+  youtube: "2-3/week"    # Shorts from 60s Fix + Viral Reels + I Tried It
+
+# Content pillars (unchanged weights, now mapped to series)
+content_pillars:
+  - name: claude_code_tips
+    weight: 70
+    series: ["60s-fix", "viral-reel", "quick-tip"]
+  - name: ugc
+    weight: 10
+    series: ["viral-reel"]
+  - name: productivity
+    weight: 20
+    series: ["i-tried-it", "stack-update", "quick-tip"]
+
+# Community Queue integration
+community_queue:
+  check_before: "thursday gap filler planning"
+  priority_rule: "P1 items get scheduled this week, P2 within 2 weeks"
+  file: "engagement/community-queue.md"

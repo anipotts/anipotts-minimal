@@ -39,6 +39,10 @@
     "./status": {
       "types": "./dist/status/index.d.ts",
       "import": "./dist/status/index.js"
+    },
+    "./typefully": {
+      "types": "./dist/typefully/index.d.ts",
+      "import": "./dist/typefully/index.js"
     }
   },
   "scripts": {

@@ -92,6 +92,16 @@ export default async function Home() {
               <ProjectCard project={project} />
             </FadeIn>
           ))}
+          <FadeIn delay={1.1}>
+            <a
+              href="https://lab.anipotts.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-accent-400 hover:underline"
+            >
+              view all work →
+            </a>
+          </FadeIn>
         </div>
       </section>
 
@@ -106,11 +116,23 @@ export default async function Home() {
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
           {latestThoughts.length > 0 ? (
-            latestThoughts.map((thought: any, index: number) => (
-              <FadeIn key={thought.slug} delay={1.1 + index * 0.1}>
-                <ThoughtLink thought={thought} />
+            <>
+              {latestThoughts.map((thought: any, index: number) => (
+                <FadeIn key={thought.slug} delay={1.1 + index * 0.1}>
+                  <ThoughtLink thought={thought} />
+                </FadeIn>
+              ))}
+              <FadeIn delay={1.6}>
+                <a
+                  href="https://thoughts.anipotts.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-accent-400 hover:underline"
+                >
+                  view all thoughts →
+                </a>
               </FadeIn>
-            ))
+            </>
           ) : (
             <FadeIn delay={1.1}>
               <p className="text-muted font-mono text-sm italic">
