@@ -31,35 +31,35 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://anipotts.com"),
   title: {
-    default: "Ani Potts",
-    template: "%s | Ani Potts",
+    default: "ani potts",
+    template: "%s | ani potts",
   },
   description:
-    "Ani Potts (Anirudh Pottammal) is a software engineer based in NYC who builds minimal interfaces to orchestrate complex systems",
+    "software engineer in nyc building minimal interfaces to orchestrate complex systems",
   keywords: [
-    "Ani Potts",
-    "Anirudh Pottammal",
+    "ani potts",
+    "anirudh pottammal",
     "software engineer",
-    "NYC",
+    "nyc",
     "developer",
-    "NYU",
+    "nyu",
   ],
-  authors: [{ name: "Ani Potts", url: "https://anipotts.com" }],
-  creator: "Ani Potts",
+  authors: [{ name: "ani potts", url: "https://anipotts.com" }],
+  creator: "ani potts",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://anipotts.com",
-    siteName: "Ani Potts",
-    title: "Ani Potts",
+    siteName: "ani potts",
+    title: "ani potts",
     description:
-      "Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.",
+      "software engineer in nyc building minimal interfaces to orchestrate complex systems",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Ani Potts",
+        alt: "ani potts",
       },
     ],
   },
@@ -67,9 +67,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     creator: "@anipottsbuilds",
     site: "@anipottsbuilds",
-    title: "Ani Potts",
+    title: "ani potts",
     description:
-      "Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.",
+      "software engineer in nyc building minimal interfaces to orchestrate complex systems",
     images: ["/og-image.png"],
   },
   robots: {
@@ -96,7 +96,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Ani Potts",
+    title: "ani potts",
   },
   other: {
     "msapplication-TileColor": "#0a0a0a",

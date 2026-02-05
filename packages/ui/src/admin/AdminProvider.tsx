@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
 import posthog from "posthog-js";
@@ -23,6 +24,8 @@ export interface AdminContextType {
   isAdmin: boolean;
   isModalOpen: boolean;
   toggleModal: () => void;
+  openModal: () => void;
+  closeModal: () => void;
   login: (password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
@@ -32,15 +35,25 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 interface AdminProviderProps {
   children: ReactNode;
   actions: AdminActions;
+  /** Optional callback when modal state changes - for layout coordination */
+  onModalChange?: (isOpen: boolean) => void;
 }
 
-export function AdminProvider({ children, actions }: AdminProviderProps) {
+export function AdminProvider({ children, actions, onModalChange }: AdminProviderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Sync modal state with external coordinator
+  useEffect(() => {
+    onModalChange?.(isModalOpen);
+  }, [isModalOpen, onModalChange]);
+
   useEffect(() => {
     actions.checkAuth().then(setIsAdmin);
+  }, [actions]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cmd+Shift+A (Mac) or Ctrl+Shift+A (Windows/Linux)
       if (
@@ -60,9 +73,11 @@ export function AdminProvider({ children, actions }: AdminProviderProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isModalOpen, actions]);
+  }, [isModalOpen]);
 
-  const toggleModal = () => setIsModalOpen((prev) => !prev);
+  const toggleModal = useCallback(() => setIsModalOpen((prev) => !prev), []);
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const login = async (password: string) => {
     const res = await actions.login(password);
@@ -83,7 +98,7 @@ export function AdminProvider({ children, actions }: AdminProviderProps) {
 
   return (
     <AdminContext.Provider
-      value={{ isAdmin, isModalOpen, toggleModal, login, logout }}
+      value={{ isAdmin, isModalOpen, toggleModal, openModal, closeModal, login, logout }}
     >
       {children}
     </AdminContext.Provider>
