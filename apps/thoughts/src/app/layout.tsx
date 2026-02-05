@@ -15,8 +15,6 @@ import {
   TerminalHeader,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
-import { AdminProvider } from "@/context/AdminContext";
-import AdminOverlay from "@/components/AdminOverlay";
 import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -58,11 +56,8 @@ export default function RootLayout({
         <TerminalBackground />
 
         <PostHogProvider>
-          <AdminProvider>
-            <AdminOverlay />
-            <WindowProvider>
+          <WindowProvider>
             <WindowLayoutWrapper>
-
               <WindowContainer>
                 <TerminalHeader defaultTitle="ani@potts:~/thoughts.anipotts.com" />
 
@@ -75,9 +70,6 @@ export default function RootLayout({
                       <a href="/" className="text-xs uppercase tracking-widest text-accent-400">
                         thoughts
                       </a>
-                      <a href="/admin" className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors">
-                        admin
-                      </a>
                     </div>
                   </nav>
                   {children}
@@ -88,11 +80,9 @@ export default function RootLayout({
 
               <TerminalPromptCentered />
               <MinimizedPill />
-
             </WindowLayoutWrapper>
             <TerminalNavigator currentSubdomain="thoughts" />
           </WindowProvider>
-          </AdminProvider>
         </PostHogProvider>
         </ThemeProvider>
       </body>

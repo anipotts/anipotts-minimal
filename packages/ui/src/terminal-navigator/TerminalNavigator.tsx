@@ -8,6 +8,7 @@ import { useTerminalHistory } from "./useTerminalHistory";
 import { useTabCompletion } from "./useTabCompletion";
 import { TerminalOutput } from "./TerminalOutput";
 import { TerminalInput } from "./TerminalInput";
+import { useLayoutCoordinator } from "../context/LayoutCoordinator";
 
 export function TerminalNavigator({
   currentSubdomain,
@@ -21,6 +22,22 @@ export function TerminalNavigator({
   const [ghostText, setGhostText] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Layout coordination for split-view with admin panel
+  const layout = useLayoutCoordinator();
+  const isAdminOpen = layout.state.isAdminOpen;
+
+  // Compute terminal height: 50vh when admin is open, 45vh otherwise
+  const terminalHeight = isAdminOpen ? "50vh" : TERMINAL_HEIGHT;
+
+  // Sync terminal open state with layout coordinator
+  useEffect(() => {
+    if (state.isOpen) {
+      layout.openTerminal();
+    } else {
+      layout.closeTerminal();
+    }
+  }, [state.isOpen, layout]);
 
   // Ctrl+` listener (desktop only)
   useEffect(() => {
@@ -192,7 +209,7 @@ export function TerminalNavigator({
               mass: ANIMATION_CONFIG.mass,
             }}
             className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col overflow-hidden border-t border-[var(--border)] shadow-2xl"
-            style={{ height: TERMINAL_HEIGHT }}
+            style={{ height: terminalHeight }}
           >
             {/* Title bar */}
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--input-bg)] shrink-0">
