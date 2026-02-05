@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { subdomains } from "@anipotts/lib/data";
+import { publicSubdomains } from "@anipotts/lib/data";
 import { commandNames } from "./commands";
 
-const subdomainNames = subdomains.map((s) => s.name);
+const subdomainNames = publicSubdomains.map((s) => s.name);
 
 // Commands that accept a subdomain argument
 const subdomainArgCommands = new Set(["cd", "open", "ping"]);

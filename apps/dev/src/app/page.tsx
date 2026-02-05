@@ -81,44 +81,56 @@ export default async function DevPage() {
           </h2>
 
           {languages && languages.languages.length > 0 ? (
-            <>
-              {/* Stacked language bar */}
-              <div className="flex h-3 rounded-full overflow-hidden mb-4">
-                {languages.languages.map((lang) => (
-                  <div
-                    key={lang.name}
-                    className="transition-all duration-500"
-                    style={{
-                      width: `${lang.percentage}%`,
-                      backgroundColor: lang.color,
-                      minWidth: lang.percentage > 0 ? "2px" : 0,
-                    }}
-                    title={`${lang.name}: ${lang.percentage}%`}
-                  />
-                ))}
-              </div>
+            (() => {
+              // Show top 6 languages, group rest as "Other"
+              const topLangs = languages.languages.slice(0, 6);
+              const otherLangs = languages.languages.slice(6);
+              const otherPct = otherLangs.reduce((sum, l) => sum + l.percentage, 0);
+              const displayLangs = otherPct > 0
+                ? [...topLangs, { name: "Other", percentage: otherPct, color: "#6b7280", bytes: 0 }]
+                : topLangs;
 
-              {/* Language labels */}
-              <div className="flex flex-wrap gap-x-4 gap-y-2">
-                {languages.languages.map((lang) => (
-                  <div key={lang.name} className="flex items-center gap-1.5">
-                    <div
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ backgroundColor: lang.color }}
-                    />
-                    <span className="text-sm text-secondary">{lang.name}</span>
-                    <span className="text-xs text-faint font-mono">
-                      {lang.percentage}%
-                    </span>
+              return (
+                <>
+                  {/* Stacked language bar */}
+                  <div className="flex h-2.5 rounded-full overflow-hidden mb-3">
+                    {displayLangs.map((lang) => (
+                      <div
+                        key={lang.name}
+                        className="transition-all duration-500"
+                        style={{
+                          width: `${lang.percentage}%`,
+                          backgroundColor: lang.color,
+                          minWidth: lang.percentage > 0.5 ? "3px" : 0,
+                        }}
+                        title={`${lang.name}: ${lang.percentage}%`}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {/* Total code size */}
-              <p className="text-[10px] text-faint mt-3 font-mono">
-                {formatBytes(languages.totalBytes)} total across public repos
-              </p>
-            </>
+                  {/* Language grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
+                    {displayLangs.map((lang) => (
+                      <div key={lang.name} className="flex items-center gap-1.5">
+                        <div
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: lang.color }}
+                        />
+                        <span className="text-xs text-secondary truncate">{lang.name}</span>
+                        <span className="text-[10px] text-faint font-mono ml-auto">
+                          {lang.percentage.toFixed(1)}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Total code size */}
+                  <p className="text-[10px] text-faint mt-2 font-mono">
+                    {formatBytes(languages.totalBytes)} across {languages.repoCount} repos
+                  </p>
+                </>
+              );
+            })()
           ) : (
             <div className="flex flex-wrap gap-2">
               {["TypeScript", "Python", "Go", "Rust"].map((lang) => (

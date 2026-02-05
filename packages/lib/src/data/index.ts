@@ -5,7 +5,7 @@ export { projects, liveProjects } from "./projects";
 export { socialLinks, SOCIAL_HANDLE, CONTACT_EMAIL } from "./social";
 
 // Site metadata
-export { site, subdomains } from "./site";
+export { site, subdomains, publicSubdomains } from "./site";
 
 // Constants
 export { SITE_VERSION } from "../constants";

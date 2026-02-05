@@ -81,112 +81,92 @@ export default async function StatusPage() {
   const upCount = services.filter((s) => s.isUp).length;
   const allUp = upCount === monitoredCount;
 
+  const categoryMap = Object.fromEntries(
+    monitoredServices.map((s) => [s.url, s.category]),
+  );
+  const ecosystemServices = services.filter(
+    (s) => (categoryMap[s.serviceUrl] ?? "anipotts") === "anipotts",
+  );
+  const projectServices = services.filter(
+    (s) => categoryMap[s.serviceUrl] === "project",
+  );
+
   return (
-    <div className="flex flex-col gap-8 py-8 px-4 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-4 py-6 px-4 max-w-4xl mx-auto">
+      {/* Header */}
       <FadeIn>
-        <div className="flex items-center justify-between border-b border-border pb-6">
-          <div>
-            <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
-              System Status
-            </h1>
-            <div className="flex items-center gap-2">
-              {allUp ? (
-                <>
-                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-green-400 text-sm font-medium">
-                    All Systems Operational
-                  </span>
-                </>
-              ) : (
-                <>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
-                  <span className="text-yellow-400 text-sm font-medium">
-                    {upCount}/{monitoredCount} Systems Operational
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] text-muted uppercase tracking-wider">
-              Last Checked
+        <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
+          <div className="flex items-center gap-3">
+            {allUp ? (
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+            ) : (
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse" />
+            )}
+            <span className={`text-sm font-medium ${allUp ? "text-green-400" : "text-yellow-400"}`}>
+              {allUp ? "All Operational" : `${upCount}/${monitoredCount} Up`}
             </span>
-            <p className="text-xs text-tertiary">
-              {formatRelativeTime(lastChecked)}
-            </p>
+          </div>
+          <span className="text-[10px] text-faint">
+            checked {formatRelativeTime(lastChecked)}
+          </span>
+        </div>
+      </FadeIn>
+
+      {/* Ecosystem Grid */}
+      <FadeIn delay={0.05}>
+        <div>
+          <h2 className="text-[10px] uppercase tracking-widest text-muted mb-2">ecosystem</h2>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+            {ecosystemServices.map((service) => (
+              <a
+                key={service.serviceUrl}
+                href={service.serviceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-2.5 py-2 bg-input border border-border-subtle rounded hover:border-accent-400/30 transition-colors group"
+                title={`${service.uptime24h}% uptime • ${service.responseTimeMs}ms`}
+              >
+                <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${service.isUp ? "bg-green-500" : "bg-red-500 animate-pulse"}`} />
+                <span className="text-xs text-secondary truncate group-hover:text-accent-400 transition-colors">
+                  {service.serviceName.replace(".anipotts.com", "").replace("anipotts.com", "www")}
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </FadeIn>
 
-      {(["anipotts", "project"] as const).map((category) => {
-        const categoryMap = Object.fromEntries(
-          monitoredServices.map((s) => [s.url, s.category]),
-        );
-        const filtered = services.filter(
-          (s) => (categoryMap[s.serviceUrl] ?? "anipotts") === category,
-        );
-        if (filtered.length === 0) return null;
-        return (
-          <div key={category} className="space-y-3">
-            <h2 className="text-xs uppercase tracking-widest text-muted">
-              {category === "anipotts" ? "Ecosystem" : "Projects"}
-            </h2>
-            {filtered.map((service, i) => (
-              <FadeIn key={service.serviceUrl} delay={i * 0.04}>
-                <div className="flex items-center justify-between p-4 bg-input border border-border rounded-lg hover:bg-overlay-10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <FaGlobe className="text-muted flex-shrink-0" />
-                    <div className="flex flex-col">
-                      <a
-                        href={service.serviceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-body text-sm hover:text-accent-400 transition-colors"
-                      >
-                        {service.serviceName}
-                      </a>
-                      {service.responseTimeMs > 0 && (
-                        <span className="text-[10px] text-faint font-mono">
-                          {service.responseTimeMs}ms
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-muted hidden md:inline">
-                      {service.uptime24h}%
-                      <span className="text-faint mx-1">·</span>
-                      7d: {service.uptime7d}%
-                    </span>
-                    <span className="text-xs text-muted md:hidden">
-                      {service.uptime24h}%
-                    </span>
-                    {service.isUp ? (
-                      <span className="flex items-center gap-1.5 text-xs text-green-400">
-                        <div className="w-2 h-2 rounded-full bg-green-500" />
-                        Up
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1.5 text-xs text-red-400">
-                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                        Down
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
+      {/* Projects Grid */}
+      {projectServices.length > 0 && (
+        <FadeIn delay={0.1}>
+          <div>
+            <h2 className="text-[10px] uppercase tracking-widest text-muted mb-2">projects</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {projectServices.map((service) => (
+                <a
+                  key={service.serviceUrl}
+                  href={service.serviceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-2.5 py-2 bg-input border border-border-subtle rounded hover:border-accent-400/30 transition-colors group"
+                  title={`${service.uptime24h}% uptime • ${service.responseTimeMs}ms`}
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${service.isUp ? "bg-green-500" : "bg-red-500 animate-pulse"}`} />
+                  <span className="text-xs text-secondary truncate group-hover:text-accent-400 transition-colors">
+                    {service.serviceName}
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
-        );
-      })}
+        </FadeIn>
+      )}
 
-      <FadeIn delay={0.5}>
-        <div className="text-center pt-8 border-t border-border-subtle">
-          <p className="text-xs text-faint">
-            HTTP health checks every 5 minutes • {monitoredCount} services
-            monitored
-          </p>
-        </div>
+      {/* Footer */}
+      <FadeIn delay={0.15}>
+        <p className="text-[10px] text-faint text-center pt-2 border-t border-border-subtle">
+          {monitoredCount} services • 5min intervals
+        </p>
       </FadeIn>
     </div>
   );
