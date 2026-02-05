@@ -13,6 +13,8 @@ import {
   MinimizedPill,
   TerminalBackground,
   TerminalHeader,
+  SubdomainHeader,
+  SubdomainFooter,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
 import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
@@ -37,7 +39,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <WindowLayoutWrapper>
               <WindowContainer>
                 <TerminalHeader defaultTitle="ani@potts:~/docs.anipotts.com" />
-                <WindowInner showNavbar={false} showFooter={false}>{children}</WindowInner>
+                <WindowInner showNavbar={false} showFooter={false}>
+                  <SubdomainHeader subdomain="docs" />
+                  {children}
+                  <SubdomainFooter subdomain="docs" />
+                </WindowInner>
                 <TerminalStatusBar />
               </WindowContainer>
               <TerminalPromptCentered /><MinimizedPill />

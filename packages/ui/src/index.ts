@@ -44,3 +44,6 @@ export type { PostHogProviderProps } from "./providers";
 // Admin
 export { AdminProvider, useAdmin, AdminShell, AdminLogin } from "./admin";
 export type { AdminActions, AdminContextType } from "./admin";
+
+// Subdomain
+export { SubdomainHeader, SubdomainFooter } from "./subdomain";

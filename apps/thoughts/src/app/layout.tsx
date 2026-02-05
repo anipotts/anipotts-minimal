@@ -13,6 +13,8 @@ import {
   MinimizedPill,
   TerminalBackground,
   TerminalHeader,
+  SubdomainHeader,
+  SubdomainFooter,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
 import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
@@ -62,17 +64,9 @@ export default function RootLayout({
                 <TerminalHeader defaultTitle="ani@potts:~/thoughts.anipotts.com" />
 
                 <WindowInner showNavbar={false} showFooter={false}>
-                  <nav className="flex items-center justify-between py-4 px-2 border-b border-border-subtle mb-8">
-                    <a href="https://anipotts.com" className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors">
-                      ani potts
-                    </a>
-                    <div className="flex items-center gap-4">
-                      <a href="/" className="text-xs uppercase tracking-widest text-accent-400">
-                        thoughts
-                      </a>
-                    </div>
-                  </nav>
+                  <SubdomainHeader subdomain="thoughts" />
                   {children}
+                  <SubdomainFooter subdomain="thoughts" />
                 </WindowInner>
 
                 <TerminalStatusBar />
