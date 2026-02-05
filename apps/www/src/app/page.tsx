@@ -87,12 +87,14 @@ export default async function Home() {
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-4">
-          {recentProjects.map((project, index) => (
-            <FadeIn key={project.slug} delay={0.6 + index * 0.1}>
-              <ProjectCard project={project} />
-            </FadeIn>
-          ))}
-          <FadeIn delay={1.1}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {recentProjects.map((project, index) => (
+              <FadeIn key={project.slug} delay={0.6 + index * 0.05}>
+                <ProjectCard project={project} />
+              </FadeIn>
+            ))}
+          </div>
+          <FadeIn delay={0.9}>
             <a
               href="https://lab.anipotts.com"
               target="_blank"

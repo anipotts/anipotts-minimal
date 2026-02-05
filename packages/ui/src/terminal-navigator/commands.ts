@@ -1,4 +1,4 @@
-import { subdomains, SITE_VERSION } from "@anipotts/lib/data";
+import { subdomains, publicSubdomains, SITE_VERSION } from "@anipotts/lib/data";
 import type { CommandDef, CommandContext, OutputLine } from "./types";
 import { PROMPT_USER, getPromptPath } from "./constants";
 
@@ -34,8 +34,8 @@ const lsCmd: CommandDef = {
     const long = args.includes("-la") || args.includes("-l") || args.includes("-al");
     if (long) {
       ctx.addOutput([
-        line("output", "total 9"),
-        ...subdomains.map((s) => {
+        line("output", `total ${publicSubdomains.length}`),
+        ...publicSubdomains.map((s) => {
           const current = s.name === ctx.currentSubdomain ? " *" : "";
           const nameType = s.name === ctx.currentSubdomain ? "accent" as const : "output" as const;
           return line(nameType,
@@ -44,7 +44,7 @@ const lsCmd: CommandDef = {
         }),
       ]);
     } else {
-      const names = subdomains.map((s) =>
+      const names = publicSubdomains.map((s) =>
         s.name === ctx.currentSubdomain ? `\x1b[accent]${s.name}/\x1b[/accent]*` : `${s.name}/`
       );
       // Show in a grid-like format
@@ -155,7 +155,7 @@ const neofetchCmd: CommandDef = {
       `Host: ${ctx.currentSubdomain}.anipotts.com`,
       `Shell: zsh`,
       `Terminal: web`,
-      `Packages: 9 (subdomains)`,
+      `Packages: ${publicSubdomains.length} (subdomains)`,
       `Uptime: ${uptimeStr}`,
       `Stack: Next.js \u00b7 React \u00b7 TypeScript`,
       `Theme: terminal-dark`,
