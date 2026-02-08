@@ -1,10 +1,17 @@
 import { ImageResponse } from "next/og";
 
 /**
- * Generates a 180x180 Apple touch icon with 2-letter text on dark background.
- * Uses lavender (#a78bfa) for all icons.
+ * Generates a 180x180 Apple touch icon with 2-letter text.
+ * Dark mode: blue (#61abea) on black (#0a0a0a)
+ * Light mode: purple (#a78bfa) on white (#faf9f7)
  */
-export function generateAppleIcon(text: string) {
+export function generateAppleIcon(
+  text: string,
+  scheme: "dark" | "light" = "dark"
+) {
+  const bg = scheme === "dark" ? "#0a0a0a" : "#faf9f7";
+  const fg = scheme === "dark" ? "#61abea" : "#a78bfa";
+
   return new ImageResponse(
     (
       <div
@@ -14,7 +21,7 @@ export function generateAppleIcon(text: string) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a0a0a",
+          background: bg,
         }}
       >
         <span
@@ -23,7 +30,7 @@ export function generateAppleIcon(text: string) {
             fontWeight: 400,
             fontFamily: "system-ui, sans-serif",
             letterSpacing: "-0.02em",
-            color: "#a78bfa",
+            color: fg,
           }}
         >
           {text}
