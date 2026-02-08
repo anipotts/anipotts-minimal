@@ -37,7 +37,7 @@ interface ExpandableNavProps {
 const primaryItems = [
   { name: "index", path: "/", subdomain: "www" },
   { name: "work", path: "/work", subdomain: "www" },
-  { name: "thoughts", path: "", subdomain: "thoughts" },
+  { name: "thoughts", path: "/thoughts", subdomain: "www" },
   { name: "connect", path: "/connect", subdomain: "www" },
 ];
 

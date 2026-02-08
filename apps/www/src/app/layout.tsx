@@ -85,6 +85,29 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://anipotts.com",
   },
+  icons: {
+    icon: [
+      {
+        url: "/api/icon?text=ap&scheme=dark",
+        type: "image/png",
+        sizes: "32x32",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        url: "/api/icon?text=ap&scheme=light",
+        type: "image/png",
+        sizes: "32x32",
+        media: "(prefers-color-scheme: light)",
+      },
+    ],
+    apple: [
+      {
+        url: "/api/icon?text=ap&scheme=dark",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
   manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
