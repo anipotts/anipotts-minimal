@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useCallback, memo, type ReactNode } from "react";
 import { useAdmin } from "./AdminProvider";
-import { FaSignOutAlt, FaLayerGroup } from "react-icons/fa";
+import { FaSignOutAlt, FaExternalLinkAlt, FaMoon, FaSun, FaAdjust } from "react-icons/fa";
 import type { AdminScope, AdminTabId } from "./types";
-import { getTabsForScope, getDefaultTab, type TabConfig } from "./tabs";
+import { getTabsForScope, getDefaultTab } from "./tabs";
+
+export type ThemeMode = "dark" | "light" | "system";
 
 export interface AdminPanelContentProps {
   scope?: AdminScope;
@@ -14,28 +16,50 @@ export interface AdminPanelContentProps {
   statusWidget?: ReactNode;
   /** Optional link to live site */
   liveSiteUrl?: string;
+  /** Current theme mode - passed from parent that has access to ThemeProvider */
+  theme?: ThemeMode;
+  /** Function to cycle through themes */
+  onThemeChange?: () => void;
 }
 
 /**
  * Admin panel content with tab navigation.
- * The actual tab content is provided by the app via renderTab prop.
+ * Full-height layout with no scrolling. GPU-optimized.
  */
-export function AdminPanelContent({
+// Theme icon mapping
+const THEME_ICONS: Record<ThemeMode, typeof FaMoon> = {
+  dark: FaMoon,
+  light: FaSun,
+  system: FaAdjust,
+};
+
+export const AdminPanelContent = memo(function AdminPanelContent({
   scope = "all",
   renderTab,
   statusWidget,
   liveSiteUrl = "/",
+  theme = "dark",
+  onThemeChange,
 }: AdminPanelContentProps) {
   const { logout } = useAdmin();
   const tabs = getTabsForScope(scope);
   const [activeTab, setActiveTab] = useState<AdminTabId>(getDefaultTab(scope));
-  const [currentTime, setCurrentTime] = useState("");
+  const [currentTime, setCurrentTime] = useState(() =>
+    new Date().toLocaleTimeString("en-US", { hour12: false })
+  );
+  const ThemeIcon = THEME_ICONS[theme];
 
+  // Update time every second (batched updates)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString("en-US", { hour12: false }));
     }, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Memoized tab change handler
+  const handleTabChange = useCallback((tabId: AdminTabId) => {
+    setActiveTab(tabId);
   }, []);
 
   // Keyboard shortcuts for tab navigation
@@ -45,93 +69,99 @@ export function AdminPanelContent({
         const tabIndex = parseInt(e.key);
         if (tabIndex >= 1 && tabIndex <= tabs.length) {
           e.preventDefault();
-          setActiveTab(tabs[tabIndex - 1].id);
+          handleTabChange(tabs[tabIndex - 1].id);
         }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [tabs]);
+  }, [tabs, handleTabChange]);
+
+  const handleLogout = useCallback(() => logout(), [logout]);
 
   return (
-    <div className="flex flex-col gap-6 min-h-full">
-      {/* Command Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border pb-4 gap-4">
+    <div className="h-full flex flex-col">
+      {/* Command Bar - fixed height */}
+      <div className="shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[var(--border)] p-4 gap-3">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-input border border-border rounded-md">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-mono text-secondary uppercase tracking-widest">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--input-bg)] border border-[var(--border)] rounded-md">
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="text-xs font-mono text-[var(--text-secondary)] uppercase tracking-widest">
               ADMIN_{scope.toUpperCase()}
             </span>
           </div>
-          <div className="hidden md:flex gap-1 text-[10px] font-mono text-muted items-center">
+          <div className="hidden md:flex gap-1 text-[10px] font-mono text-[var(--text-muted)] items-center">
             <span>{currentTime}</span>
             {statusWidget && (
               <>
-                <span className="text-faint">|</span>
+                <span className="text-[var(--text-faint)]">|</span>
                 {statusWidget}
               </>
             )}
-            <span className="text-faint">|</span>
-            <span>content-network</span>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 bg-[rgba(var(--overlay-invert),0.4)] p-1 rounded-lg border border-border flex-wrap">
+        <div className="flex items-center gap-1 bg-[rgba(var(--overlay-invert),0.4)] p-1 rounded-lg border border-[var(--border)] flex-wrap">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-mono uppercase tracking-wider transition-all ${
-                  activeTab === tab.id
-                    ? "bg-overlay-10 text-accent-400 shadow-sm"
-                    : "text-muted hover:text-secondary hover:bg-input"
+                onClick={() => handleTabChange(tab.id)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-wider transition-colors ${
+                  isActive
+                    ? "bg-[var(--overlay-10)] text-[var(--accent-400)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--input-bg)]"
                 }`}
-                title={`${tab.label} ${tab.shortcut}`}
               >
                 <Icon className="w-3 h-3" />
                 <span className="hidden sm:inline">{tab.label}</span>
-                <span className="hidden md:inline opacity-50 text-[8px] ml-1">
-                  {tab.shortcut}
-                </span>
               </button>
             );
           })}
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          {onThemeChange && (
+            <button
+              onClick={onThemeChange}
+              className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[var(--input-bg)]"
+              aria-label={`Theme: ${theme}`}
+              title={`Theme: ${theme} (click to cycle)`}
+            >
+              <ThemeIcon className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline capitalize">{theme}</span>
+            </button>
+          )}
+          <span className="text-[var(--text-faint)]">|</span>
           <a
             href={liveSiteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-muted hover:text-white transition-colors font-mono flex items-center gap-2"
+            className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[var(--input-bg)]"
           >
-            <FaLayerGroup />
-            <span className="hidden md:inline">Live Site</span>
+            <FaExternalLinkAlt className="w-3 h-3" />
+            <span className="hidden lg:inline">Live Site</span>
           </a>
+          <span className="text-[var(--text-faint)]">|</span>
           <button
-            onClick={() => logout()}
-            className="text-xs text-red-400/70 hover:text-red-400 transition-colors font-mono flex items-center gap-2 border border-red-500/20 px-3 py-1.5 rounded hover:bg-red-500/10"
+            onClick={handleLogout}
+            className="text-xs text-red-400/80 hover:text-red-400 transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-red-500/10"
           >
-            <FaSignOutAlt />
-            <span className="hidden md:inline">Logout</span>
+            <FaSignOutAlt className="w-3 h-3" />
+            <span className="hidden lg:inline">Logout</span>
           </button>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-grow relative">
-        <div
-          key={activeTab}
-          className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-        >
-          {renderTab(activeTab)}
-        </div>
+      {/* Main Content Area - fills remaining height */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {renderTab(activeTab)}
       </div>
     </div>
   );
-}
+});

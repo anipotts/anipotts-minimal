@@ -129,15 +129,11 @@ export function TerminalNavigator({
       clearOutput: () => state.clearOutput(),
       closeTerminal: () => state.close(),
       commandHistory: cmdHistory.history,
+      // SPA navigation function - commands use this instead of window.location
+      navigate: onNavigate,
     };
 
     executeCommand(val, ctx);
-
-    // Fire onNavigate callback for cd/open commands
-    const parts = val.split(/\s+/);
-    if ((parts[0] === "cd" || parts[0] === "open") && parts[1]) {
-      onNavigate?.(parts[1]);
-    }
   }, [state, currentSubdomain, cmdHistory, promptPrefix, onNavigate]);
 
   const handleArrowUp = useCallback(() => {

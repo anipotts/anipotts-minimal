@@ -35,7 +35,13 @@ export { WindowProvider, useWindowState, ThemeProvider, useTheme } from "./conte
 export type { WindowState, ThemeMode, ResolvedTheme } from "./context";
 
 // Hooks
-export { useDebounce } from "./hooks";
+export {
+  useDebounce,
+  useSubdomainNavigation,
+  getSubdomainFromPath,
+  getSubdomainPath,
+  getInternalPath,
+} from "./hooks";
 
 // Providers
 export { PostHogProvider } from "./providers";
@@ -47,3 +53,17 @@ export type { AdminActions, AdminContextType } from "./admin";
 
 // Subdomain
 export { SubdomainHeader, SubdomainFooter } from "./subdomain";
+
+// Navigation
+export { ExpandableNav } from "./components/navigation";
+
+// Utils
+export {
+  prefetchUrl,
+  createHoverPrefetch,
+  isPrefetched,
+  clearPrefetchCache,
+  navigateToSubdomain,
+  navigateSameOrigin,
+  supportsViewTransitions,
+} from "./utils";

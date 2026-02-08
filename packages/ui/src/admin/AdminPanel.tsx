@@ -91,33 +91,18 @@ export function AdminPanel({ children, scope = "all" }: AdminPanelProps) {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[var(--text-muted)] font-mono hidden md:block">
-                  ESC to close · ⌘⇧A toggle
-                </span>
-                <button
-                  onClick={toggleModal}
-                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors text-xs font-mono px-2 py-1 rounded hover:bg-[var(--overlay-5)]"
-                  aria-label="Close admin panel"
-                >
-                  [×]
-                </button>
-              </div>
+              <button
+                onClick={toggleModal}
+                className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors text-xs font-mono px-2 py-1 rounded hover:bg-[var(--overlay-5)]"
+                aria-label="Close admin panel"
+              >
+                [×]
+              </button>
             </div>
 
-            {/* Content area */}
+            {/* Content area - no scroll, tabs fill 100% */}
             <div className="flex-1 overflow-hidden">
-              {isAdmin ? (
-                <div className="h-full overflow-y-auto custom-scrollbar">
-                  <div className="p-6 md:p-8">
-                    {children}
-                  </div>
-                </div>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <AdminLogin />
-                </div>
-              )}
+              {isAdmin ? children : <AdminLogin />}
             </div>
           </motion.div>
         </>

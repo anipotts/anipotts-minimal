@@ -19,6 +19,11 @@ export interface CommandContext {
   clearOutput: () => void;
   closeTerminal: () => void;
   commandHistory: string[];
+  /**
+   * SPA navigation function. When provided, cd uses this instead of
+   * window.location.href. Called with (subdomain).
+   */
+  navigate?: (subdomain: string) => void;
 }
 
 export interface CommandDef {

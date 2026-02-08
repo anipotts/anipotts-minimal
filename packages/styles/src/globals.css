@@ -1,3 +1,74 @@
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css";
+
+/* ─────────────────────────────────────────────────────────────
+   View Transitions API - Cross-document navigation animations
+   Enables seamless subdomain switching with persistent shared elements
+   ───────────────────────────────────────────────────────────── */
+
+/* Enable cross-document view transitions for all navigations */
+@view-transition {
+  navigation: auto;
+}
+
+/* Shared elements that persist across pages (no animation) */
+.site-logo {
+  view-transition-name: site-logo;
+}
+
+.nav-container {
+  view-transition-name: nav;
+}
+
+.terminal-header {
+  view-transition-name: terminal-header;
+}
+
+.terminal-window {
+  view-transition-name: terminal-window;
+}
+
+/* Main content area transitions with fade */
+.main-content {
+  view-transition-name: main-content;
+}
+
+/* Old page content fades out */
+::view-transition-old(main-content) {
+  animation: vt-fade-out 0.15s ease-out forwards;
+}
+
+/* New page content fades in */
+::view-transition-new(main-content) {
+  animation: vt-fade-in 0.15s ease-out forwards;
+}
+
+/* Shared elements: no animation, they visually persist */
+::view-transition-group(site-logo),
+::view-transition-group(nav),
+::view-transition-group(terminal-header),
+::view-transition-group(terminal-window) {
+  animation: none;
+}
+
+/* Ensure shared elements layer above transitioning content */
+::view-transition-group(site-logo) {
+  z-index: 100;
+}
+::view-transition-group(nav) {
+  z-index: 99;
+}
+::view-transition-group(terminal-header) {
+  z-index: 98;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

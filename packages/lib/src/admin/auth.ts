@@ -15,14 +15,17 @@ export const ADMIN_COOKIE_OPTIONS = {
 };
 
 /**
- * Verify a password against the ADMIN_PASSWORD env var.
- * Called from server actions only — process.env is available at runtime.
+ * Verify a password against the provided admin password.
+ * The caller (server action) should pass process.env.ADMIN_PASSWORD
+ * to ensure proper Next.js env loading in monorepo setups.
  */
-export function verifyAdminPassword(password: string): {
+export function verifyAdminPassword(
+  password: string,
+  adminPassword: string | undefined
+): {
   success: boolean;
   error?: string;
 } {
-  const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     return { success: false, error: "Admin password not configured on server" };
   }

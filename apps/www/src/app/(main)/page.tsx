@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { projects } from "@/data/projects";
 import { supabase } from "@/lib/supabaseClient";
 import FadeIn from "@/components/FadeIn";
 import ProjectCard from "@/components/ProjectCard";
 import CompanyLink from "@/components/CompanyLink";
-import ThoughtLink from "@/app/thoughts/ThoughtLink";
-import Link from "next/link";
+import ThoughtLink from "@/components/ThoughtLink";
 
 export const revalidate = 0;
 
@@ -95,14 +95,12 @@ export default async function Home() {
             ))}
           </div>
           <FadeIn delay={0.9}>
-            <a
-              href="https://lab.anipotts.com"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/lab"
               className="text-xs text-accent-400 hover:underline"
             >
               view all work →
-            </a>
+            </Link>
           </FadeIn>
         </div>
       </section>
@@ -125,14 +123,12 @@ export default async function Home() {
                 </FadeIn>
               ))}
               <FadeIn delay={1.6}>
-                <a
-                  href="https://thoughts.anipotts.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/thoughts"
                   className="text-xs text-accent-400 hover:underline"
                 >
                   view all thoughts →
-                </a>
+                </Link>
               </FadeIn>
             </>
           ) : (

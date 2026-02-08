@@ -14,9 +14,8 @@ import {
   TerminalBackground,
   TerminalHeader,
   SubdomainHeader,
-  SubdomainFooter,
 } from "@anipotts/ui";
-import { ThemeScript } from "@anipotts/ui/server";
+import { ThemeScript, SubdomainHints, SpeculationRules } from "@anipotts/ui/server";
 import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -51,8 +50,10 @@ export default function RootLayout({
     <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <SubdomainHints current="thoughts" />
+        <SpeculationRules current="thoughts" />
       </head>
-      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
+      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
 
         <ThemeProvider>
         <TerminalBackground />
@@ -66,7 +67,6 @@ export default function RootLayout({
                 <WindowInner showNavbar={false} showFooter={false}>
                   <SubdomainHeader subdomain="thoughts" />
                   {children}
-                  <SubdomainFooter subdomain="thoughts" />
                 </WindowInner>
 
                 <TerminalStatusBar />

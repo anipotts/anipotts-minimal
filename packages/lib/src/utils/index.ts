@@ -2,6 +2,12 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export { LANGUAGE_COLORS, getLanguageColor } from "./languages";
+export {
+  isDevelopment,
+  getSubdomainUrl,
+  getHomeUrl,
+  getAllSubdomainUrls,
+} from "./urls";
 
 /**
  * Utility to merge Tailwind CSS classes with clsx

@@ -10,7 +10,7 @@ interface TerminalHeaderProps {
 
 export function TerminalHeader({ defaultTitle }: TerminalHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-input border-b border-border-subtle select-none">
+    <div className="terminal-header flex items-center justify-between px-4 py-2 bg-input border-b border-border-subtle select-none">
       <div className="flex items-center gap-2">
         <WindowControls />
         <TerminalHeaderTitle defaultTitle={defaultTitle} />

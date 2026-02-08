@@ -87,33 +87,33 @@ export default function AtomsTab() {
 
   if (loading) {
     return (
-      <div className="p-8 font-mono text-xs text-muted animate-pulse">
-        Loading atoms...
+      <div className="h-full flex items-center justify-center">
+        <span className="text-xs text-[var(--text-muted)] animate-pulse">Loading...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-3 px-1">
         <div className="flex items-center gap-2">
           <FaCircle className="w-2 h-2 text-accent-400" />
-          <h2 className="text-sm font-mono uppercase tracking-widest text-secondary">
+          <h2 className="text-sm font-mono uppercase tracking-wide text-[var(--text-primary)] font-semibold">
             Generated Atoms
           </h2>
-          <span className="text-xs text-muted ml-2">
+          <span className="text-xs text-[var(--text-muted)] font-medium">
             {atoms.length} total
           </span>
         </div>
 
         {/* Filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] text-muted uppercase">Filter:</span>
+          <span className="text-xs text-[var(--text-tertiary)] uppercase font-medium">Filter:</span>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as typeof filter)}
-            className="bg-input border border-border rounded px-2 py-1 text-xs font-mono text-secondary"
+            className="bg-[var(--input-bg)] border border-[var(--border)] rounded-md px-2.5 py-1.5 text-xs font-mono text-[var(--text-primary)] focus:border-[var(--accent-400)] focus:outline-none"
           >
             <option value="all">All Platforms</option>
             <optgroup label="By Status">
@@ -132,17 +132,17 @@ export default function AtomsTab() {
         </div>
       </div>
 
-      {/* Atoms List */}
-      <div className="space-y-3">
+      {/* Atoms List - scrollable */}
+      <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
         {filteredAtoms.length === 0 ? (
-          <div className="text-center py-12 text-muted text-sm">
-            No atoms found. Use <code className="bg-input px-1 rounded">/atomize</code> to generate atoms from content.
+          <div className="text-center py-12 text-[var(--text-muted)] text-sm">
+            No atoms found. Use <code className="bg-[var(--input-bg)] px-1.5 py-0.5 rounded font-mono text-[var(--accent-400)]">/atomize</code> to generate atoms from content.
           </div>
         ) : (
           filteredAtoms.map((atom) => (
             <div
               key={atom.id}
-              className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg p-4"
+              className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg p-4 hover:border-[var(--accent-400)]/30 transition-colors"
             >
               {/* Atom Header */}
               <div className="flex items-center justify-between mb-3">

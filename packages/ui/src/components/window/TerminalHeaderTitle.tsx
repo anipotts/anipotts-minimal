@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 export interface TerminalHeaderTitleProps {
   defaultTitle?: string;
@@ -8,13 +8,18 @@ export interface TerminalHeaderTitleProps {
 
 export function TerminalHeaderTitle({ defaultTitle = "ani@potts:~/anipotts.com" }: TerminalHeaderTitleProps) {
   const [displayedText, setDisplayedText] = useState("");
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
+    // Only animate once per mount
+    if (hasAnimated.current) return;
+    hasAnimated.current = true;
+
     let index = 0;
     const interval = setInterval(() => {
       setDisplayedText(defaultTitle.substring(0, index + 1));
       index++;
-      if (index === defaultTitle.length) {
+      if (index >= defaultTitle.length) {
         clearInterval(interval);
       }
     }, 30);

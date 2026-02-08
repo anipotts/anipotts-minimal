@@ -10,4 +10,12 @@ export {
   deleteThoughtRecord,
   incrementThoughtViewCount,
   fetchThoughtStats,
+  type QueryOptions,
 } from "./thoughts";
+
+export {
+  fetchAllAtoms,
+  fetchAtomsByContent,
+  upsertAtomRecord,
+  deleteAtomRecord,
+} from "./atoms";

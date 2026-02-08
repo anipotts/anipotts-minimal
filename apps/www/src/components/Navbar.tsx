@@ -1,65 +1,34 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import posthog from "posthog-js";
-import { motion } from "framer-motion";
-
-const navItems = [
-  { name: "index", path: "/" },
-  { name: "work", path: "/work" },
-  { name: "thoughts", path: "/thoughts" },
-  { name: "connect", path: "/connect" },
-];
+import { ExpandableNav, useSubdomainNavigation, getSubdomainFromPath } from "@anipotts/ui";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { navigateTo } = useSubdomainNavigation();
+  const currentSubdomain = getSubdomainFromPath(pathname);
 
-  const handleNavClick = (item: { name: string; path: string }) => {
-    posthog.capture('nav_link_clicked', {
-      link_name: item.name,
-      link_path: item.path,
+  const handleNavClick = (name: string, href: string) => {
+    posthog.capture("nav_link_clicked", {
+      link_name: name,
+      link_path: href,
       from_path: pathname,
     });
   };
 
+  // SPA navigation handler for subdomain links
+  const handleNavigate = useCallback((subdomain: string, path?: string) => {
+    navigateTo(subdomain, path);
+  }, [navigateTo]);
+
   return (
-    <nav className="w-full flex flex-col md:flex-row md:items-center justify-between md:gap-28 pb-12 md:py-12 gap-6 md:mb-16">
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
-        <Link href="/" className="text-lg font-bold tracking-tight whitespace-nowrap text-accent-400 hover:text-accent-400/80 transition-colors duration-300 font-heading hidden md:block">
-          ani potts
-        </Link>
-      </motion.div>
-      
-      <div className="flex w-full justify-between items-center md:flex-wrap gap-6 text-sm font-medium tracking-wide">
-        {navItems.map((item, index) => {
-          const isActive = pathname === item.path;
-          return (
-            <motion.div
-              key={item.path}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-            >
-              <Link
-                href={item.path}
-                onClick={() => handleNavClick(item)}
-                className={`transition-colors duration-300 ${
-                  isActive
-                    ? "text-body underline decoration-overlay-30 underline-offset-4 hover:text-accent-400"
-                    : "text-tertiary hover:text-body"
-                }`}
-              >
-                {item.name}
-              </Link>
-            </motion.div>
-          );
-        })}
-      </div>
-    </nav>
+    <ExpandableNav
+      currentSubdomain={currentSubdomain}
+      pathname={pathname}
+      onNavClick={handleNavClick}
+      onNavigate={handleNavigate}
+    />
   );
 }

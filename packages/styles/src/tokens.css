@@ -8,9 +8,9 @@
   --card-foreground: #1a1a2e;
   --card-darker: #f5f5f5;
 
-  /* Accent colors (same in both modes) */
-  --accent: #61abea;
-  --accent-400: #61abea;
+  /* Accent colors - lavender for light mode, blue for dark */
+  --accent: #a78bfa;
+  --accent-400: #a78bfa;
 
   /* Signal colors (same in both modes) */
   --signal-green: #4ade80;
@@ -45,7 +45,7 @@
   /* Effects */
   --grid-line: rgba(0, 0, 0, 0.03);
   --noise-opacity: 0.015;
-  --waves-color: rgba(97, 171, 234, 0.5);
+  --waves-color: rgba(167, 139, 250, 0.5);
   --waves-opacity: 0.15;
   --cursor-dot: #ffe0e0;
   --ambient-from: rgba(229, 231, 235, 0.3);
@@ -78,6 +78,10 @@
   --card: #0a0a0a;
   --card-foreground: #e5e7eb;
   --card-darker: #050505;
+
+  /* Blue accent for dark mode */
+  --accent: #61abea;
+  --accent-400: #61abea;
 
   --overlay-base: 255, 255, 255;
   --overlay-invert: 0, 0, 0;

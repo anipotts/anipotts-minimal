@@ -1,30 +1,26 @@
 "use client";
 
+import { ExpandableNav } from "../components/navigation";
+
 interface SubdomainHeaderProps {
   subdomain: string;
   showHomeLink?: boolean;
+  /**
+   * SPA navigation callback. When provided, subdomain navigation uses this
+   * instead of full page reload. Called with (subdomain, path).
+   */
+  onNavigate?: (subdomain: string, path?: string) => void;
 }
 
 /**
- * Minimal header for subdomain apps.
- * Shows link back to anipotts.com and current subdomain name.
+ * Header for subdomain apps using the shared ExpandableNav component.
+ * Provides consistent navigation across all subdomains with expandable menu.
  */
-export function SubdomainHeader({ subdomain, showHomeLink = true }: SubdomainHeaderProps) {
+export function SubdomainHeader({ subdomain, onNavigate }: SubdomainHeaderProps) {
   return (
-    <nav className="flex items-center justify-between py-4 px-2 border-b border-border-subtle mb-6">
-      {showHomeLink ? (
-        <a
-          href="https://anipotts.com"
-          className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors"
-        >
-          ani potts
-        </a>
-      ) : (
-        <span className="text-xs uppercase tracking-widest text-muted">ani potts</span>
-      )}
-      <span className="text-xs uppercase tracking-widest text-accent-400">
-        {subdomain}
-      </span>
-    </nav>
+    <ExpandableNav
+      currentSubdomain={subdomain}
+      onNavigate={onNavigate}
+    />
   );
 }

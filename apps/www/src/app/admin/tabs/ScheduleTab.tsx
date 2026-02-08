@@ -201,14 +201,14 @@ export default function ScheduleTab() {
 
   if (loading) {
     return (
-      <div className="p-8 font-mono text-xs text-muted animate-pulse">
-        Loading schedule...
+      <div className="h-full flex items-center justify-center">
+        <span className="text-xs text-[var(--text-muted)] animate-pulse">Loading...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="h-full p-4 flex flex-col gap-3 overflow-y-auto">
       {/* Status Bar */}
       <div className="flex items-center gap-4 flex-wrap bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg px-4 py-3">
         {/* Connection */}
