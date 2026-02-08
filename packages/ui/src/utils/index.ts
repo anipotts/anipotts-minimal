@@ -1,2 +1,2 @@
 export { prefetchUrl, createHoverPrefetch, isPrefetched, clearPrefetchCache } from "./prefetch";
-export { navigateToSubdomain, navigateSameOrigin, supportsViewTransitions } from "./navigation";
+export { navigateToSection, navigateToSubdomain, navigateSameOrigin, supportsViewTransitions } from "./navigation";

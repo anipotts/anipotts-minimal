@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "docs | ani potts",
     description: "Architecture reference for the anipotts.com ecosystem",
-    url: "https://docs.anipotts.com",
-    siteName: "docs.anipotts.com",
+    url: "https://anipotts.com/docs",
+    siteName: "anipotts.com",
     type: "website",
   },
   twitter: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: "Architecture reference for the anipotts.com ecosystem",
   },
   alternates: {
-    canonical: "https://docs.anipotts.com",
+    canonical: "https://anipotts.com/docs",
   },
 };
 

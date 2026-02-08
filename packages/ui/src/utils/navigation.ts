@@ -1,24 +1,32 @@
 /**
- * Navigate to a URL using the View Transitions API if available.
- * Falls back to regular navigation in browsers that don't support it.
+ * Navigate to a section path using the View Transitions API if available.
+ * All sections are now same-origin, so this uses client-side navigation.
  *
- * The View Transitions API enables smooth animated transitions between
- * DOM states, making subdomain switches feel seamless.
- *
- * @param url - The URL to navigate to
+ * @param path - The path to navigate to (e.g., "/thoughts")
  *
  * @example
- * navigateToSubdomain("https://thoughts.anipotts.com");
+ * navigateToSection("/thoughts");
+ */
+export function navigateToSection(path: string): void {
+  if (typeof document !== "undefined" && "startViewTransition" in document) {
+    (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
+      window.location.href = path;
+    });
+  } else {
+    window.location.href = path;
+  }
+}
+
+/**
+ * @deprecated Use navigateToSection for public navigation.
+ * Kept for admin subdomain access only.
  */
 export function navigateToSubdomain(url: string): void {
-  // Check if View Transitions API is available
   if (typeof document !== "undefined" && "startViewTransition" in document) {
-    // Use View Transitions for smooth animation
     (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
       window.location.href = url;
     });
   } else {
-    // Fallback for browsers without View Transitions support
     window.location.href = url;
   }
 }
@@ -33,7 +41,6 @@ export function navigateSameOrigin(url: string): void {
   if (typeof document !== "undefined" && "startViewTransition" in document) {
     (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
       window.history.pushState({}, "", url);
-      // Dispatch a popstate event to trigger any listeners
       window.dispatchEvent(new PopStateEvent("popstate"));
     });
   } else {
@@ -44,8 +51,6 @@ export function navigateSameOrigin(url: string): void {
 
 /**
  * Check if the View Transitions API is supported.
- *
- * @returns true if View Transitions are supported
  */
 export function supportsViewTransitions(): boolean {
   return typeof document !== "undefined" && "startViewTransition" in document;

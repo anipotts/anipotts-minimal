@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { incrementThoughtViews } from "@/app/(subdomain)/thoughts/actions";
+import { incrementThoughtViews } from "@/app/(main)/thoughts/actions";
 
 /**
  * Component that increments view count on mount.

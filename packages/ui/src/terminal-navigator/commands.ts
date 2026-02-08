@@ -72,7 +72,7 @@ const cdCmd: CommandDef = {
       ctx.addOutput([line("output", `Already on ${sub.name}`)]);
       return;
     }
-    ctx.addOutput([line("success", `\u2192 navigating to ${sub.name}.anipotts.com...`)]);
+    ctx.addOutput([line("success", `\u2192 navigating to ~/${sub.name}...`)]);
     // Use SPA navigation (internal path routing)
     setTimeout(() => {
       if (ctx.navigate) {
@@ -101,7 +101,7 @@ const openCmd: CommandDef = {
     }
     // Use internal path for same-origin navigation
     const path = getInternalPath(sub.name);
-    ctx.addOutput([line("success", `Opening ${sub.name}.anipotts.com in new tab...`)]);
+    ctx.addOutput([line("success", `Opening /${sub.name} in new tab...`)]);
     window.open(path, "_blank", "noopener,noreferrer");
   },
 };
@@ -111,7 +111,7 @@ const pwdCmd: CommandDef = {
   description: "Print current subdomain path",
   execute: (_args, ctx) => {
     const sub = findSubdomain(ctx.currentSubdomain);
-    ctx.addOutput([line("output", sub?.path ?? `/home/ani/${ctx.currentSubdomain}.anipotts.com`)]);
+    ctx.addOutput([line("output", sub?.path ?? `/home/ani/${ctx.currentSubdomain}`)]);
   },
 };
 
@@ -161,10 +161,10 @@ const neofetchCmd: CommandDef = {
       `${PROMPT_USER}`,
       "-".repeat(20),
       `OS: anipotts.com v${SITE_VERSION}`,
-      `Host: ${ctx.currentSubdomain}.anipotts.com`,
+      `Host: ~/${ctx.currentSubdomain}`,
       `Shell: zsh`,
       `Terminal: web`,
-      `Packages: ${publicSubdomains.length} (subdomains)`,
+      `Packages: ${publicSubdomains.length} (sections)`,
       `Uptime: ${uptimeStr}`,
       `Stack: Next.js \u00b7 React \u00b7 TypeScript`,
       `Theme: terminal-dark`,
@@ -199,7 +199,7 @@ const pingCmd: CommandDef = {
       return;
     }
 
-    ctx.addOutput([line("output", `PING ${sub.name}.anipotts.com (${sub.url})...`)]);
+    ctx.addOutput([line("output", `PING ~/${sub.name} (/${sub.name})...`)]);
 
     for (let i = 0; i < 3; i++) {
       await new Promise((r) => setTimeout(r, 400));
@@ -209,7 +209,7 @@ const pingCmd: CommandDef = {
       ]);
     }
 
-    ctx.addOutput([line("output", `--- ${sub.name}.anipotts.com ping statistics ---`)]);
+    ctx.addOutput([line("output", `--- ~/${sub.name} ping statistics ---`)]);
     ctx.addOutput([line("output", "3 packets transmitted, 3 received, 0% loss")]);
   },
 };

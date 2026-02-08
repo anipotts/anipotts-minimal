@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "metrics | ani potts",
     description: "Coding metrics and statistics from ani potts",
-    url: "https://metrics.anipotts.com",
-    siteName: "metrics.anipotts.com",
+    url: "https://anipotts.com/metrics",
+    siteName: "anipotts.com",
     type: "website",
   },
   twitter: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Coding metrics and statistics from ani potts",
   },
   alternates: {
-    canonical: "https://metrics.anipotts.com",
+    canonical: "https://anipotts.com/metrics",
   },
 };
 

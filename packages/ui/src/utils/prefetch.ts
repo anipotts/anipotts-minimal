@@ -36,7 +36,7 @@ export function prefetchUrl(url: string): void {
  * @returns Object with onMouseEnter, onMouseLeave, and onFocus handlers
  *
  * @example
- * const handlers = createHoverPrefetch("https://thoughts.anipotts.com");
+ * const handlers = createHoverPrefetch("/thoughts");
  * <a href={url} {...handlers}>Link</a>
  */
 export function createHoverPrefetch(url: string, delay = 65) {

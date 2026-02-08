@@ -14,34 +14,7 @@ interface Thought {
 }
 
 /**
- * Determines if we're on a subdomain (where paths should be relative)
- * vs main site (where paths need the /thoughts prefix).
- */
-function useSubdomainPath(slug: string): string {
-  if (typeof window === 'undefined') {
-    // SSR: use full path (safe default)
-    return `/thoughts/${slug}`;
-  }
-
-  const hostname = window.location.hostname;
-  const searchParams = new URLSearchParams(window.location.search);
-
-  // On subdomain: use relative path (/slug)
-  // thoughts.anipotts.com or localhost with _subdomain param
-  if (
-    hostname.startsWith('thoughts.') ||
-    searchParams.get('_subdomain') === 'thoughts'
-  ) {
-    return `/${slug}`;
-  }
-
-  // On main site: use full path (/thoughts/slug)
-  return `/thoughts/${slug}`;
-}
-
-/**
  * Thought preview card for the thoughts list page.
- * Links to the thought detail page using context-aware routing.
  */
 export default function ThoughtLink({ thought, readingTime }: { thought: Thought; readingTime?: number }) {
   const handleClick = () => {
@@ -51,7 +24,7 @@ export default function ThoughtLink({ thought, readingTime }: { thought: Thought
     });
   };
 
-  const href = useSubdomainPath(thought.slug);
+  const href = `/thoughts/${thought.slug}`;
 
   return (
     <Link href={href} className="group block" onClick={handleClick}>
