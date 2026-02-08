@@ -44,7 +44,7 @@ export default async function Home() {
         <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
           <FadeIn delay={0.1}>
             <h1 className="text-3xl md:text-4xl font-bold font-heading text-heading">
-              hi, i'm ani potts.
+              hi, i'm ani.
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
