@@ -135,6 +135,8 @@ export interface WavesProps {
   className?: string;
 }
 
+const FRAME_INTERVAL = 1000 / 30; // ~33ms for 30fps
+
 export function Waves({
   lineColor = "black",
   backgroundColor = "transparent",
@@ -193,6 +195,8 @@ export function Waves({
   });
 
   const frameIdRef = useRef<number | null>(null);
+  const isVisibleRef = useRef(true);
+  const lastFrameTimeRef = useRef(0);
 
   useEffect(() => {
     configRef.current = {
@@ -214,6 +218,9 @@ export function Waves({
     const container = containerRef.current;
     if (!canvas || !container) return;
     ctxRef.current = canvas.getContext("2d");
+
+    // Check prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function setSize() {
       if (!container || !canvas) return;
@@ -315,10 +322,25 @@ export function Waves({
 
     function tick(t: number) {
       if (!container) return;
+
+      // Skip frame if not visible (IntersectionObserver)
+      if (!isVisibleRef.current) {
+        frameIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
       if (boundingRef.current.width <= 0) {
         frameIdRef.current = requestAnimationFrame(tick);
         return;
       }
+
+      // 30fps throttle: skip if less than ~33ms since last frame
+      if (t - lastFrameTimeRef.current < FRAME_INTERVAL) {
+        frameIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      lastFrameTimeRef.current = t;
+
       const mouse = mouseRef.current;
       mouse.sx += (mouse.x - mouse.sx) * 0.1;
       mouse.sy += (mouse.y - mouse.sy) * 0.1;
@@ -366,15 +388,33 @@ export function Waves({
 
     setSize();
     setLines();
+
+    // If user prefers reduced motion, render one static frame and stop
+    if (prefersReducedMotion) {
+      movePoints(0);
+      drawLines();
+      return;
+    }
+
     frameIdRef.current = requestAnimationFrame(tick);
     window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("touchmove", onTouchMove, { passive: false });
 
+    // IntersectionObserver: pause animation when not visible
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0 },
+    );
+    observer.observe(container);
+
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
+      observer.disconnect();
       if (frameIdRef.current !== null) {
         cancelAnimationFrame(frameIdRef.current);
       }

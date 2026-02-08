@@ -4,23 +4,27 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { supabase } from "@/lib/supabaseClient";
 import ReactMarkdown from "react-markdown";
 import { FadeIn } from "@anipotts/ui";
-import { getPostHogClient } from "@/lib/posthog-server";
-import { headers } from "next/headers";
+import { cache } from "react";
 import ViewCounter from "@/components/thoughts/ViewCounter";
 import IncrementView from "@/components/thoughts/IncrementView";
 import type { Metadata } from "next";
 
-/**
- * Back link to the thoughts listing page.
- * Public users are always on the root domain now.
- */
-async function getBackLink(): Promise<string> {
-  return '/thoughts';
-}
-
 export const revalidate = 60;
 
-async function getThought(slug: string) {
+export async function generateStaticParams() {
+  if (!supabase) return [];
+  try {
+    const { data } = await supabase
+      .from("thoughts")
+      .select("slug")
+      .eq("published", true);
+    return (data || []).map((t) => ({ slug: t.slug }));
+  } catch {
+    return [];
+  }
+}
+
+const getThought = cache(async (slug: string) => {
   if (!supabase) return null;
   const { data } = await supabase
     .from("thoughts")
@@ -28,7 +32,7 @@ async function getThought(slug: string) {
     .eq("slug", slug)
     .single();
   return data;
-}
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -62,31 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ThoughtPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const thought = await getThought(slug);
-  const backLink = await getBackLink();
-
-  // Track thought_read event on the server
-  if (thought) {
-    try {
-      const headersList = await headers();
-      const posthog = getPostHogClient();
-      const forwardedFor = headersList.get('x-forwarded-for');
-      const ip = forwardedFor ? forwardedFor.split(',')[0] : 'anonymous';
-      const distinctId = `anon_${ip}`;
-
-      posthog.capture({
-        distinctId: distinctId,
-        event: 'thought_read',
-        properties: {
-          thought_slug: thought.slug,
-          thought_title: thought.title,
-          thought_tags: thought.tags,
-          $current_url: `/thoughts/${slug}`,
-        },
-      });
-    } catch (error) {
-      console.error('PostHog capture error:', error);
-    }
-  }
+  const backLink = '/thoughts';
 
   if (!thought) {
     if (!supabase) {

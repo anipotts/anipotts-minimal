@@ -32,3 +32,15 @@ export type {
   TypefullyQueueSummary,
   TypefullySocialSet,
 } from "./typefully";
+
+// CMS types
+export type {
+  PageContent,
+  HomepageSection,
+  HomepageContent,
+  FooterContent,
+  ProjectRow,
+  SocialLinkRow,
+  SiteSettingsMap,
+} from "./cms";
+export { projectRowToProject } from "./cms";

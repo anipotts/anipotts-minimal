@@ -1,70 +1,50 @@
-"use client";
+import { Suspense } from "react";
+import { FadeIn } from "@anipotts/ui";
+import { fetchProjects } from "@anipotts/lib/cms";
+import type { Project } from "@anipotts/types";
+import type { Metadata } from "next";
 
-import { useState } from "react";
-import { projects } from "@/data/projects";
-import FadeIn from "@/components/FadeIn";
-import ProjectCard from "@/components/ProjectCard";
-import { motion, AnimatePresence } from "framer-motion";
-import posthog from "posthog-js";
+import WorkFilteredList from "./WorkFilteredList";
 
-const categories = ["all", "ai", "product", "quant", "music"];
+export const revalidate = 60;
 
-export default function WorkPage() {
-  const [filter, setFilter] = useState("all");
+export const metadata: Metadata = {
+  title: "work",
+  description: "Projects, experiments, and open-source work from ani potts",
+  openGraph: {
+    title: "work | ani potts",
+    description: "Projects, experiments, and open-source work from ani potts",
+    url: "https://anipotts.com/work",
+    siteName: "anipotts.com",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "work | ani potts",
+    description: "Projects, experiments, and open-source work from ani potts",
+  },
+  alternates: {
+    canonical: "https://anipotts.com/work",
+  },
+};
 
-  const filteredProjects = projects.filter(p => filter === "all" || p.category === filter);
-
-  const handleCategoryFilter = (category: string) => {
-    setFilter(category);
-    posthog.capture('work_category_filtered', {
-      category: category,
-      results_count: projects.filter(p => category === "all" || p.category === category).length,
-    });
-  };
+export default async function WorkPage() {
+  const projects = await fetchProjects();
 
   return (
     <div className="flex flex-col gap-12 pb-20">
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">work</h1>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+              work
+            </h1>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
-          <FadeIn delay={0.1}>
-            <div className="flex flex-wrap gap-2">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryFilter(cat)}
-                  className={`px-3 py-1 text-[10px] uppercase tracking-wider rounded-sm border transition-all duration-300 ${
-                    filter === cat 
-                      ? "border-accent-400 text-accent-400 bg-accent-400/10" 
-                      : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </FadeIn>
-
-          <div className="flex flex-col gap-6 mt-4">
-            <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project) => (
-                <motion.div
-                  key={project.slug}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <ProjectCard project={project} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <Suspense>
+            <WorkFilteredList projects={projects} />
+          </Suspense>
         </div>
       </section>
     </div>

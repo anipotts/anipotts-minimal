@@ -1,6 +1,0 @@
-@import "tailwindcss";
-@config "../../tailwind.config.mjs";
-@import "@anipotts/styles/tokens.css";
-@import "@anipotts/styles/base.css";
-@import "../styles/prose.css";
-@import "../styles/quill.css";

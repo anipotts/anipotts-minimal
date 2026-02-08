@@ -1,6 +1,6 @@
 "use client";
 
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 
 interface CompanyLinkProps {
   href: string;
@@ -9,6 +9,7 @@ interface CompanyLinkProps {
 }
 
 export default function CompanyLink({ href, children, companyName }: CompanyLinkProps) {
+  const posthog = usePostHog();
   const handleClick = () => {
     posthog.capture('company_link_clicked', {
       company_name: companyName,

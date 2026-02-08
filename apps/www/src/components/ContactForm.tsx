@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { FaPaperPlane, FaSpinner } from "react-icons/fa";
-import posthog from "posthog-js";
+import { PaperPlaneTilt, SpinnerGap } from "@phosphor-icons/react";
+import { usePostHog } from "posthog-js/react";
 
 export default function ContactForm() {
+  const posthog = usePostHog();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -92,7 +93,7 @@ export default function ContactForm() {
       >
         {status === "loading" ? (
           <>
-            <FaSpinner className="animate-spin" /> Sending...
+            <SpinnerGap className="animate-spin" size={14} /> Sending...
           </>
         ) : status === "success" ? (
           "Message Sent"
@@ -100,7 +101,7 @@ export default function ContactForm() {
           "Failed - Try Again"
         ) : (
           <>
-            Send Message <FaPaperPlane className="text-[10px]" />
+            Send Message <PaperPlaneTilt size={12} />
           </>
         )}
       </button>

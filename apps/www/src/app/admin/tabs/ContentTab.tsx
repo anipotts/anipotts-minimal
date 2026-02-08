@@ -15,7 +15,7 @@ import {
   deleteContent,
 } from "../actions";
 import MarkdownEditor from "@/components/MarkdownEditor";
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 import Link from "next/link";
 import type { Thought, ContentType, SeriesType, ContentStatus, VoiceMode, Platform } from "@anipotts/types";
 
@@ -23,6 +23,7 @@ type EditableContent = Partial<Thought> &
   Pick<Thought, "title" | "slug" | "content" | "published" | "tags">;
 
 export default function ContentTab() {
+  const posthog = usePostHog();
   const [contents, setContents] = useState<Thought[]>([]);
   const [editing, setEditing] = useState<EditableContent | null>(null);
   const [loading, setLoading] = useState(false);

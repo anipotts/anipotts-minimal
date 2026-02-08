@@ -1,11 +1,9 @@
 import { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabaseClient';
-import { projects } from '@/data/projects';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://anipotts.com';
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -37,47 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
-    {
-      url: `${baseUrl}/links`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/updates`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/status`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/lab`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/docs`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
   ];
-
-  // Project pages (featured ones with dedicated pages)
-  const projectPages: MetadataRoute.Sitemap = projects
-    .filter((p) => p.featured && p.links?.page)
-    .map((project) => ({
-      url: `${baseUrl}${project.links!.page}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
 
   // Dynamic thought/blog pages
   let thoughtPages: MetadataRoute.Sitemap = [];
@@ -101,5 +59,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticPages, ...projectPages, ...thoughtPages];
+  return [...staticPages, ...thoughtPages];
 }

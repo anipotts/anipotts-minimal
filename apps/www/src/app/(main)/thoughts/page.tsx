@@ -1,13 +1,12 @@
 import { supabase } from "@/lib/supabaseClient";
 import { FadeIn } from "@anipotts/ui";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
-import type { Thought } from "@anipotts/types";
 import type { Metadata } from "next";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "thoughts | ani potts",
+  title: "thoughts",
   description: "Technical writings and reflections from ani potts",
   openGraph: {
     title: "thoughts | ani potts",
@@ -31,7 +30,7 @@ async function getThoughts() {
   try {
     const { data } = await supabase
       .from("thoughts")
-      .select("*")
+      .select("id, title, slug, summary, created_at, series_type, tags, views, content")
       .eq("published", true)
       .order("created_at", { ascending: false });
     return data || [];
@@ -58,7 +57,7 @@ export default async function ThoughtsPage() {
             <p className="text-muted italic text-sm">No thoughts published yet.</p>
           </FadeIn>
         ) : (
-          thoughts.map((thought: Thought, i: number) => {
+          thoughts.map((thought: any, i: number) => {
             const readingTime = thought.content
               ? Math.ceil(thought.content.split(/\s+/).length / 200)
               : undefined;

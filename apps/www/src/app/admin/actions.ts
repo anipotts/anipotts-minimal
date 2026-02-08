@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
-import type { Atom, Thought, ContentType, SeriesType, ContentStatus, VoiceMode, Platform, TypefullyDraft, TypefullyQueueSummary } from "@anipotts/types";
+import type { Atom, Thought, ContentType, SeriesType, ContentStatus, VoiceMode, Platform, TypefullyDraft, TypefullyQueueSummary, PageContent, ProjectRow, SocialLinkRow } from "@anipotts/types";
 import {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
@@ -369,6 +369,375 @@ export async function pushAtomToTypefully(
   } catch (err) {
     return {
       success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+// ============================================================================
+// CMS: PAGE CONTENT ACTIONS
+// ============================================================================
+
+export async function getPageContent(pageKey: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("page_content")
+      .select("*")
+      .eq("page_key", pageKey)
+      .order("version", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as PageContent };
+  } catch (err) {
+    console.error("Error fetching page content:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function updatePageContent(
+  pageKey: string,
+  content: object,
+  expectedVersion?: number
+) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    // Fetch current version for optimistic concurrency
+    const { data: current } = await supabase
+      .from("page_content")
+      .select("version")
+      .eq("page_key", pageKey)
+      .order("version", { ascending: false })
+      .limit(1)
+      .single();
+
+    const currentVersion = (current as { version: number } | null)?.version ?? 0;
+
+    if (expectedVersion !== undefined && currentVersion !== expectedVersion) {
+      return {
+        success: false as const,
+        error: `Version conflict: expected ${expectedVersion}, found ${currentVersion}`,
+      };
+    }
+
+    const { data, error } = await supabase
+      .from("page_content")
+      .upsert(
+        {
+          page_key: pageKey,
+          content,
+          version: currentVersion + 1,
+          published: true,
+          updated_at: new Date().toISOString(),
+          updated_by: "admin",
+        },
+        { onConflict: "page_key" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as PageContent };
+  } catch (err) {
+    console.error("Error updating page content:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function togglePageSection(
+  pageKey: string,
+  sectionKey: string,
+  visible: boolean
+) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    // Fetch current content
+    const { data: current, error: fetchErr } = await supabase
+      .from("page_content")
+      .select("*")
+      .eq("page_key", pageKey)
+      .order("version", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (fetchErr) throw fetchErr;
+    const row = current as PageContent;
+    const content = row.content as Record<string, unknown>;
+    const sections = content.sections as Record<string, Record<string, unknown>>;
+
+    if (!sections[sectionKey]) {
+      return { success: false as const, error: `Section "${sectionKey}" not found` };
+    }
+
+    sections[sectionKey].visible = visible;
+
+    const { data, error } = await supabase
+      .from("page_content")
+      .update({
+        content: { ...content, sections },
+        version: row.version + 1,
+        updated_at: new Date().toISOString(),
+        updated_by: "admin",
+      })
+      .eq("page_key", pageKey)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as PageContent };
+  } catch (err) {
+    console.error("Error toggling page section:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+// ============================================================================
+// CMS: PROJECT ACTIONS
+// ============================================================================
+
+export async function getProjects(options?: {
+  category?: string;
+  featured?: boolean;
+  visible?: boolean;
+}) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    let query = supabase
+      .from("projects")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (options?.category) query = query.eq("category", options.category);
+    if (options?.featured !== undefined) query = query.eq("featured", options.featured);
+    if (options?.visible !== undefined) query = query.eq("visible", options.visible);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return { success: true as const, data: (data || []) as ProjectRow[] };
+  } catch (err) {
+    console.error("Error fetching projects:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function upsertProject(project: Partial<ProjectRow>) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .upsert(
+        [{ ...project, updated_at: new Date().toISOString() }],
+        { onConflict: "slug" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as ProjectRow };
+  } catch (err) {
+    console.error("Error upserting project:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function deleteProject(id: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (error) throw error;
+    return { success: true as const };
+  } catch (err) {
+    console.error("Error deleting project:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function reorderProjects(orderedIds: string[]) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const updates = orderedIds.map((id, index) =>
+      supabase!
+        .from("projects")
+        .update({ sort_order: index, updated_at: new Date().toISOString() })
+        .eq("id", id)
+    );
+
+    const results = await Promise.all(updates);
+    const failed = results.find((r) => r.error);
+    if (failed?.error) throw failed.error;
+
+    return { success: true as const };
+  } catch (err) {
+    console.error("Error reordering projects:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+// ============================================================================
+// CMS: SOCIAL LINK ACTIONS
+// ============================================================================
+
+export async function getSocialLinks() {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("social_links")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    return { success: true as const, data: (data || []) as SocialLinkRow[] };
+  } catch (err) {
+    console.error("Error fetching social links:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function upsertSocialLink(link: Partial<SocialLinkRow>) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("social_links")
+      .upsert(
+        [{ ...link, updated_at: new Date().toISOString() }],
+        { onConflict: "id" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as SocialLinkRow };
+  } catch (err) {
+    console.error("Error upserting social link:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function deleteSocialLink(id: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { error } = await supabase.from("social_links").delete().eq("id", id);
+    if (error) throw error;
+    return { success: true as const };
+  } catch (err) {
+    console.error("Error deleting social link:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+// ============================================================================
+// CMS: SITE SETTINGS ACTIONS
+// ============================================================================
+
+export async function getSiteSetting(key: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+
+    if (error) throw error;
+    return {
+      success: true as const,
+      data: (data as { value: string } | null)?.value ?? null,
+    };
+  } catch (err) {
+    console.error("Error fetching site setting:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function updateSiteSetting(key: string, value: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data };
+  } catch (err) {
+    console.error("Error updating site setting:", err);
+    return {
+      success: false as const,
       error: err instanceof Error ? err.message : "Unknown error",
     };
   }
