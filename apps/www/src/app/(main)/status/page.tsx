@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "status | ani potts",
     description: "Service status monitoring for ani potts ecosystem",
-    url: "https://status.anipotts.com",
-    siteName: "status.anipotts.com",
+    url: "https://anipotts.com/status",
+    siteName: "anipotts.com",
     type: "website",
   },
   twitter: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Service status monitoring for ani potts ecosystem",
   },
   alternates: {
-    canonical: "https://status.anipotts.com",
+    canonical: "https://anipotts.com/status",
   },
 };
 

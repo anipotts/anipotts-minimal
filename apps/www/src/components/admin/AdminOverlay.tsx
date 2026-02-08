@@ -1,7 +1,9 @@
 "use client";
 
-import { AdminPanel, AdminPanelContent, type AdminTabId } from "@anipotts/ui/admin";
+import { useEffect } from "react";
+import { AdminPanel, AdminPanelContent, type AdminTabId, type AdminScope } from "@anipotts/ui/admin";
 import { useTheme } from "@anipotts/ui";
+import { useAdmin } from "@/context/AdminContext";
 import PipelineTab from "@/app/admin/tabs/PipelineTab";
 import ContentTab from "@/app/admin/tabs/ContentTab";
 import AtomsTab from "@/app/admin/tabs/AtomsTab";
@@ -33,16 +35,30 @@ function renderTab(tabId: AdminTabId) {
   }
 }
 
-export default function AdminOverlay() {
+interface AdminOverlayProps {
+  scope?: AdminScope;
+  autoOpen?: boolean;
+}
+
+export default function AdminOverlay({ scope = "all", autoOpen = false }: AdminOverlayProps) {
   const { theme, cycleTheme } = useTheme();
+  const { toggleModal, isModalOpen } = useAdmin();
+
+  useEffect(() => {
+    if (autoOpen && !isModalOpen) {
+      const timer = setTimeout(() => toggleModal(), 100);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpen]);
 
   return (
-    <AdminPanel scope="all">
+    <AdminPanel scope={scope}>
       <AdminPanelContent
-        scope="all"
+        scope={scope}
         renderTab={renderTab}
         statusWidget={<TypefullyStatusWidget />}
-        liveSiteUrl="/thoughts"
+        liveSiteUrl={scope === "all" ? "/" : `/${scope}`}
         theme={theme}
         onThemeChange={cycleTheme}
       />

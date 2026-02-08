@@ -4,10 +4,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 
 /**
- * Maps subdomain names to their internal route paths.
+ * Maps section names to their internal route paths.
  * Used for SPA navigation within the consolidated app.
  */
-const SUBDOMAIN_TO_ROUTE: Record<string, string> = {
+const SECTION_TO_ROUTE: Record<string, string> = {
   www: '/',
   thoughts: '/thoughts',
   dev: '/dev',
@@ -19,36 +19,42 @@ const SUBDOMAIN_TO_ROUTE: Record<string, string> = {
   docs: '/docs',
 };
 
+/** @deprecated Use SECTION_TO_ROUTE */
+const SUBDOMAIN_TO_ROUTE = SECTION_TO_ROUTE;
+
 /**
- * Reverse mapping: route path to subdomain name.
+ * Reverse mapping: route path to section name.
  */
-const ROUTE_TO_SUBDOMAIN: Record<string, string> = Object.fromEntries(
-  Object.entries(SUBDOMAIN_TO_ROUTE).map(([k, v]) => [v, k])
+const ROUTE_TO_SECTION: Record<string, string> = Object.fromEntries(
+  Object.entries(SECTION_TO_ROUTE).map(([k, v]) => [v, k])
 );
 
 /**
- * Get the subdomain from a route path.
+ * Get the section name from a route path.
  * @param pathname - The current pathname (e.g., "/thoughts/hello")
- * @returns The subdomain name (e.g., "thoughts") or "www" for root
+ * @returns The section name (e.g., "thoughts") or "www" for root
  */
-export function getSubdomainFromPath(pathname: string): string {
-  // Check if path starts with any known subdomain route
-  for (const [route, subdomain] of Object.entries(ROUTE_TO_SUBDOMAIN)) {
+export function getSectionFromPath(pathname: string): string {
+  // Check if path starts with any known section route
+  for (const [route, section] of Object.entries(ROUTE_TO_SECTION)) {
     if (route !== '/' && pathname.startsWith(route)) {
-      return subdomain;
+      return section;
     }
   }
   return 'www';
 }
 
+/** @deprecated Use getSectionFromPath */
+export const getSubdomainFromPath = getSectionFromPath;
+
 /**
- * Get the path within a subdomain from the full pathname.
+ * Get the path within a section from the full pathname.
  * @param pathname - The current pathname (e.g., "/thoughts/hello")
- * @returns The path within the subdomain (e.g., "/hello")
+ * @returns The path within the section (e.g., "/hello")
  */
-export function getSubdomainPath(pathname: string): string {
-  const subdomain = getSubdomainFromPath(pathname);
-  const basePath = SUBDOMAIN_TO_ROUTE[subdomain];
+export function getSectionPath(pathname: string): string {
+  const section = getSectionFromPath(pathname);
+  const basePath = SECTION_TO_ROUTE[section];
 
   if (basePath === '/') {
     return pathname;
@@ -57,6 +63,9 @@ export function getSubdomainPath(pathname: string): string {
   const subPath = pathname.slice(basePath.length);
   return subPath || '/';
 }
+
+/** @deprecated Use getSectionPath */
+export const getSubdomainPath = getSectionPath;
 
 type ViewTransitionDocument = Document & {
   startViewTransition: (callback: () => void | Promise<void>) => {
@@ -75,17 +84,17 @@ function supportsViewTransitions(): boolean {
 }
 
 /**
- * Hook for SPA navigation between subdomain routes.
+ * Hook for SPA navigation between site sections.
  *
- * This hook enables true SPA navigation within the consolidated single-app
- * architecture. It uses Next.js router for client-side transitions and
- * optionally wraps navigation in View Transitions for smooth animations.
+ * Enables true SPA navigation within the single-app architecture.
+ * Uses Next.js router for client-side transitions and optionally
+ * wraps navigation in View Transitions for smooth animations.
  *
  * @example
  * ```tsx
- * const { navigateTo, currentSubdomain, currentPath } = useSubdomainNavigation();
+ * const { navigateTo, currentSection, currentPath } = useSectionNavigation();
  *
- * // Navigate to thoughts subdomain root
+ * // Navigate to thoughts section root
  * navigateTo('thoughts');
  *
  * // Navigate to a specific thought
@@ -95,29 +104,29 @@ function supportsViewTransitions(): boolean {
  * navigateTo('www', '/work');
  * ```
  */
-export function useSubdomainNavigation() {
+export function useSectionNavigation() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const currentSubdomain = getSubdomainFromPath(pathname);
-  const currentPath = getSubdomainPath(pathname);
+  const currentSection = getSectionFromPath(pathname);
+  const currentPath = getSectionPath(pathname);
 
   /**
-   * Navigate to a subdomain route.
+   * Navigate to a section route.
    *
-   * @param subdomain - The subdomain to navigate to (e.g., "thoughts", "www")
-   * @param path - The path within the subdomain (default: "/")
+   * @param section - The section to navigate to (e.g., "thoughts", "www")
+   * @param path - The path within the section (default: "/")
    * @param options - Navigation options
    */
   const navigateTo = useCallback((
-    subdomain: string,
+    section: string,
     path: string = '/',
     options?: { scroll?: boolean }
   ) => {
-    const basePath = SUBDOMAIN_TO_ROUTE[subdomain];
+    const basePath = SECTION_TO_ROUTE[section];
 
     if (!basePath) {
-      console.warn(`Unknown subdomain: ${subdomain}`);
+      console.warn(`Unknown section: ${section}`);
       return;
     }
 
@@ -152,43 +161,52 @@ export function useSubdomainNavigation() {
   }, [router]);
 
   /**
-   * Check if we're currently on a specific subdomain.
+   * Check if we're currently on a specific section.
    */
-  const isOnSubdomain = useCallback((subdomain: string) => {
-    return currentSubdomain === subdomain;
-  }, [currentSubdomain]);
+  const isOnSection = useCallback((section: string) => {
+    return currentSection === section;
+  }, [currentSection]);
 
   return {
-    /** Current subdomain (e.g., "thoughts", "www") */
-    currentSubdomain,
-    /** Current path within the subdomain (e.g., "/hello") */
+    /** Current section (e.g., "thoughts", "www") */
+    currentSection,
+    /** @deprecated Use currentSection */
+    currentSubdomain: currentSection,
+    /** Current path within the section (e.g., "/hello") */
     currentPath,
-    /** Navigate to a subdomain + path */
+    /** Navigate to a section + path */
     navigateTo,
     /** Navigate back in history */
     goBack,
-    /** Check if currently on a subdomain */
-    isOnSubdomain,
-    /** All available subdomains */
-    subdomains: Object.keys(SUBDOMAIN_TO_ROUTE),
+    /** Check if currently on a section */
+    isOnSection,
+    /** @deprecated Use isOnSection */
+    isOnSubdomain: isOnSection,
+    /** All available sections */
+    sections: Object.keys(SECTION_TO_ROUTE),
+    /** @deprecated Use sections */
+    subdomains: Object.keys(SECTION_TO_ROUTE),
     /** Router instance for advanced usage */
     router,
   };
 }
 
+/** @deprecated Use useSectionNavigation */
+export const useSubdomainNavigation = useSectionNavigation;
+
 /**
- * Get the full internal path for a subdomain + path combination.
+ * Get the full internal path for a section + path combination.
  * Useful for generating href values for Link components.
  *
- * @param subdomain - The subdomain (e.g., "thoughts")
- * @param path - The path within the subdomain (default: "/")
+ * @param section - The section (e.g., "thoughts")
+ * @param path - The path within the section (default: "/")
  * @returns The full internal path (e.g., "/thoughts/hello")
  */
-export function getInternalPath(subdomain: string, path: string = '/'): string {
-  const basePath = SUBDOMAIN_TO_ROUTE[subdomain];
+export function getInternalPath(section: string, path: string = '/'): string {
+  const basePath = SECTION_TO_ROUTE[section];
 
   if (!basePath) {
-    console.warn(`Unknown subdomain: ${subdomain}`);
+    console.warn(`Unknown section: ${section}`);
     return path;
   }
 

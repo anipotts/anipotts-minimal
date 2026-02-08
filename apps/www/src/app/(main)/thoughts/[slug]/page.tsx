@@ -10,19 +10,10 @@ import IncrementView from "@/components/thoughts/IncrementView";
 import type { Metadata } from "next";
 
 /**
- * Get the correct back link based on whether we're on subdomain or main site.
- * Server-side detection via host header.
+ * Back link to the thoughts listing page.
+ * Public users are always on the root domain now.
  */
 async function getBackLink(): Promise<string> {
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-
-  // On subdomain: use root path
-  if (host.startsWith('thoughts.')) {
-    return '/';
-  }
-
-  // On main site: use full path
   return '/thoughts';
 }
 
@@ -62,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: thought.summary || `${thought.title} — a thought by Ani Potts`,
     },
     alternates: {
-      canonical: `https://thoughts.anipotts.com/${slug}`,
+      canonical: `https://anipotts.com/thoughts/${slug}`,
     },
   };
 }

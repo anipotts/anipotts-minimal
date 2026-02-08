@@ -37,8 +37,11 @@ export type { WindowState, ThemeMode, ResolvedTheme } from "./context";
 // Hooks
 export {
   useDebounce,
+  useSectionNavigation,
   useSubdomainNavigation,
+  getSectionFromPath,
   getSubdomainFromPath,
+  getSectionPath,
   getSubdomainPath,
   getInternalPath,
 } from "./hooks";
@@ -63,6 +66,7 @@ export {
   createHoverPrefetch,
   isPrefetched,
   clearPrefetchCache,
+  navigateToSection,
   navigateToSubdomain,
   navigateSameOrigin,
   supportsViewTransitions,

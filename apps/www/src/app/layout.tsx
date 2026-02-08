@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import {
@@ -106,14 +107,17 @@ export const metadata: Metadata = {
  * - Analytics (PostHogProvider)
  * - Navigation (TerminalNavigator)
  *
- * Child layouts ((main) and (subdomain)) add their specific
- * components like Navbar/Footer or SubdomainHeader.
+ * The (main) child layout adds Navbar/Footer.
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const adminScopeRaw = headersList.get('x-admin-scope');
+  const adminAutoOpen = headersList.get('x-admin-autoopen') === 'true';
+
   return (
     <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <head>
@@ -142,7 +146,7 @@ export default function RootLayout({
                   <MinimizedPill />
                 </WindowLayoutWrapper>
 
-                <AdminOverlay />
+                <AdminOverlay scope={adminScopeRaw as "all" | "thoughts" | "lab" | "docs" | "updates" | undefined} autoOpen={adminAutoOpen} />
                 <TerminalNavigatorWrapper />
               </WindowProvider>
             </AdminProvider>

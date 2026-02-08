@@ -16,7 +16,7 @@ export default function TerminalHeaderWrapper() {
   // For subdomains, show the full subdomain URL
   const defaultTitle = subdomain === 'www'
     ? undefined
-    : `ani@potts:~/${subdomain}.anipotts.com`;
+    : `ani@potts:~/${subdomain}`;
 
   return <TerminalHeader defaultTitle={defaultTitle} />;
 }

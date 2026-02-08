@@ -13,8 +13,8 @@ export const MAX_HISTORY = 50;
 export const CURSOR_BLINK_MS = 530;
 
 export function getPromptPath(subdomain: string): string {
-  if (subdomain === "www") return "~/anipotts.com";
-  return `~/${subdomain}.anipotts.com`;
+  if (subdomain === "www") return "~";
+  return `~/${subdomain}`;
 }
 
 export function getMotd(): string {
@@ -30,7 +30,7 @@ export function getMotd(): string {
   });
   return [
     `Last login: ${dateStr} on ttys001`,
-    "ani@potts.com \u2014 9 hosts available",
+    "ani@potts.com \u2014 9 sections available",
     "Type 'help' for commands or 'ls' to list sites.",
     "",
   ].join("\n");

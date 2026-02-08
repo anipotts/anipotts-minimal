@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "thoughts | ani potts",
     description: "Technical writings and reflections from ani potts",
-    url: "https://thoughts.anipotts.com",
-    siteName: "thoughts.anipotts.com",
+    url: "https://anipotts.com/thoughts",
+    siteName: "anipotts.com",
     type: "website",
   },
   twitter: {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description: "Technical writings and reflections from ani potts",
   },
   alternates: {
-    canonical: "https://thoughts.anipotts.com",
+    canonical: "https://anipotts.com/thoughts",
   },
 };
 

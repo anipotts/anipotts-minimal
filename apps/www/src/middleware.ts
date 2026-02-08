@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Subdomain → internal route mapping.
- * thoughts.anipotts.com serves content from /thoughts internally.
+ * Section → internal route mapping.
+ * Used for admin subdomain rewrites only.
  */
 const SUBDOMAIN_ROUTES: Record<string, string> = {
   thoughts: '/thoughts',
@@ -39,8 +39,6 @@ function getSubdomain(request: NextRequest): string | null {
   }
 
   // Preview deployments on Vercel: *.vercel.app
-  // Could be project-name-git-branch-username.vercel.app
-  // Check for _subdomain query param in these cases
   if (hostname.includes('.vercel.app') || hostname.includes('.vercel.sh')) {
     return url.searchParams.get('_subdomain');
   }
@@ -55,31 +53,46 @@ function getSubdomain(request: NextRequest): string | null {
 }
 
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
   const subdomain = getSubdomain(request);
 
-  // If no subdomain or subdomain not recognized, continue normally
+  // No subdomain detected: root domain request, pass through
   if (!subdomain || !SUBDOMAIN_ROUTES[subdomain]) {
     return NextResponse.next();
   }
 
   const targetPath = SUBDOMAIN_ROUTES[subdomain];
+  const adminCookie = request.cookies.get('admin_session');
 
-  // Prevent double-rewriting if path already starts with target
-  // (e.g., internal navigation to /thoughts/hello shouldn't rewrite again)
-  if (url.pathname.startsWith(targetPath)) {
-    return NextResponse.next();
+  if (!adminCookie) {
+    // Public user on subdomain → 301 redirect to root domain path
+    const redirectPath = request.nextUrl.pathname === '/'
+      ? targetPath
+      : `${targetPath}${request.nextUrl.pathname}`;
+
+    // Use the request's origin in dev, production domain in prod
+    const baseUrl = request.nextUrl.origin.includes('localhost')
+      ? request.nextUrl.origin
+      : 'https://anipotts.com';
+    const redirectUrl = new URL(redirectPath, baseUrl);
+    redirectUrl.search = request.nextUrl.search;
+    // Remove _subdomain param from redirect
+    redirectUrl.searchParams.delete('_subdomain');
+    return NextResponse.redirect(redirectUrl, 301);
   }
 
-  // Rewrite: / → /thoughts, /hello → /thoughts/hello
-  url.pathname = url.pathname === '/'
-    ? targetPath
-    : `${targetPath}${url.pathname}`;
-
-  // Remove the _subdomain param from the URL (for dev mode cleanliness)
+  // Admin on subdomain → rewrite with scope headers
+  const url = request.nextUrl.clone();
+  if (!url.pathname.startsWith(targetPath)) {
+    url.pathname = url.pathname === '/'
+      ? targetPath
+      : `${targetPath}${url.pathname}`;
+  }
   url.searchParams.delete('_subdomain');
 
-  return NextResponse.rewrite(url);
+  const response = NextResponse.rewrite(url);
+  response.headers.set('x-admin-scope', subdomain);
+  response.headers.set('x-admin-autoopen', 'true');
+  return response;
 }
 
 export const config = {

@@ -1,33 +1,19 @@
 /**
- * Environment-aware URL utilities for subdomain navigation.
- * In development, uses localhost with different ports.
- * In production, uses proper subdomain URLs.
+ * URL utilities for section navigation.
+ * All public pages are now same-origin at anipotts.com/*.
  */
 
-/** Port mapping for local development */
-const DEV_PORTS: Record<string, number> = {
-  www: 3000,
-  thoughts: 3001,
-  dev: 3002,
-  links: 3003,
-  updates: 3004,
-  metrics: 3005,
-  status: 3006,
-  lab: 3007,
-  docs: 3008,
-};
-
-/** Production URLs */
-const PROD_URLS: Record<string, string> = {
-  www: "https://anipotts.com",
-  thoughts: "https://thoughts.anipotts.com",
-  dev: "https://dev.anipotts.com",
-  links: "https://links.anipotts.com",
-  updates: "https://updates.anipotts.com",
-  metrics: "https://metrics.anipotts.com",
-  status: "https://status.anipotts.com",
-  lab: "https://lab.anipotts.com",
-  docs: "https://docs.anipotts.com",
+/** Section name to path mapping */
+const SECTION_PATHS: Record<string, string> = {
+  www: "/",
+  thoughts: "/thoughts",
+  dev: "/dev",
+  links: "/links",
+  updates: "/updates",
+  metrics: "/metrics",
+  status: "/status",
+  lab: "/lab",
+  docs: "/docs",
 };
 
 /**
@@ -47,31 +33,33 @@ export function isDevelopment(): boolean {
 }
 
 /**
- * Get the base URL for a subdomain.
- * Returns localhost URL in development, production URL otherwise.
+ * Get the path for a section. All sections are same-origin paths now.
+ * @param section - The section name (e.g., "thoughts", "dev")
+ * @returns The path (e.g., "/thoughts")
  */
-export function getSubdomainUrl(subdomain: string): string {
-  if (isDevelopment()) {
-    const port = DEV_PORTS[subdomain] ?? 3000;
-    return `http://localhost:${port}`;
-  }
-  return PROD_URLS[subdomain] ?? `https://${subdomain}.anipotts.com`;
+export function getSectionUrl(section: string): string {
+  return SECTION_PATHS[section] ?? `/${section}`;
 }
 
+/** @deprecated Use getSectionUrl instead */
+export const getSubdomainUrl = getSectionUrl;
+
 /**
- * Get the home (www) URL.
+ * Get the home URL path.
  */
 export function getHomeUrl(): string {
-  return getSubdomainUrl("www");
+  return "/";
 }
 
 /**
- * Get all subdomain URLs with their metadata.
+ * Get all section URLs with their metadata.
  */
-export function getAllSubdomainUrls(): Array<{ name: string; url: string }> {
-  const subdomains = Object.keys(DEV_PORTS);
-  return subdomains.map((name) => ({
+export function getAllSectionUrls(): Array<{ name: string; url: string }> {
+  return Object.entries(SECTION_PATHS).map(([name, url]) => ({
     name,
-    url: getSubdomainUrl(name),
+    url,
   }));
 }
+
+/** @deprecated Use getAllSectionUrls instead */
+export const getAllSubdomainUrls = getAllSectionUrls;
