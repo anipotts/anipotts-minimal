@@ -1,32 +1,68 @@
-import SignalsBar from "./SignalsBar";
-import LiveTime from "./LiveTime";
-import { subdomains } from "@anipotts/lib/data";
+"use client";
 
-const footerSubdomains = subdomains.filter((s) => s.name !== "www");
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+  const [marketStatus, setMarketStatus] = useState<"open" | "closed">("closed");
+  const [time, setTime] = useState<string>("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      const nyTime = new Date(
+        now.toLocaleString("en-US", { timeZone: "America/New_York" })
+      );
+
+      const day = nyTime.getDay();
+      const hour = nyTime.getHours();
+      const minute = nyTime.getMinutes();
+
+      const isWeekday = day >= 1 && day <= 5;
+      const isAfterOpen = hour > 9 || (hour === 9 && minute >= 30);
+      const isBeforeClose = hour < 16;
+
+      setMarketStatus(
+        isWeekday && isAfterOpen && isBeforeClose ? "open" : "closed"
+      );
+      setTime(
+        now
+          .toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+            timeZone: "America/New_York",
+          })
+          .toLowerCase()
+      );
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <footer className="w-full mt-24 pb-12">
-      <SignalsBar />
-      <div className="flex flex-wrap justify-center gap-x-1 gap-y-1 text-xs text-faint font-mono mb-4">
-        {footerSubdomains.map((sub, i) => (
-          <span key={sub.name}>
-            {i > 0 && <span className="mx-1">·</span>}
-            <a
-              href={sub.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent-400 transition-colors"
-            >
-              {sub.name}
-            </a>
+    <footer className="w-full mt-auto py-6">
+      <div className="flex flex-row flex-wrap justify-between gap-x-8 gap-y-2 text-xs uppercase tracking-wider font-mono">
+        <div className="flex items-center gap-2">
+          <span className="text-faint">base:</span>
+          <span className="text-secondary">new york city</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-faint">focus:</span>
+          <span className="text-secondary">durable execution</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-faint">market:</span>
+          <span
+            className={
+              marketStatus === "open" ? "text-[#4ade80]" : "text-[#ef4444]"
+            }
+          >
+            {marketStatus}
           </span>
-        ))}
-      </div>
-      <div className="text-xs text-faint font-mono flex justify-between">
-        <div>© {new Date().getFullYear()} ani potts</div>
-        <div className="flex gap-2">
-          <LiveTime />
+          {time && <span className="text-secondary">{time}</span>}
         </div>
       </div>
     </footer>

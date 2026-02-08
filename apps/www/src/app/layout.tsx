@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import {
   PostHogProvider,
   ThemeProvider,
@@ -14,13 +12,13 @@ import {
   TerminalPromptCentered,
   MinimizedPill,
   TerminalBackground,
-  TerminalHeader,
 } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
 import { AdminProvider } from "@/context/AdminContext";
 import AdminOverlay from "@/components/admin/AdminOverlay";
 import PersonSchema from "@/components/PersonSchema";
-import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
+import TerminalNavigatorWrapper from "@/components/TerminalNavigatorWrapper";
+import TerminalHeaderWrapper from "@/components/TerminalHeaderWrapper";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -87,12 +85,6 @@ export const metadata: Metadata = {
     canonical: "https://anipotts.com",
   },
   manifest: "/site.webmanifest",
-  icons: {
-    icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-    ],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -104,6 +96,19 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Root layout for the consolidated single-app architecture.
+ *
+ * This layout provides:
+ * - Theme system (ThemeProvider, ThemeScript)
+ * - Terminal UI chrome (TerminalBackground, WindowContainer, etc.)
+ * - Admin system (AdminProvider, AdminOverlay)
+ * - Analytics (PostHogProvider)
+ * - Navigation (TerminalNavigator)
+ *
+ * Child layouts ((main) and (subdomain)) add their specific
+ * components like Navbar/Footer or SubdomainHeader.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -115,35 +120,33 @@ export default function RootLayout({
         <ThemeScript />
         <PersonSchema />
       </head>
-      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
+      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
         <ThemeProvider>
-        <TerminalBackground />
+          <TerminalBackground />
 
-        <PostHogProvider>
-          <AdminProvider>
-            <WindowProvider>
-              <WindowLayoutWrapper>
-                <WindowContainer>
-                  <TerminalHeader />
+          <PostHogProvider>
+            <AdminProvider>
+              <WindowProvider>
+                <WindowLayoutWrapper>
+                  <WindowContainer>
+                    <TerminalHeaderWrapper />
 
-                  <WindowInner>
-                    <Navbar />
-                    {children}
-                    <Footer />
-                  </WindowInner>
+                    <WindowInner showNavbar={false} showFooter={false}>
+                      {children}
+                    </WindowInner>
 
-                  <TerminalStatusBar />
-                </WindowContainer>
+                    <TerminalStatusBar />
+                  </WindowContainer>
 
-                <TerminalPromptCentered />
-                <MinimizedPill />
-              </WindowLayoutWrapper>
+                  <TerminalPromptCentered />
+                  <MinimizedPill />
+                </WindowLayoutWrapper>
 
-              <AdminOverlay />
-              <TerminalNavigator currentSubdomain="www" />
-            </WindowProvider>
-          </AdminProvider>
-        </PostHogProvider>
+                <AdminOverlay />
+                <TerminalNavigatorWrapper />
+              </WindowProvider>
+            </AdminProvider>
+          </PostHogProvider>
         </ThemeProvider>
       </body>
     </html>

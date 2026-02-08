@@ -5,8 +5,9 @@ interface SubdomainFooterProps {
 }
 
 /**
- * Minimal footer for subdomain apps.
+ * Minimal footer for subdomain pages.
  * Shows copyright and link back to main site.
+ * Uses internal paths for SPA navigation.
  */
 export function SubdomainFooter({ subdomain }: SubdomainFooterProps) {
   const year = new Date().getFullYear();
@@ -16,7 +17,7 @@ export function SubdomainFooter({ subdomain }: SubdomainFooterProps) {
       <div className="flex items-center justify-between text-[10px] text-faint font-mono">
         <span>© {year} ani potts</span>
         <a
-          href="https://anipotts.com"
+          href="/"
           className="hover:text-accent-400 transition-colors"
         >
           anipotts.com

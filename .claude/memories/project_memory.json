@@ -4,65 +4,59 @@
   "realtime_memories": [
     {
       "type": "architecture",
-      "content": "Turborepo monorepo with 9 subdomain apps (www, thoughts, dev, links, updates, metrics, status, lab, docs) and shared packages (ui, lib, types, config, styles). Three-layer shared system: @anipotts/lib (plain helpers) → @anipotts/ui (client components with callback props) → per-app actions.ts (thin 'use server' wrappers). Shared packages built with tsup. GitHub: https://github.com/anipotts/anipotts.com.",
-      "added_at": "2026-01-31T01:30:00.000000",
+      "content": "Single Next.js app (apps/www) with middleware subdomain→route rewrites. Subdomains (thoughts, dev, links, updates, metrics, status, lab, docs) route to /[subdomain] paths internally. Route groups: (main)/ and (subdomain)/ both use identical Navbar+Footer layout. Navigation uses ExpandableNav with primaryItems (index, work, thoughts, connect) + expandable full list. Shared packages: @anipotts/lib, @anipotts/ui, @anipotts/types, @anipotts/styles, @anipotts/config.",
+      "added_at": "2026-02-08T09:35:00.000000",
       "source": "consolidated"
     },
     {
       "type": "branding",
-      "content": "Accent: #61ABEA (blue). Handles: @anipottsbuilds (social), @anipotts (GitHub/LinkedIn). Email: contact@anipotts.com. Bio: 'minimal interfaces to orchestrate complex systems'. Terminal header: 'ani@potts:~/[domain]' with responsive prefix hiding. Font: JetBrains Mono. Design tokens in packages/styles/src/tokens.css (light in :root, dark in .dark).",
-      "added_at": "2026-01-31T01:30:00.000000",
+      "content": "Accent colors via CSS vars: lavender #a78bfa (light), blue #61abea (dark). Tailwind config uses var(--accent-400) NOT hardcoded hex. Dynamic favicons per subdomain (next/og ImageResponse): ap, th, dv, lk, up, mt, st, lb, dc. Handles: @anipottsbuilds (social), @anipotts (GitHub/LinkedIn). Font: JetBrains Mono. Design tokens: packages/styles/src/tokens.css.",
+      "added_at": "2026-02-05T22:30:00.000000",
       "source": "consolidated"
     },
     {
       "type": "data_and_env",
-      "content": "Shared data in @anipotts/lib with tsup multi-entry builds. Modules: data/ (projects, social, site, services, SITE_VERSION), admin/ (auth, thoughts CRUD), metrics/ (GitHub/WakaTime, Supabase cache), status/ (HTTP checker), typefully/ (API wrapper). Supabase tables: thoughts, atoms, metrics_cache, status_checks, favorite_numbers. Vercel Crons: metrics daily 6AM UTC, status every 5 min. Import Supabase via @anipotts/lib/supabase, Typefully via @anipotts/lib/typefully. Env vars: NEXT_PUBLIC_POSTHOG_KEY (www only), NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, WAKATIME_API_KEY, CRON_SECRET, TYPEFULLY_API_KEY (server-side only). Use printf (not echo) for env vars. Dev: 'pnpm turbo dev --concurrency=15'.",
-      "added_at": "2026-02-02T00:00:00.000000",
+      "content": "Supabase tables: thoughts, atoms, metrics_cache, status_checks, favorite_numbers. Env vars: NEXT_PUBLIC_POSTHOG_KEY, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, GITHUB_TOKEN, WAKATIME_API_KEY, CRON_SECRET, TYPEFULLY_API_KEY. Dev: 'pnpm turbo dev --filter=@anipotts/www'. Build: 'pnpm build'. Cron routes: /api/metrics/cron, /api/status/cron.",
+      "added_at": "2026-02-08T09:35:00.000000",
       "source": "consolidated"
     },
     {
       "type": "conventions",
-      "content": "Admin accessed via Cmd+Shift+A (hidden), cookie-based auth per domain. TerminalNavigator (Ctrl+`) on all 9 apps via @anipotts/ui/terminal-navigator. ./server export uses source path (not dist) to avoid tsup dual-config issues. Shared next config in packages/config/next/base.ts. DO NOT use serverExternalPackages for framer-motion (breaks SSG). Use turbopack.resolveAlias for node:fs stub. PostHog only configured on www Vercel project. STRICT WRITING RULES (NON-NEGOTIABLE): Never use em dashes. Never list exactly 3 items (use 2, 4+, or inline prose).",
-      "added_at": "2026-02-02T00:00:00.000000",
+      "content": "Admin: Cmd+Shift+A. Terminal: Ctrl+`. Use text-body NOT text-white for theme-compatible text. PostHog on www only. STRICT WRITING: Never use em dashes. Never list exactly 3 items. Bundled UI components (tsup splitting:false) must receive theme/callbacks as props, not use hooks internally (context isolation issue).",
+      "added_at": "2026-02-05T22:30:00.000000",
       "source": "consolidated"
     },
     {
       "type": "content_system",
-      "content": "Typefully CLI at .agents/skills/typefully/scripts/typefully.js (deleted; now use @anipotts/lib/typefully for programmatic access). Config in .typefully/config.json (project-local, gitignored). Default social set: 280784 (@anipottsbuilds). Connected platforms: X, LinkedIn, Threads, Bluesky, Mastodon. Creator plan trial until Mar 1 2026: 15 posts/month, unlimited drafts. LinkedIn does NOT support threads via API. Admin ScheduleTab now has live Typefully integration (status bar, queue, schedule/publish actions, atom push). TypefullyStatusWidget in AdminHub command bar. Content pipeline: Supabase thoughts+atoms tables, content-config/ voice guides, scripts/ CLI tools.",
-      "added_at": "2026-02-02T00:00:00.000000",
+      "content": "Typefully API via @anipotts/lib/typefully. Platforms: X, LinkedIn, Threads, Bluesky, Mastodon. Content pipeline: Supabase thoughts+atoms tables, content-config/ voice guides. Series: 60s-fix, i-tried-it, quick-tip, stack-update, viral-reel. Anti-corny guardrails enforced.",
+      "added_at": "2026-02-05T20:00:00.000000",
       "source": "consolidated"
     },
     {
-      "type": "completed_work",
-      "content": "Jan 29: Ecosystem unification (shared data layer, admin, metrics, status). Jan 30: Light/dark/system theme, deep cleanup, dependency alignment, shared next config. Jan 31: Terminal Navigator on all 9 apps, subdomain polish. Feb 1: Typefully skill setup, 6 quant interview threads drafted for X/Threads/Bluesky. Feb 2: Full Typefully API integration in admin (types, lib, server actions, ScheduleTab rewrite, status widget). Mastodon platform added. Codebase cleanup (moved ADMIN_CONTENT_HUB_DESIGN.md to .claude/docs/, removed .agents/ duplicate, deleted stale typefully-cli.ts). Writing rules enforced (no em dashes, no triplets). All 6 drafts updated on Typefully. All apps build clean.",
-      "added_at": "2026-02-02T00:00:00.000000",
+      "type": "ui_decisions",
+      "content": "Footer is single-row signals bar: BASE/FOCUS/MARKET+time. No subdomain links or copyright in footer. Header (ExpandableNav) has no 'ani potts' logo; just nav items right-aligned. Subdomain pages should NOT have their own title headings (e.g. no 'THOUGHTS' h1 on thoughts page). All pages share identical header+footer layout.",
+      "added_at": "2026-02-08T09:35:00.000000",
+      "source": "consolidated"
+    },
+    {
+      "type": "claude_code_setup",
+      "content": "Agent teams enabled (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1). Teammate mode: in-process. Custom agents in .claude/agents/ require YAML frontmatter with 'name' field. User prefers agent teams over subagents for codebase analysis.",
+      "added_at": "2026-02-08T09:35:00.000000",
       "source": "consolidated"
     },
     {
       "type": "claude_response",
-      "content": "Memory consolidated: 10 entries down to 6. Removed 4 noise entries (truncated claude responses, raw message captures). Merged content_system with Typefully integration updates, updated completed_work ",
-      "added_at": "2026-02-01T19:06:31.449481",
+      "content": "Consolidated 13 memories down to 7. Removed raw message/response noise, merged architecture with the new unified layout decisions, added a new `ui_decisions` memory capturing the footer/header choices",
+      "added_at": "2026-02-08T09:35:27.618877",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "<task-notification> <task-id>a4135a2</task-id> <status>completed</status> <summary>Agent \"Update 6 Typefully drafts\" completed</summary> <result>All changes verified. Here is a summary of all 6 drafts",
-      "added_at": "2026-02-01T19:06:31.449546",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "claude_response",
-      "content": "\n\nAll done. The background agent confirmed 6/6 Typefully drafts updated successfully, which aligns with what we already verified. Everything from the plan is implemented and building clean.",
-      "added_at": "2026-02-02T11:31:35.638966",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "can you approrpriately commit and push everything to main if theres anything ur unsure about lmk",
-      "added_at": "2026-02-02T11:31:35.638990",
+      "content": "cool commit and push everything to main",
+      "added_at": "2026-02-08T09:35:27.618891",
       "source": "realtime_capture"
     }
   ],
   "created_at": "2026-01-05T21:51:27.232246",
-  "updated_at": "2026-02-02T11:31:35.638992"
+  "updated_at": "2026-02-08T09:35:27.618892"
 }

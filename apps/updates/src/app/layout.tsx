@@ -14,9 +14,8 @@ import {
   TerminalBackground,
   TerminalHeader,
   SubdomainHeader,
-  SubdomainFooter,
 } from "@anipotts/ui";
-import { ThemeScript } from "@anipotts/ui/server";
+import { ThemeScript, SubdomainHints, SpeculationRules } from "@anipotts/ui/server";
 import { TerminalNavigator } from "@anipotts/ui/terminal-navigator";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
@@ -30,8 +29,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
-      <head><ThemeScript /></head>
-      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden">
+      <head><ThemeScript /><SubdomainHints current="updates" /><SpeculationRules current="updates" /></head>
+      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
         <ThemeProvider>
         <TerminalBackground />
         <PostHogProvider>
@@ -42,7 +41,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <WindowInner showNavbar={false} showFooter={false}>
                   <SubdomainHeader subdomain="updates" />
                   {children}
-                  <SubdomainFooter subdomain="updates" />
                 </WindowInner>
                 <TerminalStatusBar />
               </WindowContainer>

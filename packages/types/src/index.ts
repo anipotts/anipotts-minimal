@@ -14,6 +14,7 @@ export type {
   ArtifactType,
   Platform,
   AtomStatus,
+  Subdomain,
 } from "./thought";
 
 // Link types

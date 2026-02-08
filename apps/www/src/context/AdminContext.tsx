@@ -24,17 +24,18 @@ const adminActions = { checkAuth, login, logout };
  * Inner provider that connects AdminProvider to LayoutCoordinator.
  */
 function AdminProviderInner({ children }: { children: ReactNode }) {
-  const layout = useLayoutCoordinator();
+  const { openAdmin, closeAdmin } = useLayoutCoordinator();
 
+  // Use stable refs - openAdmin/closeAdmin are already memoized with empty deps
   const handleModalChange = useCallback(
     (isOpen: boolean) => {
       if (isOpen) {
-        layout.openAdmin();
+        openAdmin();
       } else {
-        layout.closeAdmin();
+        closeAdmin();
       }
     },
-    [layout]
+    [openAdmin, closeAdmin]
   );
 
   return (

@@ -12,8 +12,8 @@ export default {
           darker: "var(--card-darker)",
         },
         accent: {
-          DEFAULT: "#61ABEA", // ani-blue
-          400: "#61ABEA",
+          DEFAULT: "var(--accent)",
+          400: "var(--accent-400)",
         },
         signal: {
           green: "#4ade80", // green-400

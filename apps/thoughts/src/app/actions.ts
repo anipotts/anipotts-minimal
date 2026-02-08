@@ -28,7 +28,8 @@ export async function checkAuth() {
 }
 
 export async function login(password: string) {
-  const result = verifyAdminPassword(password);
+  // Pass env var explicitly to ensure Next.js loads it properly in monorepo
+  const result = verifyAdminPassword(password, process.env.ADMIN_PASSWORD);
   if (result.success) {
     const cookieStore = await cookies();
     cookieStore.set(ADMIN_COOKIE, "true", ADMIN_COOKIE_OPTIONS);

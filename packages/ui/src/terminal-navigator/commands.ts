@@ -1,6 +1,7 @@
 import { subdomains, publicSubdomains, SITE_VERSION } from "@anipotts/lib/data";
 import type { CommandDef, CommandContext, OutputLine } from "./types";
 import { PROMPT_USER, getPromptPath } from "./constants";
+import { getInternalPath } from "../hooks/useSubdomainNavigation";
 
 let lineId = 0;
 function line(type: OutputLine["type"], content: string): OutputLine {
@@ -72,8 +73,14 @@ const cdCmd: CommandDef = {
       return;
     }
     ctx.addOutput([line("success", `\u2192 navigating to ${sub.name}.anipotts.com...`)]);
+    // Use SPA navigation (internal path routing)
     setTimeout(() => {
-      window.location.href = sub.url;
+      if (ctx.navigate) {
+        ctx.navigate(sub.name);
+      } else {
+        // Fallback: use internal path directly
+        window.location.href = getInternalPath(sub.name);
+      }
     }, 300);
   },
 };
@@ -92,8 +99,10 @@ const openCmd: CommandDef = {
       ctx.addOutput([line("error", `open: no such host: ${target}`)]);
       return;
     }
-    ctx.addOutput([line("success", `Opening ${sub.url} in new tab...`)]);
-    window.open(sub.url, "_blank", "noopener,noreferrer");
+    // Use internal path for same-origin navigation
+    const path = getInternalPath(sub.name);
+    ctx.addOutput([line("success", `Opening ${sub.name}.anipotts.com in new tab...`)]);
+    window.open(path, "_blank", "noopener,noreferrer");
   },
 };
 

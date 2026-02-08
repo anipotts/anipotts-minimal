@@ -5,14 +5,27 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Thought } from "@anipotts/types";
+import type { Thought, Subdomain } from "@anipotts/types";
+
+export interface QueryOptions {
+  subdomain?: Subdomain;
+}
 
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
-export async function fetchAllThoughts(supabase: SupabaseClient) {
-  const { data, error } = await supabase
+export async function fetchAllThoughts(
+  supabase: SupabaseClient,
+  options?: QueryOptions
+) {
+  let query = supabase
     .from("thoughts")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (options?.subdomain) {
+    query = query.eq("subdomain", options.subdomain);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error fetching admin thoughts:", error);
@@ -73,11 +86,20 @@ export async function incrementThoughtViewCount(
 }
 
 /** Fetch aggregated stats for the admin analytics monitor. */
-export async function fetchThoughtStats(supabase: SupabaseClient) {
-  const { data: thoughts, error } = await supabase
+export async function fetchThoughtStats(
+  supabase: SupabaseClient,
+  options?: QueryOptions
+) {
+  let query = supabase
     .from("thoughts")
-    .select("id, title, slug, views, published, created_at")
+    .select("id, title, slug, views, published, created_at, subdomain")
     .order("views", { ascending: false });
+
+  if (options?.subdomain) {
+    query = query.eq("subdomain", options.subdomain);
+  }
+
+  const { data: thoughts, error } = await query;
 
   if (error) {
     console.error("Error fetching stats:", error);

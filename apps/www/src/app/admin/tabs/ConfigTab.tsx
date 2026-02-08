@@ -121,23 +121,23 @@ export default function ConfigTab() {
   const [expandedVoice, setExpandedVoice] = useState<string | null>("spicy");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="h-full p-3 flex flex-col gap-3 overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 px-1">
         <FaCircle className="w-2 h-2 text-accent-400" />
-        <h2 className="text-sm font-mono uppercase tracking-widest text-secondary">
+        <h2 className="text-sm font-mono uppercase tracking-wide text-[var(--text-primary)] font-semibold">
           Content Configuration
         </h2>
-        <span className="text-[10px] text-muted ml-2">
+        <span className="text-xs text-[var(--text-muted)] font-medium">
           from content-config/
         </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Series Definitions */}
-        <div className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-[rgba(var(--overlay-invert),0.2)]">
-            <h3 className="text-xs font-mono uppercase tracking-widest text-tertiary">
+        <div className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)]">
+            <h3 className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">
               Signature Series
             </h3>
           </div>

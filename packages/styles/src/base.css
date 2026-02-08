@@ -43,3 +43,52 @@ body {
     background: transparent;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Reduced Motion Support - Accessibility
+   Respects user preference to minimize animations
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable view transitions for reduced motion users */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CSS-based Animations (for simple transitions)
+   More performant than JS-based animations for simple use cases
+   ───────────────────────────────────────────────────────────── */
+
+/* Fade-in on scroll (use with IntersectionObserver) */
+.fade-in {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Expandable content using CSS grid (0 height collapse) */
+.expandable {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease-out;
+}
+.expandable.open {
+  grid-template-rows: 1fr;
+}
+.expandable > * {
+  overflow: hidden;
+}

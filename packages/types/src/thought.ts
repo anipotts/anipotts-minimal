@@ -18,6 +18,9 @@ export type Platform =
   | 'substack'
   | 'reddit';
 
+// Valid subdomains for content scoping
+export type Subdomain = 'www' | 'thoughts' | 'dev' | 'links' | 'updates' | 'metrics' | 'status' | 'lab' | 'docs';
+
 export interface Thought {
   id: string;
   slug: string;
@@ -43,6 +46,9 @@ export interface Thought {
   voice_mode?: VoiceMode;
   project?: string;
   published_at?: string;
+
+  // Subdomain scoping
+  subdomain?: Subdomain;
 }
 
 export interface ThoughtStats {
@@ -74,6 +80,9 @@ export interface Atom {
   external_url?: string;
   created_at: string;
   updated_at: string;
+
+  // Subdomain scoping
+  subdomain?: Subdomain;
 }
 
 export interface AtomWithContent extends Atom {

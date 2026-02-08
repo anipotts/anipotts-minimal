@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminPanel, AdminPanelContent, type AdminTabId } from "@anipotts/ui/admin";
+import { useTheme } from "@anipotts/ui";
 import PipelineTab from "@/app/admin/tabs/PipelineTab";
 import ContentTab from "@/app/admin/tabs/ContentTab";
 import AtomsTab from "@/app/admin/tabs/AtomsTab";
@@ -33,6 +34,8 @@ function renderTab(tabId: AdminTabId) {
 }
 
 export default function AdminOverlay() {
+  const { theme, cycleTheme } = useTheme();
+
   return (
     <AdminPanel scope="all">
       <AdminPanelContent
@@ -40,6 +43,8 @@ export default function AdminOverlay() {
         renderTab={renderTab}
         statusWidget={<TypefullyStatusWidget />}
         liveSiteUrl="/thoughts"
+        theme={theme}
+        onThemeChange={cycleTheme}
       />
     </AdminPanel>
   );

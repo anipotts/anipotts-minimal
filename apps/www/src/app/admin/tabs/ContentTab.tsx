@@ -141,7 +141,7 @@ export default function ContentTab() {
   );
 
   return (
-    <div className="flex h-[75vh] border border-border rounded-xl overflow-hidden bg-[rgba(var(--overlay-invert),0.4)] backdrop-blur-sm">
+    <div className="flex h-full border border-[var(--border)] rounded-lg overflow-hidden bg-[rgba(var(--overlay-invert),0.4)]">
       {/* Sidebar */}
       <div className="w-64 border-r border-border flex flex-col bg-[rgba(var(--overlay-invert),0.2)]">
         <div className="p-4 border-b border-border flex flex-col gap-3">
