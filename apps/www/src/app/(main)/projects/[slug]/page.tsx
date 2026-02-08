@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import { projects } from "@/data/projects";
 import { projectContent } from "@/data/project-content";
 import FadeIn from "@/components/FadeIn";
@@ -38,9 +39,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <FadeIn>
             <Link
               href="/work"
-              className="text-xs font-mono text-muted hover:text-accent-400 transition-colors"
+              className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
             >
-              ← back to work
+              <ArrowLeft size={12} /> back to work
             </Link>
           </FadeIn>
         </div>
@@ -166,7 +167,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                           : "text-muted bg-gray-500/10"
                       }`}
                     >
-                      {item.status === "done" ? "✓" : item.status === "in-progress" ? "→" : "○"}
+                      {item.status === "done" ? "✓" : item.status === "in-progress" ? <CaretRight size={10} /> : "○"}
                     </span>
                     <span className={item.status === "done" ? "text-muted" : "text-secondary"}>
                       {item.text}
@@ -196,9 +197,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   <Link
                     key={thought.slug}
                     href={`/thoughts/${thought.slug}`}
-                    className="text-sm text-tertiary hover:text-accent-400 transition-colors"
+                    className="text-sm text-tertiary hover:text-accent-400 transition-colors inline-flex items-center gap-1.5"
                   >
-                    → {thought.title}
+                    <ArrowRight size={12} /> {thought.title}
                   </Link>
                 ))}
               </div>

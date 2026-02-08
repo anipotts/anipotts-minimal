@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { projects } from "@/data/projects";
 import { supabase } from "@/lib/supabaseClient";
 import FadeIn from "@/components/FadeIn";
@@ -97,9 +98,9 @@ export default async function Home() {
           <FadeIn delay={0.9}>
             <Link
               href="/lab"
-              className="text-xs text-accent-400 hover:underline"
+              className="text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
             >
-              view all work →
+              view all work <ArrowRight size={12} />
             </Link>
           </FadeIn>
         </div>
@@ -125,9 +126,9 @@ export default async function Home() {
               <FadeIn delay={1.6}>
                 <Link
                   href="/thoughts"
-                  className="text-xs text-accent-400 hover:underline"
+                  className="text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
                 >
-                  view all thoughts →
+                  view all thoughts <ArrowRight size={12} />
                 </Link>
               </FadeIn>
             </>

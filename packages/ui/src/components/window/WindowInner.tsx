@@ -25,7 +25,7 @@ export function WindowInner({ children, showNavbar = true, showFooter = true }: 
         )}
 
         {/* Main Content Area - has view-transition-name for cross-document transitions */}
-        <main className="main-content flex-grow w-full relative z-10 transition-all duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+        <main className="main-content flex-grow flex flex-col w-full relative z-10 transition-all duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
           {children}
         </main>
 

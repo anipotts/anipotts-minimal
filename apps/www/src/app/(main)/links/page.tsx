@@ -1,10 +1,9 @@
 import { FadeIn } from "@anipotts/ui";
 import { socialLinks, liveProjects, site } from "@anipotts/lib/data";
 import {
-  FaGithub, FaLinkedin, FaEnvelope, FaGlobe, FaCode, FaTerminal,
-  FaInstagram, FaTiktok,
-} from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+  GithubLogo, LinkedinLogo, EnvelopeSimple, Globe, Code, Terminal,
+  InstagramLogo, TiktokLogo, XLogo, ArrowSquareOut,
+} from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,13 +26,13 @@ export const metadata: Metadata = {
   },
 };
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  email: FaEnvelope,
-  github: FaGithub,
-  linkedin: FaLinkedin,
-  x: FaXTwitter,
-  instagram: FaInstagram,
-  tiktok: FaTiktok,
+const iconMap: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
+  email: EnvelopeSimple,
+  github: GithubLogo,
+  linkedin: LinkedinLogo,
+  x: XLogo,
+  instagram: InstagramLogo,
+  tiktok: TiktokLogo,
 };
 
 export default function LinksPage() {
@@ -41,7 +40,7 @@ export default function LinksPage() {
     <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 px-4">
       <FadeIn>
         <div className="flex items-center gap-3 mb-2">
-          <FaTerminal className="text-accent-400" />
+          <Terminal className="text-accent-400" size={16} />
           <h1 className="text-2xl font-bold text-body">{site.name.toLowerCase()}</h1>
         </div>
         <p className="text-muted text-sm text-center mb-8">{site.title} in {site.location}</p>
@@ -56,12 +55,12 @@ export default function LinksPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-4 p-4 bg-input border border-border rounded-lg hover:bg-overlay-10 hover:border-accent-400/30 transition-all group"
           >
-            <FaGlobe className="text-tertiary group-hover:text-accent-400 transition-colors" />
+            <Globe className="text-tertiary group-hover:text-accent-400 transition-colors" size={16} />
             <div className="flex-grow">
               <span className="text-body font-medium">Website</span>
               <span className="text-muted text-xs ml-2">{site.domain}</span>
             </div>
-            <span className="text-faint text-xs">→</span>
+            <ArrowSquareOut className="text-faint" size={14} />
           </a>
         </FadeIn>
       </div>
@@ -69,7 +68,7 @@ export default function LinksPage() {
       {/* Social links */}
       <div className="w-full max-w-md space-y-3 mb-8">
         {socialLinks.map((link, i) => {
-          const Icon = iconMap[link.icon] || FaGlobe;
+          const Icon = iconMap[link.icon] || Globe;
           return (
             <FadeIn key={link.name} delay={(i + 1) * 0.1}>
               <a
@@ -83,7 +82,7 @@ export default function LinksPage() {
                   <span className="text-body font-medium capitalize">{link.name}</span>
                   <span className="text-muted text-xs ml-2">{link.description}</span>
                 </div>
-                <span className="text-faint text-xs">→</span>
+                <ArrowSquareOut className="text-faint" size={14} />
               </a>
             </FadeIn>
           );
@@ -94,7 +93,7 @@ export default function LinksPage() {
       <FadeIn delay={0.7}>
         <div className="w-full max-w-md">
           <h2 className="text-xs uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
-            <FaCode className="text-accent-400" />
+            <Code className="text-accent-400" size={14} />
             Projects
           </h2>
           <div className="space-y-2">

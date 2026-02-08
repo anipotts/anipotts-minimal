@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { supabase } from "@/lib/supabaseClient";
 import ReactMarkdown from "react-markdown";
 import { FadeIn } from "@anipotts/ui";
@@ -92,8 +93,8 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
       return (
         <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
           <FadeIn>
-            <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors">
-              ← back to thoughts
+            <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1">
+              <ArrowLeft size={12} /> back to thoughts
             </Link>
           </FadeIn>
           <FadeIn delay={0.1}>
