@@ -28,7 +28,7 @@ export const ALL_TABS: TabConfig[] = [
  * Get tabs available for a given scope.
  */
 export function getTabsForScope(scope: AdminScope): TabConfig[] {
-  const allowedIds = SCOPE_TAB_CONFIG[scope];
+  const allowedIds = SCOPE_TAB_CONFIG[scope] ?? SCOPE_TAB_CONFIG["all"];
   return ALL_TABS.filter((tab) => allowedIds.includes(tab.id));
 }
 

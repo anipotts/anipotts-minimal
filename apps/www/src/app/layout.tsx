@@ -169,7 +169,7 @@ export default async function RootLayout({
                   <MinimizedPill />
                 </WindowLayoutWrapper>
 
-                <AdminOverlay scope={adminScopeRaw as "all" | "thoughts" | "lab" | "docs" | "updates" | undefined} autoOpen={adminAutoOpen} />
+                <AdminOverlay scope={(adminScopeRaw as "all" | "thoughts" | "lab" | "docs" | "updates") || undefined} autoOpen={adminAutoOpen} />
                 <TerminalNavigatorWrapper />
               </WindowProvider>
             </AdminProvider>
