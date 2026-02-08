@@ -1,5 +1,5 @@
 import type { IconType } from "react-icons";
-import { FaList, FaEdit, FaGraduationCap, FaClock, FaCog, FaChartLine, FaServer, FaDatabase } from "react-icons/fa";
+import { FaList, FaEdit, FaGraduationCap, FaClock, FaCog, FaChartLine, FaServer, FaDatabase, FaGlobe } from "react-icons/fa";
 import type { AdminScope, AdminTabId } from "../types";
 import { SCOPE_TAB_CONFIG } from "../types";
 
@@ -19,9 +19,10 @@ export const ALL_TABS: TabConfig[] = [
   { id: "atoms", label: "Atoms", icon: FaGraduationCap, shortcut: "⌘3" },
   { id: "schedule", label: "Schedule", icon: FaClock, shortcut: "⌘4" },
   { id: "config", label: "Config", icon: FaCog, shortcut: "⌘5" },
-  { id: "analytics", label: "Analytics", icon: FaChartLine, shortcut: "⌘6" },
-  { id: "metrics", label: "Metrics", icon: FaDatabase, shortcut: "⌘7" },
-  { id: "status", label: "Status", icon: FaServer, shortcut: "⌘8" },
+  { id: "site", label: "Site", icon: FaGlobe, shortcut: "⌘6" },
+  { id: "analytics", label: "Analytics", icon: FaChartLine, shortcut: "⌘7" },
+  { id: "metrics", label: "Metrics", icon: FaDatabase, shortcut: "⌘8" },
+  { id: "status", label: "Status", icon: FaServer, shortcut: "⌘9" },
 ];
 
 /**

@@ -9,14 +9,10 @@ import { useCallback } from 'react';
  */
 const SECTION_TO_ROUTE: Record<string, string> = {
   www: '/',
+  work: '/work',
   thoughts: '/thoughts',
+  connect: '/connect',
   dev: '/dev',
-  links: '/links',
-  updates: '/updates',
-  metrics: '/metrics',
-  status: '/status',
-  lab: '/lab',
-  docs: '/docs',
 };
 
 /** @deprecated Use SECTION_TO_ROUTE */

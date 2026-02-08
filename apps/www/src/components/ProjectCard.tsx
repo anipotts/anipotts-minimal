@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
 import { Project } from "@/data/projects";
 import Link from "next/link";
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 
 function ChromeIcon({ className }: { className?: string }) {
   return (
@@ -50,7 +49,9 @@ function StatusBadge({ status, featured }: { status?: string; featured?: boolean
 }
 
 export default function ProjectCard({ project }: { project: Project }) {
+  const posthog = usePostHog();
   const [isOpen, setIsOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleCardClick = () => {
     const newOpenState = !isOpen;
@@ -94,67 +95,64 @@ export default function ProjectCard({ project }: { project: Project }) {
         <span className="text-xs text-faint font-mono">{project.year}</span>
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="pl-6 pt-6 pb-2 flex flex-col gap-6">
-              <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
-                {project.description}
-              </p>
-              
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+      <div
+        ref={contentRef}
+        className="overflow-hidden transition-all duration-300 ease-in-out"
+        style={{
+          maxHeight: isOpen ? contentRef.current?.scrollHeight ?? 500 : 0,
+          opacity: isOpen ? 1 : 0,
+        }}
+      >
+        <div className="pl-6 pt-6 pb-2 flex flex-col gap-6">
+          <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
+            {project.description}
+          </p>
 
-              {(project.links?.live || project.links?.repo || project.links?.page) && (
-                <div className="flex gap-4 text-xs font-mono pt-2">
-                  {project.links?.page && (
-                    <Link
-                      href={project.links.page}
-                      className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ./deep_dive.md
-                    </Link>
-                  )}
-                  {project.links?.live && (
-                    <a
-                      href={project.links.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ./launch_site.sh
-                    </a>
-                  )}
-                  {project.links?.repo && (
-                    <a
-                      href={project.links.repo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ./view_source.git
-                    </a>
-                  )}
-                </div>
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <span key={tag} className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {(project.links?.live || project.links?.repo || project.links?.page) && (
+            <div className="flex gap-4 text-xs font-mono pt-2">
+              {project.links?.page && (
+                <Link
+                  href={project.links.page}
+                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  ./deep_dive.md
+                </Link>
+              )}
+              {project.links?.live && (
+                <a
+                  href={project.links.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  ./launch_site.sh
+                </a>
+              )}
+              {project.links?.repo && (
+                <a
+                  href={project.links.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  ./view_source.git
+                </a>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

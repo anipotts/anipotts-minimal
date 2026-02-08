@@ -12,6 +12,7 @@ export default defineConfig({
     "metrics/index": "src/metrics/index.ts",
     "status/index": "src/status/index.ts",
     "typefully/index": "src/typefully/index.ts",
+    "cms/index": "src/cms/index.ts",
   },
   format: ["esm"],
   dts: true,

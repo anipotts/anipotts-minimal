@@ -1,26 +1,70 @@
-"use client";
-
-import FadeIn from "@/components/FadeIn";
-import posthog from "posthog-js";
-import { socialLinks } from "@anipotts/lib/data";
-
-const handleSocialClick = (name: string, url: string) => {
-  posthog.capture('social_link_clicked', {
-    platform: name,
-    href: url,
-  });
-};
+import { FadeIn } from "@anipotts/ui";
+import { fetchSocialLinks, fetchProjects } from "@anipotts/lib/cms";
+import {
+  GithubLogo,
+  LinkedinLogo,
+  EnvelopeSimple,
+  Globe,
+  InstagramLogo,
+  TiktokLogo,
+  XLogo,
+  ArrowSquareOut,
+} from "@phosphor-icons/react/dist/ssr";
+import type { Metadata } from "next";
 
 import ContactForm from "@/components/ContactForm";
 
-export default function ConnectPage() {
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "connect",
+  description: "Get in touch with ani potts. Social links and contact form.",
+  openGraph: {
+    title: "connect | ani potts",
+    description: "Get in touch with ani potts. Social links and contact form.",
+    url: "https://anipotts.com/connect",
+    siteName: "anipotts.com",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "connect | ani potts",
+    description: "Get in touch with ani potts. Social links and contact form.",
+  },
+  alternates: {
+    canonical: "https://anipotts.com/connect",
+  },
+};
+
+const iconMap: Record<
+  string,
+  React.ComponentType<{ className?: string; size?: number }>
+> = {
+  email: EnvelopeSimple,
+  github: GithubLogo,
+  linkedin: LinkedinLogo,
+  x: XLogo,
+  instagram: InstagramLogo,
+  tiktok: TiktokLogo,
+};
+
+export default async function ConnectPage() {
+  const [socialLinks, projects] = await Promise.all([
+    fetchSocialLinks(),
+    fetchProjects({ featured: true }),
+  ]);
+
+  const liveProjects = projects.filter((p) => p.links?.live);
+
   return (
     <div className="flex flex-col gap-12 pb-20">
       {/* Intro Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">connect</h1>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+              connect
+            </h1>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3">
@@ -30,7 +74,8 @@ export default function ConnectPage() {
                 <span>open to collaboration</span>
               </div>
               <p className="text-lg md:text-xl text-secondary leading-relaxed max-w-2xl">
-                If you're working with LLM orchestration systems and think I can help, feel free to reach out:
+                If you're working with LLM orchestration systems and think I can
+                help, feel free to reach out:
               </p>
             </div>
           </FadeIn>
@@ -40,40 +85,103 @@ export default function ConnectPage() {
       {/* Socials Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
-          <FadeIn delay={0.2}>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">Socials</h2>
+          <FadeIn delay={0.15}>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+              Socials
+            </h2>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3">
-          <FadeIn delay={0.2}>
+          <FadeIn delay={0.15}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target={social.name === "email" ? undefined : "_blank"}
-                  rel={social.name === "email" ? undefined : "noopener noreferrer"}
-                  className="group flex items-center justify-between p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-10 hover:border-border transition-all duration-300"
-                  onClick={() => handleSocialClick(social.name, social.url)}
-                >
-                  <span className="text-xs uppercase tracking-widest text-tertiary group-hover:text-accent-400 transition-colors">
-                    {social.name}
-                  </span>
-                  <span className="text-xs text-faint group-hover:text-tertiary transition-colors transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 duration-300">
-                    ↗
-                  </span>
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Icon = iconMap[social.icon] || Globe;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target={social.name === "email" ? undefined : "_blank"}
+                    rel={
+                      social.name === "email"
+                        ? undefined
+                        : "noopener noreferrer"
+                    }
+                    className="group flex items-center gap-3 p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-10 hover:border-border transition-all duration-300"
+                  >
+                    <Icon
+                      className="text-tertiary group-hover:text-accent-400 transition-colors shrink-0"
+                      size={16}
+                    />
+                    <div className="flex-grow min-w-0">
+                      <span className="text-xs uppercase tracking-widest text-tertiary group-hover:text-accent-400 transition-colors">
+                        {social.name}
+                      </span>
+                      {social.description && (
+                        <span className="text-[10px] text-faint ml-2">
+                          {social.description}
+                        </span>
+                      )}
+                    </div>
+                    <ArrowSquareOut
+                      className="text-faint shrink-0"
+                      size={14}
+                    />
+                  </a>
+                );
+              })}
             </div>
           </FadeIn>
         </div>
       </section>
 
+      {/* Live Projects Section */}
+      {liveProjects.length > 0 && (
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+          <div className="col-span-1">
+            <FadeIn delay={0.25}>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+                Live Projects
+              </h2>
+            </FadeIn>
+          </div>
+          <div className="col-span-1 md:col-span-3">
+            <FadeIn delay={0.25}>
+              <div className="space-y-2">
+                {liveProjects.map((project) => (
+                  <a
+                    key={project.slug}
+                    href={project.links!.live!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 bg-[rgba(var(--overlay-invert),0.4)] border border-border-subtle rounded-lg hover:border-accent-400/20 transition-all group"
+                  >
+                    <div>
+                      <span className="text-secondary text-sm font-medium">
+                        {project.title}
+                      </span>
+                      <span className="text-faint text-xs ml-2">
+                        {project.subtitle}
+                      </span>
+                    </div>
+                    <ArrowSquareOut
+                      className="text-faint group-hover:text-accent-400 transition-colors shrink-0"
+                      size={14}
+                    />
+                  </a>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
       {/* Contact Form Section */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn delay={0.3}>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">Message Me</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+              Message Me
+            </h2>
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3">

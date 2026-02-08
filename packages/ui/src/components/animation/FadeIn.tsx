@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { motion } from "framer-motion";
 
 export interface FadeInProps {
   children: React.ReactNode;
@@ -9,42 +6,34 @@ export interface FadeInProps {
   className?: string;
   /** Animation direction: 'up' (default), 'down', 'left', 'right', or 'none' */
   direction?: "up" | "down" | "left" | "right" | "none";
-  /** Animation distance in pixels */
+  /** @deprecated No longer used. Kept for API compatibility. */
   distance?: number;
 }
+
+const animationName: Record<NonNullable<FadeInProps["direction"]>, string> = {
+  up: "fadeInUp",
+  down: "fadeInDown",
+  left: "fadeInLeft",
+  right: "fadeInRight",
+  none: "fadeInNone",
+};
 
 export function FadeIn({
   children,
   delay = 0,
   className,
   direction = "up",
-  distance = 20,
 }: FadeInProps) {
-  const getInitialPosition = () => {
-    switch (direction) {
-      case "up":
-        return { x: 0, y: distance };
-      case "down":
-        return { x: 0, y: -distance };
-      case "left":
-        return { x: distance, y: 0 };
-      case "right":
-        return { x: -distance, y: 0 };
-      case "none":
-        return { x: 0, y: 0 };
-    }
-  };
-
-  const initial = getInitialPosition();
-
   return (
-    <motion.div
-      initial={{ opacity: 0, ...initial }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+    <div
       className={className}
+      style={{
+        opacity: 0,
+        animation: `${animationName[direction]} 0.6s ease-out both`,
+        animationDelay: `${delay}s`,
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

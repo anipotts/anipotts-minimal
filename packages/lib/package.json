@@ -43,6 +43,10 @@
     "./typefully": {
       "types": "./dist/typefully/index.d.ts",
       "import": "./dist/typefully/index.js"
+    },
+    "./cms": {
+      "types": "./dist/cms/index.d.ts",
+      "import": "./dist/cms/index.js"
     }
   },
   "scripts": {

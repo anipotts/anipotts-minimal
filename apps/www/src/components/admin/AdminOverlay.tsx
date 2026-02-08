@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { AdminPanel, AdminPanelContent, type AdminTabId, type AdminScope } from "@anipotts/ui/admin";
 import { useTheme } from "@anipotts/ui";
 import { useAdmin } from "@/context/AdminContext";
-import PipelineTab from "@/app/admin/tabs/PipelineTab";
-import ContentTab from "@/app/admin/tabs/ContentTab";
-import AtomsTab from "@/app/admin/tabs/AtomsTab";
-import ScheduleTab from "@/app/admin/tabs/ScheduleTab";
-import ConfigTab from "@/app/admin/tabs/ConfigTab";
-import AnalyticsTab from "@/app/admin/tabs/AnalyticsTab";
 import TypefullyStatusWidget from "@/app/admin/TypefullyStatusWidget";
+
+const PipelineTab = dynamic(() => import("@/app/admin/tabs/PipelineTab"), { ssr: false });
+const ContentTab = dynamic(() => import("@/app/admin/tabs/ContentTab"), { ssr: false });
+const AtomsTab = dynamic(() => import("@/app/admin/tabs/AtomsTab"), { ssr: false });
+const ScheduleTab = dynamic(() => import("@/app/admin/tabs/ScheduleTab"), { ssr: false });
+const ConfigTab = dynamic(() => import("@/app/admin/tabs/ConfigTab"), { ssr: false });
+const SiteTab = dynamic(() => import("@/app/admin/tabs/SiteTab"), { ssr: false });
+const AnalyticsTab = dynamic(() => import("@/app/admin/tabs/AnalyticsTab"), { ssr: false });
 
 function renderTab(tabId: AdminTabId) {
   switch (tabId) {
@@ -24,6 +27,8 @@ function renderTab(tabId: AdminTabId) {
       return <ScheduleTab />;
     case "config":
       return <ConfigTab />;
+    case "site":
+      return <SiteTab />;
     case "analytics":
       return <AnalyticsTab />;
     default:

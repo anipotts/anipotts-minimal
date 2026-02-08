@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 import ViewCounter from "./ViewCounter";
 
 interface Thought {
@@ -17,6 +17,7 @@ interface Thought {
  * Thought preview card for the thoughts list page.
  */
 export default function ThoughtLink({ thought, readingTime }: { thought: Thought; readingTime?: number }) {
+  const posthog = usePostHog();
   const handleClick = () => {
     posthog.capture('thought_clicked', {
       thought_slug: thought.slug,

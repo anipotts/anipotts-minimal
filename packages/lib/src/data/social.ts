@@ -49,6 +49,9 @@ export const socialLinks: SocialLink[] = [
   },
 ];
 
+/** Alias for fallback when Supabase is unavailable */
+export const FALLBACK_SOCIAL_LINKS = socialLinks;
+
 /** Social handle used across platforms */
 export const SOCIAL_HANDLE = "@anipottsbuilds";
 

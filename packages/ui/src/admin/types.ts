@@ -1,17 +1,11 @@
 /**
  * Admin panel scope determines which tabs and content are available.
- * Each subdomain gets a filtered view of the admin interface.
+ * Middleware only sends "all" (www), "thoughts", or "dev".
  */
 export type AdminScope =
   | "all"       // www - full access to everything
-  | "thoughts"  // thoughts subdomain - content management
-  | "lab"       // lab subdomain - experiments
-  | "docs"      // docs subdomain - documentation
-  | "updates"   // updates subdomain - changelog
-  | "dev"       // dev subdomain - analytics only
-  | "links"     // links subdomain - analytics only
-  | "metrics"   // metrics subdomain - metrics view
-  | "status";   // status subdomain - status checks
+  | "thoughts"  // thoughts - content management
+  | "dev";      // dev - metrics, status, analytics
 
 /**
  * Tab identifiers in the admin panel.
@@ -22,6 +16,7 @@ export type AdminTabId =
   | "atoms"
   | "schedule"
   | "config"
+  | "site"
   | "analytics"
   | "metrics"
   | "status";
@@ -30,15 +25,9 @@ export type AdminTabId =
  * Configuration for which tabs are available per scope.
  */
 export const SCOPE_TAB_CONFIG: Record<AdminScope, AdminTabId[]> = {
-  all: ["pipeline", "content", "atoms", "schedule", "config", "analytics"],
+  all: ["pipeline", "content", "atoms", "schedule", "config", "site", "analytics"],
   thoughts: ["pipeline", "content", "atoms", "schedule", "analytics"],
-  lab: ["pipeline", "content", "analytics"],
-  docs: ["pipeline", "content", "analytics"],
-  updates: ["pipeline", "content", "analytics"],
-  dev: ["analytics"],
-  links: ["analytics"],
-  metrics: ["metrics", "analytics"],
-  status: ["status", "analytics"],
+  dev: ["metrics", "status", "analytics"],
 };
 
 /**

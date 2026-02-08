@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { usePostHog } from "posthog-js/react";
-import { motion, AnimatePresence } from "framer-motion";
 
 type Stats = {
   yourNumber: number;
@@ -141,137 +140,129 @@ export default function FavoriteNumberSecret({ isOpen, onClose }: Props) {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={modalRef}
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.98 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute bottom-full left-0 right-0 mb-2 mx-4 md:mx-0 md:left-4 md:right-auto md:w-80 z-50 bg-card backdrop-blur-sm border border-border rounded-md shadow-2xl overflow-hidden"
+    <div
+      ref={modalRef}
+      className="absolute bottom-full left-0 right-0 mb-2 mx-4 md:mx-0 md:left-4 md:right-auto md:w-80 z-50 bg-card backdrop-blur-sm border border-border rounded-md shadow-2xl overflow-hidden"
+      style={{
+        animation: "modalIn 0.2s ease-out both",
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle bg-input">
+        <span className="text-[10px] text-muted uppercase tracking-wider">
+          secret
+        </span>
+        <button
+          onClick={onClose}
+          className="text-muted hover:text-secondary transition-colors text-xs"
+          aria-label="Close"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle bg-input">
-            <span className="text-[10px] text-muted uppercase tracking-wider">
-              secret
-            </span>
-            <button
-              onClick={onClose}
-              className="text-muted hover:text-secondary transition-colors text-xs"
-              aria-label="Close"
-            >
-              [×]
-            </button>
+          [×]
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        {!hasSubmitted ? (
+          <div
+            key="input"
+            className="flex flex-col gap-3"
+            style={{ animation: "fadeIn 0.2s ease-out both" }}
+          >
+            <p className="text-sm text-tertiary leading-relaxed">
+              <span className="text-accent-400">&gt;</span> what's your
+              favorite number?
+            </p>
+            <p className="text-xs text-muted -mt-1">mine's 15.</p>
+
+            <form onSubmit={handleSubmit} className="flex gap-2 mt-1">
+              <div className="flex-1 flex items-center gap-1 bg-input border border-border rounded px-2 py-1.5 focus-within:border-accent-400/50 transition-colors">
+                <span className="text-accent-400 text-sm">&gt;</span>
+                <input
+                  ref={inputRef}
+                  type="number"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  className="flex-1 bg-transparent text-sm text-body outline-none placeholder:text-faint w-full"
+                  placeholder="_"
+                  disabled={loading}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading || !number}
+                className="px-3 py-1.5 text-xs bg-input border border-border text-tertiary hover:text-accent-400 hover:border-accent-400/30 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "..." : "enter"}
+              </button>
+            </form>
+            {error && (
+              <p className="text-red-400 text-xs mt-1">{error}</p>
+            )}
           </div>
+        ) : (
+          <div
+            key="stats"
+            className="flex flex-col gap-3"
+            style={{ animation: "fadeIn 0.2s ease-out both" }}
+          >
+            <div className="flex flex-col gap-1">
+              <p className="text-sm text-secondary">
+                nice. you picked{" "}
+                <span className="text-accent-400 font-medium">
+                  {stats?.yourNumber}
+                </span>
+                .
+              </p>
+              <p className="text-xs text-muted">
+                1 of {stats?.totalResponses?.toLocaleString()} answers
+              </p>
+            </div>
 
-          {/* Content */}
-          <div className="p-4">
-            <AnimatePresence mode="wait">
-              {!hasSubmitted ? (
-                <motion.div
-                  key="input"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex flex-col gap-3"
+            <div className="flex flex-col gap-1.5 mt-2">
+              {stats?.topNumbers.slice(0, 5).map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 text-xs font-mono"
                 >
-                  <p className="text-sm text-tertiary leading-relaxed">
-                    <span className="text-accent-400">&gt;</span> what's your
-                    favorite number?
-                  </p>
-                  <p className="text-xs text-muted -mt-1">mine's 15.</p>
-
-                  <form onSubmit={handleSubmit} className="flex gap-2 mt-1">
-                    <div className="flex-1 flex items-center gap-1 bg-input border border-border rounded px-2 py-1.5 focus-within:border-accent-400/50 transition-colors">
-                      <span className="text-accent-400 text-sm">&gt;</span>
-                      <input
-                        ref={inputRef}
-                        type="number"
-                        value={number}
-                        onChange={(e) => setNumber(e.target.value)}
-                        className="flex-1 bg-transparent text-sm text-body outline-none placeholder:text-faint w-full"
-                        placeholder="_"
-                        disabled={loading}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={loading || !number}
-                      className="px-3 py-1.5 text-xs bg-input border border-border text-tertiary hover:text-accent-400 hover:border-accent-400/30 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading ? "..." : "enter"}
-                    </button>
-                  </form>
-                  {error && (
-                    <p className="text-red-400 text-xs mt-1">{error}</p>
-                  )}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="stats"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-col gap-3"
-                >
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-secondary">
-                      nice. you picked{" "}
-                      <span className="text-accent-400 font-medium">
-                        {stats?.yourNumber}
+                  <span className="w-6 text-right text-muted">
+                    {item.number}
+                  </span>
+                  <AsciiBar percent={item.percent} />
+                  <span className="text-muted w-8">
+                    {Math.round(item.percent)}%
+                  </span>
+                </div>
+              ))}
+              {/* Show "other" if remaining percentage is significant */}
+              {(() => {
+                const sum =
+                  stats?.topNumbers
+                    .slice(0, 5)
+                    .reduce((acc, curr) => acc + curr.percent, 0) || 0;
+                const other = 100 - sum;
+                if (other > 2) {
+                  return (
+                    <div className="flex items-center gap-2 text-xs font-mono">
+                      <span className="w-6 text-right text-faint">
+                        ..
                       </span>
-                      .
-                    </p>
-                    <p className="text-xs text-muted">
-                      1 of {stats?.totalResponses?.toLocaleString()} answers
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5 mt-2">
-                    {stats?.topNumbers.slice(0, 5).map((item, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-2 text-xs font-mono"
-                      >
-                        <span className="w-6 text-right text-muted">
-                          {item.number}
-                        </span>
-                        <AsciiBar percent={item.percent} />
-                        <span className="text-muted w-8">
-                          {Math.round(item.percent)}%
-                        </span>
-                      </div>
-                    ))}
-                    {/* Show "other" if remaining percentage is significant */}
-                    {(() => {
-                      const sum =
-                        stats?.topNumbers
-                          .slice(0, 5)
-                          .reduce((acc, curr) => acc + curr.percent, 0) || 0;
-                      const other = 100 - sum;
-                      if (other > 2) {
-                        return (
-                          <div className="flex items-center gap-2 text-xs font-mono">
-                            <span className="w-6 text-right text-faint">
-                              ..
-                            </span>
-                            <AsciiBar percent={other} />
-                            <span className="text-faint w-8">
-                              {Math.round(other)}%
-                            </span>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      <AsciiBar percent={other} />
+                      <span className="text-faint w-8">
+                        {Math.round(other)}%
+                      </span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </div>
+    </div>
   );
 }

@@ -2,10 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import { useCallback } from "react";
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 import { ExpandableNav, useSubdomainNavigation, getSubdomainFromPath } from "@anipotts/ui";
 
 export default function Navbar() {
+  const posthog = usePostHog();
   const pathname = usePathname();
   const { navigateTo } = useSubdomainNavigation();
   const currentSubdomain = getSubdomainFromPath(pathname);

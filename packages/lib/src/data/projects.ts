@@ -142,5 +142,8 @@ export const projects: Project[] = [
   },
 ];
 
+/** Alias for fallback when Supabase is unavailable */
+export const FALLBACK_PROJECTS = projects;
+
 /** Projects with an external live URL (for status monitoring, links page, etc.) */
 export const liveProjects = projects.filter((p) => p.links?.live);
