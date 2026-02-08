@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 /**
  * Layout for the main site routes (anipotts.com).
  * Includes Navbar and Footer, unlike subdomain routes.
+ * Footer is pinned to bottom via flex-grow on content area.
  */
 export default function MainLayout({
   children,
@@ -11,10 +12,12 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="flex flex-col flex-grow w-full">
       <Navbar />
-      {children}
+      <div className="flex-grow">
+        {children}
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -103,7 +103,10 @@ export function ExpandableNav({ currentSubdomain, pathname = "/", onNavClick, on
   const navItems = buildNavItems();
 
   return (
-    <nav className="nav-container w-full flex items-center justify-end gap-6 py-6 mb-8">
+    <nav className="nav-container w-full flex flex-col items-end py-6 mb-8">
+      <span className="text-accent-400 text-[10px] font-mono tracking-widest uppercase mb-2">
+        ani potts
+      </span>
       <motion.div
         className="flex flex-wrap items-center justify-end text-sm font-medium tracking-wide"
         layout
