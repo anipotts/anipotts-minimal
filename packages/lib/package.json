@@ -47,6 +47,10 @@
     "./cms": {
       "types": "./dist/cms/index.d.ts",
       "import": "./dist/cms/index.js"
+    },
+    "./storage": {
+      "types": "./dist/storage/index.d.ts",
+      "import": "./dist/storage/index.js"
     }
   },
   "scripts": {

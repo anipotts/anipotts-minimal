@@ -6,7 +6,7 @@
 
 import { getLanguageColor } from "../utils/languages";
 
-interface ContributionDay {
+export interface ContributionDay {
   contributionCount: number;
   date: string;
 }
@@ -48,7 +48,7 @@ export interface GitHubRecentActivity {
  * Fetch contribution calendar via GitHub GraphQL API.
  * Requires a personal access token with `read:user` scope.
  */
-async function fetchContributionCalendar(
+export async function fetchContributionCalendar(
   username: string,
   token: string,
 ): Promise<ContributionDay[]> {

@@ -1,9 +1,10 @@
-export { fetchGitHubStats, fetchRepoLanguages, fetchRecentCommits } from "./github";
+export { fetchGitHubStats, fetchRepoLanguages, fetchRecentCommits, fetchContributionCalendar } from "./github";
 export type {
   GitHubStats,
   GitHubLanguageBreakdown,
   GitHubCommit,
   GitHubRecentActivity,
+  ContributionDay,
 } from "./github";
 
 export { fetchWakaTimeStats } from "./wakatime";

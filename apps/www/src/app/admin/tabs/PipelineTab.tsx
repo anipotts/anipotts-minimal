@@ -18,11 +18,11 @@ const STATUS_COLUMNS: { status: ContentStatusGroup; label: string; color: string
 // Memoized card component
 const PipelineCard = memo(function PipelineCard({ item }: { item: Thought }) {
   return (
-    <div className="p-2.5 bg-[var(--input-bg)] border border-[var(--border)] rounded-md hover:border-[var(--accent-400)]/60 hover:bg-[var(--overlay-5)] transition-all cursor-pointer group">
-      <h4 className="text-xs font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--accent-400)]">
+    <div className="p-4 bg-[var(--input-bg)] border border-[var(--border)] rounded-md hover:border-[var(--accent-400)]/60 hover:bg-[var(--overlay-5)] transition-all cursor-pointer group">
+      <h4 className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent-400)]">
         {item.title || "Untitled"}
       </h4>
-      <div className="flex items-center justify-between mt-1.5 text-[10px]">
+      <div className="flex items-center justify-between mt-2 text-[11px]">
         <span className="text-[var(--text-muted)] font-medium">{item.views} views</span>
         <span className="text-[var(--text-tertiary)]">
           {new Date(item.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
@@ -47,15 +47,15 @@ const PipelineColumn = memo(function PipelineColumn({
   return (
     <div className="flex flex-col bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg overflow-hidden min-w-0">
       {/* Column Header */}
-      <div className="px-3 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
+      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
         <div className="flex items-center gap-2">
           <FaCircle className={`w-2 h-2 ${color}`} />
-          <span className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">{label}</span>
-          <span className="ml-auto text-xs text-[var(--text-tertiary)] font-bold bg-[var(--input-bg)] px-1.5 py-0.5 rounded">{items.length}</span>
+          <span className="text-[13px] font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">{label}</span>
+          <span className="ml-auto text-xs text-[var(--text-tertiary)] font-bold bg-[var(--input-bg)] px-2.5 py-1 rounded">{items.length}</span>
         </div>
       </div>
       {/* Column Content - scrollable if needed */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-2 min-h-0">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
         {items.length === 0 ? (
           <div className="text-center text-xs text-[var(--text-muted)] py-6">Empty</div>
         ) : (
@@ -104,16 +104,16 @@ export default memo(function PipelineTab() {
   }
 
   return (
-    <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
+    <div className="h-full p-4 flex flex-col gap-3 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 shrink-0 px-1">
         <FaCircle className="w-2 h-2 text-[var(--accent-400)]" />
-        <span className="text-sm font-mono uppercase tracking-wide text-[var(--text-primary)] font-semibold">Pipeline</span>
-        <span className="text-xs text-[var(--text-muted)] ml-auto font-medium">{content.length} items</span>
+        <span className="text-lg font-semibold text-[var(--text-primary)]">Pipeline</span>
+        <span className="text-[13px] text-[var(--text-muted)] ml-auto font-medium">{content.length} items</span>
       </div>
 
       {/* Kanban Board - 5 columns, fills remaining height */}
-      <div className="flex-1 grid grid-cols-5 gap-2 min-h-0 overflow-hidden">
+      <div className="flex-1 grid grid-cols-5 gap-3 min-h-0 overflow-hidden">
         {STATUS_COLUMNS.map((col) => (
           <PipelineColumn key={col.status} status={col.status} label={col.label} color={col.color} items={grouped[col.status]} />
         ))}

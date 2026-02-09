@@ -2,3 +2,19 @@
 @config "../../tailwind.config.mjs";
 @import "@anipotts/styles/tokens.css";
 @import "@anipotts/styles/base.css";
+
+/* Admin panel scoped styles */
+.admin-panel {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.admin-panel .font-mono {
+  font-family: var(--font-mono), monospace;
+}
+.admin-panel {
+  --text-muted: #8b8b9a;
+  --text-faint: #6b6b7a;
+}
+.dark .admin-panel {
+  --text-muted: #8b8b9a;
+  --text-faint: #6b6b7a;
+}

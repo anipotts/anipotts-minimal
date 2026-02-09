@@ -84,13 +84,13 @@ export const AdminPanelContent = memo(function AdminPanelContent({
       {/* Command Bar - fixed height */}
       <div className="shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[var(--border)] p-4 gap-3">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--input-bg)] border border-[var(--border)] rounded-md">
+          <div className="flex items-center gap-2 px-3 py-2 bg-[var(--input-bg)] border border-[var(--border)] rounded-md">
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-xs font-mono text-[var(--text-secondary)] uppercase tracking-widest">
+            <span className="text-xs font-mono text-[var(--text-secondary)] uppercase tracking-wide">
               ADMIN_{scope.toUpperCase()}
             </span>
           </div>
-          <div className="hidden md:flex gap-1 text-[10px] font-mono text-[var(--text-muted)] items-center">
+          <div className="hidden md:flex gap-1 text-[11px] font-mono text-[var(--text-muted)] items-center">
             <span>{currentTime}</span>
             {statusWidget && (
               <>
@@ -102,7 +102,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 bg-[rgba(var(--overlay-invert),0.4)] p-1 rounded-lg border border-[var(--border)] flex-wrap">
+        <div className="flex items-center gap-1 bg-[var(--input-bg)] p-1.5 rounded-lg border border-[var(--border)] flex-wrap">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -110,13 +110,13 @@ export const AdminPanelContent = memo(function AdminPanelContent({
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-mono uppercase tracking-wide transition-colors ${
                   isActive
                     ? "bg-[var(--overlay-10)] text-[var(--accent-400)]"
                     : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--input-bg)]"
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             );
@@ -129,7 +129,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
           {onThemeChange && (
             <button
               onClick={onThemeChange}
-              className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[var(--input-bg)]"
+              className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2.5 py-2 rounded hover:bg-[var(--input-bg)]"
               aria-label={`Theme: ${theme}`}
               title={`Theme: ${theme} (click to cycle)`}
             >
@@ -142,7 +142,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
             href={liveSiteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[var(--input-bg)]"
+            className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-400)] transition-colors font-mono flex items-center gap-1.5 px-2.5 py-2 rounded hover:bg-[var(--input-bg)]"
           >
             <FaExternalLinkAlt className="w-3 h-3" />
             <span className="hidden lg:inline">Live Site</span>
@@ -150,7 +150,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
           <span className="text-[var(--text-faint)]">|</span>
           <button
             onClick={handleLogout}
-            className="text-xs text-red-400/80 hover:text-red-400 transition-colors font-mono flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-red-500/10"
+            className="text-xs text-red-400/80 hover:text-red-400 transition-colors font-mono flex items-center gap-1.5 px-2.5 py-2 rounded hover:bg-red-500/10"
           >
             <FaSignOutAlt className="w-3 h-3" />
             <span className="hidden lg:inline">Logout</span>

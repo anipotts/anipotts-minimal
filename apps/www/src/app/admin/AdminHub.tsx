@@ -12,6 +12,7 @@ import {
   FaClock,
   FaCog,
   FaChartLine,
+  FaGlobe,
 } from "react-icons/fa";
 import Link from "next/link";
 
@@ -22,9 +23,10 @@ import AtomsTab from "./tabs/AtomsTab";
 import ScheduleTab from "./tabs/ScheduleTab";
 import ConfigTab from "./tabs/ConfigTab";
 import AnalyticsTab from "./tabs/AnalyticsTab";
+import SiteTab from "./tabs/SiteTab";
 import TypefullyStatusWidget from "./TypefullyStatusWidget";
 
-type TabName = "pipeline" | "content" | "atoms" | "schedule" | "config" | "analytics";
+type TabName = "pipeline" | "content" | "atoms" | "schedule" | "config" | "analytics" | "site";
 
 interface TabConfig {
   id: TabName;
@@ -34,17 +36,18 @@ interface TabConfig {
 }
 
 const TABS: TabConfig[] = [
-  { id: "pipeline", label: "Pipeline", icon: FaList, shortcut: "⌘1" },
-  { id: "content", label: "Content", icon: FaEdit, shortcut: "⌘2" },
-  { id: "atoms", label: "Atoms", icon: FaGraduationCap, shortcut: "⌘3" },
-  { id: "schedule", label: "Schedule", icon: FaClock, shortcut: "⌘4" },
-  { id: "config", label: "Config", icon: FaCog, shortcut: "⌘5" },
-  { id: "analytics", label: "Analytics", icon: FaChartLine, shortcut: "⌘6" },
+  { id: "site", label: "Site", icon: FaGlobe, shortcut: "⌘1" },
+  { id: "pipeline", label: "Pipeline", icon: FaList, shortcut: "⌘2" },
+  { id: "content", label: "Content", icon: FaEdit, shortcut: "⌘3" },
+  { id: "atoms", label: "Atoms", icon: FaGraduationCap, shortcut: "⌘4" },
+  { id: "schedule", label: "Schedule", icon: FaClock, shortcut: "⌘5" },
+  { id: "config", label: "Config", icon: FaCog, shortcut: "⌘6" },
+  { id: "analytics", label: "Analytics", icon: FaChartLine, shortcut: "⌘7" },
 ];
 
 export default function AdminHub() {
   const { logout } = useAdmin();
-  const [activeTab, setActiveTab] = useState<TabName>("pipeline");
+  const [activeTab, setActiveTab] = useState<TabName>("site");
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
@@ -82,23 +85,25 @@ export default function AdminHub() {
         return <ConfigTab />;
       case "analytics":
         return <AnalyticsTab />;
+      case "site":
+        return <SiteTab />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="flex flex-col gap-6 min-h-[80vh]">
+    <div className="admin-panel flex flex-col gap-6 min-h-[80vh]">
       {/* Command Bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border pb-4 gap-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-input border border-border rounded-md">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-mono text-secondary uppercase tracking-widest">
+            <span className="text-xs font-mono text-secondary uppercase tracking-wide">
               ANIPOTTS_ADMIN_HUB
             </span>
           </div>
-          <div className="hidden md:flex gap-1 text-[10px] font-mono text-muted items-center">
+          <div className="hidden md:flex gap-1 text-[11px] font-mono text-muted items-center">
             <span>{currentTime}</span>
             <span className="text-faint">|</span>
             <TypefullyStatusWidget />
@@ -108,7 +113,7 @@ export default function AdminHub() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 bg-[rgba(var(--overlay-invert),0.4)] p-1 rounded-lg border border-border flex-wrap">
+        <div className="flex items-center gap-2 bg-[var(--input-bg)] p-1 rounded-lg border border-border flex-wrap">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -124,7 +129,7 @@ export default function AdminHub() {
               >
                 <Icon className="w-3 h-3" />
                 <span className="hidden sm:inline">{tab.label}</span>
-                <span className="hidden md:inline opacity-50 text-[8px] ml-1">
+                <span className="hidden md:inline opacity-50 text-[11px] ml-1">
                   {tab.shortcut}
                 </span>
               </button>

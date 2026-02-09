@@ -21,9 +21,9 @@ const PLATFORM_COLORS: Record<Platform, string> = {
 };
 
 const STATUS_BADGES = {
-  draft: { label: "Draft", color: "bg-yellow-500/20 text-yellow-400" },
-  scheduled: { label: "Scheduled", color: "bg-blue-500/20 text-blue-400" },
-  posted: { label: "Posted", color: "bg-green-500/20 text-green-400" },
+  draft: { label: "Draft", color: "bg-yellow-500/15 text-yellow-300" },
+  scheduled: { label: "Scheduled", color: "bg-blue-500/15 text-blue-400" },
+  posted: { label: "Posted", color: "bg-green-500/15 text-green-400" },
 };
 
 export default function AtomsTab() {
@@ -94,15 +94,15 @@ export default function AtomsTab() {
   }
 
   return (
-    <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
+    <div className="h-full p-4 flex flex-col gap-3 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3 px-1">
         <div className="flex items-center gap-2">
           <FaCircle className="w-2 h-2 text-accent-400" />
-          <h2 className="text-sm font-mono uppercase tracking-wide text-[var(--text-primary)] font-semibold">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Generated Atoms
           </h2>
-          <span className="text-xs text-[var(--text-muted)] font-medium">
+          <span className="text-[13px] text-[var(--text-muted)] font-medium">
             {atoms.length} total
           </span>
         </div>
@@ -113,7 +113,7 @@ export default function AtomsTab() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as typeof filter)}
-            className="bg-[var(--input-bg)] border border-[var(--border)] rounded-md px-2.5 py-1.5 text-xs font-mono text-[var(--text-primary)] focus:border-[var(--accent-400)] focus:outline-none"
+            className="bg-[var(--input-bg)] border border-[var(--border)] rounded-md px-3 py-2.5 text-xs font-mono text-[var(--text-primary)] focus:border-[var(--accent-400)] focus:outline-none"
           >
             <option value="all">All Platforms</option>
             <optgroup label="By Status">
@@ -150,11 +150,11 @@ export default function AtomsTab() {
                   <span className={`text-sm font-bold ${PLATFORM_COLORS[atom.platform]}`}>
                     {atom.platform.toUpperCase()}
                   </span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded ${STATUS_BADGES[atom.status]?.color || STATUS_BADGES.draft.color}`}>
+                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded ${STATUS_BADGES[atom.status]?.color || STATUS_BADGES.draft.color}`}>
                     {STATUS_BADGES[atom.status]?.label || "Draft"}
                   </span>
                   {atom.voice_mode && (
-                    <span className="text-[10px] text-faint">
+                    <span className="text-[11px] text-faint">
                       {atom.voice_mode} voice
                     </span>
                   )}
@@ -189,7 +189,7 @@ export default function AtomsTab() {
               </div>
 
               {/* Source Content */}
-              <div className="text-[10px] text-faint mb-2">
+              <div className="text-[11px] text-faint mb-3">
                 From: <span className="text-muted">{getContentTitle(atom.content_id)}</span>
               </div>
 
@@ -199,18 +199,18 @@ export default function AtomsTab() {
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full bg-input border border-border rounded p-2 text-xs text-secondary font-mono min-h-[100px]"
+                    className="w-full bg-input border border-border rounded p-3 text-xs text-secondary font-mono min-h-[100px]"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleSaveEdit(atom)}
-                      className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded flex items-center gap-1"
+                      className="text-xs bg-green-500/20 text-green-400 px-2.5 py-1.5 rounded flex items-center gap-1"
                     >
                       <FaCheck /> Save
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded flex items-center gap-1"
+                      className="text-xs bg-red-500/20 text-red-400 px-2.5 py-1.5 rounded flex items-center gap-1"
                     >
                       <FaTimes /> Cancel
                     </button>
@@ -226,7 +226,7 @@ export default function AtomsTab() {
               {atom.hashtags && atom.hashtags.length > 0 && (
                 <div className="flex gap-1 mt-2 flex-wrap">
                   {atom.hashtags.map((tag, i) => (
-                    <span key={i} className="text-[10px] text-accent-400">
+                    <span key={i} className="text-[11px] text-accent-400">
                       #{tag}
                     </span>
                   ))}
@@ -234,7 +234,7 @@ export default function AtomsTab() {
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between mt-3 text-[10px] text-faint">
+              <div className="flex items-center justify-between mt-3 text-[11px] text-faint">
                 <span>
                   Created {new Date(atom.created_at).toLocaleDateString()}
                 </span>

@@ -13,6 +13,7 @@ export default defineConfig({
     "status/index": "src/status/index.ts",
     "typefully/index": "src/typefully/index.ts",
     "cms/index": "src/cms/index.ts",
+    "storage/index": "src/storage/index.ts",
   },
   format: ["esm"],
   dts: true,

@@ -9,6 +9,7 @@ import {
   scheduleTypefullyDraftAction,
   publishTypefullyDraftAction,
   pushAtomToTypefully,
+  getScheduledContent,
 } from "../actions";
 import type { Atom, Thought, TypefullyDraft, TypefullyQueueSummary } from "@anipotts/types";
 import {
@@ -80,7 +81,7 @@ const PLATFORM_BADGE_COLORS: Record<string, string> = {
 function PlatformBadge({ platform }: { platform: string }) {
   return (
     <span
-      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+      className={`text-[11px] font-semibold px-2.5 py-1 rounded ${
         PLATFORM_BADGE_COLORS[platform] || "bg-gray-500/20 text-gray-400"
       }`}
     >
@@ -93,6 +94,7 @@ export default function ScheduleTab() {
   const [queue, setQueue] = useState<TypefullyQueueSummary | null>(null);
   const [atoms, setAtoms] = useState<Atom[]>([]);
   const [content, setContent] = useState<Thought[]>([]);
+  const [scheduledThoughts, setScheduledThoughts] = useState<Thought[]>([]);
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState<boolean | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -105,11 +107,12 @@ export default function ScheduleTab() {
   const fetchData = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
     try {
-      const [connResult, queueData, atomsData, contentData] = await Promise.all([
+      const [connResult, queueData, atomsData, contentData, scheduledData] = await Promise.all([
         checkTypefullyConnection(),
         getTypefullyQueue(),
         getAllAtoms(),
         getAdminContent(),
+        getScheduledContent(),
       ]);
 
       setConnected(connResult.connected);
@@ -117,6 +120,7 @@ export default function ScheduleTab() {
       setQueue(queueData);
       setAtoms(atomsData || []);
       setContent(contentData || []);
+      setScheduledThoughts(scheduledData || []);
       setLastFetched(new Date());
     } catch (err) {
       console.error("Error fetching schedule data:", err);
@@ -210,7 +214,7 @@ export default function ScheduleTab() {
   return (
     <div className="h-full p-4 flex flex-col gap-3 overflow-y-auto">
       {/* Status Bar */}
-      <div className="flex items-center gap-4 flex-wrap bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg px-4 py-3">
+      <div className="flex items-center gap-4 flex-wrap bg-[var(--input-bg)] border border-border rounded-lg px-4 py-3">
         {/* Connection */}
         <div className="flex items-center gap-2">
           <div
@@ -261,12 +265,75 @@ export default function ScheduleTab() {
         >
           <FaSync className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
           {lastFetched && (
-            <span className="text-[10px] text-faint">
+            <span className="text-[11px] text-faint">
               {lastFetched.toLocaleTimeString("en-US", { hour12: false })}
             </span>
           )}
         </button>
       </div>
+
+      {/* Scheduled Content (from Supabase scheduled_at) */}
+      {scheduledThoughts.length > 0 && (
+        <div className="bg-[var(--input-bg)] border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-border bg-[var(--card-darker)]">
+            <div className="flex items-center gap-2">
+              <FaCalendarAlt className="w-3 h-3 text-orange-400" />
+              <h3 className="text-[15px] font-semibold text-tertiary">
+                Scheduled Content
+              </h3>
+              <span className="text-[11px] text-muted ml-2">
+                Auto-publish queue
+              </span>
+              <span className="ml-auto text-xs font-bold text-muted">
+                {scheduledThoughts.length}
+              </span>
+            </div>
+          </div>
+          <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto">
+            {scheduledThoughts.map((thought) => (
+              <div
+                key={thought.id}
+                className="flex items-center gap-3 px-4 py-3 bg-input border border-orange-500/20 rounded"
+              >
+                <div className="flex-grow min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-secondary truncate">
+                      {thought.title || "Untitled"}
+                    </span>
+                    {thought.status && (
+                      <span className={`text-[11px] font-semibold px-2.5 py-1 rounded ${
+                        thought.status === "draft" ? "bg-yellow-500/15 text-yellow-300" :
+                        thought.status === "ready" ? "bg-orange-500/15 text-orange-400" :
+                        "bg-gray-500/15 text-gray-400"
+                      }`}>
+                        {thought.status}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted truncate mt-0.5">
+                    {thought.summary || thought.slug}
+                  </p>
+                </div>
+                <span className="text-[11px] text-orange-400 shrink-0 font-mono">
+                  {thought.scheduled_at
+                    ? relativeTime(thought.scheduled_at)
+                    : "TBD"}
+                </span>
+                <span className="text-[10px] text-faint shrink-0">
+                  {thought.scheduled_at
+                    ? new Date(thought.scheduled_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Not Connected Fallback */}
       {!connected && (
@@ -281,11 +348,11 @@ export default function ScheduleTab() {
 
       {/* Typefully Drafts */}
       {connected && (
-        <div className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-[rgba(var(--overlay-invert),0.2)]">
+        <div className="bg-[var(--input-bg)] border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-border bg-[var(--card-darker)]">
             <div className="flex items-center gap-2">
               <FaRocket className="w-3 h-3 text-accent-400" />
-              <h3 className="text-xs font-mono uppercase tracking-widest text-tertiary">
+              <h3 className="text-[15px] font-semibold text-tertiary">
                 Drafts
               </h3>
               <span className="ml-auto text-xs font-bold text-muted">
@@ -310,7 +377,7 @@ export default function ScheduleTab() {
                     className="bg-input border border-border-subtle rounded hover:border-accent-400/50 transition-colors"
                   >
                     <div
-                      className="flex items-center gap-3 p-3 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer"
                       onClick={() => toggleDraft(draft.id)}
                     >
                       {isExpanded ? (
@@ -332,7 +399,7 @@ export default function ScheduleTab() {
                             e.stopPropagation();
                             handleScheduleNextSlot(draft.id);
                           }}
-                          className="text-[10px] bg-accent-400/20 text-accent-400 px-2 py-1 rounded hover:bg-accent-400/30 transition-colors flex items-center gap-1"
+                          className="text-[11px] bg-accent-400/20 text-accent-400 px-2.5 py-1 rounded hover:bg-accent-400/30 transition-colors flex items-center gap-1"
                         >
                           <FaClock className="w-2.5 h-2.5" />
                           Schedule
@@ -365,11 +432,11 @@ export default function ScheduleTab() {
 
       {/* Scheduled */}
       {connected && scheduledItems.length > 0 && (
-        <div className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-[rgba(var(--overlay-invert),0.2)]">
+        <div className="bg-[var(--input-bg)] border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-border bg-[var(--card-darker)]">
             <div className="flex items-center gap-2">
               <FaClock className="w-3 h-3 text-blue-400" />
-              <h3 className="text-xs font-mono uppercase tracking-widest text-tertiary">
+              <h3 className="text-[15px] font-semibold text-tertiary">
                 Scheduled
               </h3>
               <span className="ml-auto text-xs font-bold text-muted">
@@ -385,7 +452,7 @@ export default function ScheduleTab() {
               return (
                 <div
                   key={draft.id}
-                  className="flex items-center gap-3 p-3 bg-input border border-blue-500/20 rounded"
+                  className="flex items-center gap-3 px-4 py-3 bg-input border border-blue-500/20 rounded"
                 >
                   <div className="flex items-center gap-1.5">
                     {platforms.map((p) => (
@@ -395,7 +462,7 @@ export default function ScheduleTab() {
                   <p className="text-[11px] text-muted truncate flex-grow min-w-0">
                     {draft.draft_title || preview.substring(0, 60)}
                   </p>
-                  <span className="text-[10px] text-blue-400 shrink-0">
+                  <span className="text-[11px] text-blue-400 shrink-0">
                     {draft.scheduled_date
                       ? relativeTime(draft.scheduled_date)
                       : "TBD"}
@@ -405,13 +472,13 @@ export default function ScheduleTab() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handlePublishNow(draft.id)}
-                          className="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded hover:bg-green-500/30"
+                          className="text-[11px] bg-green-500/20 text-green-400 px-2.5 py-1 rounded hover:bg-green-500/30"
                         >
                           Confirm
                         </button>
                         <button
                           onClick={() => setConfirmPublish(null)}
-                          className="text-[10px] bg-red-500/20 text-red-400 px-2 py-1 rounded hover:bg-red-500/30"
+                          className="text-[11px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded hover:bg-red-500/30"
                         >
                           Cancel
                         </button>
@@ -419,7 +486,7 @@ export default function ScheduleTab() {
                     ) : (
                       <button
                         onClick={() => setConfirmPublish(draft.id)}
-                        className="text-[10px] bg-green-500/15 text-green-400 px-2 py-1 rounded hover:bg-green-500/25 transition-colors flex items-center gap-1"
+                        className="text-[11px] bg-green-500/15 text-green-400 px-2.5 py-1 rounded hover:bg-green-500/25 transition-colors flex items-center gap-1"
                       >
                         <FaPaperPlane className="w-2 h-2" />
                         Publish Now
@@ -443,14 +510,14 @@ export default function ScheduleTab() {
 
       {/* Supabase Atoms Ready to Push */}
       {pushableAtoms.length > 0 && (
-        <div className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-[rgba(var(--overlay-invert),0.2)]">
+        <div className="bg-[var(--input-bg)] border border-border rounded-lg overflow-hidden">
+          <div className="px-4 py-3 border-b border-border bg-[var(--card-darker)]">
             <div className="flex items-center gap-2">
               <FaArrowUp className="w-3 h-3 text-purple-400" />
-              <h3 className="text-xs font-mono uppercase tracking-widest text-tertiary">
+              <h3 className="text-[15px] font-semibold text-tertiary">
                 Ready to Push
               </h3>
-              <span className="text-[10px] text-muted ml-2">
+              <span className="text-[11px] text-muted ml-2">
                 Supabase atoms for Typefully
               </span>
               <span className="ml-auto text-xs font-bold text-muted">
@@ -461,24 +528,24 @@ export default function ScheduleTab() {
           <div className="p-4 space-y-4 max-h-[300px] overflow-y-auto">
             {Object.entries(atomsByContent).map(([contentId, groupAtoms]) => (
               <div key={contentId}>
-                <div className="text-[10px] text-faint uppercase tracking-wider mb-2">
+                <div className="text-[11px] text-faint uppercase tracking-wider mb-2">
                   {getContentTitle(contentId)}
                 </div>
                 <div className="space-y-1.5">
                   {groupAtoms.map((atom) => (
                     <div
                       key={atom.id}
-                      className="flex items-center gap-3 p-2.5 bg-input border border-border-subtle rounded"
+                      className="flex items-center gap-3 px-4 py-3 bg-input border border-border-subtle rounded"
                     >
-                      <span className="text-[10px] font-bold text-secondary uppercase">
+                      <span className="text-[11px] font-bold text-secondary uppercase">
                         {atom.platform}
                       </span>
-                      <p className="text-[10px] text-muted truncate flex-grow min-w-0">
+                      <p className="text-[11px] text-muted truncate flex-grow min-w-0">
                         {atom.atom_content.substring(0, 60)}...
                       </p>
                       <button
                         onClick={() => handlePushAtom(atom.id)}
-                        className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors flex items-center gap-1 shrink-0"
+                        className="text-[11px] bg-purple-500/20 text-purple-400 px-2.5 py-1 rounded hover:bg-purple-500/30 transition-colors flex items-center gap-1 shrink-0"
                         disabled={!connected}
                       >
                         <FaArrowUp className="w-2 h-2" />
@@ -495,9 +562,9 @@ export default function ScheduleTab() {
 
       {/* Manual Platforms (collapsible) */}
       {manualAtoms.length > 0 && (
-        <div className="bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded-lg overflow-hidden">
+        <div className="bg-[var(--input-bg)] border border-border rounded-lg overflow-hidden">
           <button
-            className="w-full px-4 py-3 flex items-center gap-2 bg-[rgba(var(--overlay-invert),0.2)] hover:bg-[rgba(var(--overlay-invert),0.3)] transition-colors"
+            className="w-full px-4 py-3 flex items-center gap-2 bg-[var(--card-darker)] hover:bg-[rgba(var(--overlay-invert),0.3)] transition-colors"
             onClick={() => setManualExpanded(!manualExpanded)}
           >
             {manualExpanded ? (
@@ -506,10 +573,10 @@ export default function ScheduleTab() {
               <FaChevronRight className="w-2.5 h-2.5 text-faint" />
             )}
             <FaCalendarAlt className="w-3 h-3 text-purple-400" />
-            <h3 className="text-xs font-mono uppercase tracking-widest text-tertiary">
+            <h3 className="text-[15px] font-semibold text-tertiary">
               Manual Platforms
             </h3>
-            <span className="text-[10px] text-muted ml-2">
+            <span className="text-[11px] text-muted ml-2">
               TikTok, Instagram, YouTube, etc.
             </span>
             <span className="ml-auto text-xs font-bold text-muted">
@@ -521,22 +588,22 @@ export default function ScheduleTab() {
               {manualAtoms.map((atom) => (
                 <div
                   key={atom.id}
-                  className="flex items-center justify-between p-3 bg-input border border-border-subtle rounded"
+                  className="flex items-center justify-between px-4 py-3 bg-input border border-border-subtle rounded"
                 >
                   <div className="flex-grow min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-secondary">
                         {atom.platform.toUpperCase()}
                       </span>
-                      <span className="text-[10px] text-faint truncate">
+                      <span className="text-[11px] text-faint truncate">
                         {getContentTitle(atom.content_id)}
                       </span>
                     </div>
-                    <p className="text-[10px] text-muted truncate mt-1">
+                    <p className="text-[11px] text-muted truncate mt-1">
                       {atom.atom_content.substring(0, 80)}...
                     </p>
                   </div>
-                  <span className="text-[10px] text-faint ml-4">Post manually</span>
+                  <span className="text-[11px] text-faint ml-4">Post manually</span>
                 </div>
               ))}
             </div>

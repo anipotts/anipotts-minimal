@@ -17,6 +17,7 @@ export const CACHE_KEYS = {
   GITHUB_LANGUAGES: "github_languages",
   GITHUB_ACTIVITY: "github_activity",
   WAKATIME_STATS: "wakatime_stats",
+  GITHUB_CALENDAR: "github_calendar",
 } as const;
 
 /** Write a value to the metrics cache. */

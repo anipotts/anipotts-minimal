@@ -46,6 +46,7 @@ export interface Thought {
   voice_mode?: VoiceMode;
   project?: string;
   published_at?: string;
+  scheduled_at?: string;
 
   // Subdomain scoping
   subdomain?: Subdomain;
