@@ -29,7 +29,7 @@ export default function ThoughtsSearch() {
       } else {
         router.push("/thoughts");
       }
-    }, 400);
+    }, 250);
   };
 
   return (
@@ -38,13 +38,16 @@ export default function ThoughtsSearch() {
         type="text"
         value={query}
         onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") handleChange("");
+        }}
         placeholder="Search thoughts..."
-        className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-md py-2.5 px-4 text-sm text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-400)]/50 focus:outline-none transition-colors"
+        className="w-full bg-input border border-border rounded-md py-2.5 px-4 text-sm text-secondary placeholder-muted focus:border-accent-400/50 focus:outline-none transition-colors"
       />
       {query && (
         <button
           onClick={() => handleChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] text-xs"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-secondary text-xs"
         >
           Clear
         </button>

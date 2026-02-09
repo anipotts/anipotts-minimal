@@ -1,4 +1,5 @@
 import { FadeIn } from "@anipotts/ui";
+import { formatShortRelativeTime } from "@anipotts/lib";
 import type { GitHubCommit } from "@anipotts/lib/metrics";
 
 export interface GitHubEvent {
@@ -87,15 +88,6 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function formatRelativeTime(isoString: string): string {
-  const diff = Date.now() - new Date(isoString).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
 function EventCard({ event }: { event: GitHubEvent }) {
   const { event_type, event_action, payload } = event;
 
@@ -113,7 +105,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
 
     return (
       <div className="flex items-start gap-2 group">
-        <span className={`text-[11px] font-mono mt-0.5 shrink-0 ${color}`}>
+        <span className={`text-xs font-mono mt-0.5 shrink-0 ${color}`}>
           PR
         </span>
         <span className="text-sm text-tertiary leading-snug">
@@ -124,7 +116,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-[11px] text-faint hover:text-accent-400"
+            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-xs text-faint hover:text-accent-400"
           >
             view
           </a>
@@ -139,7 +131,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
     const url = payload.url as string | undefined;
     return (
       <div className="flex items-start gap-2 group">
-        <span className="text-[11px] font-mono mt-0.5 shrink-0 text-accent-400">
+        <span className="text-xs font-mono mt-0.5 shrink-0 text-accent-400">
           REL
         </span>
         <span className="text-sm text-tertiary leading-snug">
@@ -150,7 +142,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-[11px] text-faint hover:text-accent-400"
+            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-xs text-faint hover:text-accent-400"
           >
             view
           </a>
@@ -163,7 +155,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
     const count = payload.stargazers_count as number;
     return (
       <div className="flex items-start gap-2">
-        <span className="text-[11px] font-mono mt-0.5 shrink-0 text-yellow-400">
+        <span className="text-xs font-mono mt-0.5 shrink-0 text-yellow-400">
           ★
         </span>
         <span className="text-sm text-tertiary leading-snug">
@@ -178,7 +170,7 @@ function EventCard({ event }: { event: GitHubEvent }) {
     const ref = payload.ref as string;
     return (
       <div className="flex items-start gap-2">
-        <span className="text-[11px] font-mono mt-0.5 shrink-0 text-blue-400">
+        <span className="text-xs font-mono mt-0.5 shrink-0 text-blue-400">
           NEW
         </span>
         <span className="text-sm text-tertiary leading-snug">
@@ -219,8 +211,8 @@ export default function ActivitySection({
               : "What I've been shipping"}
           </p>
           {fetchedAt && (
-            <span className="text-[11px] text-faint">
-              updated {formatRelativeTime(fetchedAt)}
+            <span className="text-xs text-faint">
+              updated {formatShortRelativeTime(fetchedAt)}
             </span>
           )}
         </div>
@@ -235,12 +227,12 @@ export default function ActivitySection({
                   <span className="text-xs font-medium text-tertiary">
                     {formatDate(day.date)}
                   </span>
-                  <span className="text-[11px] text-faint font-mono">
+                  <span className="text-xs text-faint font-mono">
                     {day.date}
                   </span>
                 </div>
 
-                <div className="space-y-3 ml-2 border-l border-border pl-4">
+                <div className="space-y-5 ml-2 border-l border-border pl-6">
                   {day.repos.map((repo) => (
                     <div key={repo.name}>
                       <div className="flex items-center gap-2 mb-2">
@@ -248,7 +240,7 @@ export default function ActivitySection({
                           {repo.name}
                         </span>
                         {repo.commits.length > 0 && (
-                          <span className="text-[11px] text-faint">
+                          <span className="text-xs text-faint">
                             {repo.commits.length} commit
                             {repo.commits.length !== 1 ? "s" : ""}
                           </span>
@@ -274,17 +266,17 @@ export default function ActivitySection({
                               key={commit.sha}
                               className="flex items-start gap-2 group"
                             >
-                              <span className="text-[11px] text-faint font-mono mt-0.5 shrink-0">
+                              <span className="text-xs text-faint font-mono mt-0.5 shrink-0">
                                 {commit.sha}
                               </span>
-                              <span className="text-sm text-tertiary leading-snug">
+                              <span className="text-base text-tertiary leading-snug">
                                 {commit.message}
                               </span>
                               <a
                                 href={commit.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-[11px] text-faint hover:text-accent-400"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 text-xs text-faint hover:text-accent-400"
                               >
                                 view
                               </a>
@@ -301,20 +293,9 @@ export default function ActivitySection({
         </div>
       ) : (
         <FadeIn delay={0.1}>
-          <div className="border-l-2 border-accent-400/30 pl-4">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="px-2 py-1 bg-accent-400/10 text-accent-400 rounded text-xs font-mono">
-                v3.0.0
-              </span>
-              <span className="text-muted text-xs">anipotts.com</span>
-              <span className="text-faint text-xs">2025-01-05</span>
-            </div>
-            <ul className="space-y-2 text-sm text-secondary">
-              <li>Converted to Turborepo monorepo architecture</li>
-              <li>Added 10 subdomain apps</li>
-              <li>Shared UI component library</li>
-            </ul>
-          </div>
+          <p className="text-muted text-sm font-mono py-8 text-center">
+            No recent activity. Check back soon.
+          </p>
         </FadeIn>
       )}
 

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import type { Project } from "@anipotts/types";
 import Link from "next/link";
 
-const categories = ["all", "ai", "product", "quant", "music"];
+const CATEGORIES = ["all", "ai", "product", "quant", "music"];
 
 function ChromeIcon({ className }: { className?: string }) {
   return (
@@ -33,21 +34,21 @@ function StatusBadge({
 }) {
   if (featured) {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-accent-400 bg-accent-400/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-accent-400 bg-accent-400/10 border border-accent-400/20 px-1.5 py-0.5 rounded font-medium">
         featured
       </span>
     );
   }
   if (status === "in-progress") {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded font-medium">
         in progress
       </span>
     );
   }
   if (status === "coming-soon") {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-tertiary bg-gray-400/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-tertiary bg-gray-400/10 border border-gray-400/20 px-1.5 py-0.5 rounded font-medium">
         coming soon
       </span>
     );
@@ -70,7 +71,10 @@ function ProjectCard({ project }: { project: Project }) {
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => setIsOpen((o) => !o)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen((o) => !o); } }}
       className={`
         group w-full cursor-pointer border-l-2 pl-4 pr-4 transition-all duration-300 ease-in-out
         ${
@@ -125,7 +129,7 @@ function ProjectCard({ project }: { project: Project }) {
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
+                  className="text-xs uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
                 >
                   {tag}
                 </span>
@@ -181,20 +185,34 @@ export default function WorkFilteredList({
 }: {
   projects: Project[];
 }) {
-  const [filter, setFilter] = useState("all");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [filter, setFilter] = useState(searchParams.get("category") ?? "all");
 
-  const filteredProjects = projects.filter(
-    (p) => filter === "all" || p.category === filter,
-  );
+  const handleFilter = (cat: string) => {
+    setFilter(cat);
+    const params = new URLSearchParams(searchParams.toString());
+    if (cat === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", cat);
+    }
+    const qs = params.toString();
+    router.replace(`/work${qs ? `?${qs}` : ""}`, { scroll: false });
+  };
+
+  const filteredProjects = projects
+    .filter((p) => filter === "all" || p.category === filter)
+    .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
   return (
     <>
       <div className="flex flex-wrap gap-2">
-        {categories.map((cat) => (
+        {CATEGORIES.map((cat) => (
           <button
             key={cat}
-            onClick={() => setFilter(cat)}
-            className={`px-3 py-1 text-[10px] uppercase tracking-wider rounded-sm border transition-all duration-300 ${
+            onClick={() => handleFilter(cat)}
+            className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-300 ${
               filter === cat
                 ? "border-accent-400 text-accent-400 bg-accent-400/10"
                 : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
@@ -206,14 +224,20 @@ export default function WorkFilteredList({
       </div>
 
       <div className="flex flex-col gap-6 mt-4">
-        {filteredProjects.map((project) => (
-          <div
-            key={project.slug}
-            className="animate-[fadeInUp_0.4s_ease-out_both]"
-          >
-            <ProjectCard project={project} />
-          </div>
-        ))}
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((project) => (
+            <div
+              key={project.slug}
+              className="animate-[fadeInUp_0.4s_ease-out_both]"
+            >
+              <ProjectCard project={project} />
+            </div>
+          ))
+        ) : (
+          <p className="text-muted text-sm font-mono py-8 text-center">
+            no projects in &quot;{filter}&quot; yet.
+          </p>
+        )}
       </div>
     </>
   );

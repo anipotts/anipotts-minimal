@@ -62,7 +62,7 @@ export default async function ConnectPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+            <h1 className="text-sm font-bold uppercase tracking-widest text-accent-400">
               connect
             </h1>
           </FadeIn>
@@ -70,10 +70,11 @@ export default async function ConnectPage() {
         <div className="col-span-1 md:col-span-3">
           <FadeIn delay={0.1}>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-signal-green">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-signal-green bg-signal-green/10 border border-signal-green/20 rounded-full px-3 py-1">
+                <span className="w-2 h-2 rounded-full bg-signal-green animate-pulse" />
                 <span>open to collaboration</span>
               </div>
-              <p className="text-lg md:text-xl text-secondary leading-relaxed max-w-2xl">
+              <p className="text-xl md:text-2xl text-body leading-relaxed max-w-2xl">
                 If you're working with LLM orchestration systems and think I can
                 help, feel free to reach out:
               </p>
@@ -86,7 +87,7 @@ export default async function ConnectPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn delay={0.15}>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
               Socials
             </h2>
           </FadeIn>
@@ -106,18 +107,19 @@ export default async function ConnectPage() {
                         ? undefined
                         : "noopener noreferrer"
                     }
+                    aria-label={social.name}
                     className="group flex items-center gap-3 p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-10 hover:border-border transition-all duration-300"
                   >
                     <Icon
                       className="text-tertiary group-hover:text-accent-400 transition-colors shrink-0"
-                      size={16}
+                      size={20}
                     />
                     <div className="flex-grow min-w-0">
-                      <span className="text-xs uppercase tracking-widest text-tertiary group-hover:text-accent-400 transition-colors">
+                      <span className="text-sm uppercase tracking-widest text-tertiary group-hover:text-accent-400 transition-colors">
                         {social.name}
                       </span>
                       {social.description && (
-                        <span className="text-[10px] text-faint ml-2">
+                        <span className="text-xs text-faint ml-2">
                           {social.description}
                         </span>
                       )}
@@ -139,7 +141,7 @@ export default async function ConnectPage() {
         <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-1">
             <FadeIn delay={0.25}>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
                 Live Projects
               </h2>
             </FadeIn>
@@ -153,7 +155,8 @@ export default async function ConnectPage() {
                     href={project.links!.live!}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 bg-[rgba(var(--overlay-invert),0.4)] border border-border-subtle rounded-lg hover:border-accent-400/20 transition-all group"
+                    aria-label={`Visit ${project.title}`}
+                    className="flex items-center justify-between p-4 bg-[rgba(var(--overlay-invert),0.4)] border border-border-subtle rounded-lg hover:border-accent-400/20 transition-all group"
                   >
                     <div>
                       <span className="text-secondary text-sm font-medium">
@@ -179,7 +182,7 @@ export default async function ConnectPage() {
       <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
         <div className="col-span-1">
           <FadeIn delay={0.3}>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
               Message Me
             </h2>
           </FadeIn>

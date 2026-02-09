@@ -12,10 +12,12 @@ export default function ContactForm() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    setErrorMessage("");
 
     try {
       const res = await fetch("/api/send", {
@@ -29,12 +31,13 @@ export default function ContactForm() {
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
       posthog.capture("contact_form_submitted");
-      
+
       // Reset success message after 3 seconds
       setTimeout(() => setStatus("idle"), 3000);
     } catch (error) {
       console.error(error);
       setStatus("error");
+      setErrorMessage("Something went wrong. Please try again or email me directly.");
       posthog.capture("contact_form_error");
     }
   };
@@ -72,12 +75,24 @@ export default function ContactForm() {
           id="message"
           required
           rows={4}
+          maxLength={1000}
           className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint resize-none"
           placeholder="Your Message"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+              e.preventDefault();
+              handleSubmit(e as unknown as React.FormEvent);
+            }
+          }}
           disabled={status === "loading"}
         />
+        <div className="flex justify-end">
+          <span className={`text-xs ${formData.message.length > 1000 ? "text-red-400" : "text-faint"}`}>
+            {formData.message.length}/1000
+          </span>
+        </div>
       </div>
 
       <button
@@ -105,6 +120,9 @@ export default function ContactForm() {
           </>
         )}
       </button>
+      {errorMessage && (
+        <p className="text-red-400 text-xs mt-1">{errorMessage}</p>
+      )}
     </form>
   );
 }

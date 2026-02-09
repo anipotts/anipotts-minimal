@@ -42,6 +42,11 @@ export default async function WorkPage() {
           </FadeIn>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+          <FadeIn delay={0.05}>
+            <p className="text-secondary text-base leading-relaxed">
+              Projects, experiments, and open-source work. Click any to expand.
+            </p>
+          </FadeIn>
           <Suspense>
             <WorkFilteredList projects={projects} />
           </Suspense>

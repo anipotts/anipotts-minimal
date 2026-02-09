@@ -17,6 +17,9 @@ export {
   formatRelativeTime,
   truncate,
   slugify,
+  formatShortRelativeTime,
+  formatNumber,
+  parseTags,
 } from "./utils";
 
 // Constants

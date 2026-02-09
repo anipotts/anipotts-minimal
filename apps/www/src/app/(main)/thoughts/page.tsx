@@ -7,6 +7,17 @@ import { Suspense } from "react";
 
 export const revalidate = 60;
 
+interface ThoughtRow {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  created_at: string;
+  series_type: string | null;
+  tags: string | string[] | null;
+  views: number;
+}
+
 export const metadata: Metadata = {
   title: "thoughts",
   description: "Technical writings and reflections from ani potts",
@@ -27,22 +38,22 @@ export const metadata: Metadata = {
   },
 };
 
-async function getThoughts() {
+async function getThoughts(): Promise<ThoughtRow[]> {
   if (!supabase) return [];
   try {
     const { data } = await supabase
       .from("thoughts")
-      .select("id, title, slug, summary, created_at, series_type, tags, views, content")
+      .select("id, title, slug, summary, created_at, series_type, tags, views")
       .eq("published", true)
       .order("created_at", { ascending: false });
-    return data || [];
+    return (data as ThoughtRow[]) || [];
   } catch (e) {
     console.error("Error fetching thoughts:", e);
     return [];
   }
 }
 
-async function searchThoughts(query: string) {
+async function searchThoughts(query: string): Promise<ThoughtRow[]> {
   if (!supabase) return [];
   try {
     const { data, error } = await supabase.rpc("search_content", {
@@ -61,7 +72,7 @@ async function searchThoughts(query: string) {
     const slugs = thoughtResults.map((r) => r.slug);
     const { data: thoughts } = await supabase
       .from("thoughts")
-      .select("id, title, slug, summary, created_at, series_type, tags, views, content")
+      .select("id, title, slug, summary, created_at, series_type, tags, views")
       .eq("published", true)
       .in("slug", slugs);
 
@@ -69,7 +80,7 @@ async function searchThoughts(query: string) {
 
     // Sort by search rank
     const rankMap = new Map(thoughtResults.map((r) => [r.slug, r.rank]));
-    return thoughts.sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
+    return (thoughts as ThoughtRow[]).sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
   } catch (e) {
     console.error("Error searching thoughts:", e);
     return [];
@@ -104,26 +115,25 @@ export default async function ThoughtsPage({
         {!supabase ? (
           <FadeIn delay={0.1}>
             <div className="p-4 border border-border-subtle rounded-sm bg-input">
-              <p className="text-muted text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
+              <p className="text-muted text-sm">Database unavailable. Content will appear when the connection is restored.</p>
             </div>
           </FadeIn>
         ) : thoughts.length === 0 ? (
           <FadeIn delay={0.1}>
-            <p className="text-muted italic text-sm">
-              {query ? "No results found." : "No thoughts published yet."}
+            <p className="text-muted text-sm font-mono py-8 text-center">
+              {query ? (
+                <>no results for &quot;{query}&quot;. <a href="/thoughts" className="text-accent-400 hover:underline">clear search</a></>
+              ) : (
+                "no thoughts published yet. check back soon."
+              )}
             </p>
           </FadeIn>
         ) : (
-          thoughts.map((thought: any, i: number) => {
-            const readingTime = thought.content
-              ? Math.ceil(thought.content.split(/\s+/).length / 200)
-              : undefined;
-            return (
-              <FadeIn key={thought.slug} delay={i * 0.1} className="py-8 first:pt-0 last:pb-0">
-                <ThoughtLink thought={thought} readingTime={readingTime} />
-              </FadeIn>
-            );
-          })
+          thoughts.map((thought: ThoughtRow, i: number) => (
+            <FadeIn key={thought.slug} delay={i * 0.1} className="py-8 first:pt-0 last:pb-0">
+              <ThoughtLink thought={thought} />
+            </FadeIn>
+          ))
         )}
       </div>
     </div>

@@ -200,13 +200,13 @@ export default async function DevPage({
   const data = await fetchAllDevData();
 
   return (
-    <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-12 py-12 px-4 max-w-4xl mx-auto">
       <FadeIn>
         <div className="border-b border-border pb-6">
-          <h1 className="text-xs uppercase tracking-widest text-accent-400 mb-2">
+          <h1 className="text-sm uppercase tracking-widest text-accent-400 mb-2">
             Dev Dashboard
           </h1>
-          <p className="text-muted text-sm mb-4">
+          <p className="text-muted text-base mb-4">
             Tools, metrics, activity, and service status
           </p>
           <Suspense>
