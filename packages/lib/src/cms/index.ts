@@ -44,6 +44,7 @@ export async function fetchProjects(options?: {
   featured?: boolean;
   category?: string;
   visible?: boolean;
+  limit?: number;
 }) {
   if (!supabase) return FALLBACK_PROJECTS;
 
@@ -67,6 +68,10 @@ export async function fetchProjects(options?: {
       query = query.eq("category", options.category);
     }
 
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
+
     const { data, error } = await query;
     if (error) throw error;
     if (!data || data.length === 0) return FALLBACK_PROJECTS;
@@ -75,6 +80,47 @@ export async function fetchProjects(options?: {
   } catch (err) {
     console.warn("[cms] fetchProjects() unavailable, using fallback");
     return FALLBACK_PROJECTS;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Thoughts
+// ---------------------------------------------------------------------------
+
+export interface ThoughtSummary {
+  slug: string;
+  title: string;
+  summary: string;
+  created_at: string;
+  views?: number;
+}
+
+export async function fetchThoughts(options?: {
+  published?: boolean;
+  limit?: number;
+}): Promise<ThoughtSummary[]> {
+  if (!supabase) return [];
+
+  try {
+    let query = supabase
+      .from("thoughts")
+      .select("slug, title, summary, created_at, views")
+      .order("created_at", { ascending: false });
+
+    if (options?.published !== undefined) {
+      query = query.eq("published", options.published);
+    }
+
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data as ThoughtSummary[]) ?? [];
+  } catch (err) {
+    console.warn("[cms] fetchThoughts() unavailable, using fallback");
+    return [];
   }
 }
 

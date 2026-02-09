@@ -33,7 +33,7 @@ export default function StackSection({
       {/* Language breakdown from GitHub */}
       <FadeIn delay={0.05}>
         <div className="p-5 bg-input border border-border rounded-lg">
-          <h2 className="text-xs uppercase tracking-widest text-muted mb-4">
+          <h2 className="text-sm uppercase tracking-widest text-muted mb-4">
             Languages
             {languages && (
               <span className="text-faint font-normal ml-2">
@@ -124,7 +124,7 @@ export default function StackSection({
         {categories.map((category, i) => (
           <FadeIn key={category.name} delay={0.1 + i * 0.05}>
             <div className="p-5 bg-input border border-border rounded-lg hover:border-accent-400/20 transition-colors">
-              <h2 className="text-xs uppercase tracking-widest text-muted mb-4">
+              <h2 className="text-sm uppercase tracking-widest text-muted mb-4">
                 {category.name}
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -145,7 +145,7 @@ export default function StackSection({
       {/* Terminal config */}
       <FadeIn delay={0.4}>
         <div className="p-5 bg-accent-400/5 border border-accent-400/20 rounded-lg">
-          <h2 className="text-xs uppercase tracking-widest text-accent-400 mb-3">
+          <h2 className="text-sm uppercase tracking-widest text-accent-400 mb-3">
             Terminal Config
           </h2>
           <pre className="text-xs text-tertiary font-mono overflow-x-auto">

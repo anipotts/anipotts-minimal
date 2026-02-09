@@ -38,9 +38,9 @@ export default function DevSectionTabs() {
         <button
           key={tab.key}
           onClick={() => handleTab(tab.key)}
-          className={`px-3 py-1 text-[10px] uppercase tracking-wider rounded-sm border transition-all duration-300 ${
+          className={`px-3 py-2 text-xs uppercase tracking-wider rounded-sm border transition-all duration-300 ${
             current === tab.key
-              ? "border-accent-400 text-accent-400 bg-accent-400/10"
+              ? "border-accent-400 text-accent-400 bg-accent-400/10 shadow-sm"
               : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
           }`}
         >

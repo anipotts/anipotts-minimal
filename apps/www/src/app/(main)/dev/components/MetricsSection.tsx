@@ -1,19 +1,6 @@
 import { FadeIn } from "@anipotts/ui";
+import { formatNumber, formatShortRelativeTime } from "@anipotts/lib";
 import type { GitHubStats, WakaTimeStats } from "@anipotts/lib/metrics";
-
-function formatNumber(n: number): string {
-  return n.toLocaleString("en-US");
-}
-
-function formatRelativeTime(isoString: string | null): string {
-  if (!isoString) return "never";
-  const diff = Date.now() - new Date(isoString).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
 
 export default function MetricsSection({
   github,
@@ -36,12 +23,12 @@ export default function MetricsSection({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {statCards.map((stat, i) => (
           <FadeIn key={stat.label} delay={i * 0.05}>
-            <div className="p-4 bg-input border border-border rounded-lg">
-              <div className="text-muted text-xs mb-2">{stat.label}</div>
-              <span className="text-2xl font-bold text-body">{stat.value}</span>
+            <div className="p-6 bg-input border border-border rounded-lg">
+              <div className="text-muted text-sm mb-2">{stat.label}</div>
+              <span className="text-3xl font-bold text-body">{stat.value}</span>
             </div>
           </FadeIn>
         ))}
@@ -101,7 +88,7 @@ export default function MetricsSection({
             </a>
             {lastUpdated && (
               <span className="ml-2 text-faint">
-                updated {formatRelativeTime(lastUpdated)}
+                updated {formatShortRelativeTime(lastUpdated)}
               </span>
             )}
           </p>

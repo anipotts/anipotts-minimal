@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { supabase } from "@/lib/supabaseClient";
+import { parseTags } from "@anipotts/lib";
 import ReactMarkdown from "react-markdown";
 import { FadeIn } from "@anipotts/ui";
 import { cache } from "react";
@@ -88,29 +89,31 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
-  const tags = thought.tags
-    ? (Array.isArray(thought.tags) ? thought.tags : thought.tags.split(','))
-    : [];
+  const tags = parseTags(thought.tags);
+  const readingTime = thought.content ? Math.ceil(thought.content.split(/\s+/).length / 200) : null;
 
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
       <IncrementView slug={thought.slug} />
 
       <FadeIn>
-        <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors">
-          ← back to thoughts
+        <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1">
+          <ArrowLeft size={12} /> back to thoughts
         </Link>
       </FadeIn>
 
       <FadeIn delay={0.1}>
         <div className="border-b border-border pb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-body leading-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-body leading-tight mb-4">
             {thought.title}
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
             <time dateTime={thought.created_at}>
               {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </time>
+            {readingTime && (
+              <span className="text-faint">· {readingTime} min read</span>
+            )}
             <ViewCounter slug={thought.slug} initialViews={thought.views} />
           </div>
           {tags.length > 0 && (

@@ -1,17 +1,7 @@
 import { FadeIn } from "@anipotts/ui";
+import { formatShortRelativeTime } from "@anipotts/lib";
 import type { ServiceStatus } from "@anipotts/lib/status";
 import { monitoredServices } from "@anipotts/lib/data";
-
-function formatRelativeTime(isoString: string | null): string {
-  if (!isoString) return "never";
-  const diff = Date.now() - new Date(isoString).getTime();
-  const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
-}
 
 export default function StatusSection({
   services,
@@ -53,17 +43,17 @@ export default function StatusSection({
             </span>
           </div>
           <span className="text-[10px] text-faint">
-            checked {formatRelativeTime(lastChecked)}
+            checked {formatShortRelativeTime(lastChecked)}
           </span>
         </div>
       </FadeIn>
 
       <FadeIn delay={0.05}>
         <div>
-          <h2 className="text-[10px] uppercase tracking-widest text-muted mb-2">
+          <h2 className="text-xs uppercase tracking-widest text-muted mb-2">
             ecosystem
           </h2>
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {ecosystemServices.map((service) => (
               <a
                 key={service.serviceUrl}
@@ -80,10 +70,13 @@ export default function StatusSection({
                       : "bg-red-500 animate-pulse"
                   }`}
                 />
-                <span className="text-xs text-secondary truncate group-hover:text-accent-400 transition-colors">
+                <span className="text-sm text-secondary truncate group-hover:text-accent-400 transition-colors">
                   {service.serviceName
                     .replace(".anipotts.com", "")
                     .replace("anipotts.com", "www")}
+                </span>
+                <span className="text-[10px] text-faint ml-auto shrink-0">
+                  {service.isUp ? "online" : "down"}
                 </span>
               </a>
             ))}
@@ -94,7 +87,7 @@ export default function StatusSection({
       {projectServices.length > 0 && (
         <FadeIn delay={0.1}>
           <div>
-            <h2 className="text-[10px] uppercase tracking-widest text-muted mb-2">
+            <h2 className="text-xs uppercase tracking-widest text-muted mb-2">
               projects
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -114,8 +107,11 @@ export default function StatusSection({
                         : "bg-red-500 animate-pulse"
                     }`}
                   />
-                  <span className="text-xs text-secondary truncate group-hover:text-accent-400 transition-colors">
+                  <span className="text-sm text-secondary truncate group-hover:text-accent-400 transition-colors">
                     {service.serviceName}
+                  </span>
+                  <span className="text-[10px] text-faint ml-auto shrink-0">
+                    {service.isUp ? "online" : "down"}
                   </span>
                 </a>
               ))}
