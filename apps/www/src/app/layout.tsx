@@ -20,6 +20,7 @@ import AdminOverlay from "@/components/admin/AdminOverlay";
 import PersonSchema from "@/components/PersonSchema";
 import TerminalNavigatorWrapper from "@/components/TerminalNavigatorWrapper";
 import TerminalHeaderWrapper from "@/components/TerminalHeaderWrapper";
+import { fetchSiteConfig } from "@anipotts/lib/cms";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -27,98 +28,105 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://anipotts.com"),
-  title: {
-    default: "ani potts",
-    template: "%s | ani potts",
-  },
-  description:
-    "software engineer in nyc building minimal interfaces to orchestrate complex systems",
-  keywords: [
-    "ani potts",
-    "anirudh pottammal",
-    "software engineer",
-    "nyc",
-    "developer",
-    "nyu",
-  ],
-  authors: [{ name: "ani potts", url: "https://anipotts.com" }],
-  creator: "ani potts",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://anipotts.com",
-    siteName: "ani potts",
-    title: "ani potts",
-    description:
-      "software engineer in nyc building minimal interfaces to orchestrate complex systems",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "ani potts",
-      },
+export async function generateMetadata(): Promise<Metadata> {
+  const siteConfig = await fetchSiteConfig();
+
+  const nameLower = siteConfig.name.toLowerCase();
+  const description = `${siteConfig.title.toLowerCase()} in ${siteConfig.location.toLowerCase()} building minimal interfaces to orchestrate complex systems`;
+
+  return {
+    metadataBase: new URL(siteConfig.url),
+    title: {
+      default: nameLower,
+      template: `%s | ${nameLower}`,
+    },
+    description,
+    keywords: [
+      "ani potts",
+      "anirudh pottammal",
+      "software engineer",
+      "nyc",
+      "developer",
+      "nyu",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: "@anipottsbuilds",
-    site: "@anipottsbuilds",
-    title: "ani potts",
-    description:
-      "software engineer in nyc building minimal interfaces to orchestrate complex systems",
-    images: ["/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    authors: [{ name: nameLower, url: siteConfig.url }],
+    creator: nameLower,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: siteConfig.url,
+      siteName: nameLower,
+      title: nameLower,
+      description,
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: nameLower,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      creator: siteConfig.handle,
+      site: siteConfig.handle,
+      title: nameLower,
+      description,
+      images: [siteConfig.ogImage],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-  alternates: {
-    canonical: "https://anipotts.com",
-  },
-  icons: {
-    icon: [
-      {
-        url: "/api/icon?text=ap&scheme=dark",
-        type: "image/png",
-        sizes: "32x32",
-        media: "(prefers-color-scheme: dark)",
+    alternates: {
+      canonical: siteConfig.url,
+      types: {
+        "application/rss+xml": `${siteConfig.url}/feed.xml`,
       },
-      {
-        url: "/api/icon?text=ap&scheme=light",
-        type: "image/png",
-        sizes: "32x32",
-        media: "(prefers-color-scheme: light)",
-      },
-    ],
-    apple: [
-      {
-        url: "/api/icon?text=ap&scheme=dark",
-        sizes: "180x180",
-        type: "image/png",
-      },
-    ],
-  },
-  manifest: "/site.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "ani potts",
-  },
-  other: {
-    "msapplication-TileColor": "#0a0a0a",
-    "msapplication-config": "/browserconfig.xml",
-  },
-};
+    },
+    icons: {
+      icon: [
+        {
+          url: "/api/icon?text=ap&scheme=dark",
+          type: "image/png",
+          sizes: "32x32",
+          media: "(prefers-color-scheme: dark)",
+        },
+        {
+          url: "/api/icon?text=ap&scheme=light",
+          type: "image/png",
+          sizes: "32x32",
+          media: "(prefers-color-scheme: light)",
+        },
+      ],
+      apple: [
+        {
+          url: "/api/icon?text=ap&scheme=dark",
+          sizes: "180x180",
+          type: "image/png",
+        },
+      ],
+    },
+    manifest: "/site.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: nameLower,
+    },
+    other: {
+      "msapplication-TileColor": "#0a0a0a",
+      "msapplication-config": "/browserconfig.xml",
+    },
+  };
+}
 
 /**
  * Root layout for the consolidated single-app architecture.

@@ -4,6 +4,7 @@ import {
   fetchGitHubStats,
   fetchRepoLanguages,
   fetchRecentCommits,
+  fetchContributionCalendar,
   fetchWakaTimeStats,
   setCacheValue,
   CACHE_KEYS,
@@ -78,10 +79,24 @@ export async function GET(request: Request) {
       console.error("GitHub activity fetch failed:", err);
       results.github_activity = `error: ${err instanceof Error ? err.message : "unknown"}`;
     }
+
+    // Contribution calendar (for heatmap on dev page)
+    try {
+      const calendarDays = await fetchContributionCalendar(githubUsername, githubToken);
+      await setCacheValue(supabase, CACHE_KEYS.GITHUB_CALENDAR, {
+        days: calendarDays,
+        fetchedAt: new Date().toISOString(),
+      });
+      results.github_calendar = "ok";
+    } catch (err) {
+      console.error("GitHub calendar fetch failed:", err);
+      results.github_calendar = `error: ${err instanceof Error ? err.message : "unknown"}`;
+    }
   } else {
     results.github = "skipped (no GITHUB_TOKEN)";
     results.github_languages = "skipped (no GITHUB_TOKEN)";
     results.github_activity = "skipped (no GITHUB_TOKEN)";
+    results.github_calendar = "skipped (no GITHUB_TOKEN)";
   }
 
   // Fetch WakaTime stats

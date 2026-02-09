@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   FaCheck,
   FaCircle,
@@ -8,15 +8,19 @@ import {
   FaSearch,
   FaSave,
   FaTrash,
+  FaClock,
 } from "react-icons/fa";
 import {
   getAdminContent,
   upsertContent,
   deleteContent,
+  searchContent,
+  scheduleContent,
 } from "../actions";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { usePostHog } from "posthog-js/react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 import type { Thought, ContentType, SeriesType, ContentStatus, VoiceMode, Platform } from "@anipotts/types";
 
 type EditableContent = Partial<Thought> &
@@ -28,7 +32,12 @@ export default function ContentTab() {
   const [editing, setEditing] = useState<EditableContent | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    { type: string; id: string; slug: string; title: string; summary: string; rank: number }[] | null
+  >(null);
+  const [searching, setSearching] = useState(false);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchContent = async () => {
     try {
@@ -92,6 +101,53 @@ export default function ContentTab() {
     setUnsavedChanges(true);
   }, [editing]);
 
+  // Real-time subscription: refresh list when thoughts table changes
+  useEffect(() => {
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel("admin_thoughts_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "thoughts" },
+        () => {
+          // Only refresh the list, not the currently-editing item
+          fetchContent();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (supabase) supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Debounced full-text search
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!searchQuery.trim()) {
+      setSearchResults(null);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await searchContent(searchQuery.trim());
+        setSearchResults(results);
+      } catch {
+        setSearchResults(null);
+      }
+      setSearching(false);
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery]);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -135,31 +191,71 @@ export default function ContentTab() {
     setUnsavedChanges(false);
   };
 
-  const filteredContents = contents.filter(
-    (t) =>
-      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.slug.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleScheduleChange = async (dateValue: string) => {
+    if (!editing?.id) return;
+    const scheduledAt = dateValue ? new Date(dateValue).toISOString() : null;
+    try {
+      await scheduleContent(editing.id, scheduledAt);
+      setEditing({ ...editing, scheduled_at: scheduledAt ?? undefined });
+      setContents((prev) =>
+        prev.map((t) =>
+          t.id === editing.id
+            ? { ...t, scheduled_at: scheduledAt ?? undefined }
+            : t
+        )
+      );
+    } catch (err) {
+      console.error("Error scheduling:", err);
+    }
+  };
+
+  // Client-side filter when no search query; use search results when searching
+  const filteredContents = searchQuery.trim() && searchResults
+    ? searchResults
+        .filter((r) => r.type === "thought")
+        .map((r) => contents.find((c) => c.id === r.id))
+        .filter(Boolean) as Thought[]
+    : contents.filter(
+        (t) =>
+          t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          t.slug.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  // Format a date string to local datetime-local input value
+  const toDatetimeLocalValue = (isoStr?: string): string => {
+    if (!isoStr) return "";
+    const d = new Date(isoStr);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const showScheduler =
+    editing && (editing.status === "draft" || editing.status === "ready");
 
   return (
-    <div className="flex h-full border border-[var(--border)] rounded-lg overflow-hidden bg-[rgba(var(--overlay-invert),0.4)]">
+    <div className="flex h-full border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--input-bg)]">
       {/* Sidebar */}
-      <div className="w-64 border-r border-border flex flex-col bg-[rgba(var(--overlay-invert),0.2)]">
+      <div className="w-64 border-r border-border flex flex-col bg-[var(--card-darker)]">
         <div className="p-4 border-b border-border flex flex-col gap-3">
           <button
             onClick={startNew}
-            className="w-full bg-accent-400/10 hover:bg-accent-400/20 text-accent-400 border border-accent-400/20 py-2 rounded text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-accent-400/10 hover:bg-accent-400/20 text-accent-400 border border-accent-400/20 py-2.5 rounded text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
           >
             <FaPlus /> New Content
           </button>
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-faint text-xs" />
             <input
-              className="w-full bg-[rgba(var(--overlay-invert),0.4)] border border-border rounded py-1.5 pl-8 pr-2 text-xs text-secondary focus:border-accent-400/50 focus:outline-none"
+              className="w-full bg-[var(--input-bg)] border border-border rounded py-2.5 pl-8 pr-3 text-xs text-secondary focus:border-accent-400/50 focus:outline-none"
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {searching && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-faint animate-pulse">
+                ...
+              </span>
+            )}
           </div>
         </div>
 
@@ -168,7 +264,7 @@ export default function ContentTab() {
             <div
               key={content.id}
               onClick={() => setEditing(content)}
-              className={`p-3 border-b border-border-subtle cursor-pointer hover:bg-input transition-colors ${
+              className={`px-4 py-3 border-b border-border-subtle cursor-pointer hover:bg-input transition-colors ${
                 editing?.id === content.id
                   ? "bg-overlay-10 border-l-2 border-l-accent-400"
                   : "border-l-2 border-l-transparent"
@@ -176,9 +272,9 @@ export default function ContentTab() {
             >
               <div className="flex justify-between items-start mb-1">
                 <h4
-                  className={`text-xs font-bold truncate pr-2 ${
+                  className={`text-sm font-medium truncate pr-2 ${
                     editing?.id === content.id
-                      ? "text-white"
+                      ? "text-body"
                       : "text-tertiary"
                   }`}
                 >
@@ -188,7 +284,7 @@ export default function ContentTab() {
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
                 )}
               </div>
-              <div className="flex justify-between items-center text-[10px] text-faint font-mono">
+              <div className="flex justify-between items-center text-[11px] text-faint font-mono">
                 <span className="truncate max-w-[100px]">{content.slug}</span>
                 <span>
                   {new Date(content.created_at).toLocaleDateString(undefined, {
@@ -198,7 +294,13 @@ export default function ContentTab() {
                 </span>
               </div>
               {content.status && (
-                <span className="text-[9px] text-muted mt-1 inline-block">
+                <span className={`text-[11px] font-semibold mt-1.5 inline-block px-2.5 py-1 rounded ${
+                  content.status === "idea" ? "bg-blue-500/15 text-blue-400" :
+                  content.status === "draft" ? "bg-yellow-500/15 text-yellow-300" :
+                  content.status === "ready" ? "bg-orange-500/15 text-orange-400" :
+                  content.status === "atomized" ? "bg-purple-500/15 text-purple-400" :
+                  "bg-green-500/15 text-green-400"
+                }`}>
                   {content.status}
                 </span>
               )}
@@ -216,7 +318,7 @@ export default function ContentTab() {
               <div className="flex items-center gap-4 flex-grow">
                 <div className="flex flex-col w-full">
                   <input
-                    className="bg-transparent text-sm font-bold text-white focus:outline-none w-full placeholder-faint"
+                    className="bg-transparent text-lg font-semibold text-body focus:outline-none w-full placeholder-faint"
                     placeholder="Content Title"
                     value={editing.title}
                     onChange={(e) =>
@@ -233,7 +335,7 @@ export default function ContentTab() {
                     }
                   />
                   <input
-                    className="bg-transparent text-xs text-tertiary focus:outline-none w-full placeholder-faint mt-1 font-mono"
+                    className="bg-transparent text-[13px] text-tertiary focus:outline-none w-full placeholder-faint mt-1 font-mono"
                     placeholder="Summary"
                     value={editing.summary || ""}
                     onChange={(e) =>
@@ -245,7 +347,7 @@ export default function ContentTab() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 mr-4">
                   <span
-                    className={`text-[10px] uppercase tracking-wider ${
+                    className={`text-[11px] uppercase tracking-wider ${
                       unsavedChanges ? "text-yellow-500" : "text-faint"
                     }`}
                   >
@@ -262,7 +364,7 @@ export default function ContentTab() {
                 <button
                   onClick={(e) => handleSave(e)}
                   disabled={loading}
-                  className="bg-overlay-10 hover:bg-overlay-20 text-white px-4 py-1.5 rounded text-xs font-mono uppercase tracking-wider flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="bg-overlay-10 hover:bg-overlay-20 text-body px-4 py-2.5 rounded text-xs font-mono uppercase tracking-wider flex items-center gap-2 transition-colors disabled:opacity-50"
                 >
                   <FaSave /> {loading ? "Saving..." : "Save"}
                 </button>
@@ -270,9 +372,9 @@ export default function ContentTab() {
             </div>
 
             {/* Metadata Bar */}
-            <div className="px-6 py-3 border-b border-border flex gap-4 items-center bg-[rgba(var(--overlay-invert),0.2)] flex-wrap">
+            <div className="px-6 py-3 border-b border-border flex gap-4 items-center bg-[var(--card-darker)] flex-wrap">
               <div className="flex items-center gap-2 min-w-[150px]">
-                <span className="text-[10px] text-muted uppercase tracking-widest font-mono">
+                <span className="text-[11px] text-muted uppercase tracking-wide font-mono">
                   Slug:
                 </span>
                 <input
@@ -289,7 +391,7 @@ export default function ContentTab() {
 
               {/* Status Select */}
               <select
-                className="bg-input border border-border text-xs text-secondary font-mono rounded px-2 py-1 focus:border-accent-400/50 focus:outline-none"
+                className="bg-input border border-border text-xs text-secondary font-mono rounded px-3 py-2.5 focus:border-accent-400/50 focus:outline-none"
                 value={editing.status || "draft"}
                 onChange={(e) =>
                   setEditing({
@@ -304,11 +406,38 @@ export default function ContentTab() {
                 <option value="atomized">Atomized</option>
               </select>
 
+              {/* Schedule date-time picker (only for draft/ready) */}
+              {showScheduler && (
+                <>
+                  <div className="w-px h-4 bg-border" />
+                  <div className="flex items-center gap-2">
+                    <FaClock className="w-3 h-3 text-blue-400" />
+                    <span className="text-[11px] text-muted uppercase tracking-wide font-mono">
+                      Schedule:
+                    </span>
+                    <input
+                      type="datetime-local"
+                      className="bg-input border border-border text-xs text-secondary font-mono rounded px-3 py-2.5 focus:border-accent-400/50 focus:outline-none"
+                      value={toDatetimeLocalValue((editing as Thought).scheduled_at)}
+                      onChange={(e) => handleScheduleChange(e.target.value)}
+                    />
+                    {(editing as Thought).scheduled_at && (
+                      <button
+                        onClick={() => handleScheduleChange("")}
+                        className="text-[11px] text-red-400 hover:text-red-300 font-mono"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+
               <div className="w-px h-4 bg-border" />
 
               {/* Tags Input */}
               <div className="flex items-center gap-2 flex-grow">
-                <span className="text-[10px] text-muted uppercase tracking-widest font-mono">
+                <span className="text-[11px] text-muted uppercase tracking-wide font-mono">
                   Tags:
                 </span>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -316,7 +445,7 @@ export default function ContentTab() {
                     (tag: string) => (
                       <span
                         key={tag}
-                        className="bg-overlay-10 text-secondary px-1.5 py-0.5 rounded text-[10px] font-mono flex items-center gap-1"
+                        className="bg-overlay-10 text-secondary px-2.5 py-1 rounded text-[11px] font-mono flex items-center gap-1"
                       >
                         {tag}
                         <button
@@ -373,7 +502,7 @@ export default function ContentTab() {
                   className="accent-accent-400"
                 />
                 <span
-                  className={`text-[10px] uppercase tracking-widest font-mono ${
+                  className={`text-[11px] uppercase tracking-wide font-mono ${
                     editing.published ? "text-green-400" : "text-muted"
                   }`}
                 >
@@ -397,7 +526,7 @@ export default function ContentTab() {
             <div className="w-16 h-16 rounded-full bg-input flex items-center justify-center text-2xl">
               <FaCircle className="text-faint" />
             </div>
-            <p className="font-mono text-xs uppercase tracking-widest">
+            <p className="font-mono text-[13px] uppercase tracking-wide">
               Select content or create new
             </p>
           </div>

@@ -152,3 +152,21 @@ export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
     return {};
   }
 }
+
+// ---------------------------------------------------------------------------
+// Merged site config (CMS overrides static defaults)
+// ---------------------------------------------------------------------------
+
+export async function fetchSiteConfig() {
+  const { site } = await import("../data/site");
+  const settings = await fetchAllSiteSettings();
+  return {
+    ...site,
+    name: settings.site_name || site.name,
+    title: settings.site_title || site.title,
+    location: settings.site_location || site.location,
+    bio: settings.site_bio || site.bio,
+    shortBio: settings.site_short_bio || site.shortBio,
+    email: settings.site_email || site.email,
+  };
+}

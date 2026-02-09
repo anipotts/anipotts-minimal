@@ -27,10 +27,10 @@ const StatCard = memo(function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-[var(--overlay-5)] border border-[var(--border)] rounded-lg p-3 flex flex-col">
-      <Icon className={`w-4 h-4 ${color} mb-1.5`} />
+    <div className="bg-[var(--overlay-5)] border border-[var(--border)] rounded-lg p-4 flex flex-col">
+      <Icon className={`w-4 h-4 ${color} mb-2`} />
       <div className="text-2xl font-bold text-[var(--text-primary)]">{value}</div>
-      <div className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide font-medium">{label}</div>
+      <div className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide font-medium mt-1">{label}</div>
     </div>
   );
 });
@@ -50,7 +50,7 @@ const ProgressBar = memo(function ProgressBar({
   const pct = total > 0 ? (count / total) * 100 : 0;
   return (
     <div>
-      <div className="flex justify-between text-xs mb-1">
+      <div className="flex justify-between text-sm mb-1">
         <span className="text-[var(--text-secondary)] capitalize font-medium">{label}</span>
         <span className="text-[var(--text-tertiary)] font-bold">{count}</span>
       </div>
@@ -166,8 +166,8 @@ export default memo(function AnalyticsTab() {
       <div className="grid grid-cols-2 grid-rows-2 gap-3 min-h-0">
         {/* By Status */}
         <div className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg flex flex-col overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
-            <span className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">By Status</span>
+          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
+            <span className="text-[15px] font-semibold text-[var(--text-secondary)]">By Status</span>
           </div>
           <div className="flex-1 p-4 flex flex-col justify-center gap-3 overflow-hidden">
             {Object.entries(stats.byStatus).map(([status, count]) => (
@@ -178,8 +178,8 @@ export default memo(function AnalyticsTab() {
 
         {/* By Series */}
         <div className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg flex flex-col overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
-            <span className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">By Series</span>
+          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
+            <span className="text-[15px] font-semibold text-[var(--text-secondary)]">By Series</span>
           </div>
           <div className="flex-1 p-4 flex flex-col justify-center gap-3 overflow-hidden">
             {seriesEntries.length === 0 ? (
@@ -194,18 +194,18 @@ export default memo(function AnalyticsTab() {
 
         {/* Top Content */}
         <div className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg flex flex-col overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
-            <span className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">Top Content</span>
+          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
+            <span className="text-[15px] font-semibold text-[var(--text-secondary)]">Top Content</span>
           </div>
           <div className="flex-1 flex flex-col justify-center divide-y divide-[var(--border)] overflow-hidden">
             {topContent.length === 0 ? (
               <span className="text-xs text-[var(--text-muted)] text-center p-4">No content yet</span>
             ) : (
               topContent.map((item, i) => (
-                <div key={item.id} className="px-4 py-2.5 flex items-center gap-3 hover:bg-[var(--overlay-5)] transition-colors">
+                <div key={item.id} className="px-4 py-3 flex items-center gap-3 hover:bg-[var(--overlay-5)] transition-colors">
                   <span className="text-xs font-bold text-[var(--text-muted)] w-4">{i + 1}.</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-[var(--text-primary)] truncate font-medium">{item.title || "Untitled"}</p>
+                    <p className="text-sm text-[var(--text-primary)] truncate font-medium">{item.title || "Untitled"}</p>
                   </div>
                   <span className="text-xs font-bold text-[var(--accent-400)]">{item.views || 0}</span>
                 </div>
@@ -216,8 +216,8 @@ export default memo(function AnalyticsTab() {
 
         {/* Atoms by Platform */}
         <div className="bg-[var(--overlay-3)] border border-[var(--border)] rounded-lg flex flex-col overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
-            <span className="text-xs font-mono uppercase tracking-wide text-[var(--text-secondary)] font-semibold">By Platform</span>
+          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--overlay-5)] shrink-0">
+            <span className="text-[15px] font-semibold text-[var(--text-secondary)]">By Platform</span>
           </div>
           <div className="flex-1 p-4 flex flex-wrap items-center justify-center gap-2 content-center overflow-hidden">
             {platformEntries.length === 0 ? (

@@ -413,16 +413,23 @@ export async function updatePageContent(
   if (!isAuth) return { success: false as const, error: "Unauthorized" };
 
   try {
-    // Fetch current version for optimistic concurrency
-    const { data: current } = await supabase
+    // Fetch current row for optimistic concurrency + version history
+    const { data: currentRow } = await supabase
       .from("page_content")
-      .select("version")
+      .select("version, content, version_history, updated_at")
       .eq("page_key", pageKey)
       .order("version", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    const currentVersion = (current as { version: number } | null)?.version ?? 0;
+    const typedRow = currentRow as {
+      version: number;
+      content: unknown;
+      version_history: unknown[] | null;
+      updated_at: string;
+    } | null;
+
+    const currentVersion = typedRow?.version ?? 0;
 
     if (expectedVersion !== undefined && currentVersion !== expectedVersion) {
       return {
@@ -431,6 +438,22 @@ export async function updatePageContent(
       };
     }
 
+    // Build version history: push current content as a snapshot before overwriting
+    const existingHistory = Array.isArray(typedRow?.version_history)
+      ? typedRow.version_history
+      : [];
+
+    const newHistory = typedRow
+      ? [
+          ...existingHistory,
+          {
+            version: currentVersion,
+            content: typedRow.content,
+            updated_at: typedRow.updated_at,
+          },
+        ]
+      : existingHistory;
+
     const { data, error } = await supabase
       .from("page_content")
       .upsert(
@@ -438,6 +461,7 @@ export async function updatePageContent(
           page_key: pageKey,
           content,
           version: currentVersion + 1,
+          version_history: newHistory,
           published: true,
           updated_at: new Date().toISOString(),
           updated_by: "admin",
@@ -583,6 +607,30 @@ export async function deleteProject(id: string) {
     return { success: true as const };
   } catch (err) {
     console.error("Error deleting project:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function toggleProjectFeatured(id: string, featured: boolean) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .update({ featured, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true as const, data: data as ProjectRow };
+  } catch (err) {
+    console.error("Error toggling project featured:", err);
     return {
       success: false as const,
       error: err instanceof Error ? err.message : "Unknown error",
@@ -741,4 +789,159 @@ export async function updateSiteSetting(key: string, value: string) {
       error: err instanceof Error ? err.message : "Unknown error",
     };
   }
+}
+
+// ============================================================================
+// FULL-TEXT SEARCH (Phase 6a)
+// ============================================================================
+
+export async function searchContent(
+  query: string
+): Promise<
+  { type: string; id: string; slug: string; title: string; summary: string; rank: number }[]
+> {
+  if (!supabase) return [];
+  const isAuth = await checkAuth();
+  if (!isAuth) return [];
+
+  try {
+    const { data, error } = await supabase.rpc("search_content", {
+      query,
+      lim: 20,
+    });
+    if (error) throw error;
+    return (data as { type: string; id: string; slug: string; title: string; summary: string; rank: number }[]) ?? [];
+  } catch (err) {
+    console.error("Error searching content:", err);
+    return [];
+  }
+}
+
+// ============================================================================
+// CONTENT SCHEDULING (Phase 6b)
+// ============================================================================
+
+export async function scheduleContent(
+  thoughtId: string,
+  scheduledAt: string | null
+) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    const { error } = await supabase
+      .from("thoughts")
+      .update({ scheduled_at: scheduledAt })
+      .eq("id", thoughtId);
+    if (error) throw error;
+    return { success: true as const };
+  } catch (err) {
+    console.error("Error scheduling content:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function getScheduledContent(): Promise<Thought[]> {
+  if (!supabase) return [];
+  const isAuth = await checkAuth();
+  if (!isAuth) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from("thoughts")
+      .select("*")
+      .not("scheduled_at", "is", null)
+      .eq("published", false)
+      .order("scheduled_at", { ascending: true });
+
+    if (error) throw error;
+    return (data || []) as Thought[];
+  } catch (err) {
+    console.error("Error fetching scheduled content:", err);
+    return [];
+  }
+}
+
+// ============================================================================
+// CONTENT VERSIONING (Phase 6c)
+// ============================================================================
+
+export async function getPageContentVersions(
+  pageKey: string
+): Promise<{ version: number; content: unknown; updated_at: string }[]> {
+  if (!supabase) return [];
+  const isAuth = await checkAuth();
+  if (!isAuth) return [];
+
+  try {
+    const { data } = await supabase
+      .from("page_content")
+      .select("version_history")
+      .eq("page_key", pageKey)
+      .maybeSingle();
+
+    return (data as { version_history: { version: number; content: unknown; updated_at: string }[] } | null)?.version_history ?? [];
+  } catch (err) {
+    console.error("Error fetching page content versions:", err);
+    return [];
+  }
+}
+
+export async function restorePageContentVersion(
+  pageKey: string,
+  versionContent: unknown
+) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  try {
+    return await updatePageContent(pageKey, versionContent as object);
+  } catch (err) {
+    console.error("Error restoring page content version:", err);
+    return {
+      success: false as const,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+// ============================================================================
+// CONTACT SUBMISSIONS (Phase 7b)
+// ============================================================================
+
+export async function getContactSubmissions() {
+  if (!supabase) return [];
+  const isAuth = await checkAuth();
+  if (!isAuth) return [];
+
+  const { data, error } = await supabase
+    .from("contact_submissions")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error("Error fetching contact submissions:", error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function updateSubmissionStatus(id: string, status: string) {
+  if (!supabase) return { success: false as const, error: "Supabase not configured" };
+  const isAuth = await checkAuth();
+  if (!isAuth) return { success: false as const, error: "Unauthorized" };
+
+  const { error } = await supabase
+    .from("contact_submissions")
+    .update({ status })
+    .eq("id", id);
+
+  if (error) return { success: false as const, error: error.message };
+  return { success: true as const };
 }

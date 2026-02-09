@@ -9,6 +9,7 @@ import type {
   GitHubStats,
   GitHubRecentActivity,
   WakaTimeStats,
+  ContributionDay,
 } from "@anipotts/lib/metrics";
 import type { ServiceStatus } from "@anipotts/lib/status";
 import type { Metadata } from "next";
@@ -18,6 +19,8 @@ import type { DevSection } from "./components/DevSectionTabs";
 import StackSection from "./components/StackSection";
 import MetricsSection from "./components/MetricsSection";
 import ActivitySection from "./components/ActivitySection";
+import type { GitHubEvent } from "./components/ActivitySection";
+import ContributionHeatmap from "./components/ContributionHeatmap";
 import StatusSection from "./components/StatusSection";
 
 export const revalidate = 3600;
@@ -74,6 +77,9 @@ async function fetchAllDevData() {
       metricsUpdated: null as string | null,
       commits: [] as GitHubRecentActivity["commits"],
       activityFetchedAt: null as string | null,
+      calendarDays: [] as ContributionDay[],
+      calendarFetchedAt: null as string | null,
+      githubEvents: [] as GitHubEvent[],
       services: monitoredServices.map((s) => ({
         serviceName: s.name,
         serviceUrl: s.url,
@@ -90,7 +96,7 @@ async function fetchAllDevData() {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const [languagesResult, githubRow, wakatimeRow, activityResult, services] =
+  const [languagesResult, githubRow, wakatimeRow, activityResult, calendarResult, services, eventsResult] =
     await Promise.all([
       getCacheValue<GitHubLanguageBreakdown>(
         supabase,
@@ -118,7 +124,20 @@ async function fetchAllDevData() {
         supabase,
         CACHE_KEYS.GITHUB_ACTIVITY,
       ).catch(() => null),
+      getCacheValue<{ days: ContributionDay[]; fetchedAt: string }>(
+        supabase,
+        CACHE_KEYS.GITHUB_CALENDAR,
+      ).catch(() => null),
       getServiceStatuses(supabase).catch(() => [] as ServiceStatus[]),
+      Promise.resolve(
+        supabase
+          .from("github_events")
+          .select("id, event_type, event_action, repo, repo_url, payload, github_timestamp")
+          .order("github_timestamp", { ascending: false })
+          .limit(100),
+      )
+        .then((r) => (r.data ?? []) as GitHubEvent[])
+        .catch(() => [] as GitHubEvent[]),
     ]);
 
   const github = (githubRow?.value as GitHubStats) ?? FALLBACK_GITHUB;
@@ -163,6 +182,9 @@ async function fetchAllDevData() {
     metricsUpdated,
     commits: activityResult?.value.commits ?? [],
     activityFetchedAt: activityResult?.value.fetchedAt ?? null,
+    calendarDays: calendarResult?.value.days ?? [],
+    calendarFetchedAt: calendarResult?.value.fetchedAt ?? null,
+    githubEvents: eventsResult,
     services: finalServices as ServiceStatus[],
     statusLastChecked,
   };
@@ -202,10 +224,18 @@ export default async function DevPage({
         />
       )}
       {section === "activity" && (
-        <ActivitySection
-          commits={data.commits}
-          fetchedAt={data.activityFetchedAt}
-        />
+        <>
+          <ContributionHeatmap
+            days={data.calendarDays}
+            fetchedAt={data.calendarFetchedAt}
+          />
+          <ActivitySection
+            commits={data.commits}
+            events={data.githubEvents}
+            fetchedAt={data.activityFetchedAt}
+            isLive={data.githubEvents.length > 0}
+          />
+        </>
       )}
       {section === "status" && (
         <StatusSection

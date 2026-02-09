@@ -1,0 +1,54 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+
+/**
+ * Search input for the /thoughts page.
+ * Syncs with ?q= search param via router.push for server-side search.
+ */
+export default function ThoughtsSearch() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync from URL on navigation
+  useEffect(() => {
+    setQuery(searchParams.get("q") ?? "");
+  }, [searchParams]);
+
+  const handleChange = (value: string) => {
+    setQuery(value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      if (value.trim()) {
+        router.push(`/thoughts?q=${encodeURIComponent(value.trim())}`);
+      } else {
+        router.push("/thoughts");
+      }
+    }, 400);
+  };
+
+  return (
+    <div className="relative max-w-md">
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="Search thoughts..."
+        className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-md py-2.5 px-4 text-sm text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-400)]/50 focus:outline-none transition-colors"
+      />
+      {query && (
+        <button
+          onClick={() => handleChange("")}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] text-xs"
+        >
+          Clear
+        </button>
+      )}
+    </div>
+  );
+}

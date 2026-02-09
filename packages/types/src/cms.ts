@@ -68,6 +68,8 @@ export interface ProjectRow {
   status: ProjectStatus;
   featured: boolean;
   icon: string | null;
+  image_url?: string | null;
+  thumbnail_url?: string | null;
   link_live: string | null;
   link_repo: string | null;
   link_page: string | null;
