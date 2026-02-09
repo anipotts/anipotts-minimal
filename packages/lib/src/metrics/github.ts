@@ -250,8 +250,9 @@ export async function fetchRepoLanguages(
   }
 
   const repos: { name: string; fork: boolean }[] = await reposRes.json();
-  // Skip forks — they inflate language counts with code you didn't write
-  const ownRepos = repos.filter((r) => !r.fork);
+  // Skip forks and legacy repos that skew byte counts
+  const EXCLUDED_REPOS = ["luminator", "kdb-spy"];
+  const ownRepos = repos.filter((r) => !r.fork && !EXCLUDED_REPOS.includes(r.name));
 
   // Fetch language bytes for each repo (in parallel, batched)
   const langTotals = new Map<string, number>();

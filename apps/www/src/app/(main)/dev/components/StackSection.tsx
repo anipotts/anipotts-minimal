@@ -37,7 +37,7 @@ export default function StackSection({
             Languages
             {languages && (
               <span className="text-faint font-normal ml-2">
-                {languages.repoCount} repos
+                {languages.repoCount} public repos
               </span>
             )}
           </h2>
@@ -99,7 +99,7 @@ export default function StackSection({
 
                   <p className="text-[10px] text-faint mt-2 font-mono">
                     {formatBytes(languages.totalBytes)} across{" "}
-                    {languages.repoCount} repos
+                    {languages.repoCount} public repos
                   </p>
                 </>
               );
