@@ -1,8 +1,12 @@
 import { MetadataRoute } from 'next';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@anipotts/lib/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://anipotts.com';
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
   const staticPages: MetadataRoute.Sitemap = [
     {

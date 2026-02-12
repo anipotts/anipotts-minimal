@@ -92,9 +92,36 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
   const tags = parseTags(thought.tags);
   const readingTime = thought.content ? Math.ceil(thought.content.split(/\s+/).length / 200) : null;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: thought.title,
+    description: thought.summary || thought.title,
+    datePublished: thought.created_at,
+    dateModified: thought.updated_at || thought.created_at,
+    author: {
+      "@type": "Person",
+      name: "Ani Potts",
+      url: "https://anipotts.com",
+    },
+    publisher: {
+      "@type": "Person",
+      name: "Ani Potts",
+      url: "https://anipotts.com",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://anipotts.com/thoughts/${thought.slug}`,
+    },
+  };
+
   return (
     <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
       <IncrementView slug={thought.slug} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <FadeIn>
         <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1">
