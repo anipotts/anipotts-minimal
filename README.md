@@ -4,12 +4,12 @@
 
 1.  **Install dependencies:**
     ```bash
-    npm install
+    pnpm install
     ```
 
 2.  **Run development server:**
     ```bash
-    npm run dev
+    pnpm dev
     ```
     Open [http://localhost:3000](http://localhost:3000) to view it.
 
