@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 
 import WorkFilteredList from "./WorkFilteredList";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "work",

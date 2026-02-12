@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { AdminPanel, AdminPanelContent, type AdminTabId, type AdminScope } from "@anipotts/ui/admin";
 import { useTheme } from "@anipotts/ui";
@@ -40,22 +40,31 @@ function renderTab(tabId: AdminTabId) {
   }
 }
 
-interface AdminOverlayProps {
-  scope?: AdminScope;
-  autoOpen?: boolean;
+/** Parse a cookie value from document.cookie by name */
+function getCookie(name: string): string | undefined {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : undefined;
 }
 
-export default function AdminOverlay({ scope = "all", autoOpen = false }: AdminOverlayProps) {
+export default function AdminOverlay() {
   const { theme, cycleTheme } = useTheme();
   const { toggleModal, isModalOpen } = useAdmin();
+  const [scope, setScope] = useState<AdminScope>("all");
 
+  // Read admin scope and auto-open from short-lived cookies set by proxy.ts
   useEffect(() => {
+    const scopeCookie = getCookie("admin_scope");
+    if (scopeCookie && (scopeCookie === "thoughts" || scopeCookie === "dev")) {
+      setScope(scopeCookie);
+    }
+
+    const autoOpen = getCookie("admin_autoopen") === "true";
     if (autoOpen && !isModalOpen) {
       const timer = setTimeout(() => toggleModal(), 100);
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOpen]);
+  }, []);
 
   return (
     <AdminPanel scope={scope}>
