@@ -1,3 +1,5 @@
+"use client";
+
 // Window components
 export {
   WindowContainer,

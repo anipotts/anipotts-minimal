@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback, useRef } from "react";
 import type { OutputLine } from "./types";
 import { getMotd } from "./constants";

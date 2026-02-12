@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback } from "react";
 import { publicSubdomains } from "@anipotts/lib/data";
 import { commandNames } from "./commands";

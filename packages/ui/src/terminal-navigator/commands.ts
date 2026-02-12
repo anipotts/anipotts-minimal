@@ -1,3 +1,5 @@
+"use client";
+
 import { subdomains, publicSubdomains, SITE_VERSION } from "@anipotts/lib/data";
 import type { CommandDef, CommandContext, OutputLine } from "./types";
 import { PROMPT_USER, getPromptPath } from "./constants";

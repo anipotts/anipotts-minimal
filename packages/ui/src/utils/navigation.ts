@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Navigate to a section path using the View Transitions API if available.
  * All sections are now same-origin, so this uses client-side navigation.

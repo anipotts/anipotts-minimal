@@ -1,3 +1,5 @@
+"use client";
+
 export { useDebounce } from "./useDebounce";
 export {
   useSectionNavigation,
