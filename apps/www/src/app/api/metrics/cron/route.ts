@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { createClient } from "@anipotts/lib/supabase";
 import {
@@ -28,7 +29,15 @@ export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || !authHeader) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const expected = `Bearer ${cronSecret}`;
+  const expectedBuf = Buffer.from(expected);
+  const actualBuf = Buffer.from(authHeader);
+
+  if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
