@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Insert into Supabase
-    const userAgent = req.headers.get("user-agent") || null;
+    const userAgent = req.headers.get("user-agent")?.slice(0, 500) || null;
 
     // Insert
     const { error: insertError } = await supabase
