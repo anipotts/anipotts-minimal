@@ -102,7 +102,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 bg-[var(--input-bg)] p-1.5 rounded-lg border border-[var(--border)] flex-wrap">
+        <div className="flex items-center gap-1 bg-[var(--input-bg)] p-1.5 rounded-lg border border-[var(--border)] flex-wrap" role="tablist" aria-label="Admin panel tabs">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -110,6 +110,10 @@ export const AdminPanelContent = memo(function AdminPanelContent({
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
+                id={`tab-${tab.id}`}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-mono uppercase tracking-wide transition-colors ${
                   isActive
                     ? "bg-[var(--overlay-10)] text-[var(--accent-400)]"
@@ -159,7 +163,7 @@ export const AdminPanelContent = memo(function AdminPanelContent({
       </div>
 
       {/* Main Content Area - fills remaining height */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         {renderTab(activeTab)}
       </div>
     </div>

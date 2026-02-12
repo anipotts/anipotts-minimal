@@ -70,6 +70,7 @@ export default function ProjectCard({ project }: { project: Project }) {
     <div
       role="button"
       tabIndex={0}
+      aria-expanded={isOpen}
       onClick={() => setIsOpen((o) => !o)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
