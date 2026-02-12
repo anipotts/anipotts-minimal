@@ -102,20 +102,22 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label htmlFor="name" className="sr-only">Full name</label>
         <input
           id="name"
           required
-          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
+          className="bg-input border border-border rounded-sm p-2 text-base text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
           placeholder="Your Name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           disabled={status === "loading"}
         />
+        <label htmlFor="email" className="sr-only">Email address</label>
         <input
           id="email"
           type="email"
           required
-          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
+          className="bg-input border border-border rounded-sm p-2 text-base text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
           placeholder="Your Email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -124,12 +126,13 @@ export default function ContactForm() {
       </div>
 
       <div>
+        <label htmlFor="message" className="sr-only">Message</label>
         <textarea
           id="message"
           required
           rows={4}
           maxLength={1000}
-          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint resize-none"
+          className="bg-input border border-border rounded-sm p-2 text-base text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint resize-none"
           placeholder="Your Message"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -155,6 +158,7 @@ export default function ContactForm() {
             data-sitekey={turnstileSiteKey}
             data-callback="turnstileCallback"
             data-expired-callback="turnstileExpiredCallback"
+            aria-label="CAPTCHA verification"
           />
           {!captchaReady && (
             <p className="text-faint text-xs mt-2">Loading captcha...</p>
