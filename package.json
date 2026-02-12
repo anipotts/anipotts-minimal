@@ -14,14 +14,9 @@
     "clean": "turbo clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
-    "dev:thoughts": "turbo dev --filter=@anipotts/thoughts",
-    "dev:docs": "turbo dev --filter=@anipotts/docs",
-    "dev:status": "turbo dev --filter=@anipotts/status",
-    "dev:updates": "turbo dev --filter=@anipotts/updates",
-    "dev:lab": "turbo dev --filter=@anipotts/lab",
-    "dev:metrics": "turbo dev --filter=@anipotts/metrics",
-    "dev:links": "turbo dev --filter=@anipotts/links",
-    "dev:dev": "turbo dev --filter=@anipotts/dev"
+    "test:unit": "turbo test",
+    "test:e2e": "pnpm --filter @anipotts/www test:e2e",
+    "test": "pnpm test:unit && pnpm test:e2e"
   },
   "pnpm": {
     "overrides": {

@@ -32,11 +32,11 @@ export default async function WorkPage() {
   const projects = await fetchProjects();
 
   return (
-    <div className="flex flex-col gap-12 pb-20">
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+    <div className="flex flex-col gap-16 md:gap-20 pb-20">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-xs font-bold uppercase tracking-widest text-accent-400">
+            <h1 className="text-sm font-mono tracking-widest uppercase text-accent-400">
               work
             </h1>
           </FadeIn>

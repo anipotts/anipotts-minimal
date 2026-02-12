@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PaperPlaneTilt, SpinnerGap } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
 
@@ -11,8 +11,57 @@ export default function ContactForm() {
     email: "",
     message: "",
   });
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReady, setCaptchaReady] = useState(false);
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const statusStyles: Record<typeof status, string> = {
+    idle: "bg-accent-400/10 text-accent-400 border border-accent-400/20 hover:bg-accent-400/20",
+    loading: "bg-accent-400/10 text-accent-400 border border-accent-400/20 hover:bg-accent-400/20",
+    success: "bg-green-500/10 text-green-400 border border-green-500/20 cursor-default",
+    error: "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20",
+  };
+
+  const resetTurnstile = () => {
+    if (turnstileSiteKey) {
+      const win = window as unknown as { turnstile?: { reset?: () => void } };
+      win.turnstile?.reset?.();
+      setCaptchaToken("");
+    }
+  };
+
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+    const win = window as unknown as {
+      turnstile?: { reset?: () => void };
+      turnstileCallback?: (token: string) => void;
+      turnstileExpiredCallback?: () => void;
+    };
+
+    win.turnstileCallback = (token: string) => {
+      setCaptchaToken(token);
+    };
+    win.turnstileExpiredCallback = () => {
+      setCaptchaToken("");
+    };
+
+    const existing = document.querySelector("script[data-turnstile]");
+    if (existing) {
+      setCaptchaReady(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    script.setAttribute("data-turnstile", "true");
+    script.onload = () => setCaptchaReady(true);
+    script.onerror = () => setCaptchaReady(false);
+    document.body.appendChild(script);
+  }, [turnstileSiteKey]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,17 +69,24 @@ export default function ContactForm() {
     setErrorMessage("");
 
     try {
+      if (turnstileSiteKey && !captchaToken) {
+        setStatus("error");
+        setErrorMessage("Please complete the captcha.");
+        return;
+      }
+
       const res = await fetch("/api/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captchaToken }),
       });
 
       if (!res.ok) throw new Error("Failed to send");
 
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
-      posthog.capture("contact_form_submitted");
+      resetTurnstile();
+      posthog?.capture("contact_form_submitted");
 
       // Reset success message after 3 seconds
       setTimeout(() => setStatus("idle"), 3000);
@@ -38,39 +94,36 @@ export default function ContactForm() {
       console.error(error);
       setStatus("error");
       setErrorMessage("Something went wrong. Please try again or email me directly.");
-      posthog.capture("contact_form_error");
+      resetTurnstile();
+      posthog?.capture("contact_form_error");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <input
-            id="name"
-            required
-            className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
-            placeholder="Your Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            disabled={status === "loading"}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <input
-            id="email"
-            type="email"
-            required
-            className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
-            placeholder="Your Email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            disabled={status === "loading"}
-          />
-        </div>
+        <input
+          id="name"
+          required
+          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
+          placeholder="Your Name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          disabled={status === "loading"}
+        />
+        <input
+          id="email"
+          type="email"
+          required
+          className="bg-input border border-border rounded-sm p-2 text-sm text-body focus:border-accent-400/50 focus:outline-none transition-colors font-mono placeholder-faint"
+          placeholder="Your Email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          disabled={status === "loading"}
+        />
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div>
         <textarea
           id="message"
           required
@@ -95,16 +148,24 @@ export default function ContactForm() {
         </div>
       </div>
 
+      {turnstileSiteKey && (
+        <div className="mt-2">
+          <div
+            className="cf-turnstile"
+            data-sitekey={turnstileSiteKey}
+            data-callback="turnstileCallback"
+            data-expired-callback="turnstileExpiredCallback"
+          />
+          {!captchaReady && (
+            <p className="text-faint text-xs mt-2">Loading captcha...</p>
+          )}
+        </div>
+      )}
+
       <button
         type="submit"
-        disabled={status === "loading" || status === "success"}
-        className={`mt-2 flex items-center justify-center gap-2 py-2 px-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-all duration-300 ${
-          status === "success"
-            ? "bg-green-500/10 text-green-400 border border-green-500/20 cursor-default"
-            : status === "error"
-            ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-            : "bg-accent-400/10 text-accent-400 border border-accent-400/20 hover:bg-accent-400/20"
-        }`}
+        disabled={status === "loading" || status === "success" || (turnstileSiteKey ? !captchaToken : false)}
+        className={`mt-2 flex items-center justify-center gap-2 py-2 px-4 rounded-sm text-xs uppercase tracking-widest font-bold transition-all duration-300 ${statusStyles[status]}`}
       >
         {status === "loading" ? (
           <>

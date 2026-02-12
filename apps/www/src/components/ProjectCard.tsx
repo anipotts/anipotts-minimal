@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Project } from "@/data/projects";
+import { useState, useRef, useEffect } from "react";
+import type { Project } from "@anipotts/types";
 import Link from "next/link";
-import { usePostHog } from "posthog-js/react";
 
 function ChromeIcon({ className }: { className?: string }) {
   return (
@@ -23,24 +22,30 @@ function ChromeIcon({ className }: { className?: string }) {
   );
 }
 
-function StatusBadge({ status, featured }: { status?: string; featured?: boolean }) {
+function StatusBadge({
+  status,
+  featured,
+}: {
+  status?: string;
+  featured?: boolean;
+}) {
   if (featured) {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-accent-400 bg-accent-400/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-accent-400 bg-accent-400/10 border border-accent-400/20 px-1.5 py-0.5 rounded font-medium">
         featured
       </span>
     );
   }
   if (status === "in-progress") {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded font-medium">
         in progress
       </span>
     );
   }
   if (status === "coming-soon") {
     return (
-      <span className="text-[9px] uppercase tracking-wider text-tertiary bg-gray-400/10 px-1.5 py-0.5 rounded font-medium">
+      <span className="text-[10px] uppercase tracking-wider text-tertiary bg-gray-400/10 border border-gray-400/20 px-1.5 py-0.5 rounded font-medium">
         coming soon
       </span>
     );
@@ -49,43 +54,60 @@ function StatusBadge({ status, featured }: { status?: string; featured?: boolean
 }
 
 export default function ProjectCard({ project }: { project: Project }) {
-  const posthog = usePostHog();
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
 
-  const handleCardClick = () => {
-    const newOpenState = !isOpen;
-    setIsOpen(newOpenState);
-
-    posthog.capture('project_card_clicked', {
-      project_title: project.title,
-      project_slug: project.slug,
-      project_category: project.category,
-      action: newOpenState ? 'expanded' : 'collapsed',
-    });
-  };
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      setHeight(contentRef.current.scrollHeight);
+    } else {
+      setHeight(0);
+    }
+  }, [isOpen]);
 
   return (
     <div
-      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onClick={() => setIsOpen((o) => !o)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setIsOpen((o) => !o);
+        }
+      }}
       className={`
         group w-full cursor-pointer border-l-2 pl-4 pr-4 transition-all duration-300 ease-in-out
-        ${isOpen
-          ? "py-6 border-accent-400 bg-[rgba(var(--overlay-base),0.03)] rounded-r-xl"
-          : "py-3 border-border hover:border-overlay-30 hover:bg-[rgba(var(--overlay-base),0.02)]"
+        ${
+          isOpen
+            ? "py-6 border-accent-400 bg-[rgba(var(--overlay-base),0.03)] rounded-r-xl"
+            : "py-3 border-border hover:border-overlay-30 hover:bg-overlay-5"
         }
       `}
     >
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 font-mono text-sm">
-            <span className={isOpen ? "text-accent-400" : "text-muted group-hover:text-secondary"}>
+            <span
+              className={
+                isOpen
+                  ? "text-accent-400"
+                  : "text-muted group-hover:text-secondary"
+              }
+            >
               {isOpen ? "[-]" : "[+]"}
             </span>
             {project.icon === "chrome" && (
               <ChromeIcon className="w-4 h-4 flex-shrink-0" />
             )}
-            <h3 className={`font-bold ${isOpen ? "text-heading" : "text-secondary group-hover:text-heading"}`}>
+            <h3
+              className={`font-bold ${
+                isOpen
+                  ? "text-heading"
+                  : "text-secondary group-hover:text-heading"
+              }`}
+            >
               {project.title}
             </h3>
             <StatusBadge status={project.status} featured={project.featured} />
@@ -96,61 +118,64 @@ export default function ProjectCard({ project }: { project: Project }) {
       </div>
 
       <div
-        ref={contentRef}
         className="overflow-hidden transition-all duration-300 ease-in-out"
-        style={{
-          maxHeight: isOpen ? contentRef.current?.scrollHeight ?? 500 : 0,
-          opacity: isOpen ? 1 : 0,
-        }}
+        style={{ height }}
       >
-        <div className="pl-6 pt-6 pb-2 flex flex-col gap-6">
-          <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
-            {project.description}
-          </p>
+        <div ref={contentRef}>
+          <div className="pl-6 pt-6 pb-2 flex flex-col gap-6">
+            <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
+              {project.description}
+            </p>
 
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span key={tag} className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm">
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {(project.links?.live || project.links?.repo || project.links?.page) && (
-            <div className="flex gap-4 text-xs font-mono pt-2">
-              {project.links?.page && (
-                <Link
-                  href={project.links.page}
-                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
-                  onClick={(e) => e.stopPropagation()}
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
                 >
-                  ./deep_dive.md
-                </Link>
-              )}
-              {project.links?.live && (
-                <a
-                  href={project.links.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  ./launch_site.sh
-                </a>
-              )}
-              {project.links?.repo && (
-                <a
-                  href={project.links.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  ./view_source.git
-                </a>
-              )}
+                  {tag}
+                </span>
+              ))}
             </div>
-          )}
+
+            {(project.links?.live ||
+              project.links?.repo ||
+              project.links?.page) && (
+              <div className="flex gap-4 text-xs font-mono pt-2">
+                {project.links?.page && (
+                  <Link
+                    href={project.links.page}
+                    className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    ./deep_dive.md
+                  </Link>
+                )}
+                {project.links?.live && (
+                  <a
+                    href={project.links.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    ./launch_site.sh
+                  </a>
+                )}
+                {project.links?.repo && (
+                  <a
+                    href={project.links.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    ./view_source.git
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -25,9 +25,9 @@ export default function ThoughtsSearch() {
 
     debounceRef.current = setTimeout(() => {
       if (value.trim()) {
-        router.push(`/thoughts?q=${encodeURIComponent(value.trim())}`);
+        router.replace(`/thoughts?q=${encodeURIComponent(value.trim())}`);
       } else {
-        router.push("/thoughts");
+        router.replace("/thoughts");
       }
     }, 250);
   };
@@ -42,7 +42,7 @@ export default function ThoughtsSearch() {
           if (e.key === "Escape") handleChange("");
         }}
         placeholder="Search thoughts..."
-        className="w-full bg-input border border-border rounded-md py-2.5 px-4 text-sm text-secondary placeholder-muted focus:border-accent-400/50 focus:outline-none transition-colors"
+        className="w-full bg-input border border-border rounded-sm p-2 text-sm text-body font-mono placeholder-faint focus:border-accent-400/50 focus:outline-none transition-colors"
       />
       {query && (
         <button

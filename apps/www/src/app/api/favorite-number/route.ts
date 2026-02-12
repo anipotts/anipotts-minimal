@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { favoriteNumberSchema, formatZodError } from "@anipotts/lib/validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,15 +10,12 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     const body = await req.json();
-    const { number } = body;
-
-    // 1. Validate input
-    if (typeof number !== "number" || isNaN(number)) {
-      return NextResponse.json(
-        { error: "Invalid number" },
-        { status: 400 }
-      );
+    const parsed = favoriteNumberSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(formatZodError(parsed.error), { status: 400 });
     }
+
+    const { number } = parsed.data;
     
     const cleanNumber = Math.round(number);
     if (cleanNumber < -1000000000 || cleanNumber > 1000000000) {

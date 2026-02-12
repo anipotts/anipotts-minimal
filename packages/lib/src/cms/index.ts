@@ -93,6 +93,9 @@ export interface ThoughtSummary {
   summary: string;
   created_at: string;
   views?: number;
+  id?: string;
+  series_type?: string | null;
+  tags?: string | string[] | null;
 }
 
 export async function fetchThoughts(options?: {
@@ -104,7 +107,7 @@ export async function fetchThoughts(options?: {
   try {
     let query = supabase
       .from("thoughts")
-      .select("slug, title, summary, created_at, views")
+      .select("slug, title, summary, created_at, views, id, series_type, tags")
       .order("created_at", { ascending: false });
 
     if (options?.published !== undefined) {
@@ -120,6 +123,37 @@ export async function fetchThoughts(options?: {
     return (data as ThoughtSummary[]) ?? [];
   } catch (err) {
     console.warn("[cms] fetchThoughts() unavailable, using fallback");
+    return [];
+  }
+}
+
+export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
+  if (!supabase) return [];
+  try {
+    const { data, error } = await supabase.rpc("search_content", {
+      query,
+      lim: 20,
+    });
+    if (error) throw error;
+    if (!data) return [];
+
+    const thoughtResults = (data as { type: string; id: string; slug: string; title: string; summary: string; rank: number }[])
+      .filter((r) => r.type === "thought");
+    if (thoughtResults.length === 0) return [];
+
+    const slugs = thoughtResults.map((r) => r.slug);
+    const { data: thoughts } = await supabase
+      .from("thoughts")
+      .select("slug, title, summary, created_at, views, id, series_type, tags")
+      .eq("published", true)
+      .in("slug", slugs);
+
+    if (!thoughts) return [];
+
+    const rankMap = new Map(thoughtResults.map((r) => [r.slug, r.rank]));
+    return (thoughts as ThoughtSummary[]).sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
+  } catch (e) {
+    console.warn("[cms] searchThoughts() failed:", e);
     return [];
   }
 }
