@@ -40,3 +40,30 @@ export async function checkRateLimit(request: Request) {
   const ip = getRequestIp(request);
   return ratelimit.limit(`contact:${ip}`);
 }
+
+const adminLoginRatelimit =
+  redisUrl && redisToken
+    ? new Ratelimit({
+        redis: new Redis({ url: redisUrl, token: redisToken }),
+        limiter: Ratelimit.slidingWindow(5, "15 m"),
+      })
+    : null;
+
+export async function checkAdminLoginRateLimit(ip: string) {
+  if (!adminLoginRatelimit) {
+    if (process.env.NODE_ENV === "production") {
+      return {
+        success: false,
+        status: 500,
+        error: "Rate limiting not configured",
+        limit: 0,
+        remaining: 0,
+        reset: Date.now(),
+      };
+    }
+    console.warn("[rateLimit] Upstash not configured; skipping admin login rate limit");
+    return { success: true, limit: 0, remaining: 0, reset: Date.now() };
+  }
+
+  return adminLoginRatelimit.limit(`admin_login:${ip}`);
+}

@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import type { Atom, Thought, ContentType, SeriesType, ContentStatus, VoiceMode, Platform, TypefullyDraft, TypefullyQueueSummary, PageContent, ProjectRow, SocialLinkRow } from "@anipotts/types";
 import {
@@ -8,6 +8,8 @@ import {
   ADMIN_COOKIE_OPTIONS,
   verifyAdminPassword,
   verifyAdminTotp,
+  createSessionToken,
+  verifySessionToken,
   fetchAllThoughts,
   upsertThoughtRecord,
   deleteThoughtRecord,
@@ -15,6 +17,7 @@ import {
   fetchThoughtStats,
 } from "@anipotts/lib/admin";
 import { adminLoginSchema } from "@anipotts/lib/validation";
+import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey =
@@ -30,7 +33,10 @@ const supabase =
 
 export async function checkAuth() {
   const cookieStore = await cookies();
-  return cookieStore.get(ADMIN_COOKIE)?.value === "true";
+  const token = cookieStore.get(ADMIN_COOKIE)?.value;
+  if (!token || token === "true") return false; // reject old-format cookies
+  const sessionSecret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "";
+  return verifySessionToken(token, sessionSecret);
 }
 
 export async function login(input: { password: string; totp: string }) {
@@ -39,14 +45,27 @@ export async function login(input: { password: string; totp: string }) {
     return { success: false, error: "Invalid input" };
   }
 
+  // Rate-limit admin login attempts by IP
+  const headersList = await headers();
+  const forwarded = headersList.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || headersList.get("x-real-ip") || "unknown";
+  const rateResult = await checkAdminLoginRateLimit(ip);
+  if (!rateResult.success) {
+    return { success: false, error: "Too many login attempts. Try again later." };
+  }
+
   const { password, totp } = parsed.data;
   const passwordResult = verifyAdminPassword(password, process.env.ADMIN_PASSWORD);
   if (!passwordResult.success) {
     return passwordResult;
   }
 
+  // Enforce TOTP in production
   const totpSecret = process.env.ADMIN_TOTP_SECRET;
-  if (process.env.NODE_ENV === "production" || totpSecret) {
+  if (process.env.NODE_ENV === "production" && !totpSecret) {
+    return { success: false, error: "ADMIN_TOTP_SECRET required in production" };
+  }
+  if (totpSecret) {
     const totpResult = verifyAdminTotp(totp, totpSecret);
     if (!totpResult.success) {
       return totpResult;
@@ -54,7 +73,9 @@ export async function login(input: { password: string; totp: string }) {
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(ADMIN_COOKIE, "true", ADMIN_COOKIE_OPTIONS);
+  const sessionSecret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "";
+  const token = createSessionToken(sessionSecret);
+  cookieStore.set(ADMIN_COOKIE, token, ADMIN_COOKIE_OPTIONS);
   return { success: true };
 }
 
