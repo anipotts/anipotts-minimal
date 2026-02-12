@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import {
@@ -140,15 +139,11 @@ export async function generateMetadata(): Promise<Metadata> {
  *
  * The (main) child layout adds Navbar/Footer.
  */
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
-  const adminScopeRaw = headersList.get('x-admin-scope');
-  const adminAutoOpen = headersList.get('x-admin-autoopen') === 'true';
-
   return (
     <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <head>
@@ -156,6 +151,12 @@ export default async function RootLayout({
         <PersonSchema />
       </head>
       <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[99999] focus:bg-accent-400 focus:text-black focus:px-4 focus:py-2 focus:rounded-sm focus:text-xs focus:font-mono focus:uppercase focus:tracking-widest"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <TerminalBackground />
 
@@ -177,7 +178,7 @@ export default async function RootLayout({
                   <MinimizedPill />
                 </WindowLayoutWrapper>
 
-                <AdminOverlay scope={(adminScopeRaw as "all" | "thoughts" | "dev") || undefined} autoOpen={adminAutoOpen} />
+                <AdminOverlay />
                 <TerminalNavigatorWrapper />
               </WindowProvider>
             </AdminProvider>

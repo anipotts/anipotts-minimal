@@ -72,8 +72,9 @@ export function proxy(request: NextRequest) {
     url.searchParams.delete('_subdomain');
 
     const response = NextResponse.rewrite(url);
-    response.headers.set('x-admin-scope', subdomain);
-    response.headers.set('x-admin-autoopen', 'true');
+    // Short-lived cookies read client-side by AdminOverlay (avoids headers() in layout)
+    response.cookies.set('admin_scope', subdomain, { path: '/', maxAge: 5 });
+    response.cookies.set('admin_autoopen', 'true', { path: '/', maxAge: 5 });
     return response;
   }
 
