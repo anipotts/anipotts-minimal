@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Track which URLs have been prefetched to avoid duplicate work.
  */

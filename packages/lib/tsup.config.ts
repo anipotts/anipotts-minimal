@@ -4,7 +4,6 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     "supabase/index": "src/supabase/index.ts",
-    "posthog/index": "src/posthog/index.ts",
     "utils/index": "src/utils/index.ts",
     "feature-flags/index": "src/feature-flags/index.ts",
     "data/index": "src/data/index.ts",
@@ -18,7 +17,7 @@ export default defineConfig({
   },
   format: ["esm"],
   dts: true,
-  splitting: false,
+  splitting: true,
   sourcemap: true,
   clean: true,
   external: ["@supabase/supabase-js", "posthog-node"],

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { TerminalNavigatorProps, OutputLine, CommandContext } from "./types";

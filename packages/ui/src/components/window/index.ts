@@ -1,3 +1,5 @@
+"use client";
+
 export { WindowContainer } from "./WindowContainer";
 export type { WindowContainerProps } from "./WindowContainer";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback, useRef } from "react";
 import { MAX_HISTORY } from "./constants";
 
