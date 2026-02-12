@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import { projects } from "@/data/projects";
 import { projectContent } from "@/data/project-content";
-import FadeIn from "@/components/FadeIn";
+import { FadeIn } from "@anipotts/ui";
 
 export async function generateStaticParams() {
   return projects

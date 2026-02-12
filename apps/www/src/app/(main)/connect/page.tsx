@@ -57,12 +57,12 @@ export default async function ConnectPage() {
   const liveProjects = projects.filter((p) => p.links?.live);
 
   return (
-    <div className="flex flex-col gap-12 pb-20">
+    <div className="flex flex-col gap-16 md:gap-20 pb-20">
       {/* Intro Section */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1">
           <FadeIn>
-            <h1 className="text-sm font-bold uppercase tracking-widest text-accent-400">
+            <h1 className="text-sm font-mono tracking-widest uppercase text-accent-400">
               connect
             </h1>
           </FadeIn>
@@ -84,10 +84,10 @@ export default async function ConnectPage() {
       </section>
 
       {/* Socials Section */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1">
           <FadeIn delay={0.15}>
-            <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
+            <h2 className="text-sm font-mono tracking-widest uppercase text-accent-400">
               Socials
             </h2>
           </FadeIn>
@@ -108,7 +108,7 @@ export default async function ConnectPage() {
                         : "noopener noreferrer"
                     }
                     aria-label={social.name}
-                    className="group flex items-center gap-3 p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-10 hover:border-border transition-all duration-300"
+                    className="group flex items-center gap-3 p-4 border border-border-subtle rounded-sm bg-input hover:bg-overlay-5 hover:border-border transition-all duration-300"
                   >
                     <Icon
                       className="text-tertiary group-hover:text-accent-400 transition-colors shrink-0"
@@ -138,10 +138,10 @@ export default async function ConnectPage() {
 
       {/* Live Projects Section */}
       {liveProjects.length > 0 && (
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1">
             <FadeIn delay={0.25}>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
+              <h2 className="text-sm font-mono tracking-widest uppercase text-accent-400">
                 Live Projects
               </h2>
             </FadeIn>
@@ -179,10 +179,10 @@ export default async function ConnectPage() {
       )}
 
       {/* Contact Form Section */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1">
           <FadeIn delay={0.3}>
-            <h2 className="text-sm font-bold uppercase tracking-widest text-accent-400">
+            <h2 className="text-sm font-mono tracking-widest uppercase text-accent-400">
               Message Me
             </h2>
           </FadeIn>

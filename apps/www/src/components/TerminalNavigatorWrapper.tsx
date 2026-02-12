@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 import { TerminalNavigator } from '@anipotts/ui/terminal-navigator';
-import { getSubdomainFromPath, useSubdomainNavigation } from '@anipotts/ui';
+import { getSectionFromPath, useSectionNavigation } from '@anipotts/ui';
 
 /**
  * Client component wrapper for TerminalNavigator that automatically
@@ -12,8 +12,8 @@ import { getSubdomainFromPath, useSubdomainNavigation } from '@anipotts/ui';
  */
 export default function TerminalNavigatorWrapper() {
   const pathname = usePathname();
-  const subdomain = getSubdomainFromPath(pathname);
-  const { navigateTo } = useSubdomainNavigation();
+  const subdomain = getSectionFromPath(pathname);
+  const { navigateTo } = useSectionNavigation();
 
   // SPA navigation handler for terminal cd command
   const handleNavigate = useCallback((targetSubdomain: string) => {

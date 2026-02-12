@@ -7,12 +7,14 @@ import {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
   verifyAdminPassword,
+  verifyAdminTotp,
   fetchAllThoughts,
   upsertThoughtRecord,
   deleteThoughtRecord,
   incrementThoughtViewCount,
   fetchThoughtStats,
 } from "@anipotts/lib/admin";
+import { adminLoginSchema } from "@anipotts/lib/validation";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey =
@@ -31,14 +33,29 @@ export async function checkAuth() {
   return cookieStore.get(ADMIN_COOKIE)?.value === "true";
 }
 
-export async function login(password: string) {
-  // Pass env var explicitly to ensure Next.js loads it properly in monorepo
-  const result = verifyAdminPassword(password, process.env.ADMIN_PASSWORD);
-  if (result.success) {
-    const cookieStore = await cookies();
-    cookieStore.set(ADMIN_COOKIE, "true", ADMIN_COOKIE_OPTIONS);
+export async function login(input: { password: string; totp: string }) {
+  const parsed = adminLoginSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: "Invalid input" };
   }
-  return result;
+
+  const { password, totp } = parsed.data;
+  const passwordResult = verifyAdminPassword(password, process.env.ADMIN_PASSWORD);
+  if (!passwordResult.success) {
+    return passwordResult;
+  }
+
+  const totpSecret = process.env.ADMIN_TOTP_SECRET;
+  if (process.env.NODE_ENV === "production" || totpSecret) {
+    const totpResult = verifyAdminTotp(totp, totpSecret);
+    if (!totpResult.success) {
+      return totpResult;
+    }
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(ADMIN_COOKIE, "true", ADMIN_COOKIE_OPTIONS);
+  return { success: true };
 }
 
 export async function logout() {

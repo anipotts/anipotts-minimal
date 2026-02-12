@@ -200,49 +200,55 @@ export default async function DevPage({
   const data = await fetchAllDevData();
 
   return (
-    <div className="flex flex-col gap-12 py-12 px-4 max-w-4xl mx-auto">
-      <FadeIn>
-        <div className="border-b border-border pb-6">
-          <h1 className="text-sm uppercase tracking-widest text-accent-400 mb-2">
-            Dev Dashboard
-          </h1>
-          <p className="text-muted text-base mb-4">
-            Tools, metrics, activity, and service status
-          </p>
-          <Suspense>
-            <DevSectionTabs />
-          </Suspense>
+    <div className="flex flex-col gap-16 md:gap-20 pb-20">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="col-span-1">
+          <FadeIn>
+            <h1 className="text-sm font-mono text-accent-400 tracking-widest uppercase">
+              dev dashboard
+            </h1>
+            <p className="text-muted text-xs mt-2">
+              Tools, metrics, activity, and service status
+            </p>
+          </FadeIn>
         </div>
-      </FadeIn>
+        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+          <FadeIn delay={0.05}>
+            <Suspense>
+              <DevSectionTabs />
+            </Suspense>
+          </FadeIn>
 
-      {section === "stack" && <StackSection languages={data.languages} />}
-      {section === "metrics" && (
-        <MetricsSection
-          github={data.github}
-          wakatime={data.wakatime}
-          lastUpdated={data.metricsUpdated}
-        />
-      )}
-      {section === "activity" && (
-        <>
-          <ContributionHeatmap
-            days={data.calendarDays}
-            fetchedAt={data.calendarFetchedAt}
-          />
-          <ActivitySection
-            commits={data.commits}
-            events={data.githubEvents}
-            fetchedAt={data.activityFetchedAt}
-            isLive={data.githubEvents.length > 0}
-          />
-        </>
-      )}
-      {section === "status" && (
-        <StatusSection
-          services={data.services}
-          lastChecked={data.statusLastChecked}
-        />
-      )}
+          {section === "stack" && <StackSection languages={data.languages} />}
+          {section === "metrics" && (
+            <MetricsSection
+              github={data.github}
+              wakatime={data.wakatime}
+              lastUpdated={data.metricsUpdated}
+            />
+          )}
+          {section === "activity" && (
+            <>
+              <ContributionHeatmap
+                days={data.calendarDays}
+                fetchedAt={data.calendarFetchedAt}
+              />
+              <ActivitySection
+                commits={data.commits}
+                events={data.githubEvents}
+                fetchedAt={data.activityFetchedAt}
+                isLive={data.githubEvents.length > 0}
+              />
+            </>
+          )}
+          {section === "status" && (
+            <StatusSection
+              services={data.services}
+              lastChecked={data.statusLastChecked}
+            />
+          )}
+        </div>
+      </section>
     </div>
   );
 }

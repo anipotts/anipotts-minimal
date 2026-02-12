@@ -194,7 +194,7 @@ export default async function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-20 md:gap-24 pb-20">
+    <div className="flex flex-col gap-16 md:gap-20 pb-20">
       {order.map((key) => sectionRenderers[key]?.())}
     </div>
   );

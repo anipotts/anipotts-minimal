@@ -2,6 +2,7 @@ export {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
   verifyAdminPassword,
+  verifyAdminTotp,
 } from "./auth";
 
 export {

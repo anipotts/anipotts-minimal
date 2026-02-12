@@ -21,11 +21,21 @@ Create a `.env.local` file in the root directory with the following keys:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ADMIN_PASSWORD=your_secure_password
+ADMIN_TOTP_SECRET=your_totp_secret_base32
 ```
 
 Optional but recommended for admin actions if RLS is strict:
 ```bash
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+Contact form + abuse protection:
+```bash
+RESEND_API_KEY=your_resend_api_key
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key
+UPSTASH_REDIS_REST_URL=your_upstash_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
 ```
 
 ## Project Structure

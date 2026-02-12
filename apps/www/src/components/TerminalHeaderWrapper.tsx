@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { TerminalHeader } from '@anipotts/ui';
-import { getSubdomainFromPath } from '@anipotts/ui';
+import { getSectionFromPath } from '@anipotts/ui';
 
 /**
  * Client component wrapper for TerminalHeader that automatically
@@ -10,7 +10,7 @@ import { getSubdomainFromPath } from '@anipotts/ui';
  */
 export default function TerminalHeaderWrapper() {
   const pathname = usePathname();
-  const subdomain = getSubdomainFromPath(pathname);
+  const subdomain = getSectionFromPath(pathname);
 
   // For main site, don't pass a default title (uses router-based title)
   // For subdomains, show the full subdomain URL

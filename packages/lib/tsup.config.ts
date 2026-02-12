@@ -14,6 +14,7 @@ export default defineConfig({
     "typefully/index": "src/typefully/index.ts",
     "cms/index": "src/cms/index.ts",
     "storage/index": "src/storage/index.ts",
+    "validation/index": "src/validation/index.ts",
   },
   format: ["esm"],
   dts: true,

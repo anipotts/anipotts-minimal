@@ -11,6 +11,7 @@ import { useAdmin } from "./AdminProvider";
 export const AdminLogin = memo(function AdminLogin() {
   const { login } = useAdmin();
   const [password, setPassword] = useState("");
+  const [totp, setTotp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,10 +24,11 @@ export const AdminLogin = memo(function AdminLogin() {
     posthog.capture("admin_login_attempted");
 
     try {
-      const res = await login(password);
+      const res = await login(password, totp);
       if (!res.success) {
         setError(res.error || "ACCESS DENIED");
         setPassword("");
+        setTotp("");
         posthog.capture("admin_login_failed", { error: res.error });
       }
     } catch {
@@ -34,10 +36,15 @@ export const AdminLogin = memo(function AdminLogin() {
     } finally {
       setLoading(false);
     }
-  }, [login, password, loading]);
+  }, [login, password, totp, loading]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    if (error) setError("");
+  }, [error]);
+
+  const handleTotpChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTotp(e.target.value);
     if (error) setError("");
   }, [error]);
 
@@ -66,6 +73,20 @@ export const AdminLogin = memo(function AdminLogin() {
             className="flex-1 bg-transparent border-none outline-none text-[var(--text-body)] font-mono"
             autoFocus
             autoComplete="off"
+            spellCheck={false}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-[var(--text-muted)] whitespace-nowrap">[sudo] totp:</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={totp}
+            onChange={handleTotpChange}
+            className="flex-1 bg-transparent border-none outline-none text-[var(--text-body)] font-mono"
+            autoComplete="one-time-code"
             spellCheck={false}
             disabled={loading}
           />

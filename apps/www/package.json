@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "vitest run"
   },
   "dependencies": {
     "@anipotts/lib": "workspace:*",
@@ -26,7 +29,9 @@
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
     "resend": "^6.5.2",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "@upstash/redis": "^1.34.0",
+    "@upstash/ratelimit": "^2.0.6"
   },
   "devDependencies": {
     "@anipotts/config": "workspace:*",
@@ -38,6 +43,8 @@
     "eslint": "^9",
     "eslint-config-next": "^16.0.7",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@playwright/test": "^1.51.1",
+    "vitest": "^1.6.0"
   }
 }

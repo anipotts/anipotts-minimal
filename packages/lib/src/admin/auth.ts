@@ -4,6 +4,8 @@
  * to handle cookies (which are framework-specific).
  */
 
+import { authenticator } from "otplib";
+
 /** Cookie name used across all admin sessions */
 export const ADMIN_COOKIE = "admin_session";
 
@@ -33,4 +35,26 @@ export function verifyAdminPassword(
     return { success: true };
   }
   return { success: false, error: "Invalid password" };
+}
+
+/**
+ * Verify a TOTP against the provided secret.
+ * The caller should pass process.env.ADMIN_TOTP_SECRET.
+ */
+export function verifyAdminTotp(
+  totp: string,
+  secret: string | undefined
+): {
+  success: boolean;
+  error?: string;
+} {
+  if (!secret) {
+    return { success: false, error: "Admin TOTP secret not configured on server" };
+  }
+  const token = totp.replace(/\s+/g, "");
+  const isValid = authenticator.check(token, secret);
+  if (isValid) {
+    return { success: true };
+  }
+  return { success: false, error: "Invalid TOTP" };
 }

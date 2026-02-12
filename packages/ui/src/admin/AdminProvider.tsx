@@ -16,7 +16,7 @@ import posthog from "posthog-js";
  */
 export interface AdminActions {
   checkAuth: () => Promise<boolean>;
-  login: (password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (input: { password: string; totp: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -26,7 +26,7 @@ export interface AdminContextType {
   toggleModal: () => void;
   openModal: () => void;
   closeModal: () => void;
-  login: (password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (password: string, totp: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -79,8 +79,8 @@ export function AdminProvider({ children, actions, onModalChange }: AdminProvide
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
-  const login = async (password: string) => {
-    const res = await actions.login(password);
+  const login = async (password: string, totp: string) => {
+    const res = await actions.login({ password, totp });
     if (res.success) {
       setIsAdmin(true);
       posthog.identify("admin_user", { role: "admin" });
