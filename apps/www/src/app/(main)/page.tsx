@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { FadeIn } from "@anipotts/ui";
 import { fetchPageContent, fetchProjects, fetchThoughts } from "@anipotts/lib/cms";
@@ -9,6 +10,26 @@ import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import type { HomepageContent } from "@anipotts/types";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "ani potts — software engineer",
+  description: "software engineer based in nyc, building minimal interfaces to orchestrate complex systems. math @ nyu, graduating may 2026.",
+  openGraph: {
+    title: "ani potts — software engineer",
+    description: "software engineer based in nyc, building minimal interfaces to orchestrate complex systems. math @ nyu, graduating may 2026.",
+    url: "https://anipotts.com",
+    siteName: "ani potts",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "ani potts — software engineer",
+    description: "software engineer based in nyc, building minimal interfaces to orchestrate complex systems. math @ nyu, graduating may 2026.",
+  },
+  alternates: {
+    canonical: "https://anipotts.com",
+  },
+};
 
 /** Default homepage content used when CMS is unavailable */
 const DEFAULT_CONTENT: HomepageContent = {
