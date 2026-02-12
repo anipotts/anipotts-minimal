@@ -13,7 +13,7 @@ export const favoriteNumberSchema = z.object({
 
 export const adminLoginSchema = z.object({
   password: z.string().min(1).max(200),
-  totp: z.string().min(6).max(10),
+  totp: z.string().regex(/^\d{6}$/, "TOTP must be exactly 6 digits").or(z.literal("")),
 });
 
 export function formatZodError(error: z.ZodError) {

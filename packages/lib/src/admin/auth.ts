@@ -4,6 +4,7 @@
  * to handle cookies (which are framework-specific).
  */
 
+import crypto from "node:crypto";
 import { authenticator } from "otplib";
 
 /** Cookie name used across all admin sessions */
@@ -14,6 +15,7 @@ export const ADMIN_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: true,
   sameSite: "strict" as const,
+  maxAge: 28800,
 };
 
 /**
@@ -31,7 +33,9 @@ export function verifyAdminPassword(
   if (!adminPassword) {
     return { success: false, error: "Admin password not configured on server" };
   }
-  if (password === adminPassword) {
+  const passwordBuf = Buffer.from(password);
+  const adminBuf = Buffer.from(adminPassword);
+  if (passwordBuf.length === adminBuf.length && crypto.timingSafeEqual(passwordBuf, adminBuf)) {
     return { success: true };
   }
   return { success: false, error: "Invalid password" };
@@ -52,9 +56,44 @@ export function verifyAdminTotp(
     return { success: false, error: "Admin TOTP secret not configured on server" };
   }
   const token = totp.replace(/\s+/g, "");
+  if (!/^\d{6}$/.test(token)) {
+    return { success: false, error: "TOTP must be exactly 6 digits" };
+  }
   const isValid = authenticator.check(token, secret);
   if (isValid) {
     return { success: true };
   }
   return { success: false, error: "Invalid TOTP" };
+}
+
+/**
+ * Create an HMAC-signed session token embedding the current timestamp.
+ * Format: `<timestamp>.<hmac-hex>`
+ */
+export function createSessionToken(secret: string): string {
+  const ts = Date.now().toString();
+  const hmac = crypto.createHmac("sha256", secret).update(ts).digest("hex");
+  return `${ts}.${hmac}`;
+}
+
+/**
+ * Verify an HMAC-signed session token.
+ * Returns true only if the signature is valid and the token is less than 8 hours old.
+ */
+export function verifySessionToken(token: string, secret: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 2) return false;
+  const [ts, hmac] = parts;
+  if (!ts || !hmac) return false;
+
+  const expected = crypto.createHmac("sha256", secret).update(ts).digest("hex");
+  const hmacBuf = Buffer.from(hmac, "hex");
+  const expectedBuf = Buffer.from(expected, "hex");
+  if (hmacBuf.length !== expectedBuf.length) return false;
+  if (!crypto.timingSafeEqual(hmacBuf, expectedBuf)) return false;
+
+  // Check timestamp is not older than 8 hours (28800 seconds)
+  if (Date.now() - parseInt(ts) >= 28800 * 1000) return false;
+
+  return true;
 }
