@@ -36,7 +36,7 @@
   --text-secondary: #374151;
   --text-tertiary: #4b5563;
   --text-muted: #6b7280;
-  --text-faint: #9ca3af;
+  --text-faint: #808892;
 
   /* Scrollbar */
   --scrollbar-thumb: #c0c0c0;
@@ -99,7 +99,7 @@
   --text-secondary: #d1d5db;
   --text-tertiary: #9ca3af;
   --text-muted: #9ca3af;
-  --text-faint: #6b7280;
+  --text-faint: #737d8a;
 
   --scrollbar-thumb: #333333;
   --scrollbar-thumb-hover: #555555;
@@ -136,4 +136,34 @@ html.theme-transitioning *::before,
 html.theme-transitioning *::after {
   transition: background-color 150ms ease, color 150ms ease,
     border-color 150ms ease, box-shadow 150ms ease !important;
+}
+
+/* Keyboard focus indicators (WCAG 2.4.7 Focus Visible) */
+*:focus-visible {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Button and interactive element focus */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+/* Form input focus (already has border change, add ring) */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+}
+
+.dark input:focus-visible,
+.dark textarea:focus-visible,
+.dark select:focus-visible {
+  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.2);
 }
