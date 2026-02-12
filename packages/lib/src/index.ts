@@ -7,9 +7,6 @@ export {
 } from "./supabase";
 export type { SupabaseClient } from "./supabase";
 
-// PostHog
-export { getPostHogClient, shutdownPostHog, PostHog } from "./posthog";
-
 // Utilities
 export {
   cn,
