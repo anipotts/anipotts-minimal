@@ -9,6 +9,7 @@ body {
   font-family: var(--font-mono), monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-shadow: var(--text-enhance);
 }
 
 /* Custom scrollbar */
