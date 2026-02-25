@@ -26,6 +26,7 @@ export const subdomains = [
   { name: "thoughts", url: "https://anipotts.com/thoughts", adminUrl: "https://thoughts.anipotts.com", desc: "blog & writing", path: "/home/ani/thoughts", permissions: "drwxr-xr-x", hidden: false },
   { name: "connect", url: "https://anipotts.com/connect", adminUrl: "https://anipotts.com/connect", desc: "links & contact", path: "/home/ani/connect", permissions: "drwxr-xr-x", hidden: false },
   { name: "dev", url: "https://anipotts.com/dev", adminUrl: "https://dev.anipotts.com", desc: "engineering dashboard", path: "/home/ani/dev", permissions: "drwxr-xr-x", hidden: false },
+  { name: "claude", url: "https://anipotts.com/claude", adminUrl: "https://anipotts.com/claude", desc: "claude code tips", path: "/home/ani/claude", permissions: "dr-xr-xr-x", hidden: false },
 ] as const;
 
 /** Subdomains visible in public navigation */

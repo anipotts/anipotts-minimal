@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import Link from "next/link";
 
 interface NavItem {
   name: string;
@@ -9,10 +9,9 @@ interface NavItem {
 }
 
 interface ExpandableNavProps {
-  currentSubdomain: string;
+  currentSection: string;
   pathname?: string;
   onNavClick?: (name: string, href: string) => void;
-  onNavigate?: (subdomain: string, path?: string) => void;
 }
 
 const navItems = [
@@ -21,20 +20,14 @@ const navItems = [
   { name: "thoughts", path: "/thoughts", section: "thoughts" },
   { name: "connect", path: "/connect", section: "connect" },
   { name: "dev", path: "/dev", section: "dev" },
+  { name: "claude", path: "/claude", section: "claude" },
 ];
 
-export function ExpandableNav({ currentSubdomain, pathname = "/", onNavClick, onNavigate }: ExpandableNavProps) {
-  const handleNavClick = useCallback((name: string, href: string, section: string) => {
-    onNavClick?.(name, href);
-    if (onNavigate) {
-      onNavigate(section);
-    }
-  }, [onNavClick, onNavigate]);
-
+export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: ExpandableNavProps) {
   const items: NavItem[] = navItems.map((item) => {
     const isActive = item.section === "www"
-      ? currentSubdomain === "www" && pathname === "/"
-      : currentSubdomain === item.section || pathname.startsWith(item.path);
+      ? currentSection === "www" && pathname === "/"
+      : currentSection === item.section || pathname.startsWith(item.path);
 
     return {
       name: item.name,
@@ -56,22 +49,17 @@ export function ExpandableNav({ currentSubdomain, pathname = "/", onNavClick, on
               : "text-tertiary hover:text-body"
           }`;
 
-          const navItem = navItems.find((n) => n.name === item.name)!;
-
           return item.isActive ? (
             <span key={item.name} className={linkClass}>{item.name}</span>
           ) : (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className={linkClass}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick(item.name, item.href, navItem.section);
-              }}
+              onClick={() => onNavClick?.(item.name, item.href)}
             >
               {item.name}
-            </a>
+            </Link>
           );
         })}
       </div>

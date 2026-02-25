@@ -1,33 +1,22 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useCallback } from 'react';
-import { SubdomainHeader, useSectionNavigation, getSectionFromPath } from '@anipotts/ui';
+import { SubdomainHeader, getSectionFromPath } from '@anipotts/ui';
 
 /**
  * Client component wrapper for SubdomainHeader that automatically
- * detects the current subdomain from the route path and provides
- * SPA navigation for subdomain links.
+ * detects the current section from the route path.
  */
 export default function SubdomainHeaderWrapper() {
   const pathname = usePathname();
-  const subdomain = getSectionFromPath(pathname);
-  const { navigateTo } = useSectionNavigation();
-
-  // SPA navigation handler for subdomain links
-  const handleNavigate = useCallback((targetSubdomain: string, path?: string) => {
-    navigateTo(targetSubdomain, path);
-  }, [navigateTo]);
+  const section = getSectionFromPath(pathname);
 
   // Don't show subdomain header on main site
-  if (subdomain === 'www') {
+  if (section === 'www') {
     return null;
   }
 
   return (
-    <SubdomainHeader
-      subdomain={subdomain}
-      onNavigate={handleNavigate}
-    />
+    <SubdomainHeader subdomain={section} />
   );
 }
