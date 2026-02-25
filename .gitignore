@@ -16,3 +16,5 @@ next-env.d.ts
 .typefully
 .claude/plans
 .claude/memories
+apps/www/test-results
+apps/www/playwright-report
