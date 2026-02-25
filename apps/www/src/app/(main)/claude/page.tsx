@@ -43,15 +43,13 @@ export default function ClaudePage() {
   return (
     <div className="flex flex-col gap-16 md:gap-20 pb-20">
       {/* Hero */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              claude
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            claude
+          </span>
+        </FadeIn>
+        <div className="flex flex-col gap-6">
           <FadeIn delay={nextDelay()}>
             <h1 className="text-4xl md:text-5xl font-bold font-heading text-heading">
               claude-code-tips
@@ -95,15 +93,13 @@ export default function ClaudePage() {
       </section>
 
       {/* Plugins */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              plugins
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-4">
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            plugins
+          </span>
+        </FadeIn>
+        <div className="flex flex-col gap-4">
           <FadeIn delay={nextDelay()}>
             <p className="text-secondary text-base leading-relaxed">
               installable plugins that extend claude code with new capabilities.
@@ -126,110 +122,96 @@ export default function ClaudePage() {
       </section>
 
       {/* Hooks */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              hooks
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <div className="flex flex-col gap-3">
-            {hooks.map((hook) => (
-              <FadeIn key={hook.name} delay={nextDelay()}>
-                <a
-                  href={hook.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-start gap-3 py-2 min-h-[44px]"
-                >
-                  <span className="text-accent-400 font-mono text-xs font-bold shrink-0 pt-0.5 group-hover:underline decoration-accent-400/30 underline-offset-4">
-                    {hook.name}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted bg-input border border-border-subtle px-1.5 py-0.5 rounded shrink-0">
-                    {hook.event}
-                  </span>
-                  <span className="text-tertiary text-xs leading-relaxed">
-                    {hook.desc}
-                  </span>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            hooks
+          </span>
+        </FadeIn>
+        <div className="flex flex-col gap-3">
+          {hooks.map((hook) => (
+            <FadeIn key={hook.name} delay={nextDelay()}>
+              <a
+                href={hook.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-3 py-2 min-h-[44px]"
+              >
+                <span className="text-accent-400 font-mono text-xs font-bold shrink-0 pt-0.5 group-hover:underline decoration-accent-400/30 underline-offset-4">
+                  {hook.name}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-muted bg-input border border-border-subtle px-1.5 py-0.5 rounded shrink-0">
+                  {hook.event}
+                </span>
+                <span className="text-tertiary text-xs leading-relaxed">
+                  {hook.desc}
+                </span>
+              </a>
+            </FadeIn>
+          ))}
         </div>
       </section>
 
       {/* Skills & Commands */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              skills
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-            {skills.map((skill) => (
-              <FadeIn key={skill.name} delay={nextDelay()}>
-                <a
-                  href={skill.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-baseline gap-2 py-1.5 min-h-[44px] items-center"
-                >
-                  <code className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                    {skill.name}
-                  </code>
-                  <span className="text-tertiary text-xs">{skill.desc}</span>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            skills
+          </span>
+        </FadeIn>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+          {skills.map((skill) => (
+            <FadeIn key={skill.name} delay={nextDelay()}>
+              <a
+                href={skill.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
+              >
+                <code className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
+                  {skill.name}
+                </code>
+                <span className="text-tertiary text-xs">{skill.desc}</span>
+              </a>
+            </FadeIn>
+          ))}
         </div>
       </section>
 
       {/* Agents */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              agents
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-            {agents.map((agent) => (
-              <FadeIn key={agent.name} delay={nextDelay()}>
-                <a
-                  href={agent.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-baseline gap-2 py-1.5 min-h-[44px] items-center"
-                >
-                  <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                    {agent.name}
-                  </span>
-                  <span className="text-tertiary text-xs">{agent.desc}</span>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            agents
+          </span>
+        </FadeIn>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+          {agents.map((agent) => (
+            <FadeIn key={agent.name} delay={nextDelay()}>
+              <a
+                href={agent.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
+              >
+                <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
+                  {agent.name}
+                </span>
+                <span className="text-tertiary text-xs">{agent.desc}</span>
+              </a>
+            </FadeIn>
+          ))}
         </div>
       </section>
 
       {/* The Guide */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              the guide
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            the guide
+          </span>
+        </FadeIn>
+        <div className="flex flex-col gap-6">
           <FadeIn delay={nextDelay()}>
             <p className="text-secondary text-base leading-relaxed">
               a structured path from first session to power user. everything
@@ -267,72 +249,64 @@ export default function ClaudePage() {
       </section>
 
       {/* Docs */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              docs
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-            {docs.map((doc) => (
-              <FadeIn key={doc.name} delay={nextDelay()}>
-                <a
-                  href={doc.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-baseline gap-2 py-1.5 min-h-[44px] items-center"
-                >
-                  <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                    {doc.name}
-                  </span>
-                  <span className="text-tertiary text-xs">{doc.desc}</span>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            docs
+          </span>
+        </FadeIn>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+          {docs.map((doc) => (
+            <FadeIn key={doc.name} delay={nextDelay()}>
+              <a
+                href={doc.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
+              >
+                <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
+                  {doc.name}
+                </span>
+                <span className="text-tertiary text-xs">{doc.desc}</span>
+              </a>
+            </FadeIn>
+          ))}
         </div>
       </section>
 
       {/* Cost Tracking Callout */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn delay={nextDelay()}>
-            <span className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              cost tracking
-            </span>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <FadeIn delay={nextDelay()}>
-            <div className="border border-accent-400/20 bg-accent-400/5 rounded-lg p-6 flex flex-col gap-4">
-              <p className="text-secondary text-base leading-relaxed">
-                the miner plugin tracks every token, every tool call, every
-                session. know exactly what you're spending and where the
-                value is.
-              </p>
-              <div className="flex flex-wrap gap-4 text-xs font-mono text-muted">
-                <span>per-session cost breakdowns</span>
-                <span className="text-border">|</span>
-                <span>daily/weekly/monthly reports</span>
-                <span className="text-border">|</span>
-                <span>tool usage analytics</span>
-                <span className="text-border">|</span>
-                <span>budget alerts</span>
-              </div>
-              <a
-                href={`${BLOB}/docs/cost-tracking.md`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-mono text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 w-fit"
-              >
-                ./learn_more.md
-              </a>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={nextDelay()}>
+          <span className="text-sm font-mono tracking-wide text-accent-400">
+            cost tracking
+          </span>
+        </FadeIn>
+        <FadeIn delay={nextDelay()}>
+          <div className="border border-accent-400/20 bg-accent-400/5 rounded-lg p-6 flex flex-col gap-4">
+            <p className="text-secondary text-base leading-relaxed">
+              the miner plugin tracks every token, every tool call, every
+              session. know exactly what you&apos;re spending and where the
+              value is.
+            </p>
+            <div className="flex flex-wrap gap-4 text-xs font-mono text-muted">
+              <span>per-session cost breakdowns</span>
+              <span className="text-border">|</span>
+              <span>daily/weekly/monthly reports</span>
+              <span className="text-border">|</span>
+              <span>tool usage analytics</span>
+              <span className="text-border">|</span>
+              <span>budget alerts</span>
             </div>
-          </FadeIn>
-        </div>
+            <a
+              href={`${BLOB}/docs/cost-tracking.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-mono text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 w-fit"
+            >
+              ./learn_more.md
+            </a>
+          </div>
+        </FadeIn>
       </section>
     </div>
   );

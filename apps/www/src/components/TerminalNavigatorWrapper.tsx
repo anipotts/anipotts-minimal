@@ -6,23 +6,21 @@ import { TerminalNavigator } from '@anipotts/ui/terminal-navigator';
 import { getSectionFromPath, useSectionNavigation } from '@anipotts/ui';
 
 /**
- * Client component wrapper for TerminalNavigator that automatically
- * detects the current subdomain from the route path and provides
- * SPA navigation for the cd command.
+ * Client component wrapper for TerminalNavigator that detects the
+ * current section from the route path and provides SPA navigation.
  */
 export default function TerminalNavigatorWrapper() {
   const pathname = usePathname();
-  const subdomain = getSectionFromPath(pathname);
+  const section = getSectionFromPath(pathname);
   const { navigateTo } = useSectionNavigation();
 
-  // SPA navigation handler for terminal cd command
-  const handleNavigate = useCallback((targetSubdomain: string) => {
-    navigateTo(targetSubdomain);
+  const handleNavigate = useCallback((targetSection: string) => {
+    navigateTo(targetSection);
   }, [navigateTo]);
 
   return (
     <TerminalNavigator
-      currentSubdomain={subdomain}
+      currentSubdomain={section}
       onNavigate={handleNavigate}
     />
   );

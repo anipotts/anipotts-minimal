@@ -84,15 +84,13 @@ export default async function Home() {
       const s = content.sections.intro;
       if (!s?.visible) return null;
       return (
-        <section key="intro" className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1">
-            <FadeIn delay={nextDelay()}>
-              <span className="text-sm font-mono text-accent-400 tracking-widest uppercase">
-                {s.label ?? "index"}
-              </span>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
+        <section key="intro" className="flex flex-col gap-4">
+          <FadeIn delay={nextDelay()}>
+            <span className="text-sm font-mono text-accent-400 tracking-wide">
+              {s.label ?? "index"}
+            </span>
+          </FadeIn>
+          <div className="flex flex-col gap-6">
             <FadeIn delay={nextDelay()}>
               <h1 className="text-4xl md:text-5xl font-bold font-heading text-heading">
                 {s.heading}
@@ -114,23 +112,29 @@ export default async function Home() {
       const s = content.sections.about;
       if (!s?.visible) return null;
       return (
-        <section key="about" className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1">
-            <FadeIn delay={nextDelay()}>
-              <span className="text-sm font-mono text-accent-400 tracking-widest uppercase">
-                {s.label ?? "about me"}
-              </span>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-6 text-body text-base md:text-lg leading-relaxed">
+        <section key="about" className="flex flex-col gap-4">
+          <FadeIn delay={nextDelay()}>
+            <span className="text-sm font-mono text-accent-400 tracking-wide">
+              {s.label ?? "about me"}
+            </span>
+          </FadeIn>
+          <div className="flex flex-col gap-6 text-body text-base md:text-lg leading-relaxed">
             <FadeIn delay={nextDelay()}>
               <p>
-                Right now, I'm building an investment research platform for <CompanyLink href="https://www.pgiuchicago.com/" companyName="PGI">PGI</CompanyLink>, serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
+                Right now, I&apos;m building an investment research platform for{" "}
+                <CompanyLink href="https://www.pgiuchicago.com/" companyName="PGI">PGI</CompanyLink>,
+                serving quants at UChicago, NYU, Princeton, Brown, and other top institutions.
               </p>
             </FadeIn>
             <FadeIn delay={nextDelay()}>
               <p>
-                Previously, I built internal analytics dashboards for <CompanyLink href="https://www.atlanticrecords.com/" companyName="Atlantic Records">Atlantic</CompanyLink>, automated social media scraping for <CompanyLink href="https://www.rangemp.com/" companyName="Range Media Partners">Range Media Partners</CompanyLink>, and launched several profitable <a href="#selected-work" className="text-body hover:text-accent-400 font-medium underline decoration-overlay-30 underline-offset-4 transition-colors">PWAs</a> (see below).
+                Previously, I built internal analytics dashboards for{" "}
+                <CompanyLink href="https://www.atlanticrecords.com/" companyName="Atlantic Records">Atlantic</CompanyLink>,
+                automated social media scraping for{" "}
+                <CompanyLink href="https://www.rangemp.com/" companyName="Range Media Partners">Range Media Partners</CompanyLink>,
+                and launched several profitable{" "}
+                <a href="#selected-work" className="text-body hover:text-accent-400 font-medium underline decoration-overlay-30 underline-offset-4 transition-colors">PWAs</a>{" "}
+                (see below).
               </p>
             </FadeIn>
           </div>
@@ -142,16 +146,14 @@ export default async function Home() {
       const s = content.sections.past_work;
       if (!s?.visible) return null;
       return (
-        <section key="past_work" id="selected-work" className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1">
-            <FadeIn delay={nextDelay()}>
-              <span className="text-sm font-mono text-accent-400 tracking-widest uppercase">
-                {s.label ?? "past work"}
-              </span>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <section key="past_work" id="selected-work" className="flex flex-col gap-4">
+          <FadeIn delay={nextDelay()}>
+            <span className="text-sm font-mono text-accent-400 tracking-wide">
+              {s.label ?? "past work"}
+            </span>
+          </FadeIn>
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {recentProjects.map((project) => (
                 <FadeIn key={project.slug} delay={nextDelay()}>
                   <ProjectCard project={project} />
@@ -175,15 +177,13 @@ export default async function Home() {
       const s = content.sections.latest_thoughts;
       if (!s?.visible) return null;
       return (
-        <section key="latest_thoughts" className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1">
-            <FadeIn delay={nextDelay()}>
-              <span className="text-sm font-mono text-accent-400 tracking-widest uppercase">
-                {s.label ?? "latest thoughts"}
-              </span>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+        <section key="latest_thoughts" className="flex flex-col gap-4">
+          <FadeIn delay={nextDelay()}>
+            <span className="text-sm font-mono text-accent-400 tracking-wide">
+              {s.label ?? "latest thoughts"}
+            </span>
+          </FadeIn>
+          <div className="flex flex-col gap-8">
             {latestThoughts.length > 0 ? (
               <>
                 {latestThoughts.map((thought: ThoughtSummary) => (

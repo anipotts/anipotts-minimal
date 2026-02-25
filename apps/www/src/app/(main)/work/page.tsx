@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { FadeIn } from "@anipotts/ui";
 import { fetchProjects } from "@anipotts/lib/cms";
-import type { Project } from "@anipotts/types";
 import type { Metadata } from "next";
 
 import WorkFilteredList from "./WorkFilteredList";
@@ -33,15 +32,13 @@ export default async function WorkPage() {
 
   return (
     <div className="flex flex-col gap-16 md:gap-20 pb-20">
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn>
-            <h1 className="text-sm font-mono tracking-widest uppercase text-accent-400">
-              work
-            </h1>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+      <section className="flex flex-col gap-4">
+        <FadeIn>
+          <h1 className="text-sm font-mono tracking-wide text-accent-400">
+            work
+          </h1>
+        </FadeIn>
+        <div className="flex flex-col gap-8">
           <FadeIn delay={0.05}>
             <p className="text-secondary text-base leading-relaxed">
               Projects, experiments, and open-source work. Click any to expand.

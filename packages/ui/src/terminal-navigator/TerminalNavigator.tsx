@@ -39,7 +39,7 @@ export function TerminalNavigator({
     } else {
       layout.closeTerminal();
     }
-  }, [state.isOpen, layout]);
+  }, [state.isOpen, layout.openTerminal, layout.closeTerminal]);
 
   // Ctrl+` listener (desktop only)
   useEffect(() => {

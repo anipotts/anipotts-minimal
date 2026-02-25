@@ -2,7 +2,7 @@ import type { SocialLink } from "@anipotts/types";
 
 /**
  * Canonical list of all social/contact links.
- * Used by: www/connect, links subdomain, metadata, SubdomainNavigator.
+ * Used by: www/connect, metadata.
  */
 export const socialLinks: SocialLink[] = [
   {

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm turbo build --filter=@anipotts/ui)",
+      "Bash(pnpm build)",
+      "Bash(pnpm list tailwindcss --recursive --depth 0)",
+      "Bash(pnpm install)"
+    ]
+  }
+}

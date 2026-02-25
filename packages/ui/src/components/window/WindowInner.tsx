@@ -14,7 +14,7 @@ export function WindowInner({ children, showNavbar = true, showFooter = true }: 
   const { isFullscreen } = useWindowState();
 
   return (
-    <div className={clsx("px-6 md:px-12 lg:px-16 flex flex-col flex-grow overflow-y-auto overscroll-y-none min-h-0 bg-[rgba(var(--overlay-invert),0.4)] relative transition-all duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)] scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent", !isFullscreen && "min-h-[calc(100vh-8rem)]")}>
+    <div className={clsx("px-6 md:px-8 lg:px-10 flex flex-col flex-grow overflow-y-auto overscroll-y-none min-h-0 bg-[rgba(var(--overlay-invert),0.4)] relative transition-all duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)] scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent", !isFullscreen && "min-h-[calc(100vh-8rem)]")}>
       
       <div className={clsx("w-full mx-auto transition-[max-width] duration-[240ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col flex-grow", isFullscreen ? "max-w-4xl" : "max-w-full")}>
         {/* Navbar as Command Row - conditionally rendered */}

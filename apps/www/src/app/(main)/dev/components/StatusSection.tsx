@@ -72,7 +72,7 @@ export default function StatusSection({
                 />
                 <span className="text-sm text-secondary truncate group-hover:text-accent-400 transition-colors">
                   {service.serviceName
-                    .replace(".anipotts.com", "")
+                    .replace("anipotts.com/", "")
                     .replace("anipotts.com", "www")}
                 </span>
                 <span className="text-[10px] text-faint ml-auto shrink-0">
