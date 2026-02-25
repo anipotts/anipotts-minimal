@@ -1,69 +1,47 @@
-# Ani Potts 
+# anipotts.com
+
+Monorepo for `anipotts.com`.
+
+## Stack
+- Next.js App Router (`apps/www`)
+- Shared UI/styles/types packages (`packages/*`)
+- Git-first content (local markdown + typed content modules)
 
 ## Quick Start
-
-1.  **Install dependencies:**
-    ```bash
-    pnpm install
-    ```
-
-2.  **Run development server:**
-    ```bash
-    pnpm dev
-    ```
-    Open [http://localhost:3000](http://localhost:3000) to view it.
-
-## Environment Variables
-
-Create a `.env.local` file in the root directory with the following keys:
-
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-ADMIN_PASSWORD=your_secure_password
-ADMIN_TOTP_SECRET=your_totp_secret_base32
+pnpm install
+pnpm dev
 ```
 
-Optional but recommended for admin actions if RLS is strict:
+Open [http://localhost:3000](http://localhost:3000).
+
+## Key Commands
 ```bash
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+pnpm build
+pnpm test
+pnpm github:audit
+pnpm demo:capture anipotts-home
+pnpm demo:capture:all
 ```
 
-Contact form + abuse protection:
-```bash
-RESEND_API_KEY=your_resend_api_key
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
-TURNSTILE_SECRET_KEY=your_turnstile_secret_key
-UPSTASH_REDIS_REST_URL=your_upstash_redis_url
-UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
-```
+## Content Model
+- Thoughts markdown: `apps/www/content/thoughts/*.md`
+- Shared content outputs: `content/work/*`
+- Project/thought templates: `content/templates/*`
 
-## Project Structure
+## Route Map
+- `/`
+- `/work`
+- `/projects/[slug]`
+- `/thoughts`
+- `/thoughts/[slug]`
+- `/claude`
+- `/connect`
+- `/dev` -> permanent redirect to `/claude`
 
--   `src/app`: App Router pages and layouts.
-    -   `page.tsx`: Home page.
-    -   `work/`: Work portfolio.
-    -   `thoughts/`: Blog/Notes system.
-    -   `connect/`: Contact page.
--   `src/components`: Reusable UI components (Navbar, Footer, SignalsBar, etc.).
--   `src/data`: Static data (projects).
--   `src/lib`: Utilities (Supabase client).
+## Scripts
+- GitHub scoring audit: `scripts/github/audit-public-repos.mjs`
+- Demo capture pipeline: `scripts/demos/capture-project-demo.mjs`
 
-## Thoughts System (Supabase)
-
-The "Thoughts" section is powered by a Supabase `thoughts` table.
-
-**Schema:**
--   `id` (uuid, primary key)
--   `slug` (text, unique)
--   `title` (text)
--   `summary` (text)
--   `content` (text)
--   `tags` (text[] or text)
--   `created_at` (timestamptz)
--   `updated_at` (timestamptz)
--   `published` (boolean)
-
-**Admin Interface:**
-Visit `/thoughts/admin` to manage thoughts. You will be prompted for the `ADMIN_PASSWORD`.
-This interface allows you to Create, Read, Update, and Delete thoughts.
+## Environment
+Only set env vars for features you use (contact email, captcha, analytics, etc.).

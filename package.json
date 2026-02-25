@@ -14,14 +14,12 @@
     "clean": "turbo clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
+    "github:audit": "node scripts/github/audit-public-repos.mjs anipotts",
+    "demo:capture": "node scripts/demos/capture-project-demo.mjs",
+    "demo:capture:all": "node scripts/demos/capture-all-demos.mjs",
     "test:unit": "turbo test",
     "test:e2e": "pnpm --filter @anipotts/www test:e2e",
     "test": "pnpm test:unit && pnpm test:e2e"
-  },
-  "pnpm": {
-    "overrides": {
-      "framer-motion": "12.23.25"
-    }
   },
   "devDependencies": {
     "prettier": "^3.4.0",
