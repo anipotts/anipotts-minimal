@@ -9,7 +9,7 @@ export function WavesBackground() {
   const lineColor =
     resolvedTheme === "dark"
       ? "rgba(97, 171, 234, 0.96)"
-      : "rgba(255, 255, 255, 0.8)";
+      : "rgba(97, 171, 234, 0.5)";
 
   return (
     <div

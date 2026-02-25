@@ -2,28 +2,28 @@
 /* Light mode (default) → .dark overrides for dark mode */
 
 :root {
-  --background: #61abea;
+  --background: #1e5f99;
   --foreground: #ffffff;
-  --card: #4e96d1;
+  --card: #19507f;
   --card-foreground: #ffffff;
-  --card-darker: #4589c4;
+  --card-darker: #154468;
 
-  /* Accent colors - white for light mode (on blue bg), blue for dark */
-  --accent: #ffffff;
-  --accent-400: #ffffff;
+  /* Accent colors - #61abea in both modes for consistent branding */
+  --accent: #61abea;
+  --accent-400: #61abea;
 
   /* Signal colors (same in both modes) */
   --signal-green: #4ade80;
   --signal-red: #ef4444;
 
-  /* Overlay RGB triplets (light: white overlays on blue bg) */
+  /* Overlay RGB triplets (light: dark-blue-tinted overlays) */
   --overlay-base: 255, 255, 255;
-  --overlay-invert: 0, 0, 0;
+  --overlay-invert: 10, 40, 70;
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.15);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --ring: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.18);
+  --border-subtle: rgba(255, 255, 255, 0.10);
+  --ring: rgba(255, 255, 255, 0.12);
 
   /* Backdrops */
   --backdrop-dim: rgba(0, 0, 0, 0.4);
@@ -43,34 +43,34 @@
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
 
   /* Effects */
-  --grid-line: rgba(255, 255, 255, 0.05);
+  --grid-line: rgba(255, 255, 255, 0.06);
   --noise-opacity: 0.02;
-  --waves-color: rgba(255, 255, 255, 0.5);
+  --waves-color: rgba(97, 171, 234, 0.5);
   --waves-opacity: 0.35;
   --cursor-dot: rgba(255, 255, 255, 0.6);
-  --ambient-from: rgba(78, 150, 209, 0.4);
+  --ambient-from: rgba(30, 95, 153, 0.4);
 
   /* Quill editor */
-  --quill-toolbar-bg: rgba(255, 255, 255, 0.08);
+  --quill-toolbar-bg: rgba(255, 255, 255, 0.06);
   --quill-toolbar-border: rgba(255, 255, 255, 0.15);
-  --quill-container-bg: rgba(255, 255, 255, 0.05);
+  --quill-container-bg: rgba(255, 255, 255, 0.04);
   --quill-text: #ffffff;
-  --quill-placeholder: rgba(255, 255, 255, 0.4);
-  --quill-icon: #a8c4dc;
-  --quill-dropdown-bg: #4e96d1;
+  --quill-placeholder: rgba(255, 255, 255, 0.35);
+  --quill-icon: #7da3c2;
+  --quill-dropdown-bg: #19507f;
   --quill-dropdown-border: rgba(255, 255, 255, 0.15);
-  --quill-dropdown-shadow: rgba(0, 0, 0, 0.2);
-  --quill-item-text: #a8c4dc;
+  --quill-dropdown-shadow: rgba(0, 0, 0, 0.3);
+  --quill-item-text: #7da3c2;
 
   /* Prose */
   --prose-heading: #ffffff;
-  --prose-code-bg: rgba(255, 255, 255, 0.12);
-  --prose-pre-bg: rgba(0, 0, 0, 0.15);
-  --prose-pre-border: rgba(255, 255, 255, 0.15);
-  --prose-blockquote-text: #a8c4dc;
+  --prose-code-bg: rgba(255, 255, 255, 0.10);
+  --prose-pre-bg: rgba(0, 0, 0, 0.20);
+  --prose-pre-border: rgba(255, 255, 255, 0.12);
+  --prose-blockquote-text: #7da3c2;
 
-  /* Text readability enhancement (subtle shadow for white-on-blue) */
-  --text-enhance: 0 0 1px rgba(0, 0, 0, 0.12);
+  /* Text readability enhancement (not needed with deeper bg contrast) */
+  --text-enhance: none;
 
   /* Font variables will be defined in layout.tsx */
 }
@@ -164,7 +164,7 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.4);
 }
 
 .dark input:focus-visible,
