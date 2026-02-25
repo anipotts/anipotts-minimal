@@ -156,7 +156,7 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
       </FadeIn>
 
       <FadeIn delay={0.2}>
-        <div className="prose prose-invert prose-gray max-w-none prose-headings:font-bold prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted">
+        <div className="prose prose-invert prose-gray max-w-none prose-headings:font-bold prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted">
           <ReactMarkdown
             components={{
               img: ({ node, ...props }) => {
