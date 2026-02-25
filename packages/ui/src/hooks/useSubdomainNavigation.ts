@@ -13,10 +13,8 @@ const SECTION_TO_ROUTE: Record<string, string> = {
   thoughts: '/thoughts',
   connect: '/connect',
   dev: '/dev',
+  claude: '/claude',
 };
-
-/** @deprecated Use SECTION_TO_ROUTE */
-const SUBDOMAIN_TO_ROUTE = SECTION_TO_ROUTE;
 
 /**
  * Reverse mapping: route path to section name.
@@ -40,9 +38,6 @@ export function getSectionFromPath(pathname: string): string {
   return 'www';
 }
 
-/** @deprecated Use getSectionFromPath */
-export const getSubdomainFromPath = getSectionFromPath;
-
 /**
  * Get the path within a section from the full pathname.
  * @param pathname - The current pathname (e.g., "/thoughts/hello")
@@ -59,9 +54,6 @@ export function getSectionPath(pathname: string): string {
   const subPath = pathname.slice(basePath.length);
   return subPath || '/';
 }
-
-/** @deprecated Use getSectionPath */
-export const getSubdomainPath = getSectionPath;
 
 type ViewTransitionDocument = Document & {
   startViewTransition: (callback: () => void | Promise<void>) => {
@@ -166,8 +158,6 @@ export function useSectionNavigation() {
   return {
     /** Current section (e.g., "thoughts", "www") */
     currentSection,
-    /** @deprecated Use currentSection */
-    currentSubdomain: currentSection,
     /** Current path within the section (e.g., "/hello") */
     currentPath,
     /** Navigate to a section + path */
@@ -176,19 +166,12 @@ export function useSectionNavigation() {
     goBack,
     /** Check if currently on a section */
     isOnSection,
-    /** @deprecated Use isOnSection */
-    isOnSubdomain: isOnSection,
     /** All available sections */
     sections: Object.keys(SECTION_TO_ROUTE),
-    /** @deprecated Use sections */
-    subdomains: Object.keys(SECTION_TO_ROUTE),
     /** Router instance for advanced usage */
     router,
   };
 }
-
-/** @deprecated Use useSectionNavigation */
-export const useSubdomainNavigation = useSectionNavigation;
 
 /**
  * Get the full internal path for a section + path combination.

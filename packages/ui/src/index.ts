@@ -40,11 +40,8 @@ export type { WindowState, ThemeMode, ResolvedTheme } from "./context";
 export {
   useDebounce,
   useSectionNavigation,
-  useSubdomainNavigation,
   getSectionFromPath,
-  getSubdomainFromPath,
   getSectionPath,
-  getSubdomainPath,
   getInternalPath,
 } from "./hooks";
 
