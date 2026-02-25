@@ -39,10 +39,10 @@ export default async function ThoughtsPage({
 
   return (
     <div className="flex flex-col gap-16 md:gap-20 pb-20">
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1 flex flex-col gap-4">
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <FadeIn>
-            <h1 className="text-sm font-mono text-accent-400 tracking-widest uppercase">
+            <h1 className="text-sm font-mono text-accent-400 tracking-wide shrink-0">
               thoughts
             </h1>
           </FadeIn>
@@ -50,10 +50,11 @@ export default async function ThoughtsPage({
             <ThoughtsSearch />
           </Suspense>
         </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+
+        <div className="flex flex-col">
           {query && (
             <FadeIn delay={0.05}>
-              <p className="text-xs text-muted uppercase tracking-wider font-mono">
+              <p className="text-xs text-muted uppercase tracking-wider font-mono mb-6">
                 {thoughts.length} result{thoughts.length !== 1 ? "s" : ""} for &quot;{query}&quot;
               </p>
             </FadeIn>

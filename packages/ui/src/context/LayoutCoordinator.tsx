@@ -98,11 +98,11 @@ export function LayoutCoordinatorProvider({ children }: LayoutCoordinatorProvide
   });
 
   const openAdmin = useCallback(() => {
-    setState((prev) => ({ ...prev, isAdminOpen: true }));
+    setState((prev) => prev.isAdminOpen ? prev : { ...prev, isAdminOpen: true });
   }, []);
 
   const closeAdmin = useCallback(() => {
-    setState((prev) => ({ ...prev, isAdminOpen: false }));
+    setState((prev) => !prev.isAdminOpen ? prev : { ...prev, isAdminOpen: false });
   }, []);
 
   const toggleAdmin = useCallback(() => {
@@ -110,11 +110,11 @@ export function LayoutCoordinatorProvider({ children }: LayoutCoordinatorProvide
   }, []);
 
   const openTerminal = useCallback(() => {
-    setState((prev) => ({ ...prev, isTerminalOpen: true }));
+    setState((prev) => prev.isTerminalOpen ? prev : { ...prev, isTerminalOpen: true });
   }, []);
 
   const closeTerminal = useCallback(() => {
-    setState((prev) => ({ ...prev, isTerminalOpen: false }));
+    setState((prev) => !prev.isTerminalOpen ? prev : { ...prev, isTerminalOpen: false });
   }, []);
 
   const toggleTerminal = useCallback(() => {

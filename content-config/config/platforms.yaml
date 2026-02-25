@@ -80,7 +80,7 @@ platforms:
     enabled: true
     handle: "@anipotts"
     scheduler: manual
-    canonical_to: thoughts.anipotts.com
+    canonical_to: anipotts.com/thoughts
     voice_mode: professional
     artifact_link_style: "resources-section"
 
@@ -88,7 +88,7 @@ platforms:
     enabled: true
     handle: "@anipotts"
     scheduler: manual
-    canonical_to: thoughts.anipotts.com
+    canonical_to: anipotts.com/thoughts
     voice_mode: professional
     artifact_link_style: "resources-section"
 
@@ -131,7 +131,7 @@ integrations:
       - mastodon
 
   blog:
-    url: https://thoughts.anipotts.com
+    url: https://anipotts.com/thoughts
     admin: true
     format: markdown
 

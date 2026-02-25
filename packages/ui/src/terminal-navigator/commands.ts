@@ -1,6 +1,6 @@
 "use client";
 
-import { subdomains, publicSubdomains, SITE_VERSION } from "@anipotts/lib/data";
+import { sections, publicSections, SITE_VERSION } from "@anipotts/lib/data";
 import type { CommandDef, CommandContext, OutputLine } from "./types";
 import { PROMPT_USER, getPromptPath } from "./constants";
 import { getInternalPath } from "../hooks/useSubdomainNavigation";
@@ -10,8 +10,8 @@ function line(type: OutputLine["type"], content: string): OutputLine {
   return { id: `line-${++lineId}`, type, content };
 }
 
-function findSubdomain(name: string) {
-  return subdomains.find((s) => s.name === name);
+function findSection(name: string) {
+  return sections.find((s) => s.name === name);
 }
 
 const helpCmd: CommandDef = {
@@ -32,13 +32,13 @@ const helpCmd: CommandDef = {
 
 const lsCmd: CommandDef = {
   name: "ls",
-  description: "List subdomains",
+  description: "List sections",
   execute: (args, ctx) => {
     const long = args.includes("-la") || args.includes("-l") || args.includes("-al");
     if (long) {
       ctx.addOutput([
-        line("output", `total ${publicSubdomains.length}`),
-        ...publicSubdomains.map((s) => {
+        line("output", `total ${publicSections.length}`),
+        ...publicSections.map((s) => {
           const current = s.name === ctx.currentSubdomain ? " *" : "";
           const nameType = s.name === ctx.currentSubdomain ? "accent" as const : "output" as const;
           return line(nameType,
@@ -47,7 +47,7 @@ const lsCmd: CommandDef = {
         }),
       ]);
     } else {
-      const names = publicSubdomains.map((s) =>
+      const names = publicSections.map((s) =>
         s.name === ctx.currentSubdomain ? `\x1b[accent]${s.name}/\x1b[/accent]*` : `${s.name}/`
       );
       // Show in a grid-like format
@@ -58,14 +58,14 @@ const lsCmd: CommandDef = {
 
 const cdCmd: CommandDef = {
   name: "cd",
-  description: "Navigate to subdomain",
+  description: "Navigate to section",
   execute: (args, ctx) => {
     const target = args[0];
     if (!target) {
       ctx.addOutput([line("error", "cd: missing argument")]);
       return;
     }
-    const sub = findSubdomain(target);
+    const sub = findSection(target);
     if (!sub) {
       ctx.addOutput([line("error", `cd: no such host: ${target}`)]);
       return;
@@ -89,14 +89,14 @@ const cdCmd: CommandDef = {
 
 const openCmd: CommandDef = {
   name: "open",
-  description: "Open subdomain in new tab",
+  description: "Open section in new tab",
   execute: (args, ctx) => {
     const target = args[0];
     if (!target) {
       ctx.addOutput([line("error", "open: missing argument")]);
       return;
     }
-    const sub = findSubdomain(target);
+    const sub = findSection(target);
     if (!sub) {
       ctx.addOutput([line("error", `open: no such host: ${target}`)]);
       return;
@@ -110,7 +110,7 @@ const openCmd: CommandDef = {
 
 const pwdCmd: CommandDef = {
   name: "pwd",
-  description: "Print current subdomain path",
+  description: "Print current path",
   execute: (_args, ctx) => {
     const sub = findSubdomain(ctx.currentSubdomain);
     ctx.addOutput([line("output", sub?.path ?? `/home/ani/${ctx.currentSubdomain}`)]);
@@ -166,7 +166,7 @@ const neofetchCmd: CommandDef = {
       `Host: ~/${ctx.currentSubdomain}`,
       `Shell: zsh`,
       `Terminal: web`,
-      `Packages: ${publicSubdomains.length} (sections)`,
+      `Packages: ${publicSections.length} (sections)`,
       `Uptime: ${uptimeStr}`,
       `Stack: Next.js \u00b7 React \u00b7 TypeScript`,
       `Theme: terminal-dark`,
@@ -188,14 +188,14 @@ const neofetchCmd: CommandDef = {
 
 const pingCmd: CommandDef = {
   name: "ping",
-  description: "Ping a subdomain",
+  description: "Ping a section",
   execute: async (args, ctx) => {
     const target = args[0];
     if (!target) {
       ctx.addOutput([line("error", "ping: missing argument")]);
       return;
     }
-    const sub = findSubdomain(target);
+    const sub = findSection(target);
     if (!sub) {
       ctx.addOutput([line("error", `ping: unknown host ${target}`)]);
       return;

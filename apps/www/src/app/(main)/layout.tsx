@@ -2,9 +2,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 /**
- * Layout for the main site routes (anipotts.com).
- * Includes Navbar and Footer, unlike subdomain routes.
- * Footer is pinned to bottom via flex-grow on content area.
+ * Layout for all main site routes (anipotts.com).
+ * Wraps each page with Navbar and Footer.
  */
 export default function MainLayout({
   children,

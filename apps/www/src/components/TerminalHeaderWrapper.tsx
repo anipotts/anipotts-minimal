@@ -5,18 +5,16 @@ import { TerminalHeader } from '@anipotts/ui';
 import { getSectionFromPath } from '@anipotts/ui';
 
 /**
- * Client component wrapper for TerminalHeader that automatically
- * sets the title based on the current subdomain from the route path.
+ * Client component wrapper for TerminalHeader that sets the title
+ * based on the current section from the route path.
  */
 export default function TerminalHeaderWrapper() {
   const pathname = usePathname();
-  const subdomain = getSectionFromPath(pathname);
+  const section = getSectionFromPath(pathname);
 
-  // For main site, don't pass a default title (uses router-based title)
-  // For subdomains, show the full subdomain URL
-  const defaultTitle = subdomain === 'www'
+  const defaultTitle = section === 'www'
     ? undefined
-    : `ani@potts:~/${subdomain}`;
+    : `ani@potts:~/${section}`;
 
   return <TerminalHeader defaultTitle={defaultTitle} />;
 }

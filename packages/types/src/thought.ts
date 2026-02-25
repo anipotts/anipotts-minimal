@@ -18,8 +18,10 @@ export type Platform =
   | 'substack'
   | 'reddit';
 
-// Valid subdomains for content scoping
-export type Subdomain = 'www' | 'thoughts' | 'dev' | 'links' | 'updates' | 'metrics' | 'status' | 'lab' | 'docs';
+// Valid sections for content scoping
+export type Section = 'www' | 'thoughts' | 'dev' | 'work' | 'connect' | 'claude';
+/** @deprecated Use Section */
+export type Subdomain = Section;
 
 export interface Thought {
   id: string;
@@ -48,8 +50,8 @@ export interface Thought {
   published_at?: string;
   scheduled_at?: string;
 
-  // Subdomain scoping
-  subdomain?: Subdomain;
+  // Section scoping
+  section?: Section;
 }
 
 export interface ThoughtStats {
@@ -82,8 +84,8 @@ export interface Atom {
   created_at: string;
   updated_at: string;
 
-  // Subdomain scoping
-  subdomain?: Subdomain;
+  // Section scoping
+  section?: Section;
 }
 
 export interface AtomWithContent extends Atom {

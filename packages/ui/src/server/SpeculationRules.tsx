@@ -14,7 +14,7 @@ const PRIORITY_SECTIONS = ["www", "thoughts", "dev", "lab"];
  * Modern browsers (Chrome 109+) will prerender these pages in a hidden tab,
  * making navigation feel nearly instant.
  *
- * All URLs are now same-origin paths (e.g., "/thoughts" instead of "https://thoughts.anipotts.com").
+ * All URLs are same-origin paths (e.g., "/thoughts").
  *
  * @example
  * // In layout.tsx <head>

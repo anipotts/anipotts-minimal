@@ -20,20 +20,6 @@ export function navigateToSection(path: string): void {
 }
 
 /**
- * @deprecated Use navigateToSection for public navigation.
- * Kept for admin subdomain access only.
- */
-export function navigateToSubdomain(url: string): void {
-  if (typeof document !== "undefined" && "startViewTransition" in document) {
-    (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
-      window.location.href = url;
-    });
-  } else {
-    window.location.href = url;
-  }
-}
-
-/**
  * Navigate to a URL within the same origin using History API.
  * Uses View Transitions if available for smooth animations.
  *

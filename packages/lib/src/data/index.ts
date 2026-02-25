@@ -5,7 +5,7 @@ export { projects, FALLBACK_PROJECTS, liveProjects } from "./projects";
 export { socialLinks, FALLBACK_SOCIAL_LINKS, SOCIAL_HANDLE, CONTACT_EMAIL } from "./social";
 
 // Site metadata
-export { site, subdomains, publicSubdomains } from "./site";
+export { site, sections, publicSections } from "./site";
 
 // Constants
 export { SITE_VERSION } from "../constants";

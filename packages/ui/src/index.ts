@@ -53,9 +53,6 @@ export type { PostHogProviderProps } from "./providers";
 export { AdminProvider, useAdmin, AdminShell, AdminLogin } from "./admin";
 export type { AdminActions, AdminContextType } from "./admin";
 
-// Subdomain
-export { SubdomainHeader, SubdomainFooter } from "./subdomain";
-
 // Navigation
 export { ExpandableNav } from "./components/navigation";
 
@@ -66,7 +63,6 @@ export {
   isPrefetched,
   clearPrefetchCache,
   navigateToSection,
-  navigateToSubdomain,
   navigateSameOrigin,
   supportsViewTransitions,
 } from "./utils";

@@ -201,18 +201,18 @@ export default async function DevPage({
 
   return (
     <div className="flex flex-col gap-16 md:gap-20 pb-20">
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="col-span-1">
-          <FadeIn>
-            <h1 className="text-sm font-mono text-accent-400 tracking-widest uppercase">
+      <section className="flex flex-col gap-4">
+        <FadeIn>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-sm font-mono text-accent-400 tracking-wide">
               dev dashboard
             </h1>
-            <p className="text-muted text-xs mt-2">
+            <p className="text-muted text-xs">
               Tools, metrics, activity, and service status
             </p>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-8">
+          </div>
+        </FadeIn>
+        <div className="flex flex-col gap-8">
           <FadeIn delay={0.05}>
             <Suspense>
               <DevSectionTabs />
