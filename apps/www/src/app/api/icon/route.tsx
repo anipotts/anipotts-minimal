@@ -1,8 +1,6 @@
 import { NextRequest } from "next/server";
 import { generateIcon } from "@/lib/generateIcon";
 
-export const runtime = "edge";
-
 export function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const text = searchParams.get("text") || "ap";

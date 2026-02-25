@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("contact form submits", async ({ page }) => {
+test("command composer contact flow submits", async ({ page }) => {
   await page.route("**/api/send", async (route) => {
     await route.fulfill({
       status: 200,
@@ -11,10 +11,16 @@ test("contact form submits", async ({ page }) => {
 
   await page.goto("/connect");
 
-  await page.getByPlaceholder("Your Name").fill("Test User");
-  await page.getByPlaceholder("Your Email").fill("test@example.com");
-  await page.getByPlaceholder("Your Message").fill("Hello there");
+  await page.getByRole("button", { name: /collab/i }).click();
+  await page
+    .getByLabel(/what are you trying to build\?/i)
+    .fill("Need help building a Claude Code workflow with review gates for a production repo.");
 
-  await page.getByRole("button", { name: /send message/i }).click();
-  await expect(page.getByText("Message Sent")).toBeVisible();
+  await page.getByRole("button", { name: /continue/i }).click();
+
+  await page.getByLabel(/your name/i).fill("Test User");
+  await page.getByLabel(/your email/i).fill("test@example.com");
+
+  await page.getByRole("button", { name: /dispatch message/i }).click();
+  await expect(page.getByText(/message sent/i)).toBeVisible();
 });

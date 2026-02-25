@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createClient } from "@supabase/supabase-js";
-import { contactSchema, formatZodError } from "@anipotts/lib/validation";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { parseContactPayload } from "@/lib/contactValidation";
 
 export async function POST(request: Request) {
   try {
@@ -23,16 +22,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const parsed = contactSchema.safeParse(body);
+    const parsed = parseContactPayload(body);
     if (!parsed.success) {
-      return NextResponse.json(formatZodError(parsed.error), { status: 400 });
+      return NextResponse.json(parsed.error, { status: 400 });
     }
 
     const { name, email, message, captchaToken } = parsed.data;
 
-    const captchaRequired =
-      process.env.NODE_ENV === "production" ||
-      Boolean(process.env.TURNSTILE_SECRET_KEY);
+    const captchaRequired = Boolean(process.env.TURNSTILE_SECRET_KEY);
 
     if (captchaRequired && !captchaToken) {
       return NextResponse.json({ error: "Captcha required" }, { status: 400 });
@@ -57,20 +54,6 @@ export async function POST(request: Request) {
       replyTo: email,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
-
-    // Store submission in Supabase (non-blocking: email already sent)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        await supabase
-          .from("contact_submissions")
-          .insert({ name, email, message, status: "new" });
-      } catch (dbErr) {
-        console.error("Failed to store contact submission:", dbErr);
-      }
-    }
 
     return NextResponse.json(data);
   } catch (error) {
