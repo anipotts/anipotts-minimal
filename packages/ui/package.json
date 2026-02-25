@@ -36,21 +36,12 @@
       "types": "./dist/providers/index.d.ts",
       "import": "./dist/providers/index.js"
     },
-    "./admin": {
-      "types": "./dist/admin/index.d.ts",
-      "import": "./dist/admin/index.js"
-    },
-    "./terminal-navigator": {
-      "types": "./dist/terminal-navigator/index.d.ts",
-      "import": "./dist/terminal-navigator/index.js"
-    },
     "./server": "./src/server/index.ts"
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "next": "^16.0.0",
@@ -58,13 +49,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@anipotts/lib": "workspace:*",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.23.25",
-    "lucide-react": "^0.555.0",
-    "posthog-js": "^1.300.0",
-    "react-icons": "^5.5.0",
-    "tailwind-merge": "^3.4.0"
+    "posthog-js": "^1.300.0"
   },
   "devDependencies": {
     "@types/react": "^19",
