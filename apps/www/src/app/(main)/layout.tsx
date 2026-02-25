@@ -1,10 +1,6 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
-/**
- * Layout for all main site routes (anipotts.com).
- * Wraps each page with Navbar and Footer.
- */
 export default function MainLayout({
   children,
 }: {
@@ -13,9 +9,9 @@ export default function MainLayout({
   return (
     <div className="flex flex-col flex-grow w-full">
       <Navbar />
-      <div id="main-content" className="flex-grow">
+      <main id="main-content" className="flex-grow py-2 md:py-4">
         {children}
-      </div>
+      </main>
       <Footer />
     </div>
   );
