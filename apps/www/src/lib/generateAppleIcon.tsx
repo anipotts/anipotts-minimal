@@ -3,14 +3,14 @@ import { ImageResponse } from "next/og";
 /**
  * Generates a 180x180 Apple touch icon with 2-letter text.
  * Dark mode: blue (#61abea) on black (#0a0a0a)
- * Light mode: purple (#a78bfa) on white (#faf9f7)
+ * Light mode: white (#ffffff) on deep blue (#1e5f99)
  */
 export function generateAppleIcon(
   text: string,
   scheme: "dark" | "light" = "dark"
 ) {
-  const bg = scheme === "dark" ? "#0a0a0a" : "#faf9f7";
-  const fg = scheme === "dark" ? "#61abea" : "#a78bfa";
+  const bg = scheme === "dark" ? "#0a0a0a" : "#1e5f99";
+  const fg = scheme === "dark" ? "#61abea" : "#ffffff";
 
   return new ImageResponse(
     (

@@ -11,8 +11,8 @@
   font-family: var(--font-mono), monospace;
 }
 .admin-panel {
-  --text-muted: #8b8b9a;
-  --text-faint: #6b6b7a;
+  --text-muted: #93b5d0;
+  --text-faint: #6d99b8;
 }
 .dark .admin-panel {
   --text-muted: #8b8b9a;
