@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "test:unit": "vitest run --passWithNoTests",
-    "test:e2e": "playwright test",
-    "test": "vitest run --passWithNoTests"
+    "test:unit": "VITE_CJS_IGNORE_WARNING=true vitest run --passWithNoTests",
+    "test:e2e": "env -u NO_COLOR NODE_NO_WARNINGS=1 playwright test",
+    "test": "VITE_CJS_IGNORE_WARNING=true vitest run --passWithNoTests"
   },
   "dependencies": {
     "@anipotts/styles": "workspace:^",
