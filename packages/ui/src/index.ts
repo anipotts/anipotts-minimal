@@ -2,22 +2,10 @@
 
 // Window components
 export {
-  WindowContainer,
-  WindowControls,
-  WindowLayoutWrapper,
-  TerminalPromptCentered,
-  MinimizedPill,
-  WindowInner,
   TerminalHeaderTitle,
-  TerminalStatusBar,
   ThemeToggle,
 } from "./components/window";
 export type {
-  WindowContainerProps,
-  WindowLayoutWrapperProps,
-  TerminalPromptCenteredProps,
-  MinimizedPillProps,
-  WindowInnerProps,
   TerminalHeaderTitleProps,
 } from "./components/window";
 
@@ -33,13 +21,11 @@ export type { StatusDotProps } from "./components/feedback";
 export { TerminalBackground, TerminalHeader } from "./components/layout";
 
 // Context
-export { WindowProvider, useWindowState, ThemeProvider, useTheme } from "./context";
-export type { WindowState, ThemeMode, ResolvedTheme } from "./context";
+export { ThemeProvider, useTheme } from "./context";
+export type { ThemeMode, ResolvedTheme } from "./context";
 
 // Hooks
 export {
-  useDebounce,
-  useSectionNavigation,
   getSectionFromPath,
   getSectionPath,
   getInternalPath,
@@ -48,10 +34,6 @@ export {
 // Providers
 export { PostHogProvider } from "./providers";
 export type { PostHogProviderProps } from "./providers";
-
-// Admin
-export { AdminProvider, useAdmin, AdminShell, AdminLogin } from "./admin";
-export type { AdminActions, AdminContextType } from "./admin";
 
 // Navigation
 export { ExpandableNav } from "./components/navigation";

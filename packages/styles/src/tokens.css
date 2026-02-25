@@ -1,88 +1,63 @@
-/* Design Tokens for anipotts.com ecosystem */
-/* Light mode (default) → .dark overrides for dark mode */
+/* Core design tokens (Blueprint Mono)
+   Brand color is fixed to #61abea across themes. */
 
 :root {
-  --background: #1e5f99;
-  --foreground: #ffffff;
-  --card: #19507f;
-  --card-foreground: #ffffff;
-  --card-darker: #154468;
+  --background: #f4f8fc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --card-darker: #eaf0f7;
 
-  /* Accent colors - #61abea in both modes for consistent branding */
   --accent: #61abea;
   --accent-400: #61abea;
 
-  /* Signal colors (same in both modes) */
   --signal-green: #4ade80;
   --signal-red: #ef4444;
 
-  /* Overlay RGB triplets (light: dark-blue-tinted overlays) */
-  --overlay-base: 255, 255, 255;
-  --overlay-invert: 10, 40, 70;
+  --overlay-base: 16, 24, 40;
+  --overlay-invert: 255, 255, 255;
 
-  /* Borders */
-  --border: rgba(255, 255, 255, 0.18);
-  --border-subtle: rgba(255, 255, 255, 0.10);
-  --ring: rgba(255, 255, 255, 0.12);
+  --border: rgba(15, 23, 42, 0.18);
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --ring: rgba(15, 23, 42, 0.08);
 
-  /* Backdrops */
-  --backdrop-dim: rgba(0, 0, 0, 0.4);
-  --backdrop-medium: rgba(0, 0, 0, 0.35);
-  --input-bg: rgba(255, 255, 255, 0.1);
+  --backdrop-dim: rgba(7, 12, 24, 0.38);
+  --backdrop-medium: rgba(7, 12, 24, 0.32);
+  --input-bg: rgba(15, 23, 42, 0.04);
 
-  /* Text hierarchy */
-  --text-heading: #ffffff;
-  --text-body: #f0f4f8;
-  --text-secondary: #dce8f4;
-  --text-tertiary: #c0d4e8;
-  --text-muted: #a8c4dc;
-  --text-faint: #8aaccc;
+  --text-heading: #0b1324;
+  --text-body: #1e293b;
+  --text-secondary: #334155;
+  --text-tertiary: #475569;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
 
-  /* Scrollbar */
-  --scrollbar-thumb: rgba(255, 255, 255, 0.3);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
+  --scrollbar-thumb: rgba(15, 23, 42, 0.2);
+  --scrollbar-thumb-hover: rgba(15, 23, 42, 0.34);
 
-  /* Effects */
-  --grid-line: rgba(255, 255, 255, 0.06);
-  --noise-opacity: 0.02;
-  --waves-color: rgba(97, 171, 234, 0.5);
-  --waves-opacity: 0.35;
-  --cursor-dot: rgba(255, 255, 255, 0.6);
-  --ambient-from: rgba(30, 95, 153, 0.4);
+  --grid-line: rgba(15, 23, 42, 0.05);
+  --noise-opacity: 0.018;
+  --waves-color: rgba(97, 171, 234, 0.45);
+  --waves-opacity: 0.3;
+  --cursor-dot: rgba(15, 23, 42, 0.4);
+  --ambient-from: rgba(97, 171, 234, 0.25);
 
-  /* Quill editor */
-  --quill-toolbar-bg: rgba(255, 255, 255, 0.06);
-  --quill-toolbar-border: rgba(255, 255, 255, 0.15);
-  --quill-container-bg: rgba(255, 255, 255, 0.04);
-  --quill-text: #ffffff;
-  --quill-placeholder: rgba(255, 255, 255, 0.35);
-  --quill-icon: #7da3c2;
-  --quill-dropdown-bg: #19507f;
-  --quill-dropdown-border: rgba(255, 255, 255, 0.15);
-  --quill-dropdown-shadow: rgba(0, 0, 0, 0.3);
-  --quill-item-text: #7da3c2;
+  --prose-heading: #0b1324;
+  --prose-code-bg: rgba(15, 23, 42, 0.08);
+  --prose-pre-bg: rgba(15, 23, 42, 0.06);
+  --prose-pre-border: rgba(15, 23, 42, 0.12);
+  --prose-blockquote-text: #334155;
 
-  /* Prose */
-  --prose-heading: #ffffff;
-  --prose-code-bg: rgba(255, 255, 255, 0.10);
-  --prose-pre-bg: rgba(0, 0, 0, 0.20);
-  --prose-pre-border: rgba(255, 255, 255, 0.12);
-  --prose-blockquote-text: #7da3c2;
-
-  /* Text readability enhancement (not needed with deeper bg contrast) */
   --text-enhance: none;
-
-  /* Font variables will be defined in layout.tsx */
 }
 
 .dark {
   --background: #020308;
   --foreground: #e5e7eb;
-  --card: #0a0a0a;
+  --card: #05070f;
   --card-foreground: #e5e7eb;
-  --card-darker: #050505;
+  --card-darker: #03050a;
 
-  /* Blue accent for dark mode */
   --accent: #61abea;
   --accent-400: #61abea;
 
@@ -91,50 +66,38 @@
 
   --border: rgba(255, 255, 255, 0.1);
   --border-subtle: rgba(255, 255, 255, 0.05);
-  --ring: rgba(255, 255, 255, 0.05);
+  --ring: rgba(255, 255, 255, 0.06);
 
   --backdrop-dim: rgba(0, 0, 0, 0.6);
   --backdrop-medium: rgba(0, 0, 0, 0.5);
-  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(255, 255, 255, 0.04);
 
-  --text-heading: #f3f4f6;
-  --text-body: #e5e7eb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --text-muted: #9ca3af;
-  --text-faint: #737d8a;
+  --text-heading: #f8fafc;
+  --text-body: #e2e8f0;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
 
-  --scrollbar-thumb: #333333;
-  --scrollbar-thumb-hover: #555555;
+  --scrollbar-thumb: rgba(148, 163, 184, 0.25);
+  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.45);
 
-  --grid-line: rgba(128, 128, 128, 0.07);
-  --noise-opacity: 0.03;
-  --waves-color: rgba(97, 171, 234, 0.96);
-  --waves-opacity: 0.3;
-  --cursor-dot: #160000;
-  --ambient-from: rgba(17, 24, 39, 0.4);
+  --grid-line: rgba(148, 163, 184, 0.07);
+  --noise-opacity: 0.022;
+  --waves-color: rgba(97, 171, 234, 0.95);
+  --waves-opacity: 0.27;
+  --cursor-dot: rgba(255, 255, 255, 0.6);
+  --ambient-from: rgba(30, 64, 97, 0.3);
 
-  --quill-toolbar-bg: rgba(255, 255, 255, 0.02);
-  --quill-toolbar-border: rgba(255, 255, 255, 0.1);
-  --quill-container-bg: rgba(0, 0, 0, 0.2);
-  --quill-text: #e5e7eb;
-  --quill-placeholder: rgba(255, 255, 255, 0.3);
-  --quill-icon: #6b7280;
-  --quill-dropdown-bg: #1a1a1a;
-  --quill-dropdown-border: rgba(255, 255, 255, 0.1);
-  --quill-dropdown-shadow: rgba(0, 0, 0, 0.5);
-  --quill-item-text: #9ca3af;
-
-  --prose-heading: #f3f4f6;
+  --prose-heading: #f8fafc;
   --prose-code-bg: rgba(255, 255, 255, 0.1);
-  --prose-pre-bg: rgba(0, 0, 0, 0.4);
+  --prose-pre-bg: rgba(2, 6, 23, 0.9);
   --prose-pre-border: rgba(255, 255, 255, 0.1);
-  --prose-blockquote-text: #9ca3af;
+  --prose-blockquote-text: #94a3b8;
 
   --text-enhance: none;
 }
 
-/* Theme transition animation */
 html.theme-transitioning,
 html.theme-transitioning *,
 html.theme-transitioning *::before,
@@ -143,14 +106,12 @@ html.theme-transitioning *::after {
     border-color 150ms ease, box-shadow 150ms ease !important;
 }
 
-/* Keyboard focus indicators (WCAG 2.4.7 Focus Visible) */
 *:focus-visible {
   outline: 2px solid var(--accent-400);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-/* Button and interactive element focus */
 button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
@@ -159,16 +120,15 @@ a:focus-visible,
   outline-offset: 2px;
 }
 
-/* Form input focus (already has border change, add ring) */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.4);
+  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.35);
 }
 
 .dark input:focus-visible,
 .dark textarea:focus-visible,
 .dark select:focus-visible {
-  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.2);
+  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.25);
 }

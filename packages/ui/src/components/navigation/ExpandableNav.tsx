@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface ExpandableNavProps {
   currentSection: string;
@@ -10,32 +9,52 @@ interface ExpandableNavProps {
   onNavClick?: (name: string, href: string) => void;
 }
 
-const navItems = [
+const primaryItems = [
   { name: "index", path: "/", section: "www" },
   { name: "work", path: "/work", section: "work" },
   { name: "thoughts", path: "/thoughts", section: "thoughts" },
-  { name: "connect", path: "/connect", section: "connect" },
-  { name: "dev", path: "/dev", section: "dev" },
   { name: "claude", path: "/claude", section: "claude" },
-];
+] as const;
 
-export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: ExpandableNavProps) {
+const connectItem = { name: "connect", path: "/connect", section: "connect" } as const;
+
+function isItemActive(
+  section: string,
+  path: string,
+  currentSection: string,
+  pathname: string,
+): boolean {
+  if (section === "www") {
+    return currentSection === "www" && pathname === "/";
+  }
+
+  return currentSection === section || pathname.startsWith(path);
+}
+
+export function ExpandableNav({
+  currentSection,
+  pathname = "/",
+  onNavClick,
+}: ExpandableNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
 
-  const items = navItems.map((item) => {
-    const isActive = item.section === "www"
-      ? currentSection === "www" && pathname === "/"
-      : currentSection === item.section || pathname.startsWith(item.path);
-    return { name: item.name, href: item.path, isActive };
-  });
+  const items = primaryItems.map((item) => ({
+    name: item.name,
+    href: item.path,
+    isActive: isItemActive(item.section, item.path, currentSection, pathname),
+  }));
 
-  // Close menu on route change
+  const connectActive = isItemActive(
+    connectItem.section,
+    connectItem.path,
+    currentSection,
+    pathname,
+  );
+
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Close menu on Escape
   useEffect(() => {
     if (!menuOpen) return;
     const handleEscape = (e: KeyboardEvent) => {
@@ -48,17 +67,20 @@ export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: Ex
     return () => window.removeEventListener("keydown", handleEscape);
   }, [menuOpen]);
 
-  const handleLinkClick = useCallback((name: string, href: string) => {
-    onNavClick?.(name, href);
-    setMenuOpen(false);
-  }, [onNavClick]);
-
-  const noMotion = shouldReduceMotion ?? false;
+  const handleLinkClick = useCallback(
+    (name: string, href: string) => {
+      onNavClick?.(name, href);
+      setMenuOpen(false);
+    },
+    [onNavClick],
+  );
 
   return (
-    <nav className="nav-container w-full pt-8 pb-6 md:pt-10 md:pb-6" aria-label="Main navigation">
-      <div className="flex items-center justify-between">
-        {/* Site name - always one line, links to home */}
+    <nav
+      className="nav-container w-full pt-8 pb-6 md:pt-10 md:pb-6"
+      aria-label="Main navigation"
+    >
+      <div className="flex items-center justify-between gap-4">
         <Link
           href="/"
           className="text-accent-400 text-sm font-medium tracking-wide whitespace-nowrap shrink-0"
@@ -67,8 +89,7 @@ export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: Ex
           ani potts
         </Link>
 
-        {/* Desktop nav links */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium tracking-wide">
+        <div className="hidden md:flex items-center gap-5 text-sm font-medium tracking-wide">
           {items.map((item) => (
             <Link
               key={item.name}
@@ -84,9 +105,21 @@ export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: Ex
               {item.name}
             </Link>
           ))}
+
+          <Link
+            href={connectItem.path}
+            className={`px-3 py-1.5 rounded-sm border text-xs uppercase tracking-[0.2em] transition-colors ${
+              connectActive
+                ? "border-accent-400 bg-accent-400/15 text-accent-400"
+                : "border-accent-400/40 text-accent-400 hover:bg-accent-400/10"
+            }`}
+            onClick={() => onNavClick?.(connectItem.name, connectItem.path)}
+            aria-current={connectActive ? "page" : undefined}
+          >
+            {connectItem.name}
+          </Link>
         </div>
 
-        {/* Mobile menu toggle */}
         <button
           className="md:hidden text-tertiary hover:text-body text-sm font-medium tracking-wide transition-colors"
           onClick={() => setMenuOpen((prev) => !prev)}
@@ -98,48 +131,39 @@ export function ExpandableNav({ currentSection, pathname = "/", onNavClick }: Ex
         </button>
       </div>
 
-      {/* Mobile dropdown menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            id="mobile-nav-menu"
-            role="menu"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={noMotion ? { duration: 0 } : { duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden border-t border-border-subtle mt-4"
-          >
-            <div className="flex flex-col py-2">
-              {items.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={noMotion ? { duration: 0 } : { delay: index * 0.04, duration: 0.15 }}
-                >
-                  <Link
-                    href={item.href}
-                    role="menuitem"
-                    className={`flex items-center gap-2 py-2.5 text-sm font-medium tracking-wide transition-colors ${
-                      item.isActive
-                        ? "text-body"
-                        : "text-tertiary hover:text-body"
-                    }`}
-                    onClick={() => handleLinkClick(item.name, item.href)}
-                    aria-current={item.isActive ? "page" : undefined}
-                  >
-                    <span className={`text-accent-400 w-4 ${item.isActive ? "opacity-100" : "opacity-0"}`}>
-                      {">"}
-                    </span>
-                    {item.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        id="mobile-nav-menu"
+        role="menu"
+        aria-hidden={!menuOpen}
+        className={`md:hidden overflow-hidden border-t border-border-subtle mt-4 transition-[max-height,opacity] duration-200 ${
+          menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex flex-col py-2">
+          {[...items, { name: connectItem.name, href: connectItem.path, isActive: connectActive }].map((item, index) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              role="menuitem"
+              className={`flex items-center gap-2 py-2.5 text-sm font-medium tracking-wide transition-[opacity,transform,color] duration-150 ${
+                item.isActive ? "text-body" : "text-tertiary hover:text-body"
+              } ${menuOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-1"}`}
+              style={{ transitionDelay: menuOpen ? `${index * 24}ms` : "0ms" }}
+              onClick={() => handleLinkClick(item.name, item.href)}
+              aria-current={item.isActive ? "page" : undefined}
+            >
+              <span
+                className={`text-accent-400 w-4 ${
+                  item.isActive ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {">"}
+              </span>
+              {item.name}
+            </Link>
+          ))}
+        </div>
+      </div>
     </nav>
   );
 }

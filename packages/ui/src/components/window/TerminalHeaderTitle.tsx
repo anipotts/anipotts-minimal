@@ -1,44 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
-
 export interface TerminalHeaderTitleProps {
   defaultTitle?: string;
 }
 
 export function TerminalHeaderTitle({ defaultTitle = "ani@potts:~/anipotts.com" }: TerminalHeaderTitleProps) {
-  const [displayedText, setDisplayedText] = useState("");
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    // Only animate once per mount
-    if (hasAnimated.current) return;
-    hasAnimated.current = true;
-
-    let index = 0;
-    const interval = setInterval(() => {
-      setDisplayedText(defaultTitle.substring(0, index + 1));
-      index++;
-      if (index >= defaultTitle.length) {
-        clearInterval(interval);
-      }
-    }, 30);
-    return () => clearInterval(interval);
-  }, [defaultTitle]);
-
-  // Split at "~/" so the prefix (ani@potts:) can be hidden on mobile
-  const splitIndex = useMemo(() => {
-    const idx = defaultTitle.indexOf("~/");
-    return idx > 0 ? idx : 0;
-  }, [defaultTitle]);
-
-  const displayedPrefix = displayedText.substring(0, Math.min(displayedText.length, splitIndex));
-  const displayedPath = displayedText.substring(splitIndex);
+  const splitIndex = defaultTitle.indexOf("~/");
+  const hasPrefix = splitIndex > 0;
+  const prefix = hasPrefix ? defaultTitle.slice(0, splitIndex) : "";
+  const path = hasPrefix ? defaultTitle.slice(splitIndex) : defaultTitle;
 
   return (
     <span className="ml-3 text-[10px] md:text-xs text-muted font-medium tracking-wide">
-      {splitIndex > 0 && <span className="hidden md:inline">{displayedPrefix}</span>}
-      {displayedPath}
+      {hasPrefix && <span className="hidden md:inline">{prefix}</span>}
+      {path}
       <span className="animate-pulse">_</span>
     </span>
   );
