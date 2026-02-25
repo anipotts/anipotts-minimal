@@ -46,7 +46,7 @@ export default {
       fontFamily: {
         sans: ["var(--font-mono)", "monospace"],
         mono: ["var(--font-mono)", "monospace"],
-        heading: ["var(--font-mono)", "monospace"],
+        heading: ["var(--font-display)", "var(--font-mono)", "monospace"],
       },
       animation: {
         'signal-pulse': 'signal-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

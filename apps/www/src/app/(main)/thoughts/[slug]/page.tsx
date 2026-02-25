@@ -1,43 +1,25 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import { supabase } from "@/lib/supabaseClient";
-import { parseTags } from "@anipotts/lib";
 import ReactMarkdown from "react-markdown";
 import { FadeIn } from "@anipotts/ui";
-import { cache } from "react";
-import ViewCounter from "@/components/thoughts/ViewCounter";
-import IncrementView from "@/components/thoughts/IncrementView";
-import type { Metadata } from "next";
+import { getPublishedThoughts, getThoughtBySlug } from "@/content/thoughts";
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  if (!supabase) return [];
-  try {
-    const { data } = await supabase
-      .from("thoughts")
-      .select("slug")
-      .eq("published", true);
-    return (data || []).map((t) => ({ slug: t.slug }));
-  } catch {
-    return [];
-  }
+  const thoughts = await getPublishedThoughts();
+  return thoughts.map((thought) => ({ slug: thought.slug }));
 }
 
-const getThought = cache(async (slug: string) => {
-  if (!supabase) return null;
-  const { data } = await supabase
-    .from("thoughts")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-  return data;
-});
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
-  const thought = await getThought(slug);
+  const thought = await getThoughtBySlug(slug);
 
   if (!thought) {
     return { title: "Not Found" };
@@ -45,18 +27,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   return {
     title: thought.title,
-    description: thought.summary || `${thought.title} — a thought by Ani Potts`,
+    description: thought.summary,
     openGraph: {
       title: thought.title,
-      description: thought.summary || `${thought.title} — a thought by Ani Potts`,
+      description: thought.summary,
       type: "article",
-      publishedTime: thought.created_at,
+      publishedTime: thought.date,
       tags: thought.tags,
     },
     twitter: {
       card: "summary",
       title: thought.title,
-      description: thought.summary || `${thought.title} — a thought by Ani Potts`,
+      description: thought.summary,
     },
     alternates: {
       canonical: `https://anipotts.com/thoughts/${slug}`,
@@ -64,47 +46,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function ThoughtPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ThoughtPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const thought = await getThought(slug);
-  const backLink = '/thoughts';
+  const thought = await getThoughtBySlug(slug);
 
   if (!thought) {
-    if (!supabase) {
-      return (
-        <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
-          <FadeIn>
-            <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1">
-              <ArrowLeft size={12} /> back to thoughts
-            </Link>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <div className="p-4 border border-border-subtle rounded-sm bg-input">
-              <p className="text-muted text-xs uppercase tracking-wider">System Offline (Dev Mode)</p>
-            </div>
-          </FadeIn>
-        </div>
-      );
-    }
     notFound();
   }
 
-  const tags = parseTags(thought.tags);
-  const readingTime = thought.content ? Math.ceil(thought.content.split(/\s+/).length / 200) : null;
+  const readingTime = Math.max(1, Math.ceil(thought.content.split(/\s+/).length / 220));
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: thought.title,
-    description: thought.summary || thought.title,
-    datePublished: thought.created_at,
-    dateModified: thought.updated_at || thought.created_at,
+    description: thought.summary,
+    datePublished: thought.date,
+    dateModified: thought.date,
     author: {
-      "@type": "Person",
-      name: "Ani Potts",
-      url: "https://anipotts.com",
-    },
-    publisher: {
       "@type": "Person",
       name: "Ani Potts",
       url: "https://anipotts.com",
@@ -116,50 +79,57 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
   };
 
   return (
-    <div className="flex flex-col gap-8 py-8 px-4 max-w-4xl mx-auto">
-      <IncrementView slug={thought.slug} />
+    <article className="flex flex-col gap-8 py-2 pb-16 max-w-4xl mx-auto w-full">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <FadeIn>
-        <Link href={backLink} className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1">
+        <Link
+          href="/thoughts"
+          className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
+        >
           <ArrowLeft size={12} /> back to thoughts
         </Link>
       </FadeIn>
 
-      <FadeIn delay={0.1}>
-        <div className="border-b border-border pb-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-body leading-tight mb-4">
+      <FadeIn delay={0.05}>
+        <header className="border-b border-border pb-6">
+          <p className="text-sm uppercase tracking-[0.16em] text-accent-400 mb-3">thought</p>
+          <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading leading-tight mb-4">
             {thought.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
-            <time dateTime={thought.created_at}>
-              {new Date(thought.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted uppercase tracking-wide">
+            <time dateTime={thought.date}>
+              {new Date(thought.date).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </time>
-            {readingTime && (
-              <span className="text-faint">· {readingTime} min read</span>
-            )}
-            <ViewCounter slug={thought.slug} initialViews={thought.views} />
+            <span className="text-faint">{readingTime} min read</span>
           </div>
-          {tags.length > 0 && (
+          {thought.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
-              {tags.map((tag: string) => (
-                <span key={tag} className="text-[10px] uppercase tracking-wider text-accent-400 border border-accent-400/20 px-2 py-1 rounded-sm">
-                  {tag.trim()}
+              {thought.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] uppercase tracking-wider text-accent-400 border border-accent-400/20 px-2 py-1 rounded-sm"
+                >
+                  {tag}
                 </span>
               ))}
             </div>
           )}
-        </div>
+        </header>
       </FadeIn>
 
-      <FadeIn delay={0.2}>
-        <div className="prose prose-invert prose-gray max-w-none prose-headings:font-bold prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted">
+      <FadeIn delay={0.12}>
+        <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)]">
           <ReactMarkdown
             components={{
-              img: ({ node, ...props }) => {
+              img: ({ ...props }) => {
                 if (!props.src) return null;
                 // eslint-disable-next-line @next/next/no-img-element
                 return <img {...props} alt={props.alt || ""} style={{ maxWidth: "100%" }} />;
@@ -170,6 +140,6 @@ export default async function ThoughtPage({ params }: { params: Promise<{ slug: 
           </ReactMarkdown>
         </div>
       </FadeIn>
-    </div>
+    </article>
   );
 }

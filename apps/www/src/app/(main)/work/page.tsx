@@ -1,54 +1,100 @@
-import { Suspense } from "react";
-import { FadeIn } from "@anipotts/ui";
-import { fetchProjects } from "@anipotts/lib/cms";
 import type { Metadata } from "next";
-
-import WorkFilteredList from "./WorkFilteredList";
-
-export const revalidate = 3600;
+import Link from "next/link";
+import { FadeIn } from "@anipotts/ui";
+import ProjectCard from "@/components/ProjectCard";
+import { getWorkProjects } from "@/content/projects";
+import {
+  ContentBlocks,
+  EndCta,
+  PageFrame,
+  PagePrelude,
+  PageSummary,
+  PageTitle,
+} from "@/components/page/PageScaffold";
 
 export const metadata: Metadata = {
   title: "work",
-  description: "Projects, experiments, and open-source work from ani potts",
-  openGraph: {
-    title: "work | ani potts",
-    description: "Projects, experiments, and open-source work from ani potts",
-    url: "https://anipotts.com/work",
-    siteName: "anipotts.com",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "work | ani potts",
-    description: "Projects, experiments, and open-source work from ani potts",
-  },
+  description: "Curated projects and systems from ani potts",
   alternates: {
     canonical: "https://anipotts.com/work",
   },
 };
 
-export default async function WorkPage() {
-  const projects = await fetchProjects();
+const CATEGORIES = ["all", "ai", "product", "quant", "music", "other"] as const;
+type WorkCategory = (typeof CATEGORIES)[number];
+
+function getActiveCategory(raw: string | undefined): WorkCategory {
+  const normalized = raw?.trim().toLowerCase() ?? "all";
+  return (CATEGORIES as readonly string[]).includes(normalized)
+    ? (normalized as WorkCategory)
+    : "all";
+}
+
+export default async function WorkPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const params = await searchParams;
+  const activeCategory = getActiveCategory(params.category);
+  const projects = getWorkProjects(activeCategory === "all" ? undefined : activeCategory);
 
   return (
-    <div className="flex flex-col gap-16 md:gap-20 pb-20">
+    <PageFrame>
+      <section className="flex flex-col gap-5">
+        <FadeIn>
+          <PagePrelude>work</PagePrelude>
+        </FadeIn>
+        <FadeIn delay={0.04}>
+          <PageTitle>selected systems and products</PageTitle>
+        </FadeIn>
+        <FadeIn delay={0.08}>
+          <PageSummary>
+            High-signal projects only. Each entry includes status, context, and links to live product, source, or case study.
+          </PageSummary>
+        </FadeIn>
+      </section>
+
       <section className="flex flex-col gap-4">
         <FadeIn>
-          <h1 className="text-sm font-mono tracking-wide text-accent-400">
-            work
-          </h1>
+          <PagePrelude>catalog</PagePrelude>
         </FadeIn>
-        <div className="flex flex-col gap-8">
-          <FadeIn delay={0.05}>
-            <p className="text-secondary text-base leading-relaxed">
-              Projects, experiments, and open-source work. Click any to expand.
-            </p>
-          </FadeIn>
-          <Suspense>
-            <WorkFilteredList projects={projects} />
-          </Suspense>
-        </div>
+        <ContentBlocks>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((category) => (
+              <Link
+                key={category}
+                href={category === "all" ? "/work" : `/work?category=${category}`}
+                scroll={false}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-200 ${
+                  activeCategory === category
+                    ? "border-accent-400 text-accent-400 bg-accent-400/10"
+                    : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
+                }`}
+              >
+                {category}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-4 mt-4">
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <ProjectCard key={project.slug} project={project} />
+              ))
+            ) : (
+              <p className="text-muted text-sm font-mono py-8 text-center">
+                no projects in &quot;{activeCategory}&quot; yet.
+              </p>
+            )}
+          </div>
+        </ContentBlocks>
+        <EndCta>
+          <p className="text-xs text-muted uppercase tracking-wider">
+            publish states: <span className="text-accent-400">publish_now</span>, placeholder, improve_then_publish
+          </p>
+        </EndCta>
       </section>
-    </div>
+    </PageFrame>
   );
 }

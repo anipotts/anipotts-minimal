@@ -1,113 +1,113 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FadeIn } from "@anipotts/ui";
 import { TipCard } from "./TipCard";
 import {
-  REPO,
   BLOB,
-  plugins,
-  hooks,
-  skills,
-  agents,
-  guideTiers,
+  REPO,
   docs,
+  guideTiers,
+  hooks,
+  plugins,
   stats,
 } from "./data";
+import { getFeaturedProjects } from "@/content/projects";
+import {
+  CardBlock,
+  ContentBlocks,
+  PageFrame,
+  PagePrelude,
+  PageSummary,
+  PageTitle,
+} from "@/components/page/PageScaffold";
 
 export const metadata: Metadata = {
-  title: "claude code tips",
-  description:
-    "plugins, hooks, agents, and a comprehensive guide for claude code. tested across 4,000+ sessions.",
-  openGraph: {
-    title: "claude code tips | ani potts",
-    description:
-      "plugins, hooks, agents, and a comprehensive guide for claude code",
-    url: "https://anipotts.com/claude",
-    siteName: "ani potts",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "claude code tips | ani potts",
-    description:
-      "plugins, hooks, agents, and a comprehensive guide for claude code",
-  },
+  title: "claude",
+  description: "Claude Code systems, playbooks, and implementation patterns from ani potts",
   alternates: {
     canonical: "https://anipotts.com/claude",
   },
 };
 
 export default function ClaudePage() {
-  let delayCounter = 0;
-  const nextDelay = () => delayCounter++ * 0.04;
+  const selectedProjects = getFeaturedProjects(3);
 
   return (
-    <div className="flex flex-col gap-16 md:gap-20 pb-20">
-      {/* Hero */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            claude
-          </span>
+    <PageFrame>
+      <section className="flex flex-col gap-5" id="proof">
+        <FadeIn>
+          <PagePrelude>claude</PagePrelude>
         </FadeIn>
-        <div className="flex flex-col gap-6">
-          <FadeIn delay={nextDelay()}>
-            <h1 className="text-4xl md:text-5xl font-bold font-heading text-heading">
-              claude-code-tips
-            </h1>
-          </FadeIn>
-          <FadeIn delay={nextDelay()}>
-            <p className="text-lg text-secondary leading-relaxed">
-              plugins, hooks, agents, and a comprehensive guide for getting the
-              most out of claude code.
-            </p>
-          </FadeIn>
-          <FadeIn delay={nextDelay()}>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-muted">
-              <span>
-                <span className="text-accent-400">{stats.sessions}</span>{" "}
-                sessions
-              </span>
-              <span className="text-border">|</span>
-              <span>
-                <span className="text-accent-400">{stats.messages}</span>{" "}
-                messages
-              </span>
-              <span className="text-border">|</span>
-              <span>
-                <span className="text-accent-400">{stats.toolCalls}</span> tool
-                calls
-              </span>
-            </div>
-          </FadeIn>
-          <FadeIn delay={nextDelay()}>
-            <a
-              href={REPO}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-mono text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 inline-flex items-center gap-1.5 w-fit"
-            >
-              ./view_repo.git
-            </a>
-          </FadeIn>
-        </div>
+        <FadeIn delay={0.04}>
+          <PageTitle>claude code systems that ship</PageTitle>
+        </FadeIn>
+        <FadeIn delay={0.08}>
+          <PageSummary>
+            I design practical workflows for coding agents, quality gates, and high-velocity implementation loops.
+          </PageSummary>
+        </FadeIn>
+        <FadeIn delay={0.12}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">sessions</p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.sessions}</p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">messages</p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.messages}</p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">tool calls</p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.toolCalls}</p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">focus</p>
+              <p className="text-sm text-secondary mt-2">execution quality</p>
+            </CardBlock>
+          </div>
+        </FadeIn>
       </section>
 
-      {/* Plugins */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            plugins
-          </span>
+      <section className="flex flex-col gap-4" id="systems">
+        <FadeIn>
+          <PagePrelude>selected systems</PagePrelude>
         </FadeIn>
-        <div className="flex flex-col gap-4">
-          <FadeIn delay={nextDelay()}>
-            <p className="text-secondary text-base leading-relaxed">
-              installable plugins that extend claude code with new capabilities.
-              click to expand.
-            </p>
-          </FadeIn>
-          {plugins.map((plugin) => (
-            <FadeIn key={plugin.slug} delay={nextDelay()}>
+        <ContentBlocks>
+          {selectedProjects.map((project, index) => (
+            <FadeIn key={project.slug} delay={0.04 + index * 0.04}>
+              <CardBlock>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.16em] text-accent-400">{project.title}</p>
+                    <p className="text-sm text-secondary mt-1">{project.summary}</p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-mono">
+                    {project.links?.page && (
+                      <Link href={project.links.page} className="text-accent-400 hover:underline">
+                        case study
+                      </Link>
+                    )}
+                    {project.links?.repo && (
+                      <a href={project.links.repo} target="_blank" rel="noopener noreferrer" className="text-tertiary hover:text-body hover:underline">
+                        repo
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </CardBlock>
+            </FadeIn>
+          ))}
+        </ContentBlocks>
+      </section>
+
+      <section className="flex flex-col gap-4" id="plugins">
+        <FadeIn>
+          <PagePrelude>plugins + hooks</PagePrelude>
+        </FadeIn>
+
+        <ContentBlocks>
+          {plugins.slice(0, 4).map((plugin, index) => (
+            <FadeIn key={plugin.slug} delay={0.03 + index * 0.03}>
               <TipCard
                 name={plugin.name}
                 tagline={plugin.tagline}
@@ -118,196 +118,79 @@ export default function ClaudePage() {
               />
             </FadeIn>
           ))}
-        </div>
-      </section>
 
-      {/* Hooks */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            hooks
-          </span>
-        </FadeIn>
-        <div className="flex flex-col gap-3">
-          {hooks.map((hook) => (
-            <FadeIn key={hook.name} delay={nextDelay()}>
-              <a
-                href={hook.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-start gap-3 py-2 min-h-[44px]"
-              >
-                <span className="text-accent-400 font-mono text-xs font-bold shrink-0 pt-0.5 group-hover:underline decoration-accent-400/30 underline-offset-4">
-                  {hook.name}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-muted bg-input border border-border-subtle px-1.5 py-0.5 rounded shrink-0">
-                  {hook.event}
-                </span>
-                <span className="text-tertiary text-xs leading-relaxed">
-                  {hook.desc}
-                </span>
-              </a>
-            </FadeIn>
-          ))}
-        </div>
-      </section>
-
-      {/* Skills & Commands */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            skills
-          </span>
-        </FadeIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-          {skills.map((skill) => (
-            <FadeIn key={skill.name} delay={nextDelay()}>
-              <a
-                href={skill.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
-              >
-                <code className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                  {skill.name}
-                </code>
-                <span className="text-tertiary text-xs">{skill.desc}</span>
-              </a>
-            </FadeIn>
-          ))}
-        </div>
-      </section>
-
-      {/* Agents */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            agents
-          </span>
-        </FadeIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-          {agents.map((agent) => (
-            <FadeIn key={agent.name} delay={nextDelay()}>
-              <a
-                href={agent.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
-              >
-                <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                  {agent.name}
-                </span>
-                <span className="text-tertiary text-xs">{agent.desc}</span>
-              </a>
-            </FadeIn>
-          ))}
-        </div>
-      </section>
-
-      {/* The Guide */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            the guide
-          </span>
-        </FadeIn>
-        <div className="flex flex-col gap-6">
-          <FadeIn delay={nextDelay()}>
-            <p className="text-secondary text-base leading-relaxed">
-              a structured path from first session to power user. everything
-              learned across {stats.sessions} sessions distilled into one doc.
-            </p>
-          </FadeIn>
-          <div className="flex flex-col gap-4">
-            {guideTiers.map((tier, i) => (
-              <FadeIn key={tier.level} delay={nextDelay()}>
-                <a
-                  href={tier.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block border-l-2 border-border hover:border-accent-400 pl-4 py-3 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-mono text-accent-400 font-bold">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm font-bold text-secondary group-hover:text-heading transition-colors">
-                      {tier.label}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider text-muted">
-                      {tier.level}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {hooks.slice(0, 6).map((hook) => (
+              <CardBlock key={hook.name}>
+                <a href={hook.href} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-accent-400 text-xs uppercase tracking-[0.16em]">{hook.name}</span>
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-muted bg-input border border-border-subtle px-1.5 py-0.5 rounded">
+                      {hook.event}
                     </span>
                   </div>
-                  <p className="text-xs text-tertiary pl-6">
-                    {tier.topics.join(" · ")}
+                  <p className="text-xs text-tertiary group-hover:text-secondary transition-colors">
+                    {hook.desc}
                   </p>
                 </a>
-              </FadeIn>
+              </CardBlock>
             ))}
           </div>
-        </div>
+        </ContentBlocks>
       </section>
 
-      {/* Docs */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            docs
-          </span>
+      <section className="flex flex-col gap-4" id="playbooks">
+        <FadeIn>
+          <PagePrelude>playbooks + docs</PagePrelude>
         </FadeIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-          {docs.map((doc) => (
-            <FadeIn key={doc.name} delay={nextDelay()}>
-              <a
-                href={doc.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2 py-1.5 min-h-[44px]"
-              >
-                <span className="text-accent-400 text-xs font-mono font-bold group-hover:underline decoration-accent-400/30 underline-offset-4">
-                  {doc.name}
-                </span>
-                <span className="text-tertiary text-xs">{doc.desc}</span>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {guideTiers.map((tier) => (
+            <CardBlock key={tier.level}>
+              <a href={tier.href} target="_blank" rel="noopener noreferrer" className="group block">
+                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">{tier.level}</p>
+                <p className="text-base font-heading text-secondary mt-1 group-hover:text-heading transition-colors">
+                  {tier.label}
+                </p>
+                <p className="text-xs text-tertiary mt-2">{tier.topics.join(" · ")}</p>
               </a>
-            </FadeIn>
+            </CardBlock>
+          ))}
+
+          {docs.slice(0, 4).map((doc) => (
+            <CardBlock key={doc.name}>
+              <a href={doc.href} target="_blank" rel="noopener noreferrer" className="group block">
+                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">doc</p>
+                <p className="text-sm text-secondary group-hover:text-heading transition-colors mt-1">
+                  {doc.name}
+                </p>
+                <p className="text-xs text-tertiary mt-1">{doc.desc}</p>
+              </a>
+            </CardBlock>
           ))}
         </div>
       </section>
 
-      {/* Cost Tracking Callout */}
-      <section className="flex flex-col gap-4">
-        <FadeIn delay={nextDelay()}>
-          <span className="text-sm font-mono tracking-wide text-accent-400">
-            cost tracking
-          </span>
+      <section className="flex flex-col gap-4" id="work-together">
+        <FadeIn>
+          <PagePrelude>work together</PagePrelude>
         </FadeIn>
-        <FadeIn delay={nextDelay()}>
-          <div className="border border-accent-400/20 bg-accent-400/5 rounded-lg p-6 flex flex-col gap-4">
-            <p className="text-secondary text-base leading-relaxed">
-              the miner plugin tracks every token, every tool call, every
-              session. know exactly what you&apos;re spending and where the
-              value is.
+        <CardBlock>
+          <div className="flex flex-col gap-3">
+            <p className="text-secondary leading-relaxed">
+              If you need execution support on Claude Code workflows, agent architecture, or repo automation, I can help you ship faster.
             </p>
-            <div className="flex flex-wrap gap-4 text-xs font-mono text-muted">
-              <span>per-session cost breakdowns</span>
-              <span className="text-border">|</span>
-              <span>daily/weekly/monthly reports</span>
-              <span className="text-border">|</span>
-              <span>tool usage analytics</span>
-              <span className="text-border">|</span>
-              <span>budget alerts</span>
+            <div className="flex items-center gap-4 text-xs font-mono">
+              <Link href="/connect?intent=claude-consulting" className="text-accent-400 hover:underline">
+                /connect --intent=claude-consulting
+              </Link>
+              <a href={REPO} target="_blank" rel="noopener noreferrer" className="text-tertiary hover:text-body hover:underline">
+                {BLOB ? "view repo" : "repo"}
+              </a>
             </div>
-            <a
-              href={`${BLOB}/docs/cost-tracking.md`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-mono text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 w-fit"
-            >
-              ./learn_more.md
-            </a>
           </div>
-        </FadeIn>
+        </CardBlock>
       </section>
-    </div>
+    </PageFrame>
   );
 }

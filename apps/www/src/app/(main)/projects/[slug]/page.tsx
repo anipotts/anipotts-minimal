@@ -1,209 +1,175 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
-import { projects } from "@/data/projects";
-import { projectContent } from "@/data/project-content";
 import { FadeIn } from "@anipotts/ui";
+import { getProjectBySlug, projectEntries } from "@/content/projects";
+import { projectContent } from "@/data/project-content";
 
 export async function generateStaticParams() {
-  return projects
-    .filter((p) => p.featured && p.links?.page)
-    .map((p) => ({ slug: p.slug }));
+  return projectEntries
+    .filter((project) => project.links?.page && project.publishState === "publish_now")
+    .map((project) => ({ slug: project.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-  if (!project) return { title: "Project Not Found" };
+  const project = getProjectBySlug(slug);
+
+  if (!project) {
+    return { title: "Project Not Found" };
+  }
 
   return {
     title: `${project.title} | Ani Potts`,
     description: project.description,
+    alternates: {
+      canonical: `https://anipotts.com/projects/${project.slug}`,
+    },
   };
 }
 
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-  const content = projectContent[slug];
+  const project = getProjectBySlug(slug);
+  const content = project ? projectContent[project.slug] : null;
 
-  if (!project || !project.featured) {
+  if (!project || project.publishState !== "publish_now") {
     notFound();
   }
 
   return (
-    <div className="flex flex-col gap-16 pb-20">
-      {/* Header */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-        <div className="col-span-1">
-          <FadeIn>
-            <Link
-              href="/work"
-              className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
-            >
-              <ArrowLeft size={12} /> back to work
-            </Link>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
-          <FadeIn delay={0.1}>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-heading">{project.title}</h1>
-              {project.status === "live" && (
-                <span className="text-[9px] uppercase tracking-wider text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded font-medium">
-                  live
-                </span>
-              )}
-            </div>
-            <p className="text-tertiary text-sm mt-2">{project.subtitle}</p>
-          </FadeIn>
+    <div className="flex flex-col gap-14 pb-20 max-w-4xl mx-auto w-full">
+      <section className="flex flex-col gap-5">
+        <FadeIn>
+          <Link
+            href="/work"
+            className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
+          >
+            <ArrowLeft size={12} /> back to work
+          </Link>
+        </FadeIn>
 
-          <FadeIn delay={0.2}>
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.3}>
-            <div className="flex gap-4 text-xs font-mono">
-              {project.links?.live && (
-                <a
-                  href={project.links.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
-                >
-                  ./launch_site.sh
-                </a>
-              )}
-              {project.links?.repo && (
-                <a
-                  href={project.links.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
-                >
-                  ./view_source.git
-                </a>
-              )}
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* Overview */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-        <div className="col-span-1">
-          <FadeIn delay={0.4}>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
-              overview
-            </h2>
-          </FadeIn>
-        </div>
-        <div className="col-span-1 md:col-span-3">
-          <FadeIn delay={0.5}>
-            <p className="text-sm text-secondary leading-relaxed max-w-2xl">
-              {content?.overview || project.description}
-            </p>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* Technical Details */}
-      {content?.technical && (
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-          <div className="col-span-1">
-            <FadeIn delay={0.6}>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
-                technical
-              </h2>
-            </FadeIn>
+        <FadeIn delay={0.04}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading">
+              {project.title}
+            </h1>
+            {project.status === "live" && (
+              <span className="text-[10px] uppercase tracking-wider text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded">
+                live
+              </span>
+            )}
           </div>
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-6">
-            {content.technical.map((section, i) => (
-              <FadeIn key={section.title} delay={0.7 + i * 0.1}>
-                <div className="border-l border-border pl-4">
-                  <h3 className="text-sm font-medium text-body mb-2">
-                    {section.title}
-                  </h3>
-                  <p className="text-sm text-tertiary leading-relaxed">
-                    {section.content}
-                  </p>
-                </div>
-              </FadeIn>
+          <p className="text-secondary mt-2 text-lg">{project.subtitle}</p>
+        </FadeIn>
+
+        <FadeIn delay={0.08}>
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.1}>
+          <div className="flex flex-wrap gap-4 text-xs font-mono">
+            {project.links?.live && (
+              <a
+                href={project.links.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent-400 hover:underline"
+              >
+                ./launch_site.sh
+              </a>
+            )}
+            {project.links?.repo && (
+              <a
+                href={project.links.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-tertiary hover:text-body hover:underline"
+              >
+                ./view_source.git
+              </a>
+            )}
+          </div>
+        </FadeIn>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">overview</h2>
+        <p className="text-secondary leading-relaxed text-base md:text-lg">
+          {content?.overview || project.description}
+        </p>
+      </section>
+
+      {content?.technical && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">technical</h2>
+          <div className="flex flex-col gap-5">
+            {content.technical.map((section) => (
+              <div key={section.title} className="border-l border-border pl-4">
+                <h3 className="text-sm font-semibold text-body mb-1">{section.title}</h3>
+                <p className="text-sm text-tertiary leading-relaxed">{section.content}</p>
+              </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Roadmap / What's Next */}
       {content?.roadmap && (
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-          <div className="col-span-1">
-            <FadeIn delay={0.9}>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
-                roadmap
-              </h2>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3">
-            <FadeIn delay={1.0}>
-              <div className="flex flex-col gap-3">
-                {content.roadmap.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm">
-                    <span
-                      className={`text-xs font-mono px-1.5 py-0.5 rounded ${
-                        item.status === "done"
-                          ? "text-green-500 bg-green-500/10"
-                          : item.status === "in-progress"
-                          ? "text-yellow-500 bg-yellow-500/10"
-                          : "text-muted bg-gray-500/10"
-                      }`}
-                    >
-                      {item.status === "done" ? "✓" : item.status === "in-progress" ? <CaretRight size={10} /> : "○"}
-                    </span>
-                    <span className={item.status === "done" ? "text-muted" : "text-secondary"}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
+        <section className="flex flex-col gap-4">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">next</h2>
+          <div className="flex flex-col gap-3">
+            {content.roadmap.map((item, index) => (
+              <div key={`${item.text}-${index}`} className="flex items-start gap-3 text-sm">
+                <span
+                  className={`text-xs font-mono px-1.5 py-0.5 rounded ${
+                    item.status === "done"
+                      ? "text-green-400 bg-green-500/10"
+                      : item.status === "in-progress"
+                        ? "text-yellow-400 bg-yellow-500/10"
+                        : "text-muted bg-gray-500/10"
+                  }`}
+                >
+                  {item.status === "done" ? "✓" : item.status === "in-progress" ? <CaretRight size={10} /> : "○"}
+                </span>
+                <span className={item.status === "done" ? "text-muted" : "text-secondary"}>
+                  {item.text}
+                </span>
               </div>
-            </FadeIn>
+            ))}
           </div>
         </section>
       )}
 
-      {/* Related Thoughts */}
       {content?.relatedThoughts && content.relatedThoughts.length > 0 && (
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
-          <div className="col-span-1">
-            <FadeIn delay={1.1}>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-accent-400">
-                related thoughts
-              </h2>
-            </FadeIn>
-          </div>
-          <div className="col-span-1 md:col-span-3">
-            <FadeIn delay={1.2}>
-              <div className="flex flex-col gap-2">
-                {content.relatedThoughts.map((thought) => (
-                  <Link
-                    key={thought.slug}
-                    href={`/thoughts/${thought.slug}`}
-                    className="text-sm text-tertiary hover:text-accent-400 transition-colors inline-flex items-center gap-1.5"
-                  >
-                    <ArrowRight size={12} /> {thought.title}
-                  </Link>
-                ))}
-              </div>
-            </FadeIn>
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">related thoughts</h2>
+          <div className="flex flex-col gap-2">
+            {content.relatedThoughts.map((thought) => (
+              <Link
+                key={thought.slug}
+                href={`/thoughts/${thought.slug}`}
+                className="text-sm text-tertiary hover:text-accent-400 transition-colors inline-flex items-center gap-1.5"
+              >
+                <ArrowRight size={12} /> {thought.title}
+              </Link>
+            ))}
           </div>
         </section>
       )}

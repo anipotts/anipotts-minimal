@@ -1,39 +1,28 @@
-import { supabase } from "@/lib/supabaseClient";
+import { getPublishedThoughts } from "@/content/thoughts";
 
 export const revalidate = 3600;
 
-function escapeXml(str: string): string {
-  return str
+function escapeXml(value: string): string {
+  return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
 export async function GET() {
   const siteUrl = "https://anipotts.com";
-
-  let thoughts: { title: string; slug: string; summary: string | null; created_at: string }[] = [];
-
-  if (supabase) {
-    const { data } = await supabase
-      .from("thoughts")
-      .select("title, slug, summary, created_at")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    thoughts = data ?? [];
-  }
+  const thoughts = (await getPublishedThoughts()).slice(0, 50);
 
   const items = thoughts
     .map(
-      (t) => `    <item>
-      <title>${escapeXml(t.title)}</title>
-      <link>${siteUrl}/thoughts/${escapeXml(t.slug)}</link>
-      <guid isPermaLink="true">${siteUrl}/thoughts/${escapeXml(t.slug)}</guid>
-      <description>${escapeXml(t.summary ?? "")}</description>
-      <pubDate>${new Date(t.created_at).toUTCString()}</pubDate>
+      (thought) => `    <item>
+      <title>${escapeXml(thought.title)}</title>
+      <link>${siteUrl}/thoughts/${escapeXml(thought.slug)}</link>
+      <guid isPermaLink="true">${siteUrl}/thoughts/${escapeXml(thought.slug)}</guid>
+      <description>${escapeXml(thought.summary)}</description>
+      <pubDate>${new Date(thought.date).toUTCString()}</pubDate>
     </item>`,
     )
     .join("\n");

@@ -1,5 +1,18 @@
 export type ProjectCategory = "ai" | "product" | "quant" | "music" | "other";
 export type ProjectStatus = "live" | "in-progress" | "coming-soon";
+export type WorkPublishState =
+  | "publish_now"
+  | "placeholder"
+  | "improve_then_publish"
+  | "archive";
+
+export interface DemoAsset {
+  webm?: string;
+  gif?: string;
+  poster?: string;
+  durationMs?: number;
+  sizeBytes?: number;
+}
 
 export interface Project {
   slug: string;
@@ -14,6 +27,10 @@ export interface Project {
   status?: ProjectStatus;
   featured?: boolean;
   icon?: "chrome";
+  priority?: number;
+  publishState?: WorkPublishState;
+  summary?: string;
+  demo?: DemoAsset;
   links?: {
     live?: string;
     repo?: string;
