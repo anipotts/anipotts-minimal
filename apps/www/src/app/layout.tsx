@@ -1,25 +1,12 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import {
-  PostHogProvider,
-  ThemeProvider,
-  WindowProvider,
-  WindowContainer,
-  WindowInner,
-  WindowLayoutWrapper,
-  TerminalStatusBar,
-  TerminalPromptCentered,
-  MinimizedPill,
-  TerminalBackground,
-} from "@anipotts/ui";
+import { PostHogProvider, ThemeProvider, TerminalBackground } from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
-import { AdminProvider } from "@/context/AdminContext";
-import AdminOverlay from "@/components/admin/AdminOverlay";
 import PersonSchema from "@/components/PersonSchema";
-import TerminalNavigatorWrapper from "@/components/TerminalNavigatorWrapper";
+import SiteStatusBar from "@/components/SiteStatusBar";
 import TerminalHeaderWrapper from "@/components/TerminalHeaderWrapper";
-import { fetchSiteConfig } from "@anipotts/lib/cms";
+import { siteConfig } from "@/content/site";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -27,163 +14,151 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const siteConfig = await fetchSiteConfig();
+const displayFont = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
-  const nameLower = siteConfig.name.toLowerCase();
-  const description = `${siteConfig.title.toLowerCase()} in ${siteConfig.location.toLowerCase()} building minimal interfaces to orchestrate complex systems`;
-
-  return {
-    metadataBase: new URL(siteConfig.url),
-    title: {
-      default: nameLower,
-      template: `%s | ${nameLower}`,
-    },
-    description,
-    keywords: [
-      "ani potts",
-      "anirudh pottammal",
-      "software engineer",
-      "nyc",
-      "developer",
-      "nyu",
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.name.toLowerCase(),
+    template: `%s | ${siteConfig.name.toLowerCase()}`,
+  },
+  description: `${siteConfig.title.toLowerCase()} in ${siteConfig.location.toLowerCase()} building minimal interfaces to orchestrate complex systems`,
+  keywords: [
+    "ani potts",
+    "anirudh pottammal",
+    "software engineer",
+    "nyc",
+    "developer",
+    "claude code",
+  ],
+  authors: [{ name: siteConfig.name.toLowerCase(), url: siteConfig.url }],
+  creator: siteConfig.name.toLowerCase(),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    siteName: siteConfig.name.toLowerCase(),
+    title: siteConfig.name.toLowerCase(),
+    description: siteConfig.bio,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name.toLowerCase(),
+      },
     ],
-    authors: [{ name: nameLower, url: siteConfig.url }],
-    creator: nameLower,
-    openGraph: {
-      type: "website",
-      locale: "en_US",
-      url: siteConfig.url,
-      siteName: nameLower,
-      title: nameLower,
-      description,
-      images: [
-        {
-          url: siteConfig.ogImage,
-          width: 1200,
-          height: 630,
-          alt: nameLower,
-        },
-      ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: siteConfig.handle,
+    site: siteConfig.handle,
+    title: siteConfig.name.toLowerCase(),
+    description: siteConfig.bio,
+    images: [siteConfig.ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: siteConfig.url,
+    types: {
+      "application/rss+xml": `${siteConfig.url}/feed.xml`,
     },
-    twitter: {
-      card: "summary_large_image",
-      creator: siteConfig.handle,
-      site: siteConfig.handle,
-      title: nameLower,
-      description,
-      images: [siteConfig.ogImage],
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+  },
+  icons: {
+    icon: [
+      {
+        url: "/api/icon?text=ap&scheme=dark",
+        type: "image/png",
+        sizes: "32x32",
+        media: "(prefers-color-scheme: dark)",
       },
-    },
-    alternates: {
-      canonical: siteConfig.url,
-      types: {
-        "application/rss+xml": `${siteConfig.url}/feed.xml`,
+      {
+        url: "/api/icon?text=ap&scheme=light",
+        type: "image/png",
+        sizes: "32x32",
+        media: "(prefers-color-scheme: light)",
       },
-    },
-    icons: {
-      icon: [
-        {
-          url: "/api/icon?text=ap&scheme=dark",
-          type: "image/png",
-          sizes: "32x32",
-          media: "(prefers-color-scheme: dark)",
-        },
-        {
-          url: "/api/icon?text=ap&scheme=light",
-          type: "image/png",
-          sizes: "32x32",
-          media: "(prefers-color-scheme: light)",
-        },
-      ],
-      apple: [
-        {
-          url: "/api/icon?text=ap&scheme=dark",
-          sizes: "180x180",
-          type: "image/png",
-        },
-      ],
-    },
-    manifest: "/site.webmanifest",
-    appleWebApp: {
-      capable: true,
-      statusBarStyle: "black-translucent",
-      title: nameLower,
-    },
-    other: {
-      "msapplication-TileColor": "#0a0a0a",
-      "msapplication-config": "/browserconfig.xml",
-    },
-  };
-}
+    ],
+    apple: [
+      {
+        url: "/api/icon?text=ap&scheme=dark",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  manifest: "/site.webmanifest",
+};
 
-/**
- * Root layout for the consolidated single-app architecture.
- *
- * This layout provides:
- * - Theme system (ThemeProvider, ThemeScript)
- * - Terminal UI chrome (TerminalBackground, WindowContainer, etc.)
- * - Admin system (AdminProvider, AdminOverlay)
- * - Analytics (PostHogProvider)
- * - Navigation (TerminalNavigator)
- *
- * The (main) child layout adds Navbar/Footer.
- */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${jetbrainsMono.variable} ${displayFont.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <ThemeScript />
         <PersonSchema />
-        <meta name="theme-color" content="#1e5f99" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#020308" media="(prefers-color-scheme: dark)" />
+        <meta
+          name="theme-color"
+          content="#61abea"
+          media="(prefers-color-scheme: light)"
+        />
+        <meta
+          name="theme-color"
+          content="#020308"
+          media="(prefers-color-scheme: dark)"
+        />
       </head>
-      <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
+      <body
+        className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden"
+        suppressHydrationWarning
+      >
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[99999] focus:bg-accent-400 focus:text-black focus:px-4 focus:py-2 focus:rounded-sm focus:text-xs focus:font-mono focus:uppercase focus:tracking-widest"
         >
           Skip to content
         </a>
+
         <ThemeProvider>
           <TerminalBackground />
 
           <PostHogProvider>
-            <AdminProvider>
-              <WindowProvider>
-                <WindowLayoutWrapper>
-                  <WindowContainer>
-                    <TerminalHeaderWrapper />
+            <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
+              <div className="terminal-window w-full max-w-5xl flex flex-col border border-border shadow-2xl bg-card rounded-lg overflow-hidden ring-1 ring-ring">
+                <TerminalHeaderWrapper />
 
-                    <WindowInner showNavbar={false} showFooter={false}>
-                      {children}
-                    </WindowInner>
+                <div className="relative bg-[rgba(var(--overlay-invert),0.4)] flex-1 min-h-0">
+                  <div
+                    className="absolute inset-0 pointer-events-none opacity-45"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+                      backgroundSize: "24px 24px",
+                    }}
+                  />
 
-                    <TerminalStatusBar />
-                  </WindowContainer>
+                  <div className="relative z-10 px-6 md:px-8 lg:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
+                    {children}
+                  </div>
+                </div>
 
-                  <TerminalPromptCentered />
-                  <MinimizedPill />
-                </WindowLayoutWrapper>
-
-                <AdminOverlay />
-                <TerminalNavigatorWrapper />
-              </WindowProvider>
-            </AdminProvider>
+                <SiteStatusBar />
+              </div>
+            </div>
           </PostHogProvider>
         </ThemeProvider>
       </body>

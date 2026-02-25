@@ -1,15 +1,15 @@
 export function register() {
   if (process.env.NEXT_PHASE === "phase-production-build") return;
+  if (process.env.NODE_ENV !== "production") return;
 
-  const required = [
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  ];
+  const required = ["RESEND_API_KEY"];
 
   const recommended = [
-    "ADMIN_PASSWORD",
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "RESEND_API_KEY",
+    "NEXT_PUBLIC_POSTHOG_KEY",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+    "TURNSTILE_SECRET_KEY",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
   ];
 
   const missing = required.filter((v) => !process.env[v]);
