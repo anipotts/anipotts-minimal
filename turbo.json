@@ -16,15 +16,13 @@
       ],
       "env": [
         "NODE_ENV",
-        "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_POSTHOG_KEY",
-        "SUPABASE_SERVICE_ROLE_KEY",
-        "ADMIN_PASSWORD",
+        "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+        "TURNSTILE_SECRET_KEY",
         "RESEND_API_KEY",
-        "GITHUB_TOKEN",
-        "WAKATIME_API_KEY",
-        "BETTERSTACK_API_KEY"
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "GITHUB_TOKEN"
       ]
     },
     "dev": {
