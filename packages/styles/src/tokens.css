@@ -2,72 +2,75 @@
 /* Light mode (default) → .dark overrides for dark mode */
 
 :root {
-  --background: #faf9f7;
-  --foreground: #1a1a2e;
-  --card: #ffffff;
-  --card-foreground: #1a1a2e;
-  --card-darker: #f5f5f5;
+  --background: #1e5f99;
+  --foreground: #ffffff;
+  --card: #19507f;
+  --card-foreground: #ffffff;
+  --card-darker: #154468;
 
-  /* Accent colors - lavender for light mode, blue for dark */
-  --accent: #a78bfa;
-  --accent-400: #a78bfa;
+  /* Accent colors - #61abea in both modes for consistent branding */
+  --accent: #61abea;
+  --accent-400: #61abea;
 
   /* Signal colors (same in both modes) */
   --signal-green: #4ade80;
   --signal-red: #ef4444;
 
-  /* Overlay RGB triplets (light: black overlays on white bg) */
-  --overlay-base: 0, 0, 0;
-  --overlay-invert: 255, 255, 255;
+  /* Overlay RGB triplets (light: dark-blue-tinted overlays) */
+  --overlay-base: 255, 255, 255;
+  --overlay-invert: 10, 40, 70;
 
   /* Borders */
-  --border: rgba(0, 0, 0, 0.1);
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --ring: rgba(0, 0, 0, 0.05);
+  --border: rgba(255, 255, 255, 0.18);
+  --border-subtle: rgba(255, 255, 255, 0.10);
+  --ring: rgba(255, 255, 255, 0.12);
 
   /* Backdrops */
-  --backdrop-dim: rgba(0, 0, 0, 0.3);
-  --backdrop-medium: rgba(0, 0, 0, 0.25);
-  --input-bg: rgba(0, 0, 0, 0.03);
+  --backdrop-dim: rgba(0, 0, 0, 0.4);
+  --backdrop-medium: rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(255, 255, 255, 0.1);
 
   /* Text hierarchy */
-  --text-heading: #111827;
-  --text-body: #1f2937;
-  --text-secondary: #374151;
-  --text-tertiary: #4b5563;
-  --text-muted: #6b7280;
-  --text-faint: #808892;
+  --text-heading: #ffffff;
+  --text-body: #f0f4f8;
+  --text-secondary: #dce8f4;
+  --text-tertiary: #c0d4e8;
+  --text-muted: #a8c4dc;
+  --text-faint: #8aaccc;
 
   /* Scrollbar */
-  --scrollbar-thumb: #c0c0c0;
-  --scrollbar-thumb-hover: #999999;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.3);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
 
   /* Effects */
-  --grid-line: rgba(0, 0, 0, 0.03);
-  --noise-opacity: 0.015;
-  --waves-color: rgba(167, 139, 250, 0.5);
-  --waves-opacity: 0.25;
-  --cursor-dot: #ffe0e0;
-  --ambient-from: rgba(229, 231, 235, 0.3);
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --noise-opacity: 0.02;
+  --waves-color: rgba(97, 171, 234, 0.5);
+  --waves-opacity: 0.35;
+  --cursor-dot: rgba(255, 255, 255, 0.6);
+  --ambient-from: rgba(30, 95, 153, 0.4);
 
   /* Quill editor */
-  --quill-toolbar-bg: rgba(0, 0, 0, 0.02);
-  --quill-toolbar-border: rgba(0, 0, 0, 0.1);
-  --quill-container-bg: rgba(0, 0, 0, 0.02);
-  --quill-text: #1a1a2e;
-  --quill-placeholder: rgba(0, 0, 0, 0.3);
-  --quill-icon: #6b7280;
-  --quill-dropdown-bg: #ffffff;
-  --quill-dropdown-border: rgba(0, 0, 0, 0.1);
-  --quill-dropdown-shadow: rgba(0, 0, 0, 0.1);
-  --quill-item-text: #6b7280;
+  --quill-toolbar-bg: rgba(255, 255, 255, 0.06);
+  --quill-toolbar-border: rgba(255, 255, 255, 0.15);
+  --quill-container-bg: rgba(255, 255, 255, 0.04);
+  --quill-text: #ffffff;
+  --quill-placeholder: rgba(255, 255, 255, 0.35);
+  --quill-icon: #7da3c2;
+  --quill-dropdown-bg: #19507f;
+  --quill-dropdown-border: rgba(255, 255, 255, 0.15);
+  --quill-dropdown-shadow: rgba(0, 0, 0, 0.3);
+  --quill-item-text: #7da3c2;
 
   /* Prose */
-  --prose-heading: #111827;
-  --prose-code-bg: rgba(0, 0, 0, 0.05);
-  --prose-pre-bg: rgba(0, 0, 0, 0.03);
-  --prose-pre-border: rgba(0, 0, 0, 0.1);
-  --prose-blockquote-text: #6b7280;
+  --prose-heading: #ffffff;
+  --prose-code-bg: rgba(255, 255, 255, 0.10);
+  --prose-pre-bg: rgba(0, 0, 0, 0.20);
+  --prose-pre-border: rgba(255, 255, 255, 0.12);
+  --prose-blockquote-text: #7da3c2;
+
+  /* Text readability enhancement (not needed with deeper bg contrast) */
+  --text-enhance: none;
 
   /* Font variables will be defined in layout.tsx */
 }
@@ -127,6 +130,8 @@
   --prose-pre-bg: rgba(0, 0, 0, 0.4);
   --prose-pre-border: rgba(255, 255, 255, 0.1);
   --prose-blockquote-text: #9ca3af;
+
+  --text-enhance: none;
 }
 
 /* Theme transition animation */
@@ -159,7 +164,7 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+  box-shadow: 0 0 0 3px rgba(97, 171, 234, 0.4);
 }
 
 .dark input:focus-visible,

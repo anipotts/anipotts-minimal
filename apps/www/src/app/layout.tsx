@@ -149,6 +149,8 @@ export default function RootLayout({
       <head>
         <ThemeScript />
         <PersonSchema />
+        <meta name="theme-color" content="#1e5f99" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#020308" media="(prefers-color-scheme: dark)" />
       </head>
       <body className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden" suppressHydrationWarning>
         <a
