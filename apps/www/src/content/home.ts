@@ -2,9 +2,9 @@ export const homeContent = {
   prelude: "index",
   heading: "hi, i'm ani.",
   summary:
-    "I build minimal interfaces for complex systems, with a focus on AI workflows, execution speed, and product clarity.",
+    "Software engineer at Structured AI (YC F25), building autonomous agents that automate QA/QC for construction design engineers.",
   about: [
-    "I am currently building an investment research platform for PGI, serving analysts and quants across top institutions.",
-    "Previously I built analytics tooling for Atlantic and automation systems for Range Media Partners while launching profitable web products.",
+    "At Structured AI, I'm building the platform that lets construction design engineers automate quality assurance and quality control with autonomous agents.",
+    "Previously I built an investment research platform for PGI, analytics tooling for Atlantic, and automation systems for Range Media Partners.",
   ],
 } as const;

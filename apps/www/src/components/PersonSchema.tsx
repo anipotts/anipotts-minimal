@@ -18,11 +18,18 @@ export default function PersonSchema() {
       "https://linkedin.com/in/anipotts",
     ],
     jobTitle: siteConfig.title,
+    worksFor: {
+      "@type": "Organization",
+      name: "Structured AI",
+      url: "https://structuredai.com",
+    },
     alumniOf: {
       "@type": "EducationalOrganization",
       name: "New York University",
     },
     knowsAbout: [
+      "Autonomous Agents",
+      "AI Engineering",
       "Claude Code",
       "React",
       "TypeScript",
