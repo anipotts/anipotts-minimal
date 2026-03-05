@@ -15,10 +15,9 @@ interface TipCardProps {
   install: string;
   href: string;
   features: TipCardFeature[];
-  flagship?: boolean;
 }
 
-export function TipCard({ name, tagline, install, href, features, flagship }: TipCardProps) {
+export function TipCard({ name, tagline, install, href, features }: TipCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -73,11 +72,7 @@ export function TipCard({ name, tagline, install, href, features, flagship }: Ti
             >
               {name}
             </h3>
-            {flagship && (
-              <span className="text-[10px] uppercase tracking-wider text-accent-400 bg-accent-400/10 border border-accent-400/20 px-1.5 py-0.5 rounded font-medium">
-                flagship
-              </span>
-            )}
+
           </div>
           <p className="text-xs text-muted pl-6">{tagline}</p>
         </div>

@@ -18,7 +18,7 @@ export interface Plugin {
   install: string;
   href: string;
   features: PluginFeature[];
-  flagship?: boolean;
+
 }
 
 export const plugins: Plugin[] = [
@@ -28,7 +28,7 @@ export const plugins: Plugin[] = [
     tagline: "session analytics, cost tracking, and usage insights for claude code",
     install: "claude plugin add anipotts/claude-code-tips miner",
     href: `${BLOB}/plugins/miner`,
-    flagship: true,
+
     features: [
       { name: "session logger", desc: "logs every session with token counts, duration, cost", href: `${BLOB}/plugins/miner/session-logger.md` },
       { name: "cost dashboard", desc: "daily/weekly/monthly spend breakdowns", href: `${BLOB}/plugins/miner/cost-dashboard.md` },

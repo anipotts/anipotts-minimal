@@ -154,7 +154,7 @@ export default function RootLayout({
                     }}
                   />
 
-                  <div className="relative z-10 px-6 md:px-8 lg:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
+                  <div className="relative z-10 px-4 min-h-[calc(100svh-9rem)] flex flex-col">
                     {children}
                   </div>
                 </div>

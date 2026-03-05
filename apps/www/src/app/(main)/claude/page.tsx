@@ -47,7 +47,7 @@ export default function ClaudePage() {
           </PageSummary>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <CardBlock>
               <p className="text-[10px] uppercase tracking-[0.16em] text-faint">sessions</p>
               <p className="text-2xl font-heading text-accent-400 mt-1">{stats.sessions}</p>
@@ -59,10 +59,6 @@ export default function ClaudePage() {
             <CardBlock>
               <p className="text-[10px] uppercase tracking-[0.16em] text-faint">tool calls</p>
               <p className="text-2xl font-heading text-accent-400 mt-1">{stats.toolCalls}</p>
-            </CardBlock>
-            <CardBlock>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">focus</p>
-              <p className="text-sm text-secondary mt-2">execution quality</p>
             </CardBlock>
           </div>
         </FadeIn>
@@ -114,7 +110,7 @@ export default function ClaudePage() {
                 install={plugin.install}
                 href={plugin.href}
                 features={plugin.features}
-                flagship={plugin.flagship}
+
               />
             </FadeIn>
           ))}
