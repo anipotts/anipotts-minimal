@@ -15,7 +15,7 @@ const SERIES_OPTIONS = [
 export default function QuickPostForm() {
   const [state, formAction, isPending] = useActionState(
     async (_prev: { error?: string; success?: boolean; id?: string } | null, formData: FormData) => {
-      return await createThought(formData)
+      return await createThought(formData) as { error?: string; success?: boolean; id?: string }
     },
     null
   )

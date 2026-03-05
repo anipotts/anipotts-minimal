@@ -14,7 +14,7 @@ import { adminLoginSchema, formatZodError } from '@anipotts/lib/validation'
 import type { SeriesType, ContentStatus } from '@anipotts/types'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const VALID_STATUSES: ContentStatus[] = ['draft', 'ready', 'published', 'archived']
+const VALID_STATUSES: ContentStatus[] = ['idea', 'draft', 'ready', 'atomized', 'published']
 
 async function requireAuth(): Promise<{ error: string } | null> {
   const jar = await cookies()
