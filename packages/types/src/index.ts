@@ -32,7 +32,11 @@ export type { SocialLink, LinkInBio } from "./link";
 export type { Experiment, ExperimentStatus } from "./experiment";
 
 // Status page types
-export type { ServiceStatus, ServiceStatusState, StatusPageData } from "./status";
+export type {
+  ServiceStatus,
+  ServiceStatusState,
+  StatusPageData,
+} from "./status";
 
 // Typefully types
 export type {
@@ -40,12 +44,6 @@ export type {
   TypefullyQueueSummary,
   TypefullySocialSet,
 } from "./typefully";
-
-// API response types
-export type { ApiResult } from "./api";
-
-// Supabase database types
-export type { Database } from "./supabase";
 
 // CMS types
 export type {

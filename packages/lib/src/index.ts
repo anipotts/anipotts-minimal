@@ -23,10 +23,7 @@ export {
 export { SITE_VERSION } from "./constants";
 
 // Feature flags
-export {
-  featureFlags,
-  isFeatureEnabled,
-} from "./feature-flags";
+export { featureFlags, isFeatureEnabled } from "./feature-flags";
 export type { FeatureFlags, FeatureFlagKey } from "./feature-flags";
 
 // Validation
@@ -39,4 +36,3 @@ export {
 
 // Logger
 export { logger } from "./logger";
-export type { LogLevel } from "./logger";
