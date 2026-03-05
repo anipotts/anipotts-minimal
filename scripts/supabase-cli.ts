@@ -87,9 +87,9 @@ async function createContent(title: string, options: { series?: string; type?: s
 
 async function updateContent(id: string, field: string, value: string) {
   // Handle JSON fields
-  let parsedValue: any = value;
+  let parsedValue: string | boolean | string[] = value;
   if (field === "platforms_targeted" || field === "platforms_posted") {
-    parsedValue = JSON.parse(value);
+    parsedValue = JSON.parse(value) as string[];
   } else if (field === "published") {
     parsedValue = value === "true";
   }
@@ -144,7 +144,7 @@ async function createAtom(contentId: string, platform: string, atomContent: stri
 }
 
 async function updateAtom(id: string, field: string, value: string) {
-  let parsedValue: any = value;
+  let parsedValue: string | null = value;
   if (field === "scheduled_for" || field === "posted_at") {
     parsedValue = value === "null" ? null : value;
   }
