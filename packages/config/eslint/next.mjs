@@ -12,6 +12,21 @@ const eslintConfig = defineConfig([
     "dist/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports" },
+      ],
+    },
+  },
+  {
+    files: ["**/scripts/**"],
+    rules: {
+      "no-console": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
