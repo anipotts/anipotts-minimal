@@ -1,6 +1,8 @@
 import type {
   PageContent,
+  Project,
   ProjectRow,
+  SocialLink,
   SocialLinkRow,
   SiteSettingsMap,
   ThoughtSummary,
@@ -30,6 +32,7 @@ export async function fetchPageContent<T = unknown>(
       .single();
 
     if (error) throw error;
+    // TODO: Replace with typed Supabase client
     return data as PageContent<T>;
   } catch (err) {
     console.warn(`[cms] fetchPageContent("${pageKey}") unavailable, using fallback`);
@@ -46,7 +49,7 @@ export async function fetchProjects(options?: {
   category?: string;
   visible?: boolean;
   limit?: number;
-}) {
+}): Promise<Project[]> {
   if (!supabase) return FALLBACK_PROJECTS;
 
   try {
@@ -77,6 +80,7 @@ export async function fetchProjects(options?: {
     if (error) throw error;
     if (!data || data.length === 0) return FALLBACK_PROJECTS;
 
+    // TODO: Replace with typed Supabase client
     return (data as ProjectRow[]).map(projectRowToProject);
   } catch (err) {
     console.warn("[cms] fetchProjects() unavailable, using fallback");
@@ -112,11 +116,21 @@ export async function fetchThoughts(options?: {
 
     const { data, error } = await query;
     if (error) throw error;
+    // TODO: Replace with typed Supabase client
     return (data as ThoughtSummary[]) ?? [];
   } catch (err) {
     console.warn("[cms] fetchThoughts() unavailable, using fallback");
     return [];
   }
+}
+
+interface SearchResult {
+  type: string;
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  rank: number;
 }
 
 export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
@@ -129,7 +143,8 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     if (error) throw error;
     if (!data) return [];
 
-    const thoughtResults = (data as { type: string; id: string; slug: string; title: string; summary: string; rank: number }[])
+    // TODO: Replace with typed Supabase client
+    const thoughtResults = (data as SearchResult[])
       .filter((r) => r.type === "thought");
     if (thoughtResults.length === 0) return [];
 
@@ -143,6 +158,7 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     if (!thoughts) return [];
 
     const rankMap = new Map(thoughtResults.map((r) => [r.slug, r.rank]));
+    // TODO: Replace with typed Supabase client
     return (thoughts as ThoughtSummary[]).sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
   } catch (e) {
     console.warn("[cms] searchThoughts() failed:", e);
@@ -154,7 +170,7 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
 // Social links
 // ---------------------------------------------------------------------------
 
-export async function fetchSocialLinks() {
+export async function fetchSocialLinks(): Promise<SocialLink[]> {
   if (!supabase) return FALLBACK_SOCIAL_LINKS;
 
   try {
@@ -167,6 +183,7 @@ export async function fetchSocialLinks() {
     if (error) throw error;
     if (!data || data.length === 0) return FALLBACK_SOCIAL_LINKS;
 
+    // TODO: Replace with typed Supabase client
     return (data as SocialLinkRow[]).map((row) => ({
       name: row.name,
       url: row.url,
@@ -196,6 +213,7 @@ export async function fetchSiteSetting(
       .maybeSingle();
 
     if (error) throw error;
+    // TODO: Replace with typed Supabase client
     return (data as { value: string } | null)?.value ?? null;
   } catch (err) {
     console.warn(`[cms] fetchSiteSetting("${key}") unavailable, using fallback`);
@@ -215,6 +233,7 @@ export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
     if (!data) return {};
 
     const map: SiteSettingsMap = {};
+    // TODO: Replace with typed Supabase client
     for (const row of data as { key: string; value: string }[]) {
       map[row.key] = row.value;
     }
@@ -229,7 +248,21 @@ export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
 // Merged site config (CMS overrides static defaults)
 // ---------------------------------------------------------------------------
 
-export async function fetchSiteConfig() {
+export async function fetchSiteConfig(): Promise<{
+  name: string;
+  fullName: string;
+  title: string;
+  location: string;
+  bio: string;
+  shortBio: string;
+  domain: string;
+  url: string;
+  email: string;
+  handle: string;
+  github: string;
+  headshot: string;
+  ogImage: string;
+}> {
   const { site } = await import("../data/site");
   const settings = await fetchAllSiteSettings();
   return {
