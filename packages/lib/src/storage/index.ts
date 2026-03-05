@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { logger } from "../logger";
 
 /**
  * Upload a project image to Supabase Storage.
@@ -24,7 +25,7 @@ export async function uploadProjectImage(
     .upload(path, file, { upsert: true });
 
   if (error) {
-    console.error("[storage] uploadProjectImage failed:", error.message);
+    logger.error("storage", "uploadProjectImage failed", { message: error.message });
     return null;
   }
 
@@ -59,7 +60,7 @@ export async function deleteProjectImage(
     .remove([path]);
 
   if (error) {
-    console.error("[storage] deleteProjectImage failed:", error.message);
+    logger.error("storage", "deleteProjectImage failed", { message: error.message });
     return false;
   }
 
