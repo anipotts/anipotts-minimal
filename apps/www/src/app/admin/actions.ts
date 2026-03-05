@@ -5,12 +5,26 @@ import {
   verifyAdminPassword,
   verifyAdminTotp,
   createSessionToken,
+  verifySessionToken,
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
 } from '@anipotts/lib/admin'
 import { createServerClient } from '@anipotts/lib'
 import { adminLoginSchema, formatZodError } from '@anipotts/lib/validation'
 import type { SeriesType, ContentStatus } from '@anipotts/types'
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const VALID_STATUSES: ContentStatus[] = ['draft', 'ready', 'published', 'archived']
+
+async function requireAuth(): Promise<{ error: string } | null> {
+  const jar = await cookies()
+  const token = jar.get(ADMIN_COOKIE)?.value
+  const secret = process.env.ADMIN_PASSWORD
+  if (!token || !secret || !verifySessionToken(token, secret)) {
+    return { error: 'Unauthorized' }
+  }
+  return null
+}
 
 export async function login(formData: FormData) {
   const raw = {
@@ -30,7 +44,10 @@ export async function login(formData: FormData) {
     return { error: pwResult.error || 'Invalid password' }
   }
 
-  if (process.env.ADMIN_TOTP_SECRET && totp) {
+  if (process.env.ADMIN_TOTP_SECRET) {
+    if (!totp) {
+      return { error: 'TOTP code is required' }
+    }
     const totpResult = verifyAdminTotp(totp, process.env.ADMIN_TOTP_SECRET)
     if (!totpResult.success) {
       return { error: totpResult.error || 'Invalid TOTP' }
@@ -52,6 +69,11 @@ export async function logout() {
 }
 
 export async function approveContent(id: string) {
+  const authError = await requireAuth()
+  if (authError) return authError
+
+  if (!UUID_RE.test(id)) return { error: 'Invalid content ID' }
+
   const supabase = createServerClient()
   if (!supabase) return { error: 'Supabase not configured' }
 
@@ -65,6 +87,12 @@ export async function approveContent(id: string) {
 }
 
 export async function updateContentStatus(id: string, status: ContentStatus) {
+  const authError = await requireAuth()
+  if (authError) return authError
+
+  if (!UUID_RE.test(id)) return { error: 'Invalid content ID' }
+  if (!VALID_STATUSES.includes(status)) return { error: 'Invalid status' }
+
   const supabase = createServerClient()
   if (!supabase) return { error: 'Supabase not configured' }
 
@@ -86,6 +114,9 @@ export async function updateContentStatus(id: string, status: ContentStatus) {
 }
 
 export async function createThought(formData: FormData) {
+  const authError = await requireAuth()
+  if (authError) return authError
+
   const supabase = createServerClient()
   if (!supabase) return { error: 'Supabase not configured' }
 
@@ -96,10 +127,11 @@ export async function createThought(formData: FormData) {
 
   if (!title) return { error: 'Title is required' }
 
-  const slug = title
+  const base = title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
+  const slug = `${base}-${Date.now().toString(36).slice(-4)}`
 
   const { data, error } = await supabase
     .from('thoughts')

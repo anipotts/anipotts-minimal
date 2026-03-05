@@ -65,6 +65,7 @@ export default function QuickPostForm() {
       <select
         name="series_type"
         required
+        defaultValue=""
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
       >
         <option value="" disabled>
