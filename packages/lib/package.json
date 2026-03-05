@@ -14,11 +14,7 @@
       "types": "./dist/supabase/index.d.ts",
       "import": "./dist/supabase/index.js"
     },
-    "./posthog": {
-      "types": "./dist/posthog/index.d.ts",
-      "import": "./dist/posthog/index.js"
-    },
-    "./utils": {
+"./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
     },
