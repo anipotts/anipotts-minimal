@@ -1,5 +1,3 @@
-"use client";
-
 export interface StatusDotProps {
   className?: string;
   color?: "green" | "red" | "yellow";

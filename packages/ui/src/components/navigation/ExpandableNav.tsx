@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
-interface ExpandableNavProps {
+export interface ExpandableNavProps {
   currentSection: string;
   pathname?: string;
   onNavClick?: (name: string, href: string) => void;
