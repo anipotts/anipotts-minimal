@@ -15,6 +15,11 @@ import {
 export const metadata: Metadata = {
   title: "work",
   description: "Curated projects and systems from ani potts",
+  openGraph: {
+    title: "work | ani potts",
+    description: "Curated projects and systems from ani potts",
+    url: "https://anipotts.com/work",
+  },
   alternates: {
     canonical: "https://anipotts.com/work",
   },

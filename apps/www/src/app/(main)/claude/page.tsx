@@ -24,6 +24,11 @@ import {
 export const metadata: Metadata = {
   title: "claude",
   description: "Claude Code systems, playbooks, and implementation patterns from ani potts",
+  openGraph: {
+    title: "claude | ani potts",
+    description: "Claude Code systems, playbooks, and implementation patterns from ani potts",
+    url: "https://anipotts.com/claude",
+  },
   alternates: {
     canonical: "https://anipotts.com/claude",
   },

@@ -15,6 +15,11 @@ import {
 export const metadata: Metadata = {
   title: "thoughts",
   description: "Technical writing and notes from ani potts",
+  openGraph: {
+    title: "thoughts | ani potts",
+    description: "Technical writing and notes from ani potts",
+    url: "https://anipotts.com/thoughts",
+  },
   alternates: {
     canonical: "https://anipotts.com/thoughts",
   },

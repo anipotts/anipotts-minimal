@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getPublishedThoughts } from "@/content/thoughts";
+import { projectEntries } from "@/content/projects";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://anipotts.com";
@@ -47,5 +48,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
-  return [...staticPages, ...thoughtPages];
+  const publishedProjects = projectEntries.filter(
+    (p) => p.links?.page && p.publishState === "publish_now",
+  );
+
+  const projectPages: MetadataRoute.Sitemap = publishedProjects.map((project) => ({
+    url: `${baseUrl}/projects/${project.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...thoughtPages, ...projectPages];
 }
