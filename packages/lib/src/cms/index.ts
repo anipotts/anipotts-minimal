@@ -9,8 +9,37 @@ import type {
 } from "@anipotts/types";
 import { projectRowToProject } from "@anipotts/types";
 import { supabase } from "../supabase";
+import { logger } from "../logger";
 import { FALLBACK_PROJECTS } from "../data/projects";
 import { FALLBACK_SOCIAL_LINKS } from "../data/social";
+
+// ---------------------------------------------------------------------------
+// Fetch-with-fallback helper (DRYs up the repeated try/catch/fallback pattern)
+// ---------------------------------------------------------------------------
+
+type SupabaseResult<T> = { data: T | null; error: unknown };
+
+async function fetchWithFallback<T>(
+  queryFn: (client: NonNullable<typeof supabase>) => Promise<SupabaseResult<T>>,
+  fallback: T,
+  context: string
+): Promise<T> {
+  if (!supabase) {
+    logger.warn("cms", `No Supabase client, using fallback for ${context}`);
+    return fallback;
+  }
+  try {
+    const { data, error } = await queryFn(supabase);
+    if (error || data == null) {
+      logger.warn("cms", `Query failed for ${context}, using fallback`, { error });
+      return fallback;
+    }
+    return data;
+  } catch (err) {
+    logger.error("cms", `Exception in ${context}, using fallback`, { error: String(err) });
+    return fallback;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Page content
@@ -19,25 +48,21 @@ import { FALLBACK_SOCIAL_LINKS } from "../data/social";
 export async function fetchPageContent<T = unknown>(
   pageKey: string
 ): Promise<PageContent<T> | null> {
-  if (!supabase) return null;
-
-  try {
-    const { data, error } = await supabase
-      .from("page_content")
-      .select("*")
-      .eq("page_key", pageKey)
-      .eq("published", true)
-      .order("version", { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error) throw error;
-    // TODO: Replace with typed Supabase client
-    return data as PageContent<T>;
-  } catch (err) {
-    console.warn(`[cms] fetchPageContent("${pageKey}") unavailable, using fallback`);
-    return null;
-  }
+  return fetchWithFallback<PageContent<T> | null>(
+    async (client) => {
+      const result = await client
+        .from("page_content")
+        .select("*")
+        .eq("page_key", pageKey)
+        .eq("published", true)
+        .order("version", { ascending: false })
+        .limit(1)
+        .single();
+      return { data: result.data as PageContent<T> | null, error: result.error };
+    },
+    null,
+    `fetchPageContent("${pageKey}")`
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -58,7 +83,6 @@ export async function fetchProjects(options?: {
       .select("*")
       .order("sort_order", { ascending: true });
 
-    // Default to visible=true for public-facing queries
     const visibleFilter = options?.visible ?? true;
     if (visibleFilter) {
       query = query.eq("visible", true);
@@ -83,7 +107,7 @@ export async function fetchProjects(options?: {
     // TODO: Replace with typed Supabase client
     return (data as ProjectRow[]).map(projectRowToProject);
   } catch (err) {
-    console.warn("[cms] fetchProjects() unavailable, using fallback");
+    logger.warn("cms", "fetchProjects() unavailable, using fallback");
     return FALLBACK_PROJECTS;
   }
 }
@@ -119,7 +143,7 @@ export async function fetchThoughts(options?: {
     // TODO: Replace with typed Supabase client
     return (data as ThoughtSummary[]) ?? [];
   } catch (err) {
-    console.warn("[cms] fetchThoughts() unavailable, using fallback");
+    logger.warn("cms", "fetchThoughts() unavailable, using fallback");
     return [];
   }
 }
@@ -161,7 +185,7 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     // TODO: Replace with typed Supabase client
     return (thoughts as ThoughtSummary[]).sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
   } catch (e) {
-    console.warn("[cms] searchThoughts() failed:", e);
+    logger.warn("cms", "searchThoughts() failed", { error: String(e) });
     return [];
   }
 }
@@ -191,7 +215,7 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
       description: row.description ?? undefined,
     }));
   } catch (err) {
-    console.warn("[cms] fetchSocialLinks() unavailable, using fallback");
+    logger.warn("cms", "fetchSocialLinks() unavailable, using fallback");
     return FALLBACK_SOCIAL_LINKS;
   }
 }
@@ -203,45 +227,36 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
 export async function fetchSiteSetting(
   key: string
 ): Promise<string | null> {
-  if (!supabase) return null;
-
-  try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", key)
-      .maybeSingle();
-
-    if (error) throw error;
-    // TODO: Replace with typed Supabase client
-    return (data as { value: string } | null)?.value ?? null;
-  } catch (err) {
-    console.warn(`[cms] fetchSiteSetting("${key}") unavailable, using fallback`);
-    return null;
-  }
+  return fetchWithFallback<string | null>(
+    async (client) => {
+      const { data, error } = await client
+        .from("site_settings")
+        .select("value")
+        .eq("key", key)
+        .maybeSingle();
+      return { data: (data as { value: string } | null)?.value ?? null, error };
+    },
+    null,
+    `fetchSiteSetting("${key}")`
+  );
 }
 
 export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
-  if (!supabase) return {};
-
-  try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("key, value");
-
-    if (error) throw error;
-    if (!data) return {};
-
-    const map: SiteSettingsMap = {};
-    // TODO: Replace with typed Supabase client
-    for (const row of data as { key: string; value: string }[]) {
-      map[row.key] = row.value;
-    }
-    return map;
-  } catch (err) {
-    console.warn("[cms] fetchAllSiteSettings() unavailable, using fallback");
-    return {};
-  }
+  return fetchWithFallback<SiteSettingsMap>(
+    async (client) => {
+      const { data, error } = await client
+        .from("site_settings")
+        .select("key, value");
+      if (error || !data) return { data: null, error };
+      const map: SiteSettingsMap = {};
+      for (const row of data as { key: string; value: string }[]) {
+        map[row.key] = row.value;
+      }
+      return { data: map, error: null };
+    },
+    {},
+    "fetchAllSiteSettings"
+  );
 }
 
 // ---------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Thought, Subdomain } from "@anipotts/types";
+import { logger } from "../logger";
 
 export interface QueryOptions {
   subdomain?: Subdomain;
@@ -28,7 +29,7 @@ export async function fetchAllThoughts(
   const { data, error } = await query;
 
   if (error) {
-    console.error("Error fetching admin thoughts:", error);
+    logger.error("admin", "Error fetching thoughts", { error: String(error) });
     return [];
   }
   return data;
@@ -102,7 +103,7 @@ export async function fetchThoughtStats(
   const { data: thoughts, error } = await query;
 
   if (error) {
-    console.error("Error fetching stats:", error);
+    logger.error("admin", "Error fetching thought stats", { error: String(error) });
     return null;
   }
 
