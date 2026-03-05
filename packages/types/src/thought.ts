@@ -1,6 +1,6 @@
 // Content types
 export type ContentType = 'video' | 'article' | 'thread' | 'tip';
-export type SeriesType = '60s-fix' | 'i-tried-it' | 'quick-tip' | 'stack-update' | 'viral-reel';
+export type SeriesType = 'agent-tip' | 'build-log' | 'stack-drop' | 'founders-log' | 'viral-reel';
 export type ContentStatus = 'idea' | 'draft' | 'ready' | 'atomized' | 'published';
 export type VoiceMode = 'spicy' | 'casual' | 'professional';
 export type ArtifactType = 'gist' | 'repo' | 'screenshot' | 'screen-recording' | 'diff' | 'live-demo';

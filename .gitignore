@@ -19,3 +19,5 @@ next-env.d.ts
 apps/www/test-results
 apps/www/playwright-report
 .playwright-cli
+content/templates/
+content/work/
