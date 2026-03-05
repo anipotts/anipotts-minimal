@@ -9,6 +9,12 @@
       "dependsOn": [
         "^build"
       ],
+      "inputs": [
+        "src/**",
+        "tsup.config.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -17,6 +23,8 @@
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_POSTHOG_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
         "TURNSTILE_SECRET_KEY",
         "RESEND_API_KEY",
@@ -33,19 +41,37 @@
       "dependsOn": [
         "^build"
       ],
+      "inputs": [
+        "src/**",
+        "eslint.config.*",
+        "package.json"
+      ],
       "outputs": []
     },
     "typecheck": {
       "dependsOn": [
         "^build"
       ],
+      "inputs": [
+        "src/**",
+        "tsconfig.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "vitest.config.*",
+        "package.json"
+      ],
       "outputs": []
     },
     "clean": {
       "cache": false
-    },
-    "test": {
-      "outputs": []
     }
   }
 }
