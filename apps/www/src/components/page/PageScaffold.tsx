@@ -8,7 +8,7 @@ interface BlockProps {
 
 export function PageFrame({ children, className }: BlockProps) {
   return (
-    <div className={clsx("w-full max-w-4xl mx-auto flex flex-col gap-12 md:gap-16 pb-20", className)}>
+    <div className={clsx("w-full flex flex-col gap-12 md:gap-16 pb-20", className)}>
       {children}
     </div>
   );
