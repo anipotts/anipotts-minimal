@@ -6,6 +6,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Atom } from "@anipotts/types";
 import type { QueryOptions } from "./thoughts";
+import { logger } from "../logger";
 
 /** Fetch all atoms, ordered by newest first. */
 export async function fetchAllAtoms(
@@ -24,7 +25,7 @@ export async function fetchAllAtoms(
   const { data, error } = await query;
 
   if (error) {
-    console.error("Error fetching atoms:", error);
+    logger.error("admin", "Error fetching atoms", { error: String(error) });
     return [];
   }
   return data;
@@ -49,7 +50,7 @@ export async function fetchAtomsByContent(
   const { data, error } = await query;
 
   if (error) {
-    console.error("Error fetching atoms:", error);
+    logger.error("admin", "Error fetching atoms", { error: String(error) });
     return [];
   }
   return data;

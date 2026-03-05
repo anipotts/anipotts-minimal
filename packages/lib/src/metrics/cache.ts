@@ -11,6 +11,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { logger } from "../logger";
 
 export const CACHE_KEYS = {
   GITHUB_STATS: "github_stats",
@@ -36,7 +37,7 @@ export async function setCacheValue(
   );
 
   if (error) {
-    console.error(`Error writing metrics cache [${key}]:`, error);
+    logger.error("metrics", `Error writing cache [${key}]`, { error: String(error) });
     throw error;
   }
 }
