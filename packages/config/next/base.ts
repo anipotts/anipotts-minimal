@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * Includes transpilePackages for workspace deps and PostHog proxy rewrites.
  */
 export const baseNextConfig: NextConfig = {
-  transpilePackages: ["@anipotts/ui", "@anipotts/types"],
+  transpilePackages: ["@anipotts/ui", "@anipotts/types", "@anipotts/lib"],
   async rewrites() {
     return [
       {
