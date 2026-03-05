@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import {
   verifyAdminPassword,
@@ -124,7 +125,6 @@ describe("createSessionToken / verifySessionToken", () => {
 
     // Manually create an expired token
     const ts = (now - 28800 * 1000 - 1).toString();
-    const crypto = require("node:crypto");
     const hmac = crypto.createHmac("sha256", secret).update(ts).digest("hex");
     const expiredToken = `${ts}.${hmac}`;
 

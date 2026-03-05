@@ -1,5 +1,3 @@
-type LogLevel = "info" | "warn" | "error";
-
 const logger = {
   info: (context: string, message: string, data?: Record<string, unknown>) => {
     if (process.env.NODE_ENV === "development") {
@@ -14,5 +12,4 @@ const logger = {
   },
 };
 
-export type { LogLevel };
 export { logger };
