@@ -19,7 +19,8 @@
     "demo:capture:all": "node scripts/demos/capture-all-demos.mjs",
     "test:unit": "turbo test",
     "test:e2e": "pnpm --filter @anipotts/www test:e2e",
-    "test": "pnpm test:unit && pnpm test:e2e"
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "validate": "turbo build && turbo lint && turbo typecheck && turbo test"
   },
   "devDependencies": {
     "prettier": "^3.4.0",
