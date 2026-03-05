@@ -19,6 +19,7 @@ export type { StatusDotProps } from "./components/feedback";
 
 // Layout components
 export { TerminalBackground, TerminalHeader } from "./components/layout";
+export type { TerminalHeaderProps } from "./components/layout";
 
 // Context
 export { ThemeProvider, useTheme } from "./context";
@@ -37,6 +38,7 @@ export type { PostHogProviderProps } from "./providers";
 
 // Navigation
 export { ExpandableNav } from "./components/navigation";
+export type { ExpandableNavProps } from "./components/navigation";
 
 // Utils
 export {

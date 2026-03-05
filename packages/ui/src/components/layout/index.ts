@@ -2,3 +2,4 @@
 
 export { TerminalBackground } from "./TerminalBackground";
 export { TerminalHeader } from "./TerminalHeader";
+export type { TerminalHeaderProps } from "./TerminalHeader";

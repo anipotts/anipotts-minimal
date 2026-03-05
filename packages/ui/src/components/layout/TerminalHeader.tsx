@@ -2,7 +2,7 @@
 
 import { TerminalHeaderTitle } from "../window";
 
-interface TerminalHeaderProps {
+export interface TerminalHeaderProps {
   defaultTitle?: string;
   version?: string;
 }
