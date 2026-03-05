@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   title: "ani potts — software engineer",
   description:
     "software engineer based in nyc, building minimal interfaces to orchestrate complex systems.",
+  openGraph: {
+    title: "ani potts — software engineer",
+    description:
+      "software engineer based in nyc, building minimal interfaces to orchestrate complex systems.",
+    url: "https://anipotts.com",
+  },
   alternates: {
     canonical: "https://anipotts.com",
   },

@@ -26,6 +26,11 @@ export async function generateMetadata({
   return {
     title: `${project.title} | Ani Potts`,
     description: project.description,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      url: `https://anipotts.com/projects/${project.slug}`,
+    },
     alternates: {
       canonical: `https://anipotts.com/projects/${project.slug}`,
     },
