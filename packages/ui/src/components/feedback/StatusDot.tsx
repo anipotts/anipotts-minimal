@@ -16,7 +16,9 @@ export function StatusDot({ className = "", color = "green" }: StatusDotProps) {
       <span
         className={`animate-signal-pulse absolute inline-flex h-full w-full rounded-full ${bgColor} opacity-75`}
       />
-      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${bgColor}`} />
+      <span
+        className={`relative inline-flex rounded-full h-2.5 w-2.5 ${bgColor}`}
+      />
     </span>
   );
 }

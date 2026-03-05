@@ -3,16 +3,19 @@
 Add a proof artifact to a content piece in Supabase. Artifacts are stored directly on the content record (artifact_url, artifact_type fields).
 
 ## Usage
+
 ```
 /artifact <content-id-or-slug> <type> <url>
 ```
 
 **Arguments:**
+
 - `content-id-or-slug` — The content to attach this artifact to
 - `type` — gist | repo | screenshot | screen-recording | diff | live-demo
 - `url` — Full URL to the artifact
 
 **Examples:**
+
 ```
 /artifact multi-cursor-magic gist https://gist.github.com/anipotts/abc123
 /artifact building-portfolio-with-ai repo https://github.com/anipotts/claude-portfolio-builder
@@ -21,18 +24,19 @@ Add a proof artifact to a content piece in Supabase. Artifacts are stored direct
 
 ## Artifact Types
 
-| Type | Description | URL Pattern |
-|------|-------------|-------------|
-| **gist** | Code snippet on GitHub Gist | `https://gist.github.com/anipotts/...` |
-| **repo** | Full repository | `https://github.com/anipotts/...` |
-| **screenshot** | Static image proof | Any image URL (imgur, etc.) |
-| **screen-recording** | Video demo | YouTube, Loom, etc. |
-| **diff** | Code diff/PR | GitHub commit or PR URL |
-| **live-demo** | Deployed demo | Any deployed URL |
+| Type                 | Description                 | URL Pattern                            |
+| -------------------- | --------------------------- | -------------------------------------- |
+| **gist**             | Code snippet on GitHub Gist | `https://gist.github.com/anipotts/...` |
+| **repo**             | Full repository             | `https://github.com/anipotts/...`      |
+| **screenshot**       | Static image proof          | Any image URL (imgur, etc.)            |
+| **screen-recording** | Video demo                  | YouTube, Loom, etc.                    |
+| **diff**             | Code diff/PR                | GitHub commit or PR URL                |
+| **live-demo**        | Deployed demo               | Any deployed URL                       |
 
 ## Instructions
 
 1. Fetch the content to verify it exists:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
    npx ts-node scripts/supabase-cli.ts get-content <id-or-slug>
@@ -46,6 +50,7 @@ Add a proof artifact to a content piece in Supabase. Artifacts are stored direct
    - **stack-update** → artifact optional
 
 3. Update the content with artifact info:
+
    ```bash
    npx ts-node scripts/supabase-cli.ts update-content [id] artifact_url "[url]"
    npx ts-node scripts/supabase-cli.ts update-content [id] artifact_type "[type]"
@@ -79,13 +84,13 @@ Add a proof artifact to a content piece in Supabase. Artifacts are stored direct
 
 ## Series → Artifact Requirements
 
-| Series | Required Type | Notes |
-|--------|--------------|-------|
-| 60s-fix | gist | Code snippet that solves the problem |
-| i-tried-it | repo | Full project repository |
-| viral-reel | gist | Quick proof snippet |
-| quick-tip | optional | Encouraged but not required |
-| stack-update | optional | Link to tool/update if relevant |
+| Series       | Required Type | Notes                                |
+| ------------ | ------------- | ------------------------------------ |
+| 60s-fix      | gist          | Code snippet that solves the problem |
+| i-tried-it   | repo          | Full project repository              |
+| viral-reel   | gist          | Quick proof snippet                  |
+| quick-tip    | optional      | Encouraged but not required          |
+| stack-update | optional      | Link to tool/update if relevant      |
 
 ## Notes
 

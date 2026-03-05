@@ -2,7 +2,9 @@ export interface TerminalHeaderTitleProps {
   defaultTitle?: string;
 }
 
-export function TerminalHeaderTitle({ defaultTitle = "ani@potts:~/anipotts.com" }: TerminalHeaderTitleProps) {
+export function TerminalHeaderTitle({
+  defaultTitle = "ani@potts:~/anipotts.com",
+}: TerminalHeaderTitleProps) {
   const splitIndex = defaultTitle.indexOf("~/");
   const hasPrefix = splitIndex > 0;
   const prefix = hasPrefix ? defaultTitle.slice(0, splitIndex) : "";

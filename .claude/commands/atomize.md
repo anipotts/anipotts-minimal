@@ -3,11 +3,13 @@
 Generate platform-specific content atoms from a content piece in Supabase. Uses series-based routing — NOT all 11 platforms.
 
 ## Usage
+
 ```
 /atomize <content-id-or-slug>
 ```
 
 **Examples:**
+
 ```
 /atomize multi-cursor-magic-in-claude-code
 /atomize 550e8400-e29b-41d4-a716-446655440000
@@ -16,6 +18,7 @@ Generate platform-specific content atoms from a content piece in Supabase. Uses 
 ## Instructions
 
 1. Fetch the content from Supabase:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
    npx ts-node scripts/supabase-cli.ts get-content <id-or-slug>
@@ -32,6 +35,7 @@ Generate platform-specific content atoms from a content piece in Supabase. Uses 
    - `voice_mode` (optional override)
 
 3. If `series_type` is null or missing, STOP and ask:
+
    ```
    ⚠️ This content has no series_type assigned.
 
@@ -51,6 +55,7 @@ Generate platform-specific content atoms from a content piece in Supabase. Uses 
    - Get `artifact_required` and `artifact_type`
 
 5. If `artifact_required` is true and `artifact_url` is missing, WARN:
+
    ```
    ⚠️ This series requires a [artifact_type] artifact.
    Add one before publishing: /artifact <type> <slug> [url]
@@ -88,11 +93,13 @@ Generate platform-specific content atoms from a content piece in Supabase. Uses 
    - [ ] No recycled platitudes (motivational poster vibes)
 
 10. Create each atom in Supabase:
+
     ```bash
     npx ts-node scripts/supabase-cli.ts create-atom "[content_id]" "[platform]" "[atom_content]" "[voice_mode]"
     ```
 
 11. Update content status to "atomized":
+
     ```bash
     npx ts-node scripts/supabase-cli.ts update-content [id] status atomized
     ```
@@ -138,13 +145,13 @@ Generate platform-specific content atoms from a content piece in Supabase. Uses 
 
 ## Series → Platform Quick Reference
 
-| Series | Primary | Secondary |
-|--------|---------|-----------|
-| 60s-fix | tiktok, instagram, twitter | threads, bluesky, linkedin, youtube |
-| i-tried-it | medium, devto, youtube, twitter, linkedin, substack | reddit, tiktok, instagram |
-| quick-tip | twitter, threads, bluesky | linkedin |
-| stack-update | twitter, linkedin | bluesky, threads, devto |
-| viral-reel | tiktok, instagram | youtube, twitter |
+| Series       | Primary                                             | Secondary                           |
+| ------------ | --------------------------------------------------- | ----------------------------------- |
+| 60s-fix      | tiktok, instagram, twitter                          | threads, bluesky, linkedin, youtube |
+| i-tried-it   | medium, devto, youtube, twitter, linkedin, substack | reddit, tiktok, instagram           |
+| quick-tip    | twitter, threads, bluesky                           | linkedin                            |
+| stack-update | twitter, linkedin                                   | bluesky, threads, devto             |
+| viral-reel   | tiktok, instagram                                   | youtube, twitter                    |
 
 ## Important
 

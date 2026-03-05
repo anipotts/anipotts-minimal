@@ -24,10 +24,11 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
     typeof window !== "undefined" ? window.location.hostname : "localhost";
   const isLocalPreview =
     hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-  const captchaRequired =
-    Boolean(turnstileSiteKey) && !isLocalPreview;
+  const captchaRequired = Boolean(turnstileSiteKey) && !isLocalPreview;
 
-  const [intent, setIntent] = useState<(typeof INTENT_OPTIONS)[number] | "">("");
+  const [intent, setIntent] = useState<(typeof INTENT_OPTIONS)[number] | "">(
+    "",
+  );
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,15 +41,21 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
   useEffect(() => {
     if (!initialIntent) return;
-    const matchedIntent = INTENT_OPTIONS.find((option) =>
-      option.replace(/\s+/g, "-") === initialIntent || option === initialIntent,
+    const matchedIntent = INTENT_OPTIONS.find(
+      (option) =>
+        option.replace(/\s+/g, "-") === initialIntent ||
+        option === initialIntent,
     );
     if (matchedIntent) {
       setIntent(matchedIntent);
     }
   }, [initialIntent]);
 
-  const canSubmit = intent && message.trim().length >= 10 && name.trim().length > 1 && email.trim().length > 3;
+  const canSubmit =
+    intent &&
+    message.trim().length >= 10 &&
+    name.trim().length > 1 &&
+    email.trim().length > 3;
 
   const resetTurnstile = () => {
     if (!turnstileSiteKey) return;
@@ -148,7 +155,11 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full" aria-live="polite">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 w-full"
+      aria-live="polite"
+    >
       <div className="flex flex-wrap gap-2">
         {INTENT_OPTIONS.map((option) => {
           const active = intent === option;
@@ -205,7 +216,9 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
             data-expired-callback="turnstileExpiredCallback"
             aria-label="CAPTCHA verification"
           />
-          {!captchaReady && <p className="text-faint text-xs mt-2">Loading captcha...</p>}
+          {!captchaReady && (
+            <p className="text-faint text-xs mt-2">Loading captcha...</p>
+          )}
         </div>
       )}
 

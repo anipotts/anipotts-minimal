@@ -3,17 +3,20 @@
 Show the current state of the content pipeline from Supabase.
 
 ## Usage
+
 ```
 /status [--series <series>] [--detailed]
 ```
 
 **Options:**
+
 - `--series <series>` — Filter by series type
 - `--detailed` — Show full content list, not just counts
 
 ## Instructions
 
 1. Fetch pipeline statistics:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
    npx ts-node scripts/supabase-cli.ts stats
@@ -22,6 +25,7 @@ Show the current state of the content pipeline from Supabase.
 2. Parse the returned JSON stats
 
 3. If `--detailed` flag is present, also fetch content list:
+
    ```bash
    npx ts-node scripts/supabase-cli.ts list-content [--series <series>]
    ```

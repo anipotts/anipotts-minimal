@@ -1,30 +1,37 @@
-'use client'
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from "next/navigation";
 
-const STATUSES = ['all', 'draft', 'ready', 'atomized', 'published'] as const
-const SERIES = ['all', 'agent-tip', 'build-log', 'stack-drop', 'founders-log', 'viral-reel'] as const
+const STATUSES = ["all", "draft", "ready", "atomized", "published"] as const;
+const SERIES = [
+  "all",
+  "agent-tip",
+  "build-log",
+  "stack-drop",
+  "founders-log",
+  "viral-reel",
+] as const;
 
 export default function PipelineFilters({
   currentStatus,
   currentSeries,
   statusCounts,
 }: {
-  currentStatus: string
-  currentSeries: string
-  statusCounts: Record<string, number>
+  currentStatus: string;
+  currentSeries: string;
+  statusCounts: Record<string, number>;
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   function setFilter(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === 'all') {
-      params.delete(key)
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === "all") {
+      params.delete(key);
     } else {
-      params.set(key, value)
+      params.set(key, value);
     }
-    router.push(`/admin?${params.toString()}`)
+    router.push(`/admin?${params.toString()}`);
   }
 
   return (
@@ -33,15 +40,15 @@ export default function PipelineFilters({
         {STATUSES.map((s) => (
           <button
             key={s}
-            onClick={() => setFilter('status', s)}
+            onClick={() => setFilter("status", s)}
             className={`shrink-0 text-sm px-3 py-1.5 rounded-full transition-colors ${
               currentStatus === s
-                ? 'bg-indigo-600 text-white'
-                : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? "bg-indigo-600 text-white"
+                : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            {s === 'all' ? 'All' : s}
-            {s !== 'all' && statusCounts[s] ? ` (${statusCounts[s]})` : ''}
+            {s === "all" ? "All" : s}
+            {s !== "all" && statusCounts[s] ? ` (${statusCounts[s]})` : ""}
           </button>
         ))}
       </div>
@@ -50,17 +57,17 @@ export default function PipelineFilters({
         {SERIES.map((s) => (
           <button
             key={s}
-            onClick={() => setFilter('series', s)}
+            onClick={() => setFilter("series", s)}
             className={`shrink-0 text-sm px-3 py-1.5 rounded-full transition-colors ${
               currentSeries === s
-                ? 'bg-indigo-600 text-white'
-                : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? "bg-indigo-600 text-white"
+                : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            {s === 'all' ? 'All Series' : s}
+            {s === "all" ? "All Series" : s}
           </button>
         ))}
       </div>
     </div>
-  )
+  );
 }

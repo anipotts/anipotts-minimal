@@ -42,7 +42,9 @@ export default async function WorkPage({
 }) {
   const params = await searchParams;
   const activeCategory = getActiveCategory(params.category);
-  const projects = getWorkProjects(activeCategory === "all" ? undefined : activeCategory);
+  const projects = getWorkProjects(
+    activeCategory === "all" ? undefined : activeCategory,
+  );
 
   return (
     <PageFrame>
@@ -55,7 +57,8 @@ export default async function WorkPage({
         </FadeIn>
         <FadeIn delay={0.08}>
           <PageSummary>
-            High-signal projects only. Each entry includes status, context, and links to live product, source, or case study.
+            High-signal projects only. Each entry includes status, context, and
+            links to live product, source, or case study.
           </PageSummary>
         </FadeIn>
       </section>
@@ -69,7 +72,9 @@ export default async function WorkPage({
             {CATEGORIES.map((category) => (
               <Link
                 key={category}
-                href={category === "all" ? "/work" : `/work?category=${category}`}
+                href={
+                  category === "all" ? "/work" : `/work?category=${category}`
+                }
                 scroll={false}
                 className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-200 ${
                   activeCategory === category
@@ -96,7 +101,8 @@ export default async function WorkPage({
         </ContentBlocks>
         <EndCta>
           <p className="text-xs text-muted uppercase tracking-wider">
-            publish states: <span className="text-accent-400">publish_now</span>, placeholder, improve_then_publish
+            publish states: <span className="text-accent-400">publish_now</span>
+            , placeholder, improve_then_publish
           </p>
         </EndCta>
       </section>

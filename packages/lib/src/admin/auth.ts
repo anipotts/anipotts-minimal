@@ -25,7 +25,7 @@ export const ADMIN_COOKIE_OPTIONS = {
  */
 export function verifyAdminPassword(
   password: string,
-  adminPassword: string | undefined
+  adminPassword: string | undefined,
 ): {
   success: boolean;
   error?: string;
@@ -49,13 +49,16 @@ export function verifyAdminPassword(
  */
 export function verifyAdminTotp(
   totp: string,
-  secret: string | undefined
+  secret: string | undefined,
 ): {
   success: boolean;
   error?: string;
 } {
   if (!secret) {
-    return { success: false, error: "Admin TOTP secret not configured on server" };
+    return {
+      success: false,
+      error: "Admin TOTP secret not configured on server",
+    };
   }
   const token = totp.replace(/\s+/g, "");
   if (!/^\d{6}$/.test(token)) {

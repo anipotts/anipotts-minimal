@@ -11,7 +11,7 @@ import { logger } from "../logger";
 /** Fetch all atoms, ordered by newest first. */
 export async function fetchAllAtoms(
   supabase: SupabaseClient,
-  options?: QueryOptions
+  options?: QueryOptions,
 ) {
   let query = supabase
     .from("atoms")
@@ -35,7 +35,7 @@ export async function fetchAllAtoms(
 export async function fetchAtomsByContent(
   supabase: SupabaseClient,
   contentId: string,
-  options?: QueryOptions
+  options?: QueryOptions,
 ) {
   let query = supabase
     .from("atoms")
@@ -59,7 +59,7 @@ export async function fetchAtomsByContent(
 /** Create or update an atom record. Returns the saved record. */
 export async function upsertAtomRecord(
   supabase: SupabaseClient,
-  atom: Partial<Atom>
+  atom: Partial<Atom>,
 ) {
   const { data, error } = await supabase
     .from("atoms")

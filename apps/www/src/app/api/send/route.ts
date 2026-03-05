@@ -9,15 +9,18 @@ export async function POST(request: Request) {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
         { error: "Email service not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const rate = await checkRateLimit(request);
     if (!rate.success) {
       return NextResponse.json(
-        { error: "error" in rate && rate.error ? rate.error : "Too many requests" },
-        { status: "status" in rate && rate.status ? rate.status : 429 }
+        {
+          error:
+            "error" in rate && rate.error ? rate.error : "Too many requests",
+        },
+        { status: "status" in rate && rate.status ? rate.status : 429 },
       );
     }
 
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
       if (!captcha.success) {
         return NextResponse.json(
           { error: captcha.error || "Invalid captcha" },
-          { status: captcha.status ?? 403 }
+          { status: captcha.status ?? 403 },
         );
       }
     }
@@ -58,6 +61,9 @@ export async function POST(request: Request) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Send API error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

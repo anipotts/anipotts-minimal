@@ -3,6 +3,7 @@
 Generate a Twitter thread from a pillar blog post with correct voice mode and artifact linking.
 
 ## Usage
+
 ```
 /atomize-twitter <path-to-pillar>
 ```
@@ -44,6 +45,7 @@ Generate a Twitter thread from a pillar blog post with correct voice mode and ar
 12. Show preview of all tweets with character counts and artifact status
 
 ## Voice Check
+
 - Does it sound like Ani in **Spicy** mode? (yk, ngl, tbh, short punchy sentences)
 - Would she actually tweet this?
 - Is the hook genuinely scroll-stopping?

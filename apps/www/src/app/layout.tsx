@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { PostHogProvider, ThemeProvider, TerminalBackground } from "@anipotts/ui";
+import {
+  PostHogProvider,
+  ThemeProvider,
+  TerminalBackground,
+} from "@anipotts/ui";
 import { ThemeScript } from "@anipotts/ui/server";
 import PersonSchema from "@/components/PersonSchema";
 import SiteStatusBar from "@/components/SiteStatusBar";

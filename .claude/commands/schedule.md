@@ -5,24 +5,29 @@ Schedule text-platform atoms through Typefully API. For video platforms (TikTok,
 ## Prerequisites
 
 1. **Typefully API Key** — Set as environment variable:
+
    ```bash
    export TYPEFULLY_API_KEY="your-api-key"
    ```
+
    Get your API key from: https://typefully.com/settings/api
 
 2. **Typefully Plan** — Requires Creator plan ($12.50/mo) or higher for API access
 
 ## Usage
+
 ```
 /schedule <content-id-or-slug> [--time <time>] [--platforms <platforms>]
 ```
 
 **Arguments:**
+
 - `content-id-or-slug` — The content to schedule atoms for
 - `--time` — When to schedule: `now`, `next`, or `YYYY-MM-DDTHH:MM`
 - `--platforms` — Comma-separated list to filter (default: all text platforms)
 
 **Examples:**
+
 ```
 /schedule multi-cursor-magic --time next
 /schedule 550e8400-e29b-41d4-a716-446655440000 --platforms twitter,linkedin
@@ -32,6 +37,7 @@ Schedule text-platform atoms through Typefully API. For video platforms (TikTok,
 ## Typefully-Supported Platforms
 
 These platforms can be scheduled via Typefully API:
+
 - **twitter** (X)
 - **linkedin**
 - **threads**
@@ -40,6 +46,7 @@ These platforms can be scheduled via Typefully API:
 ## Manual Posting Platforms
 
 These platforms require manual posting (script provided):
+
 - **tiktok** — Video upload + caption
 - **instagram** — Reel/carousel upload
 - **youtube** — Video upload
@@ -51,6 +58,7 @@ These platforms require manual posting (script provided):
 ## Instructions
 
 1. Fetch atoms for this content:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
    npx ts-node scripts/supabase-cli.ts list-atoms --content <content-id> --status draft
@@ -61,6 +69,7 @@ These platforms require manual posting (script provided):
 3. Separate into Typefully-schedulable vs manual platforms
 
 4. For each Typefully platform atom, prepare the API call:
+
    ```bash
    curl -X POST https://api.typefully.com/v1/drafts/ \
      -H "X-API-KEY: Bearer $TYPEFULLY_API_KEY" \
@@ -149,6 +158,7 @@ These platforms require manual posting (script provided):
 6. After confirmation, execute Typefully API calls
 
 7. Update atom statuses in Supabase:
+
    ```bash
    npx ts-node scripts/supabase-cli.ts update-atom [atom-id] status scheduled
    npx ts-node scripts/supabase-cli.ts update-atom [atom-id] scheduled_for "[datetime]"
@@ -189,6 +199,7 @@ These platforms require manual posting (script provided):
 ## Typefully API Reference
 
 **Create Draft:**
+
 ```bash
 curl -X POST https://api.typefully.com/v1/drafts/ \
   -H "X-API-KEY: Bearer $TYPEFULLY_API_KEY" \
@@ -202,6 +213,7 @@ curl -X POST https://api.typefully.com/v1/drafts/ \
 ```
 
 **Response:**
+
 ```json
 {
   "id": "draft-uuid",

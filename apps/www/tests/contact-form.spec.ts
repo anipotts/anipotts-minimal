@@ -9,7 +9,9 @@ test.describe("contact form on /connect", () => {
   test("shows message field after selecting intent", async ({ page }) => {
     await page.goto("/connect");
     await page.getByRole("button", { name: /collab/i }).click();
-    await expect(page.getByLabel(/what are you trying to build/i)).toBeVisible();
+    await expect(
+      page.getByLabel(/what are you trying to build/i),
+    ).toBeVisible();
   });
 
   test("shows name and email fields on continue", async ({ page }) => {

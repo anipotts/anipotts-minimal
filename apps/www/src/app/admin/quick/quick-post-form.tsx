@@ -1,24 +1,31 @@
-'use client'
+"use client";
 
-import { useActionState } from 'react'
-import { createThought } from '../actions'
-import Link from 'next/link'
+import { useActionState } from "react";
+import { createThought } from "../actions";
+import Link from "next/link";
 
 const SERIES_OPTIONS = [
-  { value: 'agent-tip', label: 'Agent Tip' },
-  { value: 'build-log', label: 'Build Log' },
-  { value: 'stack-drop', label: 'Stack Drop' },
-  { value: 'founders-log', label: "Founder's Log" },
-  { value: 'viral-reel', label: 'Viral Reel' },
-] as const
+  { value: "agent-tip", label: "Agent Tip" },
+  { value: "build-log", label: "Build Log" },
+  { value: "stack-drop", label: "Stack Drop" },
+  { value: "founders-log", label: "Founder's Log" },
+  { value: "viral-reel", label: "Viral Reel" },
+] as const;
 
 export default function QuickPostForm() {
   const [state, formAction, isPending] = useActionState(
-    async (_prev: { error?: string; success?: boolean; id?: string } | null, formData: FormData) => {
-      return await createThought(formData) as { error?: string; success?: boolean; id?: string }
+    async (
+      _prev: { error?: string; success?: boolean; id?: string } | null,
+      formData: FormData,
+    ) => {
+      return (await createThought(formData)) as {
+        error?: string;
+        success?: boolean;
+        id?: string;
+      };
     },
-    null
-  )
+    null,
+  );
 
   if (state?.success && state.id) {
     return (
@@ -37,14 +44,12 @@ export default function QuickPostForm() {
           Create Another
         </button>
       </div>
-    )
+    );
   }
 
   return (
     <form action={formAction} className="space-y-4">
-      {state?.error && (
-        <p className="text-red-400 text-sm">{state.error}</p>
-      )}
+      {state?.error && <p className="text-red-400 text-sm">{state.error}</p>}
 
       <input
         name="title"
@@ -83,8 +88,8 @@ export default function QuickPostForm() {
         disabled={isPending}
         className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-lg font-medium text-white transition-colors"
       >
-        {isPending ? 'Creating...' : 'Create Draft'}
+        {isPending ? "Creating..." : "Create Draft"}
       </button>
     </form>
-  )
+  );
 }

@@ -22,7 +22,7 @@ type SupabaseResult<T> = { data: T | null; error: unknown };
 async function fetchWithFallback<T>(
   queryFn: (client: NonNullable<typeof supabase>) => Promise<SupabaseResult<T>>,
   fallback: T,
-  context: string
+  context: string,
 ): Promise<T> {
   if (!supabase) {
     logger.warn("cms", `No Supabase client, using fallback for ${context}`);
@@ -31,12 +31,16 @@ async function fetchWithFallback<T>(
   try {
     const { data, error } = await queryFn(supabase);
     if (error || data == null) {
-      logger.warn("cms", `Query failed for ${context}, using fallback`, { error });
+      logger.warn("cms", `Query failed for ${context}, using fallback`, {
+        error,
+      });
       return fallback;
     }
     return data;
   } catch (err) {
-    logger.error("cms", `Exception in ${context}, using fallback`, { error: String(err) });
+    logger.error("cms", `Exception in ${context}, using fallback`, {
+      error: String(err),
+    });
     return fallback;
   }
 }
@@ -46,7 +50,7 @@ async function fetchWithFallback<T>(
 // ---------------------------------------------------------------------------
 
 export async function fetchPageContent<T = unknown>(
-  pageKey: string
+  pageKey: string,
 ): Promise<PageContent<T> | null> {
   return fetchWithFallback<PageContent<T> | null>(
     async (client) => {
@@ -58,10 +62,13 @@ export async function fetchPageContent<T = unknown>(
         .order("version", { ascending: false })
         .limit(1)
         .single();
-      return { data: result.data as PageContent<T> | null, error: result.error };
+      return {
+        data: result.data as PageContent<T> | null,
+        error: result.error,
+      };
     },
     null,
-    `fetchPageContent("${pageKey}")`
+    `fetchPageContent("${pageKey}")`,
   );
 }
 
@@ -168,8 +175,9 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     if (!data) return [];
 
     // TODO: Replace with typed Supabase client
-    const thoughtResults = (data as SearchResult[])
-      .filter((r) => r.type === "thought");
+    const thoughtResults = (data as SearchResult[]).filter(
+      (r) => r.type === "thought",
+    );
     if (thoughtResults.length === 0) return [];
 
     const slugs = thoughtResults.map((r) => r.slug);
@@ -183,7 +191,9 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
 
     const rankMap = new Map(thoughtResults.map((r) => [r.slug, r.rank]));
     // TODO: Replace with typed Supabase client
-    return (thoughts as ThoughtSummary[]).sort((a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0));
+    return (thoughts as ThoughtSummary[]).sort(
+      (a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0),
+    );
   } catch (e) {
     logger.warn("cms", "searchThoughts() failed", { error: String(e) });
     return [];
@@ -224,9 +234,7 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
 // Site settings
 // ---------------------------------------------------------------------------
 
-export async function fetchSiteSetting(
-  key: string
-): Promise<string | null> {
+export async function fetchSiteSetting(key: string): Promise<string | null> {
   return fetchWithFallback<string | null>(
     async (client) => {
       const { data, error } = await client
@@ -237,7 +245,7 @@ export async function fetchSiteSetting(
       return { data: (data as { value: string } | null)?.value ?? null, error };
     },
     null,
-    `fetchSiteSetting("${key}")`
+    `fetchSiteSetting("${key}")`,
   );
 }
 
@@ -255,7 +263,7 @@ export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
       return { data: map, error: null };
     },
     {},
-    "fetchAllSiteSettings"
+    "fetchAllSiteSettings",
   );
 }
 

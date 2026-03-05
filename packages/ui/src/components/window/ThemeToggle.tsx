@@ -3,8 +3,8 @@
 import { useTheme, type ThemeMode } from "../../context/ThemeContext";
 
 const THEME_ICONS: Record<ThemeMode, string> = {
-  dark: "\u25CF",   // ● filled circle
-  light: "\u25CB",  // ○ empty circle
+  dark: "\u25CF", // ● filled circle
+  light: "\u25CB", // ○ empty circle
   system: "\u25D0", // ◐ half circle
 };
 

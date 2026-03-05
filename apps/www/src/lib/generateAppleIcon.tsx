@@ -7,36 +7,34 @@ import { ImageResponse } from "next/og";
  */
 export function generateAppleIcon(
   text: string,
-  scheme: "dark" | "light" = "dark"
+  scheme: "dark" | "light" = "dark",
 ) {
   const bg = scheme === "dark" ? "#0a0a0a" : "#1e5f99";
   const fg = scheme === "dark" ? "#61abea" : "#ffffff";
 
   return new ImageResponse(
-    (
-      <div
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: bg,
+      }}
+    >
+      <span
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: bg,
+          fontSize: 80,
+          fontWeight: 400,
+          fontFamily: "system-ui, sans-serif",
+          letterSpacing: "-0.02em",
+          color: fg,
         }}
       >
-        <span
-          style={{
-            fontSize: 80,
-            fontWeight: 400,
-            fontFamily: "system-ui, sans-serif",
-            letterSpacing: "-0.02em",
-            color: fg,
-          }}
-        >
-          {text}
-        </span>
-      </div>
-    ),
-    { width: 180, height: 180 }
+        {text}
+      </span>
+    </div>,
+    { width: 180, height: 180 },
   );
 }

@@ -23,7 +23,9 @@ async function resolveThoughtsDir(): Promise<string | null> {
   for (const candidate of THOUGHTS_DIR_CANDIDATES) {
     try {
       const files = await fs.readdir(candidate);
-      const hasContent = files.some((file) => file.endsWith(".md") || file.endsWith(".mdx"));
+      const hasContent = files.some(
+        (file) => file.endsWith(".md") || file.endsWith(".mdx"),
+      );
       if (hasContent) {
         return candidate;
       }
@@ -82,14 +84,19 @@ function normalizeThought(file: string, raw: string): ThoughtEntry {
   const { frontmatter, content } = parseFrontmatter(raw);
   const filenameSlug = file.replace(/\.mdx?$/, "");
   const slug = String(frontmatter.slug ?? filenameSlug).trim();
-  const title = String(frontmatter.title ?? filenameSlug.replace(/-/g, " ")).trim();
+  const title = String(
+    frontmatter.title ?? filenameSlug.replace(/-/g, " "),
+  ).trim();
   const summary = String(frontmatter.summary ?? "").trim();
   const date = String(frontmatter.date ?? "").trim();
   const tagsRaw = frontmatter.tags;
   const tags = Array.isArray(tagsRaw)
     ? tagsRaw.map((tag) => String(tag))
     : typeof tagsRaw === "string"
-      ? tagsRaw.split(",").map((tag) => tag.trim()).filter(Boolean)
+      ? tagsRaw
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
       : [];
   const published = frontmatter.published !== false;
 
@@ -103,7 +110,9 @@ function normalizeThought(file: string, raw: string): ThoughtEntry {
     throw new Error(`[thoughts] Missing summary in ${file}`);
   }
   if (!date || Number.isNaN(Date.parse(date))) {
-    throw new Error(`[thoughts] Invalid date in ${file}. Expected ISO-like date.`);
+    throw new Error(
+      `[thoughts] Invalid date in ${file}. Expected ISO-like date.`,
+    );
   }
 
   return {
@@ -155,12 +164,16 @@ export async function getPublishedThoughts(): Promise<ThoughtEntry[]> {
   return thoughts.filter((thought) => thought.published);
 }
 
-export async function getThoughtBySlug(slug: string): Promise<ThoughtEntry | undefined> {
+export async function getThoughtBySlug(
+  slug: string,
+): Promise<ThoughtEntry | undefined> {
   const thoughts = await getPublishedThoughts();
   return thoughts.find((thought) => thought.slug === slug);
 }
 
-export async function searchThoughtEntries(query: string): Promise<ThoughtEntry[]> {
+export async function searchThoughtEntries(
+  query: string,
+): Promise<ThoughtEntry[]> {
   const thoughts = await getPublishedThoughts();
   const q = query.trim().toLowerCase();
   if (!q) return thoughts;

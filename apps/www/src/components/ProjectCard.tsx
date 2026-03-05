@@ -22,7 +22,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2 font-mono text-sm">
                 <span className="text-muted group-open:hidden">[+]</span>
-                <span className="hidden text-accent-400 group-open:inline">[-]</span>
+                <span className="hidden text-accent-400 group-open:inline">
+                  [-]
+                </span>
                 <h3 className="font-semibold text-secondary group-hover:text-heading font-heading">
                   {project.title}
                 </h3>
@@ -30,7 +32,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
               </div>
               <p className="text-xs text-muted pl-6">{project.subtitle}</p>
             </div>
-            <span className="text-xs text-faint font-mono shrink-0">{project.year}</span>
+            <span className="text-xs text-faint font-mono shrink-0">
+              {project.year}
+            </span>
           </div>
         </summary>
 
@@ -50,7 +54,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
             ))}
           </div>
 
-          {(project.links?.page || project.links?.live || project.links?.repo) && (
+          {(project.links?.page ||
+            project.links?.live ||
+            project.links?.repo) && (
             <div className="flex flex-wrap gap-4 text-xs font-mono">
               {project.links?.page && (
                 <Link

@@ -36,7 +36,9 @@ describe("formatShortRelativeTime", () => {
   it("returns days for more than a day", () => {
     vi.useFakeTimers();
     vi.setSystemTime(baseTime);
-    const iso = new Date(baseTime.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const iso = new Date(
+      baseTime.getTime() - 3 * 24 * 60 * 60 * 1000,
+    ).toISOString();
     expect(formatShortRelativeTime(iso)).toBe("3d ago");
   });
 });

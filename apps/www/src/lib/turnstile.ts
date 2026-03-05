@@ -30,7 +30,7 @@ export async function verifyTurnstile(token: string) {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body,
-    }
+    },
   );
 
   const data = (await res.json()) as TurnstileResponse;

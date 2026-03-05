@@ -18,14 +18,14 @@ export function register() {
   if (missing.length > 0) {
     console.error(
       `[env] Missing REQUIRED environment variables: ${missing.join(", ")}. ` +
-      "The application may not function correctly."
+        "The application may not function correctly.",
     );
   }
 
   if (missingRecommended.length > 0) {
     console.warn(
       `[env] Missing recommended environment variables: ${missingRecommended.join(", ")}. ` +
-      "Some features will be disabled."
+        "Some features will be disabled.",
     );
   }
 }

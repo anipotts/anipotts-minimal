@@ -106,7 +106,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error(
-    "Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set"
+    "Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set",
   );
   process.exit(1);
 }
@@ -129,7 +129,14 @@ const projects = [
     category: "product",
     role: "Founder & Engineer",
     duration: "Ongoing",
-    tags: ["Next.js 15", "TypeScript", "Postgres", "AWS Lambda", "Monaco", "Stripe"],
+    tags: [
+      "Next.js 15",
+      "TypeScript",
+      "Postgres",
+      "AWS Lambda",
+      "Monaco",
+      "Stripe",
+    ],
     status: "live",
     featured: true,
     icon: null,
@@ -183,7 +190,14 @@ const projects = [
     category: "ai",
     role: "Founder",
     duration: "Summer 2025",
-    tags: ["Next.js", "TypeScript", "Convex", "LangGraph", "Stripe", "TailwindCSS"],
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "Convex",
+      "LangGraph",
+      "Stripe",
+      "TailwindCSS",
+    ],
     status: "live",
     featured: false,
     icon: null,
@@ -250,13 +264,48 @@ const projects = [
 ];
 
 const socialLinks = [
-  { name: "email", url: "mailto:contact@anipotts.com", icon: "email", description: "contact@anipotts.com" },
-  { name: "github", url: "https://github.com/anipotts", icon: "github", description: "@anipotts" },
-  { name: "linkedin", url: "https://www.linkedin.com/in/anipotts", icon: "linkedin", description: "anipotts" },
-  { name: "x", url: "https://x.com/anipottsbuilds", icon: "x", description: "@anipottsbuilds" },
-  { name: "instagram", url: "https://instagram.com/anipottsbuilds", icon: "instagram", description: "@anipottsbuilds" },
-  { name: "tiktok", url: "https://tiktok.com/@anipottsbuilds", icon: "tiktok", description: "@anipottsbuilds" },
-  { name: "mastodon", url: "https://mastodon.social/@anipotts", icon: "mastodon", description: "@anipotts@mastodon.social" },
+  {
+    name: "email",
+    url: "mailto:contact@anipotts.com",
+    icon: "email",
+    description: "contact@anipotts.com",
+  },
+  {
+    name: "github",
+    url: "https://github.com/anipotts",
+    icon: "github",
+    description: "@anipotts",
+  },
+  {
+    name: "linkedin",
+    url: "https://www.linkedin.com/in/anipotts",
+    icon: "linkedin",
+    description: "anipotts",
+  },
+  {
+    name: "x",
+    url: "https://x.com/anipottsbuilds",
+    icon: "x",
+    description: "@anipottsbuilds",
+  },
+  {
+    name: "instagram",
+    url: "https://instagram.com/anipottsbuilds",
+    icon: "instagram",
+    description: "@anipottsbuilds",
+  },
+  {
+    name: "tiktok",
+    url: "https://tiktok.com/@anipottsbuilds",
+    icon: "tiktok",
+    description: "@anipottsbuilds",
+  },
+  {
+    name: "mastodon",
+    url: "https://mastodon.social/@anipotts",
+    icon: "mastodon",
+    description: "@anipotts@mastodon.social",
+  },
 ];
 
 const siteSettings: Record<string, string> = {
@@ -265,8 +314,7 @@ const siteSettings: Record<string, string> = {
   site_location: "NYC",
   site_bio:
     "Software engineer based in NYC who builds minimal interfaces to orchestrate complex systems.",
-  site_short_bio:
-    "builds minimal interfaces to orchestrate complex systems",
+  site_short_bio: "builds minimal interfaces to orchestrate complex systems",
   site_domain: "anipotts.com",
   site_url: "https://anipotts.com",
   site_email: "contact@anipotts.com",

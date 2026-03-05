@@ -75,7 +75,5 @@ export async function checkService(
 export async function checkAllServices(
   services: { name: string; url: string }[],
 ): Promise<StatusCheckResult[]> {
-  return Promise.all(
-    services.map((s) => checkService(s.url, s.name)),
-  );
+  return Promise.all(services.map((s) => checkService(s.url, s.name)));
 }

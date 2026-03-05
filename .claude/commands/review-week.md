@@ -3,6 +3,7 @@
 Run a comprehensive weekly review: delivery check, artifact coverage, platform performance, and North Star alignment. All data from Supabase.
 
 ## Usage
+
 ```
 /review-week
 ```
@@ -14,6 +15,7 @@ Run a comprehensive weekly review: delivery check, artifact coverage, platform p
    - `CLAUDE.md` (North Star goals, metrics)
 
 2. Query Supabase for this week's data:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
 

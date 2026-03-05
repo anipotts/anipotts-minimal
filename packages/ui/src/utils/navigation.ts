@@ -11,7 +11,11 @@
  */
 export function navigateToSection(path: string): void {
   if (typeof document !== "undefined" && "startViewTransition" in document) {
-    (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
+    (
+      document as Document & {
+        startViewTransition: (callback: () => void) => void;
+      }
+    ).startViewTransition(() => {
       window.location.href = path;
     });
   } else {
@@ -27,7 +31,11 @@ export function navigateToSection(path: string): void {
  */
 export function navigateSameOrigin(url: string): void {
   if (typeof document !== "undefined" && "startViewTransition" in document) {
-    (document as Document & { startViewTransition: (callback: () => void) => void }).startViewTransition(() => {
+    (
+      document as Document & {
+        startViewTransition: (callback: () => void) => void;
+      }
+    ).startViewTransition(() => {
       window.history.pushState({}, "", url);
       window.dispatchEvent(new PopStateEvent("popstate"));
     });

@@ -35,7 +35,8 @@ const PLACEHOLDERS: ProjectEntry[] = [
     slug: "imessage-mcp",
     title: "iMessage MCP",
     subtitle: "Read-only iMessage analysis and tooling.",
-    summary: "Programmatic conversation analytics tooling for local iMessage archives.",
+    summary:
+      "Programmatic conversation analytics tooling for local iMessage archives.",
     description:
       "Local-first MCP server and analytics toolkit focused on communication patterns, search, and relationship intelligence.",
     year: "2026",
@@ -66,7 +67,8 @@ const mappedSource: ProjectEntry[] = sourceProjects.map((project, index) => {
     publishState,
     summary: project.subtitle,
     priority:
-      PRIORITY_BY_SLUG[project.slug] ?? Math.max(40, sourceProjects.length - index),
+      PRIORITY_BY_SLUG[project.slug] ??
+      Math.max(40, sourceProjects.length - index),
   };
 });
 
@@ -88,8 +90,15 @@ function validateProjectEntries(entries: ProjectEntry[]) {
     if (!project.summary.trim()) {
       throw new Error(`[projects] Missing summary for ${project.slug}`);
     }
-    if (project.publishState === "publish_now" && !project.links?.page && !project.links?.live && !project.links?.repo) {
-      throw new Error(`[projects] publish_now project requires at least one link: ${project.slug}`);
+    if (
+      project.publishState === "publish_now" &&
+      !project.links?.page &&
+      !project.links?.live &&
+      !project.links?.repo
+    ) {
+      throw new Error(
+        `[projects] publish_now project requires at least one link: ${project.slug}`,
+      );
     }
   }
 }
@@ -104,7 +113,8 @@ export const projectEntries: ProjectEntry[] = combinedEntries;
 
 export function getWorkProjects(category?: string): ProjectEntry[] {
   return projectEntries.filter((project) => {
-    const categoryMatches = !category || category === "all" || project.category === category;
+    const categoryMatches =
+      !category || category === "all" || project.category === category;
     return categoryMatches && project.publishState !== "archive";
   });
 }
@@ -115,6 +125,8 @@ export function getProjectBySlug(slug: string): ProjectEntry | undefined {
 
 export function getFeaturedProjects(limit = 4): ProjectEntry[] {
   return projectEntries
-    .filter((project) => project.publishState === "publish_now" || project.featured)
+    .filter(
+      (project) => project.publishState === "publish_now" || project.featured,
+    )
     .slice(0, limit);
 }

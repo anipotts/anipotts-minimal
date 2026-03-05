@@ -60,7 +60,9 @@ export default async function Home() {
         <ContentBlocks>
           {homeContent.about.map((line, index) => (
             <FadeIn key={line} delay={0.08 + index * 0.05}>
-              <p className="text-body leading-relaxed text-base md:text-lg">{line}</p>
+              <p className="text-body leading-relaxed text-base md:text-lg">
+                {line}
+              </p>
             </FadeIn>
           ))}
         </ContentBlocks>

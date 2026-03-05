@@ -34,7 +34,9 @@ export async function insertStatusChecks(
 
   const { error } = await supabase.from("status_checks").insert(rows);
   if (error) {
-    logger.error("status", "Error inserting status checks", { error: String(error) });
+    logger.error("status", "Error inserting status checks", {
+      error: String(error),
+    });
     throw error;
   }
 }
@@ -62,7 +64,9 @@ export async function getServiceStatuses(
     .limit(200); // Enough to cover all services' latest checks
 
   if (latestErr || !latestChecks) {
-    logger.error("status", "Error fetching latest checks", { error: String(latestErr) });
+    logger.error("status", "Error fetching latest checks", {
+      error: String(latestErr),
+    });
     return [];
   }
 
@@ -144,7 +148,9 @@ export async function cleanupOldChecks(
     .lt("checked_at", cutoff);
 
   if (error) {
-    logger.error("status", "Error cleaning up old checks", { error: String(error) });
+    logger.error("status", "Error cleaning up old checks", {
+      error: String(error),
+    });
   }
 
   return count ?? 0;

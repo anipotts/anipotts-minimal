@@ -3,6 +3,7 @@
 Generate a LinkedIn post from a pillar blog post with Professional voice mode and proof link.
 
 ## Usage
+
 ```
 /atomize-linkedin <path-to-pillar>
 ```
@@ -44,6 +45,7 @@ Generate a LinkedIn post from a pillar blog post with Professional voice mode an
 12. Show preview with character count, proof link status
 
 ## Voice Check
+
 - Professional but not corporate (she's a student, not a CEO)
 - Genuine insight, not performative wisdom
 - Would this get comments or just polite likes?

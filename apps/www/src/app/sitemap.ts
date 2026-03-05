@@ -52,12 +52,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (p) => p.links?.page && p.publishState === "publish_now",
   );
 
-  const projectPages: MetadataRoute.Sitemap = publishedProjects.map((project) => ({
-    url: `${baseUrl}/projects/${project.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  const projectPages: MetadataRoute.Sitemap = publishedProjects.map(
+    (project) => ({
+      url: `${baseUrl}/projects/${project.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }),
+  );
 
   return [...staticPages, ...thoughtPages, ...projectPages];
 }

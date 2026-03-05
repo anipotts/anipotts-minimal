@@ -1,4 +1,8 @@
-export type ServiceStatusState = "operational" | "degraded" | "down" | "maintenance";
+export type ServiceStatusState =
+  | "operational"
+  | "degraded"
+  | "down"
+  | "maintenance";
 
 export interface ServiceStatus {
   name: string;

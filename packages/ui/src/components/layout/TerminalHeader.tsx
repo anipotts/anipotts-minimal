@@ -17,7 +17,10 @@ function StaticWindowControls() {
   );
 }
 
-export function TerminalHeader({ defaultTitle, version = "3.0.1" }: TerminalHeaderProps) {
+export function TerminalHeader({
+  defaultTitle,
+  version = "3.0.1",
+}: TerminalHeaderProps) {
   return (
     <div className="terminal-header flex items-center justify-between px-6 md:px-10 py-2 bg-input border-b border-border-subtle select-none">
       <div className="flex items-center gap-2">

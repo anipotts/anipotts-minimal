@@ -3,6 +3,7 @@
 Sync pillar content with thoughts.anipotts.com.
 
 ## Usage
+
 ```
 /sync-blog [path-to-pillar]
 ```
@@ -35,6 +36,7 @@ If no path provided, syncs all pillars with status: ready.
 5. Run scripts/sync-to-blog.sh with the prepared content
 
 ## Pre-sync Checklist
+
 - [ ] Title is compelling
 - [ ] Slug is clean and SEO-friendly
 - [ ] Canonical URL matches

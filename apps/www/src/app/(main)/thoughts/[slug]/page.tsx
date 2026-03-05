@@ -58,7 +58,10 @@ export default async function ThoughtPage({
     notFound();
   }
 
-  const readingTime = Math.max(1, Math.ceil(thought.content.split(/\s+/).length / 220));
+  const readingTime = Math.max(
+    1,
+    Math.ceil(thought.content.split(/\s+/).length / 220),
+  );
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -96,7 +99,9 @@ export default async function ThoughtPage({
 
       <FadeIn delay={0.05}>
         <header className="border-b border-border pb-6">
-          <p className="text-sm uppercase tracking-[0.16em] text-accent-400 mb-3">thought</p>
+          <p className="text-sm uppercase tracking-[0.16em] text-accent-400 mb-3">
+            thought
+          </p>
           <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading leading-tight mb-4">
             {thought.title}
           </h1>
@@ -132,7 +137,13 @@ export default async function ThoughtPage({
               img: ({ ...props }) => {
                 if (!props.src) return null;
                 // eslint-disable-next-line @next/next/no-img-element
-                return <img {...props} alt={props.alt || ""} style={{ maxWidth: "100%" }} />;
+                return (
+                  <img
+                    {...props}
+                    alt={props.alt || ""}
+                    style={{ maxWidth: "100%" }}
+                  />
+                );
               },
             }}
           >

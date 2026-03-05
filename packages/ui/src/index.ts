@@ -1,13 +1,8 @@
 "use client";
 
 // Window components
-export {
-  TerminalHeaderTitle,
-  ThemeToggle,
-} from "./components/window";
-export type {
-  TerminalHeaderTitleProps,
-} from "./components/window";
+export { TerminalHeaderTitle, ThemeToggle } from "./components/window";
+export type { TerminalHeaderTitleProps } from "./components/window";
 
 // Animation components
 export { FadeIn, Waves, WavesBackground } from "./components/animation";
@@ -26,11 +21,7 @@ export { ThemeProvider, useTheme } from "./context";
 export type { ThemeMode, ResolvedTheme } from "./context";
 
 // Hooks
-export {
-  getSectionFromPath,
-  getSectionPath,
-  getInternalPath,
-} from "./hooks";
+export { getSectionFromPath, getSectionPath, getInternalPath } from "./hooks";
 
 // Providers
 export { PostHogProvider } from "./providers";

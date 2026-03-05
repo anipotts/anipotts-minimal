@@ -1,25 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [
-    ".env*"
-  ],
+  "globalDependencies": [".env*"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "tsup.config.ts",
-        "tsconfig.json",
-        "package.json"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsup.config.ts", "tsconfig.json", "package.json"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_POSTHOG_KEY",
@@ -38,36 +25,18 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "eslint.config.*",
-        "package.json"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "eslint.config.*", "package.json"],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "tsconfig.json",
-        "package.json"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
       "outputs": []
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "vitest.config.*",
-        "package.json"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "vitest.config.*", "package.json"],
       "outputs": []
     },
     "clean": {

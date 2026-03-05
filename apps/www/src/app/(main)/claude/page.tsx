@@ -2,15 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FadeIn } from "@anipotts/ui";
 import { TipCard } from "./TipCard";
-import {
-  BLOB,
-  REPO,
-  docs,
-  guideTiers,
-  hooks,
-  plugins,
-  stats,
-} from "./data";
+import { BLOB, REPO, docs, guideTiers, hooks, plugins, stats } from "./data";
 import { getFeaturedProjects } from "@/content/projects";
 import {
   CardBlock,
@@ -23,10 +15,12 @@ import {
 
 export const metadata: Metadata = {
   title: "claude",
-  description: "Claude Code systems, playbooks, and implementation patterns from ani potts",
+  description:
+    "Claude Code systems, playbooks, and implementation patterns from ani potts",
   openGraph: {
     title: "claude | ani potts",
-    description: "Claude Code systems, playbooks, and implementation patterns from ani potts",
+    description:
+      "Claude Code systems, playbooks, and implementation patterns from ani potts",
     url: "https://anipotts.com/claude",
   },
   alternates: {
@@ -48,22 +42,35 @@ export default function ClaudePage() {
         </FadeIn>
         <FadeIn delay={0.08}>
           <PageSummary>
-            I design practical workflows for coding agents, quality gates, and high-velocity implementation loops.
+            I design practical workflows for coding agents, quality gates, and
+            high-velocity implementation loops.
           </PageSummary>
         </FadeIn>
         <FadeIn delay={0.12}>
           <div className="grid grid-cols-3 gap-2">
             <CardBlock>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">sessions</p>
-              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.sessions}</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                sessions
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {stats.sessions}
+              </p>
             </CardBlock>
             <CardBlock>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">messages</p>
-              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.messages}</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                messages
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {stats.messages}
+              </p>
             </CardBlock>
             <CardBlock>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">tool calls</p>
-              <p className="text-2xl font-heading text-accent-400 mt-1">{stats.toolCalls}</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                tool calls
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {stats.toolCalls}
+              </p>
             </CardBlock>
           </div>
         </FadeIn>
@@ -79,17 +86,29 @@ export default function ClaudePage() {
               <CardBlock>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
-                    <p className="text-sm uppercase tracking-[0.16em] text-accent-400">{project.title}</p>
-                    <p className="text-sm text-secondary mt-1">{project.summary}</p>
+                    <p className="text-sm uppercase tracking-[0.16em] text-accent-400">
+                      {project.title}
+                    </p>
+                    <p className="text-sm text-secondary mt-1">
+                      {project.summary}
+                    </p>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-mono">
                     {project.links?.page && (
-                      <Link href={project.links.page} className="text-accent-400 hover:underline">
+                      <Link
+                        href={project.links.page}
+                        className="text-accent-400 hover:underline"
+                      >
                         case study
                       </Link>
                     )}
                     {project.links?.repo && (
-                      <a href={project.links.repo} target="_blank" rel="noopener noreferrer" className="text-tertiary hover:text-body hover:underline">
+                      <a
+                        href={project.links.repo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-tertiary hover:text-body hover:underline"
+                      >
                         repo
                       </a>
                     )}
@@ -115,7 +134,6 @@ export default function ClaudePage() {
                 install={plugin.install}
                 href={plugin.href}
                 features={plugin.features}
-
               />
             </FadeIn>
           ))}
@@ -123,9 +141,16 @@ export default function ClaudePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {hooks.slice(0, 6).map((hook) => (
               <CardBlock key={hook.name}>
-                <a href={hook.href} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-2">
+                <a
+                  href={hook.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col gap-2"
+                >
                   <div className="flex items-center gap-2">
-                    <span className="text-accent-400 text-xs uppercase tracking-[0.16em]">{hook.name}</span>
+                    <span className="text-accent-400 text-xs uppercase tracking-[0.16em]">
+                      {hook.name}
+                    </span>
                     <span className="text-[10px] uppercase tracking-[0.16em] text-muted bg-input border border-border-subtle px-1.5 py-0.5 rounded">
                       {hook.event}
                     </span>
@@ -148,20 +173,36 @@ export default function ClaudePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {guideTiers.map((tier) => (
             <CardBlock key={tier.level}>
-              <a href={tier.href} target="_blank" rel="noopener noreferrer" className="group block">
-                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">{tier.level}</p>
+              <a
+                href={tier.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">
+                  {tier.level}
+                </p>
                 <p className="text-base font-heading text-secondary mt-1 group-hover:text-heading transition-colors">
                   {tier.label}
                 </p>
-                <p className="text-xs text-tertiary mt-2">{tier.topics.join(" · ")}</p>
+                <p className="text-xs text-tertiary mt-2">
+                  {tier.topics.join(" · ")}
+                </p>
               </a>
             </CardBlock>
           ))}
 
           {docs.slice(0, 4).map((doc) => (
             <CardBlock key={doc.name}>
-              <a href={doc.href} target="_blank" rel="noopener noreferrer" className="group block">
-                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">doc</p>
+              <a
+                href={doc.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <p className="text-xs uppercase tracking-[0.16em] text-accent-400">
+                  doc
+                </p>
                 <p className="text-sm text-secondary group-hover:text-heading transition-colors mt-1">
                   {doc.name}
                 </p>
@@ -179,13 +220,22 @@ export default function ClaudePage() {
         <CardBlock>
           <div className="flex flex-col gap-3">
             <p className="text-secondary leading-relaxed">
-              If you need execution support on Claude Code workflows, agent architecture, or repo automation, I can help you ship faster.
+              If you need execution support on Claude Code workflows, agent
+              architecture, or repo automation, I can help you ship faster.
             </p>
             <div className="flex items-center gap-4 text-xs font-mono">
-              <Link href="/connect?intent=claude-consulting" className="text-accent-400 hover:underline">
+              <Link
+                href="/connect?intent=claude-consulting"
+                className="text-accent-400 hover:underline"
+              >
                 /connect --intent=claude-consulting
               </Link>
-              <a href={REPO} target="_blank" rel="noopener noreferrer" className="text-tertiary hover:text-body hover:underline">
+              <a
+                href={REPO}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-tertiary hover:text-body hover:underline"
+              >
                 {BLOB ? "view repo" : "repo"}
               </a>
             </div>

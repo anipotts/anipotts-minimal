@@ -37,7 +37,9 @@ export async function setCacheValue(
   );
 
   if (error) {
-    logger.error("metrics", `Error writing cache [${key}]`, { error: String(error) });
+    logger.error("metrics", `Error writing cache [${key}]`, {
+      error: String(error),
+    });
     throw error;
   }
 }

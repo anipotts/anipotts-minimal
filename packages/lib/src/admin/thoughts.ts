@@ -15,7 +15,7 @@ export interface QueryOptions {
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
 export async function fetchAllThoughts(
   supabase: SupabaseClient,
-  options?: QueryOptions
+  options?: QueryOptions,
 ) {
   let query = supabase
     .from("thoughts")
@@ -89,7 +89,7 @@ export async function incrementThoughtViewCount(
 /** Fetch aggregated stats for the admin analytics monitor. */
 export async function fetchThoughtStats(
   supabase: SupabaseClient,
-  options?: QueryOptions
+  options?: QueryOptions,
 ) {
   let query = supabase
     .from("thoughts")
@@ -103,7 +103,9 @@ export async function fetchThoughtStats(
   const { data: thoughts, error } = await query;
 
   if (error) {
-    logger.error("admin", "Error fetching thought stats", { error: String(error) });
+    logger.error("admin", "Error fetching thought stats", {
+      error: String(error),
+    });
     return null;
   }
 
