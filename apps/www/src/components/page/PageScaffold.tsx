@@ -16,7 +16,7 @@ export function PageFrame({ children, className }: BlockProps) {
 
 export function PagePrelude({ children, className }: BlockProps) {
   return (
-    <p className={clsx("text-sm font-mono uppercase tracking-[0.16em] text-accent-400", className)}>
+    <p className={clsx("text-sm font-medium tracking-wide text-accent-400", className)}>
       {children}
     </p>
   );
