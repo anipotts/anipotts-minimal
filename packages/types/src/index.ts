@@ -10,6 +10,7 @@ export type {
 // Thought/blog types
 export type {
   Thought,
+  ThoughtSummary,
   ThoughtStats,
   Atom,
   AtomWithContent,
