@@ -1,5 +1,5 @@
 {
-  "extends": "@anipotts/config/typescript/base",
+  "extends": "../config/typescript/base.json",
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
