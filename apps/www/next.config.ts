@@ -9,8 +9,6 @@ const nextConfig: NextConfig = {
       { source: "/lab/:path*", destination: "/work", permanent: true },
       { source: "/links", destination: "/connect", permanent: true },
       { source: "/links/:path*", destination: "/connect", permanent: true },
-      { source: "/admin", destination: "/connect?intent=collab", permanent: false },
-      { source: "/admin/:path*", destination: "/connect?intent=collab", permanent: false },
       { source: "/dev", destination: "/claude", permanent: true },
       { source: "/dev/:path*", destination: "/claude", permanent: true },
       { source: "/updates", destination: "/claude#proof", permanent: true },
