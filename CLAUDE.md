@@ -79,23 +79,23 @@ npx ts-node scripts/supabase-cli.ts create-content "Title" --series agent-tip --
 
 ### Signature Series (canonical names)
 
-| Series | Format | Frequency | Artifact Required |
-|--------|--------|-----------|-------------------|
-| **Agent Tip** (`agent-tip`) | Short video (30-60s) | 3x/week | Gist |
-| **Build Log** (`build-log`) | Long-form article + video | 1x/week | Repo |
-| **Stack Drop** (`stack-drop`) | Text-first tweet/thread | 1-2x/week | Optional |
-| **Founder's Log** (`founders-log`) | Text or short video | 1x/week | Optional |
-| **Viral Reel** (`viral-reel`) | Short video (<30s) | 2x/week | Gist |
+| Series                             | Format                    | Frequency | Artifact Required |
+| ---------------------------------- | ------------------------- | --------- | ----------------- |
+| **Agent Tip** (`agent-tip`)        | Short video (30-60s)      | 3x/week   | Gist              |
+| **Build Log** (`build-log`)        | Long-form article + video | 1x/week   | Repo              |
+| **Stack Drop** (`stack-drop`)      | Text-first tweet/thread   | 1-2x/week | Optional          |
+| **Founder's Log** (`founders-log`) | Text or short video       | 1x/week   | Optional          |
+| **Viral Reel** (`viral-reel`)      | Short video (<30s)        | 2x/week   | Gist              |
 
 ### Series → Platform Atomization
 
-| Series | Primary | Secondary |
-|--------|---------|-----------|
-| agent-tip | tiktok, instagram, twitter | threads, bluesky, linkedin, youtube |
-| build-log | medium, devto, youtube, twitter, linkedin, substack | reddit, tiktok, instagram |
-| stack-drop | twitter, threads, bluesky | linkedin |
-| founders-log | twitter, linkedin | bluesky, threads, substack |
-| viral-reel | tiktok, instagram | youtube, twitter |
+| Series       | Primary                                             | Secondary                           |
+| ------------ | --------------------------------------------------- | ----------------------------------- |
+| agent-tip    | tiktok, instagram, twitter                          | threads, bluesky, linkedin, youtube |
+| build-log    | medium, devto, youtube, twitter, linkedin, substack | reddit, tiktok, instagram           |
+| stack-drop   | twitter, threads, bluesky                           | linkedin                            |
+| founders-log | twitter, linkedin                                   | bluesky, threads, substack          |
+| viral-reel   | tiktok, instagram                                   | youtube, twitter                    |
 
 ---
 
@@ -110,6 +110,7 @@ Tabs: Pipeline, Content, Atoms, Schedule, Config, Analytics, Site (CMS).
 ## Environment Variables
 
 Required in `.env.local`:
+
 ```
 NEXT_PUBLIC_SUPABASE_URL=<url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<key>
@@ -118,6 +119,7 @@ TYPEFULLY_API_KEY=<key>
 ```
 
 Optional:
+
 ```
 SUPABASE_SERVICE_ROLE_KEY=<key>
 ```
@@ -139,12 +141,13 @@ SUPABASE_SERVICE_ROLE_KEY=<key>
 ## Anti-Corny Guardrails (NON-NEGOTIABLE)
 
 Every piece of content must pass:
+
 1. **No fake vulnerability** — Don't perform honesty. Just be honest.
 2. **No engagement farming** — No "comment X if you agree."
 3. **No guru energy** — Share what you found, don't preach.
 4. **No hype without receipts** — Every claim needs a proof artifact.
 5. **No recycled platitudes** — If it could go on a poster, delete it.
-6. **No em dashes** — Never use `—`, `–`, or ` -- `. Use periods, commas, or restructure.
+6. **No em dashes** — Never use `—`, `–`, or `--`. Use periods, commas, or restructure.
 7. **No triplet lists** — Never list exactly 3 items in sequence. Use 2, 4+, or inline prose.
 
 ---

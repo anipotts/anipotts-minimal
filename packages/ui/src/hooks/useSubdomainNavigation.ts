@@ -1,37 +1,37 @@
 const SECTION_TO_ROUTE: Record<string, string> = {
-  www: '/',
-  work: '/work',
-  thoughts: '/thoughts',
-  connect: '/connect',
-  claude: '/claude',
+  www: "/",
+  work: "/work",
+  thoughts: "/thoughts",
+  connect: "/connect",
+  claude: "/claude",
 };
 
 const ROUTE_TO_SECTION: Record<string, string> = Object.fromEntries(
-  Object.entries(SECTION_TO_ROUTE).map(([k, v]) => [v, k])
+  Object.entries(SECTION_TO_ROUTE).map(([k, v]) => [v, k]),
 );
 
 export function getSectionFromPath(pathname: string): string {
   for (const [route, section] of Object.entries(ROUTE_TO_SECTION)) {
-    if (route !== '/' && pathname.startsWith(route)) {
+    if (route !== "/" && pathname.startsWith(route)) {
       return section;
     }
   }
-  return 'www';
+  return "www";
 }
 
 export function getSectionPath(pathname: string): string {
   const section = getSectionFromPath(pathname);
   const basePath = SECTION_TO_ROUTE[section];
 
-  if (basePath === '/') {
+  if (basePath === "/") {
     return pathname;
   }
 
   const subPath = pathname.slice(basePath.length);
-  return subPath || '/';
+  return subPath || "/";
 }
 
-export function getInternalPath(section: string, path: string = '/'): string {
+export function getInternalPath(section: string, path: string = "/"): string {
   const basePath = SECTION_TO_ROUTE[section];
 
   if (!basePath) {
@@ -39,9 +39,9 @@ export function getInternalPath(section: string, path: string = '/'): string {
     return path;
   }
 
-  if (basePath === '/') {
+  if (basePath === "/") {
     return path;
   }
 
-  return path === '/' ? basePath : `${basePath}${path}`;
+  return path === "/" ? basePath : `${basePath}${path}`;
 }

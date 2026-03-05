@@ -30,7 +30,10 @@ export const metadata: Metadata = {
   },
 };
 
-const iconMap: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
+const iconMap: Record<
+  string,
+  React.ComponentType<{ className?: string; size?: number }>
+> = {
   email: EnvelopeSimple,
   github: GithubLogo,
   linkedin: LinkedinLogo,
@@ -68,12 +71,19 @@ export default async function ConnectPage({
                   key={social.name}
                   href={social.url}
                   target={social.name === "email" ? undefined : "_blank"}
-                  rel={social.name === "email" ? undefined : "noopener noreferrer"}
+                  rel={
+                    social.name === "email" ? undefined : "noopener noreferrer"
+                  }
                   className="group inline-flex items-center gap-1.5 text-sm text-tertiary hover:text-accent-400 transition-colors"
                 >
                   <Icon size={14} />
                   <span>{social.description}</span>
-                  {social.name !== "email" && <ArrowSquareOut size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  {social.name !== "email" && (
+                    <ArrowSquareOut
+                      size={10}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  )}
                 </a>
               );
             })}

@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { THEME_STORAGE_KEY } from "../theme-constants";
 
 export type ThemeMode = "light" | "dark" | "system";
@@ -20,7 +27,9 @@ const CYCLE_ORDER: ThemeMode[] = ["dark", "light", "system"];
 
 function getSystemPreference(): ResolvedTheme {
   if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 function applyTheme(resolved: ResolvedTheme) {
@@ -37,14 +46,18 @@ interface ThemeProviderProps {
   defaultTheme?: ThemeMode;
 }
 
-export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProviderProps) {
+export function ThemeProvider({
+  children,
+  defaultTheme = "dark",
+}: ThemeProviderProps) {
   const [theme, setThemeState] = useState<ThemeMode>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
 
   // Initialize from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
-    const initial = stored && CYCLE_ORDER.includes(stored) ? stored : defaultTheme;
+    const initial =
+      stored && CYCLE_ORDER.includes(stored) ? stored : defaultTheme;
     setThemeState(initial);
     const resolved = initial === "system" ? getSystemPreference() : initial;
     setResolvedTheme(resolved);
@@ -87,7 +100,9 @@ export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProvider
   }, [theme, setTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, cycleTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, resolvedTheme, setTheme, cycleTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   );

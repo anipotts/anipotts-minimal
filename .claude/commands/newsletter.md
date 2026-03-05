@@ -3,6 +3,7 @@
 Compile the week's best content into a Substack newsletter draft.
 
 ## Usage
+
 ```
 /newsletter [week-of-date]
 ```
@@ -29,16 +30,19 @@ Hey friends,
 ## This Week's Best
 
 ### [Pillar 1 Title]
+
 [200-300 word summary with key insight]
 [Link to full post on thoughts.anipotts.com]
 
 ### [Pillar 2 Title] (if applicable)
+
 [200-300 word summary]
 [Link]
 
 ---
 
 ## Quick Hits
+
 - [Interesting thing I found this week]
 - [Tool/resource worth checking out]
 - [Hot take or observation]
@@ -46,11 +50,13 @@ Hey friends,
 ---
 
 ## What I'm Working On
+
 [Behind-the-scenes update - projects, learning, etc.]
 
 ---
 
 ## One Thing to Try This Week
+
 [Actionable tip the reader can immediately use]
 
 ---
@@ -66,6 +72,7 @@ P.S. [Something personal, funny, or teaser for next week]
 6. Show preview and word count
 
 ## Tone
+
 - Like writing to a friend who subscribed because they like your stuff
 - Personal updates mixed with value
 - Not a content dump - curated and contextualized

@@ -11,7 +11,7 @@ test.describe("sitemap and RSS feed", () => {
     expect(contentType).toMatch(/xml/);
 
     const body = await response.text();
-    expect(body).toContain('<?xml');
+    expect(body).toContain("<?xml");
     expect(body).toContain("<urlset");
     expect(body).toContain("https://anipotts.com");
     expect(body).toContain("https://anipotts.com/work");
@@ -28,7 +28,7 @@ test.describe("sitemap and RSS feed", () => {
     expect(contentType).toMatch(/xml/);
 
     const body = await response.text();
-    expect(body).toContain('<?xml');
+    expect(body).toContain("<?xml");
     expect(body).toContain("<rss");
     expect(body).toContain("<channel>");
     expect(body).toContain("<title>ani potts</title>");

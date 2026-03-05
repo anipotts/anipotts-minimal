@@ -3,6 +3,7 @@
 Generate video scripts from a pillar blog post. Template selection depends on series type.
 
 ## Usage
+
 ```
 /atomize-video <path-to-pillar>
 ```
@@ -17,13 +18,13 @@ Generate video scripts from a pillar blog post. Template selection depends on se
 
 6. **Select template based on series type:**
 
-   | Series | Template | Duration | Notes |
-   |--------|----------|----------|-------|
-   | 60s-fix | templates/tiktok-script.md | 30-60s | HOOK/THING/RESULT/TAG format |
-   | viral-reel | templates/viral-reel-script.md | <30s | Face→screen→result, proven 100k+ format |
-   | i-tried-it | Longer outline (no template) | 3-10 min | Full walkthrough, not just a script |
-   | quick-tip | templates/tiktok-script.md | 15-30s | Shortened 60s Fix format |
-   | stack-update | templates/tiktok-script.md | 30-45s | Tool demo focus |
+   | Series       | Template                       | Duration | Notes                                   |
+   | ------------ | ------------------------------ | -------- | --------------------------------------- |
+   | 60s-fix      | templates/tiktok-script.md     | 30-60s   | HOOK/THING/RESULT/TAG format            |
+   | viral-reel   | templates/viral-reel-script.md | <30s     | Face→screen→result, proven 100k+ format |
+   | i-tried-it   | Longer outline (no template)   | 3-10 min | Full walkthrough, not just a script     |
+   | quick-tip    | templates/tiktok-script.md     | 15-30s   | Shortened 60s Fix format                |
+   | stack-update | templates/tiktok-script.md     | 30-45s   | Tool demo focus                         |
 
 7. Extract:
    - The most visually demonstrable point
@@ -60,6 +61,7 @@ Generate video scripts from a pillar blog post. Template selection depends on se
 12. Show preview with timing/slide counts and artifact status
 
 ## Voice Check
+
 - Would she naturally say this to camera?
 - Is the hook genuinely stopping? (test: would YOU stop scrolling?)
 - Are there visual elements to show (not just talking head)?

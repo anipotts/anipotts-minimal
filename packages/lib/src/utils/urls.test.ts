@@ -22,7 +22,9 @@ describe("getAllSectionUrls", () => {
   it("returns a list of sections", () => {
     const sections = getAllSectionUrls();
     expect(sections.length).toBeGreaterThan(0);
-    expect(sections).toEqual(expect.arrayContaining([{ name: "www", url: "/" }]));
+    expect(sections).toEqual(
+      expect.arrayContaining([{ name: "www", url: "/" }]),
+    );
   });
 });
 

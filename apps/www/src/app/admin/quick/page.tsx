@@ -1,4 +1,4 @@
-import QuickPostForm from './quick-post-form'
+import QuickPostForm from "./quick-post-form";
 
 export default function QuickPostPage() {
   return (
@@ -6,5 +6,5 @@ export default function QuickPostPage() {
       <h2 className="text-lg font-semibold mb-4">Quick Post</h2>
       <QuickPostForm />
     </div>
-  )
+  );
 }

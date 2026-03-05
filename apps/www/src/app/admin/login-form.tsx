@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useActionState } from 'react'
-import { login } from './actions'
+import { useActionState } from "react";
+import { login } from "./actions";
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
-      const result = await login(formData)
-      if ('success' in result && result.success) {
-        window.location.reload()
-        return null
+      const result = await login(formData);
+      if ("success" in result && result.success) {
+        window.location.reload();
+        return null;
       }
-      return result as { error?: string }
+      return result as { error?: string };
     },
-    null
-  )
+    null,
+  );
 
   return (
     <form action={formAction} className="w-full max-w-sm space-y-4">
@@ -50,8 +50,8 @@ export default function LoginForm() {
         disabled={isPending}
         className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-lg font-medium text-white transition-colors"
       >
-        {isPending ? 'Signing in...' : 'Sign In'}
+        {isPending ? "Signing in..." : "Sign In"}
       </button>
     </form>
-  )
+  );
 }

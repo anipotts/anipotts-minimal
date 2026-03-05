@@ -36,9 +36,7 @@ test.describe("public pages load correctly", () => {
   test("connect page renders contact form", async ({ page }) => {
     const response = await page.goto("/connect");
     expect(response?.status()).toBe(200);
-    await expect(
-      page.getByRole("heading", { level: 1 }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
   test("claude page renders sections", async ({ page }) => {

@@ -15,7 +15,7 @@
       "types": "./dist/supabase/index.d.ts",
       "import": "./dist/supabase/index.js"
     },
-"./utils": {
+    "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
     },

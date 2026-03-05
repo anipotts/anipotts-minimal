@@ -25,13 +25,13 @@ export async function uploadProjectImage(
     .upload(path, file, { upsert: true });
 
   if (error) {
-    logger.error("storage", "uploadProjectImage failed", { message: error.message });
+    logger.error("storage", "uploadProjectImage failed", {
+      message: error.message,
+    });
     return null;
   }
 
-  const { data } = supabase.storage
-    .from("project-images")
-    .getPublicUrl(path);
+  const { data } = supabase.storage.from("project-images").getPublicUrl(path);
 
   return data.publicUrl;
 }
@@ -60,7 +60,9 @@ export async function deleteProjectImage(
     .remove([path]);
 
   if (error) {
-    logger.error("storage", "deleteProjectImage failed", { message: error.message });
+    logger.error("storage", "deleteProjectImage failed", {
+      message: error.message,
+    });
     return false;
   }
 

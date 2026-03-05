@@ -12,11 +12,27 @@ const nextConfig: NextConfig = {
       { source: "/dev", destination: "/claude", permanent: true },
       { source: "/dev/:path*", destination: "/claude", permanent: true },
       { source: "/updates", destination: "/claude#proof", permanent: true },
-      { source: "/updates/:path*", destination: "/claude#proof", permanent: true },
+      {
+        source: "/updates/:path*",
+        destination: "/claude#proof",
+        permanent: true,
+      },
       { source: "/metrics", destination: "/claude#playbooks", permanent: true },
-      { source: "/metrics/:path*", destination: "/claude#playbooks", permanent: true },
-      { source: "/status", destination: "/claude#work-together", permanent: true },
-      { source: "/status/:path*", destination: "/claude#work-together", permanent: true },
+      {
+        source: "/metrics/:path*",
+        destination: "/claude#playbooks",
+        permanent: true,
+      },
+      {
+        source: "/status",
+        destination: "/claude#work-together",
+        permanent: true,
+      },
+      {
+        source: "/status/:path*",
+        destination: "/claude#work-together",
+        permanent: true,
+      },
       { source: "/docs", destination: "/", permanent: true },
       { source: "/docs/:path*", destination: "/", permanent: true },
     ];

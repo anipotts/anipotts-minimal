@@ -61,7 +61,9 @@ export async function checkAdminLoginRateLimit(ip: string) {
         reset: Date.now(),
       };
     }
-    console.warn("[rateLimit] Upstash not configured; skipping admin login rate limit");
+    console.warn(
+      "[rateLimit] Upstash not configured; skipping admin login rate limit",
+    );
     return { success: true, limit: 0, remaining: 0, reset: Date.now() };
   }
 

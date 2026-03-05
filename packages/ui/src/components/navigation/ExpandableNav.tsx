@@ -16,7 +16,11 @@ const primaryItems = [
   { name: "claude", path: "/claude", section: "claude" },
 ] as const;
 
-const connectItem = { name: "connect", path: "/connect", section: "connect" } as const;
+const connectItem = {
+  name: "connect",
+  path: "/connect",
+  section: "connect",
+} as const;
 
 function isItemActive(
   section: string,
@@ -125,7 +129,9 @@ export function ExpandableNav({
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-expanded={menuOpen}
           aria-controls="mobile-nav-menu"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={
+            menuOpen ? "Close navigation menu" : "Open navigation menu"
+          }
         >
           {menuOpen ? "[x_]" : "[>_]"}
         </button>
@@ -136,11 +142,20 @@ export function ExpandableNav({
         role="menu"
         aria-hidden={!menuOpen}
         className={`md:hidden overflow-hidden border-t border-border-subtle mt-4 transition-[max-height,opacity] duration-200 ${
-          menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          menuOpen
+            ? "max-h-96 opacity-100"
+            : "max-h-0 opacity-0 pointer-events-none"
         }`}
       >
         <div className="flex flex-col py-2">
-          {[...items, { name: connectItem.name, href: connectItem.path, isActive: connectActive }].map((item, index) => (
+          {[
+            ...items,
+            {
+              name: connectItem.name,
+              href: connectItem.path,
+              isActive: connectActive,
+            },
+          ].map((item, index) => (
             <Link
               key={item.name}
               href={item.href}

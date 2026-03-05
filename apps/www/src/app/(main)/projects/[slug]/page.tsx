@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CaretRight,
+} from "@phosphor-icons/react/dist/ssr";
 import { FadeIn } from "@anipotts/ui";
 import { getProjectBySlug, projectEntries } from "@/content/projects";
 import { projectContent } from "@/data/project-content";
 
 export async function generateStaticParams() {
   return projectEntries
-    .filter((project) => project.links?.page && project.publishState === "publish_now")
+    .filter(
+      (project) =>
+        project.links?.page && project.publishState === "publish_now",
+    )
     .map((project) => ({ slug: project.slug }));
 }
 
@@ -116,7 +123,9 @@ export default async function ProjectPage({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">overview</h2>
+        <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
+          overview
+        </h2>
         <p className="text-secondary leading-relaxed text-base md:text-lg">
           {content?.overview || project.description}
         </p>
@@ -124,12 +133,18 @@ export default async function ProjectPage({
 
       {content?.technical && (
         <section className="flex flex-col gap-4">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">technical</h2>
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
+            technical
+          </h2>
           <div className="flex flex-col gap-5">
             {content.technical.map((section) => (
               <div key={section.title} className="border-l border-border pl-4">
-                <h3 className="text-sm font-semibold text-body mb-1">{section.title}</h3>
-                <p className="text-sm text-tertiary leading-relaxed">{section.content}</p>
+                <h3 className="text-sm font-semibold text-body mb-1">
+                  {section.title}
+                </h3>
+                <p className="text-sm text-tertiary leading-relaxed">
+                  {section.content}
+                </p>
               </div>
             ))}
           </div>
@@ -138,10 +153,15 @@ export default async function ProjectPage({
 
       {content?.roadmap && (
         <section className="flex flex-col gap-4">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">next</h2>
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
+            next
+          </h2>
           <div className="flex flex-col gap-3">
             {content.roadmap.map((item, index) => (
-              <div key={`${item.text}-${index}`} className="flex items-start gap-3 text-sm">
+              <div
+                key={`${item.text}-${index}`}
+                className="flex items-start gap-3 text-sm"
+              >
                 <span
                   className={`text-xs font-mono px-1.5 py-0.5 rounded ${
                     item.status === "done"
@@ -151,9 +171,19 @@ export default async function ProjectPage({
                         : "text-muted bg-gray-500/10"
                   }`}
                 >
-                  {item.status === "done" ? "✓" : item.status === "in-progress" ? <CaretRight size={10} /> : "○"}
+                  {item.status === "done" ? (
+                    "✓"
+                  ) : item.status === "in-progress" ? (
+                    <CaretRight size={10} />
+                  ) : (
+                    "○"
+                  )}
                 </span>
-                <span className={item.status === "done" ? "text-muted" : "text-secondary"}>
+                <span
+                  className={
+                    item.status === "done" ? "text-muted" : "text-secondary"
+                  }
+                >
                   {item.text}
                 </span>
               </div>
@@ -164,7 +194,9 @@ export default async function ProjectPage({
 
       {content?.relatedThoughts && content.relatedThoughts.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">related thoughts</h2>
+          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
+            related thoughts
+          </h2>
           <div className="flex flex-col gap-2">
             {content.relatedThoughts.map((thought) => (
               <Link

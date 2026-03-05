@@ -17,7 +17,13 @@ interface TipCardProps {
   features: TipCardFeature[];
 }
 
-export function TipCard({ name, tagline, install, href, features }: TipCardProps) {
+export function TipCard({
+  name,
+  tagline,
+  install,
+  href,
+  features,
+}: TipCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -72,7 +78,6 @@ export function TipCard({ name, tagline, install, href, features }: TipCardProps
             >
               {name}
             </h3>
-
           </div>
           <p className="text-xs text-muted pl-6">{tagline}</p>
         </div>
@@ -90,7 +95,9 @@ export function TipCard({ name, tagline, install, href, features }: TipCardProps
               onClick={(e) => e.stopPropagation()}
             >
               <span className="text-muted select-none">$</span>
-              <code className="text-secondary flex-1 overflow-x-auto">{install}</code>
+              <code className="text-secondary flex-1 overflow-x-auto">
+                {install}
+              </code>
               <CopyButton text={install} />
             </div>
 
@@ -98,7 +105,9 @@ export function TipCard({ name, tagline, install, href, features }: TipCardProps
             <div className="flex flex-col gap-2">
               {features.map((f) => (
                 <div key={f.name} className="flex items-baseline gap-2 text-sm">
-                  <span className="text-muted select-none font-mono text-xs">+</span>
+                  <span className="text-muted select-none font-mono text-xs">
+                    +
+                  </span>
                   <a
                     href={f.href}
                     target="_blank"

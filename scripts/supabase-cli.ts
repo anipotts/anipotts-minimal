@@ -19,17 +19,24 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error("Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
+  console.error(
+    "Error: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set",
+  );
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function listContent(filters: { status?: string; series?: string }) {
-  let query = supabase.from("thoughts").select("*").order("created_at", { ascending: false });
+  let query = supabase
+    .from("thoughts")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (filters.status) {
     query = query.eq("status", filters.status);
@@ -46,7 +53,10 @@ async function listContent(filters: { status?: string; series?: string }) {
 
 async function getContent(idOrSlug: string) {
   // Try by ID first (UUID format)
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+  const isUUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      idOrSlug,
+    );
 
   let query = supabase.from("thoughts").select("*");
 
@@ -62,21 +72,29 @@ async function getContent(idOrSlug: string) {
   console.log(JSON.stringify(data, null, 2));
 }
 
-async function createContent(title: string, options: { series?: string; type?: string }) {
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+async function createContent(
+  title: string,
+  options: { series?: string; type?: string },
+) {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
   const { data, error } = await supabase
     .from("thoughts")
-    .insert([{
-      title,
-      slug,
-      body: "",
-      summary: "",
-      status: "idea",
-      content_type: options.type || "article",
-      series_type: options.series || null,
-      published: false,
-    }])
+    .insert([
+      {
+        title,
+        slug,
+        body: "",
+        summary: "",
+        status: "idea",
+        content_type: options.type || "article",
+        series_type: options.series || null,
+        published: false,
+      },
+    ])
     .select()
     .single();
 
@@ -106,8 +124,15 @@ async function updateContent(id: string, field: string, value: string) {
   console.log(JSON.stringify(data, null, 2));
 }
 
-async function listAtoms(filters: { content?: string; platform?: string; status?: string }) {
-  let query = supabase.from("atoms").select("*").order("created_at", { ascending: false });
+async function listAtoms(filters: {
+  content?: string;
+  platform?: string;
+  status?: string;
+}) {
+  let query = supabase
+    .from("atoms")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (filters.content) {
     query = query.eq("content_id", filters.content);
@@ -125,16 +150,23 @@ async function listAtoms(filters: { content?: string; platform?: string; status?
   console.log(JSON.stringify(data, null, 2));
 }
 
-async function createAtom(contentId: string, platform: string, atomContent: string, voiceMode?: string) {
+async function createAtom(
+  contentId: string,
+  platform: string,
+  atomContent: string,
+  voiceMode?: string,
+) {
   const { data, error } = await supabase
     .from("atoms")
-    .insert([{
-      content_id: contentId,
-      platform,
-      atom_content: atomContent,
-      voice_mode: voiceMode || "casual",
-      status: "draft",
-    }])
+    .insert([
+      {
+        content_id: contentId,
+        platform,
+        atom_content: atomContent,
+        voice_mode: voiceMode || "casual",
+        status: "draft",
+      },
+    ])
     .select()
     .single();
 
@@ -195,7 +227,8 @@ async function getStats() {
   });
 
   atoms?.forEach((a) => {
-    stats.atomsByPlatform[a.platform] = (stats.atomsByPlatform[a.platform] || 0) + 1;
+    stats.atomsByPlatform[a.platform] =
+      (stats.atomsByPlatform[a.platform] || 0) + 1;
     stats.atomsByStatus[a.status] = (stats.atomsByStatus[a.status] || 0) + 1;
   });
 
@@ -203,7 +236,7 @@ async function getStats() {
 }
 
 // Parse command line arguments
-const [,, command, ...args] = process.argv;
+const [, , command, ...args] = process.argv;
 
 async function main() {
   try {
@@ -238,7 +271,11 @@ async function main() {
         break;
 
       case "list-atoms": {
-        const filters: { content?: string; platform?: string; status?: string } = {};
+        const filters: {
+          content?: string;
+          platform?: string;
+          status?: string;
+        } = {};
         for (let i = 0; i < args.length; i += 2) {
           if (args[i] === "--content") filters.content = args[i + 1];
           if (args[i] === "--platform") filters.platform = args[i + 1];

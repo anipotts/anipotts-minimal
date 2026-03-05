@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { contactSchema, favoriteNumberSchema, adminLoginSchema, formatZodError } from "./index";
+import {
+  contactSchema,
+  favoriteNumberSchema,
+  adminLoginSchema,
+  formatZodError,
+} from "./index";
 import { z } from "zod";
 
 describe("contactSchema", () => {
@@ -187,7 +192,11 @@ describe("adminLoginSchema", () => {
 
 describe("formatZodError", () => {
   it("formats single field error", () => {
-    const result = contactSchema.safeParse({ name: "", email: "bad", message: "" });
+    const result = contactSchema.safeParse({
+      name: "",
+      email: "bad",
+      message: "",
+    });
     expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatZodError(result.error);

@@ -1,25 +1,47 @@
 // Content types
-export type ContentType = 'video' | 'article' | 'thread' | 'tip';
-export type SeriesType = 'agent-tip' | 'build-log' | 'stack-drop' | 'founders-log' | 'viral-reel';
-export type ContentStatus = 'idea' | 'draft' | 'ready' | 'atomized' | 'published';
-export type VoiceMode = 'spicy' | 'casual' | 'professional';
-export type ArtifactType = 'gist' | 'repo' | 'screenshot' | 'screen-recording' | 'diff' | 'live-demo';
+export type ContentType = "video" | "article" | "thread" | "tip";
+export type SeriesType =
+  | "agent-tip"
+  | "build-log"
+  | "stack-drop"
+  | "founders-log"
+  | "viral-reel";
+export type ContentStatus =
+  | "idea"
+  | "draft"
+  | "ready"
+  | "atomized"
+  | "published";
+export type VoiceMode = "spicy" | "casual" | "professional";
+export type ArtifactType =
+  | "gist"
+  | "repo"
+  | "screenshot"
+  | "screen-recording"
+  | "diff"
+  | "live-demo";
 export type Platform =
-  | 'twitter'
-  | 'linkedin'
-  | 'tiktok'
-  | 'instagram'
-  | 'threads'
-  | 'bluesky'
-  | 'mastodon'
-  | 'youtube'
-  | 'medium'
-  | 'devto'
-  | 'substack'
-  | 'reddit';
+  | "twitter"
+  | "linkedin"
+  | "tiktok"
+  | "instagram"
+  | "threads"
+  | "bluesky"
+  | "mastodon"
+  | "youtube"
+  | "medium"
+  | "devto"
+  | "substack"
+  | "reddit";
 
 // Valid sections for content scoping
-export type Section = 'www' | 'thoughts' | 'dev' | 'work' | 'connect' | 'claude';
+export type Section =
+  | "www"
+  | "thoughts"
+  | "dev"
+  | "work"
+  | "connect"
+  | "claude";
 /** @deprecated Use Section */
 export type Subdomain = Section;
 
@@ -59,7 +81,10 @@ export interface ThoughtStats {
   totalThoughts: number;
   publishedCount: number;
   draftCount: number;
-  topThoughts: Pick<Thought, 'id' | 'title' | 'slug' | 'views' | 'published' | 'created_at'>[];
+  topThoughts: Pick<
+    Thought,
+    "id" | "title" | "slug" | "views" | "published" | "created_at"
+  >[];
 
   // New stats
   byStatus?: Record<ContentStatus, number>;
@@ -67,7 +92,7 @@ export interface ThoughtStats {
 }
 
 // Atom types
-export type AtomStatus = 'draft' | 'scheduled' | 'posted';
+export type AtomStatus = "draft" | "scheduled" | "posted";
 
 export interface Atom {
   id: string;

@@ -1,7 +1,4 @@
-import type {
-  TypefullyDraft,
-  TypefullyQueueSummary,
-} from "@anipotts/types";
+import type { TypefullyDraft, TypefullyQueueSummary } from "@anipotts/types";
 
 const API_BASE = "https://api.typefully.com/v2";
 
@@ -12,7 +9,7 @@ async function typefullyFetch(
   apiKey: string,
   endpoint: string,
   method: "GET" | "POST" | "PATCH" | "DELETE" = "GET",
-  body?: Record<string, unknown>
+  body?: Record<string, unknown>,
 ): Promise<unknown> {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method,
@@ -27,9 +24,7 @@ async function typefullyFetch(
   const data = text ? JSON.parse(text) : {};
 
   if (!res.ok) {
-    throw new Error(
-      `Typefully API ${res.status}: ${JSON.stringify(data)}`
-    );
+    throw new Error(`Typefully API ${res.status}: ${JSON.stringify(data)}`);
   }
 
   return data;
@@ -38,7 +33,7 @@ async function typefullyFetch(
 export async function fetchTypefullyDrafts(
   apiKey: string,
   socialSetId: number,
-  options?: { status?: string; sort?: string; limit?: number }
+  options?: { status?: string; sort?: string; limit?: number },
 ): Promise<TypefullyDraft[]> {
   const params = new URLSearchParams();
   params.set("limit", String(options?.limit ?? 50));
@@ -47,7 +42,7 @@ export async function fetchTypefullyDrafts(
 
   const data = (await typefullyFetch(
     apiKey,
-    `/social-sets/${socialSetId}/drafts?${params}`
+    `/social-sets/${socialSetId}/drafts?${params}`,
   )) as { results?: TypefullyDraft[] };
 
   return data.results ?? [];
@@ -56,11 +51,11 @@ export async function fetchTypefullyDrafts(
 export async function fetchTypefullyDraft(
   apiKey: string,
   socialSetId: number,
-  draftId: number
+  draftId: number,
 ): Promise<TypefullyDraft> {
   return (await typefullyFetch(
     apiKey,
-    `/social-sets/${socialSetId}/drafts/${draftId}`
+    `/social-sets/${socialSetId}/drafts/${draftId}`,
   )) as TypefullyDraft;
 }
 
@@ -73,7 +68,7 @@ export async function createTypefullyDraft(
     schedule?: string;
     title?: string;
     tags?: string[];
-  }
+  },
 ): Promise<TypefullyDraft> {
   const posts = text
     .split(/\n---\n/)
@@ -81,7 +76,10 @@ export async function createTypefullyDraft(
     .map((t) => ({ text: t }));
 
   const platformList = options?.platforms ?? ["x"];
-  const platformsObj: Record<string, { enabled: boolean; posts: { text: string }[] }> = {};
+  const platformsObj: Record<
+    string,
+    { enabled: boolean; posts: { text: string }[] }
+  > = {};
   for (const p of platformList) {
     platformsObj[p] = { enabled: true, posts };
   }
@@ -95,7 +93,7 @@ export async function createTypefullyDraft(
     apiKey,
     `/social-sets/${socialSetId}/drafts`,
     "POST",
-    body
+    body,
   )) as TypefullyDraft;
 }
 
@@ -103,7 +101,7 @@ export async function updateTypefullyDraft(
   apiKey: string,
   socialSetId: number,
   draftId: number,
-  updates: { text?: string; schedule?: string }
+  updates: { text?: string; schedule?: string },
 ): Promise<TypefullyDraft> {
   const body: Record<string, unknown> = {};
 
@@ -119,7 +117,10 @@ export async function updateTypefullyDraft(
       .filter((t) => t.trim())
       .map((t) => ({ text: t }));
 
-    const platformsObj: Record<string, { enabled: boolean; posts: { text: string }[] }> = {};
+    const platformsObj: Record<
+      string,
+      { enabled: boolean; posts: { text: string }[] }
+    > = {};
     for (const p of platformList) {
       platformsObj[p] = { enabled: true, posts };
     }
@@ -134,7 +135,7 @@ export async function updateTypefullyDraft(
     apiKey,
     `/social-sets/${socialSetId}/drafts/${draftId}`,
     "PATCH",
-    body
+    body,
   )) as TypefullyDraft;
 }
 
@@ -142,32 +143,32 @@ export async function scheduleTypefullyDraft(
   apiKey: string,
   socialSetId: number,
   draftId: number,
-  time: string
+  time: string,
 ): Promise<TypefullyDraft> {
   return (await typefullyFetch(
     apiKey,
     `/social-sets/${socialSetId}/drafts/${draftId}`,
     "PATCH",
-    { publish_at: time }
+    { publish_at: time },
   )) as TypefullyDraft;
 }
 
 export async function publishTypefullyDraft(
   apiKey: string,
   socialSetId: number,
-  draftId: number
+  draftId: number,
 ): Promise<TypefullyDraft> {
   return (await typefullyFetch(
     apiKey,
     `/social-sets/${socialSetId}/drafts/${draftId}`,
     "PATCH",
-    { publish_at: "now" }
+    { publish_at: "now" },
   )) as TypefullyDraft;
 }
 
 export async function fetchTypefullyQueueSummary(
   apiKey: string,
-  socialSetId: number
+  socialSetId: number,
 ): Promise<TypefullyQueueSummary> {
   const [drafts, scheduled, published] = await Promise.all([
     fetchTypefullyDrafts(apiKey, socialSetId, { status: "draft", limit: 50 }),
@@ -187,7 +188,7 @@ export async function fetchTypefullyQueueSummary(
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const publishedThisMonth = published.filter(
-    (d) => d.published_at && new Date(d.published_at) >= monthStart
+    (d) => d.published_at && new Date(d.published_at) >= monthStart,
   ).length;
 
   return {

@@ -1,4 +1,9 @@
-export { fetchGitHubStats, fetchRepoLanguages, fetchRecentCommits, fetchContributionCalendar } from "./github";
+export {
+  fetchGitHubStats,
+  fetchRepoLanguages,
+  fetchRecentCommits,
+  fetchContributionCalendar,
+} from "./github";
 export type {
   GitHubStats,
   GitHubLanguageBreakdown,

@@ -1,1 +1,5 @@
-export { getSectionFromPath, getSectionPath, getInternalPath } from "./useSubdomainNavigation";
+export {
+  getSectionFromPath,
+  getSectionPath,
+  getInternalPath,
+} from "./useSubdomainNavigation";

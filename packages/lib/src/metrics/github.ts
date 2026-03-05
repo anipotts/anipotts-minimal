@@ -25,7 +25,12 @@ export interface GitHubStats {
 }
 
 export interface GitHubLanguageBreakdown {
-  languages: { name: string; bytes: number; percentage: number; color: string }[];
+  languages: {
+    name: string;
+    bytes: number;
+    percentage: number;
+    color: string;
+  }[];
   totalBytes: number;
   repoCount: number;
   fetchedAt: string;
@@ -84,7 +89,8 @@ export async function fetchContributionCalendar(
 
   const data = await res.json();
   const weeks: ContributionWeek[] =
-    data?.data?.user?.contributionsCollection?.contributionCalendar?.weeks ?? [];
+    data?.data?.user?.contributionsCollection?.contributionCalendar?.weeks ??
+    [];
 
   return weeks.flatMap((w) => w.contributionDays);
 }
@@ -252,7 +258,9 @@ export async function fetchRepoLanguages(
   const repos: { name: string; fork: boolean }[] = await reposRes.json();
   // Skip forks and legacy repos that skew byte counts
   const EXCLUDED_REPOS = ["luminator", "kdb-spy"];
-  const ownRepos = repos.filter((r) => !r.fork && !EXCLUDED_REPOS.includes(r.name));
+  const ownRepos = repos.filter(
+    (r) => !r.fork && !EXCLUDED_REPOS.includes(r.name),
+  );
 
   // Fetch language bytes for each repo (in parallel, batched)
   const langTotals = new Map<string, number>();
@@ -288,7 +296,8 @@ export async function fetchRepoLanguages(
   const languages = sorted.map(([name, bytes]) => ({
     name,
     bytes,
-    percentage: totalBytes > 0 ? Math.round((bytes / totalBytes) * 1000) / 10 : 0,
+    percentage:
+      totalBytes > 0 ? Math.round((bytes / totalBytes) * 1000) / 10 : 0,
     color: getLanguageColor(name),
   }));
 

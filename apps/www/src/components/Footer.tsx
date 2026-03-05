@@ -10,7 +10,9 @@ export default function Footer() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-faint">focus:</span>
-          <span className="text-secondary">claude systems + product execution</span>
+          <span className="text-secondary">
+            claude systems + product execution
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-faint">status:</span>

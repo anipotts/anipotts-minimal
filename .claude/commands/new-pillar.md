@@ -3,6 +3,7 @@
 Initialize a new pillar content file.
 
 ## Usage
+
 ```
 /new-pillar "Title of Your Post"
 ```
@@ -11,7 +12,7 @@ Initialize a new pillar content file.
 
 1. Generate slug from title (lowercase, hyphens, no special chars)
 2. Create file at `pillars/YYYY-MM-DD-slug.md`
-3. Use pillars/_template.md as base
+3. Use pillars/\_template.md as base
 4. Fill in metadata:
    - title
    - date (today)
@@ -51,6 +52,9 @@ Before you write, let's nail down:
 
 File is ready. Start writing when you're ready, then run:
 ```
+
 /atomize pillars/{{date}}-{{slug}}.md
+
 ```
+
 ```

@@ -3,16 +3,19 @@
 Initialize a new content piece in Supabase and prompt for brainstorming.
 
 ## Usage
+
 ```
 /new-content "Title of Your Content" [--series <series-type>] [--type <content-type>]
 ```
 
 **Arguments:**
+
 - `title` — Title for the content piece (required)
 - `--series` — Series type: 60s-fix, i-tried-it, quick-tip, stack-update, viral-reel (optional)
 - `--type` — Content type: video, article, thread, tip (default: article)
 
 **Examples:**
+
 ```
 /new-content "Multi-cursor Magic in Claude Code" --series 60s-fix --type video
 /new-content "Building a Portfolio Site with AI" --series i-tried-it --type article
@@ -24,6 +27,7 @@ Initialize a new content piece in Supabase and prompt for brainstorming.
 1. Parse arguments: title, optional series-type, optional content-type
 
 2. Create the content entry in Supabase:
+
    ```bash
    cd ~/code/active/websites/anipotts.com
    npx ts-node scripts/supabase-cli.ts create-content "Your Title" --series 60s-fix --type video

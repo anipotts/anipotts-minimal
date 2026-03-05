@@ -1,69 +1,76 @@
-import { createServerClient } from '@anipotts/lib'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import type { Thought, SeriesType } from '@anipotts/types'
-import Teleprompter from './teleprompter'
+import { createServerClient } from "@anipotts/lib";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import type { Thought, SeriesType } from "@anipotts/types";
+import Teleprompter from "./teleprompter";
 
 const TIMING: Record<SeriesType, string> = {
-  'viral-reel': '15-30s',
-  'agent-tip': '30-60s',
-  'build-log': '3-10 min',
-  'stack-drop': '1-2 min',
-  'founders-log': '1-3 min',
-}
+  "viral-reel": "15-30s",
+  "agent-tip": "30-60s",
+  "build-log": "3-10 min",
+  "stack-drop": "1-2 min",
+  "founders-log": "1-3 min",
+};
 
 function extractBulletPoints(content: string): {
-  hook: string
-  body: string[]
-  outro: string
+  hook: string;
+  body: string[];
+  outro: string;
 } {
   const lines = content
-    .split('\n')
+    .split("\n")
     .map((l) => l.trim())
-    .filter(Boolean)
+    .filter(Boolean);
 
   if (lines.length === 0) {
-    return { hook: 'No content yet', body: [], outro: 'Like and follow for more' }
+    return {
+      hook: "No content yet",
+      body: [],
+      outro: "Like and follow for more",
+    };
   }
 
   // First line or sentence is the hook
-  const hook = lines[0].replace(/^#+\s*/, '')
+  const hook = lines[0].replace(/^#+\s*/, "");
 
   // Last line is outro/CTA
-  const outro = lines.length > 1 ? lines[lines.length - 1].replace(/^#+\s*/, '') : 'Follow for more tips'
+  const outro =
+    lines.length > 1
+      ? lines[lines.length - 1].replace(/^#+\s*/, "")
+      : "Follow for more tips";
 
   // Middle lines are body bullets
   const body = lines
     .slice(1, -1)
-    .map((l) => l.replace(/^[-*•]\s*/, '').replace(/^#+\s*/, ''))
+    .map((l) => l.replace(/^[-*•]\s*/, "").replace(/^#+\s*/, ""))
     .filter((l) => l.length > 5)
-    .slice(0, 5)
+    .slice(0, 5);
 
-  return { hook, body, outro }
+  return { hook, body, outro };
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function RecordingPrepPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
-  const supabase = createServerClient()
-  if (!supabase) notFound()
+  const { id } = await params;
+  const supabase = createServerClient();
+  if (!supabase) notFound();
 
   const { data: thought } = await supabase
-    .from('thoughts')
-    .select('*')
-    .eq('id', id)
-    .single()
+    .from("thoughts")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  if (!thought) notFound()
+  if (!thought) notFound();
 
-  const t = thought as Thought
-  const timing = t.series_type ? TIMING[t.series_type] : '30-60s'
-  const points = extractBulletPoints(t.content || '')
+  const t = thought as Thought;
+  const timing = t.series_type ? TIMING[t.series_type] : "30-60s";
+  const points = extractBulletPoints(t.content || "");
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -72,8 +79,18 @@ export default async function RecordingPrepPage({
           href={`/admin/content/${t.id}`}
           className="text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
           </svg>
         </Link>
         <div className="flex-1 min-w-0">
@@ -85,7 +102,11 @@ export default async function RecordingPrepPage({
         </div>
       </div>
 
-      <Teleprompter hook={points.hook} body={points.body} outro={points.outro} />
+      <Teleprompter
+        hook={points.hook}
+        body={points.body}
+        outro={points.outro}
+      />
     </div>
-  )
+  );
 }

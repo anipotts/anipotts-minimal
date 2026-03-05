@@ -1,75 +1,76 @@
-import { createServerClient } from '@anipotts/lib'
-import type { Thought, ContentStatus, SeriesType } from '@anipotts/types'
-import Link from 'next/link'
-import PipelineFilters from './pipeline-filters'
-import ApproveButton from './approve-button'
+import { createServerClient } from "@anipotts/lib";
+import type { Thought, ContentStatus, SeriesType } from "@anipotts/types";
+import Link from "next/link";
+import PipelineFilters from "./pipeline-filters";
+import ApproveButton from "./approve-button";
 
 const SERIES_COLORS: Record<SeriesType, string> = {
-  'agent-tip': 'bg-blue-500/20 text-blue-400',
-  'build-log': 'bg-green-500/20 text-green-400',
-  'stack-drop': 'bg-purple-500/20 text-purple-400',
-  'founders-log': 'bg-amber-500/20 text-amber-400',
-  'viral-reel': 'bg-pink-500/20 text-pink-400',
-}
+  "agent-tip": "bg-blue-500/20 text-blue-400",
+  "build-log": "bg-green-500/20 text-green-400",
+  "stack-drop": "bg-purple-500/20 text-purple-400",
+  "founders-log": "bg-amber-500/20 text-amber-400",
+  "viral-reel": "bg-pink-500/20 text-pink-400",
+};
 
 const STATUS_COLORS: Record<string, string> = {
-  idea: 'bg-zinc-700 text-zinc-300',
-  draft: 'bg-yellow-500/20 text-yellow-400',
-  ready: 'bg-blue-500/20 text-blue-400',
-  atomized: 'bg-purple-500/20 text-purple-400',
-  published: 'bg-green-500/20 text-green-400',
-}
+  idea: "bg-zinc-700 text-zinc-300",
+  draft: "bg-yellow-500/20 text-yellow-400",
+  ready: "bg-blue-500/20 text-blue-400",
+  atomized: "bg-purple-500/20 text-purple-400",
+  published: "bg-green-500/20 text-green-400",
+};
 
 async function getThoughtsWithAtomCounts() {
-  const supabase = createServerClient()
-  if (!supabase) return []
+  const supabase = createServerClient();
+  if (!supabase) return [];
 
   const { data: thoughts, error } = await supabase
-    .from('thoughts')
-    .select('*')
-    .order('updated_at', { ascending: false })
+    .from("thoughts")
+    .select("*")
+    .order("updated_at", { ascending: false });
 
-  if (error || !thoughts) return []
+  if (error || !thoughts) return [];
 
   const { data: atomCounts } = await supabase
-    .from('atoms')
-    .select('content_id')
+    .from("atoms")
+    .select("content_id");
 
-  const countMap = new Map<string, number>()
+  const countMap = new Map<string, number>();
   if (atomCounts) {
     for (const atom of atomCounts) {
-      countMap.set(atom.content_id, (countMap.get(atom.content_id) || 0) + 1)
+      countMap.set(atom.content_id, (countMap.get(atom.content_id) || 0) + 1);
     }
   }
 
   return thoughts.map((t: Thought) => ({
     ...t,
     atom_count: countMap.get(t.id) || 0,
-  }))
+  }));
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function PipelinePage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; series?: string }>
+  searchParams: Promise<{ status?: string; series?: string }>;
 }) {
-  const thoughts = await getThoughtsWithAtomCounts()
-  const params = await searchParams
-  const statusFilter = params.status || 'all'
-  const seriesFilter = params.series || 'all'
+  const thoughts = await getThoughtsWithAtomCounts();
+  const params = await searchParams;
+  const statusFilter = params.status || "all";
+  const seriesFilter = params.series || "all";
 
   const filtered = thoughts.filter((t: Thought & { atom_count: number }) => {
-    if (statusFilter !== 'all' && (t.status || 'draft') !== statusFilter) return false
-    if (seriesFilter !== 'all' && t.series_type !== seriesFilter) return false
-    return true
-  })
+    if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
+      return false;
+    if (seriesFilter !== "all" && t.series_type !== seriesFilter) return false;
+    return true;
+  });
 
-  const statusCounts: Record<string, number> = {}
+  const statusCounts: Record<string, number> = {};
   for (const t of thoughts) {
-    const s = (t as Thought).status || 'draft'
-    statusCounts[s] = (statusCounts[s] || 0) + 1
+    const s = (t as Thought).status || "draft";
+    statusCounts[s] = (statusCounts[s] || 0) + 1;
   }
 
   return (
@@ -91,11 +92,13 @@ export default async function PipelinePage({
         )}
 
         {filtered.map((thought: Thought & { atom_count: number }) => {
-          const status = thought.status || 'draft'
-          const date = new Date(thought.updated_at || thought.created_at).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          })
+          const status = thought.status || "draft";
+          const date = new Date(
+            thought.updated_at || thought.created_at,
+          ).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
 
           return (
             <Link
@@ -109,30 +112,33 @@ export default async function PipelinePage({
                     {thought.title}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}
+                    >
                       {status}
                     </span>
                     {thought.series_type && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${SERIES_COLORS[thought.series_type] || ''}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${SERIES_COLORS[thought.series_type] || ""}`}
+                      >
                         {thought.series_type}
                       </span>
                     )}
                     {thought.atom_count > 0 && (
                       <span className="text-xs text-zinc-500">
-                        {thought.atom_count} atom{thought.atom_count !== 1 ? 's' : ''}
+                        {thought.atom_count} atom
+                        {thought.atom_count !== 1 ? "s" : ""}
                       </span>
                     )}
                     <span className="text-xs text-zinc-600">{date}</span>
                   </div>
                 </div>
-                {status === 'draft' && (
-                  <ApproveButton id={thought.id} />
-                )}
+                {status === "draft" && <ApproveButton id={thought.id} />}
               </div>
             </Link>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

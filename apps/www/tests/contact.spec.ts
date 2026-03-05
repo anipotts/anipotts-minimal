@@ -14,7 +14,9 @@ test("command composer contact flow submits", async ({ page }) => {
   await page.getByRole("button", { name: /collab/i }).click();
   await page
     .getByLabel(/what are you trying to build\?/i)
-    .fill("Need help building a Claude Code workflow with review gates for a production repo.");
+    .fill(
+      "Need help building a Claude Code workflow with review gates for a production repo.",
+    );
 
   await page.getByRole("button", { name: /continue/i }).click();
 

@@ -3,6 +3,7 @@
 Search for accounts and content to engage with authentically.
 
 ## Usage
+
 ```
 /engage [platform]
 ```
@@ -22,18 +23,21 @@ Platform options: twitter, linkedin, instagram, tiktok, reddit, all
 3. For each platform, identify:
 
 ### Accounts to Follow/Engage
+
 - Handle
 - Follower count (prefer 1k-50k - reachable, engaged)
 - What they post about
 - Engagement style (threads, videos, hot takes?)
 
 ### Content to Comment On
+
 - Specific post/thread URL
 - What it's about
 - Suggested genuine comment angle
 - Why this engagement matters
 
 ### Communities to Participate In
+
 - Subreddits
 - Discord servers
 - LinkedIn groups
@@ -44,17 +48,20 @@ Platform options: twitter, linkedin, instagram, tiktok, reddit, all
 ## Updated: {{DATE}}
 
 ### Twitter/X
-| Handle | Followers | Niche | Recent Post to Engage | Comment Angle |
-|--------|-----------|-------|----------------------|---------------|
-| @example | 15k | Claude Code | [link] | Agree and add your experience |
+
+| Handle   | Followers | Niche       | Recent Post to Engage | Comment Angle                 |
+| -------- | --------- | ----------- | --------------------- | ----------------------------- |
+| @example | 15k       | Claude Code | [link]                | Agree and add your experience |
 
 ### Instagram
+
 ...
 
 ### Reddit
-| Subreddit | Members | Activity | Type of Posts That Do Well |
-|-----------|---------|----------|---------------------------|
-| r/ClaudeAI | 50k | High | Tips, comparisons, workflows |
+
+| Subreddit  | Members | Activity | Type of Posts That Do Well   |
+| ---------- | ------- | -------- | ---------------------------- |
+| r/ClaudeAI | 50k     | High     | Tips, comparisons, workflows |
 ```
 
 ## Engagement Philosophy

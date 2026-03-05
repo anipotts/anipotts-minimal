@@ -12,7 +12,14 @@ export const projects: Project[] = [
     category: "product",
     role: "Founder and Engineer",
     duration: "Ongoing",
-    tags: ["Next.js 15", "TypeScript", "Postgres", "AWS Lambda", "Monaco", "Stripe"],
+    tags: [
+      "Next.js 15",
+      "TypeScript",
+      "Postgres",
+      "AWS Lambda",
+      "Monaco",
+      "Stripe",
+    ],
     status: "live",
     featured: true,
     links: {
@@ -63,7 +70,14 @@ export const projects: Project[] = [
     category: "ai",
     role: "Founder",
     duration: "Summer 2025",
-    tags: ["Next.js", "TypeScript", "Convex", "LangGraph", "Stripe", "TailwindCSS"],
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "Convex",
+      "LangGraph",
+      "Stripe",
+      "TailwindCSS",
+    ],
     status: "live",
     links: {
       live: "https://chained.chat",
@@ -90,7 +104,8 @@ export const projects: Project[] = [
   {
     slug: "habittracker-obh",
     title: "Artist Scouting Dashboard",
-    subtitle: "Cross-platform artist growth tracking for an Atlantic Records venture.",
+    subtitle:
+      "Cross-platform artist growth tracking for an Atlantic Records venture.",
     description:
       "Aggregated Chartmetric, YouTube, TikTok, and Instagram signals into a centralized scouting dashboard with geo-based discovery flows.",
     year: "2024",
@@ -118,4 +133,6 @@ export const projects: Project[] = [
   },
 ];
 
-export const liveProjects = projects.filter((project) => Boolean(project.links?.live));
+export const liveProjects = projects.filter((project) =>
+  Boolean(project.links?.live),
+);

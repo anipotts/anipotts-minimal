@@ -47,7 +47,8 @@ export default async function ThoughtsPage({
         </FadeIn>
         <FadeIn delay={0.08}>
           <PageSummary>
-            Short technical essays and operating notes from projects, experiments, and shipping cycles.
+            Short technical essays and operating notes from projects,
+            experiments, and shipping cycles.
           </PageSummary>
         </FadeIn>
       </section>
@@ -59,7 +60,8 @@ export default async function ThoughtsPage({
 
         {query && (
           <p className="text-xs text-muted uppercase tracking-wider font-mono">
-            {thoughts.length} result{thoughts.length !== 1 ? "s" : ""} for &quot;{query}&quot;
+            {thoughts.length} result{thoughts.length !== 1 ? "s" : ""} for
+            &quot;{query}&quot;
           </p>
         )}
 
@@ -70,7 +72,11 @@ export default async function ThoughtsPage({
             </p>
           ) : (
             thoughts.map((thought, index) => (
-              <FadeIn key={thought.slug} delay={0.04 + index * 0.03} className="py-7 first:pt-0 last:pb-0">
+              <FadeIn
+                key={thought.slug}
+                delay={0.04 + index * 0.03}
+                className="py-7 first:pt-0 last:pb-0"
+              >
                 <ThoughtLink thought={thought} />
               </FadeIn>
             ))
