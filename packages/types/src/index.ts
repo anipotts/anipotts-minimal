@@ -40,6 +40,12 @@ export type {
   TypefullySocialSet,
 } from "./typefully";
 
+// API response types
+export type { ApiResult } from "./api";
+
+// Supabase database types
+export type { Database } from "./supabase";
+
 // CMS types
 export type {
   PageContent,
