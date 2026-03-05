@@ -91,3 +91,14 @@ export interface Atom {
 export interface AtomWithContent extends Atom {
   thought?: Thought;
 }
+
+export interface ThoughtSummary {
+  slug: string;
+  title: string;
+  summary: string;
+  created_at: string;
+  views?: number;
+  id?: string;
+  series_type?: SeriesType | null;
+  tags?: string | string[] | null;
+}

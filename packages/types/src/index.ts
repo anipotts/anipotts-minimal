@@ -10,6 +10,7 @@ export type {
 // Thought/blog types
 export type {
   Thought,
+  ThoughtSummary,
   ThoughtStats,
   Atom,
   AtomWithContent,
@@ -20,6 +21,7 @@ export type {
   ArtifactType,
   Platform,
   AtomStatus,
+  Section,
   Subdomain,
 } from "./thought";
 
@@ -38,6 +40,12 @@ export type {
   TypefullyQueueSummary,
   TypefullySocialSet,
 } from "./typefully";
+
+// API response types
+export type { ApiResult } from "./api";
+
+// Supabase database types
+export type { Database } from "./supabase";
 
 // CMS types
 export type {
