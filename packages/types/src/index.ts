@@ -21,6 +21,7 @@ export type {
   ArtifactType,
   Platform,
   AtomStatus,
+  Section,
   Subdomain,
 } from "./thought";
 
