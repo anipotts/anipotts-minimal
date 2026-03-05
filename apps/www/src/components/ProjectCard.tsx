@@ -2,22 +2,6 @@ import Link from "next/link";
 import type { ProjectEntry } from "@/content/projects";
 
 function StatusBadge({ project }: { project: ProjectEntry }) {
-  if (project.publishState === "placeholder") {
-    return (
-      <span className="text-[10px] uppercase tracking-wider text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded font-medium">
-        placeholder
-      </span>
-    );
-  }
-
-  if (project.featured) {
-    return (
-      <span className="text-[10px] uppercase tracking-wider text-accent-400 bg-accent-400/10 border border-accent-400/20 px-1.5 py-0.5 rounded font-medium">
-        featured
-      </span>
-    );
-  }
-
   if (project.status === "in-progress") {
     return (
       <span className="text-[10px] uppercase tracking-wider text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded font-medium">
