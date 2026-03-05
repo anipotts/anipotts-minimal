@@ -20,6 +20,11 @@ import {
 export const metadata: Metadata = {
   title: "connect",
   description: "Get in touch with ani potts",
+  openGraph: {
+    title: "connect | ani potts",
+    description: "Get in touch with ani potts",
+    url: "https://anipotts.com/connect",
+  },
   alternates: {
     canonical: "https://anipotts.com/connect",
   },
