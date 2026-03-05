@@ -33,9 +33,11 @@ export function verifyAdminPassword(
   if (!adminPassword) {
     return { success: false, error: "Admin password not configured on server" };
   }
-  const passwordBuf = Buffer.from(password);
-  const adminBuf = Buffer.from(adminPassword);
-  if (passwordBuf.length === adminBuf.length && crypto.timingSafeEqual(passwordBuf, adminBuf)) {
+  // Hash both values so timingSafeEqual always compares equal-length buffers,
+  // avoiding a timing leak on password length differences.
+  const passwordHash = crypto.createHash("sha256").update(password).digest();
+  const adminHash = crypto.createHash("sha256").update(adminPassword).digest();
+  if (crypto.timingSafeEqual(passwordHash, adminHash)) {
     return { success: true };
   }
   return { success: false, error: "Invalid password" };
