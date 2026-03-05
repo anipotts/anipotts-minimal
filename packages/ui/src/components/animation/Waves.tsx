@@ -424,6 +424,7 @@ export function Waves({
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       style={{
         backgroundColor,
         ...style,

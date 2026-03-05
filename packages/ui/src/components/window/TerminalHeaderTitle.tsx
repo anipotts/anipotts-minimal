@@ -1,5 +1,3 @@
-"use client";
-
 export interface TerminalHeaderTitleProps {
   defaultTitle?: string;
 }
