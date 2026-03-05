@@ -21,3 +21,9 @@ apps/www/playwright-report
 .playwright-cli
 content/templates/
 content/work/
+
+# Override global gitignore to share workspace settings
+!.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
