@@ -3,6 +3,7 @@ import type {
   ProjectRow,
   SocialLinkRow,
   SiteSettingsMap,
+  ThoughtSummary,
 } from "@anipotts/types";
 import { projectRowToProject } from "@anipotts/types";
 import { supabase } from "../supabase";
@@ -87,16 +88,7 @@ export async function fetchProjects(options?: {
 // Thoughts
 // ---------------------------------------------------------------------------
 
-export interface ThoughtSummary {
-  slug: string;
-  title: string;
-  summary: string;
-  created_at: string;
-  views?: number;
-  id?: string;
-  series_type?: string | null;
-  tags?: string | string[] | null;
-}
+export type { ThoughtSummary } from "@anipotts/types";
 
 export async function fetchThoughts(options?: {
   published?: boolean;
