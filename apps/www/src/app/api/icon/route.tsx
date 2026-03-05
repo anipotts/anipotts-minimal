@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { generateIcon } from "@/lib/generateIcon";
 
 export function GET(request: NextRequest) {
