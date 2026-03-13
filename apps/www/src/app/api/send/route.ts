@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { checkRateLimit } from "@/lib/rateLimit";
-import { parseContactPayload } from "@/lib/contactValidation";
+import { parseContactPayload } from "@anipotts/lib";
 
 export async function POST(request: Request) {
   try {
