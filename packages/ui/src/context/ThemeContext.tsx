@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import { THEME_STORAGE_KEY } from "../theme-constants";
@@ -99,10 +100,13 @@ export function ThemeProvider({
     setTheme(CYCLE_ORDER[nextIndex]);
   }, [theme, setTheme]);
 
+  const value = useMemo(
+    () => ({ theme, resolvedTheme, setTheme, cycleTheme }),
+    [theme, resolvedTheme, setTheme, cycleTheme],
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{ theme, resolvedTheme, setTheme, cycleTheme }}
-    >
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
