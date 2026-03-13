@@ -76,6 +76,7 @@ export default async function WorkPage({
                   category === "all" ? "/work" : `/work?category=${category}`
                 }
                 scroll={false}
+                aria-current={activeCategory === category ? "page" : undefined}
                 className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-200 ${
                   activeCategory === category
                     ? "border-accent-400 text-accent-400 bg-accent-400/10"

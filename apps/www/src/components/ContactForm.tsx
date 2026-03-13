@@ -160,13 +160,14 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       className="flex flex-col gap-4 w-full"
       aria-live="polite"
     >
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Message intent">
         {INTENT_OPTIONS.map((option) => {
           const active = intent === option;
           return (
             <button
               key={option}
               type="button"
+              aria-pressed={intent === option}
               className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-colors ${
                 active
                   ? "border-accent-400 bg-accent-400/15 text-accent-400"
@@ -184,6 +185,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
         value={message}
         onChange={(event) => setMessage(event.target.value)}
         placeholder="What do you need? Be specific — objective, timeline, constraints."
+        aria-label="Message"
         className="min-h-32 bg-input border border-border rounded-sm p-3 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono resize-y"
         maxLength={900}
         required
@@ -194,6 +196,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Name"
+          aria-label="Name"
           className="bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
           required
         />
@@ -202,6 +205,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="Email"
+          aria-label="Email"
           className="bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
           required
         />

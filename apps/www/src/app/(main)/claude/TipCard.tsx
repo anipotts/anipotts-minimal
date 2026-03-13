@@ -38,7 +38,6 @@ export function TipCard({
 
   return (
     <div
-      role="button"
       tabIndex={0}
       aria-expanded={isOpen}
       onClick={() => setIsOpen((o) => !o)}
