@@ -50,7 +50,9 @@ export function SessionTable({ sessions, timezone }: SessionTableProps) {
       if (sortKey === "start") {
         const leftDate = new Date(left).getTime();
         const rightDate = new Date(right).getTime();
-        return direction === "asc" ? leftDate - rightDate : rightDate - leftDate;
+        return direction === "asc"
+          ? leftDate - rightDate
+          : rightDate - leftDate;
       }
 
       if (typeof left === "number" && typeof right === "number") {
@@ -71,6 +73,11 @@ export function SessionTable({ sessions, timezone }: SessionTableProps) {
     }
     setSortKey(key);
     setDirection(key === "project" ? "asc" : "desc");
+  };
+
+  const ariaSort = (key: SortKey): "ascending" | "descending" | "none" => {
+    if (sortKey !== key) return "none";
+    return direction === "asc" ? "ascending" : "descending";
   };
 
   const headerButton = (label: string, key: SortKey) => (
@@ -96,11 +103,21 @@ export function SessionTable({ sessions, timezone }: SessionTableProps) {
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="text-left border-b border-border-subtle">
-            <th className="pb-3 pr-4">{headerButton("date", "start")}</th>
-            <th className="pb-3 pr-4">{headerButton("duration", "durationMinutes")}</th>
-            <th className="pb-3 pr-4">{headerButton("tool calls", "toolCalls")}</th>
-            <th className="pb-3 pr-4">{headerButton("files", "filesMutated")}</th>
-            <th className="pb-3">{headerButton("project", "project")}</th>
+            <th className="pb-3 pr-4" aria-sort={ariaSort("start")}>
+              {headerButton("date", "start")}
+            </th>
+            <th className="pb-3 pr-4" aria-sort={ariaSort("durationMinutes")}>
+              {headerButton("duration", "durationMinutes")}
+            </th>
+            <th className="pb-3 pr-4" aria-sort={ariaSort("toolCalls")}>
+              {headerButton("tool calls", "toolCalls")}
+            </th>
+            <th className="pb-3 pr-4" aria-sort={ariaSort("filesMutated")}>
+              {headerButton("files", "filesMutated")}
+            </th>
+            <th className="pb-3" aria-sort={ariaSort("project")}>
+              {headerButton("project", "project")}
+            </th>
           </tr>
         </thead>
         <tbody>
