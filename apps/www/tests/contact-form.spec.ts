@@ -6,22 +6,17 @@ test.describe("contact form on /connect", () => {
     await expect(page.getByRole("button", { name: /collab/i })).toBeVisible();
   });
 
-  test("shows message field after selecting intent", async ({ page }) => {
+  test("shows all form fields on page load", async ({ page }) => {
     await page.goto("/connect");
-    await page.getByRole("button", { name: /collab/i }).click();
-    await expect(
-      page.getByLabel(/what are you trying to build/i),
-    ).toBeVisible();
+    await expect(page.getByLabel("Message", { exact: true })).toBeVisible();
+    await expect(page.getByLabel(/^name$/i)).toBeVisible();
+    await expect(page.getByLabel(/^email$/i)).toBeVisible();
   });
 
-  test("shows name and email fields on continue", async ({ page }) => {
+  test("selecting intent highlights the button", async ({ page }) => {
     await page.goto("/connect");
-    await page.getByRole("button", { name: /collab/i }).click();
-    await page
-      .getByLabel(/what are you trying to build/i)
-      .fill("Test message for form validation");
-    await page.getByRole("button", { name: /continue/i }).click();
-    await expect(page.getByLabel(/your name/i)).toBeVisible();
-    await expect(page.getByLabel(/your email/i)).toBeVisible();
+    const collabBtn = page.getByRole("button", { name: /collab/i });
+    await collabBtn.click();
+    await expect(collabBtn).toHaveAttribute("aria-pressed", "true");
   });
 });
