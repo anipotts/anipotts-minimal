@@ -1,10 +1,12 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { approveContent } from "./actions";
 
 export default function ApproveButton({ id }: { id: string }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   return (
     <button
@@ -13,7 +15,7 @@ export default function ApproveButton({ id }: { id: string }) {
         e.stopPropagation();
         startTransition(async () => {
           await approveContent(id);
-          window.location.reload();
+          router.refresh();
         });
       }}
       disabled={isPending}
