@@ -37,7 +37,4 @@ export {
   createHoverPrefetch,
   isPrefetched,
   clearPrefetchCache,
-  navigateToSection,
-  navigateSameOrigin,
-  supportsViewTransitions,
 } from "./utils";

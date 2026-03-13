@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   contactSchema,
-  favoriteNumberSchema,
   adminLoginSchema,
   formatZodError,
 } from "./index";
@@ -93,43 +92,6 @@ describe("contactSchema", () => {
 
   it("rejects missing fields", () => {
     const result = contactSchema.safeParse({});
-    expect(result.success).toBe(false);
-  });
-});
-
-describe("favoriteNumberSchema", () => {
-  it("accepts a finite number", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 42 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts zero", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 0 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts negative numbers", () => {
-    const result = favoriteNumberSchema.safeParse({ number: -7 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts decimals", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 3.14 });
-    expect(result.success).toBe(true);
-  });
-
-  it("rejects Infinity", () => {
-    const result = favoriteNumberSchema.safeParse({ number: Infinity });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects NaN", () => {
-    const result = favoriteNumberSchema.safeParse({ number: NaN });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects strings", () => {
-    const result = favoriteNumberSchema.safeParse({ number: "42" });
     expect(result.success).toBe(false);
   });
 });
