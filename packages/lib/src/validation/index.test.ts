@@ -3,6 +3,7 @@ import {
   contactSchema,
   adminLoginSchema,
   formatZodError,
+  parseContactPayload,
 } from "./index";
 import { z } from "zod";
 
@@ -149,6 +150,75 @@ describe("adminLoginSchema", () => {
       totp: "1234567",
     });
     expect(result2.success).toBe(false);
+  });
+});
+
+describe("parseContactPayload", () => {
+  it("returns success with valid data", () => {
+    const result = parseContactPayload({
+      name: "Ani",
+      email: "ani@example.com",
+      message: "Hello there",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.name).toBe("Ani");
+      expect(result.data.email).toBe("ani@example.com");
+      expect(result.data.message).toBe("Hello there");
+    }
+  });
+
+  it("returns success with captchaToken", () => {
+    const result = parseContactPayload({
+      name: "Ani",
+      email: "ani@example.com",
+      message: "Hello",
+      captchaToken: "tok_abc",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.captchaToken).toBe("tok_abc");
+    }
+  });
+
+  it("trims whitespace from name and message", () => {
+    const result = parseContactPayload({
+      name: "  Ani  ",
+      email: "ani@example.com",
+      message: "  Hello  ",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.name).toBe("Ani");
+      expect(result.data.message).toBe("Hello");
+    }
+  });
+
+  it("returns failure with field errors for invalid data", () => {
+    const result = parseContactPayload({
+      name: "",
+      email: "bad",
+      message: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.error).toBe("Invalid input");
+      expect(result.error.fields).toBeDefined();
+      expect(Object.keys(result.error.fields).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns failure for non-object input", () => {
+    const result = parseContactPayload("not an object");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.error).toBe("Invalid input");
+    }
+  });
+
+  it("returns failure for null input", () => {
+    const result = parseContactPayload(null);
+    expect(result.success).toBe(false);
   });
 });
 

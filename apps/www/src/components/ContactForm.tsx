@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SpinnerGap } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
+import { contactSchema } from "@anipotts/lib";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -38,6 +39,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!initialIntent) return;
@@ -54,8 +56,8 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
   const canSubmit =
     intent &&
     message.trim().length >= 10 &&
-    name.trim().length > 1 &&
-    email.trim().length > 3;
+    name.trim().length > 0 &&
+    email.trim().length > 0;
 
   const resetTurnstile = () => {
     if (!turnstileSiteKey) return;
@@ -111,6 +113,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
     setStatus("loading");
     setErrorMessage("");
+    setFieldErrors({});
 
     try {
       if (captchaRequired && !captchaToken) {
@@ -120,6 +123,26 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       }
 
       const body = `[${intent}]\n${message.trim()}`;
+
+      const validation = contactSchema.safeParse({
+        name: name.trim(),
+        email: email.trim(),
+        message: body,
+        captchaToken: captchaToken || undefined,
+      });
+      if (!validation.success) {
+        const errors: Record<string, string> = {};
+        for (const issue of validation.error.issues) {
+          const key = issue.path[0];
+          if (key && !errors[String(key)]) {
+            errors[String(key)] = issue.message;
+          }
+        }
+        setFieldErrors(errors);
+        setStatus("error");
+        setErrorMessage("Please fix the highlighted fields.");
+        return;
+      }
 
       const response = await fetch("/api/send", {
         method: "POST",

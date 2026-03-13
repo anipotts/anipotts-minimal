@@ -31,7 +31,9 @@ export {
   contactSchema,
   adminLoginSchema,
   formatZodError,
+  parseContactPayload,
 } from "./validation";
+export type { ContactPayload } from "./validation";
 
 // Logger
 export { logger } from "./logger";
