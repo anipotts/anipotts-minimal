@@ -6,6 +6,11 @@ import { parseContactPayload } from "@/lib/contactValidation";
 
 export async function POST(request: Request) {
   try {
+    const origin = request.headers.get("origin");
+    if (origin && !origin.endsWith("anipotts.com") && origin !== "http://localhost:3000") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
         { error: "Email service not configured" },
@@ -50,7 +55,7 @@ export async function POST(request: Request) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: "Contact Form <onboarding@resend.dev>",
       to: ["contact@anipotts.com"],
       subject: `New Message from ${name}`,
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Send API error:", error);
     return NextResponse.json(
