@@ -1,16 +1,9 @@
 import { createServerClient } from "@anipotts/lib";
-import type { Thought, ContentStatus, SeriesType } from "@anipotts/types";
+import type { Thought } from "@anipotts/types";
 import Link from "next/link";
 import PipelineFilters from "./pipeline-filters";
 import ApproveButton from "./approve-button";
-
-const SERIES_COLORS: Record<SeriesType, string> = {
-  "agent-tip": "bg-blue-500/20 text-blue-400",
-  "build-log": "bg-green-500/20 text-green-400",
-  "stack-drop": "bg-purple-500/20 text-purple-400",
-  "founders-log": "bg-amber-500/20 text-amber-400",
-  "viral-reel": "bg-pink-500/20 text-pink-400",
-};
+import { SERIES_COLORS } from "@/lib/constants";
 
 const STATUS_COLORS: Record<string, string> = {
   idea: "bg-zinc-700 text-zinc-300",
@@ -31,9 +24,11 @@ async function getThoughtsWithAtomCounts() {
 
   if (error || !thoughts) return [];
 
+  const thoughtIds = thoughts.map((t: Thought) => t.id);
   const { data: atomCounts } = await supabase
     .from("atoms")
-    .select("content_id");
+    .select("content_id")
+    .in("content_id", thoughtIds);
 
   const countMap = new Map<string, number>();
   if (atomCounts) {
