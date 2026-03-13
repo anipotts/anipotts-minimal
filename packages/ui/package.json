@@ -37,7 +37,10 @@
       "types": "./dist/providers/index.d.ts",
       "import": "./dist/providers/index.js"
     },
-    "./server": "./src/server/index.ts"
+    "./server": {
+      "types": "./src/server/index.ts",
+      "import": "./src/server/index.ts"
+    }
   },
   "scripts": {
     "build": "tsup",

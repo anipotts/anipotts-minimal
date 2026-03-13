@@ -11,6 +11,8 @@ import {
 } from "@anipotts/lib/admin";
 import { createServerClient } from "@anipotts/lib";
 import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
+import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
+import { headers } from "next/headers";
 import type { SeriesType, ContentStatus } from "@anipotts/types";
 
 const UUID_RE =
@@ -34,6 +36,16 @@ async function requireAuth(): Promise<{ error: string } | null> {
 }
 
 export async function login(formData: FormData) {
+  const hdrs = await headers();
+  const ip =
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    hdrs.get("x-real-ip") ||
+    "unknown";
+  const rateLimit = await checkAdminLoginRateLimit(ip);
+  if (!rateLimit.success) {
+    return { error: "Too many login attempts. Try again later." };
+  }
+
   const raw = {
     password: formData.get("password") as string,
     totp: (formData.get("totp") as string) || "",
@@ -61,7 +73,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  const secret = process.env.ADMIN_PASSWORD!;
+  const secret = process.env.ADMIN_PASSWORD ?? "";
   const token = createSessionToken(secret);
   const jar = await cookies();
   jar.set(ADMIN_COOKIE, token, ADMIN_COOKIE_OPTIONS);
@@ -135,7 +147,7 @@ export async function createThought(formData: FormData) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-  const slug = `${base}-${Date.now().toString(36).slice(-4)}`;
+  const slug = `${base}-${Date.now().toString(36)}`;
 
   const { data, error } = await supabase
     .from("thoughts")

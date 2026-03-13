@@ -27,12 +27,12 @@ export function getSectionPath(pathname: string): string {
     return pathname;
   }
 
-  const subPath = pathname.slice(basePath.length);
+  const subPath = basePath ? pathname.slice(basePath.length) : pathname;
   return subPath || "/";
 }
 
 export function getInternalPath(section: string, path: string = "/"): string {
-  const basePath = SECTION_TO_ROUTE[section];
+  const basePath: string | undefined = SECTION_TO_ROUTE[section];
 
   if (!basePath) {
     console.warn(`Unknown section: ${section}`);

@@ -19,6 +19,8 @@ const eslintConfig = defineConfig([
         "error",
         { prefer: "type-imports" },
       ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-non-null-assertion": "warn",
     },
   },
   {

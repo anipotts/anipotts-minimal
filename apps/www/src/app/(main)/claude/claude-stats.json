@@ -1,0 +1,533 @@
+{
+  "generatedAt": "2026-03-12T22:17:15.557Z",
+  "timezone": "America/New_York",
+  "totals": {
+    "sessions": 6403,
+    "toolCalls": 144098,
+    "filesMutated": 2936,
+    "humanMinutesSaved": 208639,
+    "streakDays": 19
+  },
+  "tools": {
+    "ToolSearch": 818,
+    "Bash": 31076,
+    "TaskUpdate": 4002,
+    "SendMessage": 800,
+    "TaskList": 391,
+    "Agent": 1038,
+    "Write": 3370,
+    "Read": 53718,
+    "AskUserQuestion": 277,
+    "WebSearch": 4593,
+    "WebFetch": 3662,
+    "TeamCreate": 23,
+    "TaskCreate": 2129,
+    "Edit": 13187,
+    "ExitPlanMode": 447,
+    "Grep": 11887,
+    "Glob": 8568,
+    "Task": 1293,
+    "mcp__posthog__organization-details-get": 1,
+    "mcp__posthog__event-definitions-list": 1,
+    "TaskOutput": 283,
+    "EnterPlanMode": 26,
+    "TaskGet": 192,
+    "TaskStop": 17,
+    "Skill": 43,
+    "TodoWrite": 709,
+    "mcp__claude_ai_Vercel__list_teams": 2,
+    "mcp__claude_ai_Vercel__list_projects": 2,
+    "bash": 7,
+    "mcp__supabase-pgi__apply_migration": 2,
+    "mcp__supabase-pgi__execute_sql": 47,
+    "TeamDelete": 31,
+    "mcp__supabase-pgi__list_tables": 5,
+    "mcp__claude_ai_Supabase__get_project": 1,
+    "mcp__claude_ai_Supabase__get_project_url": 2,
+    "mcp__imessage__temporal_heatmap": 10,
+    "mcp__imessage__message_stats": 5,
+    "mcp__imessage__get_reactions": 8,
+    "mcp__imessage__list_contacts": 2,
+    "mcp__imessage__search_messages": 8,
+    "mcp__imessage__double_texts": 5,
+    "mcp__imessage__yearly_wrapped": 5,
+    "mcp__imessage__list_group_chats": 1,
+    "mcp__claude_ai_Supabase__list_projects": 8,
+    "mcp__claude_ai_Supabase__list_migrations": 2,
+    "mcp__claude_ai_Vercel__get_project": 1,
+    "mcp__plugin_playwright_playwright__browser_navigate": 58,
+    "mcp__plugin_playwright_playwright__browser_console_messages": 4,
+    "mcp__plugin_playwright_playwright__browser_run_code": 75,
+    "mcp__claude_ai_Vercel__list_deployments": 6,
+    "mcp__ide__getDiagnostics": 50,
+    "mcp__plugin_playwright_playwright__browser_click": 77,
+    "mcp__plugin_playwright_playwright__browser_take_screenshot": 16,
+    "mcp__plugin_playwright_playwright__browser_evaluate": 61,
+    "mcp__plugin_playwright_playwright__browser_snapshot": 17,
+    "mcp__plugin_playwright_playwright__browser_wait_for": 20,
+    "mcp__plugin_context7_context7__resolve-library-id": 1,
+    "mcp__plugin_context7_context7__query-docs": 2,
+    "mcp__rudy__message_stats": 5,
+    "mcp__rudy__temporal_heatmap": 4,
+    "mcp__rudy__get_profile_section": 13,
+    "mcp__rudy__get_relationship_intel": 1,
+    "mcp__rudy__list_contacts": 2,
+    "mcp__rudy__search_messages": 51,
+    "mcp__rudy__get_conversation": 4,
+    "mcp__rudy__help": 2,
+    "mcp__plugin_playwright_playwright__browser_fill_form": 18,
+    "mcp__plugin_playwright_playwright__browser_close": 5,
+    "mcp__gws__sheets_spreadsheets_create": 1,
+    "mcp__gws__sheets_spreadsheets_values_batchUpdate": 7,
+    "mcp__gws__sheets_spreadsheets_batchUpdate": 20,
+    "mcp__gws__drive_files_create": 74,
+    "mcp__claude_ai_Slack__slack_send_message": 5,
+    "mcp__gws__gmail_users_labels_list": 7,
+    "mcp__gws__gmail_users_labels_create": 43,
+    "mcp__gws__gmail_users_settings_filters_create": 8,
+    "mcp__gws__gmail_users_messages_list": 35,
+    "mcp__gws__gmail_users_threads_get": 9,
+    "mcp__gws__gmail_users_messages_get": 244,
+    "mcp__gws__drive_files_export": 5,
+    "mcp__obs__obs-get-scene-list": 1,
+    "mcp__obs__obs-get-scene-items": 1,
+    "mcp__obs__obs-get-record-status": 2,
+    "mcp__obs__obs-get-record-directory": 1,
+    "mcp__obs__obs-start-record": 1,
+    "mcp__obs__obs-stop-record": 1,
+    "mcp__claude_ai_Slack__slack_search_channels": 27,
+    "mcp__claude_ai_Typefully__typefully_list_social_sets": 3,
+    "mcp__gws__drive_files_list": 32,
+    "mcp__claude_ai_Gmail__gmail_list_labels": 2,
+    "mcp__claude_ai_Gmail__gmail_get_profile": 2,
+    "mcp__gws__sheets_spreadsheets_values_update": 16,
+    "mcp__gws__sheets_spreadsheets_values_get": 30,
+    "mcp__gws__sheets_spreadsheets_get": 4,
+    "mcp__gws__sheets_spreadsheets_values_clear": 2,
+    "mcp__claude_ai_Supabase__restore_project": 1,
+    "mcp__claude_ai_Supabase__list_organizations": 2,
+    "mcp__claude_ai_Supabase__get_cost": 1,
+    "mcp__claude_ai_Supabase__confirm_cost": 1,
+    "mcp__claude_ai_Supabase__create_project": 1,
+    "mcp__claude_ai_Supabase__apply_migration": 10,
+    "mcp__claude_ai_Supabase__get_publishable_keys": 1,
+    "mcp__claude_ai_Supabase__execute_sql": 153,
+    "mcp__claude_ai_Slack__slack_read_user_profile": 1,
+    "mcp__claude_ai_Slack__slack_read_channel": 1,
+    "mcp__claude_ai_Vercel__get_deployment_build_logs": 4,
+    "mcp__gws__calendar_calendarList_list": 7,
+    "mcp__gws__calendar_calendars_insert": 4,
+    "mcp__gws__calendar_calendarList_update": 4,
+    "mcp__gws__calendar_events_insert": 7,
+    "mcp__claude_ai_Gmail__gmail_search_messages": 3,
+    "mcp__claude_ai_Gmail__gmail_read_message": 10,
+    "mcp__gws__gmail_users_getProfile": 5,
+    "mcp__gws__gmail_users_settings_filters_list": 4,
+    "mcp__gws__drive_about_get": 4,
+    "mcp__gws__drive_files_update": 7,
+    "mcp__gws__drive_files_delete": 7,
+    "mcp__gws__gmail_users_messages_batchModify": 4,
+    "mcp__plugin_playwright_playwright__browser_resize": 1,
+    "mcp__plugin_playwright_playwright__browser_file_upload": 1,
+    "mcp__gws__gmail_users_labels_delete": 5,
+    "mcp__gws__gmail_users_settings_sendAs_list": 1,
+    "mcp__gws__gmail_users_drafts_list": 1,
+    "mcp__gws__calendar_events_list": 1,
+    "mcp__gws__gmail_users_settings_sendAs_get": 1,
+    "mcp__gws__gmail_users_settings_sendAs_update": 1,
+    "mcp__gws__gmail_users_drafts_create": 5,
+    "mcp__gws__gmail_users_drafts_delete": 1,
+    "EnterWorktree": 10,
+    "LSP": 1,
+    "TaskList\" />": 2,
+    "ListMcpResourcesTool": 1,
+    "mcp__plugin_greptile_greptile__list_custom_context": 3,
+    "mcp__plugin_greptile_greptile__list_pull_requests": 1,
+    "mcp__plugin_greptile_greptile__trigger_code_review": 1,
+    "mcp__gemini-video-understanding__analyze_design_video": 1,
+    "mcp__gemini-video-understanding__analyze_bug_video": 2,
+    "mcp__supabase-pgi__get_project_url": 1,
+    "mcp__claude_ai_Typefully__typefully_get_social_set_details": 1,
+    "mcp__rudy__conversation_vibe": 1,
+    "mcp__claude_ai_Typefully__typefully_list_drafts": 2,
+    "mcp__claude_ai_Typefully__typefully_delete_draft": 12,
+    "mcp__claude_ai_Typefully__typefully_create_draft": 12,
+    "mcp__claude_ai_Typefully__typefully_get_draft": 1,
+    "mcp__claude_ai_Typefully__typefully_edit_draft": 3,
+    "mcp__claude_ai_Typefully__typefully_get_queue_schedule": 1,
+    "mcp__ide__executeCode": 1,
+    "mcp__plugin_playwright_playwright__browser_install": 1
+  },
+  "daily": [
+    {
+      "date": "2026-02-11",
+      "toolCalls": 3454,
+      "filesMutated": 197
+    },
+    {
+      "date": "2026-02-12",
+      "toolCalls": 4806,
+      "filesMutated": 238
+    },
+    {
+      "date": "2026-02-13",
+      "toolCalls": 4137,
+      "filesMutated": 172
+    },
+    {
+      "date": "2026-02-14",
+      "toolCalls": 4786,
+      "filesMutated": 300
+    },
+    {
+      "date": "2026-02-15",
+      "toolCalls": 5091,
+      "filesMutated": 215
+    },
+    {
+      "date": "2026-02-16",
+      "toolCalls": 3599,
+      "filesMutated": 169
+    },
+    {
+      "date": "2026-02-17",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-18",
+      "toolCalls": 2050,
+      "filesMutated": 72
+    },
+    {
+      "date": "2026-02-19",
+      "toolCalls": 3783,
+      "filesMutated": 135
+    },
+    {
+      "date": "2026-02-20",
+      "toolCalls": 1488,
+      "filesMutated": 13
+    },
+    {
+      "date": "2026-02-21",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-22",
+      "toolCalls": 4807,
+      "filesMutated": 231
+    },
+    {
+      "date": "2026-02-23",
+      "toolCalls": 5047,
+      "filesMutated": 309
+    },
+    {
+      "date": "2026-02-24",
+      "toolCalls": 4661,
+      "filesMutated": 243
+    },
+    {
+      "date": "2026-02-25",
+      "toolCalls": 4477,
+      "filesMutated": 256
+    },
+    {
+      "date": "2026-02-26",
+      "toolCalls": 965,
+      "filesMutated": 48
+    },
+    {
+      "date": "2026-02-27",
+      "toolCalls": 2512,
+      "filesMutated": 113
+    },
+    {
+      "date": "2026-02-28",
+      "toolCalls": 2275,
+      "filesMutated": 123
+    },
+    {
+      "date": "2026-03-01",
+      "toolCalls": 3168,
+      "filesMutated": 131
+    },
+    {
+      "date": "2026-03-02",
+      "toolCalls": 3741,
+      "filesMutated": 83
+    },
+    {
+      "date": "2026-03-03",
+      "toolCalls": 916,
+      "filesMutated": 45
+    },
+    {
+      "date": "2026-03-04",
+      "toolCalls": 179,
+      "filesMutated": 18
+    },
+    {
+      "date": "2026-03-05",
+      "toolCalls": 4388,
+      "filesMutated": 172
+    },
+    {
+      "date": "2026-03-06",
+      "toolCalls": 6076,
+      "filesMutated": 136
+    },
+    {
+      "date": "2026-03-07",
+      "toolCalls": 660,
+      "filesMutated": 31
+    },
+    {
+      "date": "2026-03-08",
+      "toolCalls": 6087,
+      "filesMutated": 376
+    },
+    {
+      "date": "2026-03-09",
+      "toolCalls": 5929,
+      "filesMutated": 166
+    },
+    {
+      "date": "2026-03-10",
+      "toolCalls": 7964,
+      "filesMutated": 174
+    },
+    {
+      "date": "2026-03-11",
+      "toolCalls": 7127,
+      "filesMutated": 396
+    },
+    {
+      "date": "2026-03-12",
+      "toolCalls": 1096,
+      "filesMutated": 31
+    }
+  ],
+  "sessions": [
+    {
+      "id": "agent-a8b0fd9073c078318",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:44:53.937Z",
+      "end": "2026-03-12T21:44:59.599Z",
+      "durationMinutes": 0.1,
+      "toolCalls": 4,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-a094f9ae57e9a82a5",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:26.051Z",
+      "end": "2026-03-12T21:43:45.199Z",
+      "durationMinutes": 1.3,
+      "toolCalls": 29,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-39dbd23aced61013",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:26.051Z",
+      "end": "2026-03-12T21:43:37.258Z",
+      "durationMinutes": 1.2,
+      "toolCalls": 29,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-ae52c44034aedf2f5",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:21.499Z",
+      "end": "2026-03-12T21:43:25.656Z",
+      "durationMinutes": 1.1,
+      "toolCalls": 18,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-fcd2814dc8ef5c27",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:17.357Z",
+      "end": "2026-03-12T21:43:32.369Z",
+      "durationMinutes": 1.3,
+      "toolCalls": 32,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-af6f9847f79675805",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:17.357Z",
+      "end": "2026-03-12T21:43:38.799Z",
+      "durationMinutes": 1.4,
+      "toolCalls": 32,
+      "filesMutated": 0
+    },
+    {
+      "id": "8310782a-778f-4036-8276-24a11095e3d1",
+      "project": "anipotts.com",
+      "start": "2026-03-12T21:42:01.093Z",
+      "end": "2026-03-12T22:03:53.965Z",
+      "durationMinutes": 21.9,
+      "toolCalls": 28,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-a0c10fe4ef0796908",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:39:33.412Z",
+      "end": "2026-03-12T21:41:43.215Z",
+      "durationMinutes": 2.2,
+      "toolCalls": 31,
+      "filesMutated": 2
+    },
+    {
+      "id": "agent-a3526f5ee1878ef08",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:39:12.987Z",
+      "end": "2026-03-12T21:45:03.782Z",
+      "durationMinutes": 5.8,
+      "toolCalls": 39,
+      "filesMutated": 2
+    },
+    {
+      "id": "agent-a19b2ebaecd9264c8",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:28:37.483Z",
+      "end": "2026-03-12T21:31:41.902Z",
+      "durationMinutes": 3.1,
+      "toolCalls": 21,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-a1f72f1089c0ea592",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:28:27.802Z",
+      "end": "2026-03-12T21:32:34.351Z",
+      "durationMinutes": 4.1,
+      "toolCalls": 33,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-ac70675913380adbf",
+      "project": "fullstack",
+      "start": "2026-03-12T21:27:19.491Z",
+      "end": "2026-03-12T21:28:15.338Z",
+      "durationMinutes": 0.9,
+      "toolCalls": 11,
+      "filesMutated": 2
+    },
+    {
+      "id": "agent-aside_question-31e1cc8ee2b345ed",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:25:13.441Z",
+      "end": "2026-03-12T21:40:20.078Z",
+      "durationMinutes": 15.1,
+      "toolCalls": 11,
+      "filesMutated": 1
+    },
+    {
+      "id": "a1dfe483-8fd0-45c1-b713-ab045904f07b",
+      "project": "claude-code-tips",
+      "start": "2026-03-12T21:25:13.441Z",
+      "end": "2026-03-12T22:04:25.857Z",
+      "durationMinutes": 39.2,
+      "toolCalls": 28,
+      "filesMutated": 2
+    },
+    {
+      "id": "agent-acompact-fc9d0e08664856b1",
+      "project": "fullstack",
+      "start": "2026-03-12T21:24:13.745Z",
+      "end": "2026-03-12T21:39:55.859Z",
+      "durationMinutes": 15.7,
+      "toolCalls": 135,
+      "filesMutated": 9
+    },
+    {
+      "id": "1aaef149-2297-4606-8842-b9eb1d691d0b",
+      "project": "fullstack",
+      "start": "2026-03-12T21:24:13.745Z",
+      "end": "2026-03-12T21:55:48.376Z",
+      "durationMinutes": 31.6,
+      "toolCalls": 147,
+      "filesMutated": 9
+    },
+    {
+      "id": "agent-a1d7d53c802e447c6",
+      "project": "Content",
+      "start": "2026-03-12T21:23:52.675Z",
+      "end": "2026-03-12T21:23:53.495Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "id": "809df00e-e83e-4439-8327-a04c66b2b553",
+      "project": "Content",
+      "start": "2026-03-12T21:19:48.814Z",
+      "end": "2026-03-12T21:25:01.271Z",
+      "durationMinutes": 5.2,
+      "toolCalls": 24,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-af998a922956855bb",
+      "project": "fullstack",
+      "start": "2026-03-12T20:52:04.206Z",
+      "end": "2026-03-12T20:56:13.920Z",
+      "durationMinutes": 4.2,
+      "toolCalls": 45,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-29dfdd15dc6236c6",
+      "project": "fullstack",
+      "start": "2026-03-12T20:50:02.524Z",
+      "end": "2026-03-12T20:51:00.185Z",
+      "durationMinutes": 1,
+      "toolCalls": 2,
+      "filesMutated": 0
+    }
+  ],
+  "records": {
+    "fastestCommitCadence": {
+      "commitsPerHour": 28,
+      "repo": "fullstack",
+      "windowStart": "2026-02-17T18:00:00.000Z"
+    },
+    "mostFilesChanged": {
+      "files": 60,
+      "sessionId": "db401192-4318-4c5e-a296-c657d9b750a8",
+      "startedAt": "2026-03-08T18:15:29.777Z",
+      "project": "claude-code-tips"
+    },
+    "longestSession": {
+      "durationMinutes": 33143.8,
+      "sessionId": "5f33f796-5f25-4284-8f2b-6a4fa2700968",
+      "startedAt": "2026-02-01T18:35:06.864Z",
+      "project": "distribution"
+    },
+    "mostToolCalls": {
+      "toolCalls": 6500,
+      "sessionId": "4e2ba21d-a7bd-4e18-8cd0-47f3e0c502f7",
+      "startedAt": "2026-02-11T04:12:24.792Z",
+      "project": "chalk"
+    }
+  },
+  "live": {
+    "isCodingNow": false,
+    "lastModifiedAt": "2026-03-12T22:10:19.676Z"
+  },
+  "meta": {
+    "projectCount": 29,
+    "sinceDays": 180,
+    "sourceSessions": 6403,
+    "sourceFiles": 6446
+  },
+  "labels": {
+    "generatedAtLocal": "Mar 12, 2026, 06:17 PM"
+  }
+}

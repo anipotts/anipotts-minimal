@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   contactSchema,
-  favoriteNumberSchema,
   adminLoginSchema,
   formatZodError,
+  parseContactPayload,
 } from "./index";
 import { z } from "zod";
 
@@ -97,43 +97,6 @@ describe("contactSchema", () => {
   });
 });
 
-describe("favoriteNumberSchema", () => {
-  it("accepts a finite number", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 42 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts zero", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 0 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts negative numbers", () => {
-    const result = favoriteNumberSchema.safeParse({ number: -7 });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts decimals", () => {
-    const result = favoriteNumberSchema.safeParse({ number: 3.14 });
-    expect(result.success).toBe(true);
-  });
-
-  it("rejects Infinity", () => {
-    const result = favoriteNumberSchema.safeParse({ number: Infinity });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects NaN", () => {
-    const result = favoriteNumberSchema.safeParse({ number: NaN });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects strings", () => {
-    const result = favoriteNumberSchema.safeParse({ number: "42" });
-    expect(result.success).toBe(false);
-  });
-});
-
 describe("adminLoginSchema", () => {
   it("accepts valid password with 6-digit TOTP", () => {
     const result = adminLoginSchema.safeParse({
@@ -187,6 +150,75 @@ describe("adminLoginSchema", () => {
       totp: "1234567",
     });
     expect(result2.success).toBe(false);
+  });
+});
+
+describe("parseContactPayload", () => {
+  it("returns success with valid data", () => {
+    const result = parseContactPayload({
+      name: "Ani",
+      email: "ani@example.com",
+      message: "Hello there",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.name).toBe("Ani");
+      expect(result.data.email).toBe("ani@example.com");
+      expect(result.data.message).toBe("Hello there");
+    }
+  });
+
+  it("returns success with captchaToken", () => {
+    const result = parseContactPayload({
+      name: "Ani",
+      email: "ani@example.com",
+      message: "Hello",
+      captchaToken: "tok_abc",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.captchaToken).toBe("tok_abc");
+    }
+  });
+
+  it("trims whitespace from name and message", () => {
+    const result = parseContactPayload({
+      name: "  Ani  ",
+      email: "ani@example.com",
+      message: "  Hello  ",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.name).toBe("Ani");
+      expect(result.data.message).toBe("Hello");
+    }
+  });
+
+  it("returns failure with field errors for invalid data", () => {
+    const result = parseContactPayload({
+      name: "",
+      email: "bad",
+      message: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.error).toBe("Invalid input");
+      expect(result.error.fields).toBeDefined();
+      expect(Object.keys(result.error.fields).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns failure for non-object input", () => {
+    const result = parseContactPayload("not an object");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.error).toBe("Invalid input");
+    }
+  });
+
+  it("returns failure for null input", () => {
+    const result = parseContactPayload(null);
+    expect(result.success).toBe(false);
   });
 });
 

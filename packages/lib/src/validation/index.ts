@@ -7,10 +7,6 @@ export const contactSchema = z.object({
   captchaToken: z.string().optional(),
 });
 
-export const favoriteNumberSchema = z.object({
-  number: z.number().finite(),
-});
-
 export const adminLoginSchema = z.object({
   password: z.string().min(1).max(200),
   totp: z
@@ -27,5 +23,19 @@ export function formatZodError(error: z.ZodError) {
       fields[key] = issue.message;
     }
   }
-  return { error: "Invalid input", fields };
+  return { error: "Invalid input" as const, fields };
+}
+
+export type ContactPayload = z.infer<typeof contactSchema>;
+
+type ParseContactResult =
+  | { success: true; data: ContactPayload }
+  | { success: false; error: { error: string; fields: Record<string, string> } };
+
+export function parseContactPayload(input: unknown): ParseContactResult {
+  const result = contactSchema.safeParse(input);
+  if (!result.success) {
+    return { success: false, error: formatZodError(result.error) };
+  }
+  return { success: true, data: result.data };
 }

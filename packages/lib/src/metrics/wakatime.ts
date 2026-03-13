@@ -79,7 +79,7 @@ export async function fetchWakaTimeStats(
     topLanguages.push({
       name: "Other",
       percentage: Math.round(otherPercent * 10) / 10,
-      color: LANGUAGE_COLORS["Other"],
+      color: LANGUAGE_COLORS["Other"] ?? "#6b7280",
     });
   }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SpinnerGap } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
+import { contactSchema } from "@anipotts/lib";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -38,6 +39,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [_fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!initialIntent) return;
@@ -54,8 +56,8 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
   const canSubmit =
     intent &&
     message.trim().length >= 10 &&
-    name.trim().length > 1 &&
-    email.trim().length > 3;
+    name.trim().length > 0 &&
+    email.trim().length > 0;
 
   const resetTurnstile = () => {
     if (!turnstileSiteKey) return;
@@ -111,6 +113,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
     setStatus("loading");
     setErrorMessage("");
+    setFieldErrors({});
 
     try {
       if (captchaRequired && !captchaToken) {
@@ -120,6 +123,26 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       }
 
       const body = `[${intent}]\n${message.trim()}`;
+
+      const validation = contactSchema.safeParse({
+        name: name.trim(),
+        email: email.trim(),
+        message: body,
+        captchaToken: captchaToken || undefined,
+      });
+      if (!validation.success) {
+        const errors: Record<string, string> = {};
+        for (const issue of validation.error.issues) {
+          const key = issue.path[0];
+          if (key && !errors[String(key)]) {
+            errors[String(key)] = issue.message;
+          }
+        }
+        setFieldErrors(errors);
+        setStatus("error");
+        setErrorMessage("Please fix the highlighted fields.");
+        return;
+      }
 
       const response = await fetch("/api/send", {
         method: "POST",
@@ -160,13 +183,14 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       className="flex flex-col gap-4 w-full"
       aria-live="polite"
     >
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Message intent">
         {INTENT_OPTIONS.map((option) => {
           const active = intent === option;
           return (
             <button
               key={option}
               type="button"
+              aria-pressed={intent === option}
               className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-colors ${
                 active
                   ? "border-accent-400 bg-accent-400/15 text-accent-400"
@@ -184,6 +208,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
         value={message}
         onChange={(event) => setMessage(event.target.value)}
         placeholder="What do you need? Be specific — objective, timeline, constraints."
+        aria-label="Message"
         className="min-h-32 bg-input border border-border rounded-sm p-3 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono resize-y"
         maxLength={900}
         required
@@ -194,6 +219,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Name"
+          aria-label="Name"
           className="bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
           required
         />
@@ -202,6 +228,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="Email"
+          aria-label="Email"
           className="bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
           required
         />

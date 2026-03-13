@@ -6,8 +6,3 @@ export {
   isPrefetched,
   clearPrefetchCache,
 } from "./prefetch";
-export {
-  navigateToSection,
-  navigateSameOrigin,
-  supportsViewTransitions,
-} from "./navigation";

@@ -6,5 +6,10 @@ export function GET(request: NextRequest) {
   const text = searchParams.get("text") || "ap";
   const scheme = searchParams.get("scheme") === "light" ? "light" : "dark";
 
-  return generateIcon(text, scheme);
+  const response = generateIcon(text, scheme);
+  response.headers.set(
+    "Cache-Control",
+    "public, max-age=86400, immutable",
+  );
+  return response;
 }

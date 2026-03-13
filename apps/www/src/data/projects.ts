@@ -132,7 +132,3 @@ export const projects: Project[] = [
     },
   },
 ];
-
-export const liveProjects = projects.filter((project) =>
-  Boolean(project.links?.live),
-);

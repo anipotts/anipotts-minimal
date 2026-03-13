@@ -22,16 +22,27 @@ export async function verifyTurnstile(token: string) {
     response: token,
   });
 
-  const res = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  let res: Response;
+  try {
+    res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+        signal: controller.signal,
       },
-      body,
-    },
-  );
+    );
+  } catch {
+    return { success: false, error: "Captcha verification timed out", status: 503 };
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const data = (await res.json()) as TurnstileResponse;
   if (!data.success) {
