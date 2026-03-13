@@ -31,12 +31,12 @@ function extractBulletPoints(content: string): {
   }
 
   // First line or sentence is the hook
-  const hook = lines[0]!.replace(/^#+\s*/, "");
+  const hook = (lines[0] ?? "No content yet").replace(/^#+\s*/, "");
 
   // Last line is outro/CTA
   const outro =
     lines.length > 1
-      ? lines[lines.length - 1]!.replace(/^#+\s*/, "")
+      ? (lines[lines.length - 1] ?? "").replace(/^#+\s*/, "")
       : "Follow for more tips";
 
   // Middle lines are body bullets
