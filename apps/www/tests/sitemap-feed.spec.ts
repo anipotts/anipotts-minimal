@@ -40,7 +40,7 @@ test.describe("sitemap and RSS feed", () => {
     expect(response.status()).toBe(200);
 
     const body = await response.text();
-    expect(body).toContain("User-agent");
+    expect(body).toContain("User-Agent");
     expect(body).toContain("Disallow: /admin");
     expect(body).toContain("Disallow: /api/");
     expect(body).toContain("Sitemap:");
