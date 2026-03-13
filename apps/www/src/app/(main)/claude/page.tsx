@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FadeIn } from "@anipotts/ui";
 import { TipCard } from "./TipCard";
-import { BLOB, REPO, docs, guideTiers, hooks, plugins, stats } from "./data";
+import { ThroughputChart } from "./ThroughputChart";
+import { SessionTable } from "./SessionTable";
+import { formatDuration } from "./format";
+import claudeStats from "./claude-stats.json";
+import { BLOB, REPO, docs, guideTiers, hooks, plugins } from "./data";
 import { getFeaturedProjects } from "@/content/projects";
 import {
   CardBlock,
@@ -28,8 +32,45 @@ export const metadata: Metadata = {
   },
 };
 
+const formatNumber = (value: number) => value.toLocaleString();
+
+const formatHumanTime = (minutes: number) => {
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) {
+    return `${hours.toLocaleString()}h`;
+  }
+  const days = Math.round(hours / 8);
+  return `${hours.toLocaleString()}h (${days.toLocaleString()}d @ 8h)`;
+};
+
+const formatUpdatedDate = (value: string, timeZone: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  }).format(new Date(value));
+
+const formatUpdatedTime = (value: string, timeZone: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+
 export default function ClaudePage() {
   const selectedProjects = getFeaturedProjects(3);
+  const liveClass = claudeStats.live.isCodingNow
+    ? "bg-accent-400 animate-pulse"
+    : "bg-muted/40";
+  const updatedDate = formatUpdatedDate(
+    claudeStats.generatedAt,
+    claudeStats.timezone,
+  );
+  const updatedTime = formatUpdatedTime(
+    claudeStats.generatedAt,
+    claudeStats.timezone,
+  );
 
   return (
     <PageFrame>
@@ -47,21 +88,13 @@ export default function ClaudePage() {
           </PageSummary>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <CardBlock>
               <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
                 sessions
               </p>
               <p className="text-2xl font-heading text-accent-400 mt-1">
-                {stats.sessions}
-              </p>
-            </CardBlock>
-            <CardBlock>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
-                messages
-              </p>
-              <p className="text-2xl font-heading text-accent-400 mt-1">
-                {stats.messages}
+                {formatNumber(claudeStats.totals.sessions)}
               </p>
             </CardBlock>
             <CardBlock>
@@ -69,11 +102,146 @@ export default function ClaudePage() {
                 tool calls
               </p>
               <p className="text-2xl font-heading text-accent-400 mt-1">
-                {stats.toolCalls}
+                {formatNumber(claudeStats.totals.toolCalls)}
+              </p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                files mutated
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {formatNumber(claudeStats.totals.filesMutated)}
+              </p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                human time saved
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {formatHumanTime(claudeStats.totals.humanMinutesSaved)}
+              </p>
+            </CardBlock>
+            <CardBlock>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+                current streak
+              </p>
+              <p className="text-2xl font-heading text-accent-400 mt-1">
+                {claudeStats.totals.streakDays}d
               </p>
             </CardBlock>
           </div>
         </FadeIn>
+        <FadeIn delay={0.16}>
+          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-tertiary">
+            <span className="inline-flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${liveClass}`} />
+              {claudeStats.live.isCodingNow ? "coding now" : "idle"}
+            </span>
+            <span className="text-muted">
+              last updated {updatedDate} · {updatedTime} ({claudeStats.timezone})
+            </span>
+          </div>
+        </FadeIn>
+      </section>
+
+      <section className="flex flex-col gap-4" id="leaderboard">
+        <FadeIn>
+          <PagePrelude>code time leaderboard</PagePrelude>
+        </FadeIn>
+        <FadeIn delay={0.04}>
+          <PageSummary>
+            Live session telemetry across Claude Code projects, tuned to show how
+            quickly AI-assisted shipping compresses timelines.
+          </PageSummary>
+        </FadeIn>
+        <ContentBlocks>
+          <FadeIn delay={0.08}>
+            <CardBlock>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between text-xs font-mono text-tertiary">
+                  <span>throughput · last 30 days</span>
+                  <span>{claudeStats.timezone}</span>
+                </div>
+                <ThroughputChart data={claudeStats.daily} />
+              </div>
+            </CardBlock>
+          </FadeIn>
+          <FadeIn delay={0.12}>
+            <CardBlock>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between text-xs font-mono text-tertiary">
+                  <span>session history · last 20</span>
+                  <span>sortable</span>
+                </div>
+                <SessionTable
+                  sessions={claudeStats.sessions}
+                  timezone={claudeStats.timezone}
+                />
+              </div>
+            </CardBlock>
+          </FadeIn>
+        </ContentBlocks>
+      </section>
+
+      <section className="flex flex-col gap-4" id="burst-records">
+        <FadeIn>
+          <PagePrelude>burst records</PagePrelude>
+        </FadeIn>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <CardBlock>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+              fastest commit cadence
+            </p>
+            <p className="text-xl font-heading text-accent-400 mt-1">
+              {claudeStats.records.fastestCommitCadence.commitsPerHour.toLocaleString()}{" "}
+              commits/hour
+            </p>
+            <p className="text-xs text-tertiary mt-2">
+              {claudeStats.records.fastestCommitCadence.repo
+                ? `${claudeStats.records.fastestCommitCadence.repo} · ${claudeStats.records.fastestCommitCadence.windowStart?.slice(0, 10)}`
+                : "no git data"}
+            </p>
+          </CardBlock>
+          <CardBlock>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+              most files changed
+            </p>
+            <p className="text-xl font-heading text-accent-400 mt-1">
+              {claudeStats.records.mostFilesChanged.files.toLocaleString()} files
+            </p>
+            <p className="text-xs text-tertiary mt-2">
+              {claudeStats.records.mostFilesChanged.project
+                ? `${claudeStats.records.mostFilesChanged.project} · ${claudeStats.records.mostFilesChanged.startedAt?.slice(0, 10)}`
+                : "no session data"}
+            </p>
+          </CardBlock>
+          <CardBlock>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+              longest session
+            </p>
+            <p className="text-xl font-heading text-accent-400 mt-1">
+              {formatDuration(claudeStats.records.longestSession.durationMinutes)}
+            </p>
+            <p className="text-xs text-tertiary mt-2">
+              {claudeStats.records.longestSession.project
+                ? `${claudeStats.records.longestSession.project} · ${claudeStats.records.longestSession.startedAt?.slice(0, 10)}`
+                : "no session data"}
+            </p>
+          </CardBlock>
+          <CardBlock>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
+              most tool calls
+            </p>
+            <p className="text-xl font-heading text-accent-400 mt-1">
+              {claudeStats.records.mostToolCalls.toolCalls.toLocaleString()} calls
+            </p>
+            <p className="text-xs text-tertiary mt-2">
+              {claudeStats.records.mostToolCalls.project
+                ? `${claudeStats.records.mostToolCalls.project} · ${claudeStats.records.mostToolCalls.startedAt?.slice(0, 10)}`
+                : "no session data"}
+            </p>
+          </CardBlock>
+        </div>
       </section>
 
       <section className="flex flex-col gap-4" id="systems">

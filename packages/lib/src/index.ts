@@ -29,7 +29,6 @@ export type { FeatureFlags, FeatureFlagKey } from "./feature-flags";
 // Validation
 export {
   contactSchema,
-  favoriteNumberSchema,
   adminLoginSchema,
   formatZodError,
 } from "./validation";

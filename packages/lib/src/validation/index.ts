@@ -7,10 +7,6 @@ export const contactSchema = z.object({
   captchaToken: z.string().optional(),
 });
 
-export const favoriteNumberSchema = z.object({
-  number: z.number().finite(),
-});
-
 export const adminLoginSchema = z.object({
   password: z.string().min(1).max(200),
   totp: z
