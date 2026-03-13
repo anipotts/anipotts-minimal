@@ -2,6 +2,14 @@
   "name": "anipotts.com",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
+  "author": "Ani Potts",
+  "homepage": "https://anipotts.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anipotts/anipotts.com"
+  },
+  "description": "Personal website and content platform for anipotts.com",
   "packageManager": "pnpm@10.5.2",
   "engines": {
     "node": ">=20.0.0"
@@ -17,6 +25,8 @@
     "github:audit": "node scripts/github/audit-public-repos.mjs anipotts",
     "demo:capture": "node scripts/demos/capture-project-demo.mjs",
     "demo:capture:all": "node scripts/demos/capture-all-demos.mjs",
+    "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
+    "update-claude-stats:commit": "scripts/claude/refresh-claude-stats.sh",
     "test:unit": "turbo test",
     "test:e2e": "pnpm --filter @anipotts/www test:e2e",
     "test": "pnpm test:unit && pnpm test:e2e",
