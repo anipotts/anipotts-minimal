@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { updateContentStatus } from "../../actions";
 import type { ContentStatus } from "@anipotts/types";
 
@@ -23,6 +24,7 @@ export default function StatusActions({
   currentStatus: string;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const actions = TRANSITIONS[currentStatus] || [];
 
   if (actions.length === 0) return null;
@@ -36,7 +38,7 @@ export default function StatusActions({
           onClick={() => {
             startTransition(async () => {
               await updateContentStatus(id, next);
-              window.location.reload();
+              router.refresh();
             });
           }}
           className={`text-sm px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${

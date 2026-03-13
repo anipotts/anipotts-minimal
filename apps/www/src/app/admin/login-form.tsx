@@ -1,14 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 import { login } from "./actions";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       const result = await login(formData);
       if ("success" in result && result.success) {
-        window.location.reload();
+        router.refresh();
         return null;
       }
       return result as { error?: string };
@@ -30,6 +32,7 @@ export default function LoginForm() {
         name="password"
         type="password"
         placeholder="Password"
+        aria-label="Password"
         required
         autoFocus
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -41,6 +44,7 @@ export default function LoginForm() {
         inputMode="numeric"
         pattern="\d{6}"
         placeholder="TOTP (optional)"
+        aria-label="TOTP code"
         maxLength={6}
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
       />
