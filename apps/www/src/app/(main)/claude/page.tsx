@@ -138,7 +138,8 @@ export default function ClaudePage() {
               {claudeStats.live.isCodingNow ? "coding now" : "idle"}
             </span>
             <span className="text-muted">
-              last updated {updatedDate} · {updatedTime} ({claudeStats.timezone})
+              last updated {updatedDate} · {updatedTime} ({claudeStats.timezone}
+              )
             </span>
           </div>
         </FadeIn>
@@ -150,8 +151,8 @@ export default function ClaudePage() {
         </FadeIn>
         <FadeIn delay={0.04}>
           <PageSummary>
-            Live session telemetry across Claude Code projects, tuned to show how
-            quickly AI-assisted shipping compresses timelines.
+            Live session telemetry across Claude Code projects, tuned to show
+            how quickly AI-assisted shipping compresses timelines.
           </PageSummary>
         </FadeIn>
         <ContentBlocks>
@@ -198,7 +199,7 @@ export default function ClaudePage() {
             </p>
             <p className="text-xs text-tertiary mt-2">
               {claudeStats.records.fastestCommitCadence.repo
-                ? `${claudeStats.records.fastestCommitCadence.repo} · ${claudeStats.records.fastestCommitCadence.windowStart?.slice(0, 10)}`
+                ? `${claudeStats.records.fastestCommitCadence.repo}${claudeStats.records.fastestCommitCadence.windowStart ? ` · ${claudeStats.records.fastestCommitCadence.windowStart.slice(0, 10)}` : ""}`
                 : "no git data"}
             </p>
           </CardBlock>
@@ -207,11 +208,12 @@ export default function ClaudePage() {
               most files changed
             </p>
             <p className="text-xl font-heading text-accent-400 mt-1">
-              {claudeStats.records.mostFilesChanged.files.toLocaleString()} files
+              {claudeStats.records.mostFilesChanged.files.toLocaleString()}{" "}
+              files
             </p>
             <p className="text-xs text-tertiary mt-2">
               {claudeStats.records.mostFilesChanged.project
-                ? `${claudeStats.records.mostFilesChanged.project} · ${claudeStats.records.mostFilesChanged.startedAt?.slice(0, 10)}`
+                ? `${claudeStats.records.mostFilesChanged.project}${claudeStats.records.mostFilesChanged.startedAt ? ` · ${claudeStats.records.mostFilesChanged.startedAt.slice(0, 10)}` : ""}`
                 : "no session data"}
             </p>
           </CardBlock>
@@ -220,11 +222,13 @@ export default function ClaudePage() {
               longest session
             </p>
             <p className="text-xl font-heading text-accent-400 mt-1">
-              {formatDuration(claudeStats.records.longestSession.durationMinutes)}
+              {formatDuration(
+                claudeStats.records.longestSession.durationMinutes,
+              )}
             </p>
             <p className="text-xs text-tertiary mt-2">
               {claudeStats.records.longestSession.project
-                ? `${claudeStats.records.longestSession.project} · ${claudeStats.records.longestSession.startedAt?.slice(0, 10)}`
+                ? `${claudeStats.records.longestSession.project}${claudeStats.records.longestSession.startedAt ? ` · ${claudeStats.records.longestSession.startedAt.slice(0, 10)}` : ""}`
                 : "no session data"}
             </p>
           </CardBlock>
@@ -233,11 +237,12 @@ export default function ClaudePage() {
               most tool calls
             </p>
             <p className="text-xl font-heading text-accent-400 mt-1">
-              {claudeStats.records.mostToolCalls.toolCalls.toLocaleString()} calls
+              {claudeStats.records.mostToolCalls.toolCalls.toLocaleString()}{" "}
+              calls
             </p>
             <p className="text-xs text-tertiary mt-2">
               {claudeStats.records.mostToolCalls.project
-                ? `${claudeStats.records.mostToolCalls.project} · ${claudeStats.records.mostToolCalls.startedAt?.slice(0, 10)}`
+                ? `${claudeStats.records.mostToolCalls.project}${claudeStats.records.mostToolCalls.startedAt ? ` · ${claudeStats.records.mostToolCalls.startedAt.slice(0, 10)}` : ""}`
                 : "no session data"}
             </p>
           </CardBlock>

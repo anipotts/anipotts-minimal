@@ -4,10 +4,16 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { parseContactPayload } from "@anipotts/lib";
 
+const ALLOWED_ORIGINS = new Set([
+  "https://anipotts.com",
+  "https://www.anipotts.com",
+  "http://localhost:3000",
+]);
+
 export async function POST(request: Request) {
   try {
     const origin = request.headers.get("origin");
-    if (origin && !origin.endsWith("anipotts.com") && origin !== "http://localhost:3000") {
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -55,13 +61,21 @@ export async function POST(request: Request) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
+    const { error: sendError } = await resend.emails.send({
       from: "Contact Form <onboarding@resend.dev>",
       to: ["contact@anipotts.com"],
       subject: `New Message from ${name}`,
       replyTo: email,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
+
+    if (sendError) {
+      console.error("Resend error:", sendError);
+      return NextResponse.json(
+        { error: "Failed to send email" },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
