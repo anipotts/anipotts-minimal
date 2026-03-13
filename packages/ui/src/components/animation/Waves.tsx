@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, CSSProperties } from "react";
+import { useRef, useEffect, type CSSProperties } from "react";
 
 class Grad {
   x: number;
@@ -65,9 +65,11 @@ class Noise {
     if (seed < 256) seed |= seed << 8;
     for (let i = 0; i < 256; i++) {
       let v =
-        i & 1 ? this.p[i] ^ (seed & 255) : this.p[i] ^ ((seed >> 8) & 255);
+        i & 1
+          ? this.p[i]! ^ (seed & 255)
+          : this.p[i]! ^ ((seed >> 8) & 255);
       this.perm[i] = this.perm[i + 256] = v;
-      this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12];
+      this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12]!;
     }
   }
   fade(t: number): number {
@@ -83,10 +85,10 @@ class Noise {
     y -= Y;
     X &= 255;
     Y &= 255;
-    const n00 = this.gradP[X + this.perm[Y]].dot2(x, y);
-    const n01 = this.gradP[X + this.perm[Y + 1]].dot2(x, y - 1);
-    const n10 = this.gradP[X + 1 + this.perm[Y]].dot2(x - 1, y);
-    const n11 = this.gradP[X + 1 + this.perm[Y + 1]].dot2(x - 1, y - 1);
+    const n00 = this.gradP[X + this.perm[Y]!]!.dot2(x, y);
+    const n01 = this.gradP[X + this.perm[Y + 1]!]!.dot2(x, y - 1);
+    const n10 = this.gradP[X + 1 + this.perm[Y]!]!.dot2(x - 1, y);
+    const n11 = this.gradP[X + 1 + this.perm[Y + 1]!]!.dot2(x - 1, y - 1);
     const u = this.fade(x);
     return this.lerp(
       this.lerp(n00, n10, u),
@@ -348,13 +350,15 @@ export function Waves({
       ctx.beginPath();
       ctx.strokeStyle = configRef.current.lineColor;
       linesRef.current.forEach((points) => {
-        let p1 = moved(points[0], false);
+        const first = points[0];
+        if (!first) return;
+        let p1 = moved(first, false);
         ctx.moveTo(p1.x, p1.y);
         points.forEach((p, idx) => {
           const isLast = idx === points.length - 1;
           p1 = moved(p, !isLast);
           const p2 = moved(
-            points[idx + 1] || points[points.length - 1],
+            points[idx + 1] ?? points[points.length - 1]!,
             !isLast,
           );
           ctx.lineTo(p1.x, p1.y);
@@ -414,6 +418,7 @@ export function Waves({
     }
     function onTouchMove(e: TouchEvent) {
       const touch = e.touches[0];
+      if (!touch) return;
       updateMouse(touch.clientX, touch.clientY);
     }
     function updateMouse(x: number, y: number) {
@@ -448,7 +453,7 @@ export function Waves({
     // IntersectionObserver: pause animation when not visible
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isVisibleRef.current = entry.isIntersecting;
+        if (entry) isVisibleRef.current = entry.isIntersecting;
       },
       { threshold: 0 },
     );
