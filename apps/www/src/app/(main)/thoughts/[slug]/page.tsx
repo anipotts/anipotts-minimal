@@ -136,8 +136,8 @@ export default async function ThoughtPage({
             components={{
               img: ({ ...props }) => {
                 if (!props.src) return null;
-                // eslint-disable-next-line @next/next/no-img-element
                 return (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     {...props}
                     alt={props.alt || ""}
