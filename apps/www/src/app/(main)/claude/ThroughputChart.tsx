@@ -86,7 +86,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
           cx={width - barWidth / 2}
           cy={
             chartBottom -
-            (data[data.length - 1]?.filesMutated / maxValue) * chartHeight
+            ((data[data.length - 1]?.filesMutated ?? 0) / maxValue) * chartHeight
           }
           r={3}
           fill="rgba(var(--accent-400),1)"

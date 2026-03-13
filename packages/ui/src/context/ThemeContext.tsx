@@ -97,7 +97,7 @@ export function ThemeProvider({
   const cycleTheme = useCallback(() => {
     const currentIndex = CYCLE_ORDER.indexOf(theme);
     const nextIndex = (currentIndex + 1) % CYCLE_ORDER.length;
-    setTheme(CYCLE_ORDER[nextIndex]);
+    setTheme(CYCLE_ORDER[nextIndex] ?? CYCLE_ORDER[0] ?? "system");
   }, [theme, setTheme]);
 
   const value = useMemo(

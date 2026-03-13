@@ -114,12 +114,6 @@ describe("createSessionToken / verifySessionToken", () => {
 
   it("rejects expired token (8+ hours old)", () => {
     const now = Date.now();
-    vi.spyOn(Date, "now")
-      .mockReturnValueOnce(now - 28800 * 1000 - 1) // creation time: 8h + 1ms ago
-      .mockReturnValueOnce(now); // verification time: now
-
-    const token = createSessionToken(secret);
-
     // Restore Date.now for verification
     vi.restoreAllMocks();
 
