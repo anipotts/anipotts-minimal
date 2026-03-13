@@ -1,0 +1,31 @@
+name: Claude Fix Issue
+
+# NOTE: This workflow uses anthropics/claude-code-action which handles
+# all user input internally. No untrusted input is used in run: commands.
+# Triggered ONLY by adding the 'claude-fix' label to an issue.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  fix:
+    if: github.event.label.name == 'claude-fix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Read the issue title and body carefully. Implement the fix described.
+            Create a pull request with the changes. Follow CLAUDE.md guidelines.
+            Run lint and typecheck before committing.
+          claude_args: "--max-turns 20 --model claude-sonnet-4-6"
