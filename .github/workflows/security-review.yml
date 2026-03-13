@@ -1,0 +1,28 @@
+name: Security Review
+
+# NOTE: This workflow uses anthropics/claude-code-security-review which handles
+# all analysis internally. No untrusted input is used in run: commands.
+
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+
+      - uses: anthropics/claude-code-security-review@main
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          exclude-directories: node_modules,.next,dist
+          claude-model: claude-sonnet-4-6

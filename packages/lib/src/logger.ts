@@ -1,7 +1,7 @@
 const logger = {
   info: (context: string, message: string, data?: Record<string, unknown>) => {
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[${context}] ${message}`, data ?? "");
+      console.info(`[${context}] ${message}`, data ?? "");
     }
   },
   warn: (context: string, message: string, data?: Record<string, unknown>) => {

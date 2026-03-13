@@ -36,5 +36,5 @@ export const LANGUAGE_COLORS: Record<string, string> = {
 
 /** Get the color for a language name, falling back to "Other". */
 export function getLanguageColor(name: string): string {
-  return LANGUAGE_COLORS[name] ?? LANGUAGE_COLORS["Other"];
+  return LANGUAGE_COLORS[name] ?? LANGUAGE_COLORS["Other"] ?? "#6b7280";
 }

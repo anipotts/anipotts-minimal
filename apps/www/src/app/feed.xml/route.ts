@@ -35,6 +35,7 @@ export async function GET() {
     <description>Technical writings and reflections from ani potts</description>
     <language>en-us</language>
     <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>${thoughts[0] ? new Date(thoughts[0].date).toUTCString() : new Date().toUTCString()}</lastBuildDate>
 ${items}
   </channel>
 </rss>`;

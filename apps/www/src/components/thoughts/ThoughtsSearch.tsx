@@ -43,6 +43,7 @@ export default function ThoughtsSearch() {
           if (e.key === "Escape") handleChange("");
         }}
         placeholder="Search thoughts..."
+        aria-label="Search thoughts"
         className="w-full bg-input border border-border rounded-sm p-2 text-sm text-body font-mono placeholder-faint focus:border-accent-400/50 focus:outline-none transition-colors"
       />
       {query && (

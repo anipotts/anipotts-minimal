@@ -44,14 +44,18 @@ export function PostHogProvider({
       return;
     }
 
-    posthog.init(key, {
-      api_host: apiHost,
-      ui_host: "https://us.posthog.com",
-      person_profiles: "identified_only",
-      capture_pageview: false, // We handle pageviews manually
-      capture_exceptions: true,
-      debug: process.env.NODE_ENV === "development",
-    });
+    try {
+      posthog.init(key, {
+        api_host: apiHost,
+        ui_host: "https://us.posthog.com",
+        person_profiles: "identified_only",
+        capture_pageview: false, // We handle pageviews manually
+        capture_exceptions: true,
+        debug: process.env.NODE_ENV === "development",
+      });
+    } catch {
+      console.warn("PostHog initialization failed");
+    }
   }, [apiKey, apiHost]);
 
   return (

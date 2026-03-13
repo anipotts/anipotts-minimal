@@ -29,10 +29,11 @@ export type { FeatureFlags, FeatureFlagKey } from "./feature-flags";
 // Validation
 export {
   contactSchema,
-  favoriteNumberSchema,
   adminLoginSchema,
   formatZodError,
+  parseContactPayload,
 } from "./validation";
+export type { ContactPayload } from "./validation";
 
 // Logger
 export { logger } from "./logger";

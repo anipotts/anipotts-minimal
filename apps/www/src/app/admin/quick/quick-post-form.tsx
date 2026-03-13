@@ -1,8 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useCallback } from "react";
 import { createThought } from "../actions";
 import Link from "next/link";
+
+type FormState = { error?: string; success?: boolean; id?: string } | null;
 
 const SERIES_OPTIONS = [
   { value: "agent-tip", label: "Agent Tip" },
@@ -14,18 +16,15 @@ const SERIES_OPTIONS = [
 
 export default function QuickPostForm() {
   const [state, formAction, isPending] = useActionState(
-    async (
-      _prev: { error?: string; success?: boolean; id?: string } | null,
-      formData: FormData,
-    ) => {
-      return (await createThought(formData)) as {
-        error?: string;
-        success?: boolean;
-        id?: string;
-      };
+    async (_prev: FormState, formData: FormData) => {
+      return (await createThought(formData)) as NonNullable<FormState>;
     },
     null,
   );
+
+  const handleCreateAnother = useCallback(() => {
+    window.location.reload();
+  }, []);
 
   if (state?.success && state.id) {
     return (
@@ -38,7 +37,7 @@ export default function QuickPostForm() {
           View Content
         </Link>
         <button
-          onClick={() => window.location.reload()}
+          onClick={handleCreateAnother}
           className="block mx-auto text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           Create Another
@@ -55,6 +54,7 @@ export default function QuickPostForm() {
         name="title"
         type="text"
         placeholder="Title"
+        aria-label="Title"
         required
         autoFocus
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
@@ -63,6 +63,7 @@ export default function QuickPostForm() {
       <textarea
         name="content"
         placeholder="Content (optional — add later)"
+        aria-label="Content"
         rows={8}
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
       />
@@ -70,6 +71,7 @@ export default function QuickPostForm() {
       <select
         name="series_type"
         required
+        aria-label="Series type"
         defaultValue=""
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
       >

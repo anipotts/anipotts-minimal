@@ -109,7 +109,7 @@ function calculateStreaks(days: ContributionDay[]): {
 
   // Current streak: count backwards from today (or yesterday if today has 0)
   let currentStreak = 0;
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]!;
   let startIdx = 0;
 
   // If today has no contributions, start from yesterday
@@ -118,7 +118,7 @@ function calculateStreaks(days: ContributionDay[]): {
   }
 
   for (let i = startIdx; i < sorted.length; i++) {
-    if (sorted[i].contributionCount > 0) {
+    if (sorted[i]!.contributionCount > 0) {
       currentStreak++;
     } else {
       break;
@@ -357,7 +357,7 @@ export async function fetchRecentCommits(
 
         return commits.map((c) => ({
           sha: c.sha.slice(0, 7),
-          message: c.commit.message.split("\n")[0],
+          message: c.commit.message.split("\n")[0] ?? "",
           date: c.commit.author.date,
           repo: repoName,
           url: c.html_url,
