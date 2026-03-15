@@ -13,7 +13,7 @@ import { createServerClient } from "@anipotts/lib";
 import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
 import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
 import { headers } from "next/headers";
-import type { SeriesType, ContentStatus } from "@anipotts/types";
+import type { SeriesType, ContentStatus, ContentType } from "@anipotts/types";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -139,7 +139,8 @@ export async function createThought(formData: FormData) {
   const title = (formData.get("title") as string)?.trim();
   const content = (formData.get("content") as string)?.trim();
   const seriesType = formData.get("series_type") as SeriesType;
-  const contentType = (formData.get("content_type") as string) || "article";
+  const contentType =
+    (formData.get("content_type") as ContentType) || "article";
 
   if (!title) return { error: "Title is required" };
 
