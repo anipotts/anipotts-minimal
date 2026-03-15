@@ -56,3 +56,6 @@ export type {
   SiteSettingsMap,
 } from "./cms";
 export { projectRowToProject } from "./cms";
+
+// Database types (typed Supabase client)
+export type { Database } from "./database";

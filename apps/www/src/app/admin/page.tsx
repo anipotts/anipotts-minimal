@@ -1,5 +1,8 @@
 import { createServerClient } from "@anipotts/lib";
-import type { Thought } from "@anipotts/types";
+import type { Database } from "@anipotts/types";
+
+type ThoughtRow = Database["public"]["Tables"]["thoughts"]["Row"];
+type ThoughtWithCount = ThoughtRow & { atom_count: number };
 import Link from "next/link";
 import PipelineFilters from "./pipeline-filters";
 import ApproveButton from "./approve-button";
@@ -24,7 +27,7 @@ async function getThoughtsWithAtomCounts() {
 
   if (error || !thoughts) return [];
 
-  const thoughtIds = thoughts.map((t: Thought) => t.id);
+  const thoughtIds = thoughts.map((t) => t.id);
   const { data: atomCounts } = await supabase
     .from("atoms")
     .select("content_id")
@@ -37,7 +40,7 @@ async function getThoughtsWithAtomCounts() {
     }
   }
 
-  return thoughts.map((t: Thought) => ({
+  return thoughts.map((t) => ({
     ...t,
     atom_count: countMap.get(t.id) || 0,
   }));
@@ -55,7 +58,7 @@ export default async function PipelinePage({
   const statusFilter = params.status || "all";
   const seriesFilter = params.series || "all";
 
-  const filtered = thoughts.filter((t: Thought & { atom_count: number }) => {
+  const filtered = thoughts.filter((t: ThoughtWithCount) => {
     if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
       return false;
     if (seriesFilter !== "all" && t.series_type !== seriesFilter) return false;
@@ -64,7 +67,7 @@ export default async function PipelinePage({
 
   const statusCounts: Record<string, number> = {};
   for (const t of thoughts) {
-    const s = (t as Thought).status || "draft";
+    const s = t.status || "draft";
     statusCounts[s] = (statusCounts[s] || 0) + 1;
   }
 
@@ -86,7 +89,7 @@ export default async function PipelinePage({
           <p className="text-zinc-500 text-center py-8">No content found</p>
         )}
 
-        {filtered.map((thought: Thought & { atom_count: number }) => {
+        {filtered.map((thought: ThoughtWithCount) => {
           const status = thought.status || "draft";
           const date = new Date(
             thought.updated_at || thought.created_at,

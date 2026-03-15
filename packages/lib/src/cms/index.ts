@@ -1,9 +1,8 @@
 import type {
   PageContent,
   Project,
-  ProjectRow,
+  ProjectCategory,
   SocialLink,
-  SocialLinkRow,
   SiteSettingsMap,
   ThoughtSummary,
 } from "@anipotts/types";
@@ -78,7 +77,7 @@ export async function fetchPageContent<T = unknown>(
 
 export async function fetchProjects(options?: {
   featured?: boolean;
-  category?: string;
+  category?: ProjectCategory;
   visible?: boolean;
   limit?: number;
 }): Promise<Project[]> {
@@ -111,8 +110,7 @@ export async function fetchProjects(options?: {
     if (error) throw error;
     if (!data || data.length === 0) return FALLBACK_PROJECTS;
 
-    // TODO: Replace with typed Supabase client
-    return (data as ProjectRow[]).map(projectRowToProject);
+    return data.map(projectRowToProject);
   } catch (err) {
     logger.warn("cms", "fetchProjects() unavailable, using fallback");
     return FALLBACK_PROJECTS;
@@ -147,21 +145,11 @@ export async function fetchThoughts(options?: {
 
     const { data, error } = await query;
     if (error) throw error;
-    // TODO: Replace with typed Supabase client
-    return (data as ThoughtSummary[]) ?? [];
+    return (data ?? []) as ThoughtSummary[];
   } catch (err) {
     logger.warn("cms", "fetchThoughts() unavailable, using fallback");
     return [];
   }
-}
-
-interface SearchResult {
-  type: string;
-  id: string;
-  slug: string;
-  title: string;
-  summary: string;
-  rank: number;
 }
 
 export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
@@ -174,10 +162,7 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     if (error) throw error;
     if (!data) return [];
 
-    // TODO: Replace with typed Supabase client
-    const thoughtResults = (data as SearchResult[]).filter(
-      (r) => r.type === "thought",
-    );
+    const thoughtResults = data.filter((r) => r.type === "thought");
     if (thoughtResults.length === 0) return [];
 
     const slugs = thoughtResults.map((r) => r.slug);
@@ -190,7 +175,6 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
     if (!thoughts) return [];
 
     const rankMap = new Map(thoughtResults.map((r) => [r.slug, r.rank]));
-    // TODO: Replace with typed Supabase client
     return (thoughts as ThoughtSummary[]).sort(
       (a, b) => (rankMap.get(b.slug) ?? 0) - (rankMap.get(a.slug) ?? 0),
     );
@@ -217,8 +201,7 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
     if (error) throw error;
     if (!data || data.length === 0) return FALLBACK_SOCIAL_LINKS;
 
-    // TODO: Replace with typed Supabase client
-    return (data as SocialLinkRow[]).map((row) => ({
+    return data.map((row) => ({
       name: row.name,
       url: row.url,
       icon: row.icon,
@@ -242,7 +225,7 @@ export async function fetchSiteSetting(key: string): Promise<string | null> {
         .select("value")
         .eq("key", key)
         .maybeSingle();
-      return { data: (data as { value: string } | null)?.value ?? null, error };
+      return { data: data?.value ?? null, error };
     },
     null,
     `fetchSiteSetting("${key}")`,
@@ -257,7 +240,7 @@ export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
         .select("key, value");
       if (error || !data) return { data: null, error };
       const map: SiteSettingsMap = {};
-      for (const row of data as { key: string; value: string }[]) {
+      for (const row of data) {
         map[row.key] = row.value;
       }
       return { data: map, error: null };

@@ -1,3 +1,4 @@
+import type { Database } from "@anipotts/types";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -6,8 +7,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
 
 // We export a client that is null if not configured, forcing consumers to check.
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!)
+export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
+  ? createClient<Database>(supabaseUrl!, supabaseAnonKey!)
   : null;
 
 // Helper to create a server-side client with service role key
@@ -16,7 +17,7 @@ export function createServerClient() {
   if (!supabaseUrl || !serviceRoleKey) {
     return null;
   }
-  return createClient(supabaseUrl, serviceRoleKey);
+  return createClient<Database>(supabaseUrl, serviceRoleKey);
 }
 
 export { createClient } from "@supabase/supabase-js";
