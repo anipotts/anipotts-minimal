@@ -1,0 +1,13 @@
+{
+  "name": "@anipotts/brand",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5"
+  }
+}
