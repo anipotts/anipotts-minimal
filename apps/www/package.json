@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "cp -r ../../packages/brand/dist/header.global.js public/brand/header.js && next build",
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
