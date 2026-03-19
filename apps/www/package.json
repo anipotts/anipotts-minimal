@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "mkdir -p public/brand && for f in ../../packages/brand/dist/*.global.js; do cp \"$f\" \"public/brand/$(basename \"$f\" .global.js).js\"; done && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
