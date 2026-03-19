@@ -34,9 +34,10 @@ export async function generateMetadata({
       type: "article",
       publishedTime: thought.date,
       tags: thought.tags,
+      images: ["/og-image.png"],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: thought.title,
       description: thought.summary,
     },

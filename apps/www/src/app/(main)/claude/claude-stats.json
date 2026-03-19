@@ -1,47 +1,53 @@
 {
-  "generatedAt": "2026-03-12T22:17:15.557Z",
+  "generatedAt": "2026-03-19T07:25:03.616Z",
   "timezone": "America/New_York",
   "totals": {
-    "sessions": 6403,
-    "toolCalls": 144098,
-    "filesMutated": 2936,
-    "humanMinutesSaved": 208639,
-    "streakDays": 19
+    "sessions": 6915,
+    "toolCalls": 136490,
+    "filesMutated": 2734,
+    "humanMinutesSaved": 197350,
+    "streakDays": 26
   },
   "tools": {
-    "ToolSearch": 818,
-    "Bash": 31076,
-    "TaskUpdate": 4002,
-    "SendMessage": 800,
-    "TaskList": 391,
-    "Agent": 1038,
-    "Write": 3370,
-    "Read": 53718,
-    "AskUserQuestion": 277,
-    "WebSearch": 4593,
-    "WebFetch": 3662,
-    "TeamCreate": 23,
-    "TaskCreate": 2129,
-    "Edit": 13187,
-    "ExitPlanMode": 447,
-    "Grep": 11887,
-    "Glob": 8568,
-    "Task": 1293,
+    "ToolSearch": 885,
+    "Bash": 30844,
+    "TaskUpdate": 1278,
+    "SendMessage": 802,
+    "TaskList": 308,
+    "Agent": 1284,
+    "Write": 3057,
+    "Read": 53585,
+    "AskUserQuestion": 231,
+    "WebSearch": 4702,
+    "WebFetch": 3735,
+    "TeamCreate": 22,
+    "TaskCreate": 589,
+    "Edit": 10581,
+    "ExitPlanMode": 365,
+    "Grep": 11442,
+    "Glob": 9092,
+    "Task": 738,
     "mcp__posthog__organization-details-get": 1,
     "mcp__posthog__event-definitions-list": 1,
-    "TaskOutput": 283,
-    "EnterPlanMode": 26,
-    "TaskGet": 192,
-    "TaskStop": 17,
-    "Skill": 43,
-    "TodoWrite": 709,
+    "TaskOutput": 183,
+    "EnterPlanMode": 14,
+    "TaskGet": 191,
+    "TaskStop": 6,
+    "Skill": 59,
+    "TodoWrite": 760,
+    "mcp__plugin_playwright_playwright__browser_navigate": 136,
+    "mcp__plugin_playwright_playwright__browser_take_screenshot": 142,
+    "mcp__plugin_playwright_playwright__browser_evaluate": 135,
+    "mcp__plugin_playwright_playwright__browser_wait_for": 28,
+    "mcp__plugin_playwright_playwright__browser_click": 108,
+    "mcp__plugin_playwright_playwright__browser_type": 1,
+    "mcp__plugin_playwright_playwright__browser_resize": 24,
     "mcp__claude_ai_Vercel__list_teams": 2,
     "mcp__claude_ai_Vercel__list_projects": 2,
-    "bash": 7,
-    "mcp__supabase-pgi__apply_migration": 2,
-    "mcp__supabase-pgi__execute_sql": 47,
-    "TeamDelete": 31,
-    "mcp__supabase-pgi__list_tables": 5,
+    "bash": 11,
+    "mcp__supabase-pgi__apply_migration": 1,
+    "mcp__supabase-pgi__execute_sql": 11,
+    "TeamDelete": 30,
     "mcp__claude_ai_Supabase__get_project": 1,
     "mcp__claude_ai_Supabase__get_project_url": 2,
     "mcp__imessage__temporal_heatmap": 10,
@@ -52,19 +58,14 @@
     "mcp__imessage__double_texts": 5,
     "mcp__imessage__yearly_wrapped": 5,
     "mcp__imessage__list_group_chats": 1,
-    "mcp__claude_ai_Supabase__list_projects": 8,
-    "mcp__claude_ai_Supabase__list_migrations": 2,
+    "mcp__claude_ai_Supabase__list_projects": 3,
+    "mcp__claude_ai_Supabase__list_migrations": 1,
     "mcp__claude_ai_Vercel__get_project": 1,
-    "mcp__plugin_playwright_playwright__browser_navigate": 58,
     "mcp__plugin_playwright_playwright__browser_console_messages": 4,
     "mcp__plugin_playwright_playwright__browser_run_code": 75,
-    "mcp__claude_ai_Vercel__list_deployments": 6,
+    "mcp__claude_ai_Vercel__list_deployments": 7,
     "mcp__ide__getDiagnostics": 50,
-    "mcp__plugin_playwright_playwright__browser_click": 77,
-    "mcp__plugin_playwright_playwright__browser_take_screenshot": 16,
-    "mcp__plugin_playwright_playwright__browser_evaluate": 61,
-    "mcp__plugin_playwright_playwright__browser_snapshot": 17,
-    "mcp__plugin_playwright_playwright__browser_wait_for": 20,
+    "mcp__plugin_playwright_playwright__browser_snapshot": 18,
     "mcp__plugin_context7_context7__resolve-library-id": 1,
     "mcp__plugin_context7_context7__query-docs": 2,
     "mcp__rudy__message_stats": 5,
@@ -76,11 +77,17 @@
     "mcp__rudy__get_conversation": 4,
     "mcp__rudy__help": 2,
     "mcp__plugin_playwright_playwright__browser_fill_form": 18,
-    "mcp__plugin_playwright_playwright__browser_close": 5,
+    "mcp__plugin_playwright_playwright__browser_close": 6,
     "mcp__gws__sheets_spreadsheets_create": 1,
     "mcp__gws__sheets_spreadsheets_values_batchUpdate": 7,
     "mcp__gws__sheets_spreadsheets_batchUpdate": 20,
     "mcp__gws__drive_files_create": 74,
+    "mcp__plugin_playwright_playwright__browser_tabs": 1,
+    "mcp__claude_ai_Typefully__typefully_list_social_sets": 4,
+    "mcp__claude_ai_Typefully__typefully_list_drafts": 4,
+    "mcp__claude_ai_Typefully__typefully_get_queue": 1,
+    "mcp__claude_ai_Typefully__typefully_get_draft": 4,
+    "mcp__claude_ai_Typefully__typefully_create_draft": 13,
     "mcp__claude_ai_Slack__slack_send_message": 5,
     "mcp__gws__gmail_users_labels_list": 7,
     "mcp__gws__gmail_users_labels_create": 43,
@@ -96,7 +103,6 @@
     "mcp__obs__obs-start-record": 1,
     "mcp__obs__obs-stop-record": 1,
     "mcp__claude_ai_Slack__slack_search_channels": 27,
-    "mcp__claude_ai_Typefully__typefully_list_social_sets": 3,
     "mcp__gws__drive_files_list": 32,
     "mcp__claude_ai_Gmail__gmail_list_labels": 2,
     "mcp__claude_ai_Gmail__gmail_get_profile": 2,
@@ -105,13 +111,13 @@
     "mcp__gws__sheets_spreadsheets_get": 4,
     "mcp__gws__sheets_spreadsheets_values_clear": 2,
     "mcp__claude_ai_Supabase__restore_project": 1,
-    "mcp__claude_ai_Supabase__list_organizations": 2,
+    "mcp__claude_ai_Supabase__list_organizations": 1,
     "mcp__claude_ai_Supabase__get_cost": 1,
     "mcp__claude_ai_Supabase__confirm_cost": 1,
     "mcp__claude_ai_Supabase__create_project": 1,
-    "mcp__claude_ai_Supabase__apply_migration": 10,
+    "mcp__claude_ai_Supabase__apply_migration": 1,
     "mcp__claude_ai_Supabase__get_publishable_keys": 1,
-    "mcp__claude_ai_Supabase__execute_sql": 153,
+    "mcp__claude_ai_Supabase__execute_sql": 52,
     "mcp__claude_ai_Slack__slack_read_user_profile": 1,
     "mcp__claude_ai_Slack__slack_read_channel": 1,
     "mcp__claude_ai_Vercel__get_deployment_build_logs": 4,
@@ -127,7 +133,6 @@
     "mcp__gws__drive_files_update": 7,
     "mcp__gws__drive_files_delete": 7,
     "mcp__gws__gmail_users_messages_batchModify": 4,
-    "mcp__plugin_playwright_playwright__browser_resize": 1,
     "mcp__plugin_playwright_playwright__browser_file_upload": 1,
     "mcp__gws__gmail_users_labels_delete": 5,
     "mcp__gws__gmail_users_settings_sendAs_list": 1,
@@ -138,62 +143,18 @@
     "mcp__gws__gmail_users_drafts_create": 5,
     "mcp__gws__gmail_users_drafts_delete": 1,
     "EnterWorktree": 10,
+    "mcp__Claude_Preview__preview_start": 2,
     "LSP": 1,
-    "TaskList\" />": 2,
-    "ListMcpResourcesTool": 1,
-    "mcp__plugin_greptile_greptile__list_custom_context": 3,
-    "mcp__plugin_greptile_greptile__list_pull_requests": 1,
-    "mcp__plugin_greptile_greptile__trigger_code_review": 1,
-    "mcp__gemini-video-understanding__analyze_design_video": 1,
-    "mcp__gemini-video-understanding__analyze_bug_video": 2,
-    "mcp__supabase-pgi__get_project_url": 1,
+    "mcp__supabase-pgi__list_tables": 1,
     "mcp__claude_ai_Typefully__typefully_get_social_set_details": 1,
     "mcp__rudy__conversation_vibe": 1,
-    "mcp__claude_ai_Typefully__typefully_list_drafts": 2,
     "mcp__claude_ai_Typefully__typefully_delete_draft": 12,
-    "mcp__claude_ai_Typefully__typefully_create_draft": 12,
-    "mcp__claude_ai_Typefully__typefully_get_draft": 1,
     "mcp__claude_ai_Typefully__typefully_edit_draft": 3,
     "mcp__claude_ai_Typefully__typefully_get_queue_schedule": 1,
     "mcp__ide__executeCode": 1,
     "mcp__plugin_playwright_playwright__browser_install": 1
   },
   "daily": [
-    {
-      "date": "2026-02-11",
-      "toolCalls": 3454,
-      "filesMutated": 197
-    },
-    {
-      "date": "2026-02-12",
-      "toolCalls": 4806,
-      "filesMutated": 238
-    },
-    {
-      "date": "2026-02-13",
-      "toolCalls": 4137,
-      "filesMutated": 172
-    },
-    {
-      "date": "2026-02-14",
-      "toolCalls": 4786,
-      "filesMutated": 300
-    },
-    {
-      "date": "2026-02-15",
-      "toolCalls": 5091,
-      "filesMutated": 215
-    },
-    {
-      "date": "2026-02-16",
-      "toolCalls": 3599,
-      "filesMutated": 169
-    },
-    {
-      "date": "2026-02-17",
-      "toolCalls": 0,
-      "filesMutated": 0
-    },
     {
       "date": "2026-02-18",
       "toolCalls": 2050,
@@ -291,7 +252,7 @@
     },
     {
       "date": "2026-03-09",
-      "toolCalls": 5929,
+      "toolCalls": 5940,
       "filesMutated": 166
     },
     {
@@ -306,189 +267,224 @@
     },
     {
       "date": "2026-03-12",
-      "toolCalls": 1096,
-      "filesMutated": 31
+      "toolCalls": 1124,
+      "filesMutated": 33
+    },
+    {
+      "date": "2026-03-13",
+      "toolCalls": 8430,
+      "filesMutated": 405
+    },
+    {
+      "date": "2026-03-14",
+      "toolCalls": 37,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-03-15",
+      "toolCalls": 1616,
+      "filesMutated": 70
+    },
+    {
+      "date": "2026-03-16",
+      "toolCalls": 11,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-03-17",
+      "toolCalls": 1257,
+      "filesMutated": 45
+    },
+    {
+      "date": "2026-03-18",
+      "toolCalls": 1547,
+      "filesMutated": 63
+    },
+    {
+      "date": "2026-03-19",
+      "toolCalls": 373,
+      "filesMutated": 34
     }
   ],
   "sessions": [
     {
-      "id": "agent-a8b0fd9073c078318",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:44:53.937Z",
-      "end": "2026-03-12T21:44:59.599Z",
+      "id": "agent-a10bfe365ad03ac51",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T07:24:49.133Z",
+      "end": "2026-03-19T07:24:52.637Z",
       "durationMinutes": 0.1,
-      "toolCalls": 4,
+      "toolCalls": 1,
       "filesMutated": 0
     },
     {
-      "id": "agent-a094f9ae57e9a82a5",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:26.051Z",
-      "end": "2026-03-12T21:43:45.199Z",
-      "durationMinutes": 1.3,
-      "toolCalls": 29,
+      "id": "agent-a00cac6ee8c1c1ae5",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T07:24:44.396Z",
+      "end": "2026-03-19T07:24:48.084Z",
+      "durationMinutes": 0.1,
+      "toolCalls": 2,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-39dbd23aced61013",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:26.051Z",
-      "end": "2026-03-12T21:43:37.258Z",
-      "durationMinutes": 1.2,
-      "toolCalls": 29,
+      "id": "agent-a5900211b2e6157d4",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T07:24:40.694Z",
+      "end": "2026-03-19T07:25:03.445Z",
+      "durationMinutes": 0.4,
+      "toolCalls": 15,
       "filesMutated": 0
     },
     {
-      "id": "agent-ae52c44034aedf2f5",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:21.499Z",
-      "end": "2026-03-12T21:43:25.656Z",
-      "durationMinutes": 1.1,
-      "toolCalls": 18,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-acompact-fcd2814dc8ef5c27",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:17.357Z",
-      "end": "2026-03-12T21:43:32.369Z",
-      "durationMinutes": 1.3,
-      "toolCalls": 32,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-af6f9847f79675805",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:17.357Z",
-      "end": "2026-03-12T21:43:38.799Z",
-      "durationMinutes": 1.4,
-      "toolCalls": 32,
-      "filesMutated": 0
-    },
-    {
-      "id": "8310782a-778f-4036-8276-24a11095e3d1",
-      "project": "anipotts.com",
-      "start": "2026-03-12T21:42:01.093Z",
-      "end": "2026-03-12T22:03:53.965Z",
-      "durationMinutes": 21.9,
-      "toolCalls": 28,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-a0c10fe4ef0796908",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:39:33.412Z",
-      "end": "2026-03-12T21:41:43.215Z",
-      "durationMinutes": 2.2,
-      "toolCalls": 31,
-      "filesMutated": 2
-    },
-    {
-      "id": "agent-a3526f5ee1878ef08",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:39:12.987Z",
-      "end": "2026-03-12T21:45:03.782Z",
-      "durationMinutes": 5.8,
-      "toolCalls": 39,
-      "filesMutated": 2
-    },
-    {
-      "id": "agent-a19b2ebaecd9264c8",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:28:37.483Z",
-      "end": "2026-03-12T21:31:41.902Z",
-      "durationMinutes": 3.1,
+      "id": "30f20fba-6326-4f07-8e49-fd722208f014",
+      "project": "Code",
+      "start": "2026-03-19T06:51:19.421Z",
+      "end": "2026-03-19T06:53:42.202Z",
+      "durationMinutes": 2.4,
       "toolCalls": 21,
       "filesMutated": 0
     },
     {
-      "id": "agent-a1f72f1089c0ea592",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:28:27.802Z",
-      "end": "2026-03-12T21:32:34.351Z",
-      "durationMinutes": 4.1,
-      "toolCalls": 33,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-ac70675913380adbf",
-      "project": "fullstack",
-      "start": "2026-03-12T21:27:19.491Z",
-      "end": "2026-03-12T21:28:15.338Z",
-      "durationMinutes": 0.9,
-      "toolCalls": 11,
-      "filesMutated": 2
-    },
-    {
-      "id": "agent-aside_question-31e1cc8ee2b345ed",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:25:13.441Z",
-      "end": "2026-03-12T21:40:20.078Z",
-      "durationMinutes": 15.1,
+      "id": "agent-ade791fa078f55201",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T06:27:59.358Z",
+      "end": "2026-03-19T06:29:24.697Z",
+      "durationMinutes": 1.4,
       "toolCalls": 11,
       "filesMutated": 1
     },
     {
-      "id": "a1dfe483-8fd0-45c1-b713-ab045904f07b",
-      "project": "claude-code-tips",
-      "start": "2026-03-12T21:25:13.441Z",
-      "end": "2026-03-12T22:04:25.857Z",
-      "durationMinutes": 39.2,
-      "toolCalls": 28,
-      "filesMutated": 2
+      "id": "agent-adddaaf07336a70c7",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T05:57:36.709Z",
+      "end": "2026-03-19T05:58:20.865Z",
+      "durationMinutes": 0.7,
+      "toolCalls": 8,
+      "filesMutated": 1
     },
     {
-      "id": "agent-acompact-fc9d0e08664856b1",
-      "project": "fullstack",
-      "start": "2026-03-12T21:24:13.745Z",
-      "end": "2026-03-12T21:39:55.859Z",
-      "durationMinutes": 15.7,
-      "toolCalls": 135,
-      "filesMutated": 9
+      "id": "agent-a63e92871c4e064c9",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T05:57:31.457Z",
+      "end": "2026-03-19T05:59:32.327Z",
+      "durationMinutes": 2,
+      "toolCalls": 11,
+      "filesMutated": 1
     },
     {
-      "id": "1aaef149-2297-4606-8842-b9eb1d691d0b",
-      "project": "fullstack",
-      "start": "2026-03-12T21:24:13.745Z",
-      "end": "2026-03-12T21:55:48.376Z",
-      "durationMinutes": 31.6,
-      "toolCalls": 147,
-      "filesMutated": 9
-    },
-    {
-      "id": "agent-a1d7d53c802e447c6",
-      "project": "Content",
-      "start": "2026-03-12T21:23:52.675Z",
-      "end": "2026-03-12T21:23:53.495Z",
-      "durationMinutes": 0,
-      "toolCalls": 0,
+      "id": "agent-a5809f82b11024aae",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:43:40.254Z",
+      "end": "2026-03-19T04:45:54.025Z",
+      "durationMinutes": 2.2,
+      "toolCalls": 10,
       "filesMutated": 0
     },
     {
-      "id": "809df00e-e83e-4439-8327-a04c66b2b553",
-      "project": "Content",
-      "start": "2026-03-12T21:19:48.814Z",
-      "end": "2026-03-12T21:25:01.271Z",
-      "durationMinutes": 5.2,
-      "toolCalls": 24,
+      "id": "agent-acompact-84728e88169c9502",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:02:40.890Z",
+      "end": "2026-03-19T04:03:19.779Z",
+      "durationMinutes": 0.6,
+      "toolCalls": 1,
       "filesMutated": 0
     },
     {
-      "id": "agent-af998a922956855bb",
-      "project": "fullstack",
-      "start": "2026-03-12T20:52:04.206Z",
-      "end": "2026-03-12T20:56:13.920Z",
-      "durationMinutes": 4.2,
-      "toolCalls": 45,
+      "id": "agent-acompact-91d1daec567da90d",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:02:08.154Z",
+      "end": "2026-03-19T04:02:40.612Z",
+      "durationMinutes": 0.5,
+      "toolCalls": 5,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-29dfdd15dc6236c6",
-      "project": "fullstack",
-      "start": "2026-03-12T20:50:02.524Z",
-      "end": "2026-03-12T20:51:00.185Z",
-      "durationMinutes": 1,
+      "id": "agent-acompact-55878255b9872d0e",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:01:42.458Z",
+      "end": "2026-03-19T04:02:08.082Z",
+      "durationMinutes": 0.4,
+      "toolCalls": 6,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-f67a42dbdde9b0c2",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:01:20.988Z",
+      "end": "2026-03-19T04:01:42.399Z",
+      "durationMinutes": 0.4,
       "toolCalls": 2,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-aeb5486f87688ce20",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:01:20.988Z",
+      "end": "2026-03-19T04:03:33.869Z",
+      "durationMinutes": 2.2,
+      "toolCalls": 14,
+      "filesMutated": 0
+    },
+    {
+      "id": "201fce12-a842-4b17-bdc8-04adb1434304",
+      "project": "fourtwenty.nyc",
+      "start": "2026-03-19T04:00:38.936Z",
+      "end": "2026-03-19T07:24:55.195Z",
+      "durationMinutes": 204.3,
+      "toolCalls": 266,
+      "filesMutated": 31
+    },
+    {
+      "id": "agent-acompact-6d1b1530d57c6e26",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:14:26.958Z",
+      "end": "2026-03-19T03:15:06.535Z",
+      "durationMinutes": 0.7,
+      "toolCalls": 3,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-f86887496f83aa32",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:13:49.753Z",
+      "end": "2026-03-19T03:14:26.666Z",
+      "durationMinutes": 0.6,
+      "toolCalls": 1,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-8662694c9ded0b5f",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:13:10.841Z",
+      "end": "2026-03-19T03:13:49.459Z",
+      "durationMinutes": 0.6,
+      "toolCalls": 1,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-d0b532b004ca07a6",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:12:31.208Z",
+      "end": "2026-03-19T03:13:10.579Z",
+      "durationMinutes": 0.7,
+      "toolCalls": 1,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-d8bd32aedc5db3de",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:11:48.929Z",
+      "end": "2026-03-19T03:12:30.933Z",
+      "durationMinutes": 0.7,
+      "toolCalls": 1,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-acompact-ab9f356d996f717f",
+      "project": "anipotts.com",
+      "start": "2026-03-19T03:11:16.220Z",
+      "end": "2026-03-19T03:11:48.690Z",
+      "durationMinutes": 0.5,
+      "toolCalls": 1,
       "filesMutated": 0
     }
   ],
@@ -505,29 +501,29 @@
       "project": "claude-code-tips"
     },
     "longestSession": {
-      "durationMinutes": 33143.8,
-      "sessionId": "5f33f796-5f25-4284-8f2b-6a4fa2700968",
-      "startedAt": "2026-02-01T18:35:06.864Z",
-      "project": "distribution"
+      "durationMinutes": 34888.4,
+      "sessionId": "5a54699d-05d4-44cb-b053-8cae0f73a3b7",
+      "startedAt": "2026-02-22T19:15:42.417Z",
+      "project": "Code"
     },
     "mostToolCalls": {
-      "toolCalls": 6500,
-      "sessionId": "4e2ba21d-a7bd-4e18-8cd0-47f3e0c502f7",
-      "startedAt": "2026-02-11T04:12:24.792Z",
-      "project": "chalk"
+      "toolCalls": 899,
+      "sessionId": "3e82a7da-de49-49d9-a61e-0c22ed08eca3",
+      "startedAt": "2026-03-02T19:08:30.785Z",
+      "project": "structured"
     }
   },
   "live": {
-    "isCodingNow": false,
-    "lastModifiedAt": "2026-03-12T22:10:19.676Z"
+    "isCodingNow": true,
+    "lastModifiedAt": "2026-03-19T07:25:03.851Z"
   },
   "meta": {
     "projectCount": 29,
     "sinceDays": 180,
-    "sourceSessions": 6403,
-    "sourceFiles": 6446
+    "sourceSessions": 6915,
+    "sourceFiles": 6932
   },
   "labels": {
-    "generatedAtLocal": "Mar 12, 2026, 06:17 PM"
+    "generatedAtLocal": "Mar 19, 2026, 03:25 AM"
   }
 }

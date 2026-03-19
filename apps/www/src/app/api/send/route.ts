@@ -7,7 +7,7 @@ import { parseContactPayload } from "@anipotts/lib";
 const ALLOWED_ORIGINS = new Set([
   "https://anipotts.com",
   "https://www.anipotts.com",
-  "http://localhost:3000",
+  ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
 ]);
 
 export async function POST(request: Request) {

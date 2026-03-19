@@ -170,7 +170,6 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
       setTimeout(() => setStatus("idle"), 2800);
     } catch (error) {
-      console.error(error);
       setStatus("error");
       setErrorMessage("Failed to send. Try again or email directly.");
       resetTurnstile();
@@ -183,7 +182,11 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       className="flex flex-col gap-4 w-full"
       aria-live="polite"
     >
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Message intent">
+      <div
+        className="flex flex-wrap gap-2"
+        role="radiogroup"
+        aria-label="Message intent"
+      >
         {INTENT_OPTIONS.map((option) => {
           const active = intent === option;
           return (
@@ -207,7 +210,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       <textarea
         value={message}
         onChange={(event) => setMessage(event.target.value)}
-        placeholder="What do you need? Be specific — objective, timeline, constraints."
+        placeholder="What do you need? Be specific. Objective, timeline, constraints."
         aria-label="Message"
         className="min-h-32 bg-input border border-border rounded-sm p-3 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono resize-y"
         maxLength={900}
