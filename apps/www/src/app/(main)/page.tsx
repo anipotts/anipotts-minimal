@@ -17,13 +17,13 @@ import { getPublishedThoughts } from "@/content/thoughts";
 import { homeContent } from "@/content/home";
 
 export const metadata: Metadata = {
-  title: "ani potts — software engineer",
+  title: "ani potts | software engineer at Structured AI (YC F25)",
   description:
-    "software engineer based in nyc, building minimal interfaces to orchestrate complex systems.",
+    "software engineer at Structured AI (YC F25), building autonomous agents and AI infrastructure. based in nyc.",
   openGraph: {
-    title: "ani potts — software engineer",
+    title: "ani potts | software engineer at Structured AI (YC F25)",
     description:
-      "software engineer based in nyc, building minimal interfaces to orchestrate complex systems.",
+      "software engineer at Structured AI (YC F25), building autonomous agents and AI infrastructure. based in nyc.",
     url: "https://anipotts.com",
   },
   alternates: {

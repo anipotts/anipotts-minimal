@@ -13,9 +13,9 @@ export default function PersonSchema() {
     url: siteConfig.url,
     image: `${siteConfig.url}${siteConfig.headshot}`,
     sameAs: [
-      "https://twitter.com/anipottsbuilds",
+      "https://x.com/anipottsbuilds",
       "https://github.com/anipotts",
-      "https://linkedin.com/in/anipotts",
+      "https://www.linkedin.com/in/anipotts",
     ],
     jobTitle: siteConfig.title,
     worksFor: {

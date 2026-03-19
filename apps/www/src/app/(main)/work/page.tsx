@@ -5,7 +5,6 @@ import ProjectCard from "@/components/ProjectCard";
 import { getWorkProjects } from "@/content/projects";
 import {
   ContentBlocks,
-  EndCta,
   PageFrame,
   PagePrelude,
   PageSummary,
@@ -100,12 +99,6 @@ export default async function WorkPage({
             )}
           </div>
         </ContentBlocks>
-        <EndCta>
-          <p className="text-xs text-muted uppercase tracking-wider">
-            publish states: <span className="text-accent-400">publish_now</span>
-            , placeholder, improve_then_publish
-          </p>
-        </EndCta>
       </section>
     </PageFrame>
   );
