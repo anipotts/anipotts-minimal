@@ -5,7 +5,7 @@ import {
   ArrowRight,
   CaretRight,
 } from "@phosphor-icons/react/dist/ssr";
-import { FadeIn } from "@anipotts/ui";
+import { Stagger } from "@anipotts/ui";
 import { getProjectBySlug, projectEntries } from "@/content/projects";
 import { projectContent } from "@/data/project-content";
 
@@ -59,84 +59,81 @@ export default async function ProjectPage({
 
   return (
     <div className="flex flex-col gap-14 pb-20 max-w-4xl mx-auto w-full">
-      <section className="flex flex-col gap-5">
-        <FadeIn>
-          <Link
-            href="/work"
-            className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
-          >
-            <ArrowLeft size={12} /> back to work
-          </Link>
-        </FadeIn>
+      <Stagger as="section" className="flex flex-col gap-5">
+        <Link
+          href="/work"
+          className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
+        >
+          <ArrowLeft size={12} /> back to work
+        </Link>
 
-        <FadeIn delay={0.04}>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading">
-              {project.title}
-            </h1>
-            {project.status === "live" && (
-              <span className="text-[10px] uppercase tracking-wider text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded">
-                live
-              </span>
-            )}
-          </div>
-          <p className="text-secondary mt-2 text-lg">{project.subtitle}</p>
-        </FadeIn>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading">
+            {project.title}
+          </h1>
+          {project.status === "live" && (
+            <span className="text-[10px] uppercase tracking-wider text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded">
+              live
+            </span>
+          )}
+        </div>
 
-        <FadeIn delay={0.08}>
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </FadeIn>
+        <p className="text-secondary text-lg">{project.subtitle}</p>
 
-        <FadeIn delay={0.1}>
-          <div className="flex flex-wrap gap-4 text-xs font-mono">
-            {project.links?.live && (
-              <a
-                href={project.links.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent-400 hover:underline"
-              >
-                ./launch_site.sh
-              </a>
-            )}
-            {project.links?.repo && (
-              <a
-                href={project.links.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-tertiary hover:text-body hover:underline"
-              >
-                ./view_source.git
-              </a>
-            )}
-          </div>
-        </FadeIn>
-      </section>
+        <div className="flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
 
-      <section className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-4 text-xs font-mono">
+          {project.links?.live && (
+            <a
+              href={project.links.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent-400 hover:underline"
+            >
+              ./launch_site.sh
+            </a>
+          )}
+          {project.links?.repo && (
+            <a
+              href={project.links.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-tertiary hover:text-body hover:underline"
+            >
+              ./view_source.git
+            </a>
+          )}
+        </div>
+      </Stagger>
+
+      <Stagger as="section" className="flex flex-col gap-4" offset={0.3}>
         <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
           overview
         </h2>
         <p className="text-secondary leading-relaxed text-base md:text-lg">
           {content?.overview || project.description}
         </p>
-      </section>
+      </Stagger>
 
       {content?.technical && (
-        <section className="flex flex-col gap-4">
+        <Stagger as="section" className="flex flex-col gap-4" offset={0.36}>
           <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
             technical
           </h2>
-          <div className="flex flex-col gap-5">
+          <Stagger
+            className="flex flex-col gap-5"
+            interval={0.04}
+            offset={0.42}
+          >
             {content.technical.map((section) => (
               <div key={section.title} className="border-l border-border pl-4">
                 <h3 className="text-sm font-semibold text-body mb-1">
@@ -147,16 +144,20 @@ export default async function ProjectPage({
                 </p>
               </div>
             ))}
-          </div>
-        </section>
+          </Stagger>
+        </Stagger>
       )}
 
       {content?.roadmap && (
-        <section className="flex flex-col gap-4">
+        <Stagger as="section" className="flex flex-col gap-4" offset={0.48}>
           <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
             next
           </h2>
-          <div className="flex flex-col gap-3">
+          <Stagger
+            className="flex flex-col gap-3"
+            interval={0.03}
+            offset={0.54}
+          >
             {content.roadmap.map((item, index) => (
               <div
                 key={`${item.text}-${index}`}
@@ -188,16 +189,16 @@ export default async function ProjectPage({
                 </span>
               </div>
             ))}
-          </div>
-        </section>
+          </Stagger>
+        </Stagger>
       )}
 
       {content?.relatedThoughts && content.relatedThoughts.length > 0 && (
-        <section className="flex flex-col gap-3">
+        <Stagger as="section" className="flex flex-col gap-3" offset={0.54}>
           <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
             related thoughts
           </h2>
-          <div className="flex flex-col gap-2">
+          <Stagger className="flex flex-col gap-2" interval={0.03} offset={0.6}>
             {content.relatedThoughts.map((thought) => (
               <Link
                 key={thought.slug}
@@ -207,8 +208,8 @@ export default async function ProjectPage({
                 <ArrowRight size={12} /> {thought.title}
               </Link>
             ))}
-          </div>
-        </section>
+          </Stagger>
+        </Stagger>
       )}
     </div>
   );

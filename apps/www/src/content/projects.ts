@@ -1,5 +1,5 @@
 import type { Project } from "@anipotts/types";
-import { projects as sourceProjects } from "@/data/projects";
+import { projects as sourceProjects } from "@anipotts/lib/data";
 
 export type WorkPublishState =
   | "publish_now"
@@ -25,34 +25,15 @@ export interface ProjectEntry extends Project {
 const PRIORITY_BY_SLUG: Record<string, number> = {
   quantercise: 100,
   "pgi-research-platform": 95,
+  "claude-code-tips": 92,
+  "imessage-mcp": 91,
   "quantercise-extension": 90,
   chainedchat: 89,
+  saeshify: 85,
   "nyu-purity-test": 84,
 };
 
-const PLACEHOLDERS: ProjectEntry[] = [
-  {
-    slug: "imessage-mcp",
-    title: "iMessage MCP",
-    subtitle: "Read-only iMessage analysis and tooling.",
-    summary:
-      "Programmatic conversation analytics tooling for local iMessage archives.",
-    description:
-      "Local-first MCP server and analytics toolkit focused on communication patterns, search, and relationship intelligence.",
-    year: "2026",
-    category: "ai",
-    role: "Creator",
-    duration: "2026",
-    tags: ["TypeScript", "MCP", "SQLite", "LLM Tooling"],
-    status: "in-progress",
-    featured: true,
-    links: {
-      repo: "https://github.com/anipotts/imessage-mcp",
-    },
-    publishState: "placeholder",
-    priority: 82,
-  },
-];
+const PLACEHOLDERS: ProjectEntry[] = [];
 
 const mappedSource: ProjectEntry[] = sourceProjects.map((project, index) => {
   const publishState: WorkPublishState = project.featured

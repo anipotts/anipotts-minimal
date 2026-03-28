@@ -12,7 +12,7 @@ export function FadeIn({ children, delay = 0, className }: FadeInProps) {
       className={className}
       style={{
         opacity: 0,
-        animation: `fadeInUp 0.6s ease-out both`,
+        animation: `fadeInUp 0.5s ease-out both`,
         animationDelay: `${delay}s`,
       }}
     >

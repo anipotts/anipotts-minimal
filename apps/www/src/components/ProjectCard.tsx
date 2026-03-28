@@ -38,7 +38,7 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
           </div>
         </summary>
 
-        <div className="pl-10 pr-4 pb-5 pt-2 flex flex-col gap-5">
+        <div className="pl-10 pr-4 pb-5 pt-2 flex flex-col gap-5 animate-[fadeInUp_0.5s_ease-out_both]">
           <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
             {project.description}
           </p>

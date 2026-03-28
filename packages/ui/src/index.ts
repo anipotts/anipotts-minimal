@@ -5,8 +5,17 @@ export { TerminalHeaderTitle, ThemeToggle } from "./components/window";
 export type { TerminalHeaderTitleProps } from "./components/window";
 
 // Animation components
-export { FadeIn, Waves, WavesBackground } from "./components/animation";
-export type { FadeInProps, WavesProps } from "./components/animation";
+export {
+  FadeIn,
+  Stagger,
+  Waves,
+  WavesBackground,
+} from "./components/animation";
+export type {
+  FadeInProps,
+  StaggerProps,
+  WavesProps,
+} from "./components/animation";
 
 // Feedback components
 export { StatusDot } from "./components/feedback";

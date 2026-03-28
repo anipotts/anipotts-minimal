@@ -2,10 +2,9 @@ import type { NextConfig } from "next";
 
 /**
  * Shared Next.js config for all anipotts.com apps.
- * Includes transpilePackages for workspace deps and PostHog proxy rewrites.
+ * Workspace packages emit ESM via tsup, no transpilation needed.
  */
 export const baseNextConfig: NextConfig = {
-  transpilePackages: ["@anipotts/ui", "@anipotts/types", "@anipotts/lib"],
   async rewrites() {
     return [
       {

@@ -18,6 +18,12 @@ export const socialLinks: SocialLink[] = [
     description: "@anipotts",
   },
   {
+    name: "github sponsors",
+    url: "https://github.com/sponsors/anipotts",
+    icon: "github",
+    description: "sponsors/anipotts",
+  },
+  {
     name: "linkedin",
     url: "https://www.linkedin.com/in/anipotts",
     icon: "linkedin",

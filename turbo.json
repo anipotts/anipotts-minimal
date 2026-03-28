@@ -1,12 +1,27 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [".env*", ".prettierrc*", "tsconfig.json", "pnpm-workspace.yaml", "packages/config/**"],
+  "globalDependencies": [
+    ".prettierrc*",
+    "tsconfig.json",
+    "pnpm-workspace.yaml"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "tsup.config.ts", "tsconfig.json", "package.json"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@anipotts/www#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "tsconfig.json",
+        "package.json",
+        "next.config.ts",
+        "tailwind.config.mjs"
+      ],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_POSTHOG_KEY",
@@ -17,7 +32,10 @@
         "RESEND_API_KEY",
         "UPSTASH_REDIS_REST_URL",
         "UPSTASH_REDIS_REST_TOKEN",
-        "GITHUB_TOKEN"
+        "GITHUB_TOKEN",
+        "BEEHIIV_API_KEY",
+        "BEEHIIV_PUBLICATION_ID",
+        "ADMIN_PASSWORD"
       ]
     },
     "dev": {

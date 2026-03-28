@@ -7,10 +7,10 @@ import {
   LinkedinLogo,
   XLogo,
 } from "@phosphor-icons/react/dist/ssr";
-import { FadeIn } from "@anipotts/ui";
+import { FadeIn, Stagger } from "@anipotts/ui";
 import ContactForm from "@/components/ContactForm";
 import NewsletterSubscribe from "@/components/NewsletterSubscribe";
-import { socialLinks } from "@/content/socials";
+import { socialLinks } from "@anipotts/lib/data";
 import {
   PageFrame,
   PagePrelude,
@@ -51,55 +51,47 @@ export default async function ConnectPage({
 
   return (
     <PageFrame>
-      <section className="flex flex-col gap-5">
-        <FadeIn>
-          <PagePrelude>connect</PagePrelude>
-        </FadeIn>
-        <FadeIn delay={0.04}>
-          <PageTitle>get in touch</PageTitle>
-        </FadeIn>
-        <FadeIn delay={0.08}>
-          <PageSummary>
-            For work inquiries, collaborations, or Claude Code consulting.
-          </PageSummary>
-        </FadeIn>
-        <FadeIn delay={0.12}>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {socialLinks.map((social) => {
-              const Icon = iconMap[social.icon] || Globe;
-              return (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target={social.name === "email" ? undefined : "_blank"}
-                  rel={
-                    social.name === "email" ? undefined : "noopener noreferrer"
-                  }
-                  className="group inline-flex items-center gap-1.5 text-sm text-tertiary hover:text-accent-400 transition-colors"
-                >
-                  <Icon size={14} />
-                  <span>{social.description}</span>
-                  {social.name !== "email" && (
-                    <ArrowSquareOut
-                      size={10}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  )}
-                </a>
-              );
-            })}
-          </div>
-        </FadeIn>
-      </section>
+      <Stagger as="section" className="flex flex-col gap-5">
+        <PagePrelude>connect</PagePrelude>
+        <PageTitle>get in touch</PageTitle>
+        <PageSummary>
+          For work inquiries, collaborations, or Claude Code consulting.
+        </PageSummary>
+        <div className="flex flex-wrap gap-x-5 gap-y-2">
+          {socialLinks.map((social) => {
+            const Icon = iconMap[social.icon] || Globe;
+            return (
+              <a
+                key={social.name}
+                href={social.url}
+                target={social.name === "email" ? undefined : "_blank"}
+                rel={
+                  social.name === "email" ? undefined : "noopener noreferrer"
+                }
+                className="group inline-flex items-center gap-1.5 text-sm text-tertiary hover:text-accent-400 transition-colors"
+              >
+                <Icon size={14} />
+                <span>{social.description}</span>
+                {social.name !== "email" && (
+                  <ArrowSquareOut
+                    size={10}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </Stagger>
 
       <section className="flex flex-col gap-4" aria-label="Newsletter">
-        <FadeIn>
+        <FadeIn delay={0.3}>
           <NewsletterSubscribe />
         </FadeIn>
       </section>
 
       <section className="flex flex-col gap-4">
-        <FadeIn>
+        <FadeIn delay={0.4}>
           <ContactForm initialIntent={initialIntent} />
         </FadeIn>
       </section>

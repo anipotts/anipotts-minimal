@@ -6,7 +6,7 @@ export default defineConfig([
     format: ["iife"],
     globalName: "AniPottsBrand",
     minify: true,
-    clean: true,
+    clean: false,
   },
   {
     entry: { footer: "src/footer.ts" },
