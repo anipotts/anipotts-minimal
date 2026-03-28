@@ -4,6 +4,7 @@ import {
   XLogo,
   LinkedinLogo,
   EnvelopeSimple,
+  Heart,
   Globe,
 } from "@phosphor-icons/react/dist/ssr";
 import { FadeIn } from "@anipotts/ui";
@@ -20,11 +21,12 @@ const NAV = [
 const iconMap: Record<string, React.ComponentType<Record<string, unknown>>> = {
   email: EnvelopeSimple,
   github: GithubLogo,
+  heart: Heart,
   linkedin: LinkedinLogo,
   x: XLogo,
 };
 
-const FOOTER_ICONS = ["github", "x", "linkedin", "email"] as const;
+const FOOTER_ICONS = ["github", "heart", "x", "linkedin", "email"] as const;
 
 export default function Footer() {
   const footerSocials = socialLinks.filter((s) =>

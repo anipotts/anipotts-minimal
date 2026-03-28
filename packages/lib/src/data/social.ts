@@ -20,7 +20,7 @@ export const socialLinks: SocialLink[] = [
   {
     name: "github sponsors",
     url: "https://github.com/sponsors/anipotts",
-    icon: "github",
+    icon: "heart",
     description: "sponsors/anipotts",
   },
   {
