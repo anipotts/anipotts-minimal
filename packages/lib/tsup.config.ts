@@ -16,8 +16,7 @@ export default defineConfig({
     "validation/index": "src/validation/index.ts",
   },
   format: ["esm"],
-  // dts: false - types resolve via TS project references and tsconfig paths, not .d.ts files
-  dts: false,
+  dts: true,
   splitting: true,
   sourcemap: false,
   external: ["@supabase/supabase-js", "posthog-node"],
