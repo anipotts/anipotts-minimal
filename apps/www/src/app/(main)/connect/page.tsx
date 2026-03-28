@@ -9,6 +9,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { FadeIn } from "@anipotts/ui";
 import ContactForm from "@/components/ContactForm";
+import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import { socialLinks } from "@/content/socials";
 import {
   PageFrame,
@@ -88,6 +89,12 @@ export default async function ConnectPage({
               );
             })}
           </div>
+        </FadeIn>
+      </section>
+
+      <section className="flex flex-col gap-4" aria-label="Newsletter">
+        <FadeIn>
+          <NewsletterSubscribe />
         </FadeIn>
       </section>
 

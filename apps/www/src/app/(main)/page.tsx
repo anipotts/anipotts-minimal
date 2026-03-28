@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { FadeIn } from "@anipotts/ui";
 import ProjectCard from "@/components/ProjectCard";
+import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import {
   ContentBlocks,
@@ -116,6 +117,12 @@ export default async function Home() {
             />
           </Link>
         </EndCta>
+      </section>
+
+      <section className="flex flex-col gap-4" aria-label="Newsletter">
+        <FadeIn>
+          <NewsletterSubscribe />
+        </FadeIn>
       </section>
     </PageFrame>
   );
