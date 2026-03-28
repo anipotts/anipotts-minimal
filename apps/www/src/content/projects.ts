@@ -35,7 +35,7 @@ const PRIORITY_BY_SLUG: Record<string, number> = {
 
 const PLACEHOLDERS: ProjectEntry[] = [];
 
-const mappedSource: ProjectEntry[] = sourceProjects.map((project, index) => {
+const mappedSource = sourceProjects.map<ProjectEntry>((project, index) => {
   const publishState: WorkPublishState = project.featured
     ? "publish_now"
     : project.status === "live"
