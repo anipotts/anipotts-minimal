@@ -19,13 +19,7 @@ export async function POST(request: Request) {
 
     const rate = await checkRateLimit(request);
     if (!rate.success) {
-      return NextResponse.json(
-        {
-          error:
-            "error" in rate && rate.error ? rate.error : "Too many requests",
-        },
-        { status: "status" in rate && rate.status ? rate.status : 429 },
-      );
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const body = await request.json();
