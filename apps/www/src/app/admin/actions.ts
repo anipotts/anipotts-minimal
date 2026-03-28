@@ -76,7 +76,10 @@ export async function login(formData: FormData) {
   const secret = process.env.ADMIN_PASSWORD ?? "";
   const token = createSessionToken(secret);
   const jar = await cookies();
-  jar.set(ADMIN_COOKIE, token, ADMIN_COOKIE_OPTIONS);
+  jar.set(ADMIN_COOKIE, token, {
+    ...ADMIN_COOKIE_OPTIONS,
+    sameSite: ADMIN_COOKIE_OPTIONS.sameSite as "strict" | "lax" | "none",
+  });
 
   return { success: true };
 }
