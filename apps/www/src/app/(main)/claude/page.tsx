@@ -357,16 +357,10 @@ export default function ClaudePage() {
       {/* Session Log (bottom of page) */}
       <section id="sessions" className="flex flex-col gap-4">
         <PagePrelude>session log</PagePrelude>
-        <PageSummary>
-          Raw session telemetry from the last 20 Claude Code sessions. Sorted by
-          date, click any column header to re-sort.
-        </PageSummary>
-        <div className="border border-border-subtle rounded-md bg-overlay-5 overflow-x-auto">
-          <SessionTable
-            sessions={claudeStats.sessions}
-            timezone={claudeStats.timezone}
-          />
-        </div>
+        <SessionTable
+          sessions={claudeStats.sessions}
+          timezone={claudeStats.timezone}
+        />
       </section>
     </PageFrame>
   );
