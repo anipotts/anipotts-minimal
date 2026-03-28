@@ -7,6 +7,7 @@ import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import {
   ContentBlocks,
   EndCta,
+  ListBlock,
   PageFrame,
   PagePrelude,
   PageSummary,
@@ -59,7 +60,7 @@ export default async function Home() {
         </FadeIn>
         <ContentBlocks>
           {homeContent.about.map((line, index) => (
-            <FadeIn key={line} delay={0.08 + index * 0.05}>
+            <FadeIn key={line} delay={0.08 + index * 0.04}>
               <p className="text-body leading-relaxed text-base md:text-lg">
                 {line}
               </p>
@@ -72,9 +73,9 @@ export default async function Home() {
         <FadeIn>
           <PagePrelude>selected work</PagePrelude>
         </FadeIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           {projects.map((project, index) => (
-            <FadeIn key={project.slug} delay={0.06 + index * 0.04}>
+            <FadeIn key={project.slug} delay={0.04 + index * 0.03}>
               <ProjectCard project={project} />
             </FadeIn>
           ))}
@@ -82,7 +83,7 @@ export default async function Home() {
         <EndCta>
           <Link
             href="/work"
-            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+            className="group text-xs text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 inline-flex items-center gap-1"
           >
             view all work
             <ArrowRight
@@ -97,17 +98,21 @@ export default async function Home() {
         <FadeIn>
           <PagePrelude>latest thoughts</PagePrelude>
         </FadeIn>
-        <div className="flex flex-col gap-8">
+        <ListBlock>
           {recentThoughts.map((thought, index) => (
-            <FadeIn key={thought.slug} delay={0.06 + index * 0.04}>
+            <FadeIn
+              key={thought.slug}
+              delay={0.04 + index * 0.03}
+              className="py-5 first:pt-0 last:pb-0"
+            >
               <ThoughtLink thought={thought} />
             </FadeIn>
           ))}
-        </div>
+        </ListBlock>
         <EndCta>
           <Link
             href="/thoughts"
-            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+            className="group text-xs text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 inline-flex items-center gap-1"
           >
             view all thoughts
             <ArrowRight

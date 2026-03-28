@@ -1,10 +1,16 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import ReactMarkdown from "react-markdown";
 import { FadeIn } from "@anipotts/ui";
 import { getPublishedThoughts, getThoughtBySlug } from "@/content/thoughts";
+import {
+  BackLink,
+  MetaLine,
+  PageFrame,
+  PageTitle,
+  SectionLabel,
+  TagList,
+} from "@/components/page/PageScaffold";
 
 export const revalidate = 60;
 
@@ -82,56 +88,44 @@ export default async function ThoughtPage({
     },
   };
 
+  const formattedDate = new Date(thought.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
-    <article className="flex flex-col gap-8 py-2 pb-16 max-w-4xl mx-auto w-full">
+    <PageFrame className="pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <FadeIn>
-        <Link
-          href="/thoughts"
-          className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
-        >
-          <ArrowLeft size={12} /> back to thoughts
-        </Link>
+        <BackLink href="/thoughts">back to thoughts</BackLink>
       </FadeIn>
 
-      <FadeIn delay={0.05}>
-        <header className="border-b border-border pb-6">
-          <p className="text-sm uppercase tracking-[0.16em] text-accent-400 mb-3">
-            thought
-          </p>
-          <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading leading-tight mb-4">
-            {thought.title}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-muted uppercase tracking-wide">
-            <time dateTime={thought.date}>
-              {new Date(thought.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-            <span className="text-faint">{readingTime} min read</span>
-          </div>
-          {thought.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {thought.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] uppercase tracking-wider text-accent-400 border border-accent-400/20 px-2 py-1 rounded-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </header>
-      </FadeIn>
+      <section className="flex flex-col gap-4">
+        <FadeIn delay={0.04}>
+          <SectionLabel>thought</SectionLabel>
+        </FadeIn>
+        <FadeIn delay={0.06}>
+          <PageTitle>{thought.title}</PageTitle>
+        </FadeIn>
+        <FadeIn delay={0.08}>
+          <MetaLine
+            items={[
+              { value: formattedDate },
+              { value: `${readingTime} min read` },
+            ]}
+          />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <TagList tags={thought.tags} />
+        </FadeIn>
+      </section>
 
-      <FadeIn delay={0.12}>
+      <FadeIn delay={0.14}>
         <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)]">
           <ReactMarkdown
             components={{
@@ -152,6 +146,6 @@ export default async function ThoughtPage({
           </ReactMarkdown>
         </div>
       </FadeIn>
-    </article>
+    </PageFrame>
   );
 }

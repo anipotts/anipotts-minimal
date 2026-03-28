@@ -63,7 +63,7 @@ export default async function ConnectPage({
           </PageSummary>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div className="flex flex-wrap gap-3">
             {socialLinks.map((social) => {
               const Icon = iconMap[social.icon] || Globe;
               return (

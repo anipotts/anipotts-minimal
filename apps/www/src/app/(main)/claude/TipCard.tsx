@@ -51,7 +51,7 @@ export function TipCard({
         group w-full cursor-pointer border-l-2 pl-4 pr-4 transition-all duration-300 ease-in-out
         ${
           isOpen
-            ? "py-6 border-accent-400 bg-[rgba(var(--overlay-base),0.03)] rounded-r-xl"
+            ? "py-4 border-accent-400 bg-overlay-5 rounded-r-xl"
             : "py-3 border-border hover:border-overlay-30 hover:bg-overlay-5"
         }
       `}
@@ -87,7 +87,7 @@ export function TipCard({
         style={{ height }}
       >
         <div ref={contentRef}>
-          <div className="pl-6 pt-6 pb-2 flex flex-col gap-5">
+          <div className="pl-8 pt-4 pb-2 flex flex-col gap-5">
             {/* Install command */}
             <div
               className="flex items-center gap-3 bg-input rounded px-3 py-2 font-mono text-xs"
