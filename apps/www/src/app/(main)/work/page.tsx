@@ -143,71 +143,64 @@ export default async function WorkPage({
         </PageSummary>
       </Stagger>
 
-      <section className="flex flex-col gap-4">
-        <Stagger>
-          <PagePrelude>catalog</PagePrelude>
-          <ContentBlocks>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((category) => (
-                <Link
-                  key={category}
-                  href={
-                    category === "all" ? "/work" : `/work?category=${category}`
-                  }
-                  scroll={false}
-                  aria-current={
-                    activeCategory === category ? "page" : undefined
-                  }
-                  className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-200 ${
-                    activeCategory === category
-                      ? "border-accent-400 text-accent-400 bg-accent-400/10"
-                      : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
-                  }`}
-                >
-                  {category}
-                </Link>
-              ))}
-            </div>
-
-            {yearGroups.length > 0 ? (
-              <Stagger
-                className="flex flex-col gap-10"
-                interval={0.1}
-                offset={0.12}
+      <Stagger as="section" className="flex flex-col gap-4">
+        <PagePrelude>catalog</PagePrelude>
+        <ContentBlocks>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((category) => (
+              <Link
+                key={category}
+                href={
+                  category === "all" ? "/work" : `/work?category=${category}`
+                }
+                scroll={false}
+                aria-current={activeCategory === category ? "page" : undefined}
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-sm border transition-all duration-200 ${
+                  activeCategory === category
+                    ? "border-accent-400 text-accent-400 bg-accent-400/10"
+                    : "border-border text-muted hover:border-overlay-30 hover:text-secondary"
+                }`}
               >
-                {yearGroups.map(({ year, quarters }) => (
-                  <div key={year} className="flex flex-col gap-6">
-                    <h2 className="text-sm uppercase tracking-widest text-secondary font-mono border-b border-border pb-2 font-semibold">
-                      {year}
-                    </h2>
-                    {quarters.map(({ quarter, projects: qProjects }) => (
-                      <div
-                        key={quarter ?? "all"}
-                        className="flex flex-col gap-4"
-                      >
-                        {quarter && (
-                          <h3 className="text-xs uppercase tracking-wider text-muted font-mono pl-4">
-                            {quarter}
-                          </h3>
-                        )}
-                        <div className="flex flex-col gap-4">
-                          {qProjects.map((project) => (
-                            <ProjectCard key={project.slug} project={project} />
-                          ))}
-                        </div>
+                {category}
+              </Link>
+            ))}
+          </div>
+
+          {yearGroups.length > 0 ? (
+            <Stagger
+              className="flex flex-col gap-10"
+              interval={0.1}
+              offset={0.12}
+            >
+              {yearGroups.map(({ year, quarters }) => (
+                <div key={year} className="flex flex-col gap-6">
+                  <h2 className="text-sm uppercase tracking-widest text-secondary font-mono border-b border-border pb-2 font-semibold">
+                    {year}
+                  </h2>
+                  {quarters.map(({ quarter, projects: qProjects }) => (
+                    <div key={quarter ?? "all"} className="flex flex-col gap-4">
+                      {quarter && (
+                        <h3 className="text-xs uppercase tracking-wider text-muted font-mono pl-4">
+                          {quarter}
+                        </h3>
+                      )}
+                      <div className="flex flex-col gap-4">
+                        {qProjects.map((project) => (
+                          <ProjectCard key={project.slug} project={project} />
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ))}
-              </Stagger>
-            ) : (
-              <p className="text-muted text-sm font-mono py-8 text-center">
-                no projects in &quot;{activeCategory}&quot; yet.
-              </p>
-            )}
-          </ContentBlocks>
-        </Stagger>
-      </section>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </Stagger>
+          ) : (
+            <p className="text-muted text-sm font-mono py-8 text-center">
+              no projects in &quot;{activeCategory}&quot; yet.
+            </p>
+          )}
+        </ContentBlocks>
+      </Stagger>
     </PageFrame>
   );
 }

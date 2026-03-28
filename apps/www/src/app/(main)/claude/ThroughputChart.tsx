@@ -70,7 +70,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
               width={Math.max(2, barWidth - 2)}
               height={barHeight}
               rx={2}
-              fill="rgba(var(--accent-400),0.35)"
+              fill="rgba(var(--accent-400),0.6)"
             />
           );
         })}
@@ -86,18 +86,14 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
           cx={width - barWidth / 2}
           cy={
             chartBottom -
-            ((data[data.length - 1]?.filesMutated ?? 0) / maxValue) * chartHeight
+            ((data[data.length - 1]?.filesMutated ?? 0) / maxValue) *
+              chartHeight
           }
           r={3}
           fill="rgba(var(--accent-400),1)"
         />
 
-        <text
-          x={0}
-          y={height - 12}
-          fill="rgba(var(--muted),1)"
-          fontSize="10"
-        >
+        <text x={0} y={height - 12} fill="rgba(var(--muted),1)" fontSize="10">
           {data[0]?.date}
         </text>
         <text
@@ -121,7 +117,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
       </svg>
       <div className="flex items-center gap-4 text-[11px] text-tertiary font-mono">
         <span className="inline-flex items-center gap-2">
-          <span className="h-2 w-6 rounded-sm bg-[rgba(var(--accent-400),0.35)]" />
+          <span className="h-2 w-6 rounded-sm bg-[rgba(var(--accent-400),0.6)]" />
           tool calls
         </span>
         <span className="inline-flex items-center gap-2">
