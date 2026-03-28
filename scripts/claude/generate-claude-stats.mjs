@@ -334,7 +334,7 @@ async function main() {
 
   const totalSessions = sessions.length;
   const streakDays = calculateStreak(sessionDates);
-  const recentDays = getRecentDays(30);
+  const recentDays = getRecentDays(90);
   const daily = recentDays.map((date) => ({
     date,
     toolCalls: dailyMap.get(date)?.toolCalls || 0,

@@ -6,7 +6,7 @@ import { ThroughputChart } from "./ThroughputChart";
 import { SessionTable } from "./SessionTable";
 import { formatDuration } from "./format";
 import claudeStats from "./claude-stats.json";
-import { BLOB, REPO, docs, guideTiers, hooks, plugins } from "./data";
+import { TIPS_REPO, MINE_REPO, minePlugin, hooks, docs } from "./data";
 import { getFeaturedProjects } from "@/content/projects";
 import {
   CardBlock,
@@ -78,8 +78,8 @@ export default function ClaudePage() {
         <PagePrelude>claude</PagePrelude>
         <PageTitle>claude code systems that ship</PageTitle>
         <PageSummary>
-          I design practical workflows for coding agents, quality gates, and
-          high-velocity implementation loops.
+          Practical workflows for coding agents, quality gates, and
+          high-velocity implementation loops. Everything is open source.
         </PageSummary>
         <Stagger
           className="grid grid-cols-2 md:grid-cols-5 gap-2 [&>div]:h-full [&>div>*]:h-full"
@@ -138,6 +138,7 @@ export default function ClaudePage() {
         </div>
       </Stagger>
 
+      {/* Leaderboard */}
       <section id="leaderboard">
         <Stagger className="flex flex-col gap-4">
           <PagePrelude>code time leaderboard</PagePrelude>
@@ -177,6 +178,7 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
+      {/* Burst Records */}
       <section id="burst-records">
         <Stagger className="flex flex-col gap-4">
           <PagePrelude>burst records</PagePrelude>
@@ -246,6 +248,7 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
+      {/* Selected Systems */}
       <section id="systems">
         <Stagger className="flex flex-col gap-4">
           <PagePrelude>selected systems</PagePrelude>
@@ -294,33 +297,25 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section id="plugins">
+      {/* Plugin + Hooks */}
+      <section id="plugin">
         <Stagger className="flex flex-col gap-4">
-          <PagePrelude>plugins + hooks</PagePrelude>
+          <PagePrelude>plugin + hooks</PagePrelude>
           <ContentBlocks>
-            <Stagger
-              className="flex flex-col gap-8"
-              interval={0.04}
-              offset={0.06}
-            >
-              {plugins.slice(0, 4).map((plugin) => (
-                <TipCard
-                  key={plugin.slug}
-                  name={plugin.name}
-                  tagline={plugin.tagline}
-                  install={plugin.install}
-                  href={plugin.href}
-                  features={plugin.features}
-                />
-              ))}
-            </Stagger>
+            <TipCard
+              name={minePlugin.name}
+              tagline={minePlugin.tagline}
+              install={minePlugin.install}
+              href={minePlugin.href}
+              features={minePlugin.features}
+            />
 
             <Stagger
               className="grid grid-cols-1 md:grid-cols-2 gap-3"
               interval={0.03}
-              offset={0.24}
+              offset={0.12}
             >
-              {hooks.slice(0, 6).map((hook) => (
+              {hooks.map((hook) => (
                 <CardBlock key={hook.name}>
                   <a
                     href={hook.href}
@@ -347,36 +342,16 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section id="playbooks">
+      {/* Docs */}
+      <section id="docs">
         <Stagger className="flex flex-col gap-4">
-          <PagePrelude>playbooks + docs</PagePrelude>
+          <PagePrelude>docs + playbooks</PagePrelude>
           <Stagger
             className="grid grid-cols-1 md:grid-cols-2 gap-3"
             interval={0.04}
             offset={0.06}
           >
-            {guideTiers.map((tier) => (
-              <CardBlock key={tier.level}>
-                <a
-                  href={tier.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block"
-                >
-                  <p className="text-xs uppercase tracking-[0.16em] text-accent-400">
-                    {tier.level}
-                  </p>
-                  <p className="text-base font-heading text-secondary mt-1 group-hover:text-heading transition-colors">
-                    {tier.label}
-                  </p>
-                  <p className="text-xs text-tertiary mt-2">
-                    {tier.topics.join(" · ")}
-                  </p>
-                </a>
-              </CardBlock>
-            ))}
-
-            {docs.slice(0, 4).map((doc) => (
+            {docs.map((doc) => (
               <CardBlock key={doc.name}>
                 <a
                   href={doc.href}
@@ -398,6 +373,7 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
+      {/* Work Together */}
       <section id="work-together">
         <Stagger className="flex flex-col gap-4">
           <PagePrelude>work together</PagePrelude>
@@ -415,12 +391,20 @@ export default function ClaudePage() {
                   /connect --intent=claude-consulting
                 </Link>
                 <a
-                  href={REPO}
+                  href={TIPS_REPO}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-tertiary hover:text-body hover:underline"
                 >
-                  {BLOB ? "view repo" : "repo"}
+                  view tips repo
+                </a>
+                <a
+                  href={MINE_REPO}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-tertiary hover:text-body hover:underline"
+                >
+                  view mine plugin
                 </a>
               </div>
             </div>

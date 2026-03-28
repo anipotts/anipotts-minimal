@@ -1,100 +1,88 @@
 {
-  "generatedAt": "2026-03-19T07:25:03.616Z",
+  "generatedAt": "2026-03-28T06:37:40.531Z",
   "timezone": "America/New_York",
   "totals": {
-    "sessions": 6915,
-    "toolCalls": 136490,
-    "filesMutated": 2734,
-    "humanMinutesSaved": 197350,
-    "streakDays": 26
+    "sessions": 7331,
+    "toolCalls": 140956,
+    "filesMutated": 3028,
+    "humanMinutesSaved": 208981,
+    "streakDays": 35
   },
   "tools": {
-    "ToolSearch": 885,
-    "Bash": 30844,
-    "TaskUpdate": 1278,
-    "SendMessage": 802,
-    "TaskList": 308,
-    "Agent": 1284,
-    "Write": 3057,
-    "Read": 53585,
-    "AskUserQuestion": 231,
-    "WebSearch": 4702,
-    "WebFetch": 3735,
-    "TeamCreate": 22,
-    "TaskCreate": 589,
-    "Edit": 10581,
-    "ExitPlanMode": 365,
-    "Grep": 11442,
-    "Glob": 9092,
-    "Task": 738,
-    "mcp__posthog__organization-details-get": 1,
-    "mcp__posthog__event-definitions-list": 1,
-    "TaskOutput": 183,
-    "EnterPlanMode": 14,
-    "TaskGet": 191,
-    "TaskStop": 6,
-    "Skill": 59,
-    "TodoWrite": 760,
-    "mcp__plugin_playwright_playwright__browser_navigate": 136,
-    "mcp__plugin_playwright_playwright__browser_take_screenshot": 142,
+    "Glob": 9367,
+    "Write": 3256,
+    "Read": 54762,
+    "Bash": 34463,
+    "Grep": 11445,
+    "Edit": 9878,
+    "WebSearch": 5266,
+    "WebFetch": 4135,
+    "Agent": 1685,
+    "ToolSearch": 917,
+    "TaskCreate": 475,
+    "TaskUpdate": 1059,
+    "SendMessage": 778,
+    "TaskList": 278,
+    "AskUserQuestion": 226,
+    "TeamCreate": 16,
+    "ExitPlanMode": 313,
+    "mcp__claude_ai_Vercel__list_projects": 4,
+    "mcp__claude_ai_Vercel__get_project": 22,
+    "Skill": 74,
+    "mcp__claude_ai_Gmail__gmail_search_messages": 28,
+    "Task": 102,
+    "TaskOutput": 121,
+    "EnterPlanMode": 8,
+    "TaskGet": 198,
+    "mcp__claude_ai_Gmail__gmail_create_draft": 7,
+    "mcp__claude_ai_Gmail__gmail_list_labels": 3,
+    "mcp__claude_ai_Google_Calendar__gcal_list_calendars": 1,
+    "mcp__claude_ai_Google_Calendar__gcal_create_event": 18,
+    "mcp__claude_ai_Gmail__gmail_read_message": 24,
+    "mcp__claude_ai_Gmail__gmail_list_drafts": 1,
+    "TodoWrite": 599,
+    "mcp__claude_ai_Gmail__gmail_read_thread": 2,
+    "TaskStop": 5,
+    "mcp__plugin_playwright_playwright__browser_navigate": 107,
+    "mcp__plugin_playwright_playwright__browser_take_screenshot": 138,
     "mcp__plugin_playwright_playwright__browser_evaluate": 135,
     "mcp__plugin_playwright_playwright__browser_wait_for": 28,
-    "mcp__plugin_playwright_playwright__browser_click": 108,
+    "mcp__plugin_playwright_playwright__browser_click": 63,
     "mcp__plugin_playwright_playwright__browser_type": 1,
     "mcp__plugin_playwright_playwright__browser_resize": 24,
     "mcp__claude_ai_Vercel__list_teams": 2,
-    "mcp__claude_ai_Vercel__list_projects": 2,
     "bash": 11,
     "mcp__supabase-pgi__apply_migration": 1,
-    "mcp__supabase-pgi__execute_sql": 11,
-    "TeamDelete": 30,
+    "mcp__supabase-pgi__execute_sql": 10,
+    "CronCreate": 6,
+    "CronDelete": 5,
+    "TeamDelete": 22,
     "mcp__claude_ai_Supabase__get_project": 1,
     "mcp__claude_ai_Supabase__get_project_url": 2,
-    "mcp__imessage__temporal_heatmap": 10,
-    "mcp__imessage__message_stats": 5,
-    "mcp__imessage__get_reactions": 8,
-    "mcp__imessage__list_contacts": 2,
-    "mcp__imessage__search_messages": 8,
-    "mcp__imessage__double_texts": 5,
-    "mcp__imessage__yearly_wrapped": 5,
-    "mcp__imessage__list_group_chats": 1,
     "mcp__claude_ai_Supabase__list_projects": 3,
     "mcp__claude_ai_Supabase__list_migrations": 1,
-    "mcp__claude_ai_Vercel__get_project": 1,
     "mcp__plugin_playwright_playwright__browser_console_messages": 4,
-    "mcp__plugin_playwright_playwright__browser_run_code": 75,
-    "mcp__claude_ai_Vercel__list_deployments": 7,
-    "mcp__ide__getDiagnostics": 50,
-    "mcp__plugin_playwright_playwright__browser_snapshot": 18,
-    "mcp__plugin_context7_context7__resolve-library-id": 1,
-    "mcp__plugin_context7_context7__query-docs": 2,
-    "mcp__rudy__message_stats": 5,
-    "mcp__rudy__temporal_heatmap": 4,
-    "mcp__rudy__get_profile_section": 13,
-    "mcp__rudy__get_relationship_intel": 1,
-    "mcp__rudy__list_contacts": 2,
-    "mcp__rudy__search_messages": 51,
-    "mcp__rudy__get_conversation": 4,
-    "mcp__rudy__help": 2,
-    "mcp__plugin_playwright_playwright__browser_fill_form": 18,
-    "mcp__plugin_playwright_playwright__browser_close": 6,
+    "mcp__plugin_playwright_playwright__browser_run_code": 53,
+    "mcp__claude_ai_Vercel__list_deployments": 8,
+    "mcp__plugin_playwright_playwright__browser_snapshot": 8,
     "mcp__gws__sheets_spreadsheets_create": 1,
     "mcp__gws__sheets_spreadsheets_values_batchUpdate": 7,
     "mcp__gws__sheets_spreadsheets_batchUpdate": 20,
     "mcp__gws__drive_files_create": 74,
     "mcp__plugin_playwright_playwright__browser_tabs": 1,
-    "mcp__claude_ai_Typefully__typefully_list_social_sets": 4,
-    "mcp__claude_ai_Typefully__typefully_list_drafts": 4,
-    "mcp__claude_ai_Typefully__typefully_get_queue": 1,
+    "mcp__plugin_playwright_playwright__browser_close": 2,
+    "mcp__claude_ai_Typefully__typefully_list_social_sets": 3,
+    "mcp__claude_ai_Typefully__typefully_list_drafts": 5,
+    "mcp__claude_ai_Typefully__typefully_get_queue": 2,
     "mcp__claude_ai_Typefully__typefully_get_draft": 4,
-    "mcp__claude_ai_Typefully__typefully_create_draft": 13,
+    "mcp__claude_ai_Typefully__typefully_create_draft": 1,
     "mcp__claude_ai_Slack__slack_send_message": 5,
     "mcp__gws__gmail_users_labels_list": 7,
     "mcp__gws__gmail_users_labels_create": 43,
     "mcp__gws__gmail_users_settings_filters_create": 8,
-    "mcp__gws__gmail_users_messages_list": 35,
+    "mcp__gws__gmail_users_messages_list": 36,
     "mcp__gws__gmail_users_threads_get": 9,
-    "mcp__gws__gmail_users_messages_get": 244,
+    "mcp__gws__gmail_users_messages_get": 247,
     "mcp__gws__drive_files_export": 5,
     "mcp__obs__obs-get-scene-list": 1,
     "mcp__obs__obs-get-scene-items": 1,
@@ -102,10 +90,10 @@
     "mcp__obs__obs-get-record-directory": 1,
     "mcp__obs__obs-start-record": 1,
     "mcp__obs__obs-stop-record": 1,
+    "mcp__rudy__search_messages": 22,
     "mcp__claude_ai_Slack__slack_search_channels": 27,
     "mcp__gws__drive_files_list": 32,
-    "mcp__claude_ai_Gmail__gmail_list_labels": 2,
-    "mcp__claude_ai_Gmail__gmail_get_profile": 2,
+    "mcp__claude_ai_Gmail__gmail_get_profile": 4,
     "mcp__gws__sheets_spreadsheets_values_update": 16,
     "mcp__gws__sheets_spreadsheets_values_get": 30,
     "mcp__gws__sheets_spreadsheets_get": 4,
@@ -120,19 +108,19 @@
     "mcp__claude_ai_Supabase__execute_sql": 52,
     "mcp__claude_ai_Slack__slack_read_user_profile": 1,
     "mcp__claude_ai_Slack__slack_read_channel": 1,
-    "mcp__claude_ai_Vercel__get_deployment_build_logs": 4,
+    "mcp__rudy__get_conversation": 3,
+    "mcp__claude_ai_Vercel__get_deployment_build_logs": 9,
     "mcp__gws__calendar_calendarList_list": 7,
     "mcp__gws__calendar_calendars_insert": 4,
     "mcp__gws__calendar_calendarList_update": 4,
     "mcp__gws__calendar_events_insert": 7,
-    "mcp__claude_ai_Gmail__gmail_search_messages": 3,
-    "mcp__claude_ai_Gmail__gmail_read_message": 10,
     "mcp__gws__gmail_users_getProfile": 5,
     "mcp__gws__gmail_users_settings_filters_list": 4,
     "mcp__gws__drive_about_get": 4,
     "mcp__gws__drive_files_update": 7,
     "mcp__gws__drive_files_delete": 7,
     "mcp__gws__gmail_users_messages_batchModify": 4,
+    "mcp__plugin_playwright_playwright__browser_fill_form": 2,
     "mcp__plugin_playwright_playwright__browser_file_upload": 1,
     "mcp__gws__gmail_users_labels_delete": 5,
     "mcp__gws__gmail_users_settings_sendAs_list": 1,
@@ -142,33 +130,284 @@
     "mcp__gws__gmail_users_settings_sendAs_update": 1,
     "mcp__gws__gmail_users_drafts_create": 5,
     "mcp__gws__gmail_users_drafts_delete": 1,
-    "EnterWorktree": 10,
+    "EnterWorktree": 11,
     "mcp__Claude_Preview__preview_start": 2,
+    "mcp__claude_ai_Typefully__typefully_get_me": 1,
+    "mcp__claude_ai_Typefully__typefully_list_social_set_analytics_posts": 1,
     "LSP": 1,
     "mcp__supabase-pgi__list_tables": 1,
-    "mcp__claude_ai_Typefully__typefully_get_social_set_details": 1,
-    "mcp__rudy__conversation_vibe": 1,
-    "mcp__claude_ai_Typefully__typefully_delete_draft": 12,
-    "mcp__claude_ai_Typefully__typefully_edit_draft": 3,
-    "mcp__claude_ai_Typefully__typefully_get_queue_schedule": 1,
-    "mcp__ide__executeCode": 1,
-    "mcp__plugin_playwright_playwright__browser_install": 1
+    "mcp__ide__executeCode": 1
   },
   "daily": [
     {
+      "date": "2025-12-29",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2025-12-30",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2025-12-31",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-01",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-02",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-03",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-04",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-05",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-06",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-07",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-08",
+      "toolCalls": 128,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-09",
+      "toolCalls": 1000,
+      "filesMutated": 1
+    },
+    {
+      "date": "2026-01-10",
+      "toolCalls": 1107,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-11",
+      "toolCalls": 2379,
+      "filesMutated": 102
+    },
+    {
+      "date": "2026-01-12",
+      "toolCalls": 2644,
+      "filesMutated": 92
+    },
+    {
+      "date": "2026-01-13",
+      "toolCalls": 933,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-14",
+      "toolCalls": 121,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-15",
+      "toolCalls": 1270,
+      "filesMutated": 25
+    },
+    {
+      "date": "2026-01-16",
+      "toolCalls": 1193,
+      "filesMutated": 28
+    },
+    {
+      "date": "2026-01-17",
+      "toolCalls": 86,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-18",
+      "toolCalls": 566,
+      "filesMutated": 57
+    },
+    {
+      "date": "2026-01-19",
+      "toolCalls": 56,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-20",
+      "toolCalls": 95,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-21",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-22",
+      "toolCalls": 289,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-23",
+      "toolCalls": 375,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-24",
+      "toolCalls": 250,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-25",
+      "toolCalls": 311,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-26",
+      "toolCalls": 161,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-27",
+      "toolCalls": 99,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-28",
+      "toolCalls": 274,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-29",
+      "toolCalls": 557,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-01-30",
+      "toolCalls": 1607,
+      "filesMutated": 94
+    },
+    {
+      "date": "2026-01-31",
+      "toolCalls": 723,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-01",
+      "toolCalls": 1243,
+      "filesMutated": 73
+    },
+    {
+      "date": "2026-02-02",
+      "toolCalls": 1688,
+      "filesMutated": 26
+    },
+    {
+      "date": "2026-02-03",
+      "toolCalls": 802,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-04",
+      "toolCalls": 696,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-05",
+      "toolCalls": 1827,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-06",
+      "toolCalls": 995,
+      "filesMutated": 2
+    },
+    {
+      "date": "2026-02-07",
+      "toolCalls": 3367,
+      "filesMutated": 189
+    },
+    {
+      "date": "2026-02-08",
+      "toolCalls": 2064,
+      "filesMutated": 76
+    },
+    {
+      "date": "2026-02-09",
+      "toolCalls": 334,
+      "filesMutated": 15
+    },
+    {
+      "date": "2026-02-10",
+      "toolCalls": 2305,
+      "filesMutated": 35
+    },
+    {
+      "date": "2026-02-11",
+      "toolCalls": 1955,
+      "filesMutated": 67
+    },
+    {
+      "date": "2026-02-12",
+      "toolCalls": 2000,
+      "filesMutated": 22
+    },
+    {
+      "date": "2026-02-13",
+      "toolCalls": 1969,
+      "filesMutated": 7
+    },
+    {
+      "date": "2026-02-14",
+      "toolCalls": 2246,
+      "filesMutated": 38
+    },
+    {
+      "date": "2026-02-15",
+      "toolCalls": 2650,
+      "filesMutated": 10
+    },
+    {
+      "date": "2026-02-16",
+      "toolCalls": 1200,
+      "filesMutated": 0
+    },
+    {
+      "date": "2026-02-17",
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
       "date": "2026-02-18",
-      "toolCalls": 2050,
-      "filesMutated": 72
+      "toolCalls": 1030,
+      "filesMutated": 0
     },
     {
       "date": "2026-02-19",
-      "toolCalls": 3783,
-      "filesMutated": 135
+      "toolCalls": 1587,
+      "filesMutated": 13
     },
     {
       "date": "2026-02-20",
-      "toolCalls": 1488,
-      "filesMutated": 13
+      "toolCalls": 1166,
+      "filesMutated": 0
     },
     {
       "date": "2026-02-21",
@@ -177,23 +416,23 @@
     },
     {
       "date": "2026-02-22",
-      "toolCalls": 4807,
-      "filesMutated": 231
+      "toolCalls": 3116,
+      "filesMutated": 125
     },
     {
       "date": "2026-02-23",
-      "toolCalls": 5047,
-      "filesMutated": 309
+      "toolCalls": 3224,
+      "filesMutated": 179
     },
     {
       "date": "2026-02-24",
-      "toolCalls": 4661,
-      "filesMutated": 243
+      "toolCalls": 2583,
+      "filesMutated": 123
     },
     {
       "date": "2026-02-25",
-      "toolCalls": 4477,
-      "filesMutated": 256
+      "toolCalls": 2697,
+      "filesMutated": 120
     },
     {
       "date": "2026-02-26",
@@ -282,8 +521,8 @@
     },
     {
       "date": "2026-03-15",
-      "toolCalls": 1616,
-      "filesMutated": 70
+      "toolCalls": 1641,
+      "filesMutated": 71
     },
     {
       "date": "2026-03-16",
@@ -297,194 +536,239 @@
     },
     {
       "date": "2026-03-18",
-      "toolCalls": 1547,
-      "filesMutated": 63
+      "toolCalls": 1566,
+      "filesMutated": 65
     },
     {
       "date": "2026-03-19",
-      "toolCalls": 373,
-      "filesMutated": 34
+      "toolCalls": 704,
+      "filesMutated": 37
+    },
+    {
+      "date": "2026-03-20",
+      "toolCalls": 1132,
+      "filesMutated": 46
+    },
+    {
+      "date": "2026-03-21",
+      "toolCalls": 2207,
+      "filesMutated": 169
+    },
+    {
+      "date": "2026-03-22",
+      "toolCalls": 3515,
+      "filesMutated": 198
+    },
+    {
+      "date": "2026-03-23",
+      "toolCalls": 2424,
+      "filesMutated": 124
+    },
+    {
+      "date": "2026-03-24",
+      "toolCalls": 344,
+      "filesMutated": 12
+    },
+    {
+      "date": "2026-03-25",
+      "toolCalls": 2730,
+      "filesMutated": 136
+    },
+    {
+      "date": "2026-03-26",
+      "toolCalls": 1089,
+      "filesMutated": 59
+    },
+    {
+      "date": "2026-03-27",
+      "toolCalls": 1221,
+      "filesMutated": 85
+    },
+    {
+      "date": "2026-03-28",
+      "toolCalls": 558,
+      "filesMutated": 43
     }
   ],
   "sessions": [
     {
-      "id": "agent-a10bfe365ad03ac51",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T07:24:49.133Z",
-      "end": "2026-03-19T07:24:52.637Z",
-      "durationMinutes": 0.1,
-      "toolCalls": 1,
+      "id": "agent-ac6c4a61958a11405",
+      "project": "anipotts.com",
+      "start": "2026-03-28T06:15:23.220Z",
+      "end": "2026-03-28T06:15:24.025Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-a00cac6ee8c1c1ae5",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T07:24:44.396Z",
-      "end": "2026-03-19T07:24:48.084Z",
-      "durationMinutes": 0.1,
-      "toolCalls": 2,
+      "id": "agent-af0cd333695838ad0",
+      "project": "anipotts.com",
+      "start": "2026-03-28T06:15:16.591Z",
+      "end": "2026-03-28T06:15:17.605Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-a5900211b2e6157d4",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T07:24:40.694Z",
-      "end": "2026-03-19T07:25:03.445Z",
-      "durationMinutes": 0.4,
-      "toolCalls": 15,
+      "id": "agent-aa5f8c7a3e8885036",
+      "project": "anipotts.com",
+      "start": "2026-03-28T06:15:10.625Z",
+      "end": "2026-03-28T06:15:11.743Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "30f20fba-6326-4f07-8e49-fd722208f014",
-      "project": "Code",
-      "start": "2026-03-19T06:51:19.421Z",
-      "end": "2026-03-19T06:53:42.202Z",
-      "durationMinutes": 2.4,
-      "toolCalls": 21,
+      "id": "agent-a98d215add455db01",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:43:53.856Z",
+      "end": "2026-03-28T05:43:54.765Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-ade791fa078f55201",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T06:27:59.358Z",
-      "end": "2026-03-19T06:29:24.697Z",
-      "durationMinutes": 1.4,
+      "id": "agent-af2dcaa07fc16e0da",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:43:48.635Z",
+      "end": "2026-03-28T05:43:49.804Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
+      "filesMutated": 0
+    },
+    {
+      "id": "fded5d19-f442-46bf-82f6-d39472e796e8",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:43:25.649Z",
+      "end": "2026-03-28T06:37:39.447Z",
+      "durationMinutes": 54.2,
+      "toolCalls": 311,
+      "filesMutated": 17
+    },
+    {
+      "id": "agent-a165074731fe59660",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:25:01.979Z",
+      "end": "2026-03-28T05:26:54.446Z",
+      "durationMinutes": 1.9,
+      "toolCalls": 27,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-abe8dc345b8ed9832",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:24:54.979Z",
+      "end": "2026-03-28T05:26:24.252Z",
+      "durationMinutes": 1.5,
       "toolCalls": 11,
-      "filesMutated": 1
+      "filesMutated": 0
     },
     {
-      "id": "agent-adddaaf07336a70c7",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T05:57:36.709Z",
-      "end": "2026-03-19T05:58:20.865Z",
-      "durationMinutes": 0.7,
-      "toolCalls": 8,
-      "filesMutated": 1
+      "id": "agent-a69a7c5e4e9858766",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:24:50.544Z",
+      "end": "2026-03-28T05:26:24.529Z",
+      "durationMinutes": 1.6,
+      "toolCalls": 19,
+      "filesMutated": 0
     },
     {
-      "id": "agent-a63e92871c4e064c9",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T05:57:31.457Z",
-      "end": "2026-03-19T05:59:32.327Z",
-      "durationMinutes": 2,
+      "id": "agent-a10aa678dc35d126e",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:24:45.806Z",
+      "end": "2026-03-28T05:25:54.820Z",
+      "durationMinutes": 1.2,
+      "toolCalls": 9,
+      "filesMutated": 0
+    },
+    {
+      "id": "agent-ab85b82aa08c704d3",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:24:41.157Z",
+      "end": "2026-03-28T05:26:12.333Z",
+      "durationMinutes": 1.5,
       "toolCalls": 11,
-      "filesMutated": 1
-    },
-    {
-      "id": "agent-a5809f82b11024aae",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:43:40.254Z",
-      "end": "2026-03-19T04:45:54.025Z",
-      "durationMinutes": 2.2,
-      "toolCalls": 10,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-84728e88169c9502",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:02:40.890Z",
-      "end": "2026-03-19T04:03:19.779Z",
-      "durationMinutes": 0.6,
-      "toolCalls": 1,
+      "id": "agent-a543e64e244e09aec",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:30.933Z",
+      "end": "2026-03-28T05:23:31.871Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-91d1daec567da90d",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:02:08.154Z",
-      "end": "2026-03-19T04:02:40.612Z",
-      "durationMinutes": 0.5,
-      "toolCalls": 5,
+      "id": "agent-aaa78102b67b5687b",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:27.073Z",
+      "end": "2026-03-28T05:23:28.449Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-55878255b9872d0e",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:01:42.458Z",
-      "end": "2026-03-19T04:02:08.082Z",
-      "durationMinutes": 0.4,
-      "toolCalls": 6,
+      "id": "agent-a5156a81f87120719",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:23.944Z",
+      "end": "2026-03-28T05:23:25.352Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-f67a42dbdde9b0c2",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:01:20.988Z",
-      "end": "2026-03-19T04:01:42.399Z",
-      "durationMinutes": 0.4,
-      "toolCalls": 2,
+      "id": "agent-a7bcd0ebc9c31108a",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:14.807Z",
+      "end": "2026-03-28T05:23:15.781Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "agent-aeb5486f87688ce20",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:01:20.988Z",
-      "end": "2026-03-19T04:03:33.869Z",
-      "durationMinutes": 2.2,
-      "toolCalls": 14,
+      "id": "agent-a4fac6aceac089207",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:07.492Z",
+      "end": "2026-03-28T05:23:09.913Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     },
     {
-      "id": "201fce12-a842-4b17-bdc8-04adb1434304",
-      "project": "fourtwenty.nyc",
-      "start": "2026-03-19T04:00:38.936Z",
-      "end": "2026-03-19T07:24:55.195Z",
-      "durationMinutes": 204.3,
-      "toolCalls": 266,
-      "filesMutated": 31
+      "id": "agent-adad95e355f8cee53",
+      "project": "component-redesign",
+      "start": "2026-03-28T05:23:01.126Z",
+      "end": "2026-03-28T05:23:01.894Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
+      "filesMutated": 0
     },
     {
-      "id": "agent-acompact-6d1b1530d57c6e26",
+      "id": "683aff30-6f31-4b9b-9174-d0c4bcbb24ee",
       "project": "anipotts.com",
-      "start": "2026-03-19T03:14:26.958Z",
-      "end": "2026-03-19T03:15:06.535Z",
-      "durationMinutes": 0.7,
-      "toolCalls": 3,
+      "start": "2026-03-28T05:17:54.063Z",
+      "end": "2026-03-28T05:39:07.181Z",
+      "durationMinutes": 21.2,
+      "toolCalls": 128,
+      "filesMutated": 25
+    },
+    {
+      "id": "agent-a112061a3e45c7c00",
+      "project": "anipotts.com",
+      "start": "2026-03-28T05:09:44.790Z",
+      "end": "2026-03-28T05:11:32.958Z",
+      "durationMinutes": 1.8,
+      "toolCalls": 13,
       "filesMutated": 0
     },
     {
-      "id": "agent-acompact-f86887496f83aa32",
+      "id": "agent-ae4365a133d723e45",
       "project": "anipotts.com",
-      "start": "2026-03-19T03:13:49.753Z",
-      "end": "2026-03-19T03:14:26.666Z",
-      "durationMinutes": 0.6,
-      "toolCalls": 1,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-acompact-8662694c9ded0b5f",
-      "project": "anipotts.com",
-      "start": "2026-03-19T03:13:10.841Z",
-      "end": "2026-03-19T03:13:49.459Z",
-      "durationMinutes": 0.6,
-      "toolCalls": 1,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-acompact-d0b532b004ca07a6",
-      "project": "anipotts.com",
-      "start": "2026-03-19T03:12:31.208Z",
-      "end": "2026-03-19T03:13:10.579Z",
-      "durationMinutes": 0.7,
-      "toolCalls": 1,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-acompact-d8bd32aedc5db3de",
-      "project": "anipotts.com",
-      "start": "2026-03-19T03:11:48.929Z",
-      "end": "2026-03-19T03:12:30.933Z",
-      "durationMinutes": 0.7,
-      "toolCalls": 1,
-      "filesMutated": 0
-    },
-    {
-      "id": "agent-acompact-ab9f356d996f717f",
-      "project": "anipotts.com",
-      "start": "2026-03-19T03:11:16.220Z",
-      "end": "2026-03-19T03:11:48.690Z",
-      "durationMinutes": 0.5,
-      "toolCalls": 1,
+      "start": "2026-03-28T04:53:01.050Z",
+      "end": "2026-03-28T04:53:02.159Z",
+      "durationMinutes": 0,
+      "toolCalls": 0,
       "filesMutated": 0
     }
   ],
@@ -515,15 +799,15 @@
   },
   "live": {
     "isCodingNow": true,
-    "lastModifiedAt": "2026-03-19T07:25:03.851Z"
+    "lastModifiedAt": "2026-03-28T06:37:54.626Z"
   },
   "meta": {
-    "projectCount": 29,
+    "projectCount": 30,
     "sinceDays": 180,
-    "sourceSessions": 6915,
-    "sourceFiles": 6932
+    "sourceSessions": 7331,
+    "sourceFiles": 7345
   },
   "labels": {
-    "generatedAtLocal": "Mar 19, 2026, 03:25 AM"
+    "generatedAtLocal": "Mar 28, 2026, 02:37 AM"
   }
 }
