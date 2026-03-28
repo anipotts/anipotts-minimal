@@ -1,21 +1,14 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkOrigin } from "@/lib/cors";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { parseContactPayload } from "@anipotts/lib";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://anipotts.com",
-  "https://www.anipotts.com",
-  ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
-]);
-
 export async function POST(request: Request) {
   try {
-    const origin = request.headers.get("origin");
-    if (origin && !ALLOWED_ORIGINS.has(origin)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const forbidden = checkOrigin(request);
+    if (forbidden) return forbidden;
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
