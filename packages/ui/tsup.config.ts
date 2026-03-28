@@ -12,8 +12,7 @@ export default defineConfig({
     "providers/index": "src/providers/index.ts",
   },
   format: ["esm"],
-  // dts: false - types resolve via TS project references and tsconfig paths, not .d.ts files
-  dts: false,
+  dts: true,
   splitting: true,
   sourcemap: false,
   external: ["react", "react-dom", "next"],

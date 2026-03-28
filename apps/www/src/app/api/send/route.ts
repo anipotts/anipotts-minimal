@@ -34,7 +34,11 @@ export async function POST(request: Request) {
       return NextResponse.json(parsed.error, { status: 400 });
     }
 
-    const { name, email, message, captchaToken } = parsed.data;
+    const data = parsed.data;
+    if (!data) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+    const { name, email, message, captchaToken } = data;
 
     const captchaRequired = Boolean(process.env.TURNSTILE_SECRET_KEY);
 

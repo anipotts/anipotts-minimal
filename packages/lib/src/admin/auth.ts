@@ -11,10 +11,15 @@ import { authenticator } from "otplib";
 export const ADMIN_COOKIE = "admin_session";
 
 /** Cookie options for admin session */
-export const ADMIN_COOKIE_OPTIONS = {
+export const ADMIN_COOKIE_OPTIONS: {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "strict" | "lax" | "none";
+  maxAge: number;
+} = {
   httpOnly: true,
   secure: true,
-  sameSite: "strict" as const,
+  sameSite: "strict",
   maxAge: 28800,
 };
 
