@@ -88,7 +88,7 @@ export default function ClaudePage() {
           </PageSummary>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <CardBlock>
               <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
                 sessions

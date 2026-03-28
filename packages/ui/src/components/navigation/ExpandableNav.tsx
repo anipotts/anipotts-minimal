@@ -81,7 +81,7 @@ export function ExpandableNav({
 
   return (
     <nav
-      className="nav-container w-full pt-8 pb-6 md:pt-10 md:pb-6"
+      className="nav-container w-full pt-6 pb-4 md:pt-8 md:pb-5"
       aria-label="Main navigation"
     >
       <div className="flex items-center justify-between gap-4">

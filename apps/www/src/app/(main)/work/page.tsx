@@ -87,7 +87,7 @@ export default async function WorkPage({
             ))}
           </div>
 
-          <div className="flex flex-col gap-4 mt-4">
+          <div className="flex flex-col gap-3">
             {projects.length > 0 ? (
               projects.map((project) => (
                 <ProjectCard key={project.slug} project={project} />

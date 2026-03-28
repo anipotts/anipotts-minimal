@@ -75,7 +75,7 @@ export default async function ThoughtsPage({
               <FadeIn
                 key={thought.slug}
                 delay={0.04 + index * 0.03}
-                className="py-7 first:pt-0 last:pb-0"
+                className="py-5 md:py-6 first:pt-0 last:pb-0"
               >
                 <ThoughtLink thought={thought} />
               </FadeIn>

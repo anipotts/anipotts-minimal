@@ -84,7 +84,7 @@ export function SessionTable({ sessions, timezone }: SessionTableProps) {
     <button
       type="button"
       onClick={() => toggleSort(key)}
-      className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-muted hover:text-secondary"
+      className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted hover:text-secondary"
     >
       {label}
       <span
