@@ -10,6 +10,24 @@ export function Bone({ className }: { className?: string }) {
   );
 }
 
+/** Variable-width text placeholder lines */
+export function SkeletonText({
+  lines = 1,
+  className,
+}: {
+  lines?: number;
+  className?: string;
+}) {
+  const widths = ["w-full", "w-5/6", "w-4/6", "w-3/4", "w-2/3"];
+  return (
+    <div className={clsx("flex flex-col gap-2.5", className)}>
+      {Array.from({ length: lines }, (_, i) => (
+        <Bone key={i} className={clsx("h-4", widths[i % widths.length])} />
+      ))}
+    </div>
+  );
+}
+
 /** Matches the standard page header: prelude + title + summary */
 export function SkeletonPageHeader({ prelude }: { prelude?: string }) {
   return (

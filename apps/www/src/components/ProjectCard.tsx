@@ -1,22 +1,11 @@
 import Link from "next/link";
 import type { ProjectEntry } from "@/content/projects";
-
-function StatusBadge({ project }: { project: ProjectEntry }) {
-  if (project.status === "in-progress") {
-    return (
-      <span className="text-[10px] uppercase tracking-wider text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded font-medium">
-        in progress
-      </span>
-    );
-  }
-
-  return null;
-}
+import { StatusBadge, TagList } from "@/components/page/PageScaffold";
 
 export default function ProjectCard({ project }: { project: ProjectEntry }) {
   return (
     <article className="w-full">
-      <details className="group border-l-2 border-border transition-colors duration-200 hover:border-overlay-30 hover:bg-overlay-5 open:border-accent-400/40">
+      <details className="group border-l-2 border-border transition-all duration-300 hover:border-overlay-30 hover:bg-overlay-5 open:border-accent-400/40 open:bg-overlay-5">
         <summary className="list-none cursor-pointer pl-4 pr-4 py-3">
           <div className="flex justify-between items-start gap-3">
             <div className="flex flex-col gap-1">
@@ -28,31 +17,22 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
                 <h3 className="font-semibold text-secondary group-hover:text-heading font-heading">
                   {project.title}
                 </h3>
-                <StatusBadge project={project} />
+                {project.status && <StatusBadge status={project.status} />}
               </div>
-              <p className="text-xs text-muted pl-6">{project.subtitle}</p>
+              <p className="text-xs text-muted pl-8">{project.subtitle}</p>
             </div>
             <span className="text-xs text-faint font-mono shrink-0">
-              {project.year}
+              {project.duration || project.year}
             </span>
           </div>
         </summary>
 
-        <div className="pl-10 pr-4 pb-5 pt-2 flex flex-col gap-5 animate-[fadeInUp_0.5s_ease-out_both]">
+        <div className="pl-8 pr-4 pb-4 pt-3 flex flex-col gap-5">
           <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
             {project.description}
           </p>
 
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          <TagList tags={project.tags} />
 
           {(project.links?.page ||
             project.links?.live ||

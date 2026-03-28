@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CaretRight,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import { Stagger } from "@anipotts/ui";
 import { getProjectBySlug, projectEntries } from "@/content/projects";
 import { projectContent } from "@/data/project-content";
+import {
+  BackLink,
+  MetaLine,
+  PageFrame,
+  PageSummary,
+  PageTitle,
+  SectionBlock,
+  StatusBadge,
+  TagList,
+} from "@/components/page/PageScaffold";
 
 export async function generateStaticParams() {
   return projectEntries
@@ -58,46 +64,31 @@ export default async function ProjectPage({
   }
 
   return (
-    <div className="flex flex-col gap-14 pb-20 max-w-4xl mx-auto w-full">
-      <Stagger as="section" className="flex flex-col gap-5">
-        <Link
-          href="/work"
-          className="text-xs font-mono text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
-        >
-          <ArrowLeft size={12} /> back to work
-        </Link>
+    <PageFrame>
+      <Stagger>
+        <BackLink href="/work">back to work</BackLink>
+      </Stagger>
 
+      <Stagger as="section" className="flex flex-col gap-4" offset={0.06}>
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-4xl md:text-5xl font-semibold font-heading text-heading">
-            {project.title}
-          </h1>
-          {project.status === "live" && (
-            <span className="text-[10px] uppercase tracking-wider text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded">
-              live
-            </span>
-          )}
+          <PageTitle>{project.title}</PageTitle>
+          {project.status && <StatusBadge status={project.status} />}
         </div>
-
-        <p className="text-secondary text-lg">{project.subtitle}</p>
-
-        <div className="flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-[10px] uppercase tracking-wider text-muted bg-input px-2 py-1 rounded-sm"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
+        <PageSummary>{project.subtitle}</PageSummary>
+        <MetaLine
+          items={[
+            { label: "role", value: project.role },
+            { label: "duration", value: project.duration },
+          ]}
+        />
+        <TagList tags={project.tags} />
         <div className="flex flex-wrap gap-4 text-xs font-mono">
           {project.links?.live && (
             <a
               href={project.links.live}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent-400 hover:underline"
+              className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
             >
               ./launch_site.sh
             </a>
@@ -107,7 +98,7 @@ export default async function ProjectPage({
               href={project.links.repo}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-tertiary hover:text-body hover:underline"
+              className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
             >
               ./view_source.git
             </a>
@@ -115,25 +106,15 @@ export default async function ProjectPage({
         </div>
       </Stagger>
 
-      <Stagger as="section" className="flex flex-col gap-4" offset={0.3}>
-        <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
-          overview
-        </h2>
+      <SectionBlock label="overview">
         <p className="text-secondary leading-relaxed text-base md:text-lg">
           {content?.overview || project.description}
         </p>
-      </Stagger>
+      </SectionBlock>
 
       {content?.technical && (
-        <Stagger as="section" className="flex flex-col gap-4" offset={0.36}>
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
-            technical
-          </h2>
-          <Stagger
-            className="flex flex-col gap-5"
-            interval={0.04}
-            offset={0.42}
-          >
+        <SectionBlock label="technical">
+          <Stagger className="flex flex-col gap-5" interval={0.04}>
             {content.technical.map((section) => (
               <div key={section.title} className="border-l border-border pl-4">
                 <h3 className="text-sm font-semibold text-body mb-1">
@@ -145,19 +126,12 @@ export default async function ProjectPage({
               </div>
             ))}
           </Stagger>
-        </Stagger>
+        </SectionBlock>
       )}
 
       {content?.roadmap && (
-        <Stagger as="section" className="flex flex-col gap-4" offset={0.48}>
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
-            next
-          </h2>
-          <Stagger
-            className="flex flex-col gap-3"
-            interval={0.03}
-            offset={0.54}
-          >
+        <SectionBlock label="next">
+          <Stagger className="flex flex-col gap-3" interval={0.03}>
             {content.roadmap.map((item, index) => (
               <div
                 key={`${item.text}-${index}`}
@@ -173,11 +147,11 @@ export default async function ProjectPage({
                   }`}
                 >
                   {item.status === "done" ? (
-                    "✓"
+                    "\u2713"
                   ) : item.status === "in-progress" ? (
                     <CaretRight size={10} />
                   ) : (
-                    "○"
+                    "\u25CB"
                   )}
                 </span>
                 <span
@@ -190,27 +164,24 @@ export default async function ProjectPage({
               </div>
             ))}
           </Stagger>
-        </Stagger>
+        </SectionBlock>
       )}
 
       {content?.relatedThoughts && content.relatedThoughts.length > 0 && (
-        <Stagger as="section" className="flex flex-col gap-3" offset={0.54}>
-          <h2 className="text-xs uppercase tracking-[0.16em] text-accent-400">
-            related thoughts
-          </h2>
-          <Stagger className="flex flex-col gap-2" interval={0.03} offset={0.6}>
+        <SectionBlock label="related thoughts">
+          <Stagger className="flex flex-col gap-2" interval={0.03}>
             {content.relatedThoughts.map((thought) => (
               <Link
                 key={thought.slug}
                 href={`/thoughts/${thought.slug}`}
-                className="text-sm text-tertiary hover:text-accent-400 transition-colors inline-flex items-center gap-1.5"
+                className="text-sm text-tertiary hover:text-accent-400 transition-colors duration-200 inline-flex items-center gap-1.5"
               >
                 <ArrowRight size={12} /> {thought.title}
               </Link>
             ))}
           </Stagger>
-        </Stagger>
+        </SectionBlock>
       )}
-    </div>
+    </PageFrame>
   );
 }
