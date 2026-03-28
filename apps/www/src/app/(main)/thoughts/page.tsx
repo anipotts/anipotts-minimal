@@ -49,7 +49,7 @@ export default async function ThoughtsPage({
         </PageSummary>
       </Stagger>
 
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-6">
         <Suspense fallback={null}>
           <ThoughtsSearch />
         </Suspense>
@@ -61,24 +61,25 @@ export default async function ThoughtsPage({
           </p>
         )}
 
-        <ListBlock>
-          {thoughts.length === 0 ? (
-            <p className="text-muted text-sm font-mono py-8 text-center">
-              no results. try a broader query.
-            </p>
-          ) : (
-            <Stagger
-              className="flex flex-col divide-y divide-border-subtle"
-              interval={0.04}
-            >
-              {thoughts.map((thought) => (
-                <div key={thought.slug} className="py-7 first:pt-0 last:pb-0">
-                  <ThoughtLink thought={thought} />
-                </div>
-              ))}
-            </Stagger>
-          )}
-        </ListBlock>
+        {thoughts.length === 0 ? (
+          <p className="text-muted text-sm font-mono py-8 text-center">
+            no results. try a broader query.
+          </p>
+        ) : (
+          <Stagger
+            className="flex flex-col divide-y divide-border-subtle"
+            interval={0.04}
+          >
+            {thoughts.map((thought) => (
+              <div
+                key={thought.slug}
+                className="py-5 md:py-6 first:pt-0 last:pb-0"
+              >
+                <ThoughtLink thought={thought} />
+              </div>
+            ))}
+          </Stagger>
+        )}
       </section>
     </PageFrame>
   );
