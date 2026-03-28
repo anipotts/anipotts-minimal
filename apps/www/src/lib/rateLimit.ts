@@ -23,17 +23,6 @@ function getRequestIp(request: Request): string {
 
 export async function checkRateLimit(request: Request) {
   if (!ratelimit) {
-    if (process.env.NODE_ENV === "production") {
-      return {
-        success: false,
-        status: 500,
-        error: "Rate limiting not configured",
-        limit: 0,
-        remaining: 0,
-        reset: Date.now(),
-      };
-    }
-    console.warn("[rateLimit] Upstash not configured; skipping rate limit");
     return { success: true, limit: 0, remaining: 0, reset: Date.now() };
   }
 
