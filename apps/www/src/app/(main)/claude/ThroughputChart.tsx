@@ -11,6 +11,12 @@ interface ThroughputChartProps {
   className?: string;
 }
 
+const ACCENT = "#61abea";
+const ACCENT_60 = "#61abea99";
+const ACCENT_90 = "#61abeae6";
+const MUTED = "#6b7280";
+const GRID = "#ffffff10";
+
 export function ThroughputChart({ data, className }: ThroughputChartProps) {
   if (!data.length) return null;
 
@@ -41,7 +47,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
         viewBox={`0 0 ${width} ${height}`}
         className="w-full h-44"
         role="img"
-        aria-label="Tool calls and files mutated over the last 30 days"
+        aria-label="Tool calls and files mutated over the last 90 days"
       >
         {[0.25, 0.5, 0.75, 1].map((ratio) => {
           const y = chartBottom - chartHeight * ratio;
@@ -52,7 +58,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
               x2={width}
               y1={y}
               y2={y}
-              stroke="rgba(var(--border-subtle),0.6)"
+              stroke={GRID}
               strokeDasharray="4 4"
             />
           );
@@ -70,7 +76,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
               width={Math.max(2, barWidth - 2)}
               height={barHeight}
               rx={2}
-              fill="rgba(var(--accent-400),0.6)"
+              fill={ACCENT_60}
             />
           );
         })}
@@ -78,7 +84,7 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
         <polyline
           points={linePoints}
           fill="none"
-          stroke="rgba(var(--accent-400),0.9)"
+          stroke={ACCENT_90}
           strokeWidth={2}
         />
 
@@ -90,38 +96,35 @@ export function ThroughputChart({ data, className }: ThroughputChartProps) {
               chartHeight
           }
           r={3}
-          fill="rgba(var(--accent-400),1)"
+          fill={ACCENT}
         />
 
-        <text x={0} y={height - 12} fill="rgba(var(--muted),1)" fontSize="10">
+        <text x={0} y={height - 12} fill={MUTED} fontSize="10">
           {data[0]?.date}
         </text>
         <text
           x={width}
           y={height - 12}
-          fill="rgba(var(--muted),1)"
+          fill={MUTED}
           fontSize="10"
           textAnchor="end"
         >
           {data[data.length - 1]?.date}
         </text>
-        <text
-          x={width}
-          y={16}
-          fill="rgba(var(--muted),1)"
-          fontSize="10"
-          textAnchor="end"
-        >
+        <text x={width} y={16} fill={MUTED} fontSize="10" textAnchor="end">
           max {maxValue.toLocaleString()}
         </text>
       </svg>
       <div className="flex items-center gap-4 text-[11px] text-tertiary font-mono">
         <span className="inline-flex items-center gap-2">
-          <span className="h-2 w-6 rounded-sm bg-[rgba(var(--accent-400),0.6)]" />
+          <span
+            className="h-2 w-6 rounded-sm"
+            style={{ backgroundColor: ACCENT_60 }}
+          />
           tool calls
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="h-0.5 w-6 bg-[rgba(var(--accent-400),0.9)]" />
+          <span className="h-0.5 w-6" style={{ backgroundColor: ACCENT_90 }} />
           files mutated
         </span>
       </div>

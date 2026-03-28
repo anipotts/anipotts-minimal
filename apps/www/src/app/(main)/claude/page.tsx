@@ -155,7 +155,7 @@ export default function ClaudePage() {
               <CardBlock>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between text-xs font-mono text-tertiary">
-                    <span>throughput · last 30 days</span>
+                    <span>throughput · last 90 days</span>
                     <span>{claudeStats.timezone}</span>
                   </div>
                   <ThroughputChart data={claudeStats.daily} />
