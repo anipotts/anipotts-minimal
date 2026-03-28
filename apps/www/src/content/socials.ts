@@ -25,4 +25,16 @@ export const socialLinks: SocialLink[] = [
     icon: "x",
     description: "@anipottsbuilds",
   },
+  {
+    name: "newsletter",
+    url: "https://news.anipotts.com",
+    icon: "email",
+    description: "Ani Potts Builds",
+  },
+  {
+    name: "buy me a coffee",
+    url: "https://buymeacoffee.com/anipotts",
+    icon: "coffee",
+    description: "buymeacoffee.com/anipotts",
+  },
 ];

@@ -47,6 +47,18 @@ export const socialLinks: SocialLink[] = [
     icon: "mastodon",
     description: "@anipotts@mastodon.social",
   },
+  {
+    name: "newsletter",
+    url: "https://news.anipotts.com",
+    icon: "email",
+    description: "Ani Potts Builds",
+  },
+  {
+    name: "buy me a coffee",
+    url: "https://buymeacoffee.com/anipotts",
+    icon: "coffee",
+    description: "buymeacoffee.com/anipotts",
+  },
 ];
 
 /** Alias for fallback when Supabase is unavailable */
