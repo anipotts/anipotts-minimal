@@ -5,7 +5,6 @@ import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import ThoughtsSearch from "@/components/thoughts/ThoughtsSearch";
 import { getPublishedThoughts, searchThoughtEntries } from "@/content/thoughts";
 import {
-  ListBlock,
   PageFrame,
   PagePrelude,
   PageSummary,
