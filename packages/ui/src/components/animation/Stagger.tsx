@@ -22,9 +22,7 @@ export function Stagger({
   className,
   as: Tag = "div",
 }: StaggerProps) {
-  const items = React.Children.toArray(children).filter(
-    (child) => child !== null && child !== undefined && child !== false,
-  );
+  const items = React.Children.toArray(children);
 
   return (
     <Tag className={className}>

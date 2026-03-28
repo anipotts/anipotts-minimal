@@ -93,10 +93,11 @@ function groupByYearAndQuarter(projects: ProjectEntry[]): YearGroup[] {
     }
 
     if (!yearMap.has(year)) yearMap.set(year, new Map());
-    const qMap = yearMap.get(year)!;
+    const qMap = yearMap.get(year) ?? new Map();
     const key = quarter ?? "_none";
     if (!qMap.has(key)) qMap.set(key, []);
-    qMap.get(key)!.push(project);
+    const arr = qMap.get(key) ?? [];
+    arr.push(project);
   }
 
   return Array.from(yearMap.entries())
