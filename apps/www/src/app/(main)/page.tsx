@@ -8,6 +8,7 @@ import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import {
   ContentBlocks,
   EndCta,
+  ListBlock,
   PageFrame,
   PagePrelude,
   PageSummary,
@@ -48,35 +49,26 @@ export default async function Home() {
         <PageSummary>{homeContent.summary}</PageSummary>
       </Stagger>
 
-      <section className="flex flex-col gap-4">
-        <Stagger>
-          <PagePrelude>about</PagePrelude>
-          <ContentBlocks>
-            <Stagger
-              className="flex flex-col gap-8"
-              interval={0.05}
-              offset={0.06}
+      <Stagger as="section" className="flex flex-col gap-4" offset={0.18}>
+        <PagePrelude>about</PagePrelude>
+        <ContentBlocks>
+          {homeContent.about.map((line) => (
+            <p
+              key={line}
+              className="text-body leading-relaxed text-base md:text-lg"
             >
-              {homeContent.about.map((line) => (
-                <p
-                  key={line}
-                  className="text-body leading-relaxed text-base md:text-lg"
-                >
-                  {line}
-                </p>
-              ))}
-            </Stagger>
-          </ContentBlocks>
-        </Stagger>
-      </section>
+              {line}
+            </p>
+          ))}
+        </ContentBlocks>
+      </Stagger>
 
       <section className="flex flex-col gap-4" id="selected-work">
-        <Stagger>
+        <Stagger offset={0.3}>
           <PagePrelude>selected work</PagePrelude>
           <Stagger
             className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             interval={0.04}
-            offset={0.06}
           >
             {projects.map((project) => (
               <ProjectCard key={project.slug} project={project} />
@@ -97,35 +89,31 @@ export default async function Home() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <Stagger>
-          <PagePrelude>latest thoughts</PagePrelude>
-          <Stagger
-            className="flex flex-col gap-8"
-            interval={0.04}
-            offset={0.06}
+      <Stagger as="section" className="flex flex-col gap-4" offset={0.42}>
+        <PagePrelude>latest thoughts</PagePrelude>
+        <ListBlock>
+          {recentThoughts.map((thought) => (
+            <div key={thought.slug} className="py-5 first:pt-0 last:pb-0">
+              <ThoughtLink thought={thought} />
+            </div>
+          ))}
+        </ListBlock>
+        <EndCta>
+          <Link
+            href="/thoughts"
+            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
           >
-            {recentThoughts.map((thought) => (
-              <ThoughtLink key={thought.slug} thought={thought} />
-            ))}
-          </Stagger>
-          <EndCta>
-            <Link
-              href="/thoughts"
-              className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
-            >
-              view all thoughts
-              <ArrowRight
-                size={12}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </Link>
-          </EndCta>
-        </Stagger>
-      </section>
+            view all thoughts
+            <ArrowRight
+              size={12}
+              className="transition-transform group-hover:translate-x-1"
+            />
+          </Link>
+        </EndCta>
+      </Stagger>
 
       <section className="flex flex-col gap-4" aria-label="Newsletter">
-        <Stagger>
+        <Stagger offset={0.5}>
           <NewsletterSubscribe />
         </Stagger>
       </section>
