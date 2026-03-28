@@ -82,7 +82,7 @@ export default function ClaudePage() {
           high-velocity implementation loops.
         </PageSummary>
         <Stagger
-          className="grid grid-cols-2 md:grid-cols-5 gap-2"
+          className="grid grid-cols-2 md:grid-cols-5 gap-2 [&>div]:h-full [&>div>*]:h-full"
           interval={0.04}
           offset={0.18}
         >
@@ -138,8 +138,8 @@ export default function ClaudePage() {
         </div>
       </Stagger>
 
-      <section className="flex flex-col gap-4" id="leaderboard">
-        <Stagger>
+      <section id="leaderboard">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>code time leaderboard</PagePrelude>
           <PageSummary>
             Live session telemetry across Claude Code projects, tuned to show
@@ -177,8 +177,8 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4" id="burst-records">
-        <Stagger>
+      <section id="burst-records">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>burst records</PagePrelude>
           <Stagger
             className="grid grid-cols-1 md:grid-cols-2 gap-3"
@@ -246,8 +246,8 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4" id="systems">
-        <Stagger>
+      <section id="systems">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>selected systems</PagePrelude>
           <ContentBlocks>
             <Stagger
@@ -294,8 +294,8 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4" id="plugins">
-        <Stagger>
+      <section id="plugins">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>plugins + hooks</PagePrelude>
           <ContentBlocks>
             <Stagger
@@ -347,8 +347,8 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4" id="playbooks">
-        <Stagger>
+      <section id="playbooks">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>playbooks + docs</PagePrelude>
           <Stagger
             className="grid grid-cols-1 md:grid-cols-2 gap-3"
@@ -398,8 +398,8 @@ export default function ClaudePage() {
         </Stagger>
       </section>
 
-      <section className="flex flex-col gap-4" id="work-together">
-        <Stagger>
+      <section id="work-together">
+        <Stagger className="flex flex-col gap-4">
           <PagePrelude>work together</PagePrelude>
           <CardBlock>
             <div className="flex flex-col gap-3">

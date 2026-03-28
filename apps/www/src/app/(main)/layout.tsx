@@ -9,7 +9,10 @@ export default function MainLayout({
   return (
     <div className="flex flex-col flex-grow w-full">
       <Navbar />
-      <main id="main-content" className="main-content flex-grow py-2 md:py-4">
+      <main
+        id="main-content"
+        className="main-content flex-grow pt-6 pb-4 md:pt-10 md:pb-6"
+      >
         {children}
       </main>
       <Footer />

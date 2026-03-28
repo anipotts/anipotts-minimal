@@ -63,8 +63,8 @@ export default async function Home() {
         </ContentBlocks>
       </Stagger>
 
-      <section className="flex flex-col gap-4" id="selected-work">
-        <Stagger offset={0.3}>
+      <section id="selected-work">
+        <Stagger className="flex flex-col gap-4" offset={0.3}>
           <PagePrelude>selected work</PagePrelude>
           <Stagger
             className="grid grid-cols-1 sm:grid-cols-2 gap-3"
@@ -112,8 +112,8 @@ export default async function Home() {
         </EndCta>
       </Stagger>
 
-      <section className="flex flex-col gap-4" aria-label="Newsletter">
-        <Stagger offset={0.5}>
+      <section aria-label="Newsletter">
+        <Stagger className="flex flex-col gap-4" offset={0.5}>
           <NewsletterSubscribe />
         </Stagger>
       </section>
