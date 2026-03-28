@@ -39,7 +39,6 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [_fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!initialIntent) return;
@@ -113,7 +112,6 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
 
     setStatus("loading");
     setErrorMessage("");
-    setFieldErrors({});
 
     try {
       if (captchaRequired && !captchaToken) {
@@ -138,7 +136,6 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
             errors[String(key)] = issue.message;
           }
         }
-        setFieldErrors(errors);
         setStatus("error");
         setErrorMessage("Please fix the highlighted fields.");
         return;
@@ -169,7 +166,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       resetTurnstile();
 
       setTimeout(() => setStatus("idle"), 2800);
-    } catch (error) {
+    } catch {
       setStatus("error");
       setErrorMessage("Failed to send. Try again or email directly.");
       resetTurnstile();
