@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Stagger } from "@anipotts/ui";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import ThoughtsSearch from "@/components/thoughts/ThoughtsSearch";
 import { getPublishedThoughts, searchThoughtEntries } from "@/content/thoughts";
@@ -39,14 +38,14 @@ export default async function ThoughtsPage({
 
   return (
     <PageFrame>
-      <Stagger as="section" className="flex flex-col gap-5">
+      <section className="flex flex-col gap-5">
         <PagePrelude>thoughts</PagePrelude>
         <PageTitle>writing, systems, and product notes</PageTitle>
         <PageSummary>
           Short technical essays and operating notes from projects, experiments,
           and shipping cycles.
         </PageSummary>
-      </Stagger>
+      </section>
 
       <section className="flex flex-col gap-6">
         <Suspense fallback={null}>
@@ -65,10 +64,7 @@ export default async function ThoughtsPage({
             no results. try a broader query.
           </p>
         ) : (
-          <Stagger
-            className="flex flex-col divide-y divide-border-subtle"
-            interval={0.04}
-          >
+          <div className="flex flex-col divide-y divide-border-subtle">
             {thoughts.map((thought) => (
               <div
                 key={thought.slug}
@@ -77,7 +73,7 @@ export default async function ThoughtsPage({
                 <ThoughtLink thought={thought} />
               </div>
             ))}
-          </Stagger>
+          </div>
         )}
       </section>
     </PageFrame>
