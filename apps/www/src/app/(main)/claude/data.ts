@@ -1,96 +1,38 @@
-const REPO = "https://github.com/anipotts/claude-code-tips";
-const BLOB = `${REPO}/blob/main`;
+const TIPS_REPO = "https://github.com/anipotts/claude-code-tips";
+const TIPS_BLOB = `${TIPS_REPO}/blob/main`;
+const MINE_REPO = "https://github.com/anipotts/mine";
+const MINE_BLOB = `${MINE_REPO}/blob/main`;
 
-export { REPO, BLOB };
+export { TIPS_REPO, TIPS_BLOB, MINE_REPO, MINE_BLOB };
 
-// --- Plugins ---
+// --- Plugin (mine) ---
 
-export interface PluginFeature {
+export interface MineFeature {
   name: string;
   desc: string;
-  href: string;
 }
 
-export interface Plugin {
-  name: string;
-  slug: string;
-  tagline: string;
-  install: string;
-  href: string;
-  features: PluginFeature[];
-}
-
-export const plugins: Plugin[] = [
-  {
-    name: "miner",
-    slug: "miner",
-    tagline:
-      "session analytics, cost tracking, and usage insights for claude code",
-    install: "claude plugin add anipotts/claude-code-tips miner",
-    href: `${BLOB}/plugins/miner`,
-
-    features: [
-      {
-        name: "session logger",
-        desc: "logs every session with token counts, duration, cost",
-        href: `${BLOB}/plugins/miner/session-logger.md`,
-      },
-      {
-        name: "cost dashboard",
-        desc: "daily/weekly/monthly spend breakdowns",
-        href: `${BLOB}/plugins/miner/cost-dashboard.md`,
-      },
-      {
-        name: "tool call tracker",
-        desc: "tracks which tools get used and how often",
-        href: `${BLOB}/plugins/miner/tool-tracker.md`,
-      },
-      {
-        name: "conversation stats",
-        desc: "message counts, turn ratios, context usage",
-        href: `${BLOB}/plugins/miner/conversation-stats.md`,
-      },
-    ],
-  },
-  {
-    name: "handoff",
-    slug: "handoff",
-    tagline: "seamless context transfer between claude code sessions",
-    install: "claude plugin add anipotts/claude-code-tips handoff",
-    href: `${BLOB}/plugins/handoff`,
-    features: [
-      {
-        name: "context snapshot",
-        desc: "save and restore session context",
-        href: `${BLOB}/plugins/handoff/context-snapshot.md`,
-      },
-      {
-        name: "task continuation",
-        desc: "pick up where you left off across sessions",
-        href: `${BLOB}/plugins/handoff/task-continuation.md`,
-      },
-    ],
-  },
-  {
-    name: "broadcast",
-    slug: "broadcast",
-    tagline: "share claude code session highlights and outputs",
-    install: "claude plugin add anipotts/claude-code-tips broadcast",
-    href: `${BLOB}/plugins/broadcast`,
-    features: [
-      {
-        name: "session export",
-        desc: "export sessions as markdown or json",
-        href: `${BLOB}/plugins/broadcast/session-export.md`,
-      },
-      {
-        name: "highlight reel",
-        desc: "auto-extract the best parts of a session",
-        href: `${BLOB}/plugins/broadcast/highlight-reel.md`,
-      },
-    ],
-  },
-];
+export const minePlugin = {
+  name: "mine",
+  tagline:
+    "mines every claude code session into a local sqlite database. total recall for your dev work.",
+  install: "claude plugin add anipotts/mine",
+  href: MINE_REPO,
+  features: [
+    { name: "/mine", desc: "7-day dashboard with projects, tools, models" },
+    {
+      name: "/mine search",
+      desc: "full-text search across all conversations",
+    },
+    { name: "/mine mistakes", desc: "error patterns claude keeps repeating" },
+    { name: "/mine hotspots", desc: "most-edited files across sessions" },
+    { name: "/mine loops", desc: "where you got stuck" },
+    {
+      name: "/mine cost",
+      desc: "cost breakdown by project, model, daily trend",
+    },
+  ] satisfies MineFeature[],
+};
 
 // --- Hooks ---
 
@@ -103,79 +45,52 @@ export interface Hook {
 
 export const hooks: Hook[] = [
   {
-    name: "pre-commit-lint",
-    event: "PreToolCall",
-    desc: "runs linter before any file write commits",
-    href: `${BLOB}/hooks/pre-commit-lint.md`,
+    name: "safety-guard",
+    event: "PreToolUse",
+    desc: "blocks force pushes, rm -rf, DROP TABLE, curl|bash",
+    href: `${TIPS_BLOB}/hooks/safety-guard.sh`,
   },
   {
-    name: "auto-context",
-    event: "PostToolCall",
-    desc: "injects relevant context after file reads",
-    href: `${BLOB}/hooks/auto-context.md`,
+    name: "panopticon",
+    event: "PostToolUse",
+    desc: "logs every tool action to a local sqlite audit trail",
+    href: `${TIPS_BLOB}/hooks/panopticon.sh`,
   },
   {
-    name: "cost-guard",
-    event: "PreToolCall",
-    desc: "warns when a session is about to exceed cost threshold",
-    href: `${BLOB}/hooks/cost-guard.md`,
+    name: "context-save",
+    event: "PreCompact",
+    desc: "writes a handoff summary before context compaction",
+    href: `${TIPS_BLOB}/hooks/context-save.sh`,
   },
   {
-    name: "output-sanitizer",
-    event: "PostToolCall",
-    desc: "strips sensitive data from tool outputs",
-    href: `${BLOB}/hooks/output-sanitizer.md`,
+    name: "no-squash",
+    event: "PreToolUse",
+    desc: "blocks squash merges. regular merges only.",
+    href: `${TIPS_BLOB}/hooks/no-squash.sh`,
   },
   {
-    name: "session-bookmarks",
+    name: "notify",
     event: "Notification",
-    desc: "saves bookmarks at key moments in a session",
-    href: `${BLOB}/hooks/session-bookmarks.md`,
-  },
-];
-
-// --- Guide ---
-
-export interface GuideTier {
-  level: string;
-  label: string;
-  topics: string[];
-  href: string;
-}
-
-export const guideTiers: GuideTier[] = [
-  {
-    level: "beginner",
-    label: "getting started",
-    topics: [
-      "installation and setup",
-      "your first session",
-      "basic commands",
-      "understanding context windows",
-    ],
-    href: `${BLOB}/docs/guide.md#beginner`,
+    desc: "routes claude code notifications to macOS alerts",
+    href: `${TIPS_BLOB}/hooks/notify.sh`,
   },
   {
-    level: "intermediate",
-    label: "leveling up",
-    topics: [
-      "custom instructions (CLAUDE.md)",
-      "hooks and plugins",
-      "multi-file editing",
-      "cost optimization",
-    ],
-    href: `${BLOB}/docs/guide.md#intermediate`,
+    name: "commit-nudge",
+    event: "PostToolUse",
+    desc: "reminds you to commit after many file edits",
+    href: `${TIPS_BLOB}/hooks/commit-nudge.sh`,
   },
   {
-    level: "advanced",
-    label: "power user",
-    topics: [
-      "custom agents",
-      "MCP server integration",
-      "CI/CD workflows",
-      "enterprise patterns",
-    ],
-    href: `${BLOB}/docs/guide.md#advanced`,
+    name: "replay-capture",
+    event: "Stop",
+    desc: "captures session summary for replay and handoffs",
+    href: `${TIPS_BLOB}/hooks/replay-capture.sh`,
+  },
+  {
+    name: "stats-refresh",
+    event: "SessionStart",
+    desc: "refreshes repo stats from mine.db once per day",
+    href: `${TIPS_BLOB}/hooks/stats-refresh.sh`,
   },
 ];
 
@@ -189,33 +104,43 @@ export interface Doc {
 
 export const docs: Doc[] = [
   {
-    name: "guide.md",
-    desc: "comprehensive getting started guide",
-    href: `${BLOB}/docs/guide.md`,
+    name: "hooks",
+    desc: "the enforcement layer behind automation",
+    href: `${TIPS_BLOB}/docs/hooks.md`,
   },
   {
-    name: "plugins.md",
-    desc: "plugin system architecture and API",
-    href: `${BLOB}/docs/plugins.md`,
-  },
-  {
-    name: "hooks.md",
-    desc: "hook events, lifecycle, and examples",
-    href: `${BLOB}/docs/hooks.md`,
-  },
-  {
-    name: "agents.md",
+    name: "agents",
     desc: "agent configuration and custom agents",
-    href: `${BLOB}/docs/agents.md`,
+    href: `${TIPS_BLOB}/docs/agents.md`,
   },
   {
-    name: "cost-tracking.md",
-    desc: "understanding and optimizing costs",
-    href: `${BLOB}/docs/cost-tracking.md`,
+    name: "cost",
+    desc: "what claude code actually costs, with real numbers",
+    href: `${TIPS_BLOB}/docs/cost.md`,
   },
   {
-    name: "contributing.md",
-    desc: "how to contribute tips and plugins",
-    href: `${BLOB}/docs/contributing.md`,
+    name: "automation",
+    desc: "daemons, cron, github actions patterns",
+    href: `${TIPS_BLOB}/docs/automation.md`,
+  },
+  {
+    name: "mistakes",
+    desc: "mistakes i keep making and the fixes",
+    href: `${TIPS_BLOB}/docs/mistakes.md`,
+  },
+  {
+    name: "my stack",
+    desc: "the 12 CI pipelines that maintain this repo",
+    href: `${TIPS_BLOB}/docs/my-stack.md`,
+  },
+  {
+    name: "session workflow",
+    desc: "how i start a session",
+    href: `${TIPS_BLOB}/docs/session-workflow.md`,
+  },
+  {
+    name: "worktrees",
+    desc: "parallel branches without context switching",
+    href: `${TIPS_BLOB}/docs/worktrees.md`,
   },
 ];

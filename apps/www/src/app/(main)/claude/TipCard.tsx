@@ -6,7 +6,7 @@ import { CopyButton } from "./CopyButton";
 interface TipCardFeature {
   name: string;
   desc: string;
-  href: string;
+  href?: string;
 }
 
 interface TipCardProps {
@@ -107,15 +107,21 @@ export function TipCard({
                   <span className="text-muted select-none font-mono text-xs">
                     +
                   </span>
-                  <a
-                    href={f.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 font-mono text-xs"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {f.name}
-                  </a>
+                  {f.href ? (
+                    <a
+                      href={f.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4 font-mono text-xs"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {f.name}
+                    </a>
+                  ) : (
+                    <span className="text-accent-400 font-mono text-xs">
+                      {f.name}
+                    </span>
+                  )}
                   <span className="text-tertiary text-xs">{f.desc}</span>
                 </div>
               ))}
