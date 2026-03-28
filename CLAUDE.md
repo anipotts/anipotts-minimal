@@ -130,9 +130,9 @@ SUPABASE_SERVICE_ROLE_KEY=<key>
 
 ## Key Technical Patterns
 
-- Pages use `export const revalidate = 0` for fresh Supabase data
+- Supabase-backed pages use `export const revalidate = 0` for fresh data. File-based pages (thoughts list) use `revalidate = 3600`
 - Terminal UI managed by `WindowContext` (states: open, collapsed, minimized, fullscreen)
-- `FadeIn` component for staggered animations
+- `Stagger` component for page section animations (auto-staggers children). `FadeIn` available for one-off cases
 - PostHog proxied through Next.js rewrites to `/ingest/*`
 - Admin requires cookie auth set via ADMIN_PASSWORD env var
 - CMS with Supabase + static fallback (`packages/lib/src/data/`)

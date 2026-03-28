@@ -7,10 +7,10 @@ export const projects: Project[] = [
     title: "Quantercise",
     subtitle: "Quant interview prep for Jane Street, Citadel, Two Sigma.",
     description:
-      "400+ problems with Python code editor, KaTeX math rendering, instant grading, and gamification. Next.js 15, React 19, Postgres (Aurora → Neon migration), Lambda for sandboxed execution. Actively used by candidates targeting top trading firms.",
-    year: "2024–",
+      "400+ problems with Python code editor, KaTeX math rendering, instant grading, and gamification. Next.js 15, React 19, Postgres (Aurora to Neon migration), Lambda for sandboxed execution.",
+    year: "2024-",
     category: "product",
-    role: "Founder & Engineer",
+    role: "Founder and Engineer",
     duration: "Ongoing",
     tags: [
       "Next.js 15",
@@ -48,6 +48,62 @@ export const projects: Project[] = [
 
   // === ACTIVE WORK ===
   {
+    slug: "claude-code-tips",
+    title: "Claude Code Tips",
+    subtitle:
+      "Practical patterns for agentic coding: hooks, agents, automation.",
+    description:
+      "A living reference built from hundreds of Claude Code sessions. Covers hooks, custom agents, MCP servers, plugin development, and automation patterns.",
+    year: "2025-",
+    category: "ai",
+    role: "Creator",
+    duration: "Ongoing",
+    tags: ["Python", "Claude Code", "Hooks", "Agents", "MCP", "Plugins"],
+    status: "live",
+    featured: true,
+    links: {
+      repo: "https://github.com/anipotts/claude-code-tips",
+    },
+  },
+
+  {
+    slug: "imessage-mcp",
+    title: "iMessage MCP",
+    subtitle:
+      "Explore your iMessage history with AI. Spotify Wrapped for texts.",
+    description:
+      "Read-only MCP server for macOS that gives AI access to iMessage analytics. Conversation search, streaks, contact stats, and more. Privacy-first, published on npm.",
+    year: "2025-",
+    category: "ai",
+    role: "Creator",
+    duration: "Ongoing",
+    tags: ["TypeScript", "MCP", "SQLite", "macOS", "Privacy"],
+    status: "live",
+    links: {
+      repo: "https://github.com/anipotts/imessage-mcp",
+      live: "https://npmjs.com/package/imessage-mcp",
+    },
+  },
+
+  {
+    slug: "saeshify",
+    title: "Saeshify",
+    subtitle: "Real-time rhyme scheme visualization.",
+    description:
+      "GPU-accelerated rendering pipeline that visualizes rhyme patterns in real time as lyrics play. Built with WebGL and Web Audio API.",
+    year: "2025-",
+    category: "music",
+    role: "Creator",
+    duration: "Ongoing",
+    tags: ["TypeScript", "WebGL", "Audio", "Visualization"],
+    status: "live",
+    links: {
+      repo: "https://github.com/anipotts/saeshify",
+      live: "https://saeshify.vercel.app",
+    },
+  },
+
+  {
     slug: "pgi-research-platform",
     title: "PGI Research Portal",
     subtitle: "Macro research platform for 300+ quants.",
@@ -56,7 +112,7 @@ export const projects: Project[] = [
     year: "2025",
     category: "quant",
     role: "Chief Tech Officer",
-    duration: "2025–",
+    duration: "2025-",
     tags: ["Next.js", "TypeScript", "Postgres", "TailwindCSS", "RSS"],
     status: "live",
     links: {
@@ -127,9 +183,9 @@ export const projects: Project[] = [
   {
     slug: "options-pricing-sensitivity",
     title: "Options Pricing + Sensitivity Analysis",
-    subtitle: "Black–Scholes and binomial pricing with volatility sweeps.",
+    subtitle: "Black-Scholes and binomial pricing with volatility sweeps.",
     description:
-      "Developed a Python tool to price European options using Black–Scholes and binomial models, analyzing how prices move across volatility regimes to illustrate Greeks and model behavior.",
+      "Developed a Python tool to price European options using Black-Scholes and binomial models, analyzing how prices move across volatility regimes to illustrate Greeks and model behavior.",
     year: "2023",
     category: "quant",
     role: "Developer",

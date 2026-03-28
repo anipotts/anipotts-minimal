@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export interface ExpandableNavProps {
   currentSection: string;
@@ -40,6 +41,7 @@ export function ExpandableNav({
   pathname = "/",
   onNavClick,
 }: ExpandableNavProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const items = primaryItems.map((item) => ({
@@ -104,6 +106,7 @@ export function ExpandableNav({
                   : "text-tertiary hover:text-body"
               }`}
               onClick={() => onNavClick?.(item.name, item.href)}
+              onMouseEnter={() => router.prefetch(item.href)}
               aria-current={item.isActive ? "page" : undefined}
             >
               {item.name}
@@ -118,6 +121,7 @@ export function ExpandableNav({
                 : "border-accent-400/40 text-accent-400 hover:bg-accent-400/10"
             }`}
             onClick={() => onNavClick?.(connectItem.name, connectItem.path)}
+            onMouseEnter={() => router.prefetch(connectItem.path)}
             aria-current={connectActive ? "page" : undefined}
           >
             {connectItem.name}

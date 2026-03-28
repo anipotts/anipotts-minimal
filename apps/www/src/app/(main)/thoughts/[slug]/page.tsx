@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import ReactMarkdown from "react-markdown";
-import { FadeIn } from "@anipotts/ui";
+import { Stagger } from "@anipotts/ui";
 import { getPublishedThoughts, getThoughtBySlug } from "@/content/thoughts";
 
 export const revalidate = 60;
@@ -89,16 +89,14 @@ export default async function ThoughtPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <FadeIn>
+      <Stagger className="flex flex-col gap-8">
         <Link
           href="/thoughts"
           className="text-xs uppercase tracking-widest text-muted hover:text-accent-400 transition-colors inline-flex items-center gap-1"
         >
           <ArrowLeft size={12} /> back to thoughts
         </Link>
-      </FadeIn>
 
-      <FadeIn delay={0.05}>
         <header className="border-b border-border pb-6">
           <p className="text-sm uppercase tracking-[0.16em] text-accent-400 mb-3">
             thought
@@ -129,14 +127,17 @@ export default async function ThoughtPage({
             </div>
           )}
         </header>
-      </FadeIn>
 
-      <FadeIn delay={0.12}>
         <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)]">
           <ReactMarkdown
             components={{
               img: ({ ...props }) => {
-                if (!props.src) return null;
+                if (!props.src || typeof props.src !== "string") return null;
+                const isSafe =
+                  props.src.startsWith("https://") ||
+                  props.src.startsWith("http://") ||
+                  props.src.startsWith("/");
+                if (!isSafe) return null;
                 return (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -151,7 +152,7 @@ export default async function ThoughtPage({
             {thought.content}
           </ReactMarkdown>
         </div>
-      </FadeIn>
+      </Stagger>
     </article>
   );
 }

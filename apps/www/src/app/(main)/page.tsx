@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { FadeIn } from "@anipotts/ui";
+import { Stagger } from "@anipotts/ui";
 import ProjectCard from "@/components/ProjectCard";
 import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
@@ -42,87 +42,92 @@ export default async function Home() {
 
   return (
     <PageFrame>
-      <section className="flex flex-col gap-5">
-        <FadeIn>
-          <PagePrelude>{homeContent.prelude}</PagePrelude>
-        </FadeIn>
-        <FadeIn delay={0.04}>
-          <PageTitle>{homeContent.heading}</PageTitle>
-        </FadeIn>
-        <FadeIn delay={0.08}>
-          <PageSummary>{homeContent.summary}</PageSummary>
-        </FadeIn>
-      </section>
+      <Stagger as="section" className="flex flex-col gap-5">
+        <PagePrelude>{homeContent.prelude}</PagePrelude>
+        <PageTitle>{homeContent.heading}</PageTitle>
+        <PageSummary>{homeContent.summary}</PageSummary>
+      </Stagger>
 
       <section className="flex flex-col gap-4">
-        <FadeIn>
+        <Stagger>
           <PagePrelude>about</PagePrelude>
-        </FadeIn>
-        <ContentBlocks>
-          {homeContent.about.map((line, index) => (
-            <FadeIn key={line} delay={0.08 + index * 0.05}>
-              <p className="text-body leading-relaxed text-base md:text-lg">
-                {line}
-              </p>
-            </FadeIn>
-          ))}
-        </ContentBlocks>
+          <ContentBlocks>
+            <Stagger
+              className="flex flex-col gap-8"
+              interval={0.05}
+              offset={0.06}
+            >
+              {homeContent.about.map((line) => (
+                <p
+                  key={line}
+                  className="text-body leading-relaxed text-base md:text-lg"
+                >
+                  {line}
+                </p>
+              ))}
+            </Stagger>
+          </ContentBlocks>
+        </Stagger>
       </section>
 
       <section className="flex flex-col gap-4" id="selected-work">
-        <FadeIn>
+        <Stagger>
           <PagePrelude>selected work</PagePrelude>
-        </FadeIn>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {projects.map((project, index) => (
-            <FadeIn key={project.slug} delay={0.06 + index * 0.04}>
-              <ProjectCard project={project} />
-            </FadeIn>
-          ))}
-        </div>
-        <EndCta>
-          <Link
-            href="/work"
-            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+          <Stagger
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            interval={0.04}
+            offset={0.06}
           >
-            view all work
-            <ArrowRight
-              size={12}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-        </EndCta>
+            {projects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
+          </Stagger>
+          <EndCta>
+            <Link
+              href="/work"
+              className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+            >
+              view all work
+              <ArrowRight
+                size={12}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </EndCta>
+        </Stagger>
       </section>
 
       <section className="flex flex-col gap-4">
-        <FadeIn>
+        <Stagger>
           <PagePrelude>latest thoughts</PagePrelude>
-        </FadeIn>
-        <div className="flex flex-col gap-8">
-          {recentThoughts.map((thought, index) => (
-            <FadeIn key={thought.slug} delay={0.06 + index * 0.04}>
-              <ThoughtLink thought={thought} />
-            </FadeIn>
-          ))}
-        </div>
-        <EndCta>
-          <Link
-            href="/thoughts"
-            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+          <Stagger
+            className="flex flex-col gap-8"
+            interval={0.04}
+            offset={0.06}
           >
-            view all thoughts
-            <ArrowRight
-              size={12}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-        </EndCta>
+            {recentThoughts.map((thought) => (
+              <ThoughtLink key={thought.slug} thought={thought} />
+            ))}
+          </Stagger>
+          <EndCta>
+            <Link
+              href="/thoughts"
+              className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
+            >
+              view all thoughts
+              <ArrowRight
+                size={12}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </EndCta>
+        </Stagger>
       </section>
 
       <section className="flex flex-col gap-4" aria-label="Newsletter">
-        <FadeIn>
+        <Stagger>
           <NewsletterSubscribe />
-        </FadeIn>
+        </Stagger>
       </section>
     </PageFrame>
   );
