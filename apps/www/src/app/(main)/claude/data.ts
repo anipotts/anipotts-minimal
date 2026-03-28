@@ -16,7 +16,7 @@ export const minePlugin = {
   name: "mine",
   tagline:
     "mines every claude code session into a local sqlite database. total recall for your dev work.",
-  install: "claude plugin add anipotts/mine",
+  install: "claude plugin marketplace add anipotts/claude-code-tips",
   href: MINE_REPO,
   features: [
     { name: "/mine", desc: "7-day dashboard with projects, tools, models" },
