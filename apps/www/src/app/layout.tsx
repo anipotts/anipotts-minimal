@@ -10,6 +10,7 @@ import { ThemeScript } from "@anipotts/ui/server";
 import PersonSchema from "@/components/PersonSchema";
 import SiteStatusBar from "@/components/SiteStatusBar";
 import TerminalHeaderWrapper from "@/components/TerminalHeaderWrapper";
+import { CursorPortal } from "@/components/CursorPortal";
 import { siteConfig } from "@/content/site";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -145,25 +146,18 @@ export default function RootLayout({
 
           <PostHogProvider>
             <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
-              <div className="terminal-window w-full max-w-5xl flex flex-col border border-border shadow-2xl bg-card rounded-lg overflow-hidden ring-1 ring-ring">
-                <TerminalHeaderWrapper />
-
-                <div className="relative bg-[rgba(var(--overlay-invert),0.4)] flex-1 min-h-0">
-                  <div
-                    className="absolute inset-0 pointer-events-none opacity-45"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-                      backgroundSize: "24px 24px",
-                    }}
-                  />
-
-                  <div className="relative z-10 px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
-                    {children}
-                  </div>
+              <div className="terminal-window w-full max-w-5xl flex flex-col border border-border shadow-2xl bg-transparent rounded-lg overflow-hidden ring-1 ring-ring">
+                <div className="bg-card">
+                  <TerminalHeaderWrapper />
                 </div>
 
-                <SiteStatusBar />
+                <div className="relative bg-transparent flex-1 min-h-0 overflow-hidden">
+                  <CursorPortal>{children}</CursorPortal>
+                </div>
+
+                <div className="bg-card">
+                  <SiteStatusBar />
+                </div>
               </div>
             </div>
           </PostHogProvider>
