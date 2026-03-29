@@ -6,7 +6,6 @@ import ProjectCard from "@/components/ProjectCard";
 import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
 import {
-  ContentBlocks,
   EndCta,
   ListBlock,
   PageFrame,
@@ -14,6 +13,7 @@ import {
   PageSummary,
   PageTitle,
 } from "@/components/page/PageScaffold";
+import { PretextAbout } from "@/components/Intro/PretextAbout";
 import { getFeaturedProjects } from "@/content/projects";
 import { getPublishedThoughts } from "@/content/thoughts";
 import { homeContent } from "@/content/home";
@@ -51,16 +51,7 @@ export default async function Home() {
 
       <Stagger as="section" className="flex flex-col gap-4" offset={0.18}>
         <PagePrelude>about</PagePrelude>
-        <ContentBlocks>
-          {homeContent.about.map((line) => (
-            <p
-              key={line}
-              className="text-body leading-relaxed text-base md:text-lg"
-            >
-              {line}
-            </p>
-          ))}
-        </ContentBlocks>
+        <PretextAbout paragraphs={homeContent.about} />
       </Stagger>
 
       <section id="selected-work">
