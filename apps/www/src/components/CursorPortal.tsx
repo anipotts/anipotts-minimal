@@ -1,59 +1,33 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
-import { WavesBackground } from "@anipotts/ui";
+import { useEffect, useRef } from "react";
 
 const PORTAL_RADIUS = 80;
 const LERP = 0.15;
 const FRAME_INTERVAL = 1000 / 30;
-const REPEL_RADIUS = 140;
-const REPEL_STRENGTH = 25;
 
 /**
- * CursorPortal: Lando Norris-style mask reveal.
+ * CursorPortal: a see-through circle that reveals the wave background
+ * behind the terminal window. The circle follows the cursor with a
+ * clean hard edge and accent border.
  *
- * A high-z overlay containing the wave background, masked to a circle
- * at the cursor position. Sits on TOP of all content so the cursor
- * "reveals" the animated waves through the page. Also applies CSS
- * transform displacement to nearby text elements for a flow effect.
- *
- * Desktop only. No-op on mobile/reduced-motion.
+ * No content displacement. No opacity fade. Desktop only.
+ * The circle is a transparent hole in the card background layers,
+ * letting the animated waves show through.
  */
 export function CursorPortal() {
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const holeRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -999, y: -999, sx: -999, sy: -999 });
   const activeRef = useRef(false);
   const frameRef = useRef<number | null>(null);
   const lastFrameRef = useRef(0);
   const isVisibleRef = useRef(true);
-  const flowEls = useRef<HTMLElement[]>([]);
-  const flowRectsRef = useRef<DOMRect[]>([]);
-  const scrollYRef = useRef(0);
-  const contentRef = useRef<HTMLElement | null>(null);
-
-  const refreshFlowElements = useCallback(() => {
-    const content = contentRef.current;
-    if (!content) return;
-    // Select all text-bearing elements for displacement
-    const els = content.querySelectorAll<HTMLElement>(
-      "h1, h2, h3, p, a, span, article, [data-flow]",
-    );
-    flowEls.current = Array.from(els).filter((el) => {
-      // Skip elements inside PretextAbout (it handles its own reflow)
-      if (el.closest("[data-pretext]")) return false;
-      // Skip tiny elements (labels, icons)
-      const rect = el.getBoundingClientRect();
-      return rect.width > 20 && rect.height > 10;
-    });
-    flowRectsRef.current = flowEls.current.map((el) =>
-      el.getBoundingClientRect(),
-    );
-  }, []);
 
   useEffect(() => {
-    const overlay = overlayRef.current;
-    if (!overlay) return;
+    const hole = holeRef.current;
+    const ring = ringRef.current;
+    if (!hole) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -63,22 +37,13 @@ export function CursorPortal() {
     const isMobile = window.matchMedia("(hover: none)").matches;
     if (isMobile) return;
 
-    // Find the terminal window and content area
-    const terminalWindow = overlay.closest(
-      ".terminal-window",
-    ) as HTMLElement | null;
-    if (!terminalWindow) return;
-    const contentArea = overlay.parentElement?.querySelector(
-      ".portal-content",
-    ) as HTMLElement | null;
-    contentRef.current = contentArea;
-
-    // Initial scan of flow elements
-    refreshFlowElements();
+    // The content area is the parent of the portal
+    const contentArea = hole.parentElement as HTMLElement | null;
+    if (!contentArea) return;
 
     function onMouseMove(e: MouseEvent) {
-      if (!terminalWindow) return;
-      const rect = terminalWindow.getBoundingClientRect();
+      if (!contentArea) return;
+      const rect = contentArea.getBoundingClientRect();
       posRef.current.x = e.clientX - rect.left;
       posRef.current.y = e.clientY - rect.top;
       if (!activeRef.current) {
@@ -90,50 +55,6 @@ export function CursorPortal() {
 
     function onMouseLeave() {
       activeRef.current = false;
-    }
-
-    function onScroll() {
-      scrollYRef.current = window.scrollY;
-      // Refresh rects on scroll
-      flowRectsRef.current = flowEls.current.map((el) =>
-        el.getBoundingClientRect(),
-      );
-    }
-
-    function displaceElements() {
-      if (!terminalWindow) return;
-      const twRect = terminalWindow.getBoundingClientRect();
-      // Cursor in viewport coords
-      const cx = twRect.left + posRef.current.sx;
-      const cy = twRect.top + posRef.current.sy;
-
-      for (let i = 0; i < flowEls.current.length; i++) {
-        const el = flowEls.current[i];
-        if (!el) continue;
-        const rect = flowRectsRef.current[i];
-        if (!rect) continue;
-
-        // Element center
-        const ecx = rect.left + rect.width / 2;
-        const ecy = rect.top + rect.height / 2;
-        const dx = ecx - cx;
-        const dy = ecy - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < REPEL_RADIUS && activeRef.current) {
-          const force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
-          const angle = Math.atan2(dy, dx);
-          const tx = Math.cos(angle) * force;
-          const ty = Math.sin(angle) * force;
-          el.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
-          el.style.transition = "transform 0.08s ease-out";
-        } else {
-          if (el.style.transform !== "") {
-            el.style.transform = "";
-            el.style.transition = "transform 0.3s ease-out";
-          }
-        }
-      }
     }
 
     function tick(t: number) {
@@ -148,27 +69,30 @@ export function CursorPortal() {
       lastFrameRef.current = t;
 
       const pos = posRef.current;
-
-      if (activeRef.current) {
-        pos.sx += (pos.x - pos.sx) * LERP;
-        pos.sy += (pos.y - pos.sy) * LERP;
-      } else {
-        // Shrink radius when inactive (handled via opacity below)
-      }
+      pos.sx += (pos.x - pos.sx) * LERP;
+      pos.sy += (pos.y - pos.sy) * LERP;
 
       const x = pos.sx;
       const y = pos.sy;
 
-      // Apply mask to overlay — hard edge, no feather
-      const ring = ringRef.current;
-      if (overlay) {
+      if (hole) {
         if (activeRef.current) {
-          overlay.style.clipPath = `circle(${PORTAL_RADIUS}px at ${x.toFixed(1)}px ${y.toFixed(1)}px)`;
+          // Invert the clip: show everything EXCEPT the circle
+          // This punches a transparent hole in the background overlay
+          const r = PORTAL_RADIUS;
+          const xp = x.toFixed(1);
+          const yp = y.toFixed(1);
+          // Polygon that covers the full area with a circle cut out
+          // Using CSS mask with inverted radial gradient
+          const mask = `radial-gradient(circle ${r}px at ${xp}px ${yp}px, transparent ${r - 1}px, black ${r}px)`;
+          hole.style.maskImage = mask;
+          hole.style.webkitMaskImage = mask;
         } else {
-          overlay.style.clipPath = "circle(0px at -999px -999px)";
+          hole.style.maskImage = "none";
+          hole.style.webkitMaskImage = "none";
         }
       }
-      // Position border ring centered on cursor
+
       if (ring) {
         if (activeRef.current) {
           ring.style.visibility = "visible";
@@ -178,15 +102,11 @@ export function CursorPortal() {
         }
       }
 
-      // Displace text elements
-      displaceElements();
-
       frameRef.current = requestAnimationFrame(tick);
     }
 
-    terminalWindow.addEventListener("mousemove", onMouseMove);
-    terminalWindow.addEventListener("mouseleave", onMouseLeave);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    contentArea.addEventListener("mousemove", onMouseMove);
+    contentArea.addEventListener("mouseleave", onMouseLeave);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -194,66 +114,45 @@ export function CursorPortal() {
       },
       { threshold: 0 },
     );
-    observer.observe(overlay);
-
-    // Refresh flow elements periodically (handles dynamic content)
-    const refreshInterval = setInterval(refreshFlowElements, 2000);
+    observer.observe(contentArea);
 
     frameRef.current = requestAnimationFrame(tick);
 
     return () => {
-      terminalWindow.removeEventListener("mousemove", onMouseMove);
-      terminalWindow.removeEventListener("mouseleave", onMouseLeave);
-      window.removeEventListener("scroll", onScroll);
+      contentArea.removeEventListener("mousemove", onMouseMove);
+      contentArea.removeEventListener("mouseleave", onMouseLeave);
       observer.disconnect();
-      clearInterval(refreshInterval);
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-      // Clean up transforms
-      flowEls.current.forEach((el) => {
-        el.style.transform = "";
-        el.style.transition = "";
-      });
     };
-  }, [refreshFlowElements]);
+  }, []);
 
   return (
     <>
-      {/* Portal overlay: wave background visible only inside cursor circle */}
+      {/* Background fill with a circular hole cut out at cursor position.
+          This covers the card background + overlay + grid. The hole
+          lets the wave animation behind the terminal window show through. */}
       <div
-        ref={overlayRef}
-        className="hidden md:block absolute inset-0 z-[50] pointer-events-none overflow-hidden rounded-b-lg"
+        ref={holeRef}
+        className="hidden md:block absolute inset-0 z-[5] pointer-events-none rounded-b-lg"
         aria-hidden="true"
         style={{
-          clipPath: "circle(0px at -999px -999px)",
+          background: "var(--card)",
         }}
-      >
-        {/* Dark base matching page background */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "var(--background)" }}
-        />
-        {/* Ambient glow */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))",
-          }}
-        />
-        {/* Noise texture */}
-        <div
-          className="absolute inset-0 bg-noise mix-blend-overlay"
-          style={{ opacity: "var(--noise-opacity)" }}
-        />
-        {/* Wave animation */}
-        <div className="absolute inset-0" style={{ opacity: 0.7 }}>
-          <WavesBackground />
-        </div>
-      </div>
-      {/* Border ring around portal circle */}
+      />
+      {/* Grid overlay — also gets the hole punched through */}
+      <div
+        className="hidden md:block absolute inset-0 z-[6] pointer-events-none opacity-45"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+      {/* Border ring */}
       <div
         ref={ringRef}
-        className="hidden md:block absolute top-0 left-0 z-[51] pointer-events-none"
+        className="hidden md:block absolute top-0 left-0 z-[52] pointer-events-none"
         aria-hidden="true"
         style={{
           visibility: "hidden",
@@ -261,7 +160,7 @@ export function CursorPortal() {
           height: PORTAL_RADIUS * 2,
           borderRadius: "50%",
           border: "1px solid var(--accent-400)",
-          opacity: 0.4,
+          opacity: 0.5,
         }}
       />
     </>
