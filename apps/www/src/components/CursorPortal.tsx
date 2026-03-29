@@ -1,32 +1,58 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
+import { WavesBackground } from "@anipotts/ui";
 
-const PORTAL_RADIUS = 120;
-const INNER_STOP = 0.5; // fully transparent up to this fraction of radius
+const PORTAL_RADIUS = 140;
+const LERP = 0.12;
+const FRAME_INTERVAL = 1000 / 30;
+const REPEL_RADIUS = 180;
+const REPEL_STRENGTH = 30;
 
 /**
- * CursorPortal: tracks cursor position on the terminal window and applies
- * a CSS mask that creates a transparent "hole" revealing the wavy background.
+ * CursorPortal: Lando Norris-style mask reveal.
  *
- * The background mask layer sits between the waves (z:-10) and the content (z:3).
- * As the cursor moves, the mask opens a feathered circle, letting the waves show through.
+ * A high-z overlay containing the wave background, masked to a circle
+ * at the cursor position. Sits on TOP of all content so the cursor
+ * "reveals" the animated waves through the page. Also applies CSS
+ * transform displacement to nearby text elements for a flow effect.
+ *
+ * Desktop only. No-op on mobile/reduced-motion.
  */
-export function CursorPortal({ children }: { children: React.ReactNode }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+export function CursorPortal() {
+  const overlayRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -999, y: -999, sx: -999, sy: -999 });
-  const radiusRef = useRef(0); // animated radius (0 = closed, PORTAL_RADIUS = open)
   const activeRef = useRef(false);
   const frameRef = useRef<number | null>(null);
+  const lastFrameRef = useRef(0);
   const isVisibleRef = useRef(true);
+  const flowEls = useRef<HTMLElement[]>([]);
+  const flowRectsRef = useRef<DOMRect[]>([]);
+  const scrollYRef = useRef(0);
+  const contentRef = useRef<HTMLElement | null>(null);
+
+  const refreshFlowElements = useCallback(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    // Select all text-bearing elements for displacement
+    const els = content.querySelectorAll<HTMLElement>(
+      "h1, h2, h3, p, a, span, article, [data-flow]",
+    );
+    flowEls.current = Array.from(els).filter((el) => {
+      // Skip elements inside PretextAbout (it handles its own reflow)
+      if (el.closest("[data-pretext]")) return false;
+      // Skip tiny elements (labels, icons)
+      const rect = el.getBoundingClientRect();
+      return rect.width > 20 && rect.height > 10;
+    });
+    flowRectsRef.current = flowEls.current.map((el) =>
+      el.getBoundingClientRect(),
+    );
+  }, []);
 
   useEffect(() => {
-    const container = containerRef.current;
-    const bg = bgRef.current;
-    const grid = gridRef.current;
-    if (!container || !bg || !grid) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -36,11 +62,24 @@ export function CursorPortal({ children }: { children: React.ReactNode }) {
     const isMobile = window.matchMedia("(hover: none)").matches;
     if (isMobile) return;
 
+    // Find the terminal window and content area
+    const terminalWindow = overlay.closest(
+      ".terminal-window",
+    ) as HTMLElement | null;
+    if (!terminalWindow) return;
+    const contentArea = overlay.parentElement?.querySelector(
+      ".portal-content",
+    ) as HTMLElement | null;
+    contentRef.current = contentArea;
+
+    // Initial scan of flow elements
+    refreshFlowElements();
+
     function onMouseMove(e: MouseEvent) {
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
+      if (!terminalWindow) return;
+      const rect = terminalWindow.getBoundingClientRect();
       posRef.current.x = e.clientX - rect.left;
-      posRef.current.y = e.clientY - rect.top + container.scrollTop;
+      posRef.current.y = e.clientY - rect.top;
       if (!activeRef.current) {
         posRef.current.sx = posRef.current.x;
         posRef.current.sy = posRef.current.y;
@@ -52,63 +91,95 @@ export function CursorPortal({ children }: { children: React.ReactNode }) {
       activeRef.current = false;
     }
 
-    function applyMask(
-      el: HTMLElement,
-      x: number,
-      y: number,
-      r: number,
-      innerFrac: number,
-    ) {
-      if (r < 0.5) {
-        el.style.maskImage = "none";
-        el.style.webkitMaskImage = "none";
-        return;
-      }
-      const inner = Math.round(r * innerFrac);
-      const outer = Math.round(r);
-      const mask = `radial-gradient(circle ${outer}px at ${x}px ${y}px, transparent ${inner}px, black ${outer}px)`;
-      el.style.maskImage = mask;
-      el.style.webkitMaskImage = mask;
+    function onScroll() {
+      scrollYRef.current = window.scrollY;
+      // Refresh rects on scroll
+      flowRectsRef.current = flowEls.current.map((el) =>
+        el.getBoundingClientRect(),
+      );
     }
 
-    function tick() {
-      if (!container || !bg || !grid) {
-        frameRef.current = requestAnimationFrame(tick);
-        return;
-      }
+    function displaceElements() {
+      if (!terminalWindow) return;
+      const twRect = terminalWindow.getBoundingClientRect();
+      // Cursor in viewport coords
+      const cx = twRect.left + posRef.current.sx;
+      const cy = twRect.top + posRef.current.sy;
 
+      for (let i = 0; i < flowEls.current.length; i++) {
+        const el = flowEls.current[i];
+        if (!el) continue;
+        const rect = flowRectsRef.current[i];
+        if (!rect) continue;
+
+        // Element center
+        const ecx = rect.left + rect.width / 2;
+        const ecy = rect.top + rect.height / 2;
+        const dx = ecx - cx;
+        const dy = ecy - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < REPEL_RADIUS && activeRef.current) {
+          const force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
+          const angle = Math.atan2(dy, dx);
+          const tx = Math.cos(angle) * force;
+          const ty = Math.sin(angle) * force;
+          el.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+          el.style.transition = "transform 0.08s ease-out";
+        } else {
+          if (el.style.transform !== "") {
+            el.style.transform = "";
+            el.style.transition = "transform 0.3s ease-out";
+          }
+        }
+      }
+    }
+
+    function tick(t: number) {
       if (!isVisibleRef.current) {
         frameRef.current = requestAnimationFrame(tick);
         return;
       }
+      if (t - lastFrameRef.current < FRAME_INTERVAL) {
+        frameRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      lastFrameRef.current = t;
 
       const pos = posRef.current;
-      pos.sx += (pos.x - pos.sx) * 0.12;
-      pos.sy += (pos.y - pos.sy) * 0.12;
 
-      // Animate radius open/closed
-      const targetRadius = activeRef.current ? PORTAL_RADIUS : 0;
-      radiusRef.current += (targetRadius - radiusRef.current) * 0.1;
+      if (activeRef.current) {
+        pos.sx += (pos.x - pos.sx) * LERP;
+        pos.sy += (pos.y - pos.sy) * LERP;
+      } else {
+        // Shrink radius when inactive (handled via opacity below)
+      }
 
-      const x = Math.round(pos.sx * 10) / 10;
-      const y = Math.round(pos.sy * 10) / 10;
-      const r = radiusRef.current;
+      const x = pos.sx;
+      const y = pos.sy;
 
-      // Apply mask to background layer (card color) - portal shows waves through
-      applyMask(bg, x, y, r, INNER_STOP);
-      // Grid gets a slightly tighter mask so grid lines fade first
-      applyMask(grid, x, y, r * 1.1, 0.3);
+      // Apply mask to overlay
+      if (overlay) {
+        if (activeRef.current) {
+          const inner = Math.round(PORTAL_RADIUS * 0.6);
+          const outer = PORTAL_RADIUS;
+          overlay.style.maskImage = `radial-gradient(circle ${outer}px at ${x.toFixed(1)}px ${y.toFixed(1)}px, black ${inner}px, transparent ${outer}px)`;
+          overlay.style.webkitMaskImage = overlay.style.maskImage;
+          overlay.style.opacity = "1";
+        } else {
+          overlay.style.opacity = "0";
+        }
+      }
 
-      // Also set CSS vars for any children that want to know cursor position
-      container.style.setProperty("--portal-x", `${x}px`);
-      container.style.setProperty("--portal-y", `${y}px`);
-      container.style.setProperty("--portal-r", `${r}px`);
+      // Displace text elements
+      displaceElements();
 
       frameRef.current = requestAnimationFrame(tick);
     }
 
-    container.addEventListener("mousemove", onMouseMove);
-    container.addEventListener("mouseleave", onMouseLeave);
+    terminalWindow.addEventListener("mousemove", onMouseMove);
+    terminalWindow.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -116,50 +187,61 @@ export function CursorPortal({ children }: { children: React.ReactNode }) {
       },
       { threshold: 0 },
     );
-    observer.observe(container);
+    observer.observe(overlay);
+
+    // Refresh flow elements periodically (handles dynamic content)
+    const refreshInterval = setInterval(refreshFlowElements, 2000);
 
     frameRef.current = requestAnimationFrame(tick);
 
     return () => {
-      container.removeEventListener("mousemove", onMouseMove);
-      container.removeEventListener("mouseleave", onMouseLeave);
+      terminalWindow.removeEventListener("mousemove", onMouseMove);
+      terminalWindow.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("scroll", onScroll);
       observer.disconnect();
+      clearInterval(refreshInterval);
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      // Clean up transforms
+      flowEls.current.forEach((el) => {
+        el.style.transform = "";
+        el.style.transition = "";
+      });
     };
-  }, []);
+  }, [refreshFlowElements]);
 
   return (
-    <div ref={containerRef} className="cursor-portal-container relative">
-      {/* Background layer: card color with portal hole punched through */}
+    <div
+      ref={overlayRef}
+      className="hidden md:block absolute inset-0 z-[50] pointer-events-none overflow-hidden rounded-b-lg"
+      aria-hidden="true"
+      style={{
+        opacity: "0",
+        transition: "opacity 0.3s ease-out",
+        maskImage: "none",
+        WebkitMaskImage: "none",
+      }}
+    >
+      {/* Dark base matching page background */}
       <div
-        ref={bgRef}
-        className="absolute inset-0 pointer-events-none z-[1]"
-        aria-hidden="true"
-        style={{ background: "var(--card)" }}
+        className="absolute inset-0"
+        style={{ background: "var(--background)" }}
       />
-      {/* Wave amplifier: bright glow visible only through the portal hole */}
+      {/* Ambient glow */}
       <div
-        className="absolute inset-0 pointer-events-none z-[0]"
-        aria-hidden="true"
+        className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 600px 400px at 50% 40%, rgba(97, 171, 234, 0.25), transparent 70%)",
+            "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))",
         }}
       />
-      {/* Grid overlay with portal hole */}
+      {/* Noise texture */}
       <div
-        ref={gridRef}
-        className="absolute inset-0 pointer-events-none opacity-45 z-[2]"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
+        className="absolute inset-0 bg-noise mix-blend-overlay"
+        style={{ opacity: "var(--noise-opacity)" }}
       />
-      {/* Content on top */}
-      <div className="relative z-[3] px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
-        {children}
+      {/* Wave animation - higher opacity for portal visibility */}
+      <div className="absolute inset-0" style={{ opacity: 0.7 }}>
+        <WavesBackground />
       </div>
     </div>
   );

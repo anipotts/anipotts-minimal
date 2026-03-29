@@ -364,7 +364,7 @@ export function PretextAbout({ paragraphs }: PretextAboutProps) {
   }, [paragraphs]);
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative" ref={containerRef} data-pretext>
       {/* Accessible text for screen readers and SEO */}
       <div className={isReady ? "sr-only" : undefined}>
         {paragraphs.map((line) => (
