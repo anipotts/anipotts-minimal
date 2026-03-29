@@ -3,11 +3,11 @@
 import { useEffect, useRef, useCallback } from "react";
 import { WavesBackground } from "@anipotts/ui";
 
-const PORTAL_RADIUS = 140;
-const LERP = 0.12;
+const PORTAL_RADIUS = 80;
+const LERP = 0.15;
 const FRAME_INTERVAL = 1000 / 30;
-const REPEL_RADIUS = 180;
-const REPEL_STRENGTH = 30;
+const REPEL_RADIUS = 140;
+const REPEL_STRENGTH = 25;
 
 /**
  * CursorPortal: Lando Norris-style mask reveal.
@@ -21,6 +21,7 @@ const REPEL_STRENGTH = 30;
  */
 export function CursorPortal() {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -999, y: -999, sx: -999, sy: -999 });
   const activeRef = useRef(false);
   const frameRef = useRef<number | null>(null);
@@ -158,16 +159,22 @@ export function CursorPortal() {
       const x = pos.sx;
       const y = pos.sy;
 
-      // Apply mask to overlay
+      // Apply mask to overlay — hard edge, no feather
+      const ring = ringRef.current;
       if (overlay) {
         if (activeRef.current) {
-          const inner = Math.round(PORTAL_RADIUS * 0.6);
-          const outer = PORTAL_RADIUS;
-          overlay.style.maskImage = `radial-gradient(circle ${outer}px at ${x.toFixed(1)}px ${y.toFixed(1)}px, black ${inner}px, transparent ${outer}px)`;
-          overlay.style.webkitMaskImage = overlay.style.maskImage;
-          overlay.style.opacity = "1";
+          overlay.style.clipPath = `circle(${PORTAL_RADIUS}px at ${x.toFixed(1)}px ${y.toFixed(1)}px)`;
         } else {
-          overlay.style.opacity = "0";
+          overlay.style.clipPath = "circle(0px at -999px -999px)";
+        }
+      }
+      // Position border ring centered on cursor
+      if (ring) {
+        if (activeRef.current) {
+          ring.style.visibility = "visible";
+          ring.style.transform = `translate(${(x - PORTAL_RADIUS).toFixed(1)}px, ${(y - PORTAL_RADIUS).toFixed(1)}px)`;
+        } else {
+          ring.style.visibility = "hidden";
         }
       }
 
@@ -210,39 +217,53 @@ export function CursorPortal() {
   }, [refreshFlowElements]);
 
   return (
-    <div
-      ref={overlayRef}
-      className="hidden md:block absolute inset-0 z-[50] pointer-events-none overflow-hidden rounded-b-lg"
-      aria-hidden="true"
-      style={{
-        opacity: "0",
-        transition: "opacity 0.3s ease-out",
-        maskImage: "none",
-        WebkitMaskImage: "none",
-      }}
-    >
-      {/* Dark base matching page background */}
+    <>
+      {/* Portal overlay: wave background visible only inside cursor circle */}
       <div
-        className="absolute inset-0"
-        style={{ background: "var(--background)" }}
-      />
-      {/* Ambient glow */}
-      <div
-        className="absolute inset-0"
+        ref={overlayRef}
+        className="hidden md:block absolute inset-0 z-[50] pointer-events-none overflow-hidden rounded-b-lg"
+        aria-hidden="true"
         style={{
-          background:
-            "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))",
+          clipPath: "circle(0px at -999px -999px)",
+        }}
+      >
+        {/* Dark base matching page background */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "var(--background)" }}
+        />
+        {/* Ambient glow */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at center, var(--ambient-from), var(--background), var(--background))",
+          }}
+        />
+        {/* Noise texture */}
+        <div
+          className="absolute inset-0 bg-noise mix-blend-overlay"
+          style={{ opacity: "var(--noise-opacity)" }}
+        />
+        {/* Wave animation */}
+        <div className="absolute inset-0" style={{ opacity: 0.7 }}>
+          <WavesBackground />
+        </div>
+      </div>
+      {/* Border ring around portal circle */}
+      <div
+        ref={ringRef}
+        className="hidden md:block absolute top-0 left-0 z-[51] pointer-events-none"
+        aria-hidden="true"
+        style={{
+          visibility: "hidden",
+          width: PORTAL_RADIUS * 2,
+          height: PORTAL_RADIUS * 2,
+          borderRadius: "50%",
+          border: "1px solid var(--accent-400)",
+          opacity: 0.4,
         }}
       />
-      {/* Noise texture */}
-      <div
-        className="absolute inset-0 bg-noise mix-blend-overlay"
-        style={{ opacity: "var(--noise-opacity)" }}
-      />
-      {/* Wave animation - higher opacity for portal visibility */}
-      <div className="absolute inset-0" style={{ opacity: 0.7 }}>
-        <WavesBackground />
-      </div>
-    </div>
+    </>
   );
 }

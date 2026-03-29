@@ -65,9 +65,7 @@ class Noise {
     if (seed < 256) seed |= seed << 8;
     for (let i = 0; i < 256; i++) {
       let v =
-        i & 1
-          ? this.p[i]! ^ (seed & 255)
-          : this.p[i]! ^ ((seed >> 8) & 255);
+        i & 1 ? this.p[i]! ^ (seed & 255) : this.p[i]! ^ ((seed >> 8) & 255);
       this.perm[i] = this.perm[i + 256] = v;
       this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12]!;
     }
@@ -480,14 +478,7 @@ export function Waves({
       }}
       className={`absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
     >
-      <div
-        className="absolute top-0 left-0 bg-[var(--cursor-dot)] rounded-full w-[0.5rem] h-[0.5rem]"
-        style={{
-          transform:
-            "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
-          willChange: "transform",
-        }}
-      />
+      {/* cursor dot removed — CursorPortal handles cursor visualization */}
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
