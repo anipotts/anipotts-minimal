@@ -11,7 +11,6 @@ import PersonSchema from "@/components/PersonSchema";
 import SiteStatusBar from "@/components/SiteStatusBar";
 import TerminalHeaderWrapper from "@/components/TerminalHeaderWrapper";
 import { FerrofluidBorder } from "@/components/FerrofluidBorder";
-import { PretextFlow } from "@/components/PretextFlow";
 import { siteConfig } from "@/content/site";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -148,7 +147,6 @@ export default function RootLayout({
           <PostHogProvider>
             <div className="relative">
               <FerrofluidBorder />
-              <PretextFlow />
               <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
                 <div className="terminal-window w-full max-w-5xl flex flex-col border border-border md:border-transparent shadow-2xl bg-card md:bg-transparent rounded-lg ring-1 ring-ring md:ring-transparent">
                   <TerminalHeaderWrapper />
