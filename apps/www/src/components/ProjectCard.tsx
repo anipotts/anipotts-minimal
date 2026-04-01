@@ -1,34 +1,37 @@
 import Link from "next/link";
 import type { ProjectEntry } from "@/content/projects";
-import { StatusBadge, TagList } from "@/components/page/PageScaffold";
+import { MetaLine, StatusBadge, TagList } from "@/components/page/PageScaffold";
 
 export default function ProjectCard({ project }: { project: ProjectEntry }) {
   return (
-    <article className="w-full">
-      <details className="group border-l-2 border-border transition-all duration-300 hover:border-overlay-30 hover:bg-overlay-5 open:border-accent-400/40 open:bg-overlay-5">
-        <summary className="list-none cursor-pointer pl-4 pr-4 py-3">
-          <div className="flex justify-between items-start gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 font-mono text-sm">
-                <span className="text-muted group-open:hidden">[+]</span>
-                <span className="hidden text-accent-400 group-open:inline">
-                  [-]
+    <article className="w-full" data-no-flow>
+      <details className="group rounded-md p-3 -m-3 border border-transparent hover:border-accent-400/20 hover:bg-accent-400/5 transition-all duration-200 open:border-accent-400/20 open:bg-accent-400/5">
+        <summary className="list-none cursor-pointer">
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-muted text-xs font-mono group-open:text-accent-400 transition-colors">
+                  <span className="group-open:hidden">+</span>
+                  <span className="hidden group-open:inline">&minus;</span>
                 </span>
-                <h3 className="font-semibold text-secondary group-hover:text-heading font-heading">
+                <h3 className="text-lg font-semibold text-body group-hover:text-accent-400 transition-colors duration-200 font-heading">
                   {project.title}
                 </h3>
                 {project.status && <StatusBadge status={project.status} />}
               </div>
-              <p className="text-xs text-muted pl-8">{project.subtitle}</p>
+              <MetaLine
+                items={[{ value: project.duration || project.year || "" }]}
+                className="shrink-0"
+              />
             </div>
-            <span className="text-xs text-faint font-mono shrink-0">
-              {project.duration || project.year}
-            </span>
+            <p className="text-secondary leading-relaxed text-sm">
+              {project.subtitle}
+            </p>
           </div>
         </summary>
 
-        <div className="pl-8 pr-4 pb-4 pt-3 flex flex-col gap-5">
-          <p className="text-sm text-secondary leading-relaxed max-w-2xl border-l border-border pl-4">
+        <div className="pt-4 flex flex-col gap-4">
+          <p className="text-secondary leading-relaxed text-sm max-w-2xl">
             {project.description}
           </p>
 
@@ -41,9 +44,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
               {project.links?.page && (
                 <Link
                   href={project.links.page}
-                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                  className="text-accent-400 hover:underline underline-offset-4"
                 >
-                  ./case_study.md
+                  case study
                 </Link>
               )}
               {project.links?.live && (
@@ -51,9 +54,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
                   href={project.links.live}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-accent-400 hover:underline decoration-accent-400/30 underline-offset-4"
+                  className="text-accent-400 hover:underline underline-offset-4"
                 >
-                  ./launch_site.sh
+                  live site
                 </a>
               )}
               {project.links?.repo && (
@@ -61,9 +64,9 @@ export default function ProjectCard({ project }: { project: ProjectEntry }) {
                   href={project.links.repo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-tertiary hover:text-body hover:underline decoration-overlay-30 underline-offset-4"
+                  className="text-tertiary hover:text-body hover:underline underline-offset-4"
                 >
-                  ./view_source.git
+                  source
                 </a>
               )}
             </div>

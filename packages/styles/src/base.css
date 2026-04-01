@@ -3,6 +3,27 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 }
 
+@media (hover: hover) {
+  * { cursor: none !important; }
+  /* Hide ALL CSS borders on desktop — ferrofluid canvas draws them */
+  .portal-content .rounded-md,
+  .portal-content .rounded-sm,
+  .portal-content button,
+  .portal-content input,
+  .portal-content details,
+  .portal-content [class*="border-border"],
+  .portal-content [class*="border-accent"],
+  .portal-content [class*="border-transparent"] {
+    border-color: transparent !important;
+    background-color: transparent !important;
+  }
+  .portal-content input:focus,
+  .portal-content input:focus-visible {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -15,6 +36,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-shadow: var(--text-enhance);
 }
+
+/* Hide scrollbar everywhere (scroll still works) */
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

@@ -100,10 +100,12 @@ export function ExpandableNav({
             <Link
               key={item.name}
               href={item.href}
-              className={`transition-colors duration-300 whitespace-nowrap ${
+              data-ferro-nav=""
+              {...(item.isActive ? { "data-ferro-active": "" } : {})}
+              className={`transition-colors duration-300 whitespace-nowrap pb-1 ${
                 item.isActive
-                  ? "text-body underline decoration-accent-400 underline-offset-4"
-                  : "text-tertiary hover:text-body"
+                  ? "text-body"
+                  : "text-tertiary hover:text-accent-400"
               }`}
               onClick={() => onNavClick?.(item.name, item.href)}
               onMouseEnter={() => router.prefetch(item.href)}

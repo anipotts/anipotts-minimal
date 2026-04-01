@@ -27,3 +27,6 @@ content/work/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Playground prototypes
+playground*.html

@@ -32,6 +32,7 @@ export default function ThoughtLink({ thought }: { thought: ThoughtPreview }) {
     <Link
       href={`/thoughts/${thought.slug}`}
       className="group block rounded-md p-3 -m-3 border border-transparent hover:border-accent-400/20 hover:bg-accent-400/5 transition-all duration-200"
+      data-no-flow
       onClick={handleClick}
     >
       <div className="flex flex-col gap-2">

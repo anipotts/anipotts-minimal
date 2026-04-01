@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Ani Potts",
   fullName: "Anirudh Pottammal",
-  title: "Software Engineer, Structured AI (YC F25)",
+  title: "Software Engineer",
   location: "NYC",
-  bio: "Software engineer at Structured AI (YC F25) building autonomous agents for construction design automation.",
-  shortBio: "software engineer at Structured AI (YC F25)",
+  bio: "Software engineer building agent orchestration platforms. Shares workflow tips and open source tools for Claude Code.",
+  shortBio: "software engineer, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
   email: "contact@anipotts.com",

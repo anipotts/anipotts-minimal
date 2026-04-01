@@ -169,7 +169,7 @@ export default async function WorkPage({
 
           {yearGroups.length > 0 ? (
             <Stagger
-              className="flex flex-col gap-10"
+              className="flex flex-col gap-14"
               interval={0.1}
               offset={0.12}
             >
@@ -185,7 +185,7 @@ export default async function WorkPage({
                           {quarter}
                         </h3>
                       )}
-                      <div className="flex flex-col gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                         {qProjects.map((project) => (
                           <ProjectCard key={project.slug} project={project} />
                         ))}

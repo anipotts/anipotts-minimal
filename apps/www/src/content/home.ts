@@ -2,9 +2,9 @@ export const homeContent = {
   prelude: "index",
   heading: "hi, i'm ani.",
   summary:
-    "Software engineer at Structured AI (YC F25), building autonomous agents that automate QA/QC for construction design engineers.",
+    "Software engineer in NYC building agent orchestration platforms. I post my best workflow tips online as I build.",
   about: [
-    "At Structured AI, I'm building the platform that lets construction design engineers automate quality assurance and quality control with autonomous agents.",
-    "Previously I built an investment research platform for PGI, analytics tooling for Atlantic, and automation systems for Range Media Partners.",
+    "I build platforms where autonomous agents do real work. Previously at Structured AI (YC F25), now working on the next thing with a cofounder.",
+    "I share everything I learn about Claude Code, agentic workflows, and shipping faster. Open source tools, practical patterns, real usage data.",
   ],
 } as const;

@@ -19,13 +19,13 @@ import { getPublishedThoughts } from "@/content/thoughts";
 import { homeContent } from "@/content/home";
 
 export const metadata: Metadata = {
-  title: "ani potts | software engineer at Structured AI (YC F25)",
+  title: "ani potts | software engineer",
   description:
-    "software engineer at Structured AI (YC F25), building autonomous agents and AI infrastructure. based in nyc.",
+    "software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code.",
   openGraph: {
-    title: "ani potts | software engineer at Structured AI (YC F25)",
+    title: "ani potts | software engineer",
     description:
-      "software engineer at Structured AI (YC F25), building autonomous agents and AI infrastructure. based in nyc.",
+      "software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code.",
     url: "https://anipotts.com",
   },
   alternates: {
@@ -67,7 +67,7 @@ export default async function Home() {
         <Stagger className="flex flex-col gap-4" offset={0.3}>
           <PagePrelude>selected work</PagePrelude>
           <Stagger
-            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-8"
             interval={0.04}
           >
             {projects.map((project) => (

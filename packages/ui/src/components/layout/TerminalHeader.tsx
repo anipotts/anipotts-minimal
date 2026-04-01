@@ -22,7 +22,7 @@ export function TerminalHeader({
   version = "3.0.1",
 }: TerminalHeaderProps) {
   return (
-    <div className="terminal-header flex items-center justify-between px-6 md:px-10 py-2 bg-input border-b border-border-subtle select-none">
+    <div className="terminal-header flex items-center justify-between px-6 md:px-10 py-2 bg-input md:bg-transparent border-b border-border-subtle select-none">
       <div className="flex items-center gap-2">
         <StaticWindowControls />
         <TerminalHeaderTitle defaultTitle={defaultTitle} />

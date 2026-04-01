@@ -65,9 +65,7 @@ class Noise {
     if (seed < 256) seed |= seed << 8;
     for (let i = 0; i < 256; i++) {
       let v =
-        i & 1
-          ? this.p[i]! ^ (seed & 255)
-          : this.p[i]! ^ ((seed >> 8) & 255);
+        i & 1 ? this.p[i]! ^ (seed & 255) : this.p[i]! ^ ((seed >> 8) & 255);
       this.perm[i] = this.perm[i + 256] = v;
       this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12]!;
     }
@@ -299,23 +297,44 @@ export function Waves({
       } = configRef.current;
       lines.forEach((pts) => {
         pts.forEach((p) => {
+          // Primary wave: slow, large movement
           const move =
             noise.perlin2(
               (p.x + time * waveSpeedX) * 0.002,
               (p.y + time * waveSpeedY) * 0.0015,
             ) * 12;
-          p.wave.x = Math.cos(move) * waveAmpX;
-          p.wave.y = Math.sin(move) * waveAmpY;
+          // Secondary wave: faster, finer detail, independent axis
+          const move2 =
+            noise.perlin2(
+              (p.y + time * waveSpeedX * 1.7) * 0.004 + 100,
+              (p.x + time * waveSpeedY * 1.3) * 0.003 + 100,
+            ) * 5;
+          p.wave.x =
+            Math.cos(move) * waveAmpX + Math.sin(move2) * waveAmpX * 0.2;
+          p.wave.y =
+            Math.sin(move) * waveAmpY + Math.cos(move2) * waveAmpY * 0.3;
 
           const dx = p.x - mouse.sx,
             dy = p.y - mouse.sy;
           const dist = Math.hypot(dx, dy);
+
+          // Velocity-based push (original)
           const l = Math.max(175, mouse.vs);
           if (dist < l) {
             const s = 1 - dist / l;
             const f = Math.cos(dist * 0.001) * s;
             p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00065;
             p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00065;
+          }
+
+          // Static radial repulsion — tight circle matching inner spade size
+          const staticR = 35;
+          if (dist < staticR && dist > 0) {
+            const repelT = 1 - dist / staticR;
+            const repelForce = repelT * repelT * 2.5;
+            const repelAngle = Math.atan2(dy, dx);
+            p.cursor.vx += Math.cos(repelAngle) * repelForce;
+            p.cursor.vy += Math.sin(repelAngle) * repelForce;
           }
 
           p.cursor.vx += (0 - p.cursor.x) * tension;
@@ -390,8 +409,8 @@ export function Waves({
       lastFrameTimeRef.current = t;
 
       const mouse = mouseRef.current;
-      mouse.sx += (mouse.x - mouse.sx) * 0.1;
-      mouse.sy += (mouse.y - mouse.sy) * 0.1;
+      mouse.sx += (mouse.x - mouse.sx) * 0.3;
+      mouse.sy += (mouse.y - mouse.sy) * 0.3;
       const dx = mouse.x - mouse.lx,
         dy = mouse.y - mouse.ly;
       const d = Math.hypot(dx, dy);
@@ -401,8 +420,6 @@ export function Waves({
       mouse.lx = mouse.x;
       mouse.ly = mouse.y;
       mouse.a = Math.atan2(dy, dx);
-      container.style.setProperty("--x", `${mouse.sx}px`);
-      container.style.setProperty("--y", `${mouse.sy}px`);
 
       movePoints(t);
       drawLines();
@@ -480,14 +497,6 @@ export function Waves({
       }}
       className={`absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
     >
-      <div
-        className="absolute top-0 left-0 bg-[var(--cursor-dot)] rounded-full w-[0.5rem] h-[0.5rem]"
-        style={{
-          transform:
-            "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
-          willChange: "transform",
-        }}
-      />
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
