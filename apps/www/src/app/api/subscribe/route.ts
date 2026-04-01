@@ -16,10 +16,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const apiKey = process.env.BEEHIIV_API_KEY;
-    const publicationId = process.env.BEEHIIV_PUBLICATION_ID;
+    const apiKey = process.env.BUTTONDOWN_API_KEY;
 
-    if (!apiKey || !publicationId) {
+    if (!apiKey) {
       return NextResponse.json(
         { error: "Newsletter service not configured" },
         { status: 500 },
@@ -36,27 +35,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const res = await fetch(
-      `https://api.beehiiv.com/v2/publications/${publicationId}/subscriptions`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: parsed.data,
-          reactivate_existing: true,
-          send_welcome_email: true,
-          utm_source: "anipotts.com",
-          referring_site: "https://anipotts.com",
-        }),
+    const res = await fetch("https://api.buttondown.com/v1/subscribers", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${apiKey}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        email_address: parsed.data,
+        tags: ["website"],
+        type: "regular",
+      }),
+    });
 
     if (!res.ok) {
       const err = await res.text();
-      logger.error("subscribe", `Beehiiv API returned ${res.status}`, {
+      logger.error("subscribe", `Buttondown API returned ${res.status}`, {
         body: err,
       });
       return NextResponse.json(
