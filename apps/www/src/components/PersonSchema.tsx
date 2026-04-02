@@ -18,11 +18,6 @@ export default function PersonSchema() {
       "https://www.linkedin.com/in/anipotts",
     ],
     jobTitle: siteConfig.title,
-    worksFor: {
-      "@type": "Organization",
-      name: "Structured AI",
-      url: "https://structuredai.com",
-    },
     alumniOf: {
       "@type": "EducationalOrganization",
       name: "New York University",

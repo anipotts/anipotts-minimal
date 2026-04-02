@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Stagger } from "@anipotts/ui";
 import { getPublishedThoughts, getThoughtBySlug } from "@/content/thoughts";
+import { sharedOpenGraph } from "@/content/site";
 import {
   BackLink,
   MetaLine,
@@ -35,12 +36,12 @@ export async function generateMetadata({
     title: thought.title,
     description: thought.summary,
     openGraph: {
+      ...sharedOpenGraph,
       title: thought.title,
       description: thought.summary,
       type: "article",
       publishedTime: thought.date,
       tags: thought.tags,
-      images: ["/og-image.png"],
     },
     twitter: {
       card: "summary_large_image",

@@ -2,19 +2,121 @@
 
 import { useEffect, useRef } from "react";
 
-// ── Weakened ferrofluid params ──
-const MAGNET_R = 80;
-const MAGNET_STR = 12;
-const BUBBLE_R = 22;
-const SNAP_DEPTH = 90;
-const BORDER_PTS = 240;
-const MOUSE_LERP = 0.35;
-const SPADE_SIZE = 28; // half-height of the spade shape
+// ── Animation constants ──
+const FERRO = {
+  // Core magnet
+  magnetRadius: 80,
+  magnetStrength: 12,
+  bubbleRadius: 22,
+  snapDepth: 90,
+  mouseLerp: 0.35,
+  angleLerp: 0.2,
 
-// ── Spade as discrete points for morphing animation ──
-// When progress=0: points form a tiny circle (unraveled thread)
-// When progress=1: points form the full spade shape
-// In between: each point lerps with staggered timing (spaghetti pulling into shape)
+  // Window border
+  borderPoints: 240,
+  borderColor: "rgba(97, 171, 234, 0.3)",
+
+  // Spade cursor
+  spadeSize: 28,
+  spadeDissolveDist: 30,
+  spadeBubbleDepth: 40,
+
+  // Cursor glow
+  glowRadius: 90,
+  glowStops: [0.14, 0.07, 0] as const,
+
+  // Cards
+  cardBorderPoints: 80,
+  cardCornerRadius: 3,
+  cardRescanInterval: 60,
+  cardHoverThreshold: 0.05,
+  cardHoverBoost: 1.5,
+  cardIdleAlpha: 0.25,
+  cardHoverAlphaRange: 0.75,
+
+  // Buttons/inputs (multipliers of core values)
+  buttonRadiusMul: 0.5,
+  buttonStrengthMul: 0.35,
+
+  // Nav underlines
+  navRadiusMul: 0.5,
+  navStrengthMul: 0.35,
+  navPoints: 30,
+  navActiveAlpha: 0.7,
+  navHoverAlpha: 0.5,
+  navLineWidth: 1.5,
+
+  // Grid overlay
+  gridSpacing: 24,
+  gridAlpha: 0.45,
+
+  // Accent color (shared with Waves component)
+  accent: { r: 97, g: 171, b: 234 },
+} as const;
+
+type Pt = { bx: number; by: number };
+
+// ── Shared helpers ──
+
+const rgba = (a: number) =>
+  `rgba(${FERRO.accent.r}, ${FERRO.accent.g}, ${FERRO.accent.b}, ${a})`;
+
+function displacePoints(
+  pts: Pt[],
+  mx: number,
+  my: number,
+  radius: number,
+  strength: number,
+): Pt[] {
+  return pts.map((pt) => {
+    const dx = mx - pt.bx,
+      dy = my - pt.by;
+    const dist = Math.hypot(dx, dy);
+    if (dist >= radius || dist === 0) return pt;
+    const t = 1 - dist / radius;
+    const ease = t * t * t * (t * (t * 6 - 15) + 10); // quintic smoothstep
+    const s = ease * strength;
+    const angle = Math.atan2(dy, dx);
+    return {
+      bx: pt.bx + Math.cos(angle) * s,
+      by: pt.by + Math.sin(angle) * s,
+    };
+  });
+}
+
+function traceClosedPath(ctx: CanvasRenderingContext2D, pts: Pt[]) {
+  const n = pts.length;
+  if (n < 2) return;
+  ctx.beginPath();
+  ctx.moveTo((pts[0]!.bx + pts[1]!.bx) / 2, (pts[0]!.by + pts[1]!.by) / 2);
+  for (let i = 1; i <= n; i++) {
+    const c = pts[i % n]!,
+      nx = pts[(i + 1) % n]!;
+    ctx.quadraticCurveTo(c.bx, c.by, (c.bx + nx.bx) / 2, (c.by + nx.by) / 2);
+  }
+  ctx.closePath();
+}
+
+function rectEdgeDist(
+  mx: number,
+  my: number,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+): number {
+  const dL = mx - left,
+    dR = right - mx,
+    dT = my - top,
+    dB = bottom - my;
+  if (dL > 0 && dR > 0 && dT > 0 && dB > 0) return -Math.min(dL, dR, dT, dB);
+  return Math.hypot(
+    Math.max(left - mx, 0, mx - right),
+    Math.max(top - my, 0, my - bottom),
+  );
+}
+
+// ── Spade shape points ──
 const SPADE_PTS: [number, number][] = [
   [0, -18],
   [-2, -16],
@@ -55,19 +157,17 @@ const SPADE_PTS: [number, number][] = [
   [0, -18],
 ];
 
-function drawSpade(
-  ctx: CanvasRenderingContext2D,
+function buildSpadePath(
   x: number,
   y: number,
   angle: number,
   size: number,
-) {
+): Path2D {
   const s = size / 18;
   const cos = Math.cos(angle - Math.PI / 2);
   const sin = Math.sin(angle - Math.PI / 2);
   const n = SPADE_PTS.length;
 
-  ctx.beginPath();
   const worldPts: { x: number; y: number }[] = [];
   for (let i = 0; i < n; i++) {
     const [lx, ly] = SPADE_PTS[i]!;
@@ -75,20 +175,23 @@ function drawSpade(
       py = ly * s;
     worldPts.push({ x: x + px * cos - py * sin, y: y + px * sin + py * cos });
   }
+
+  const path = new Path2D();
   const first = worldPts[0]!,
     second = worldPts[1]!;
-  ctx.moveTo((first.x + second.x) / 2, (first.y + second.y) / 2);
+  path.moveTo((first.x + second.x) / 2, (first.y + second.y) / 2);
   for (let i = 1; i <= n; i++) {
     const curr = worldPts[i % n]!,
       next = worldPts[(i + 1) % n]!;
-    ctx.quadraticCurveTo(
+    path.quadraticCurveTo(
       curr.x,
       curr.y,
       (curr.x + next.x) / 2,
       (curr.y + next.y) / 2,
     );
   }
-  ctx.closePath();
+  path.closePath();
+  return path;
 }
 
 export function FerrofluidBorder() {
@@ -102,30 +205,31 @@ export function FerrofluidBorder() {
     ly: -999,
     set: false,
   });
-  const angleRef = useRef(0); // smoothed travel angle
+  const angleRef = useRef(0);
   const frameRef = useRef<number | null>(null);
   const isVisibleRef = useRef(true);
   const winRectRef = useRef({ x: 0, y: 0, w: 0, h: 0, r: 8 });
+  const winRectDirtyRef = useRef(true);
+  const cachedBorderPtsRef = useRef<Pt[]>([]);
   const cachedCardsRef = useRef<{ el: HTMLElement; rect: DOMRect }[]>([]);
+  const cachedNavRef = useRef<HTMLElement[]>([]);
   const cardScanFrameRef = useRef(0);
   const cardColorRef = useRef("#05070f");
-  const bgColorRef = useRef("#020308");
   const gridColorRef = useRef("rgba(148, 163, 184, 0.07)");
+  const lastCssVarsRef = useRef({ cx: 0, cy: 0, r: 0, sr: 0, a: 0 });
 
   useEffect(() => {
     if (!canvasRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (window.matchMedia("(hover: none)").matches) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cvs = canvasRef.current!;
+    const cvs = canvasRef.current;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const ctx = cvs.getContext("2d")!;
 
     function readColors() {
       const s = getComputedStyle(document.documentElement);
       cardColorRef.current = s.getPropertyValue("--card").trim();
-      bgColorRef.current = s.getPropertyValue("--background").trim();
       gridColorRef.current =
         s.getPropertyValue("--grid-line").trim() || "rgba(148, 163, 184, 0.07)";
     }
@@ -141,6 +245,7 @@ export function FerrofluidBorder() {
         h: r.height,
         r: 8,
       };
+      cachedBorderPtsRef.current = getRectPts();
     }
 
     function setSize() {
@@ -151,6 +256,7 @@ export function FerrofluidBorder() {
       cvs.style.height = `${window.innerHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       measureWindow();
+      winRectDirtyRef.current = false;
     }
 
     function signedDepth() {
@@ -159,11 +265,11 @@ export function FerrofluidBorder() {
       return Math.min(m.sx - x, x + w - m.sx, m.sy - y, y + h - m.sy);
     }
 
-    function getRectPts() {
+    function getRectPts(): Pt[] {
       const { x, y, w, h, r } = winRectRef.current;
-      const pts: { bx: number; by: number }[] = [];
+      const pts: Pt[] = [];
       const perim = 2 * (w + h - 4 * r) + 2 * Math.PI * r;
-      const step = perim / BORDER_PTS;
+      const step = perim / FERRO.borderPoints;
       const segs = [
         { sx: x + r, sy: y, ex: x + w - r, ey: y },
         { cx: x + w - r, cy: y + r, sa: -Math.PI / 2, ea: 0, r },
@@ -200,66 +306,43 @@ export function FerrofluidBorder() {
       return pts;
     }
 
-    function drawFrame() {
+    function drawFrame(): number {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       const m = mouseRef.current;
       const depth = m.set ? signedDepth() : -999;
-      const borderPts = getRectPts();
+      const borderPts = cachedBorderPtsRef.current;
 
-      // ── Ferrofluid border deformation ──
-      const insideFade = depth > 0 ? Math.max(0, 1 - depth / SNAP_DEPTH) : 1;
-      const displaced = borderPts.map((pt) => {
-        if (!m.set) return pt;
-        const dx = m.sx - pt.bx,
-          dy = m.sy - pt.by;
-        const dist = Math.hypot(dx, dy);
-        if (dist >= MAGNET_R || dist === 0) return pt;
-        const t = 1 - dist / MAGNET_R;
-        const ease = t * t * t * (t * (t * 6 - 15) + 10);
-        const strength = ease * MAGNET_STR * insideFade;
-        const angle = Math.atan2(dy, dx);
-        return {
-          bx: pt.bx + Math.cos(angle) * strength,
-          by: pt.by + Math.sin(angle) * strength,
-        };
-      });
+      // ── Window border deformation ──
+      const insideFade =
+        depth > 0 ? Math.max(0, 1 - depth / FERRO.snapDepth) : 1;
+      const displaced = m.set
+        ? displacePoints(
+            borderPts,
+            m.sx,
+            m.sy,
+            FERRO.magnetRadius,
+            FERRO.magnetStrength * insideFade,
+          )
+        : borderPts;
 
-      // ── Fill window shape ──
-      ctx.beginPath();
-      const n = displaced.length;
-      const f = displaced[0],
-        s2 = displaced[1 % n];
-      if (!f || !s2) return;
-      ctx.moveTo((f.bx + s2.bx) / 2, (f.by + s2.by) / 2);
-      for (let i = 1; i <= n; i++) {
-        const c = displaced[i % n],
-          nx = displaced[(i + 1) % n];
-        if (c && nx)
-          ctx.quadraticCurveTo(
-            c.bx,
-            c.by,
-            (c.bx + nx.bx) / 2,
-            (c.by + nx.by) / 2,
-          );
-      }
-      ctx.closePath();
+      // Fill + grid
+      traceClosedPath(ctx, displaced);
       ctx.fillStyle = cardColorRef.current;
       ctx.fill();
 
-      // ── Grid lines ──
       const wr = winRectRef.current;
       ctx.save();
       ctx.clip();
       ctx.strokeStyle = gridColorRef.current;
-      ctx.globalAlpha = 0.45;
+      ctx.globalAlpha = FERRO.gridAlpha;
       ctx.lineWidth = 1;
-      for (let gx = wr.x; gx <= wr.x + wr.w; gx += 24) {
+      for (let gx = wr.x; gx <= wr.x + wr.w; gx += FERRO.gridSpacing) {
         ctx.beginPath();
         ctx.moveTo(Math.round(gx) + 0.5, wr.y);
         ctx.lineTo(Math.round(gx) + 0.5, wr.y + wr.h);
         ctx.stroke();
       }
-      for (let gy = wr.y; gy <= wr.y + wr.h; gy += 24) {
+      for (let gy = wr.y; gy <= wr.y + wr.h; gy += FERRO.gridSpacing) {
         ctx.beginPath();
         ctx.moveTo(wr.x, Math.round(gy) + 0.5);
         ctx.lineTo(wr.x + wr.w, Math.round(gy) + 0.5);
@@ -268,47 +351,26 @@ export function FerrofluidBorder() {
       ctx.restore();
       ctx.globalAlpha = 1;
 
-      // ── Border stroke ──
-      ctx.beginPath();
-      const f2 = displaced[0],
-        s3 = displaced[1 % n];
-      if (f2 && s3) {
-        ctx.moveTo((f2.bx + s3.bx) / 2, (f2.by + s3.by) / 2);
-        for (let i = 1; i <= n; i++) {
-          const c2 = displaced[i % n],
-            nx2 = displaced[(i + 1) % n];
-          if (c2 && nx2)
-            ctx.quadraticCurveTo(
-              c2.bx,
-              c2.by,
-              (c2.bx + nx2.bx) / 2,
-              (c2.by + nx2.by) / 2,
-            );
-        }
-        ctx.closePath();
-      }
-      ctx.strokeStyle = "rgba(97, 171, 234, 0.3)";
+      // Border stroke
+      traceClosedPath(ctx, displaced);
+      ctx.strokeStyle = FERRO.borderColor;
       ctx.stroke();
 
-      // ── Cursor glow (subtle blue tint that follows cursor everywhere) ──
+      // ── Cursor glow ──
       if (m.set) {
-        const glowR = 90;
+        const glowR = FERRO.glowRadius;
         const grad = ctx.createRadialGradient(m.sx, m.sy, 0, m.sx, m.sy, glowR);
-        grad.addColorStop(0, "rgba(97, 171, 234, 0.14)");
-        grad.addColorStop(0.5, "rgba(97, 171, 234, 0.07)");
-        grad.addColorStop(1, "rgba(97, 171, 234, 0)");
+        grad.addColorStop(0, rgba(FERRO.glowStops[0]));
+        grad.addColorStop(0.5, rgba(FERRO.glowStops[1]));
+        grad.addColorStop(1, rgba(FERRO.glowStops[2]));
         ctx.fillStyle = grad;
         ctx.fillRect(m.sx - glowR, m.sy - glowR, glowR * 2, glowR * 2);
       }
 
-      // ── Card ferrofluid borders ──
-      const CARD_MAGNET_R = MAGNET_R;
-      const CARD_BORDER_PTS = 80;
-
-      // Rescan card elements every 60 frames (~1s at 60fps)
+      // ── Card + nav rescan ──
       cardScanFrameRef.current++;
       if (
-        cardScanFrameRef.current >= 60 ||
+        cardScanFrameRef.current >= FERRO.cardRescanInterval ||
         cachedCardsRef.current.length === 0
       ) {
         cardScanFrameRef.current = 0;
@@ -321,40 +383,43 @@ export function FerrofluidBorder() {
             return r.width >= 30 && r.height >= 20;
           })
           .map((el) => ({ el, rect: el.getBoundingClientRect() }));
+        cachedNavRef.current = Array.from(
+          document.querySelectorAll<HTMLElement>("[data-ferro-nav]"),
+        );
       }
 
+      // ── Card ferrofluid borders ──
       let nearestCardDist = Infinity;
 
       for (const card of cachedCardsRef.current) {
-        const cr = card.el.getBoundingClientRect();
+        const cr = card.rect;
         if (cr.bottom < 0 || cr.top > window.innerHeight) continue;
 
-        // Buttons/inputs get weaker ferrofluid
         const isButton =
           card.el.tagName === "BUTTON" ||
           card.el.tagName === "INPUT" ||
           cr.height < 50;
-        const elMagnetR = isButton ? CARD_MAGNET_R * 0.5 : CARD_MAGNET_R;
-        const elMagnetStr = isButton ? MAGNET_STR * 0.35 : MAGNET_STR;
+        const elMagnetR = isButton
+          ? FERRO.magnetRadius * FERRO.buttonRadiusMul
+          : FERRO.magnetRadius;
+        const elMagnetStr = isButton
+          ? FERRO.magnetStrength * FERRO.buttonStrengthMul
+          : FERRO.magnetStrength;
 
-        const dLeft = m.sx - cr.left;
-        const dRight = cr.right - m.sx;
-        const dTop = m.sy - cr.top;
-        const dBottom = cr.bottom - m.sy;
-        const inside = dLeft > 0 && dRight > 0 && dTop > 0 && dBottom > 0;
-        const edgeDist = inside
-          ? -Math.min(dLeft, dRight, dTop, dBottom)
-          : Math.hypot(
-              Math.max(cr.left - m.sx, 0, m.sx - cr.right),
-              Math.max(cr.top - m.sy, 0, m.sy - cr.bottom),
-            );
+        const edgeDist = rectEdgeDist(
+          m.sx,
+          m.sy,
+          cr.left,
+          cr.top,
+          cr.right,
+          cr.bottom,
+        );
         if (edgeDist < nearestCardDist) nearestCardDist = edgeDist;
 
-        // Generate card border points (sharper corners: radius 3)
-        const cardR = 3;
-        const cardPts: { bx: number; by: number }[] = [];
+        const cardR = FERRO.cardCornerRadius;
+        const cardPts: Pt[] = [];
         const perim = 2 * (cr.width + cr.height);
-        const step = perim / CARD_BORDER_PTS;
+        const step = perim / FERRO.cardBorderPoints;
 
         for (let px = cr.left + cardR; px <= cr.right - cardR; px += step)
           cardPts.push({ bx: px, by: cr.top });
@@ -365,119 +430,75 @@ export function FerrofluidBorder() {
         for (let py = cr.bottom - cardR; py >= cr.top + cardR; py -= step)
           cardPts.push({ bx: cr.left, by: py });
 
-        // Magnetic deformation toward cursor (weaker for buttons)
-        const displaced = cardPts.map((pt) => {
-          const dx = m.sx - pt.bx,
-            dy = m.sy - pt.by;
-          const dist = Math.hypot(dx, dy);
-          if (dist >= elMagnetR || dist === 0) return pt;
-          const t = 1 - dist / elMagnetR;
-          const ease = t * t * t * (t * (t * 6 - 15) + 10);
-          const strength = ease * elMagnetStr;
-          const angle = Math.atan2(dy, dx);
-          return {
-            bx: pt.bx + Math.cos(angle) * strength,
-            by: pt.by + Math.sin(angle) * strength,
-          };
-        });
-
-        // Hover proximity: 0 = far away, 1 = cursor on border/inside
+        const cardDisplaced = displacePoints(
+          cardPts,
+          m.sx,
+          m.sy,
+          elMagnetR,
+          elMagnetStr,
+        );
         const hoverT =
           edgeDist < elMagnetR ? Math.pow(1 - edgeDist / elMagnetR, 2) : 0;
 
-        // Draw card shape
-        if (displaced.length > 2) {
-          ctx.beginPath();
-          const cn = displaced.length;
-          const cf = displaced[0]!,
-            cs = displaced[1 % cn]!;
-          ctx.moveTo((cf.bx + cs.bx) / 2, (cf.by + cs.by) / 2);
-          for (let i = 1; i <= cn; i++) {
-            const cc = displaced[i % cn]!,
-              cnx = displaced[(i + 1) % cn]!;
-            ctx.quadraticCurveTo(
-              cc.bx,
-              cc.by,
-              (cc.bx + cnx.bx) / 2,
-              (cc.by + cnx.by) / 2,
-            );
-          }
-          ctx.closePath();
+        if (cardDisplaced.length > 2) {
+          traceClosedPath(ctx, cardDisplaced);
 
-          // On hover: cut out card fill to reveal waves bg
-          if (hoverT > 0.05) {
+          if (hoverT > FERRO.cardHoverThreshold) {
             ctx.globalCompositeOperation = "destination-out";
-            ctx.globalAlpha = Math.min(1, hoverT * 1.5);
+            ctx.globalAlpha = Math.min(1, hoverT * FERRO.cardHoverBoost);
             ctx.fill();
             ctx.globalAlpha = 1;
             ctx.globalCompositeOperation = "source-over";
           }
 
-          // Border: idle = subtle blue, hover = bright blue
-          const borderAlpha = 0.25 + hoverT * 0.75; // 0.25 idle → 1.0 on hover
-          ctx.strokeStyle = `rgba(97, 171, 234, ${borderAlpha})`;
+          const borderAlpha =
+            FERRO.cardIdleAlpha + hoverT * FERRO.cardHoverAlphaRange;
+          ctx.strokeStyle = rgba(borderAlpha);
           ctx.stroke();
         }
       }
 
       // ── Nav item ferrofluid underlines ──
-      const NAV_MAGNET_R = MAGNET_R * 0.5;
-      const NAV_MAGNET_STR = MAGNET_STR * 0.35;
-      const navEls = document.querySelectorAll<HTMLElement>("[data-ferro-nav]");
-      for (const navEl of navEls) {
+      const NAV_MAGNET_R = FERRO.magnetRadius * FERRO.navRadiusMul;
+      const NAV_MAGNET_STR = FERRO.magnetStrength * FERRO.navStrengthMul;
+
+      for (const navEl of cachedNavRef.current) {
         const nr = navEl.getBoundingClientRect();
         if (nr.bottom < 0 || nr.top > window.innerHeight) continue;
 
         const isActive = navEl.hasAttribute("data-ferro-active");
-
-        // Distance from cursor to nav element
-        const nDLeft = m.sx - nr.left,
-          nDRight = nr.right - m.sx;
-        const nDTop = m.sy - nr.top,
-          nDBottom = nr.bottom - m.sy;
-        const nInside = nDLeft > 0 && nDRight > 0 && nDTop > 0 && nDBottom > 0;
-        const navEdgeDist = nInside
-          ? -Math.min(nDLeft, nDRight, nDTop, nDBottom)
-          : Math.hypot(
-              Math.max(nr.left - m.sx, 0, m.sx - nr.right),
-              Math.max(nr.top - m.sy, 0, m.sy - nr.bottom),
-            );
-
+        const navEdgeDist = rectEdgeDist(
+          m.sx,
+          m.sy,
+          nr.left,
+          nr.top,
+          nr.right,
+          nr.bottom,
+        );
         if (navEdgeDist < nearestCardDist) nearestCardDist = navEdgeDist;
 
-        // Only draw if active or cursor is nearby
         const navHoverT =
           navEdgeDist < NAV_MAGNET_R
             ? Math.pow(1 - navEdgeDist / NAV_MAGNET_R, 2)
             : 0;
         if (!isActive && navHoverT < 0.01) continue;
 
-        // Generate bottom-edge-only points
         const bottomY = nr.bottom;
-        const navPts: { bx: number; by: number }[] = [];
-        const navStep = nr.width / 30;
+        const navPts: Pt[] = [];
+        const navStep = nr.width / FERRO.navPoints;
         for (let px = nr.left; px <= nr.right; px += navStep) {
           navPts.push({ bx: px, by: bottomY });
         }
         navPts.push({ bx: nr.right, by: bottomY });
 
-        // Magnetic deformation
-        const navDisplaced = navPts.map((pt) => {
-          const dx = m.sx - pt.bx,
-            dy = m.sy - pt.by;
-          const dist = Math.hypot(dx, dy);
-          if (dist >= NAV_MAGNET_R || dist === 0) return pt;
-          const t = 1 - dist / NAV_MAGNET_R;
-          const ease = t * t * t * (t * (t * 6 - 15) + 10);
-          const strength = ease * NAV_MAGNET_STR;
-          const angle = Math.atan2(dy, dx);
-          return {
-            bx: pt.bx + Math.cos(angle) * strength,
-            by: pt.by + Math.sin(angle) * strength,
-          };
-        });
+        const navDisplaced = displacePoints(
+          navPts,
+          m.sx,
+          m.sy,
+          NAV_MAGNET_R,
+          NAV_MAGNET_STR,
+        );
 
-        // Draw the underline
         if (navDisplaced.length > 1) {
           ctx.beginPath();
           ctx.moveTo(navDisplaced[0]!.bx, navDisplaced[0]!.by);
@@ -494,38 +515,42 @@ export function FerrofluidBorder() {
           const last = navDisplaced[navDisplaced.length - 1]!;
           ctx.lineTo(last.bx, last.by);
 
-          const alpha = isActive ? 0.7 : navHoverT * 0.5;
-          ctx.strokeStyle = `rgba(97, 171, 234, ${alpha})`;
-          ctx.lineWidth = 1.5;
+          const alpha = isActive
+            ? FERRO.navActiveAlpha
+            : navHoverT * FERRO.navHoverAlpha;
+          ctx.strokeStyle = rgba(alpha);
+          ctx.lineWidth = FERRO.navLineWidth;
           ctx.stroke();
         }
       }
 
-      // ── Spade cursor (only inside window) ──
-      if (!m.set || depth < -5) return;
-      const bubbleT = Math.max(0, Math.min(1, depth / 40));
-      let spadeScale = bubbleT * SPADE_SIZE;
-      if (spadeScale < 1) return;
+      // ── Spade cursor ──
+      if (!m.set || depth < -5) return depth;
+      const bubbleT = Math.max(0, Math.min(1, depth / FERRO.spadeBubbleDepth));
+      let spadeScale = bubbleT * FERRO.spadeSize;
+      if (spadeScale < 1) return depth;
 
-      // ── Shrink spade near card borders ──
-      const DISSOLVE_DIST = 30;
-      if (nearestCardDist < DISSOLVE_DIST) {
-        spadeScale *= Math.max(0, nearestCardDist / DISSOLVE_DIST);
+      if (nearestCardDist < FERRO.spadeDissolveDist) {
+        spadeScale *= Math.max(0, nearestCardDist / FERRO.spadeDissolveDist);
       }
-      if (spadeScale < 1) return;
+      if (spadeScale < 1) return depth;
 
-      // Cut spade shape out of the fill
+      const spadePath = buildSpadePath(
+        m.sx,
+        m.sy,
+        angleRef.current,
+        spadeScale,
+      );
       ctx.globalCompositeOperation = "destination-out";
-      drawSpade(ctx, m.sx, m.sy, angleRef.current, spadeScale);
       ctx.fillStyle = "black";
-      ctx.fill();
+      ctx.fill(spadePath);
       ctx.globalCompositeOperation = "source-over";
 
-      // Stroke spade with border color
-      drawSpade(ctx, m.sx, m.sy, angleRef.current, spadeScale);
-      ctx.strokeStyle = "rgba(97, 171, 234, 0.3)";
+      ctx.strokeStyle = FERRO.borderColor;
       ctx.lineWidth = 1;
-      ctx.stroke();
+      ctx.stroke(spadePath);
+
+      return depth;
     }
 
     function tick() {
@@ -534,43 +559,62 @@ export function FerrofluidBorder() {
         return;
       }
 
-      // Keep canvas viewport-aligned; absolute position means it rubber-bands with content
       cvs.style.transform = `translateY(${window.scrollY}px)`;
-      measureWindow();
+      if (winRectDirtyRef.current) {
+        measureWindow();
+        winRectDirtyRef.current = false;
+      }
 
       const m = mouseRef.current;
-      m.sx += (m.x - m.sx) * MOUSE_LERP;
-      m.sy += (m.y - m.sy) * MOUSE_LERP;
+      m.sx += (m.x - m.sx) * FERRO.mouseLerp;
+      m.sy += (m.y - m.sy) * FERRO.mouseLerp;
 
-      // ── Smooth travel angle ──
       const vx = m.sx - m.lx,
         vy = m.sy - m.ly;
       const speed = Math.hypot(vx, vy);
       if (speed > 0.5) {
         const targetAngle = Math.atan2(vy, vx);
-        // Shortest-path angle interpolation
         let diff = targetAngle - angleRef.current;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
-        angleRef.current += diff * 0.2;
+        angleRef.current += diff * FERRO.angleLerp;
       }
       m.lx = m.sx;
       m.ly = m.sy;
 
-      drawFrame();
+      const depth = drawFrame();
 
-      // ── Publish cursor state for Pretext/RevealBadge ──
-      const depth = signedDepth();
-      const bubbleT = Math.max(0, Math.min(1, depth / 40));
-      const bubbleR = bubbleT * BUBBLE_R;
-      // Spade scale computed in drawFrame, but we need it here too for CSS vars
-      const rawSpadeScale = Math.max(0, Math.min(1, depth / 40)) * SPADE_SIZE;
+      // Publish cursor state as CSS custom props (only when changed)
+      const bubbleT = Math.max(0, Math.min(1, depth / FERRO.spadeBubbleDepth));
+      const bubbleR = bubbleT * FERRO.bubbleRadius;
+      const rawSpadeScale = bubbleT * FERRO.spadeSize;
+      const last = lastCssVarsRef.current;
+      const cx = Math.round(m.sx * 10) / 10;
+      const cy = Math.round(m.sy * 10) / 10;
+      const rr = Math.round(bubbleR * 10) / 10;
+      const sr = Math.round(rawSpadeScale * 10) / 10;
+      const aa = Math.round(angleRef.current * 100) / 100;
       const root = document.documentElement;
-      root.style.setProperty("--ferro-cx", `${m.sx}`);
-      root.style.setProperty("--ferro-cy", `${m.sy}`);
-      root.style.setProperty("--ferro-r", `${bubbleR}`);
-      root.style.setProperty("--ferro-spade-r", `${rawSpadeScale}`);
-      root.style.setProperty("--ferro-angle", `${angleRef.current}`);
+      if (cx !== last.cx) {
+        root.style.setProperty("--ferro-cx", `${cx}`);
+        last.cx = cx;
+      }
+      if (cy !== last.cy) {
+        root.style.setProperty("--ferro-cy", `${cy}`);
+        last.cy = cy;
+      }
+      if (rr !== last.r) {
+        root.style.setProperty("--ferro-r", `${rr}`);
+        last.r = rr;
+      }
+      if (sr !== last.sr) {
+        root.style.setProperty("--ferro-spade-r", `${sr}`);
+        last.sr = sr;
+      }
+      if (aa !== last.a) {
+        root.style.setProperty("--ferro-angle", `${aa}`);
+        last.a = aa;
+      }
 
       frameRef.current = requestAnimationFrame(tick);
     }
@@ -588,11 +632,16 @@ export function FerrofluidBorder() {
       }
     }
 
+    function onScroll() {
+      winRectDirtyRef.current = true;
+    }
+
     readColors();
     setSize();
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("resize", setSize);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     const themeObs = new MutationObserver(readColors);
     themeObs.observe(document.documentElement, {
@@ -610,6 +659,7 @@ export function FerrofluidBorder() {
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", setSize);
+      window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVis);
       themeObs.disconnect();
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);

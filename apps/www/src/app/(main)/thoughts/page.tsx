@@ -9,6 +9,7 @@ import {
   PageSummary,
   PageTitle,
 } from "@/components/page/PageScaffold";
+import { sharedOpenGraph } from "@/content/site";
 
 export const revalidate = 3600;
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   title: "thoughts",
   description: "Technical writing and notes from ani potts",
   openGraph: {
+    ...sharedOpenGraph,
     title: "thoughts | ani potts",
     description: "Technical writing and notes from ani potts",
     url: "https://anipotts.com/thoughts",
@@ -42,8 +44,8 @@ export default async function ThoughtsPage({
         <PagePrelude>thoughts</PagePrelude>
         <PageTitle>writing, systems, and product notes</PageTitle>
         <PageSummary>
-          Short technical essays and operating notes from projects, experiments,
-          and shipping cycles.
+          Technical essays and notes from what I&apos;m building. Mostly agents,
+          tooling, and things I figured out the hard way.
         </PageSummary>
       </section>
 

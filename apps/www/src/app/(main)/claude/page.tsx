@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { sharedOpenGraph } from "@/content/site";
 import { TipCard } from "./TipCard";
 import { ThroughputChart } from "./ThroughputChart";
 import { SessionTable } from "./SessionTable";
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
   description:
     "Claude Code systems, playbooks, and implementation patterns from ani potts",
   openGraph: {
+    ...sharedOpenGraph,
     title: "claude | ani potts",
     description:
       "Claude Code systems, playbooks, and implementation patterns from ani potts",
@@ -78,8 +80,8 @@ export default function ClaudePage() {
         <PagePrelude>claude</PagePrelude>
         <PageTitle>claude code systems that ship</PageTitle>
         <PageSummary>
-          Practical workflows for coding agents, quality gates, and
-          high-velocity implementation loops. Everything is open source.
+          How I actually use Claude Code. Hooks, agents, plugins, real session
+          data. Everything is open source.
         </PageSummary>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           <CardBlock>
@@ -323,8 +325,8 @@ export default function ClaudePage() {
         <CardBlock>
           <div className="flex flex-col gap-3">
             <p className="text-secondary leading-relaxed">
-              If you need execution support on Claude Code workflows, agent
-              architecture, or repo automation, I can help you ship faster.
+              If you want help setting up Claude Code workflows or agent systems
+              for your team, I consult on that.
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
               <Link

@@ -1,13 +1,11 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { Stagger } from "@anipotts/ui";
 import ProjectCard from "@/components/ProjectCard";
 import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import ThoughtLink from "@/components/thoughts/ThoughtLink";
+import ViewAllLink from "@/components/ViewAllLink";
 import {
   ContentBlocks,
-  EndCta,
   ListBlock,
   PageFrame,
   PagePrelude,
@@ -17,12 +15,14 @@ import {
 import { getFeaturedProjects } from "@/content/projects";
 import { getPublishedThoughts } from "@/content/thoughts";
 import { homeContent } from "@/content/home";
+import { sharedOpenGraph } from "@/content/site";
 
 export const metadata: Metadata = {
-  title: "ani potts | software engineer",
+  title: "software engineer",
   description:
     "software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code.",
   openGraph: {
+    ...sharedOpenGraph,
     title: "ani potts | software engineer",
     description:
       "software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code.",
@@ -34,10 +34,8 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [projects, thoughts] = await Promise.all([
-    Promise.resolve(getFeaturedProjects(4)),
-    getPublishedThoughts(),
-  ]);
+  const projects = getFeaturedProjects(4);
+  const thoughts = await getPublishedThoughts();
 
   const recentThoughts = thoughts.slice(0, 3);
 
@@ -64,8 +62,11 @@ export default async function Home() {
       </Stagger>
 
       <section id="selected-work">
-        <Stagger className="flex flex-col gap-4" offset={0.3}>
-          <PagePrelude>selected work</PagePrelude>
+        <Stagger className="flex flex-col gap-6" offset={0.3}>
+          <div className="flex items-center justify-between">
+            <PagePrelude>selected work</PagePrelude>
+            <ViewAllLink href="/work">view all work</ViewAllLink>
+          </div>
           <Stagger
             className="grid grid-cols-1 sm:grid-cols-2 gap-8"
             interval={0.04}
@@ -74,23 +75,14 @@ export default async function Home() {
               <ProjectCard key={project.slug} project={project} />
             ))}
           </Stagger>
-          <EndCta>
-            <Link
-              href="/work"
-              className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
-            >
-              view all work
-              <ArrowRight
-                size={12}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </Link>
-          </EndCta>
         </Stagger>
       </section>
 
-      <Stagger as="section" className="flex flex-col gap-4" offset={0.42}>
-        <PagePrelude>latest thoughts</PagePrelude>
+      <Stagger as="section" className="flex flex-col gap-6" offset={0.42}>
+        <div className="flex items-center justify-between">
+          <PagePrelude>latest thoughts</PagePrelude>
+          <ViewAllLink href="/thoughts">view all thoughts</ViewAllLink>
+        </div>
         <ListBlock>
           {recentThoughts.map((thought) => (
             <div key={thought.slug} className="py-5 first:pt-0 last:pb-0">
@@ -98,18 +90,6 @@ export default async function Home() {
             </div>
           ))}
         </ListBlock>
-        <EndCta>
-          <Link
-            href="/thoughts"
-            className="group text-xs text-accent-400 hover:underline inline-flex items-center gap-1"
-          >
-            view all thoughts
-            <ArrowRight
-              size={12}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-        </EndCta>
       </Stagger>
 
       <section aria-label="Newsletter">

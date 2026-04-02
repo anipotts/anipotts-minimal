@@ -43,41 +43,22 @@ export default function NewsletterSubscribe() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="text-sm uppercase tracking-wider text-secondary font-mono">
-        get my build notes
-      </h3>
-      <p className="text-sm text-tertiary leading-relaxed">
-        Weekly thoughts on agents, dev tools, and building in public.
-      </p>
-
-      {status === "success" ? (
-        <p className="text-sm text-green-400 py-2" role="status">
-          You&apos;re in. Check your inbox.
-        </p>
-      ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col sm:flex-row gap-2"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            aria-label="Email address"
-            required
-            className="flex-1 bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
-          />
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium tracking-wide text-accent-400">
+          get my build notes weekly
+        </h2>
+        {status !== "success" && (
           <button
             type="submit"
+            form="newsletter-form"
             disabled={status === "loading" || !email.trim()}
-            className={`px-4 py-2.5 rounded-sm text-xs uppercase tracking-wider font-medium transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-sm text-xs uppercase tracking-[0.2em] transition-colors ${
               status === "loading"
                 ? "border border-border text-faint cursor-wait"
                 : email.trim()
-                  ? "border border-accent-400/30 text-accent-400 hover:bg-accent-400/10"
-                  : "border border-border text-faint cursor-not-allowed"
+                  ? "border border-accent-400/40 text-accent-400 hover:bg-accent-400/10"
+                  : "border border-accent-400/40 text-accent-400/40 cursor-default"
             }`}
           >
             {status === "loading" ? (
@@ -88,6 +69,24 @@ export default function NewsletterSubscribe() {
               "subscribe"
             )}
           </button>
+        )}
+      </div>
+
+      {status === "success" ? (
+        <p className="text-sm text-green-400 py-2" role="status">
+          You&apos;re in. Check your inbox.
+        </p>
+      ) : (
+        <form id="newsletter-form" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            aria-label="Email address"
+            required
+            className="w-full bg-input border border-border rounded-sm p-2.5 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono"
+          />
         </form>
       )}
 

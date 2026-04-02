@@ -31,13 +31,13 @@ export default function ThoughtLink({ thought }: { thought: ThoughtPreview }) {
   return (
     <Link
       href={`/thoughts/${thought.slug}`}
-      className="group block rounded-md p-3 -m-3 border border-transparent hover:border-accent-400/20 hover:bg-accent-400/5 transition-all duration-200"
+      className="group block rounded-md p-3 -m-3 border border-transparent transition-all duration-200"
       data-no-flow
       onClick={handleClick}
     >
       <div className="flex flex-col gap-2">
         <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-          <h2 className="text-2xl font-semibold text-body group-hover:text-accent-400 transition-colors duration-200 font-heading">
+          <h2 className="text-2xl font-semibold text-body group-hover:text-accent-400 transition-all duration-200 font-heading group-active:animate-[textBounce_0.25s_ease-out]">
             {thought.title}
           </h2>
           <MetaLine items={[{ value: formattedDate }]} className="shrink-0" />

@@ -68,7 +68,7 @@ export function TipCard({
             >
               {isOpen ? "[-]" : "[+]"}
             </span>
-            <h3
+            <h2
               className={`font-bold ${
                 isOpen
                   ? "text-heading"
@@ -76,7 +76,7 @@ export function TipCard({
               }`}
             >
               {name}
-            </h3>
+            </h2>
           </div>
           <p className="text-xs text-muted pl-6">{tagline}</p>
         </div>

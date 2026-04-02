@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { sharedOpenGraph } from "@/content/site";
 import {
   ArrowSquareOut,
   EnvelopeSimple,
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
   title: "connect",
   description: "Get in touch with ani potts",
   openGraph: {
+    ...sharedOpenGraph,
     title: "connect | ani potts",
     description: "Get in touch with ani potts",
     url: "https://anipotts.com/connect",
@@ -55,7 +57,7 @@ export default async function ConnectPage({
         <PagePrelude>connect</PagePrelude>
         <PageTitle>get in touch</PageTitle>
         <PageSummary>
-          For work inquiries, collaborations, or Claude Code consulting.
+          Work, collabs, Claude Code consulting, or just to say hey.
         </PageSummary>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           {socialLinks.map((social) => {

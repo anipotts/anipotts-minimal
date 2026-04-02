@@ -15,6 +15,17 @@ export const siteConfig = {
   version: "3.0.1",
 } as const;
 
+export const sharedOpenGraph = {
+  images: [
+    {
+      url: siteConfig.ogImage,
+      width: 1200,
+      height: 630,
+      alt: siteConfig.name.toLowerCase(),
+    },
+  ],
+};
+
 export interface NavItem {
   name: string;
   path: string;

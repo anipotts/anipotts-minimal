@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import { Stagger } from "@anipotts/ui";
 import { getProjectBySlug, projectEntries } from "@/content/projects";
+import { sharedOpenGraph } from "@/content/site";
 import { projectContent } from "@/data/project-content";
 import {
   BackLink,
@@ -37,9 +38,10 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${project.title} | Ani Potts`,
+    title: project.title,
     description: project.description,
     openGraph: {
+      ...sharedOpenGraph,
       title: project.title,
       description: project.description,
       url: `https://anipotts.com/projects/${project.slug}`,

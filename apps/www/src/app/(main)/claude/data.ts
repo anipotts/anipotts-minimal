@@ -15,7 +15,7 @@ export interface MineFeature {
 export const minePlugin = {
   name: "mine",
   tagline:
-    "mines every claude code session into a local sqlite database. total recall for your dev work.",
+    "mines every claude code session into a local sqlite database. search, stats, cost breakdowns, error patterns.",
   install: "claude plugin marketplace add anipotts/claude-code-tips",
   href: MINE_REPO,
   features: [

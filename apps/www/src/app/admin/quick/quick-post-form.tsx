@@ -62,7 +62,7 @@ export default function QuickPostForm() {
 
       <textarea
         name="content"
-        placeholder="Content (optional — add later)"
+        placeholder="Content (optional, add later)"
         aria-label="Content"
         rows={8}
         className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"

@@ -53,7 +53,7 @@ export const projects: Project[] = [
     subtitle:
       "Practical patterns for agentic coding: hooks, agents, automation.",
     description:
-      "A living reference built from hundreds of Claude Code sessions. Covers hooks, custom agents, MCP servers, plugin development, and automation patterns.",
+      "Reference repo built from hundreds of Claude Code sessions. Hooks, custom agents, MCP servers, plugin development, automation patterns.",
     year: "2025-",
     category: "ai",
     role: "Creator",
@@ -159,7 +159,6 @@ export const projects: Project[] = [
     status: "live",
     links: {
       live: "https://nyupuritytest.com",
-      repo: "https://github.com/anipotts/nyu-rice-purity",
     },
   },
 

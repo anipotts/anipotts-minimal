@@ -129,15 +129,10 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
         captchaToken: captchaToken || undefined,
       });
       if (!validation.success) {
-        const errors: Record<string, string> = {};
-        for (const issue of validation.error.issues) {
-          const key = issue.path[0];
-          if (key && !errors[String(key)]) {
-            errors[String(key)] = issue.message;
-          }
-        }
         setStatus("error");
-        setErrorMessage("Please fix the highlighted fields.");
+        setErrorMessage(
+          validation.error.issues[0]?.message ?? "Invalid input.",
+        );
         return;
       }
 
@@ -207,7 +202,7 @@ export default function ContactForm({ initialIntent = "" }: ContactFormProps) {
       <textarea
         value={message}
         onChange={(event) => setMessage(event.target.value)}
-        placeholder="What do you need? Be specific. Objective, timeline, constraints."
+        placeholder="What's on your mind? The more context the better."
         aria-label="Message"
         className="min-h-32 bg-input border border-border rounded-sm p-3 text-sm text-body focus:border-accent-400/60 focus:outline-none transition-colors font-mono resize-y"
         maxLength={900}

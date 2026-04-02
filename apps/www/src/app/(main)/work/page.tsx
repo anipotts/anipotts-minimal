@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Stagger } from "@anipotts/ui";
 import ProjectCard from "@/components/ProjectCard";
 import type { ProjectEntry } from "@/content/projects";
+import { sharedOpenGraph } from "@/content/site";
 import { getWorkProjects } from "@/content/projects";
 import {
   ContentBlocks,
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   title: "work",
   description: "Curated projects and systems from ani potts",
   openGraph: {
+    ...sharedOpenGraph,
     title: "work | ani potts",
     description: "Curated projects and systems from ani potts",
     url: "https://anipotts.com/work",
@@ -139,8 +141,8 @@ export default async function WorkPage({
         <PagePrelude>work</PagePrelude>
         <PageTitle>selected systems and products</PageTitle>
         <PageSummary>
-          High-signal projects only. Each entry includes status, context, and
-          links to live product, source, or case study.
+          Everything I&apos;ve shipped or am actively building. Status, context,
+          links to live product or source.
         </PageSummary>
       </Stagger>
 
@@ -187,7 +189,11 @@ export default async function WorkPage({
                       )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                         {qProjects.map((project) => (
-                          <ProjectCard key={project.slug} project={project} />
+                          <ProjectCard
+                            key={project.slug}
+                            project={project}
+                            headingLevel="h3"
+                          />
                         ))}
                       </div>
                     </div>

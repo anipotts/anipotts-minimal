@@ -89,7 +89,7 @@ export function ExpandableNav({
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="text-accent-400 text-sm font-medium tracking-wide whitespace-nowrap shrink-0"
+          className="text-accent-400 text-sm font-medium tracking-wide whitespace-nowrap shrink-0 active:animate-[textBounce_0.25s_ease-out]"
           onClick={() => onNavClick?.("home", "/")}
         >
           ani potts
@@ -102,7 +102,7 @@ export function ExpandableNav({
               href={item.href}
               data-ferro-nav=""
               {...(item.isActive ? { "data-ferro-active": "" } : {})}
-              className={`transition-colors duration-300 whitespace-nowrap pb-1 ${
+              className={`transition-all duration-300 whitespace-nowrap pb-1 active:animate-[textBounce_0.25s_ease-out] ${
                 item.isActive
                   ? "text-body"
                   : "text-tertiary hover:text-accent-400"
