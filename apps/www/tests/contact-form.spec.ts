@@ -10,7 +10,7 @@ test.describe("contact form on /connect", () => {
     await page.goto("/connect");
     await expect(page.getByLabel("Message", { exact: true })).toBeVisible();
     await expect(page.getByLabel(/^name$/i)).toBeVisible();
-    await expect(page.getByLabel(/^email$/i)).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible();
   });
 
   test("selecting intent highlights the button", async ({ page }) => {

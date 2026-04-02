@@ -5,7 +5,7 @@ test.describe("public pages load correctly", () => {
     const response = await page.goto("/");
     expect(response?.status()).toBe(200);
     await expect(
-      page.getByRole("heading", { level: 1, name: /hi, i'm ani\./i }),
+      page.getByRole("heading", { level: 1, name: /hi, i'm ani potts\./i }),
     ).toBeVisible();
   });
 
