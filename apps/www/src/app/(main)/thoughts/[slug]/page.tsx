@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Stagger } from "@anipotts/ui";
+import ViewAllLink from "@/components/ViewAllLink";
 import { getPublishedThoughts, getThoughtBySlug } from "@/content/thoughts";
 import { sharedOpenGraph } from "@/content/site";
 import {
-  BackLink,
   MetaLine,
   PageFrame,
   PageTitle,
-  SectionLabel,
   TagList,
 } from "@/components/page/PageScaffold";
 
@@ -102,12 +101,8 @@ export default async function ThoughtPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <Stagger>
-        <BackLink href="/thoughts">back to thoughts</BackLink>
-      </Stagger>
-
-      <Stagger as="section" className="flex flex-col gap-4" offset={0.06}>
-        <SectionLabel>thought</SectionLabel>
+      <Stagger as="section" className="flex flex-col gap-4">
+        <ViewAllLink href="/thoughts">all thoughts</ViewAllLink>
         <PageTitle>{thought.title}</PageTitle>
         <MetaLine
           items={[
@@ -118,7 +113,7 @@ export default async function ThoughtPage({
         <TagList tags={thought.tags} />
       </Stagger>
 
-      <Stagger offset={0.3}>
+      <Stagger offset={0.2}>
         <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)]">
           <ReactMarkdown
             components={{

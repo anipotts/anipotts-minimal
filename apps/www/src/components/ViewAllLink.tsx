@@ -11,7 +11,7 @@ export default function ViewAllLink({
   return (
     <Link
       href={href}
-      className="px-3 py-1.5 rounded-sm border border-accent-400/40 text-accent-400 text-xs uppercase tracking-[0.2em] transition-colors hover:bg-accent-400/10"
+      className="self-start px-3 py-1.5 rounded-sm border border-accent-400/40 text-accent-400 text-xs uppercase tracking-[0.2em] transition-colors hover:bg-accent-400/10"
     >
       {children}
     </Link>
