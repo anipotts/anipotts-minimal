@@ -209,9 +209,8 @@ export function FerrofluidBorder() {
   const frameRef = useRef<number | null>(null);
   const isVisibleRef = useRef(true);
   const winRectRef = useRef({ x: 0, y: 0, w: 0, h: 0, r: 8 });
-  const winRectDirtyRef = useRef(true);
   const cachedBorderPtsRef = useRef<Pt[]>([]);
-  const cachedCardsRef = useRef<{ el: HTMLElement; rect: DOMRect }[]>([]);
+  const cachedCardsRef = useRef<HTMLElement[]>([]);
   const cachedNavRef = useRef<HTMLElement[]>([]);
   const cardScanFrameRef = useRef(0);
   const cardColorRef = useRef("#05070f");
@@ -256,7 +255,6 @@ export function FerrofluidBorder() {
       cvs.style.height = `${window.innerHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       measureWindow();
-      winRectDirtyRef.current = false;
     }
 
     function signedDepth() {
@@ -377,12 +375,10 @@ export function FerrofluidBorder() {
         const els = document.querySelectorAll<HTMLElement>(
           ".portal-content .rounded-md, .portal-content button, .portal-content a.rounded-sm, .portal-content input.rounded-sm",
         );
-        cachedCardsRef.current = Array.from(els)
-          .filter((el) => {
-            const r = el.getBoundingClientRect();
-            return r.width >= 30 && r.height >= 20;
-          })
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }));
+        cachedCardsRef.current = Array.from(els).filter((el) => {
+          const r = el.getBoundingClientRect();
+          return r.width >= 30 && r.height >= 20;
+        });
         cachedNavRef.current = Array.from(
           document.querySelectorAll<HTMLElement>("[data-ferro-nav]"),
         );
@@ -391,14 +387,12 @@ export function FerrofluidBorder() {
       // ── Card ferrofluid borders ──
       let nearestCardDist = Infinity;
 
-      for (const card of cachedCardsRef.current) {
-        const cr = card.rect;
+      for (const el of cachedCardsRef.current) {
+        const cr = el.getBoundingClientRect();
         if (cr.bottom < 0 || cr.top > window.innerHeight) continue;
 
         const isButton =
-          card.el.tagName === "BUTTON" ||
-          card.el.tagName === "INPUT" ||
-          cr.height < 50;
+          el.tagName === "BUTTON" || el.tagName === "INPUT" || cr.height < 50;
         const elMagnetR = isButton
           ? FERRO.magnetRadius * FERRO.buttonRadiusMul
           : FERRO.magnetRadius;
@@ -560,10 +554,7 @@ export function FerrofluidBorder() {
       }
 
       cvs.style.transform = `translateY(${window.scrollY}px)`;
-      if (winRectDirtyRef.current) {
-        measureWindow();
-        winRectDirtyRef.current = false;
-      }
+      measureWindow();
 
       const m = mouseRef.current;
       m.sx += (m.x - m.sx) * FERRO.mouseLerp;
@@ -632,16 +623,11 @@ export function FerrofluidBorder() {
       }
     }
 
-    function onScroll() {
-      winRectDirtyRef.current = true;
-    }
-
     readColors();
     setSize();
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("resize", setSize);
-    window.addEventListener("scroll", onScroll, { passive: true });
 
     const themeObs = new MutationObserver(readColors);
     themeObs.observe(document.documentElement, {
@@ -659,7 +645,6 @@ export function FerrofluidBorder() {
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", setSize);
-      window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVis);
       themeObs.disconnect();
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
