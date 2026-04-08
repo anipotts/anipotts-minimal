@@ -19,7 +19,7 @@ export default function StatusActions({
   currentStatus,
 }: {
   id: string;
-  currentStatus: string;
+  currentStatus: ContentStatus;
 }) {
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<string | null>(null);
