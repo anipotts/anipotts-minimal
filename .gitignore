@@ -30,3 +30,36 @@ content/work/
 
 # Playground prototypes
 playground*.html
+
+# Claude Code local state
+.claude/projects/
+.claude/memory/
+.claude/hooks/
+.claude/settings.local.json
+.claude/plugins/
+
+# Agent/research docs (never commit)
+agent-*.md
+*_REPORT.md
+*_NOTES.md
+*_AGENT_*.md
+DESIGN_SPEC.md
+
+# Debug/test screenshots
+debug-*.png
+stress-test-*.png
+test-admin-*.png
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Logfire
+.logfire/
+LOGFIRE_*.md
+
+# One-off scripts/scratch
+extraction-logs.md
+output.md
+sample_event.md
+task_*.md
+qaqc-scaling.md
