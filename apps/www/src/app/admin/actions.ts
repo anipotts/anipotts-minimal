@@ -34,6 +34,7 @@ import {
   getEmail as buttondownGetEmail,
   updateEmail as buttondownUpdateEmail,
   deleteEmail as buttondownDeleteEmail,
+  listSubscribers as buttondownListSubscribers,
 } from "./lib/buttondown";
 
 const UUID_RE =
@@ -767,4 +768,15 @@ export async function syncMarkdownThoughts() {
     };
   }
   return { success: true, message: `Synced ${synced} thoughts` };
+}
+
+// ── Subscribers ──
+
+export async function fetchSubscribers() {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  const result = await buttondownListSubscribers("regular");
+  if (result.error) return { error: result.error };
+  return { success: true, subscribers: result.data, count: result.count };
 }

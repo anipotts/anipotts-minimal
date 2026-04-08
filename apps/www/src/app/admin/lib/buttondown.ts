@@ -32,6 +32,40 @@ export interface ButtondownEmail {
   email_type: string;
 }
 
+export interface ButtondownSubscriber {
+  id: string;
+  email: string;
+  creation_date: string;
+  notes: string;
+  tags: string[];
+  type: "regular" | "unsubscribed" | "unactivated" | "removed";
+  subscriber_type: string;
+}
+
+export async function listSubscribers(
+  type?: "regular" | "unsubscribed",
+): Promise<{ data: ButtondownSubscriber[]; count: number; error?: string }> {
+  try {
+    const { apiKey } = getConfig();
+    const params = new URLSearchParams();
+    if (type) params.set("type", type);
+    const res = await fetch(`${BASE_URL}/subscribers?${params.toString()}`, {
+      headers: headers(apiKey),
+    });
+    if (!res.ok) {
+      return {
+        data: [],
+        count: 0,
+        error: `Buttondown ${res.status}: ${await res.text()}`,
+      };
+    }
+    const data = await res.json();
+    return { data: data.results || [], count: data.count || 0 };
+  } catch (e) {
+    return { data: [], count: 0, error: String(e) };
+  }
+}
+
 export async function listEmails(
   status?: ButtondownEmailStatus,
 ): Promise<{ data: ButtondownEmail[]; error?: string }> {
