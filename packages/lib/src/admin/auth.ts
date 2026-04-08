@@ -19,7 +19,7 @@ export const ADMIN_COOKIE_OPTIONS: {
 } = {
   httpOnly: true,
   secure: true,
-  sameSite: "strict",
+  sameSite: "lax",
   maxAge: 28800,
 };
 

@@ -134,7 +134,7 @@ describe("constants", () => {
   it("exports secure cookie options", () => {
     expect(ADMIN_COOKIE_OPTIONS.httpOnly).toBe(true);
     expect(ADMIN_COOKIE_OPTIONS.secure).toBe(true);
-    expect(ADMIN_COOKIE_OPTIONS.sameSite).toBe("strict");
+    expect(ADMIN_COOKIE_OPTIONS.sameSite).toBe("lax");
     expect(ADMIN_COOKIE_OPTIONS.maxAge).toBe(28800);
   });
 });

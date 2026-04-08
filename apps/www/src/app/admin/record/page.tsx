@@ -37,7 +37,7 @@ export default async function RecordPage() {
         {thoughts.map((t) => (
           <Link
             key={t.id}
-            href={`/admin/record/${t.id}`}
+            href={`/record/${t.id}`}
             className="block bg-zinc-900 rounded-xl p-4 active:bg-zinc-800 transition-colors"
           >
             <h3 className="font-medium text-zinc-100 truncate">{t.title}</h3>
