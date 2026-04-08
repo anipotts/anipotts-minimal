@@ -110,21 +110,17 @@ export default async function ContentDetailPage({
         </div>
 
         {/* Right panel: Metadata, Actions, Distribution */}
-        <div className="w-80 shrink-0 border-l border-zinc-800 overflow-y-auto admin-scroll">
-          <div className="p-4 space-y-4">
+        <div className="w-72 shrink-0 border-l border-zinc-800/60 overflow-y-auto admin-scroll">
+          <div className="p-3 space-y-4">
             {/* Status + Actions */}
             <section>
-              <h4 className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                Status
-              </h4>
+              <h4 className="admin-label">Status</h4>
               <StatusActions id={t.id} currentStatus={status} />
             </section>
 
             {/* Metadata */}
             <section>
-              <h4 className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                Details
-              </h4>
+              <h4 className="admin-label">Details</h4>
               <div className="text-xs text-zinc-400 space-y-1.5">
                 {t.content_type && (
                   <div>
@@ -181,17 +177,13 @@ export default async function ContentDetailPage({
 
             {/* Buttondown */}
             <section>
-              <h4 className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                Email
-              </h4>
+              <h4 className="admin-label">Email</h4>
               <ButtondownCard contentId={t.id} />
             </section>
 
             {/* Atoms */}
             <section>
-              <h4 className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                Distribution
-              </h4>
+              <h4 className="admin-label">Distribution</h4>
               <AtomManager contentId={t.id} atoms={(atoms as Atom[]) || []} />
             </section>
 

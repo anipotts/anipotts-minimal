@@ -49,8 +49,8 @@ export default function PipelineFilters({
             }
             router.push(`/?${params.toString()}`);
           }}
-          placeholder="Search thoughts..."
-          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-200 admin-input"
+          placeholder="Search..."
+          className="flex-1 rounded-md px-3 py-1.5 text-[12px] text-zinc-200 admin-input"
         />
         <select
           value={searchParams.get("sort") || "updated"}
@@ -60,7 +60,7 @@ export default function PipelineFilters({
               e.target.value === "updated" ? "all" : e.target.value,
             )
           }
-          className="bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1.5 text-xs text-zinc-400 admin-input"
+          className="rounded-md px-2 py-1.5 text-[12px] text-zinc-400 admin-input"
         >
           <option value="updated">Updated</option>
           <option value="created">Created</option>
@@ -68,35 +68,28 @@ export default function PipelineFilters({
           <option value="title">Title</option>
         </select>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
+
+      <div className="flex items-center gap-1.5 flex-wrap">
         {STATUSES.map((s) => (
           <button
             key={s}
             onClick={() => setFilter("status", s)}
-            className={`shrink-0 text-sm px-3 py-1.5 rounded-full transition-colors ${
-              currentStatus === s
-                ? "bg-indigo-600 text-white"
-                : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
-            }`}
+            data-active={currentStatus === s}
+            className="admin-pill"
           >
             {s === "all" ? "All" : s}
-            {s !== "all" && statusCounts[s] ? ` (${statusCounts[s]})` : ""}
+            {s !== "all" && statusCounts[s] ? ` ${statusCounts[s]}` : ""}
           </button>
         ))}
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
+        <span className="w-px h-3 bg-zinc-800 mx-1" />
         {SERIES.map((s) => (
           <button
             key={s}
             onClick={() => setFilter("series", s)}
-            className={`shrink-0 text-sm px-3 py-1.5 rounded-full transition-colors ${
-              currentSeries === s
-                ? "bg-indigo-600 text-white"
-                : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
-            }`}
+            data-active={currentSeries === s}
+            className="admin-pill"
           >
-            {s === "all" ? "All Series" : s}
+            {s === "all" ? "All" : s}
           </button>
         ))}
       </div>

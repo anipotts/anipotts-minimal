@@ -151,10 +151,7 @@ export default function EditableContent({
         }}
       >
         {editTags.map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded-md"
-          >
+          <span key={tag} className="admin-tag">
             {tag}
             <button
               type="button"
@@ -162,7 +159,6 @@ export default function EditableContent({
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="text-zinc-500 hover:text-zinc-200 transition-colors"
             >
               x
             </button>

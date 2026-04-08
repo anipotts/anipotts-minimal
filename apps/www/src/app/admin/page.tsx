@@ -93,19 +93,17 @@ export default async function PipelinePage({
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="shrink-0 border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-sm font-semibold">Pipeline</h2>
-          <span className="text-xs text-zinc-500">
+      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-baseline gap-3">
+          <h2 className="text-[13px] font-medium text-zinc-200">Pipeline</h2>
+          <span className="text-[11px] text-zinc-600">
             {filtered.length} of {thoughts.length}
           </span>
         </div>
         <SyncButton />
       </div>
 
-      {/* Filters */}
-      <div className="shrink-0 px-6 py-2 border-b border-zinc-800/50">
+      <div className="shrink-0 px-6 py-2.5 border-b border-zinc-800/40">
         <PipelineFilters
           currentStatus={statusFilter}
           currentSeries={seriesFilter}
@@ -113,77 +111,74 @@ export default async function PipelinePage({
         />
       </div>
 
-      {/* List */}
       <div className="flex-1 overflow-y-auto admin-scroll">
         {filtered.length === 0 && (
-          <p className="text-zinc-500 text-center py-12 text-sm">
-            No content found
-          </p>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-zinc-600 text-[12px]">
+              No content matches your filters
+            </p>
+          </div>
         )}
 
-        <div className="divide-y divide-zinc-800/50">
-          {filtered.map((thought: ThoughtWithCount) => {
-            const status = thought.status || "draft";
-            const date = new Date(
-              thought.updated_at || thought.created_at,
-            ).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            });
-            const postedPlatforms = thought.platforms_posted as string[] | null;
+        {filtered.map((thought: ThoughtWithCount) => {
+          const status = thought.status || "draft";
+          const date = new Date(
+            thought.updated_at || thought.created_at,
+          ).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
+          const postedPlatforms = thought.platforms_posted as string[] | null;
 
-            return (
-              <Link
-                key={thought.id}
-                href={`/content/${thought.id}`}
-                className="flex items-center gap-4 px-6 py-3 hover:bg-zinc-900/50 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-zinc-100 truncate">
-                      {thought.title}
-                    </span>
-                  </div>
-                </div>
+          return (
+            <Link
+              key={thought.id}
+              href={`/content/${thought.id}`}
+              className="admin-row"
+            >
+              <div className="flex-1 min-w-0">
+                <span className="text-[13px] text-zinc-200 truncate block">
+                  {thought.title}
+                </span>
+              </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  {thought.atom_count > 0 && (
-                    <span className="text-[11px] text-zinc-500">
-                      {thought.atom_count}a
-                    </span>
-                  )}
-                  {postedPlatforms && postedPlatforms.length > 0 && (
-                    <span className="flex items-center gap-0.5">
-                      {postedPlatforms.map((p) => (
-                        <span
-                          key={p}
-                          className="text-[10px] px-1 py-0.5 bg-green-500/10 text-green-400 rounded"
-                        >
-                          {PLATFORM_ABBREV[p] || p}
-                        </span>
-                      ))}
-                    </span>
-                  )}
-                  {thought.series_type && (
-                    <span
-                      className={`text-[11px] px-1.5 py-0.5 rounded ${SERIES_COLORS[thought.series_type] || ""}`}
-                    >
-                      {thought.series_type}
-                    </span>
-                  )}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {thought.atom_count > 0 && (
+                  <span className="text-[10px] text-zinc-600 tabular-nums">
+                    {thought.atom_count}a
+                  </span>
+                )}
+                {postedPlatforms && postedPlatforms.length > 0 && (
+                  <span className="flex items-center gap-0.5">
+                    {postedPlatforms.map((p) => (
+                      <span
+                        key={p}
+                        className="admin-badge bg-green-500/10 text-green-400"
+                      >
+                        {PLATFORM_ABBREV[p] || p}
+                      </span>
+                    ))}
+                  </span>
+                )}
+                {thought.series_type && (
                   <span
-                    className={`text-[11px] px-1.5 py-0.5 rounded ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}
+                    className={`admin-badge ${SERIES_COLORS[thought.series_type] || ""}`}
                   >
-                    {status}
+                    {thought.series_type}
                   </span>
-                  <span className="text-[11px] text-zinc-600 w-12 text-right">
-                    {date}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                )}
+                <span
+                  className={`admin-badge ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}
+                >
+                  {status}
+                </span>
+                <span className="text-[10px] text-zinc-600 w-11 text-right tabular-nums">
+                  {date}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

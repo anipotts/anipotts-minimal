@@ -66,10 +66,10 @@ export default function StatusActions({
                   router.refresh();
                 });
               }}
-              className={`text-sm px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+              className={`text-[12px] px-3 py-1.5 rounded-md font-medium transition-colors disabled:opacity-50 ${
                 next === "draft"
-                  ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-300"
-                  : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                  ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/50"
+                  : "bg-indigo-600/90 hover:bg-indigo-500 text-white"
               }`}
             >
               {isPending ? "..." : label}
@@ -83,7 +83,7 @@ export default function StatusActions({
         <button
           disabled={isPending}
           onClick={handlePublishEverywhere}
-          className="w-full py-3 bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-lg font-medium text-white transition-colors text-sm flex items-center justify-center gap-2"
+          className="w-full py-2 bg-green-600/90 hover:bg-green-500 disabled:opacity-50 rounded-md font-medium text-white transition-colors text-[12px] flex items-center justify-center gap-2"
         >
           {isPending ? (
             "Publishing..."
