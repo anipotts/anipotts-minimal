@@ -36,7 +36,10 @@ export default function AtomManager({
   atoms: Atom[];
 }) {
   const [isPending, startTransition] = useTransition();
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -66,9 +69,12 @@ export default function AtomManager({
         tags,
       );
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Atom created");
+        setFeedback({ type: "success", message: "Atom created" });
         setNewContent("");
         setNewHashtags("");
         setShowCreate(false);
@@ -89,9 +95,12 @@ export default function AtomManager({
         hashtags: tags,
       });
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Atom updated");
+        setFeedback({ type: "success", message: "Atom updated" });
         setEditingId(null);
         router.refresh();
       }
@@ -104,9 +113,12 @@ export default function AtomManager({
       setFeedback(null);
       const result = await deleteAtom(atomId);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Atom deleted");
+        setFeedback({ type: "success", message: "Atom deleted" });
         router.refresh();
       }
     });
@@ -117,9 +129,15 @@ export default function AtomManager({
       setFeedback(null);
       const result = await pushAtomToTypefully(atomId);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback(`Pushed to Typefully (draft ${result.draftId})`);
+        setFeedback({
+          type: "success",
+          message: `Pushed to Typefully (draft ${result.draftId})`,
+        });
         router.refresh();
       }
     });
@@ -130,9 +148,15 @@ export default function AtomManager({
       setFeedback(null);
       const result = await fetchTypefullyDraftStatus(draftId);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback(`Typefully: ${result.draft?.status || "unknown"}`);
+        setFeedback({
+          type: "success",
+          message: `Typefully: ${result.draft?.status || "unknown"}`,
+        });
       }
     });
   }
@@ -159,9 +183,9 @@ export default function AtomManager({
 
       {feedback && (
         <p
-          className={`text-sm ${feedback.includes("error") || feedback.includes("Error") ? "text-red-400" : "text-green-400"}`}
+          className={`text-sm ${feedback.type === "error" ? "text-red-400" : "text-green-400"}`}
         >
-          {feedback}
+          {feedback.message}
         </p>
       )}
 
