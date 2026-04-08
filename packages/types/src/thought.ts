@@ -1,11 +1,11 @@
 // Content types
 export type ContentType = "video" | "article" | "thread" | "tip";
 export type SeriesType =
-  | "agent-tip"
-  | "build-log"
-  | "stack-drop"
-  | "founders-log"
-  | "viral-reel";
+  | "tip"
+  | "news"
+  | "tutorial"
+  | "essay"
+  | "behind-the-scenes";
 export type ContentStatus =
   | "idea"
   | "draft"

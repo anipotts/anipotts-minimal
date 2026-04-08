@@ -48,11 +48,11 @@ const VALID_STATUSES: ContentStatus[] = [
   "published",
 ];
 const VALID_SERIES: SeriesType[] = [
-  "agent-tip",
-  "build-log",
-  "stack-drop",
-  "founders-log",
-  "viral-reel",
+  "tip",
+  "news",
+  "tutorial",
+  "essay",
+  "behind-the-scenes",
 ];
 const VALID_CONTENT_TYPES: ContentType[] = [
   "video",

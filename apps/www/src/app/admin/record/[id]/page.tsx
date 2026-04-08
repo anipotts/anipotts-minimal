@@ -5,11 +5,11 @@ import type { Thought, SeriesType } from "@anipotts/types";
 import Teleprompter from "./teleprompter";
 
 const TIMING: Record<SeriesType, string> = {
-  "viral-reel": "15-30s",
-  "agent-tip": "30-60s",
-  "build-log": "3-10 min",
-  "stack-drop": "1-2 min",
-  "founders-log": "1-3 min",
+  tip: "30-60s",
+  news: "1-2 min",
+  tutorial: "5-15 min",
+  essay: "3-10 min",
+  "behind-the-scenes": "1-3 min",
 };
 
 function extractBulletPoints(content: string): {

@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 const STATUSES = ["all", "draft", "ready", "atomized", "published"] as const;
 const SERIES = [
   "all",
-  "agent-tip",
-  "build-log",
-  "stack-drop",
-  "founders-log",
-  "viral-reel",
+  "tip",
+  "news",
+  "tutorial",
+  "essay",
+  "behind-the-scenes",
 ] as const;
 
 export default function PipelineFilters({
