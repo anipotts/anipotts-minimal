@@ -31,11 +31,26 @@ export default function PipelineFilters({
     } else {
       params.set(key, value);
     }
-    router.push(`/admin?${params.toString()}`);
+    router.push(`/?${params.toString()}`);
   }
 
   return (
     <div className="space-y-2">
+      <input
+        type="text"
+        defaultValue={searchParams.get("q") || ""}
+        onChange={(e) => {
+          const params = new URLSearchParams(searchParams.toString());
+          if (e.target.value) {
+            params.set("q", e.target.value);
+          } else {
+            params.delete("q");
+          }
+          router.push(`/?${params.toString()}`);
+        }}
+        placeholder="Search thoughts..."
+        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-200 admin-input"
+      />
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
         {STATUSES.map((s) => (
           <button

@@ -43,17 +43,20 @@ export const dynamic = "force-dynamic";
 export default async function PipelinePage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; series?: string }>;
+  searchParams: Promise<{ status?: string; series?: string; q?: string }>;
 }) {
   const thoughts = await getThoughtsWithAtomCounts();
   const params = await searchParams;
   const statusFilter = params.status || "all";
   const seriesFilter = params.series || "all";
+  const searchQuery = (params.q || "").toLowerCase();
 
   const filtered = thoughts.filter((t: ThoughtWithCount) => {
     if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
       return false;
     if (seriesFilter !== "all" && t.series_type !== seriesFilter) return false;
+    if (searchQuery && !t.title.toLowerCase().includes(searchQuery))
+      return false;
     return true;
   });
 
