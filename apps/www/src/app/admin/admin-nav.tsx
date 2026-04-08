@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "./actions";
 
 const tabs = [
   {
     label: "Pipeline",
-    href: "/admin",
+    href: "/",
     icon: (
       <svg
-        className="w-6 h-6"
+        className="w-4 h-4"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -25,10 +26,10 @@ const tabs = [
   },
   {
     label: "Record",
-    href: "/admin/record",
+    href: "/record",
     icon: (
       <svg
-        className="w-6 h-6"
+        className="w-4 h-4"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -43,11 +44,11 @@ const tabs = [
     ),
   },
   {
-    label: "Quick Post",
-    href: "/admin/quick",
+    label: "New",
+    href: "/quick",
     icon: (
       <svg
-        className="w-6 h-6"
+        className="w-4 h-4"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -67,30 +68,58 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 z-50">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+    <aside className="w-48 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen sticky top-0">
+      <div className="px-4 py-4 border-b border-zinc-800">
+        <h1 className="text-sm font-semibold tracking-tight text-zinc-200">
+          Content Admin
+        </h1>
+      </div>
+
+      <nav className="flex-1 py-2 px-2 space-y-0.5">
         {tabs.map((tab) => {
           const isActive =
-            tab.href === "/admin"
-              ? pathname === "/admin" || pathname.startsWith("/admin/content")
+            tab.href === "/"
+              ? pathname === "/" || pathname.startsWith("/content")
               : pathname.startsWith(tab.href);
 
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors ${
                 isActive
-                  ? "text-indigo-400"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-zinc-800 text-zinc-100"
+                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
               }`}
             >
               {tab.icon}
-              <span className="text-xs font-medium">{tab.label}</span>
+              {tab.label}
             </Link>
           );
         })}
+      </nav>
+
+      <div className="px-2 py-3 border-t border-zinc-800">
+        <button
+          onClick={() => logout()}
+          className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors w-full"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+            />
+          </svg>
+          Sign out
+        </button>
       </div>
-    </nav>
+    </aside>
   );
 }

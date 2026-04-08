@@ -26,7 +26,7 @@ function extractBulletPoints(content: string): {
     return {
       hook: "No content yet",
       body: [],
-      outro: "Like and follow for more",
+      outro: "",
     };
   }
 
@@ -37,7 +37,7 @@ function extractBulletPoints(content: string): {
   const outro =
     lines.length > 1
       ? (lines[lines.length - 1] ?? "").replace(/^#+\s*/, "")
-      : "Follow for more tips";
+      : "";
 
   // Middle lines are body bullets
   const body = lines
@@ -76,7 +76,7 @@ export default async function RecordingPrepPage({
     <div className="min-h-screen bg-black text-white flex flex-col">
       <div className="flex items-center gap-3 p-4 bg-zinc-900/50">
         <Link
-          href={`/admin/content/${t.id}`}
+          href={`/content/${t.id}`}
           className="text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <svg

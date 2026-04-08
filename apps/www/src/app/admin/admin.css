@@ -1,0 +1,8 @@
+.admin-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+.admin-scroll::-webkit-scrollbar {
+  display: none;
+}

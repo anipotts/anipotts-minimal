@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import {
   PostHogProvider,
@@ -80,35 +81,25 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      {
-        url: "/api/icon?text=ap&scheme=dark",
-        type: "image/png",
-        sizes: "32x32",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/api/icon?text=ap&scheme=light",
-        type: "image/png",
-        sizes: "32x32",
-        media: "(prefers-color-scheme: light)",
-      },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
     ],
     apple: [
-      {
-        url: "/api/icon?text=ap&scheme=dark",
-        sizes: "180x180",
-        type: "image/png",
-      },
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hdrs = await headers();
+  const host = hdrs.get("host") ?? "";
+  const isAdmin = host.startsWith("admin.");
+
   return (
     <html
       lang="en"
@@ -117,7 +108,7 @@ export default function RootLayout({
     >
       <head>
         <ThemeScript />
-        <PersonSchema />
+        {!isAdmin && <PersonSchema />}
         <meta
           name="theme-color"
           content="#61abea"
@@ -130,7 +121,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="relative min-h-screen antialiased text-foreground bg-transparent font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden"
+        className={`relative min-h-screen antialiased text-foreground font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden ${isAdmin ? "bg-zinc-950" : "bg-transparent custom-cursor"}`}
         suppressHydrationWarning
       >
         <a
@@ -141,36 +132,41 @@ export default function RootLayout({
         </a>
 
         <ThemeProvider>
-          <TerminalBackground />
+          {isAdmin ? (
+            <PostHogProvider>{children}</PostHogProvider>
+          ) : (
+            <>
+              <TerminalBackground />
+              <PostHogProvider>
+                <div className="relative">
+                  <FerrofluidBorder />
+                  <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
+                    <div className="terminal-window w-full max-w-5xl flex flex-col border border-border md:border-transparent shadow-2xl bg-card md:bg-transparent rounded-lg ring-1 ring-ring md:ring-transparent">
+                      <TerminalHeaderWrapper />
 
-          <PostHogProvider>
-            <div className="relative">
-              <FerrofluidBorder />
-              <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
-                <div className="terminal-window w-full max-w-5xl flex flex-col border border-border md:border-transparent shadow-2xl bg-card md:bg-transparent rounded-lg ring-1 ring-ring md:ring-transparent">
-                  <TerminalHeaderWrapper />
+                      <div className="relative bg-transparent flex-1">
+                        {/* Grid drawn on ferrofluid canvas on desktop so it gets cut with the bubble */}
+                        <div
+                          className="md:hidden absolute inset-0 pointer-events-none opacity-45"
+                          style={{
+                            backgroundImage:
+                              "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+                            backgroundSize: "24px 24px",
+                          }}
+                        />
 
-                  <div className="relative bg-transparent flex-1">
-                    {/* Grid drawn on ferrofluid canvas on desktop so it gets cut with the bubble */}
-                    <div
-                      className="md:hidden absolute inset-0 pointer-events-none opacity-45"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-                        backgroundSize: "24px 24px",
-                      }}
-                    />
+                        <div className="portal-content relative z-10 px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
+                          {children}
+                        </div>
+                      </div>
 
-                    <div className="portal-content relative z-10 px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
-                      {children}
+                      <SiteStatusBar />
                     </div>
                   </div>
-
-                  <SiteStatusBar />
                 </div>
-              </div>
-            </div>
-          </PostHogProvider>
+              </PostHogProvider>
+            </>
+          )}
         </ThemeProvider>
       </body>
     </html>

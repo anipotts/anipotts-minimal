@@ -3,6 +3,7 @@ import { verifySessionToken, ADMIN_COOKIE } from "@anipotts/lib/admin";
 import type { Metadata } from "next";
 import LoginForm from "./login-form";
 import AdminNav from "./admin-nav";
+import "./admin.css";
 
 export const metadata: Metadata = {
   title: "Content Admin",
@@ -29,14 +30,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
-      <header className="sticky top-0 z-50 bg-zinc-900 border-b border-zinc-800 px-4 py-3">
-        <h1 className="text-lg font-semibold tracking-tight">Content Admin</h1>
-      </header>
-
-      <main className="flex-1 pb-20 overflow-y-auto">{children}</main>
-
+    <div className="h-screen bg-zinc-950 text-zinc-100 flex overflow-hidden">
       <AdminNav />
+      <main className="flex-1 overflow-hidden">{children}</main>
     </div>
   );
 }

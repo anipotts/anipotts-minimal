@@ -4,7 +4,7 @@
 }
 
 @media (hover: hover) {
-  * { cursor: none !important; }
+  body.custom-cursor * { cursor: none !important; }
   /* Hide ALL CSS borders on desktop — ferrofluid canvas draws them */
   .portal-content .rounded-md,
   .portal-content .rounded-sm,
