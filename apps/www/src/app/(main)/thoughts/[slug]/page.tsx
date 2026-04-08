@@ -114,9 +114,23 @@ export default async function ThoughtPage({
       </Stagger>
 
       <Stagger offset={0.2}>
-        <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)]">
+        <div className="prose dark:prose-invert prose-slate max-w-none prose-headings:font-heading prose-a:text-accent-400 prose-a:underline prose-a:decoration-accent-400/30 prose-a:underline-offset-4 hover:prose-a:decoration-accent-400/60 prose-img:rounded-lg prose-p:leading-relaxed prose-p:text-base prose-p:md:text-lg prose-li:marker:text-muted prose-pre:border prose-pre:border-border-subtle prose-pre:bg-[rgba(var(--overlay-invert),0.5)] [&>p:first-of-type]:text-lg [&>p:first-of-type]:md:text-xl [&>p:first-of-type]:text-zinc-200 [&>p:first-of-type]:font-medium prose-p:my-6">
           <ReactMarkdown
             components={{
+              p: ({ children }) => {
+                const text =
+                  typeof children === "string"
+                    ? children
+                    : Array.isArray(children)
+                      ? children.filter((c) => typeof c === "string").join("")
+                      : "";
+                const isShort = text.length < 80 && text.length > 0;
+                return isShort ? (
+                  <p className="text-zinc-300 font-medium">{children}</p>
+                ) : (
+                  <p>{children}</p>
+                );
+              },
               img: ({ ...props }) => {
                 if (!props.src || typeof props.src !== "string") return null;
                 const isSafe =

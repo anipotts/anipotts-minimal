@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { cache } from "react";
+import { createServerClient } from "@anipotts/lib";
 
 export interface ThoughtEntry {
   slug: string;
@@ -159,7 +160,54 @@ export const getThoughtEntries = cache(async (): Promise<ThoughtEntry[]> => {
   return entries.sort((a, b) => +new Date(b.date) - +new Date(a.date));
 });
 
+function supabaseRowToEntry(row: Record<string, unknown>): ThoughtEntry {
+  const tags = Array.isArray(row.tags) ? row.tags.map(String) : [];
+  return {
+    slug: String(row.slug),
+    title: String(row.title),
+    summary: String(row.summary ?? ""),
+    date: String(row.published_at ?? row.created_at ?? ""),
+    tags,
+    published: row.status === "published" || Boolean(row.published),
+    content: String(row.content ?? ""),
+  };
+}
+
+async function getSupabasePublishedThoughts(): Promise<ThoughtEntry[] | null> {
+  const supabase = createServerClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("thoughts")
+    .select("*")
+    .eq("status", "published")
+    .order("published_at", { ascending: false });
+
+  if (error || !data || data.length === 0) return null;
+  return data.map((row: Record<string, unknown>) => supabaseRowToEntry(row));
+}
+
+async function getSupabaseThoughtBySlug(
+  slug: string,
+): Promise<ThoughtEntry | null> {
+  const supabase = createServerClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("thoughts")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .single();
+
+  if (error || !data) return null;
+  return supabaseRowToEntry(data as Record<string, unknown>);
+}
+
 export async function getPublishedThoughts(): Promise<ThoughtEntry[]> {
+  const supabaseThoughts = await getSupabasePublishedThoughts();
+  if (supabaseThoughts) return supabaseThoughts;
+
   const thoughts = await getThoughtEntries();
   return thoughts.filter((thought) => thought.published);
 }
@@ -167,6 +215,9 @@ export async function getPublishedThoughts(): Promise<ThoughtEntry[]> {
 export async function getThoughtBySlug(
   slug: string,
 ): Promise<ThoughtEntry | undefined> {
+  const supabaseThought = await getSupabaseThoughtBySlug(slug);
+  if (supabaseThought) return supabaseThought;
+
   const thoughts = await getPublishedThoughts();
   return thoughts.find((thought) => thought.slug === slug);
 }

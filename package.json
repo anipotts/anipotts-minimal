@@ -25,6 +25,7 @@
     "github:audit": "node scripts/github/audit-public-repos.mjs anipotts",
     "demo:capture": "node scripts/demos/capture-project-demo.mjs",
     "demo:capture:all": "node scripts/demos/capture-all-demos.mjs",
+    "sync-thoughts": "npx tsx scripts/sync-thoughts.ts",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "update-claude-stats:commit": "scripts/claude/refresh-claude-stats.sh",
     "test:unit": "turbo test",
