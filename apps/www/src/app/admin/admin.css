@@ -6,3 +6,39 @@
 .admin-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Clean focus styles for admin inputs */
+.admin-input {
+  outline: none;
+  border-color: transparent;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.admin-input:focus {
+  border-color: rgba(113, 113, 122, 0.4);
+  background-color: rgba(24, 24, 27, 0.5);
+}
+.admin-input::placeholder {
+  color: rgba(113, 113, 122, 0.5);
+}
+
+/* Borderless editor fields (title, summary, tags) */
+.admin-field {
+  outline: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.admin-field:focus {
+  border-bottom-color: rgba(113, 113, 122, 0.3);
+}
+
+/* Content editor area */
+.admin-editor {
+  outline: none;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.admin-editor:focus {
+  border-color: rgba(113, 113, 122, 0.25);
+  box-shadow: 0 0 0 1px rgba(113, 113, 122, 0.1);
+}

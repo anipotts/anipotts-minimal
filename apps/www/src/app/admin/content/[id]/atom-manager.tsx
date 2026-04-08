@@ -199,7 +199,7 @@ export default function AtomManager({
               <select
                 value={newPlatform}
                 onChange={(e) => setNewPlatform(e.target.value as Platform)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 admin-input"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p.value} value={p.value}>
@@ -213,7 +213,7 @@ export default function AtomManager({
               <select
                 value={newVoice}
                 onChange={(e) => setNewVoice(e.target.value as VoiceMode)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 admin-input"
               >
                 {VOICE_OPTIONS.map((v) => (
                   <option key={v.value} value={v.value}>
@@ -242,7 +242,7 @@ export default function AtomManager({
               onChange={(e) => setNewContent(e.target.value)}
               rows={5}
               placeholder={`Write your ${selectedPlatform?.label || "X"} post...`}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono focus:outline-none focus:border-indigo-500 resize-y"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono admin-input resize-y"
             />
           </div>
 
@@ -255,7 +255,7 @@ export default function AtomManager({
               value={newHashtags}
               onChange={(e) => setNewHashtags(e.target.value)}
               placeholder="#claudecode, #ai"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 admin-input"
             />
           </div>
 
@@ -302,14 +302,14 @@ export default function AtomManager({
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={4}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono focus:outline-none focus:border-indigo-500 resize-y"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono admin-input resize-y"
               />
               <input
                 type="text"
                 value={editHashtags}
                 onChange={(e) => setEditHashtags(e.target.value)}
                 placeholder="Hashtags (comma separated)"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 admin-input"
               />
               <div className="flex gap-2">
                 <button

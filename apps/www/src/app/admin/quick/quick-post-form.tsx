@@ -50,7 +50,7 @@ export default function QuickPostForm() {
         aria-label="Title"
         required
         autoFocus
-        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 admin-input text-lg"
       />
 
       <textarea
@@ -58,7 +58,7 @@ export default function QuickPostForm() {
         placeholder="Content (optional, add later)"
         aria-label="Content"
         rows={8}
-        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
+        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 placeholder:text-zinc-500 admin-input resize-y"
       />
 
       <select
@@ -66,7 +66,7 @@ export default function QuickPostForm() {
         required
         aria-label="Series type"
         defaultValue=""
-        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 admin-input"
       >
         <option value="" disabled>
           Series Type

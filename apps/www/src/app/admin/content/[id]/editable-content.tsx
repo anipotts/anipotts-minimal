@@ -104,7 +104,7 @@ export default function EditableContent({
           markDirty();
         }}
         placeholder="Title"
-        className="w-full bg-transparent text-xl font-semibold text-zinc-100 placeholder:text-zinc-600 focus:outline-none border-b border-transparent focus:border-zinc-700 pb-1 transition-colors"
+        className="w-full bg-transparent text-xl font-semibold text-zinc-100 admin-field pb-1"
       />
 
       {/* Summary */}
@@ -116,7 +116,7 @@ export default function EditableContent({
         }}
         placeholder="Summary (one line description)"
         rows={2}
-        className="w-full bg-transparent text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none border-b border-transparent focus:border-zinc-700 pb-1 resize-none transition-colors"
+        className="w-full bg-transparent text-sm text-zinc-300 admin-field pb-1 resize-none"
       />
 
       {/* Tags */}
@@ -128,7 +128,7 @@ export default function EditableContent({
           markDirty();
         }}
         placeholder="Tags (comma separated)"
-        className="w-full bg-transparent text-xs text-zinc-400 placeholder:text-zinc-600 focus:outline-none border-b border-transparent focus:border-zinc-700 pb-1 transition-colors"
+        className="w-full bg-transparent text-xs text-zinc-400 admin-field pb-1"
       />
 
       {/* Content */}
@@ -145,7 +145,7 @@ export default function EditableContent({
               markDirty();
             }}
             placeholder="Start writing..."
-            className="w-full h-full bg-zinc-900/30 rounded-md p-4 text-sm text-zinc-200 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-700 resize-none leading-relaxed"
+            className="w-full h-full bg-zinc-900/30 p-4 text-sm text-zinc-200 font-mono admin-editor resize-none leading-relaxed"
           />
         )}
       </div>

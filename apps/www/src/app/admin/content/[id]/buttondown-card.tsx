@@ -164,13 +164,13 @@ export default function ButtondownCard({
           value={editSubject}
           onChange={(e) => setEditSubject(e.target.value)}
           placeholder="Subject"
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500"
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-xs text-zinc-200 admin-input"
         />
         <textarea
           value={editBody}
           onChange={(e) => setEditBody(e.target.value)}
           rows={6}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-indigo-500 resize-y"
+          className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-xs text-zinc-200 font-mono admin-input resize-y"
         />
         <div className="flex gap-1.5">
           <button
@@ -234,7 +234,7 @@ export default function ButtondownCard({
               type="datetime-local"
               value={scheduleDate}
               onChange={(e) => setScheduleDate(e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded px-1.5 py-0.5 text-[11px] text-zinc-300 focus:outline-none focus:border-indigo-500"
+              className="bg-zinc-800 border border-zinc-700 rounded px-1.5 py-0.5 text-[11px] text-zinc-300 admin-input"
             />
             <button
               onClick={handleSchedule}
