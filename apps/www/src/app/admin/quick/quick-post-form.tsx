@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useCallback } from "react";
+import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 import { createThought } from "../actions";
 import Link from "next/link";
 import { SERIES_OPTIONS } from "@/lib/constants";
@@ -8,16 +9,13 @@ import { SERIES_OPTIONS } from "@/lib/constants";
 type FormState = { error?: string; success?: boolean; id?: string } | null;
 
 export default function QuickPostForm() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData) => {
       return (await createThought(formData)) as NonNullable<FormState>;
     },
     null,
   );
-
-  const handleCreateAnother = useCallback(() => {
-    window.location.reload();
-  }, []);
 
   if (state?.success && state.id) {
     return (
@@ -30,7 +28,7 @@ export default function QuickPostForm() {
           View Content
         </Link>
         <button
-          onClick={handleCreateAnother}
+          onClick={() => router.refresh()}
           className="block mx-auto text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           Create Another
