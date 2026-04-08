@@ -39,6 +39,7 @@ export default function ButtondownCard({
   const router = useRouter();
 
   function handleCreateDraft() {
+    if (!confirm("Create a Buttondown email draft for this content?")) return;
     startTransition(async () => {
       setFeedback(null);
       const result = await pushToButtondown(contentId);
@@ -109,6 +110,12 @@ export default function ButtondownCard({
 
   function handleSchedule() {
     if (!emailState.emailId || !scheduleDate) return;
+    if (
+      !confirm(
+        `Schedule this email for ${new Date(scheduleDate).toLocaleString()}?`,
+      )
+    )
+      return;
     startTransition(async () => {
       setFeedback(null);
       const result = await editButtondownEmail(emailState.emailId!, {

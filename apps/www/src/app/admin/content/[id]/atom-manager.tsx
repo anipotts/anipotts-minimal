@@ -125,6 +125,7 @@ export default function AtomManager({
   }
 
   function handlePushToTypefully(atomId: string) {
+    if (!confirm("Push this atom to Typefully as a draft?")) return;
     startTransition(async () => {
       setFeedback(null);
       const result = await pushAtomToTypefully(atomId);
