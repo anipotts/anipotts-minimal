@@ -3,16 +3,9 @@
 import { useActionState, useCallback } from "react";
 import { createThought } from "../actions";
 import Link from "next/link";
+import { SERIES_OPTIONS } from "@/lib/constants";
 
 type FormState = { error?: string; success?: boolean; id?: string } | null;
-
-const SERIES_OPTIONS = [
-  { value: "agent-tip", label: "Agent Tip" },
-  { value: "build-log", label: "Build Log" },
-  { value: "stack-drop", label: "Stack Drop" },
-  { value: "founders-log", label: "Founder's Log" },
-  { value: "viral-reel", label: "Viral Reel" },
-] as const;
 
 export default function QuickPostForm() {
   const [state, formAction, isPending] = useActionState(
@@ -31,7 +24,7 @@ export default function QuickPostForm() {
       <div className="bg-zinc-900 rounded-xl p-6 text-center space-y-4">
         <div className="text-green-400 text-lg font-medium">Created!</div>
         <Link
-          href={`/admin/content/${state.id}`}
+          href={`/content/${state.id}`}
           className="inline-block px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white transition-colors"
         >
           View Content

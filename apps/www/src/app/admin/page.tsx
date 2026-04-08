@@ -5,16 +5,8 @@ type ThoughtRow = Database["public"]["Tables"]["thoughts"]["Row"];
 type ThoughtWithCount = ThoughtRow & { atom_count: number };
 import Link from "next/link";
 import PipelineFilters from "./pipeline-filters";
-import ApproveButton from "./approve-button";
-import { SERIES_COLORS } from "@/lib/constants";
-
-const STATUS_COLORS: Record<string, string> = {
-  idea: "bg-zinc-700 text-zinc-300",
-  draft: "bg-yellow-500/20 text-yellow-400",
-  ready: "bg-blue-500/20 text-blue-400",
-  atomized: "bg-purple-500/20 text-purple-400",
-  published: "bg-green-500/20 text-green-400",
-};
+import SyncButton from "./sync-button";
+import { SERIES_COLORS, STATUS_COLORS, PLATFORM_ABBREV } from "@/lib/constants";
 
 async function getThoughtsWithAtomCounts() {
   const supabase = createServerClient();
@@ -72,70 +64,98 @@ export default async function PipelinePage({
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Pipeline</h2>
-        <span className="text-sm text-zinc-500">{thoughts.length} total</span>
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="shrink-0 border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h2 className="text-sm font-semibold">Pipeline</h2>
+          <span className="text-xs text-zinc-500">
+            {filtered.length} of {thoughts.length}
+          </span>
+        </div>
+        <SyncButton />
       </div>
 
-      <PipelineFilters
-        currentStatus={statusFilter}
-        currentSeries={seriesFilter}
-        statusCounts={statusCounts}
-      />
+      {/* Filters */}
+      <div className="shrink-0 px-6 py-2 border-b border-zinc-800/50">
+        <PipelineFilters
+          currentStatus={statusFilter}
+          currentSeries={seriesFilter}
+          statusCounts={statusCounts}
+        />
+      </div>
 
-      <div className="space-y-3">
+      {/* List */}
+      <div className="flex-1 overflow-y-auto admin-scroll">
         {filtered.length === 0 && (
-          <p className="text-zinc-500 text-center py-8">No content found</p>
+          <p className="text-zinc-500 text-center py-12 text-sm">
+            No content found
+          </p>
         )}
 
-        {filtered.map((thought: ThoughtWithCount) => {
-          const status = thought.status || "draft";
-          const date = new Date(
-            thought.updated_at || thought.created_at,
-          ).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          });
+        <div className="divide-y divide-zinc-800/50">
+          {filtered.map((thought: ThoughtWithCount) => {
+            const status = thought.status || "draft";
+            const date = new Date(
+              thought.updated_at || thought.created_at,
+            ).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            });
+            const postedPlatforms = thought.platforms_posted as string[] | null;
 
-          return (
-            <Link
-              key={thought.id}
-              href={`/admin/content/${thought.id}`}
-              className="block bg-zinc-900 rounded-xl p-4 active:bg-zinc-800 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-3">
+            return (
+              <Link
+                key={thought.id}
+                href={`/content/${thought.id}`}
+                className="flex items-center gap-4 px-6 py-3 hover:bg-zinc-900/50 transition-colors"
+              >
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-zinc-100 truncate">
-                    {thought.title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}
-                    >
-                      {status}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-zinc-100 truncate">
+                      {thought.title}
                     </span>
-                    {thought.series_type && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${SERIES_COLORS[thought.series_type] || ""}`}
-                      >
-                        {thought.series_type}
-                      </span>
-                    )}
-                    {thought.atom_count > 0 && (
-                      <span className="text-xs text-zinc-500">
-                        {thought.atom_count} atom
-                        {thought.atom_count !== 1 ? "s" : ""}
-                      </span>
-                    )}
-                    <span className="text-xs text-zinc-600">{date}</span>
                   </div>
                 </div>
-                {status === "draft" && <ApproveButton id={thought.id} />}
-              </div>
-            </Link>
-          );
-        })}
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {thought.atom_count > 0 && (
+                    <span className="text-[11px] text-zinc-500">
+                      {thought.atom_count}a
+                    </span>
+                  )}
+                  {postedPlatforms && postedPlatforms.length > 0 && (
+                    <span className="flex items-center gap-0.5">
+                      {postedPlatforms.map((p) => (
+                        <span
+                          key={p}
+                          className="text-[10px] px-1 py-0.5 bg-green-500/10 text-green-400 rounded"
+                        >
+                          {PLATFORM_ABBREV[p] || p}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                  {thought.series_type && (
+                    <span
+                      className={`text-[11px] px-1.5 py-0.5 rounded ${SERIES_COLORS[thought.series_type] || ""}`}
+                    >
+                      {thought.series_type}
+                    </span>
+                  )}
+                  <span
+                    className={`text-[11px] px-1.5 py-0.5 rounded ${STATUS_COLORS[status] || STATUS_COLORS.draft}`}
+                  >
+                    {status}
+                  </span>
+                  <span className="text-[11px] text-zinc-600 w-12 text-right">
+                    {date}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
