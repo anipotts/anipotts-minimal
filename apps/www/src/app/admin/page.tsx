@@ -43,22 +43,47 @@ export const dynamic = "force-dynamic";
 export default async function PipelinePage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; series?: string; q?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    series?: string;
+    q?: string;
+    sort?: string;
+  }>;
 }) {
   const thoughts = await getThoughtsWithAtomCounts();
   const params = await searchParams;
   const statusFilter = params.status || "all";
   const seriesFilter = params.series || "all";
   const searchQuery = (params.q || "").toLowerCase();
+  const sortBy = params.sort || "updated";
 
-  const filtered = thoughts.filter((t: ThoughtWithCount) => {
-    if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
-      return false;
-    if (seriesFilter !== "all" && t.series_type !== seriesFilter) return false;
-    if (searchQuery && !t.title.toLowerCase().includes(searchQuery))
-      return false;
-    return true;
-  });
+  const filtered = thoughts
+    .filter((t: ThoughtWithCount) => {
+      if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
+        return false;
+      if (seriesFilter !== "all" && t.series_type !== seriesFilter)
+        return false;
+      if (searchQuery && !t.title.toLowerCase().includes(searchQuery))
+        return false;
+      return true;
+    })
+    .sort((a: ThoughtWithCount, b: ThoughtWithCount) => {
+      switch (sortBy) {
+        case "created":
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        case "views":
+          return (b.views || 0) - (a.views || 0);
+        case "title":
+          return a.title.localeCompare(b.title);
+        default:
+          return (
+            new Date(b.updated_at || b.created_at).getTime() -
+            new Date(a.updated_at || a.created_at).getTime()
+          );
+      }
+    });
 
   const statusCounts: Record<string, number> = {};
   for (const t of thoughts) {

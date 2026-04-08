@@ -36,21 +36,38 @@ export default function PipelineFilters({
 
   return (
     <div className="space-y-2">
-      <input
-        type="text"
-        defaultValue={searchParams.get("q") || ""}
-        onChange={(e) => {
-          const params = new URLSearchParams(searchParams.toString());
-          if (e.target.value) {
-            params.set("q", e.target.value);
-          } else {
-            params.delete("q");
+      <div className="flex gap-2">
+        <input
+          type="text"
+          defaultValue={searchParams.get("q") || ""}
+          onChange={(e) => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (e.target.value) {
+              params.set("q", e.target.value);
+            } else {
+              params.delete("q");
+            }
+            router.push(`/?${params.toString()}`);
+          }}
+          placeholder="Search thoughts..."
+          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-200 admin-input"
+        />
+        <select
+          value={searchParams.get("sort") || "updated"}
+          onChange={(e) =>
+            setFilter(
+              "sort",
+              e.target.value === "updated" ? "all" : e.target.value,
+            )
           }
-          router.push(`/?${params.toString()}`);
-        }}
-        placeholder="Search thoughts..."
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 text-xs text-zinc-200 admin-input"
-      />
+          className="bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1.5 text-xs text-zinc-400 admin-input"
+        >
+          <option value="updated">Updated</option>
+          <option value="created">Created</option>
+          <option value="views">Views</option>
+          <option value="title">Title</option>
+        </select>
+      </div>
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
         {STATUSES.map((s) => (
           <button
