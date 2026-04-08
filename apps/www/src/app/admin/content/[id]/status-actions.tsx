@@ -32,6 +32,12 @@ export default function StatusActions({
     currentStatus === "ready" || currentStatus === "atomized";
 
   function handlePublishEverywhere() {
+    if (
+      !confirm(
+        "Publish this content everywhere? This will push to Typefully and Buttondown.",
+      )
+    )
+      return;
     startTransition(async () => {
       setFeedback(null);
       setPublishResults(null);
