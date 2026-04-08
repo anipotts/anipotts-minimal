@@ -25,7 +25,10 @@ export default function ButtondownCard({
   initialEmailId?: string;
 }) {
   const [isPending, startTransition] = useTransition();
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const [emailState, setEmailState] = useState<ButtondownState>({
     emailId: initialEmailId,
   });
@@ -40,9 +43,12 @@ export default function ButtondownCard({
       setFeedback(null);
       const result = await pushToButtondown(contentId);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Draft created");
+        setFeedback({ type: "success", message: "Draft created" });
         setEmailState({ emailId: result.emailId, status: "draft" });
         router.refresh();
       }
@@ -55,7 +61,10 @@ export default function ButtondownCard({
       setFeedback(null);
       const result = await fetchButtondownEmailStatus(emailState.emailId!);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else if (result.email) {
         setEmailState({
           emailId: emailState.emailId,
@@ -82,9 +91,12 @@ export default function ButtondownCard({
         body: editBody,
       });
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Updated");
+        setFeedback({ type: "success", message: "Updated" });
         setEmailState((prev) => ({
           ...prev,
           subject: editSubject,
@@ -104,9 +116,12 @@ export default function ButtondownCard({
         publish_date: new Date(scheduleDate).toISOString(),
       });
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
-        setFeedback("Scheduled");
+        setFeedback({ type: "success", message: "Scheduled" });
         setEmailState((prev) => ({ ...prev, status: "scheduled" }));
       }
     });
@@ -118,7 +133,10 @@ export default function ButtondownCard({
       setFeedback(null);
       const result = await removeButtondownEmail(emailState.emailId!);
       if ("error" in result) {
-        setFeedback(result.error ?? "Unknown error");
+        setFeedback({
+          type: "error",
+          message: result.error ?? "Unknown error",
+        });
       } else {
         setEmailState({});
         setEditing(false);
@@ -177,9 +195,9 @@ export default function ButtondownCard({
     <div className="space-y-2">
       {feedback && (
         <p
-          className={`text-[11px] ${feedback.includes("error") || feedback.includes("Error") ? "text-red-400" : "text-green-400"}`}
+          className={`text-[11px] ${feedback.type === "error" ? "text-red-400" : "text-green-400"}`}
         >
-          {feedback}
+          {feedback.message}
         </p>
       )}
       <div className="flex items-center gap-1.5">
