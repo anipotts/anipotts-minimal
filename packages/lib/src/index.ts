@@ -1,12 +1,3 @@
-// Supabase
-export {
-  supabase,
-  isSupabaseConfigured,
-  createServerClient,
-  createClient,
-} from "./supabase";
-export type { SupabaseClient } from "./supabase";
-
 // Utilities
 export {
   cn,

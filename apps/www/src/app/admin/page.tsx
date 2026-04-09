@@ -1,40 +1,75 @@
-import { createServerClient } from "@anipotts/lib";
-import type { Database } from "@anipotts/types";
-
-type ThoughtRow = Database["public"]["Tables"]["thoughts"]["Row"];
-type ThoughtWithCount = ThoughtRow & { atom_count: number };
+import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
 import Link from "next/link";
 import PipelineFilters from "./pipeline-filters";
 import SyncButton from "./sync-button";
 import { SERIES_COLORS, STATUS_COLORS, PLATFORM_ABBREV } from "@/lib/constants";
 
-async function getThoughtsWithAtomCounts() {
-  const supabase = createServerClient();
-  if (!supabase) return [];
+interface ThoughtWithCount {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  status: string;
+  series_type: string | null;
+  content_type: string | null;
+  published: boolean;
+  views: number;
+  tags: string[];
+  platforms_posted: string[];
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  artifact_url: string | null;
+  artifact_type: string | null;
+  atom_count: number;
+}
 
-  const { data: thoughts, error } = await supabase
-    .from("thoughts")
-    .select("*")
-    .order("updated_at", { ascending: false });
+async function getThoughtsWithAtomCounts(): Promise<ThoughtWithCount[]> {
+  const db = getDB();
+  if (!db) return [];
 
-  if (error || !thoughts) return [];
+  const { results: thoughts } = await db
+    .prepare("SELECT * FROM thoughts ORDER BY updated_at DESC")
+    .all<Record<string, unknown>>();
 
-  const thoughtIds = thoughts.map((t) => t.id);
-  const { data: atomCounts } = await supabase
-    .from("atoms")
-    .select("content_id")
-    .in("content_id", thoughtIds);
+  if (!thoughts || thoughts.length === 0) return [];
+
+  const thoughtIds = thoughts.map((t) => t.id as string);
+  const placeholders = thoughtIds.map(() => "?").join(", ");
+  const { results: atomRows } = await db
+    .prepare(
+      `SELECT content_id FROM atoms WHERE content_id IN (${placeholders})`,
+    )
+    .bind(...thoughtIds)
+    .all<{ content_id: string }>();
 
   const countMap = new Map<string, number>();
-  if (atomCounts) {
-    for (const atom of atomCounts) {
+  if (atomRows) {
+    for (const atom of atomRows) {
       countMap.set(atom.content_id, (countMap.get(atom.content_id) || 0) + 1);
     }
   }
 
   return thoughts.map((t) => ({
-    ...t,
-    atom_count: countMap.get(t.id) || 0,
+    id: t.id as string,
+    title: t.title as string,
+    slug: t.slug as string,
+    summary: (t.summary as string) ?? "",
+    content: (t.content as string) ?? "",
+    status: (t.status as string) ?? "draft",
+    series_type: (t.series_type as string) ?? null,
+    content_type: (t.content_type as string) ?? null,
+    published: toBool(t.published),
+    views: (t.views as number) ?? 0,
+    tags: parseJsonArray(t.tags),
+    platforms_posted: parseJsonArray(t.platforms_posted),
+    created_at: t.created_at as string,
+    updated_at: (t.updated_at as string) ?? (t.created_at as string),
+    published_at: (t.published_at as string) ?? null,
+    artifact_url: (t.artifact_url as string) ?? null,
+    artifact_type: (t.artifact_type as string) ?? null,
+    atom_count: countMap.get(t.id as string) || 0,
   }));
 }
 
@@ -162,7 +197,7 @@ export default async function PipelinePage({
                 )}
                 {thought.series_type && (
                   <span
-                    className={`admin-badge ${SERIES_COLORS[thought.series_type] || ""}`}
+                    className={`admin-badge ${SERIES_COLORS[thought.series_type as keyof typeof SERIES_COLORS] || ""}`}
                   >
                     {thought.series_type}
                   </span>

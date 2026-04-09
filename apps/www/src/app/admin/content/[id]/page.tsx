@@ -1,4 +1,4 @@
-import { createServerClient } from "@anipotts/lib";
+import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Thought, Atom } from "@anipotts/types";
@@ -8,6 +8,28 @@ import AtomManager from "./atom-manager";
 import ButtondownCard from "./buttondown-card";
 import { SERIES_COLORS, STATUS_COLORS, PLATFORM_ABBREV } from "@/lib/constants";
 
+function deserializeThought(
+  row: Record<string, unknown>,
+): Record<string, unknown> {
+  return {
+    ...row,
+    tags: parseJsonArray(row.tags),
+    platforms_targeted: parseJsonArray(row.platforms_targeted),
+    platforms_posted: parseJsonArray(row.platforms_posted),
+    published: toBool(row.published),
+    views: (row.views as number) ?? 0,
+  };
+}
+
+function deserializeAtom(
+  row: Record<string, unknown>,
+): Record<string, unknown> {
+  return {
+    ...row,
+    hashtags: parseJsonArray(row.hashtags),
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function ContentDetailPage({
@@ -16,24 +38,28 @@ export default async function ContentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = createServerClient();
-  if (!supabase) notFound();
+  const db = getDB();
+  if (!db) notFound();
 
-  const { data: thought } = await supabase
-    .from("thoughts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const thoughtRow = await db
+    .prepare("SELECT * FROM thoughts WHERE id = ?")
+    .bind(id)
+    .first<Record<string, unknown>>();
 
-  if (!thought) notFound();
+  if (!thoughtRow) notFound();
 
-  const { data: atoms } = await supabase
-    .from("atoms")
-    .select("*")
-    .eq("content_id", id)
-    .order("created_at", { ascending: false });
+  const thought = deserializeThought(thoughtRow);
 
-  const t = thought as Thought;
+  const { results: atomRows } = await db
+    .prepare(
+      "SELECT * FROM atoms WHERE content_id = ? ORDER BY created_at DESC",
+    )
+    .bind(id)
+    .all<Record<string, unknown>>();
+
+  const atoms = (atomRows ?? []).map(deserializeAtom);
+
+  const t = thought as unknown as Thought;
   const status = t.status || "draft";
 
   return (
@@ -184,7 +210,10 @@ export default async function ContentDetailPage({
             {/* Atoms */}
             <section>
               <h4 className="admin-label">Distribution</h4>
-              <AtomManager contentId={t.id} atoms={(atoms as Atom[]) || []} />
+              <AtomManager
+                contentId={t.id}
+                atoms={(atoms as unknown as Atom[]) || []}
+              />
             </section>
 
             {/* Recording */}

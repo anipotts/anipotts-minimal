@@ -9,7 +9,6 @@ import {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
 } from "@anipotts/lib/admin";
-import { createServerClient } from "@anipotts/lib";
 import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
 import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
 import { headers } from "next/headers";
@@ -110,14 +109,7 @@ async function getThoughtById(id: string, columns = "*") {
       .bind(id)
       .first<Record<string, unknown>>();
   }
-  const supabase = createServerClient();
-  if (!supabase) return null;
-  const { data } = await supabase
-    .from("thoughts")
-    .select(columns === "*" ? "*" : columns)
-    .eq("id", id)
-    .single();
-  return data as Record<string, unknown> | null;
+  return null;
 }
 
 // ── D1 helper: update thought fields by ID ──
@@ -137,11 +129,7 @@ async function updateThought(
       .run();
     return {};
   }
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Database not configured" };
-  const { error } = await supabase.from("thoughts").update(fields).eq("id", id);
-  if (error) return { error: error.message };
-  return {};
+  return { error: "Database not configured" };
 }
 
 // ── D1 helper: read a single atom by ID ──
@@ -154,14 +142,7 @@ async function getAtomById(id: string) {
       .bind(id)
       .first<Record<string, unknown>>();
   }
-  const supabase = createServerClient();
-  if (!supabase) return null;
-  const { data } = await supabase
-    .from("atoms")
-    .select("*")
-    .eq("id", id)
-    .single();
-  return data as Record<string, unknown> | null;
+  return null;
 }
 
 // ── D1 helper: update atom fields by ID ──
@@ -181,11 +162,7 @@ async function updateAtomFields(
       .run();
     return {};
   }
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Database not configured" };
-  const { error } = await supabase.from("atoms").update(fields).eq("id", id);
-  if (error) return { error: error.message };
-  return {};
+  return { error: "Database not configured" };
 }
 
 // ── Auth ──
@@ -326,28 +303,7 @@ export async function createThought(formData: FormData) {
     return { success: true, id };
   }
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Database not configured" };
-
-  const { data, error } = await supabase
-    .from("thoughts")
-    .insert({
-      title,
-      slug,
-      content: content || "",
-      summary: "",
-      series_type: seriesType,
-      content_type: contentType,
-      status: "draft",
-      published: false,
-      tags: [],
-      views: 0,
-    })
-    .select("id")
-    .single();
-
-  if (error) return { error: error.message };
-  return { success: true, id: data.id };
+  return { error: "Database not configured" };
 }
 
 export async function updateThoughtContent(
@@ -546,13 +502,10 @@ export async function createAtom(
   if (authError) return authError;
   if (!UUID_RE.test(contentId)) return { error: "Invalid content ID" };
 
-  // upsertAtomRecord handles D1/Supabase routing internally
-  const supabase = createServerClient();
-  if (!supabase && !getDB()) return { error: "Database not configured" };
+  if (!getDB()) return { error: "Database not configured" };
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
-    const data = await upsertAtomRecord(supabase!, {
+    const data = await upsertAtomRecord({
       content_id: contentId,
       platform,
       atom_content: atomContent,
@@ -579,12 +532,10 @@ export async function updateAtom(
   if (authError) return authError;
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
-  const supabase = createServerClient();
-  if (!supabase && !getDB()) return { error: "Database not configured" };
+  if (!getDB()) return { error: "Database not configured" };
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
-    const data = await upsertAtomRecord(supabase!, {
+    const data = await upsertAtomRecord({
       id: atomId,
       ...fields,
       updated_at: now(),
@@ -600,12 +551,10 @@ export async function deleteAtom(atomId: string) {
   if (authError) return authError;
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
-  const supabase = createServerClient();
-  if (!supabase && !getDB()) return { error: "Database not configured" };
+  if (!getDB()) return { error: "Database not configured" };
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
-    await deleteAtomRecord(supabase!, atomId);
+    await deleteAtomRecord(atomId);
     return { success: true };
   } catch (e) {
     return { error: String(e) };
@@ -833,53 +782,7 @@ export async function syncMarkdownThoughts() {
         }
         synced++;
       } else {
-        // Supabase fallback
-        const supabase = createServerClient();
-        if (!supabase) {
-          syncErrors.push(`${slug}: no database available`);
-          continue;
-        }
-
-        const { data: existing } = await supabase
-          .from("thoughts")
-          .select("id")
-          .eq("slug", slug)
-          .single();
-
-        if (existing) {
-          const { error: syncErr } = await supabase
-            .from("thoughts")
-            .update({
-              slug,
-              title,
-              summary,
-              content,
-              tags,
-              published,
-              status,
-              updated_at: ts,
-              ...(publishedAt ? { published_at: publishedAt } : {}),
-            })
-            .eq("id", existing.id);
-          if (syncErr) syncErrors.push(`${slug}: ${syncErr.message}`);
-          else synced++;
-        } else {
-          const { error: syncErr } = await supabase.from("thoughts").insert({
-            slug,
-            title,
-            summary,
-            content,
-            tags,
-            published,
-            status,
-            updated_at: ts,
-            created_at: date ? new Date(date).toISOString() : ts,
-            views: 0,
-            ...(publishedAt ? { published_at: publishedAt } : {}),
-          });
-          if (syncErr) syncErrors.push(`${slug}: ${syncErr.message}`);
-          else synced++;
-        }
+        syncErrors.push(`${slug}: no database available`);
       }
     } catch (err) {
       syncErrors.push(

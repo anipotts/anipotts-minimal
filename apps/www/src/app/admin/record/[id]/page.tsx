@@ -1,4 +1,4 @@
-import { createServerClient } from "@anipotts/lib";
+import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Thought, SeriesType } from "@anipotts/types";
@@ -57,16 +57,24 @@ export default async function RecordingPrepPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = createServerClient();
-  if (!supabase) notFound();
+  const db = getDB();
+  if (!db) notFound();
 
-  const { data: thought } = await supabase
-    .from("thoughts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const thoughtRow = await db
+    .prepare("SELECT * FROM thoughts WHERE id = ?")
+    .bind(id)
+    .first<Record<string, unknown>>();
 
-  if (!thought) notFound();
+  if (!thoughtRow) notFound();
+
+  const thought = {
+    ...thoughtRow,
+    tags: parseJsonArray(thoughtRow.tags),
+    platforms_targeted: parseJsonArray(thoughtRow.platforms_targeted),
+    platforms_posted: parseJsonArray(thoughtRow.platforms_posted),
+    published: toBool(thoughtRow.published),
+    views: (thoughtRow.views as number) ?? 0,
+  };
 
   const t = thought as Thought;
   const timing = t.series_type ? TIMING[t.series_type] : "30-60s";

@@ -11,10 +11,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./supabase": {
-      "types": "./dist/supabase/index.d.ts",
-      "import": "./dist/supabase/index.js"
-    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
@@ -51,10 +47,6 @@
       "types": "./dist/cms/index.d.ts",
       "import": "./dist/cms/index.js"
     },
-    "./storage": {
-      "types": "./dist/storage/index.d.ts",
-      "import": "./dist/storage/index.js"
-    },
     "./validation": {
       "types": "./dist/validation/index.d.ts",
       "import": "./dist/validation/index.js"
@@ -68,7 +60,6 @@
   },
   "dependencies": {
     "@anipotts/types": "workspace:*",
-    "@supabase/supabase-js": "^2.86.0",
     "clsx": "^2.1.1",
     "posthog-node": "^5.17.0",
     "tailwind-merge": "^3.4.0",
