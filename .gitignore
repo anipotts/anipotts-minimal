@@ -28,6 +28,10 @@ content/work/
 !.vscode/settings.json
 !.vscode/extensions.json
 
+# Cloudflare build artifacts
+.open-next/
+.wrangler/
+
 # Playground prototypes
 playground*.html
 

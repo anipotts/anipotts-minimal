@@ -719,8 +719,13 @@ export async function syncMarkdownThoughts() {
     join: (...p: string[]) => string;
   };
   try {
-    fsModule = await import("node:fs/promises");
-    pathModule = await import("node:path");
+    const fs = await import("node:fs/promises");
+    fsModule = {
+      readdir: (p: string) => fs.readdir(p),
+      readFile: (p: string, e: string) => fs.readFile(p, e as BufferEncoding),
+    };
+    const path = await import("node:path");
+    pathModule = { resolve: path.resolve, join: path.join };
   } catch {
     return {
       error:

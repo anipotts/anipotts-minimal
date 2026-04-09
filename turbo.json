@@ -30,11 +30,8 @@
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
         "TURNSTILE_SECRET_KEY",
         "RESEND_API_KEY",
-        "UPSTASH_REDIS_REST_URL",
-        "UPSTASH_REDIS_REST_TOKEN",
         "GITHUB_TOKEN",
-        "BEEHIIV_API_KEY",
-        "BEEHIIV_PUBLICATION_ID",
+        "BUTTONDOWN_API_KEY",
         "ADMIN_PASSWORD"
       ]
     },
