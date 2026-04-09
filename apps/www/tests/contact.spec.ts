@@ -21,6 +21,12 @@ test("contact form submits successfully", async ({ page }) => {
   await page.getByLabel(/^name$/i).fill("Test User");
   await page.getByLabel(/^email$/i).fill("test@example.com");
 
-  await page.getByRole("button", { name: /^send$/i }).click();
+  // Wait for the send button to become enabled after React processes all the
+  // field state updates (canSubmit depends on intent + message + name + email
+  // all being truthy).  Without this, the click can land on a still-disabled
+  // button, which silently does nothing.
+  const sendBtn = page.getByRole("button", { name: /^send$/i });
+  await expect(sendBtn).toBeEnabled();
+  await sendBtn.click();
   await expect(page.getByRole("button", { name: /^sent$/i })).toBeVisible();
 });
