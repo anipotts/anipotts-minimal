@@ -1,57 +1,42 @@
 /**
  * Query helpers for the thoughts/blog system.
- * D1-only.
+ * Uses Drizzle ORM for typed D1 queries.
  */
 
 import type { Thought, Subdomain } from "@anipotts/types";
+import { eq, desc, sql, and } from "drizzle-orm";
 import { logger } from "../logger";
-import {
-  getDB,
-  parseJsonArray,
-  toJsonArray,
-  toBool,
-  fromBool,
-  uuid,
-  now,
-} from "../db";
+import { getDrizzle, parseJsonArray, toJsonArray, uuid, now } from "../db";
+import * as s from "../db/schema";
 
 export interface QueryOptions {
   subdomain?: Subdomain;
 }
 
-/** Deserialize a D1 row into a Thought-like object. */
-function deserializeThought(
-  row: Record<string, unknown>,
-): Record<string, unknown> {
-  return {
-    ...row,
-    tags: parseJsonArray(row.tags),
-    platforms_targeted: parseJsonArray(row.platforms_targeted),
-    platforms_posted: parseJsonArray(row.platforms_posted),
-    published: toBool(row.published),
-    views: (row.views as number) ?? 0,
-  };
-}
-
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
 export async function fetchAllThoughts(options?: QueryOptions) {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return [];
 
   try {
-    let sql = "SELECT * FROM thoughts";
-    const params: unknown[] = [];
+    const conditions = [];
     if (options?.subdomain) {
-      sql += " WHERE section = ?";
-      params.push(options.subdomain);
+      conditions.push(eq(s.thoughts.section, options.subdomain));
     }
-    sql += " ORDER BY created_at DESC";
 
-    const stmt = db.prepare(sql);
-    const { results } = await (
-      params.length > 0 ? stmt.bind(...params) : stmt
-    ).all<Record<string, unknown>>();
-    return (results ?? []).map(deserializeThought);
+    const results = await db
+      .select()
+      .from(s.thoughts)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(s.thoughts.created_at));
+
+    return results.map((row) => ({
+      ...row,
+      tags: parseJsonArray(row.tags),
+      platforms_targeted: parseJsonArray(row.platforms_targeted),
+      platforms_posted: parseJsonArray(row.platforms_posted),
+      views: row.views ?? 0,
+    }));
   } catch (err) {
     logger.error("admin", "D1 fetchAllThoughts failed", {
       error: String(err),
@@ -62,21 +47,20 @@ export async function fetchAllThoughts(options?: QueryOptions) {
 
 /** Create or update a thought record. Returns the saved record. */
 export async function upsertThoughtRecord(thought: Partial<Thought>) {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) throw new Error("Database not configured");
 
   const id = thought.id || uuid();
   const ts = now();
 
-  // Build column/value lists for INSERT OR REPLACE
-  const record: Record<string, unknown> = {
+  const record = {
     id,
     slug: thought.slug ?? "",
     title: thought.title ?? "",
     summary: thought.summary ?? "",
     content: thought.content ?? "",
     tags: toJsonArray(thought.tags),
-    published: fromBool(thought.published),
+    published: thought.published ?? false,
     views: thought.views ?? 0,
     section: thought.section ?? null,
     content_type: thought.content_type ?? "article",
@@ -94,68 +78,93 @@ export async function upsertThoughtRecord(thought: Partial<Thought>) {
     updated_at: ts,
   };
 
-  const cols = Object.keys(record);
-  const placeholders = cols.map(() => "?").join(", ");
-  const sql = `INSERT OR REPLACE INTO thoughts (${cols.join(", ")}) VALUES (${placeholders})`;
-
   await db
-    .prepare(sql)
-    .bind(...Object.values(record))
-    .run();
-  return deserializeThought(record);
+    .insert(s.thoughts)
+    .values(record)
+    .onConflictDoUpdate({
+      target: s.thoughts.id,
+      set: {
+        slug: record.slug,
+        title: record.title,
+        summary: record.summary,
+        content: record.content,
+        tags: record.tags,
+        published: record.published,
+        views: record.views,
+        section: record.section,
+        content_type: record.content_type,
+        series_type: record.series_type,
+        status: record.status,
+        artifact_url: record.artifact_url,
+        artifact_type: record.artifact_type,
+        platforms_targeted: record.platforms_targeted,
+        platforms_posted: record.platforms_posted,
+        voice_mode: record.voice_mode,
+        project: record.project,
+        published_at: record.published_at,
+        scheduled_at: record.scheduled_at,
+        updated_at: record.updated_at,
+      },
+    });
+
+  return {
+    ...record,
+    tags: parseJsonArray(record.tags),
+    platforms_targeted: parseJsonArray(record.platforms_targeted),
+    platforms_posted: parseJsonArray(record.platforms_posted),
+    views: record.views ?? 0,
+  };
 }
 
 /** Delete a thought by ID. */
 export async function deleteThoughtRecord(id: string) {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) throw new Error("Database not configured");
 
-  await db.prepare("DELETE FROM thoughts WHERE id = ?").bind(id).run();
+  await db.delete(s.thoughts).where(eq(s.thoughts.id, id));
 }
 
 /** Increment view count for a thought by slug. */
 export async function incrementThoughtViewCount(slug: string) {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return;
 
   await db
-    .prepare("UPDATE thoughts SET views = views + 1 WHERE slug = ?")
-    .bind(slug)
-    .run();
+    .update(s.thoughts)
+    .set({ views: sql`views + 1` })
+    .where(eq(s.thoughts.slug, slug));
 }
 
 /** Fetch aggregated stats for the admin analytics monitor. */
 export async function fetchThoughtStats(options?: QueryOptions) {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return null;
 
   try {
-    let sql =
-      "SELECT id, title, slug, views, published, created_at, section FROM thoughts";
-    const params: unknown[] = [];
+    const conditions = [];
     if (options?.subdomain) {
-      sql += " WHERE section = ?";
-      params.push(options.subdomain);
+      conditions.push(eq(s.thoughts.section, options.subdomain));
     }
-    sql += " ORDER BY views DESC";
 
-    const stmt = db.prepare(sql);
-    const { results } = await (
-      params.length > 0 ? stmt.bind(...params) : stmt
-    ).all<Record<string, unknown>>();
+    const results = await db
+      .select({
+        id: s.thoughts.id,
+        title: s.thoughts.title,
+        slug: s.thoughts.slug,
+        views: s.thoughts.views,
+        published: s.thoughts.published,
+        created_at: s.thoughts.created_at,
+        section: s.thoughts.section,
+      })
+      .from(s.thoughts)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(s.thoughts.views));
 
-    const thoughts = results ?? [];
-    const totalViews = thoughts.reduce(
-      (acc, t) => acc + ((t.views as number) || 0),
-      0,
-    );
-    const totalThoughts = thoughts.length;
-    const publishedCount = thoughts.filter((t) => toBool(t.published)).length;
+    const totalViews = results.reduce((acc, t) => acc + (t.views || 0), 0);
+    const totalThoughts = results.length;
+    const publishedCount = results.filter((t) => t.published).length;
     const draftCount = totalThoughts - publishedCount;
-    const topThoughts = thoughts.slice(0, 5).map((t) => ({
-      ...t,
-      published: toBool(t.published),
-    }));
+    const topThoughts = results.slice(0, 5);
 
     return {
       totalViews,

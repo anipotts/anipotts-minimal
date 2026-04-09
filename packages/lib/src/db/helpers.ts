@@ -46,16 +46,6 @@ export function toJson(val: unknown): string {
   return JSON.stringify(val ?? {});
 }
 
-/** Convert D1 INTEGER (0/1) to boolean. */
-export function toBool(val: unknown): boolean {
-  return val === 1 || val === true || val === "1";
-}
-
-/** Convert boolean to D1 INTEGER (0/1). */
-export function fromBool(val: boolean | null | undefined): number {
-  return val ? 1 : 0;
-}
-
 /** Generate a UUID v4. Works in both Node.js and Workers runtime. */
 export function uuid(): string {
   return crypto.randomUUID();

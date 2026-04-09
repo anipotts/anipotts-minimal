@@ -1,4 +1,4 @@
-import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
+import { getDrizzle, parseJsonArray, schema, desc } from "@anipotts/lib/db";
 import Link from "next/link";
 import PipelineFilters from "./pipeline-filters";
 import { SERIES_COLORS, STATUS_COLORS, PLATFORM_ABBREV } from "@/lib/constants";
@@ -25,50 +25,57 @@ interface ThoughtWithCount {
 }
 
 async function getThoughtsWithAtomCounts(): Promise<ThoughtWithCount[]> {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return [];
 
-  const { results: thoughts } = await db
-    .prepare("SELECT * FROM thoughts ORDER BY updated_at DESC")
-    .all<Record<string, unknown>>();
+  const thoughts = await db
+    .select()
+    .from(schema.thoughts)
+    .orderBy(desc(schema.thoughts.updated_at));
 
-  if (!thoughts || thoughts.length === 0) return [];
+  if (thoughts.length === 0) return [];
 
-  const thoughtIds = thoughts.map((t) => t.id as string);
+  // Get atom counts per thought using raw count query
+  const thoughtIds = thoughts.map((t) => t.id);
   const placeholders = thoughtIds.map(() => "?").join(", ");
-  const { results: atomRows } = await db
-    .prepare(
-      `SELECT content_id FROM atoms WHERE content_id IN (${placeholders})`,
-    )
-    .bind(...thoughtIds)
-    .all<{ content_id: string }>();
 
+  // Use the raw D1 for the IN query since Drizzle's inArray requires importing
+  const { getDB } = await import("@anipotts/lib/db");
+  const d1 = getDB();
   const countMap = new Map<string, number>();
-  if (atomRows) {
-    for (const atom of atomRows) {
-      countMap.set(atom.content_id, (countMap.get(atom.content_id) || 0) + 1);
+  if (d1) {
+    const { results: atomRows } = await d1
+      .prepare(
+        `SELECT content_id FROM atoms WHERE content_id IN (${placeholders})`,
+      )
+      .bind(...thoughtIds)
+      .all<{ content_id: string }>();
+    if (atomRows) {
+      for (const atom of atomRows) {
+        countMap.set(atom.content_id, (countMap.get(atom.content_id) || 0) + 1);
+      }
     }
   }
 
   return thoughts.map((t) => ({
-    id: t.id as string,
-    title: t.title as string,
-    slug: t.slug as string,
-    summary: (t.summary as string) ?? "",
-    content: (t.content as string) ?? "",
-    status: (t.status as string) ?? "draft",
-    series_type: (t.series_type as string) ?? null,
-    content_type: (t.content_type as string) ?? null,
-    published: toBool(t.published),
-    views: (t.views as number) ?? 0,
+    id: t.id,
+    title: t.title,
+    slug: t.slug,
+    summary: t.summary ?? "",
+    content: t.content ?? "",
+    status: t.status ?? "draft",
+    series_type: t.series_type ?? null,
+    content_type: t.content_type ?? null,
+    published: t.published ?? false,
+    views: t.views ?? 0,
     tags: parseJsonArray(t.tags),
     platforms_posted: parseJsonArray(t.platforms_posted),
-    created_at: t.created_at as string,
-    updated_at: (t.updated_at as string) ?? (t.created_at as string),
-    published_at: (t.published_at as string) ?? null,
-    artifact_url: (t.artifact_url as string) ?? null,
-    artifact_type: (t.artifact_type as string) ?? null,
-    atom_count: countMap.get(t.id as string) || 0,
+    created_at: t.created_at ?? "",
+    updated_at: t.updated_at ?? t.created_at ?? "",
+    published_at: t.published_at ?? null,
+    artifact_url: t.artifact_url ?? null,
+    artifact_type: t.artifact_type ?? null,
+    atom_count: countMap.get(t.id) || 0,
   }));
 }
 

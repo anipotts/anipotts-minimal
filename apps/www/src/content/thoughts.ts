@@ -7,7 +7,15 @@
  */
 
 import { cache } from "react";
-import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
+import {
+  getDrizzle,
+  getDB,
+  parseJsonArray,
+  schema,
+  eq,
+  or,
+  desc,
+} from "@anipotts/lib/db";
 
 export interface ThoughtEntry {
   slug: string;
@@ -19,28 +27,38 @@ export interface ThoughtEntry {
   content: string;
 }
 
-function d1RowToEntry(row: Record<string, unknown>): ThoughtEntry {
+type ThoughtRow = typeof schema.thoughts.$inferSelect;
+
+function thoughtRowToEntry(row: ThoughtRow): ThoughtEntry {
   return {
-    slug: String(row.slug),
-    title: String(row.title),
-    summary: String(row.summary ?? ""),
-    date: String(row.published_at ?? row.created_at ?? ""),
+    slug: row.slug,
+    title: row.title,
+    summary: row.summary ?? "",
+    date: row.published_at ?? row.created_at ?? "",
     tags: parseJsonArray(row.tags),
-    published: row.status === "published" || toBool(row.published),
-    content: String(row.content ?? ""),
+    published: row.status === "published" || (row.published ?? false),
+    content: row.content ?? "",
   };
 }
 
 export const getPublishedThoughts = cache(async (): Promise<ThoughtEntry[]> => {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const { results } = await db
-        .prepare(
-          "SELECT * FROM thoughts WHERE status = 'published' OR published = 1 ORDER BY published_at DESC, created_at DESC",
+      const results = await db
+        .select()
+        .from(schema.thoughts)
+        .where(
+          or(
+            eq(schema.thoughts.status, "published"),
+            eq(schema.thoughts.published, true),
+          ),
         )
-        .all<Record<string, unknown>>();
-      return (results ?? []).map(d1RowToEntry);
+        .orderBy(
+          desc(schema.thoughts.published_at),
+          desc(schema.thoughts.created_at),
+        );
+      return results.map(thoughtRowToEntry);
     } catch {
       // D1 query failed
     }
@@ -52,16 +70,17 @@ export const getPublishedThoughts = cache(async (): Promise<ThoughtEntry[]> => {
 export async function getThoughtBySlug(
   slug: string,
 ): Promise<ThoughtEntry | undefined> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const row = await db
-        .prepare(
-          "SELECT * FROM thoughts WHERE slug = ? AND (status = 'published' OR published = 1)",
-        )
-        .bind(slug)
-        .first<Record<string, unknown>>();
-      if (row) return d1RowToEntry(row);
+      const rows = await db
+        .select()
+        .from(schema.thoughts)
+        .where(eq(schema.thoughts.slug, slug));
+      const row = rows[0];
+      if (row && (row.status === "published" || row.published)) {
+        return thoughtRowToEntry(row);
+      }
     } catch {
       // D1 query failed
     }
@@ -76,11 +95,11 @@ export async function searchThoughtEntries(
   const q = query.trim().toLowerCase();
   if (!q) return getPublishedThoughts();
 
-  // D1 FTS5 search
-  const db = getDB();
-  if (db) {
+  // D1 FTS5 search: must use raw SQL (Drizzle doesn't support FTS5 MATCH)
+  const d1 = getDB();
+  if (d1) {
     try {
-      const { results } = await db
+      const { results } = await d1
         .prepare(
           `SELECT t.* FROM thoughts_fts fts
            JOIN thoughts t ON t.rowid = fts.rowid
@@ -91,7 +110,18 @@ export async function searchThoughtEntries(
         )
         .bind(q)
         .all<Record<string, unknown>>();
-      return (results ?? []).map(d1RowToEntry);
+      return (results ?? []).map((row) => ({
+        slug: String(row.slug),
+        title: String(row.title),
+        summary: String(row.summary ?? ""),
+        date: String(row.published_at ?? row.created_at ?? ""),
+        tags: parseJsonArray(row.tags),
+        published:
+          row.status === "published" ||
+          row.published === 1 ||
+          row.published === true,
+        content: String(row.content ?? ""),
+      }));
     } catch {
       // fall through to in-memory filter
     }

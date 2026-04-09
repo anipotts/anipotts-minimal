@@ -1,4 +1,4 @@
-import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
+import { getDrizzle, parseJsonArray, schema, eq } from "@anipotts/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Thought, SeriesType } from "@anipotts/types";
@@ -48,14 +48,15 @@ export default async function RecordingPrepPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) notFound();
 
-  const thoughtRow = await db
-    .prepare("SELECT * FROM thoughts WHERE id = ?")
-    .bind(id)
-    .first<Record<string, unknown>>();
+  const thoughtRows = await db
+    .select()
+    .from(schema.thoughts)
+    .where(eq(schema.thoughts.id, id));
 
+  const thoughtRow = thoughtRows[0];
   if (!thoughtRow) notFound();
 
   const thought = {
@@ -63,8 +64,7 @@ export default async function RecordingPrepPage({
     tags: parseJsonArray(thoughtRow.tags),
     platforms_targeted: parseJsonArray(thoughtRow.platforms_targeted),
     platforms_posted: parseJsonArray(thoughtRow.platforms_posted),
-    published: toBool(thoughtRow.published),
-    views: (thoughtRow.views as number) ?? 0,
+    views: thoughtRow.views ?? 0,
   };
 
   const t = thought as Thought;

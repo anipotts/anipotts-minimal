@@ -7,56 +7,12 @@ import type {
   ThoughtSummary,
 } from "@anipotts/types";
 import { projectRowToProject } from "@anipotts/types";
+import { eq, desc, asc, and } from "drizzle-orm";
 import { logger } from "../logger";
 import { FALLBACK_PROJECTS } from "../data/projects";
 import { FALLBACK_SOCIAL_LINKS } from "../data/social";
-import { getDB, parseJsonArray, toBool, parseJson } from "../db";
-
-// ---------------------------------------------------------------------------
-// D1 row deserializers
-// ---------------------------------------------------------------------------
-
-function deserializeThoughtSummary(
-  row: Record<string, unknown>,
-): ThoughtSummary {
-  return {
-    slug: row.slug as string,
-    title: row.title as string,
-    summary: row.summary as string,
-    created_at: row.created_at as string,
-    views: row.views as number | undefined,
-    id: row.id as string | undefined,
-    series_type: row.series_type as ThoughtSummary["series_type"],
-    tags: parseJsonArray(row.tags),
-  };
-}
-
-function deserializeProject(row: Record<string, unknown>): Project {
-  return projectRowToProject({
-    id: row.id as string,
-    slug: row.slug as string,
-    title: row.title as string,
-    subtitle: row.subtitle as string,
-    description: row.description as string,
-    year: row.year as string,
-    category: row.category as Project["category"],
-    role: row.role as string,
-    duration: row.duration as string,
-    tags: parseJsonArray(row.tags),
-    status: row.status as string as "live" | "in-progress" | "coming-soon",
-    featured: toBool(row.featured),
-    icon: row.icon as string | null,
-    image_url: row.image_url as string | null,
-    thumbnail_url: row.thumbnail_url as string | null,
-    link_live: row.link_live as string | null,
-    link_repo: row.link_repo as string | null,
-    link_page: row.link_page as string | null,
-    sort_order: row.sort_order as number,
-    visible: toBool(row.visible),
-    created_at: row.created_at as string,
-    updated_at: row.updated_at as string,
-  });
-}
+import { getDrizzle, getDB, parseJsonArray, parseJson } from "../db";
+import * as s from "../db/schema";
 
 // ---------------------------------------------------------------------------
 // Page content
@@ -65,25 +21,31 @@ function deserializeProject(row: Record<string, unknown>): Project {
 export async function fetchPageContent<T = unknown>(
   pageKey: string,
 ): Promise<PageContent<T> | null> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const row = await db
-        .prepare(
-          "SELECT * FROM page_content WHERE page_key = ? AND published = 1 ORDER BY version DESC LIMIT 1",
+      const rows = await db
+        .select()
+        .from(s.pageContent)
+        .where(
+          and(
+            eq(s.pageContent.page_key, pageKey),
+            eq(s.pageContent.published, true),
+          ),
         )
-        .bind(pageKey)
-        .first<Record<string, unknown>>();
+        .orderBy(desc(s.pageContent.version))
+        .limit(1);
+      const row = rows[0];
       if (!row) return null;
       return {
-        id: row.id as string,
-        page_key: row.page_key as string,
+        id: row.id,
+        page_key: row.page_key,
         content: parseJson<T>(row.content) as T,
-        version: row.version as number,
-        published: toBool(row.published),
-        updated_at: row.updated_at as string,
-        updated_by: row.updated_by as string | null,
-        created_at: row.created_at as string,
+        version: row.version ?? 1,
+        published: row.published ?? false,
+        updated_at: row.updated_at ?? "",
+        updated_by: row.updated_by ?? null,
+        created_at: row.created_at ?? "",
       };
     } catch (err) {
       logger.error("cms", `D1 fetchPageContent("${pageKey}") failed`, {
@@ -106,40 +68,53 @@ export async function fetchProjects(options?: {
   visible?: boolean;
   limit?: number;
 }): Promise<Project[]> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      let sql = "SELECT * FROM projects";
-      const conditions: string[] = [];
-      const params: unknown[] = [];
-
+      const conditions = [];
       const visibleFilter = options?.visible ?? true;
       if (visibleFilter) {
-        conditions.push("visible = 1");
+        conditions.push(eq(s.projects.visible, true));
       }
       if (options?.featured !== undefined) {
-        conditions.push("featured = ?");
-        params.push(options.featured ? 1 : 0);
+        conditions.push(eq(s.projects.featured, options.featured));
       }
       if (options?.category) {
-        conditions.push("category = ?");
-        params.push(options.category);
-      }
-      if (conditions.length > 0) {
-        sql += " WHERE " + conditions.join(" AND ");
-      }
-      sql += " ORDER BY sort_order ASC";
-      if (options?.limit) {
-        sql += " LIMIT ?";
-        params.push(options.limit);
+        conditions.push(eq(s.projects.category, options.category));
       }
 
-      const stmt = db.prepare(sql);
-      const { results } = await (
-        params.length > 0 ? stmt.bind(...params) : stmt
-      ).all<Record<string, unknown>>();
-      if (!results || results.length === 0) return FALLBACK_PROJECTS;
-      return results.map(deserializeProject);
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      const results = await db
+        .select()
+        .from(s.projects)
+        .where(whereClause)
+        .orderBy(asc(s.projects.sort_order))
+        .limit(options?.limit ?? 1000);
+
+      if (results.length === 0) return FALLBACK_PROJECTS;
+      return results.map((row) =>
+        projectRowToProject({
+          ...row,
+          subtitle: row.subtitle ?? "",
+          description: row.description ?? "",
+          year: row.year ?? "",
+          category: (row.category ?? "project") as Project["category"],
+          role: row.role ?? "",
+          duration: row.duration ?? "",
+          tags: parseJsonArray(row.tags),
+          status: (row.status ?? "live") as
+            | "live"
+            | "in-progress"
+            | "coming-soon",
+          featured: row.featured ?? false,
+          visible: row.visible ?? true,
+          sort_order: row.sort_order ?? 0,
+          created_at: row.created_at ?? "",
+          updated_at: row.updated_at ?? "",
+        }),
+      );
     } catch (err) {
       logger.warn("cms", "D1 fetchProjects() failed, using fallback", {
         error: String(err),
@@ -161,32 +136,42 @@ export async function fetchThoughts(options?: {
   published?: boolean;
   limit?: number;
 }): Promise<ThoughtSummary[]> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      let sql =
-        "SELECT slug, title, summary, created_at, views, id, series_type, tags FROM thoughts";
-      const conditions: string[] = [];
-      const params: unknown[] = [];
-
+      const conditions = [];
       if (options?.published !== undefined) {
-        conditions.push("published = ?");
-        params.push(options.published ? 1 : 0);
-      }
-      if (conditions.length > 0) {
-        sql += " WHERE " + conditions.join(" AND ");
-      }
-      sql += " ORDER BY created_at DESC";
-      if (options?.limit) {
-        sql += " LIMIT ?";
-        params.push(options.limit);
+        conditions.push(eq(s.thoughts.published, options.published));
       }
 
-      const stmt = db.prepare(sql);
-      const { results } = await (
-        params.length > 0 ? stmt.bind(...params) : stmt
-      ).all<Record<string, unknown>>();
-      return (results ?? []).map(deserializeThoughtSummary);
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      const results = await db
+        .select({
+          slug: s.thoughts.slug,
+          title: s.thoughts.title,
+          summary: s.thoughts.summary,
+          created_at: s.thoughts.created_at,
+          views: s.thoughts.views,
+          id: s.thoughts.id,
+          series_type: s.thoughts.series_type,
+          tags: s.thoughts.tags,
+        })
+        .from(s.thoughts)
+        .where(whereClause)
+        .orderBy(desc(s.thoughts.created_at))
+        .limit(options?.limit ?? 1000);
+      return results.map((row) => ({
+        slug: row.slug,
+        title: row.title,
+        summary: row.summary ?? "",
+        created_at: row.created_at ?? "",
+        views: row.views ?? undefined,
+        id: row.id ?? undefined,
+        series_type: row.series_type as ThoughtSummary["series_type"],
+        tags: parseJsonArray(row.tags),
+      }));
     } catch (err) {
       logger.warn("cms", "D1 fetchThoughts() failed, using fallback", {
         error: String(err),
@@ -199,11 +184,11 @@ export async function fetchThoughts(options?: {
 }
 
 export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
-  const db = getDB();
-  if (db) {
+  const d1 = getDB();
+  if (d1) {
     try {
-      // FTS5 search across thoughts and projects, return thought matches
-      const { results } = await db
+      // FTS5 search: must use raw SQL (Drizzle doesn't support FTS5 MATCH)
+      const { results } = await d1
         .prepare(
           `SELECT t.slug, t.title, t.summary, t.created_at, t.views, t.id, t.series_type, t.tags,
                   rank
@@ -216,7 +201,16 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
         )
         .bind(query)
         .all<Record<string, unknown>>();
-      return (results ?? []).map(deserializeThoughtSummary);
+      return (results ?? []).map((row) => ({
+        slug: row.slug as string,
+        title: row.title as string,
+        summary: (row.summary as string) ?? "",
+        created_at: (row.created_at as string) ?? "",
+        views: row.views as number | undefined,
+        id: row.id as string | undefined,
+        series_type: row.series_type as ThoughtSummary["series_type"],
+        tags: parseJsonArray(row.tags),
+      }));
     } catch (err) {
       logger.warn("cms", "D1 searchThoughts() failed", { error: String(err) });
       return [];
@@ -231,20 +225,20 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
 // ---------------------------------------------------------------------------
 
 export async function fetchSocialLinks(): Promise<SocialLink[]> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const { results } = await db
-        .prepare(
-          "SELECT * FROM social_links WHERE visible = 1 ORDER BY sort_order ASC",
-        )
-        .all<Record<string, unknown>>();
-      if (!results || results.length === 0) return FALLBACK_SOCIAL_LINKS;
+      const results = await db
+        .select()
+        .from(s.socialLinks)
+        .where(eq(s.socialLinks.visible, true))
+        .orderBy(asc(s.socialLinks.sort_order));
+      if (results.length === 0) return FALLBACK_SOCIAL_LINKS;
       return results.map((row) => ({
-        name: row.name as string,
-        url: row.url as string,
-        icon: row.icon as string,
-        description: (row.description as string) ?? undefined,
+        name: row.name,
+        url: row.url,
+        icon: row.icon,
+        description: row.description ?? undefined,
       }));
     } catch (err) {
       logger.warn("cms", "D1 fetchSocialLinks() failed, using fallback", {
@@ -262,14 +256,14 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
 // ---------------------------------------------------------------------------
 
 export async function fetchSiteSetting(key: string): Promise<string | null> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const row = await db
-        .prepare("SELECT value FROM site_settings WHERE key = ?")
-        .bind(key)
-        .first<{ value: string }>();
-      return row?.value ?? null;
+      const rows = await db
+        .select({ value: s.siteSettings.value })
+        .from(s.siteSettings)
+        .where(eq(s.siteSettings.key, key));
+      return rows[0]?.value ?? null;
     } catch (err) {
       logger.warn("cms", `D1 fetchSiteSetting("${key}") failed`, {
         error: String(err),
@@ -282,14 +276,14 @@ export async function fetchSiteSetting(key: string): Promise<string | null> {
 }
 
 export async function fetchAllSiteSettings(): Promise<SiteSettingsMap> {
-  const db = getDB();
+  const db = getDrizzle();
   if (db) {
     try {
-      const { results } = await db
-        .prepare("SELECT key, value FROM site_settings")
-        .all<{ key: string; value: string }>();
+      const results = await db
+        .select({ key: s.siteSettings.key, value: s.siteSettings.value })
+        .from(s.siteSettings);
       const map: SiteSettingsMap = {};
-      for (const row of results ?? []) {
+      for (const row of results) {
         map[row.key] = row.value;
       }
       return map;

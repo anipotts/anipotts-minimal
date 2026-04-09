@@ -1,35 +1,34 @@
 /**
- * Status check persistence. D1-only.
+ * Status check persistence. Uses Drizzle ORM for typed D1 queries.
  *
  * D1 table: status_checks (id INTEGER PK AUTOINCREMENT, service_url, service_name,
  *   status_code, response_time_ms, is_up INTEGER, checked_at TEXT)
  */
 
 import type { StatusCheckResult } from "./checker";
+import { lt, desc } from "drizzle-orm";
 import { logger } from "../logger";
-import { getDB, toBool, fromBool } from "../db";
+import { getDrizzle, getDB } from "../db";
+import * as s from "../db/schema";
 
 /** Insert a batch of status check results. */
 export async function insertStatusChecks(
   checks: StatusCheckResult[],
 ): Promise<void> {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) throw new Error("Database not configured");
 
-  const stmt = db.prepare(
-    "INSERT INTO status_checks (service_url, service_name, status_code, response_time_ms, is_up, checked_at) VALUES (?, ?, ?, ?, ?, ?)",
-  );
-  const batch = checks.map((c) =>
-    stmt.bind(
-      c.serviceUrl,
-      c.serviceName,
-      c.statusCode,
-      c.responseTimeMs,
-      fromBool(c.isUp),
-      c.checkedAt,
-    ),
-  );
-  await db.batch(batch);
+  const values = checks.map((c) => ({
+    service_url: c.serviceUrl,
+    service_name: c.serviceName,
+    status_code: c.statusCode,
+    response_time_ms: c.responseTimeMs,
+    is_up: c.isUp,
+    checked_at: c.checkedAt,
+  }));
+
+  // Drizzle supports batch insert
+  await db.insert(s.statusChecks).values(values);
 }
 
 export interface ServiceStatus {
@@ -45,37 +44,42 @@ export interface ServiceStatus {
 
 /** Get the latest status + uptime percentages for all monitored services. */
 export async function getServiceStatuses(): Promise<ServiceStatus[]> {
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return [];
 
   try {
-    // Get latest check per service
-    const { results: latestChecks } = await db
-      .prepare("SELECT * FROM status_checks ORDER BY checked_at DESC LIMIT 200")
-      .all<Record<string, unknown>>();
+    // Get latest checks (raw approach is simpler for the grouping logic)
+    const latestChecks = await db
+      .select()
+      .from(s.statusChecks)
+      .orderBy(desc(s.statusChecks.checked_at))
+      .limit(200);
 
-    if (!latestChecks || latestChecks.length === 0) return [];
+    if (latestChecks.length === 0) return [];
 
-    const latestByService = new Map<string, Record<string, unknown>>();
+    const latestByService = new Map<string, (typeof latestChecks)[0]>();
     for (const check of latestChecks) {
-      const url = check.service_url as string;
-      if (!latestByService.has(url)) {
-        latestByService.set(url, check);
+      if (!latestByService.has(check.service_url)) {
+        latestByService.set(check.service_url, check);
       }
     }
 
-    const now = Date.now();
-    const ago24h = new Date(now - 24 * 60 * 60 * 1000).toISOString();
-    const ago7d = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const nowMs = Date.now();
+    const ago24h = new Date(nowMs - 24 * 60 * 60 * 1000).toISOString();
+    const ago7d = new Date(nowMs - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { results: checks24h } = await db
+    // Use raw D1 for the time-range queries (simpler than Drizzle gte on text columns)
+    const d1 = getDB();
+    if (!d1) return [];
+
+    const { results: checks24h } = await d1
       .prepare(
         "SELECT service_url, is_up FROM status_checks WHERE checked_at >= ?",
       )
       .bind(ago24h)
       .all<{ service_url: string; is_up: number }>();
 
-    const { results: checks7d } = await db
+    const { results: checks7d } = await d1
       .prepare(
         "SELECT service_url, is_up FROM status_checks WHERE checked_at >= ?",
       )
@@ -89,19 +93,19 @@ export async function getServiceStatuses(): Promise<ServiceStatus[]> {
       if (!checks) return 100;
       const serviceChecks = checks.filter((c) => c.service_url === url);
       if (serviceChecks.length === 0) return 100;
-      const upCount = serviceChecks.filter((c) => toBool(c.is_up)).length;
+      const upCount = serviceChecks.filter((c) => c.is_up === 1).length;
       return Math.round((upCount / serviceChecks.length) * 1000) / 10;
     }
 
     const results: ServiceStatus[] = [];
     for (const [url, latest] of latestByService) {
       results.push({
-        serviceName: latest.service_name as string,
+        serviceName: latest.service_name,
         serviceUrl: url,
-        isUp: toBool(latest.is_up),
-        statusCode: latest.status_code as number | null,
-        responseTimeMs: latest.response_time_ms as number,
-        lastChecked: latest.checked_at as string,
+        isUp: latest.is_up,
+        statusCode: latest.status_code,
+        responseTimeMs: latest.response_time_ms,
+        lastChecked: latest.checked_at,
         uptime24h: calcUptime(checks24h ?? null, url),
         uptime7d: calcUptime(checks7d ?? null, url),
       });
@@ -121,12 +125,11 @@ export async function cleanupOldChecks(daysToKeep = 30): Promise<number> {
     Date.now() - daysToKeep * 24 * 60 * 60 * 1000,
   ).toISOString();
 
-  const db = getDB();
+  const db = getDrizzle();
   if (!db) return 0;
 
   const result = await db
-    .prepare("DELETE FROM status_checks WHERE checked_at < ?")
-    .bind(cutoff)
-    .run();
-  return result.meta.changes;
+    .delete(s.statusChecks)
+    .where(lt(s.statusChecks.checked_at, cutoff));
+  return result.rowsAffected;
 }

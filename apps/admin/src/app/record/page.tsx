@@ -1,4 +1,10 @@
-import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
+import {
+  getDrizzle,
+  parseJsonArray,
+  schema,
+  desc,
+  inArray,
+} from "@anipotts/lib/db";
 import type { Thought } from "@anipotts/types";
 import Link from "next/link";
 import { SERIES_COLORS } from "@/lib/constants";
@@ -6,31 +12,29 @@ import { SERIES_COLORS } from "@/lib/constants";
 export const dynamic = "force-dynamic";
 
 export default async function RecordPage() {
-  const db = getDB();
+  const db = getDrizzle();
   const thoughts: Thought[] = [];
 
   if (db) {
-    const { results } = await db
-      .prepare(
-        "SELECT * FROM thoughts WHERE status IN ('ready', 'draft') ORDER BY updated_at DESC LIMIT 20",
-      )
-      .all<Record<string, unknown>>();
+    const results = await db
+      .select()
+      .from(schema.thoughts)
+      .where(inArray(schema.thoughts.status, ["ready", "draft"]))
+      .orderBy(desc(schema.thoughts.updated_at))
+      .limit(20);
 
-    if (results) {
-      thoughts.push(
-        ...results.map(
-          (row) =>
-            ({
-              ...row,
-              tags: parseJsonArray(row.tags),
-              platforms_targeted: parseJsonArray(row.platforms_targeted),
-              platforms_posted: parseJsonArray(row.platforms_posted),
-              published: toBool(row.published),
-              views: (row.views as number) ?? 0,
-            }) as unknown as Thought,
-        ),
-      );
-    }
+    thoughts.push(
+      ...results.map(
+        (row) =>
+          ({
+            ...row,
+            tags: parseJsonArray(row.tags),
+            platforms_targeted: parseJsonArray(row.platforms_targeted),
+            platforms_posted: parseJsonArray(row.platforms_posted),
+            views: row.views ?? 0,
+          }) as unknown as Thought,
+      ),
+    );
   }
 
   return (
