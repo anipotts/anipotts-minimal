@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@anipotts/config": "workspace:*",
+    "@opennextjs/cloudflare": "^1.19.0",
     "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",

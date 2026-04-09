@@ -1,6 +1,13 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+/**
+ * Thought/blog content fetching.
+ *
+ * Data source priority: D1 -> Supabase -> empty.
+ * Filesystem reads removed (Workers have no filesystem).
+ * Markdown files sync to the database via git hook, so DB is always fresh.
+ */
+
 import { cache } from "react";
+import { getDB, parseJsonArray, toBool } from "@anipotts/lib/db";
 import { createServerClient } from "@anipotts/lib";
 
 export interface ThoughtEntry {
@@ -13,152 +20,17 @@ export interface ThoughtEntry {
   content: string;
 }
 
-const THOUGHTS_DIR_CANDIDATES = Array.from(
-  new Set([
-    path.resolve(process.cwd(), "content", "thoughts"),
-    path.resolve(process.cwd(), "..", "..", "content", "thoughts"),
-  ]),
-);
-
-async function resolveThoughtsDir(): Promise<string | null> {
-  for (const candidate of THOUGHTS_DIR_CANDIDATES) {
-    try {
-      const files = await fs.readdir(candidate);
-      const hasContent = files.some(
-        (file) => file.endsWith(".md") || file.endsWith(".mdx"),
-      );
-      if (hasContent) {
-        return candidate;
-      }
-    } catch {
-      continue;
-    }
-  }
-
-  return null;
-}
-
-function parseValue(raw: string): string | string[] | boolean {
-  const value = raw.trim();
-
-  if (value === "true") return true;
-  if (value === "false") return false;
-
-  if (value.startsWith("[") && value.endsWith("]")) {
-    return value
-      .slice(1, -1)
-      .split(",")
-      .map((part) => part.trim().replace(/^['\"]|['\"]$/g, ""))
-      .filter(Boolean);
-  }
-
-  return value.replace(/^['\"]|['\"]$/g, "");
-}
-
-function parseFrontmatter(raw: string) {
-  if (!raw.startsWith("---\n")) {
-    return { frontmatter: {}, content: raw.trim() };
-  }
-
-  const endIndex = raw.indexOf("\n---\n", 4);
-  if (endIndex === -1) {
-    return { frontmatter: {}, content: raw.trim() };
-  }
-
-  const frontmatterBlock = raw.slice(4, endIndex);
-  const content = raw.slice(endIndex + 5).trim();
-  const frontmatter: Record<string, string | string[] | boolean> = {};
-
-  for (const line of frontmatterBlock.split("\n")) {
-    const separator = line.indexOf(":");
-    if (separator === -1) continue;
-
-    const key = line.slice(0, separator).trim();
-    const value = line.slice(separator + 1);
-    frontmatter[key] = parseValue(value);
-  }
-
-  return { frontmatter, content };
-}
-
-function normalizeThought(file: string, raw: string): ThoughtEntry {
-  const { frontmatter, content } = parseFrontmatter(raw);
-  const filenameSlug = file.replace(/\.mdx?$/, "");
-  const slug = String(frontmatter.slug ?? filenameSlug).trim();
-  const title = String(
-    frontmatter.title ?? filenameSlug.replace(/-/g, " "),
-  ).trim();
-  const summary = String(frontmatter.summary ?? "").trim();
-  const date = String(frontmatter.date ?? "").trim();
-  const tagsRaw = frontmatter.tags;
-  const tags = Array.isArray(tagsRaw)
-    ? tagsRaw.map((tag) => String(tag))
-    : typeof tagsRaw === "string"
-      ? tagsRaw
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean)
-      : [];
-  const published = frontmatter.published !== false;
-
-  if (!slug) {
-    throw new Error(`[thoughts] Missing slug in ${file}`);
-  }
-  if (!title) {
-    throw new Error(`[thoughts] Missing title in ${file}`);
-  }
-  if (!summary) {
-    throw new Error(`[thoughts] Missing summary in ${file}`);
-  }
-  if (!date || Number.isNaN(Date.parse(date))) {
-    throw new Error(
-      `[thoughts] Invalid date in ${file}. Expected ISO-like date.`,
-    );
-  }
-
+function d1RowToEntry(row: Record<string, unknown>): ThoughtEntry {
   return {
-    slug,
-    title,
-    summary,
-    date,
-    tags,
-    published,
-    content,
+    slug: String(row.slug),
+    title: String(row.title),
+    summary: String(row.summary ?? ""),
+    date: String(row.published_at ?? row.created_at ?? ""),
+    tags: parseJsonArray(row.tags),
+    published: row.status === "published" || toBool(row.published),
+    content: String(row.content ?? ""),
   };
 }
-
-export const getThoughtEntries = cache(async (): Promise<ThoughtEntry[]> => {
-  const thoughtsDir = await resolveThoughtsDir();
-  if (!thoughtsDir) return [];
-
-  let files: string[] = [];
-
-  try {
-    files = await fs.readdir(thoughtsDir);
-  } catch {
-    return [];
-  }
-
-  const entries = await Promise.all(
-    files
-      .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
-      .map(async (file) => {
-        const absolutePath = path.join(thoughtsDir, file);
-        const raw = await fs.readFile(absolutePath, "utf8");
-        return normalizeThought(file, raw);
-      }),
-  );
-
-  const seen = new Set<string>();
-  for (const entry of entries) {
-    if (seen.has(entry.slug)) {
-      throw new Error(`[thoughts] Duplicate slug detected: ${entry.slug}`);
-    }
-    seen.add(entry.slug);
-  }
-
-  return entries.sort((a, b) => +new Date(b.date) - +new Date(a.date));
-});
 
 function supabaseRowToEntry(row: Record<string, unknown>): ThoughtEntry {
   const tags = Array.isArray(row.tags) ? row.tags.map(String) : [];
@@ -173,68 +45,120 @@ function supabaseRowToEntry(row: Record<string, unknown>): ThoughtEntry {
   };
 }
 
-async function getSupabasePublishedThoughts(): Promise<ThoughtEntry[] | null> {
+export const getPublishedThoughts = cache(async (): Promise<ThoughtEntry[]> => {
+  // D1 path
+  const db = getDB();
+  if (db) {
+    try {
+      const { results } = await db
+        .prepare(
+          "SELECT * FROM thoughts WHERE status = 'published' OR published = 1 ORDER BY published_at DESC, created_at DESC",
+        )
+        .all<Record<string, unknown>>();
+      return (results ?? []).map(d1RowToEntry);
+    } catch {
+      // fall through to Supabase
+    }
+  }
+
+  // Supabase path
   const supabase = createServerClient();
-  if (!supabase) return null;
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("thoughts")
+      .select("*")
+      .eq("status", "published")
+      .order("published_at", { ascending: false });
 
-  const { data, error } = await supabase
-    .from("thoughts")
-    .select("*")
-    .eq("status", "published")
-    .order("published_at", { ascending: false });
+    if (!error && data && data.length > 0) {
+      return data.map((row: Record<string, unknown>) =>
+        supabaseRowToEntry(row),
+      );
+    }
+  }
 
-  if (error || !data || data.length === 0) return null;
-  return data.map((row: Record<string, unknown>) => supabaseRowToEntry(row));
-}
-
-async function getSupabaseThoughtBySlug(
-  slug: string,
-): Promise<ThoughtEntry | null> {
-  const supabase = createServerClient();
-  if (!supabase) return null;
-
-  const { data, error } = await supabase
-    .from("thoughts")
-    .select("*")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .single();
-
-  if (error || !data) return null;
-  return supabaseRowToEntry(data as Record<string, unknown>);
-}
-
-export async function getPublishedThoughts(): Promise<ThoughtEntry[]> {
-  const supabaseThoughts = await getSupabasePublishedThoughts();
-  if (supabaseThoughts) return supabaseThoughts;
-
-  const thoughts = await getThoughtEntries();
-  return thoughts.filter((thought) => thought.published);
-}
+  return [];
+});
 
 export async function getThoughtBySlug(
   slug: string,
 ): Promise<ThoughtEntry | undefined> {
-  const supabaseThought = await getSupabaseThoughtBySlug(slug);
-  if (supabaseThought) return supabaseThought;
+  // D1 path
+  const db = getDB();
+  if (db) {
+    try {
+      const row = await db
+        .prepare(
+          "SELECT * FROM thoughts WHERE slug = ? AND (status = 'published' OR published = 1)",
+        )
+        .bind(slug)
+        .first<Record<string, unknown>>();
+      if (row) return d1RowToEntry(row);
+    } catch {
+      // fall through to Supabase
+    }
+  }
 
-  const thoughts = await getPublishedThoughts();
-  return thoughts.find((thought) => thought.slug === slug);
+  // Supabase path
+  const supabase = createServerClient();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("thoughts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .single();
+
+    if (!error && data) {
+      return supabaseRowToEntry(data as Record<string, unknown>);
+    }
+  }
+
+  return undefined;
 }
 
 export async function searchThoughtEntries(
   query: string,
 ): Promise<ThoughtEntry[]> {
-  const thoughts = await getPublishedThoughts();
   const q = query.trim().toLowerCase();
-  if (!q) return thoughts;
+  if (!q) return getPublishedThoughts();
 
-  return thoughts.filter((thought) => {
-    return (
-      thought.title.toLowerCase().includes(q) ||
-      thought.summary.toLowerCase().includes(q) ||
-      thought.tags.join(" ").toLowerCase().includes(q) ||
-      thought.content.toLowerCase().includes(q)
-    );
-  });
+  // D1 FTS5 search
+  const db = getDB();
+  if (db) {
+    try {
+      const { results } = await db
+        .prepare(
+          `SELECT t.* FROM thoughts_fts fts
+           JOIN thoughts t ON t.rowid = fts.rowid
+           WHERE thoughts_fts MATCH ?
+             AND (t.status = 'published' OR t.published = 1)
+           ORDER BY rank
+           LIMIT 20`,
+        )
+        .bind(q)
+        .all<Record<string, unknown>>();
+      return (results ?? []).map(d1RowToEntry);
+    } catch {
+      // fall through to in-memory filter
+    }
+  }
+
+  // Fallback: in-memory filter
+  const thoughts = await getPublishedThoughts();
+  return thoughts.filter(
+    (t) =>
+      t.title.toLowerCase().includes(q) ||
+      t.summary.toLowerCase().includes(q) ||
+      t.tags.join(" ").toLowerCase().includes(q) ||
+      t.content.toLowerCase().includes(q),
+  );
 }
+
+/**
+ * @deprecated Use getPublishedThoughts() instead.
+ * Kept for backward compatibility with components that import this.
+ */
+export const getThoughtEntries = cache(
+  async (): Promise<ThoughtEntry[]> => getPublishedThoughts(),
+);

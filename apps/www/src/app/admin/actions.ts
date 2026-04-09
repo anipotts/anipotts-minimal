@@ -9,8 +9,6 @@ import {
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
 } from "@anipotts/lib/admin";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { createServerClient } from "@anipotts/lib";
 import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
 import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
@@ -23,6 +21,14 @@ import type {
   VoiceMode,
 } from "@anipotts/types";
 import { upsertAtomRecord, deleteAtomRecord } from "@anipotts/lib/admin";
+import {
+  getDB,
+  uuid,
+  now,
+  toJsonArray,
+  fromBool,
+  parseJsonArray,
+} from "@anipotts/lib/db";
 import {
   createDraft as typefullyCreateDraft,
   getDraft as typefullyGetDraft,
@@ -94,6 +100,96 @@ async function requireAuth(): Promise<{ error: string } | null> {
   return null;
 }
 
+// ── D1 helper: read a single thought by ID ──
+
+async function getThoughtById(id: string, columns = "*") {
+  const db = getDB();
+  if (db) {
+    return db
+      .prepare(`SELECT ${columns} FROM thoughts WHERE id = ?`)
+      .bind(id)
+      .first<Record<string, unknown>>();
+  }
+  const supabase = createServerClient();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from("thoughts")
+    .select(columns === "*" ? "*" : columns)
+    .eq("id", id)
+    .single();
+  return data as Record<string, unknown> | null;
+}
+
+// ── D1 helper: update thought fields by ID ──
+
+async function updateThought(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<{ error?: string }> {
+  const db = getDB();
+  if (db) {
+    const sets = Object.keys(fields)
+      .map((k) => `${k} = ?`)
+      .join(", ");
+    await db
+      .prepare(`UPDATE thoughts SET ${sets} WHERE id = ?`)
+      .bind(...Object.values(fields), id)
+      .run();
+    return {};
+  }
+  const supabase = createServerClient();
+  if (!supabase) return { error: "Database not configured" };
+  const { error } = await supabase.from("thoughts").update(fields).eq("id", id);
+  if (error) return { error: error.message };
+  return {};
+}
+
+// ── D1 helper: read a single atom by ID ──
+
+async function getAtomById(id: string) {
+  const db = getDB();
+  if (db) {
+    return db
+      .prepare("SELECT * FROM atoms WHERE id = ?")
+      .bind(id)
+      .first<Record<string, unknown>>();
+  }
+  const supabase = createServerClient();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from("atoms")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return data as Record<string, unknown> | null;
+}
+
+// ── D1 helper: update atom fields by ID ──
+
+async function updateAtomFields(
+  id: string,
+  fields: Record<string, unknown>,
+): Promise<{ error?: string }> {
+  const db = getDB();
+  if (db) {
+    const sets = Object.keys(fields)
+      .map((k) => `${k} = ?`)
+      .join(", ");
+    await db
+      .prepare(`UPDATE atoms SET ${sets} WHERE id = ?`)
+      .bind(...Object.values(fields), id)
+      .run();
+    return {};
+  }
+  const supabase = createServerClient();
+  if (!supabase) return { error: "Database not configured" };
+  const { error } = await supabase.from("atoms").update(fields).eq("id", id);
+  if (error) return { error: error.message };
+  return {};
+}
+
+// ── Auth ──
+
 export async function login(formData: FormData) {
   const hdrs = await headers();
   const ip =
@@ -149,54 +245,45 @@ export async function logout() {
   return { success: true };
 }
 
+// ── Content Status ──
+
 export async function approveContent(id: string) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const { error } = await supabase
-    .from("thoughts")
-    .update({ status: "ready", updated_at: new Date().toISOString() })
-    .eq("id", id);
-
-  if (error) return { error: error.message };
+  const result = await updateThought(id, {
+    status: "ready",
+    updated_at: now(),
+  });
+  if (result.error) return { error: result.error };
   return { success: true };
 }
 
 export async function updateContentStatus(id: string, status: ContentStatus) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
   if (!VALID_STATUSES.includes(status)) return { error: "Invalid status" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
   const update: Record<string, string> = {
     status,
-    updated_at: new Date().toISOString(),
+    updated_at: now(),
   };
   if (status === "published") {
-    update.published_at = new Date().toISOString();
+    update.published_at = now();
   }
 
-  const { error } = await supabase.from("thoughts").update(update).eq("id", id);
-
-  if (error) return { error: error.message };
+  const result = await updateThought(id, update);
+  if (result.error) return { error: result.error };
   return { success: true };
 }
+
+// ── Content CRUD ──
 
 export async function createThought(formData: FormData) {
   const authError = await requireAuth();
   if (authError) return authError;
-
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
 
   const title = (formData.get("title") as string)?.trim();
   const content = (formData.get("content") as string)?.trim();
@@ -215,6 +302,32 @@ export async function createThought(formData: FormData) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   const slug = `${base}-${Date.now().toString(36)}`;
+  const id = uuid();
+  const ts = now();
+
+  const db = getDB();
+  if (db) {
+    await db
+      .prepare(
+        `INSERT INTO thoughts (id, title, slug, content, summary, series_type, content_type, status, published, tags, views, created_at, updated_at)
+         VALUES (?, ?, ?, ?, '', ?, ?, 'draft', 0, '[]', 0, ?, ?)`,
+      )
+      .bind(
+        id,
+        title,
+        slug,
+        content || "",
+        seriesType || null,
+        contentType,
+        ts,
+        ts,
+      )
+      .run();
+    return { success: true, id };
+  }
+
+  const supabase = createServerClient();
+  if (!supabase) return { error: "Database not configured" };
 
   const { data, error } = await supabase
     .from("thoughts")
@@ -237,26 +350,51 @@ export async function createThought(formData: FormData) {
   return { success: true, id: data.id };
 }
 
+export async function updateThoughtContent(
+  id: string,
+  fields: {
+    title?: string;
+    summary?: string;
+    content?: string;
+    tags?: string[];
+  },
+) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
+
+  const update: Record<string, unknown> = { updated_at: now() };
+  if (fields.title !== undefined) {
+    if (!fields.title.trim()) return { error: "Title cannot be empty" };
+    update.title = fields.title;
+  }
+  if (fields.summary !== undefined) update.summary = fields.summary;
+  if (fields.content !== undefined) update.content = fields.content;
+
+  // D1: tags stored as JSON string
+  const db = getDB();
+  if (fields.tags !== undefined) {
+    update.tags = db ? toJsonArray(fields.tags) : fields.tags;
+  }
+
+  const result = await updateThought(id, update);
+  if (result.error) return { error: result.error };
+  return { success: true };
+}
+
+// ── Distribution: Buttondown ──
+
 export async function pushToButtondown(id: string) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const { data: thought, error: fetchError } = await supabase
-    .from("thoughts")
-    .select("title, content")
-    .eq("id", id)
-    .single();
-
-  if (fetchError || !thought) return { error: "Thought not found" };
+  const thought = await getThoughtById(id, "title, content");
+  if (!thought) return { error: "Thought not found" };
 
   const result = await buttondownCreateEmail(
-    thought.title,
-    thought.content || "",
+    String(thought.title),
+    String(thought.content || ""),
     "draft",
   );
   if (result.error) return { error: result.error };
@@ -264,31 +402,24 @@ export async function pushToButtondown(id: string) {
   return { success: true, emailId: result.data.id };
 }
 
+// ── Distribution: Typefully ──
+
 export async function pushToTypefully(id: string) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const { data: thought, error: fetchError } = await supabase
-    .from("thoughts")
-    .select("title, content, slug")
-    .eq("id", id)
-    .single();
-
-  if (fetchError || !thought) return { error: "Thought not found" };
+  const thought = await getThoughtById(id, "title, content, slug");
+  if (!thought) return { error: "Thought not found" };
 
   const link = `${SITE_URL}/thoughts/${thought.slug}`;
-  const content = thought.content || "";
+  const content = String(thought.content || "");
 
   const xResult = await typefullyCreateDraft(buildXPost(content, link));
   if (xResult.error) return { error: `X: ${xResult.error}` };
 
   const liResult = await typefullyCreateDraft(
-    buildLinkedInPost(thought.title, content, link),
+    buildLinkedInPost(String(thought.title), content, link),
   );
   if (liResult.error) return { error: `LinkedIn: ${liResult.error}` };
 
@@ -317,28 +448,20 @@ export async function publishEverywhere(
 ): Promise<PublishResult | { error: string }> {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const { data: thought, error: fetchError } = await supabase
-    .from("thoughts")
-    .select("title, content, slug, platforms_posted")
-    .eq("id", id)
-    .single();
-
-  if (fetchError || !thought) return { error: "Thought not found" };
+  const thought = await getThoughtById(id);
+  if (!thought) return { error: "Thought not found" };
 
   const link = `${SITE_URL}/thoughts/${thought.slug}`;
-  const content = thought.content || "";
+  const content = String(thought.content || "");
 
-  // Run distribution in parallel, but update DB status separately after
   const [xResult, liResult, bdResult] = await Promise.allSettled([
     typefullyCreateDraft(buildXPost(content, link)),
-    typefullyCreateDraft(buildLinkedInPost(thought.title, content, link)),
-    buttondownCreateEmail(thought.title, content, "draft"),
+    typefullyCreateDraft(
+      buildLinkedInPost(String(thought.title), content, link),
+    ),
+    buttondownCreateEmail(String(thought.title), content, "draft"),
   ]);
 
   const result: PublishResult = {
@@ -374,35 +497,31 @@ export async function publishEverywhere(
     },
   };
 
-  // Only set status to published if at least one distribution succeeded
   const anyDistributionSucceeded =
     result.typefully.x.success ||
     result.typefully.linkedin.success ||
     result.buttondown.success;
 
   if (anyDistributionSucceeded) {
-    const now = new Date().toISOString();
-    const posted: Platform[] = [
-      ...((thought.platforms_posted as Platform[]) || []),
-    ];
+    const ts = now();
+    const existingPosted = parseJsonArray<Platform>(thought.platforms_posted);
+    const posted: Platform[] = [...existingPosted];
     if (result.typefully.x.success && !posted.includes("twitter"))
       posted.push("twitter");
     if (result.typefully.linkedin.success && !posted.includes("linkedin"))
       posted.push("linkedin");
 
-    const { error: statusError } = await supabase
-      .from("thoughts")
-      .update({
-        status: "published" as ContentStatus,
-        published_at: now,
-        updated_at: now,
-        platforms_posted: posted,
-      })
-      .eq("id", id);
+    const db = getDB();
+    const updateResult = await updateThought(id, {
+      status: "published" as ContentStatus,
+      published_at: ts,
+      updated_at: ts,
+      platforms_posted: db ? toJsonArray(posted) : (posted as unknown),
+    });
 
     result.status = {
-      success: !statusError,
-      error: statusError?.message,
+      success: !updateResult.error,
+      error: updateResult.error,
     };
   } else {
     result.status = {
@@ -425,14 +544,15 @@ export async function createAtom(
 ) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(contentId)) return { error: "Invalid content ID" };
 
+  // upsertAtomRecord handles D1/Supabase routing internally
   const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
+  if (!supabase && !getDB()) return { error: "Database not configured" };
 
   try {
-    const data = await upsertAtomRecord(supabase, {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
+    const data = await upsertAtomRecord(supabase!, {
       content_id: contentId,
       platform,
       atom_content: atomContent,
@@ -457,17 +577,17 @@ export async function updateAtom(
 ) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
   const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
+  if (!supabase && !getDB()) return { error: "Database not configured" };
 
   try {
-    const data = await upsertAtomRecord(supabase, {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
+    const data = await upsertAtomRecord(supabase!, {
       id: atomId,
       ...fields,
-      updated_at: new Date().toISOString(),
+      updated_at: now(),
     });
     return { success: true, atom: data };
   } catch (e) {
@@ -478,14 +598,14 @@ export async function updateAtom(
 export async function deleteAtom(atomId: string) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
   const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
+  if (!supabase && !getDB()) return { error: "Database not configured" };
 
   try {
-    await deleteAtomRecord(supabase, atomId);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- checked above
+    await deleteAtomRecord(supabase!, atomId);
     return { success: true };
   } catch (e) {
     return { error: String(e) };
@@ -495,31 +615,18 @@ export async function deleteAtom(atomId: string) {
 export async function pushAtomToTypefully(atomId: string) {
   const authError = await requireAuth();
   if (authError) return authError;
-
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
+  const atom = await getAtomById(atomId);
+  if (!atom) return { error: "Atom not found" };
 
-  const { data: atom, error: fetchError } = await supabase
-    .from("atoms")
-    .select("*")
-    .eq("id", atomId)
-    .single();
-
-  if (fetchError || !atom) return { error: "Atom not found" };
-
-  const result = await typefullyCreateDraft(atom.atom_content);
+  const result = await typefullyCreateDraft(String(atom.atom_content));
   if (result.error) return { error: result.error };
 
-  // Store the Typefully draft ID on the atom
-  await supabase
-    .from("atoms")
-    .update({
-      typefully_draft_id: result.data?.id,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", atomId);
+  await updateAtomFields(atomId, {
+    typefully_draft_id: result.data?.id,
+    updated_at: now(),
+  });
 
   return { success: true, draftId: result.data?.id };
 }
@@ -596,38 +703,208 @@ export async function removeButtondownEmail(emailId: string) {
   return { success: true };
 }
 
-export async function updateThoughtContent(
-  id: string,
-  fields: {
-    title?: string;
-    summary?: string;
-    content?: string;
-    tags?: string[];
-  },
-) {
+// ── Markdown Sync (filesystem, only works in dev/build, not Workers) ──
+
+export async function syncMarkdownThoughts() {
   const authError = await requireAuth();
   if (authError) return authError;
 
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const update: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
+  // Dynamic import: fails gracefully in Workers (no filesystem)
+  let fsModule: {
+    readdir: (p: string) => Promise<string[]>;
+    readFile: (p: string, e: string) => Promise<string>;
   };
-  if (fields.title !== undefined) {
-    if (!fields.title.trim()) return { error: "Title cannot be empty" };
-    update.title = fields.title;
+  let pathModule: {
+    resolve: (...p: string[]) => string;
+    join: (...p: string[]) => string;
+  };
+  try {
+    fsModule = await import("node:fs/promises");
+    pathModule = await import("node:path");
+  } catch {
+    return {
+      error:
+        "Filesystem not available in this runtime. Use the Mac Mini sync or admin UI to manage content.",
+    };
   }
-  if (fields.summary !== undefined) update.summary = fields.summary;
-  if (fields.content !== undefined) update.content = fields.content;
-  if (fields.tags !== undefined) update.tags = fields.tags;
 
-  const { error } = await supabase.from("thoughts").update(update).eq("id", id);
-  if (error) return { error: error.message };
-  return { success: true };
+  const thoughtsDir = pathModule.resolve(process.cwd(), "content", "thoughts");
+  let files: string[];
+  try {
+    files = (await fsModule.readdir(thoughtsDir)).filter(
+      (f: string) => f.endsWith(".md") || f.endsWith(".mdx"),
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to read thoughts directory: ${msg}` };
+  }
+
+  let synced = 0;
+  const syncErrors: string[] = [];
+
+  for (const file of files) {
+    const raw = await fsModule.readFile(
+      pathModule.join(thoughtsDir, file),
+      "utf8",
+    );
+    const { frontmatter, content } = parseMarkdownFrontmatter(raw);
+
+    const slug = String(frontmatter.slug ?? file.replace(/\.mdx?$/, "")).trim();
+    const title = String(frontmatter.title ?? slug.replace(/-/g, " ")).trim();
+    const summary = String(frontmatter.summary ?? "").trim();
+    const date = String(frontmatter.date ?? "").trim();
+    const published = frontmatter.published === true;
+    const tagsRaw = frontmatter.tags;
+    const tags = Array.isArray(tagsRaw)
+      ? tagsRaw.map((t) => String(t))
+      : typeof tagsRaw === "string"
+        ? tagsRaw
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+
+    const status = published ? ("published" as const) : ("draft" as const);
+    const ts = now();
+    const publishedAt =
+      published && date ? new Date(date).toISOString() : undefined;
+
+    try {
+      const db = getDB();
+      if (db) {
+        // D1 path: check if exists, then upsert
+        const existing = await db
+          .prepare("SELECT id FROM thoughts WHERE slug = ?")
+          .bind(slug)
+          .first<{ id: string }>();
+
+        if (existing) {
+          const sets = [
+            "title = ?",
+            "summary = ?",
+            "content = ?",
+            "tags = ?",
+            "published = ?",
+            "status = ?",
+            "updated_at = ?",
+          ];
+          const vals: unknown[] = [
+            title,
+            summary,
+            content,
+            toJsonArray(tags),
+            fromBool(published),
+            status,
+            ts,
+          ];
+          if (publishedAt) {
+            sets.push("published_at = ?");
+            vals.push(publishedAt);
+          }
+          await db
+            .prepare(`UPDATE thoughts SET ${sets.join(", ")} WHERE id = ?`)
+            .bind(...vals, existing.id)
+            .run();
+        } else {
+          await db
+            .prepare(
+              `INSERT INTO thoughts (id, slug, title, summary, content, tags, published, status, views, created_at, updated_at${publishedAt ? ", published_at" : ""})
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?${publishedAt ? ", ?" : ""})`,
+            )
+            .bind(
+              uuid(),
+              slug,
+              title,
+              summary,
+              content,
+              toJsonArray(tags),
+              fromBool(published),
+              status,
+              date ? new Date(date).toISOString() : ts,
+              ts,
+              ...(publishedAt ? [publishedAt] : []),
+            )
+            .run();
+        }
+        synced++;
+      } else {
+        // Supabase fallback
+        const supabase = createServerClient();
+        if (!supabase) {
+          syncErrors.push(`${slug}: no database available`);
+          continue;
+        }
+
+        const { data: existing } = await supabase
+          .from("thoughts")
+          .select("id")
+          .eq("slug", slug)
+          .single();
+
+        if (existing) {
+          const { error: syncErr } = await supabase
+            .from("thoughts")
+            .update({
+              slug,
+              title,
+              summary,
+              content,
+              tags,
+              published,
+              status,
+              updated_at: ts,
+              ...(publishedAt ? { published_at: publishedAt } : {}),
+            })
+            .eq("id", existing.id);
+          if (syncErr) syncErrors.push(`${slug}: ${syncErr.message}`);
+          else synced++;
+        } else {
+          const { error: syncErr } = await supabase.from("thoughts").insert({
+            slug,
+            title,
+            summary,
+            content,
+            tags,
+            published,
+            status,
+            updated_at: ts,
+            created_at: date ? new Date(date).toISOString() : ts,
+            views: 0,
+            ...(publishedAt ? { published_at: publishedAt } : {}),
+          });
+          if (syncErr) syncErrors.push(`${slug}: ${syncErr.message}`);
+          else synced++;
+        }
+      }
+    } catch (err) {
+      syncErrors.push(
+        `${slug}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  if (syncErrors.length > 0) {
+    return {
+      success: true,
+      message: `Synced ${synced} thoughts`,
+      errors: syncErrors,
+    };
+  }
+  return { success: true, message: `Synced ${synced} thoughts` };
 }
+
+// ── Subscribers ──
+
+export async function fetchSubscribers() {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  const result = await buttondownListSubscribers("regular");
+  if (result.error) return { error: result.error };
+  return { success: true, subscribers: result.data, count: result.count };
+}
+
+// ── Helpers ──
 
 function parseMarkdownValue(raw: string): string | string[] | boolean {
   const value = raw.trim();
@@ -644,7 +921,6 @@ function parseMarkdownValue(raw: string): string | string[] | boolean {
 }
 
 function parseMarkdownFrontmatter(rawInput: string) {
-  // Normalize CRLF and strip BOM
   const raw = rawInput.replace(/\r\n/g, "\n").replace(/^\uFEFF/, "");
   if (!raw.startsWith("---\n"))
     return {
@@ -668,115 +944,4 @@ function parseMarkdownFrontmatter(rawInput: string) {
     );
   }
   return { frontmatter, content };
-}
-
-export async function syncMarkdownThoughts() {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
-  const supabase = createServerClient();
-  if (!supabase) return { error: "Supabase not configured" };
-
-  const thoughtsDir = path.resolve(process.cwd(), "content", "thoughts");
-  let files: string[];
-  try {
-    files = (await fs.readdir(thoughtsDir)).filter(
-      (f) => f.endsWith(".md") || f.endsWith(".mdx"),
-    );
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return { error: `Failed to read thoughts directory: ${msg}` };
-  }
-
-  let synced = 0;
-  const syncErrors: string[] = [];
-
-  for (const file of files) {
-    const raw = await fs.readFile(path.join(thoughtsDir, file), "utf8");
-    const { frontmatter, content } = parseMarkdownFrontmatter(raw);
-
-    const slug = String(frontmatter.slug ?? file.replace(/\.mdx?$/, "")).trim();
-    const title = String(frontmatter.title ?? slug.replace(/-/g, " ")).trim();
-    const summary = String(frontmatter.summary ?? "").trim();
-    const date = String(frontmatter.date ?? "").trim();
-    const published = frontmatter.published === true;
-    const tagsRaw = frontmatter.tags;
-    const tags = Array.isArray(tagsRaw)
-      ? tagsRaw.map((t) => String(t))
-      : typeof tagsRaw === "string"
-        ? tagsRaw
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : [];
-
-    const status = published ? ("published" as const) : ("draft" as const);
-    const now = new Date().toISOString();
-    const publishedAt =
-      published && date ? new Date(date).toISOString() : undefined;
-
-    const { data: existing } = await supabase
-      .from("thoughts")
-      .select("id")
-      .eq("slug", slug)
-      .single();
-
-    let syncErr;
-    if (existing) {
-      ({ error: syncErr } = await supabase
-        .from("thoughts")
-        .update({
-          slug,
-          title,
-          summary,
-          content,
-          tags,
-          published,
-          status,
-          updated_at: now,
-          ...(publishedAt ? { published_at: publishedAt } : {}),
-        })
-        .eq("id", existing.id));
-    } else {
-      ({ error: syncErr } = await supabase.from("thoughts").insert({
-        slug,
-        title,
-        summary,
-        content,
-        tags,
-        published,
-        status,
-        updated_at: now,
-        created_at: date ? new Date(date).toISOString() : now,
-        views: 0,
-        ...(publishedAt ? { published_at: publishedAt } : {}),
-      }));
-    }
-
-    if (syncErr) {
-      syncErrors.push(`${slug}: ${syncErr.message}`);
-    } else {
-      synced++;
-    }
-  }
-
-  if (syncErrors.length > 0) {
-    return {
-      success: true,
-      message: `Synced ${synced} thoughts`,
-      errors: syncErrors,
-    };
-  }
-  return { success: true, message: `Synced ${synced} thoughts` };
-}
-
-// ── Subscribers ──
-
-export async function fetchSubscribers() {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
-  const result = await buttondownListSubscribers("regular");
-  if (result.error) return { error: result.error };
-  return { success: true, subscribers: result.data, count: result.count };
 }
