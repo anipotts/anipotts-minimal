@@ -29,24 +29,11 @@ async function slidingWindow(
   const db = getDB();
 
   if (db) {
-    // Ensure table exists (cheap no-op after first call)
-    await db
-      .prepare(
-        `CREATE TABLE IF NOT EXISTS rate_limits (
-        key TEXT NOT NULL,
-        ts INTEGER NOT NULL
-      )`,
-      )
-      .run();
-    await db
-      .prepare(
-        `CREATE INDEX IF NOT EXISTS idx_rate_limits_key_ts ON rate_limits(key, ts)`,
-      )
-      .run();
-
-    // Clean old entries and insert new one in a batch
+    // Clean expired entries for this key and insert new one in a batch
     await db.batch([
-      db.prepare("DELETE FROM rate_limits WHERE ts < ?").bind(windowStart),
+      db
+        .prepare("DELETE FROM rate_limits WHERE key = ? AND ts < ?")
+        .bind(key, windowStart),
       db
         .prepare("INSERT INTO rate_limits (key, ts) VALUES (?, ?)")
         .bind(key, now),
