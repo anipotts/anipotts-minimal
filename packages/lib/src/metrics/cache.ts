@@ -1,17 +1,11 @@
 /**
- * Supabase cache helpers for metrics data.
- * Uses a simple key-value table: metrics_cache(key TEXT PK, value JSONB, updated_at TIMESTAMPTZ)
- *
- * Supabase SQL to create the table:
- *   CREATE TABLE metrics_cache (
- *     key TEXT PRIMARY KEY,
- *     value JSONB NOT NULL,
- *     updated_at TIMESTAMPTZ DEFAULT now()
- *   );
+ * Metrics cache helpers. D1-first with Supabase fallback.
+ * Simple key-value table: metrics_cache(key TEXT PK, value TEXT/JSONB, updated_at TEXT)
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "../logger";
+import { getDB, parseJson, toJson, now } from "../db";
 
 export const CACHE_KEYS = {
   GITHUB_STATS: "github_stats",
@@ -27,6 +21,17 @@ export async function setCacheValue(
   key: string,
   value: unknown,
 ): Promise<void> {
+  const db = getDB();
+  if (db) {
+    await db
+      .prepare(
+        "INSERT OR REPLACE INTO metrics_cache (key, value, updated_at) VALUES (?, ?, ?)",
+      )
+      .bind(key, toJson(value), now())
+      .run();
+    return;
+  }
+
   const { error } = await supabase.from("metrics_cache").upsert(
     {
       key,
@@ -49,6 +54,19 @@ export async function getCacheValue<T>(
   supabase: SupabaseClient,
   key: string,
 ): Promise<{ value: T; updatedAt: string } | null> {
+  const db = getDB();
+  if (db) {
+    const row = await db
+      .prepare("SELECT value, updated_at FROM metrics_cache WHERE key = ?")
+      .bind(key)
+      .first<{ value: string; updated_at: string }>();
+    if (!row) return null;
+    return {
+      value: parseJson<T>(row.value) as T,
+      updatedAt: row.updated_at,
+    };
+  }
+
   const { data, error } = await supabase
     .from("metrics_cache")
     .select("value, updated_at")

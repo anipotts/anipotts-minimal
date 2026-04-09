@@ -43,6 +43,10 @@
       "types": "./dist/typefully/index.d.ts",
       "import": "./dist/typefully/index.js"
     },
+    "./db": {
+      "types": "./dist/db/index.d.ts",
+      "import": "./dist/db/index.js"
+    },
     "./cms": {
       "types": "./dist/cms/index.d.ts",
       "import": "./dist/cms/index.js"
