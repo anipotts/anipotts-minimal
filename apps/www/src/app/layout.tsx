@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { headers } from "next/headers";
 import "./globals.css";
 import {
   PostHogProvider,
@@ -91,15 +90,11 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hdrs = await headers();
-  const host = hdrs.get("host") ?? "";
-  const isAdmin = host.startsWith("admin.");
-
   return (
     <html
       lang="en"
@@ -108,7 +103,7 @@ export default async function RootLayout({
     >
       <head>
         <ThemeScript />
-        {!isAdmin && <PersonSchema />}
+        <PersonSchema />
         <meta
           name="theme-color"
           content="#61abea"
@@ -121,7 +116,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`relative min-h-screen antialiased text-foreground font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden ${isAdmin ? "bg-zinc-950" : "bg-transparent custom-cursor"}`}
+        className="relative min-h-screen antialiased text-foreground font-mono selection:bg-accent-400/20 selection:text-accent-400 overflow-x-hidden bg-transparent custom-cursor"
         suppressHydrationWarning
       >
         <a
@@ -132,41 +127,34 @@ export default async function RootLayout({
         </a>
 
         <ThemeProvider>
-          {isAdmin ? (
-            <PostHogProvider>{children}</PostHogProvider>
-          ) : (
-            <>
-              <TerminalBackground />
-              <PostHogProvider>
-                <div className="relative">
-                  <FerrofluidBorder />
-                  <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
-                    <div className="terminal-window w-full max-w-5xl flex flex-col border border-border md:border-transparent shadow-2xl bg-card md:bg-transparent rounded-lg ring-1 ring-ring md:ring-transparent">
-                      <TerminalHeaderWrapper />
+          <TerminalBackground />
+          <PostHogProvider>
+            <div className="relative">
+              <FerrofluidBorder />
+              <div className="relative z-10 min-h-screen w-full flex justify-center p-2 md:p-8 lg:p-14">
+                <div className="terminal-window w-full max-w-5xl flex flex-col border border-border md:border-transparent shadow-2xl bg-card md:bg-transparent rounded-lg ring-1 ring-ring md:ring-transparent">
+                  <TerminalHeaderWrapper />
 
-                      <div className="relative bg-transparent flex-1">
-                        {/* Grid drawn on ferrofluid canvas on desktop so it gets cut with the bubble */}
-                        <div
-                          className="md:hidden absolute inset-0 pointer-events-none opacity-45"
-                          style={{
-                            backgroundImage:
-                              "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-                            backgroundSize: "24px 24px",
-                          }}
-                        />
+                  <div className="relative bg-transparent flex-1">
+                    <div
+                      className="md:hidden absolute inset-0 pointer-events-none opacity-45"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+                        backgroundSize: "24px 24px",
+                      }}
+                    />
 
-                        <div className="portal-content relative z-10 px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
-                          {children}
-                        </div>
-                      </div>
-
-                      <SiteStatusBar />
+                    <div className="portal-content relative z-10 px-6 md:px-10 min-h-[calc(100svh-9rem)] flex flex-col">
+                      {children}
                     </div>
                   </div>
+
+                  <SiteStatusBar />
                 </div>
-              </PostHogProvider>
-            </>
-          )}
+              </div>
+            </div>
+          </PostHogProvider>
         </ThemeProvider>
       </body>
     </html>

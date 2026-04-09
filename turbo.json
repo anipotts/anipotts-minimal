@@ -28,9 +28,25 @@
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
         "TURNSTILE_SECRET_KEY",
         "RESEND_API_KEY",
-        "GITHUB_TOKEN",
+        "GITHUB_TOKEN"
+      ]
+    },
+    "@anipotts/admin#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "tsconfig.json",
+        "package.json",
+        "next.config.ts",
+        "tailwind.config.mjs"
+      ],
+      "env": [
+        "NODE_ENV",
+        "ADMIN_PASSWORD",
+        "ADMIN_TOTP_SECRET",
         "BUTTONDOWN_API_KEY",
-        "ADMIN_PASSWORD"
+        "TYPEFULLY_API_KEY",
+        "TYPEFULLY_SOCIAL_SET_ID"
       ]
     },
     "dev": {

@@ -39,6 +39,12 @@
       "eslint --fix --no-warn-ignored -c apps/www/eslint.config.mjs",
       "prettier --write"
     ],
+    "apps/admin/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "workers/**/*.ts": [
+      "prettier --write"
+    ],
     "packages/**/*.{ts,tsx}": [
       "prettier --write"
     ],

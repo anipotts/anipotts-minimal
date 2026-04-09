@@ -7,14 +7,6 @@ interface RateLimitResult {
   reset: number;
 }
 
-/**
- * D1-backed sliding window rate limiter.
- * Falls back to in-memory Map when D1 is unavailable (local dev).
- *
- * Table auto-created on first use:
- *   rate_limits(key TEXT, ts INTEGER)
- */
-
 const memoryStore = new Map<string, number[]>();
 
 async function slidingWindow(
@@ -29,7 +21,6 @@ async function slidingWindow(
   const db = getDB();
 
   if (db) {
-    // Clean expired entries for this key and insert new one in a batch
     await db.batch([
       db
         .prepare("DELETE FROM rate_limits WHERE key = ? AND ts < ?")
@@ -73,19 +64,9 @@ async function slidingWindow(
   };
 }
 
-function getRequestIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
-  }
-  return request.headers.get("x-real-ip") ?? "unknown";
-}
-
-/** Contact form / subscribe: 5 requests per 10 minutes */
-export async function checkRateLimit(
-  request: Request,
+/** Admin login: 5 attempts per 15 minutes */
+export async function checkAdminLoginRateLimit(
+  ip: string,
 ): Promise<RateLimitResult> {
-  const ip = getRequestIp(request);
-  return slidingWindow(`contact:${ip}`, 5, 10 * 60 * 1000);
+  return slidingWindow(`admin_login:${ip}`, 5, 15 * 60 * 1000);
 }

@@ -1,13 +1,13 @@
-name = "anipotts-www"
+name = "anipotts-admin"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 account_id = "0f856093bdcd34a7da1bde5ee4385163"
 main = ".open-next/worker.js"
 workers_dev = true
 
-# Custom domains (CF DNS already manages anipotts.com)
+# Custom domain
 [[routes]]
-pattern = "anipotts.com/*"
+pattern = "admin.anipotts.com/*"
 zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
 
 [assets]

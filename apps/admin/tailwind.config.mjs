@@ -1,0 +1,10 @@
+import baseConfig from "@anipotts/config/tailwind";
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  ...baseConfig,
+  content: [
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+};

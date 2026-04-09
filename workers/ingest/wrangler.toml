@@ -1,18 +1,9 @@
-name = "anipotts-www"
+name = "anipotts-ingest"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 account_id = "0f856093bdcd34a7da1bde5ee4385163"
-main = ".open-next/worker.js"
+main = "src/index.ts"
 workers_dev = true
-
-# Custom domains (CF DNS already manages anipotts.com)
-[[routes]]
-pattern = "anipotts.com/*"
-zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
-
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
 
 # D1 database binding
 [[d1_databases]]
