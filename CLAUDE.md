@@ -19,7 +19,7 @@ pnpm update-claude-stats                    # Regenerate /claude stats from sess
 
 ```
 apps/www/           Next.js site + /admin
-packages/lib/       Supabase helpers, CMS fetchers, data
+packages/lib/       D1 database, CMS fetchers, data
 packages/types/     TypeScript interfaces
 packages/ui/        Shared React components (Stagger, FadeIn, ExpandableNav)
 content/thoughts/   Blog posts (auto-synced from ~/Content/pillars/)
@@ -28,9 +28,11 @@ scripts/claude/     Stats generation from ~/.claude session logs
 
 Content flow: `~/Content/pillars/*.md` auto-syncs to `content/thoughts/` via git post-commit hook. Pillars with `status: ready` and a non-empty summary get copied with `published: true`.
 
-## Supabase
+## Cloudflare D1
 
-Tables: `thoughts`, `atoms`, `page_content`, `projects`, `social_links`, `site_settings`
+Database: `anipotts-db` (SQLite at edge via CF Workers)
+Tables: `thoughts`, `atoms`, `page_content`, `projects`, `social_links`, `site_settings`, `rate_limits`
+FTS5 virtual tables for full-text search on thoughts and projects.
 
 Static fallback data lives in `packages/lib/src/data/`. CMS pages use `revalidate = 0`, file-based pages use `revalidate = 3600`.
 
@@ -39,7 +41,6 @@ Static fallback data lives in `packages/lib/src/data/`. CMS pages use `revalidat
 Required in `.env.local`:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 ADMIN_PASSWORD, TYPEFULLY_API_KEY
 BUTTONDOWN_API_KEY
 ```
