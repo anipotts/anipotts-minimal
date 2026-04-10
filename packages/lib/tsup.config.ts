@@ -16,10 +16,12 @@ export default defineConfig({
     "money/index": "src/money/index.ts",
     "code/index": "src/code/index.ts",
     "ops/index": "src/ops/index.ts",
+    "mini/index": "src/mini/index.ts",
+    "mini/stream": "src/mini/stream.ts",
   },
   format: ["esm"],
   dts: true,
   splitting: true,
   sourcemap: false,
-  external: ["posthog-node"],
+  external: ["posthog-node", "react"],
 });

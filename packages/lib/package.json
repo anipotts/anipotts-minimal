@@ -62,6 +62,14 @@
     "./ops": {
       "types": "./dist/ops/index.d.ts",
       "import": "./dist/ops/index.js"
+    },
+    "./mini": {
+      "types": "./dist/mini/index.d.ts",
+      "import": "./dist/mini/index.js"
+    },
+    "./mini/stream": {
+      "types": "./dist/mini/stream.d.ts",
+      "import": "./dist/mini/stream.js"
     }
   },
   "scripts": {
@@ -79,8 +87,17 @@
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },
+  "peerDependencies": {
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/react": "^19",
     "tsup": "^8.0.0",
     "typescript": "^5",
     "vitest": "^1.6.0"

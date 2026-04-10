@@ -5,6 +5,7 @@ import {
   getContentPipelineStats,
   getMercurySnapshot,
 } from "@anipotts/lib/money";
+import { getMiniHealth } from "@anipotts/lib/mini";
 
 export const dynamic = "force-dynamic";
 
@@ -61,22 +62,28 @@ const HEALTH_ENDPOINTS = [
 ];
 
 async function HealthPanel() {
-  const results = await Promise.allSettled(
-    HEALTH_ENDPOINTS.map(async ({ name, url }) => {
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-        if (!res.ok) return { name, ok: false };
-        const data = (await res.json()) as { ok: boolean };
-        return { name, ok: data.ok };
-      } catch {
-        return { name, ok: false };
-      }
-    }),
-  );
+  const [workerResults, miniHealth] = await Promise.all([
+    Promise.allSettled(
+      HEALTH_ENDPOINTS.map(async ({ name, url }) => {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+          if (!res.ok) return { name, ok: false };
+          const data = (await res.json()) as { ok: boolean };
+          return { name, ok: data.ok };
+        } catch {
+          return { name, ok: false };
+        }
+      }),
+    ),
+    getMiniHealth(),
+  ]);
 
-  const apps = results.map((r) =>
+  const apps = workerResults.map((r) =>
     r.status === "fulfilled" ? r.value : { name: "?", ok: false },
   );
+
+  // Add Mini API health
+  apps.push({ name: "mini", ok: miniHealth?.ok ?? false });
 
   return (
     <PanelShell title="Health">

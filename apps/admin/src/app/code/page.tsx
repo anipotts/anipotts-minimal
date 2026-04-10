@@ -1,17 +1,17 @@
 import { Suspense } from "react";
 import {
-  getRepoHealth,
   getDeploymentStatus,
   getNpmStats,
   getGitHubOverview,
 } from "@anipotts/lib/code";
 import type {
-  RepoHealth,
   WorkerDeployment,
   FlyMachine,
   NpmPackageStats,
   GitHubRepoStats,
 } from "@anipotts/lib/code";
+import { getMiniRepos, getMiniSessions } from "@anipotts/lib/mini";
+import LiveCodeSections from "./live-repos";
 
 export const dynamic = "force-dynamic";
 
@@ -52,106 +52,23 @@ function SectionSkeleton({ title }: { title: string }) {
   );
 }
 
-function EmptyState({ message }: { message: string }) {
+function StatCard({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+}) {
   return (
-    <div className="py-6 text-center">
-      <p className="text-[12px] text-zinc-500">{message}</p>
-      <p className="text-[10px] text-zinc-600 mt-1">
-        Awaiting data from Mac Mini
-      </p>
+    <div className="rounded-lg border border-zinc-800/40 bg-zinc-900/30 p-3 text-center">
+      <div className="text-[16px] font-medium text-zinc-200">{value}</div>
+      <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
+        {label}
+      </div>
+      {sub && <div className="text-[10px] text-zinc-600 mt-0.5">{sub}</div>}
     </div>
-  );
-}
-
-function FreshnessIndicator({ updatedAt }: { updatedAt: string | null }) {
-  if (!updatedAt) return null;
-  const age = Date.now() - new Date(updatedAt).getTime();
-  const mins = Math.floor(age / 60000);
-  const color =
-    mins < 10
-      ? "text-zinc-600"
-      : mins < 60
-        ? "text-amber-500/70"
-        : "text-red-400/70";
-  const label = mins < 60 ? `${mins}m ago` : `${Math.floor(mins / 60)}h ago`;
-  return <span className={`text-[10px] ${color}`}>{label}</span>;
-}
-
-// ── Repos Table ──
-
-function RepoRow({ repo }: { repo: RepoHealth }) {
-  const dirtyBadge = repo.dirty ? (
-    <span className="admin-badge bg-amber-950/40 text-amber-400 border border-amber-900/30">
-      dirty
-    </span>
-  ) : null;
-
-  return (
-    <div className="admin-row text-[12px]">
-      <div className="flex-1 min-w-0">
-        <div className="text-zinc-200 font-medium">{repo.repo}</div>
-        {repo.lastCommitMsg && (
-          <div className="text-[10px] text-zinc-600 truncate max-w-[280px]">
-            {repo.lastCommitMsg}
-          </div>
-        )}
-      </div>
-      <div className="w-14 flex justify-center">{dirtyBadge}</div>
-      <div className="w-16 text-right text-zinc-500">
-        {repo.unpushedCount > 0 && (
-          <span className="text-amber-400">{repo.unpushedCount} unpushed</span>
-        )}
-      </div>
-      <div className="w-12 text-right text-zinc-600">
-        {repo.staleBranches > 0 && `${repo.staleBranches} stale`}
-      </div>
-      <div className="w-20 text-right">
-        <FreshnessIndicator updatedAt={repo.lastCommitAt} />
-      </div>
-    </div>
-  );
-}
-
-async function ReposSection() {
-  const repos = await getRepoHealth();
-
-  if (repos.length === 0) {
-    return (
-      <Section title="Repos">
-        <EmptyState message="No repo health data in D1" />
-      </Section>
-    );
-  }
-
-  const dirtyCount = repos.filter((r) => r.dirty).length;
-  const updatedAt = repos[0]?.updatedAt ?? null;
-
-  return (
-    <Section title={`Repos (${repos.length})`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex gap-3">
-          {dirtyCount > 0 && (
-            <span className="text-[11px] text-amber-400">
-              {dirtyCount} dirty
-            </span>
-          )}
-          <span className="text-[11px] text-zinc-500">
-            {repos.reduce((s, r) => s + r.unpushedCount, 0)} total unpushed
-          </span>
-        </div>
-        <FreshnessIndicator updatedAt={updatedAt} />
-      </div>
-      <div className="admin-row text-[10px] text-zinc-500 uppercase tracking-wide border-b border-zinc-800/40">
-        <div className="flex-1">Repo</div>
-        <div className="w-14 text-center">Status</div>
-        <div className="w-16 text-right">Unpushed</div>
-        <div className="w-12 text-right">Stale</div>
-        <div className="w-20 text-right">Last commit</div>
-      </div>
-      {repos.map((r) => (
-        <RepoRow key={r.repo} repo={r} />
-      ))}
-    </Section>
   );
 }
 
@@ -255,26 +172,6 @@ async function DeploymentsSection() {
 }
 
 // ── npm Stats ──
-
-function StatCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-zinc-800/40 bg-zinc-900/30 p-3 text-center">
-      <div className="text-[16px] font-medium text-zinc-200">{value}</div>
-      <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
-        {label}
-      </div>
-      {sub && <div className="text-[10px] text-zinc-600 mt-0.5">{sub}</div>}
-    </div>
-  );
-}
 
 function NpmRow({ pkg }: { pkg: NpmPackageStats }) {
   const fmt = (n: number) =>
@@ -383,6 +280,15 @@ async function GitHubSection() {
 
 // ── Page ──
 
+async function LiveCodeWrapper() {
+  const [repos, sessions] = await Promise.all([
+    getMiniRepos(),
+    getMiniSessions(),
+  ]);
+
+  return <LiveCodeSections initial={{ repos, sessions }} />;
+}
+
 export default function CodePage() {
   return (
     <div className="h-full flex flex-col">
@@ -390,8 +296,15 @@ export default function CodePage() {
         <h2 className="text-[13px] font-medium text-zinc-200">Code</h2>
       </div>
       <div className="flex-1 overflow-y-auto admin-scroll p-6 space-y-4">
-        <Suspense fallback={<SectionSkeleton title="Repos" />}>
-          <ReposSection />
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <SectionSkeleton title="Repos" />
+              <SectionSkeleton title="CC Analytics" />
+            </div>
+          }
+        >
+          <LiveCodeWrapper />
         </Suspense>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -390,7 +390,24 @@ export const codeHealth = sqliteTable("code_health", {
 });
 
 // ---------------------------------------------------------------------------
-// 19. email_queue (failed emails for retry)
+// 19. daily_rollups (historical aggregates from Mini API, hourly push)
+// ---------------------------------------------------------------------------
+
+export const dailyRollups = sqliteTable(
+  "daily_rollups",
+  {
+    id: text("id").primaryKey(),
+    date: text("date").notNull(),
+    hour: integer("hour").notNull(),
+    metric: text("metric").notNull(),
+    value: real("value").notNull(),
+    created_at: text("created_at"),
+  },
+  (table) => [index("idx_rollups_date").on(table.date, table.metric)],
+);
+
+// ---------------------------------------------------------------------------
+// 20. email_queue (failed emails for retry)
 // ---------------------------------------------------------------------------
 
 export const emailQueue = sqliteTable(

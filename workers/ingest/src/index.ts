@@ -3,13 +3,14 @@ interface Env {
   MAC_MINI_INGEST_KEY: string;
 }
 
-type Category = "ops" | "code" | "analytics" | "business";
+type Category = "ops" | "code" | "analytics" | "business" | "rollup";
 
 const CATEGORY_TABLE: Record<Category, string> = {
   ops: "ops_snapshots",
   code: "code_health",
   analytics: "analytics_events",
   business: "business_data",
+  rollup: "daily_rollups",
 };
 
 const VALID_CATEGORIES = new Set<Category>([
@@ -17,6 +18,7 @@ const VALID_CATEGORIES = new Set<Category>([
   "code",
   "analytics",
   "business",
+  "rollup",
 ]);
 
 /** Allowlisted columns per table. Only these can be written via ingest. */
@@ -43,6 +45,7 @@ const TABLE_COLUMNS: Record<Category, Set<string>> = {
     "fetched_at",
   ]),
   business: new Set(["key", "value", "source_file", "updated_at"]),
+  rollup: new Set(["id", "date", "hour", "metric", "value", "created_at"]),
 };
 
 /** Primary key column(s) per table, used to look up existing rows for merging. */
@@ -51,6 +54,7 @@ const PK_COLUMNS: Record<Category, string[]> = {
   code: ["repo"],
   analytics: ["id"],
   business: ["key"],
+  rollup: ["id"],
 };
 
 /** Timestamp column name per table (set automatically on ingest). */
@@ -59,6 +63,7 @@ const TS_COLUMN: Record<Category, string> = {
   code: "updated_at",
   analytics: "fetched_at",
   business: "updated_at",
+  rollup: "created_at",
 };
 
 interface IngestPayload {

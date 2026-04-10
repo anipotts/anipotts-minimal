@@ -4,6 +4,43 @@ interface Env {
   MERCURY_API_TOKEN?: string;
   MERCURY_ACCOUNT_ID_CHECKING?: string;
   MERCURY_ACCOUNT_ID_SAVINGS?: string;
+  MINI_API_KEY?: string;
+  MINI_API_URL?: string;
+}
+
+interface MiniReposResponse {
+  repos: {
+    name: string;
+    dirty: boolean;
+    dirty_files: number;
+    unpushed_count: number;
+    last_commit: { hash?: string; message?: string; date?: string };
+  }[];
+  ts: string;
+}
+
+interface MiniVitalsResponse {
+  hostname: string;
+  cpu_percent: number;
+  mem_percent: number;
+  disk_percent: number;
+  uptime_seconds: number;
+  ts: string;
+}
+
+async function fetchMiniApi<T>(env: Env, path: string): Promise<T | null> {
+  if (!env.MINI_API_KEY) return null;
+  const baseUrl = env.MINI_API_URL || "https://api.mini.anipotts.com";
+  try {
+    const res = await fetch(`${baseUrl}${path}`, {
+      headers: { Authorization: `Bearer ${env.MINI_API_KEY}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 interface BusinessDataRow {
@@ -432,7 +469,7 @@ async function buildAndSendReport(env: Env): Promise<{
   try {
     const weekOf = new Date().toISOString().slice(0, 10);
 
-    // Fetch all data in parallel
+    // Fetch all data in parallel (Mini API + D1 for fallback)
     const [
       mercury,
       dealsRaw,
@@ -440,6 +477,8 @@ async function buildAndSendReport(env: Env): Promise<{
       thoughtRows,
       codeHealthRows,
       opsRows,
+      miniRepos,
+      miniVitals,
     ] = await Promise.all([
       getMercuryData(env),
       getBusinessData(env.DB, "brand-deals"),
@@ -451,6 +490,8 @@ async function buildAndSendReport(env: Env): Promise<{
       env.DB.prepare(
         "SELECT key, category, value, updated_at FROM ops_snapshots WHERE category IN ('crons', 'system') ORDER BY updated_at DESC",
       ).all<OpsSnapshotRow>(),
+      fetchMiniApi<MiniReposResponse>(env, "/code/repos"),
+      fetchMiniApi<MiniVitalsResponse>(env, "/ops/vitals"),
     ]);
 
     // Parse deals
@@ -496,11 +537,15 @@ async function buildAndSendReport(env: Env): Promise<{
       else if (row.status === "published") published++;
     }
 
-    // Parse dirty repos
-    const dirtyRepos = codeHealthRows.results.map((r) => ({
-      repo: r.repo,
-      unpushed: r.unpushed_count ?? 0,
-    }));
+    // Parse dirty repos: prefer Mini API data, fall back to D1
+    const dirtyRepos = miniRepos
+      ? miniRepos.repos
+          .filter((r) => r.dirty || r.unpushed_count > 0)
+          .map((r) => ({ repo: r.name, unpushed: r.unpushed_count }))
+      : codeHealthRows.results.map((r) => ({
+          repo: r.repo,
+          unpushed: r.unpushed_count ?? 0,
+        }));
 
     // Parse failed crons from ops_snapshots
     const failedCrons: { name: string; exitCode: number }[] = [];
@@ -522,11 +567,12 @@ async function buildAndSendReport(env: Env): Promise<{
       }
     }
 
-    // Mini last seen: use the most recent system-category row
-    const systemRow = opsRows.results.find(
-      (r) => r.category === "system" && r.key === "system",
-    );
-    const miniLastSeen = systemRow?.updated_at ?? null;
+    // Mini status: prefer live vitals from Mini API, fall back to D1
+    const miniLastSeen = miniVitals
+      ? miniVitals.ts
+      : (opsRows.results.find(
+          (r) => r.category === "system" && r.key === "system",
+        )?.updated_at ?? null);
 
     const subject = `Weekly Report: ${weekOf}`;
     const html = generateEmailHtml({

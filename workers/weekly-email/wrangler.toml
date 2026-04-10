@@ -14,4 +14,4 @@ database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
 # Sunday 9am EDT = 13:00 UTC (during DST, arrives 8am EST in winter)
 # DST covers ~8 months of the year, so optimizing for EDT
 [triggers]
-crons = ["0 13 * * 0"]
+crons = ["0 13 * * SUN"]
