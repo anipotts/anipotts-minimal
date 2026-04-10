@@ -42,11 +42,11 @@ cpu_percent=$(top -l 1 -n 0 2>/dev/null | awk '/CPU usage/{gsub(/%/,""); print $
 # Memory via vm_stat
 page_size=$(sysctl -n hw.pagesize 2>/dev/null || echo 4096)
 vm_output=$(vm_stat 2>/dev/null || echo "")
-pages_active=$(echo "$vm_output" | awk '/Pages active/{gsub(/\./,""); print $3}')
+pages_active=$(echo "$vm_output" | awk '/Pages active/{gsub(/[^0-9]/,""); print}' | head -1)
 pages_active="${pages_active:-0}"
-pages_wired=$(echo "$vm_output" | awk '/Pages wired/{gsub(/\./,""); print $3}')
+pages_wired=$(echo "$vm_output" | awk '/Pages wired down/{gsub(/[^0-9]/,""); print}' | head -1)
 pages_wired="${pages_wired:-0}"
-pages_compressed=$(echo "$vm_output" | awk '/Pages occupied by compressor/{gsub(/\./,""); print $3}')
+pages_compressed=$(echo "$vm_output" | awk '/Pages occupied by compressor/{gsub(/[^0-9]/,""); print}' | head -1)
 pages_compressed="${pages_compressed:-0}"
 total_mem_bytes=$(sysctl -n hw.memsize 2>/dev/null || echo "1")
 used_pages=$((pages_active + pages_wired + pages_compressed))

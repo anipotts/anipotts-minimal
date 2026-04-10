@@ -55,8 +55,8 @@ for repo_dir in "$REPOS_DIR"/*/; do
   done
   if [[ -n "$default_branch" ]]; then
     stale=$(git -C "$repo_dir" branch --merged "$default_branch" 2>/dev/null \
-      | grep -v "^\*" \
-      | grep -vE "^\s*(main|master)$" \
+      | { grep -v "^\*" || true; } \
+      | { grep -vE "^\s*(main|master)$" || true; } \
       | wc -l | tr -d ' ')
   fi
 
