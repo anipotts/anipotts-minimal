@@ -45,6 +45,14 @@ const TABLE_COLUMNS: Record<Category, Set<string>> = {
   business: new Set(["key", "value", "source_file", "updated_at"]),
 };
 
+/** Primary key column(s) per table, used to look up existing rows for merging. */
+const PK_COLUMNS: Record<Category, string[]> = {
+  ops: ["key", "category"],
+  code: ["repo"],
+  analytics: ["id"],
+  business: ["key"],
+};
+
 /** Timestamp column name per table (set automatically on ingest). */
 const TS_COLUMN: Record<Category, string> = {
   ops: "updated_at",
@@ -65,10 +73,58 @@ function jsonResponse(body: Record<string, unknown>, status = 200): Response {
   });
 }
 
+/**
+ * Fetch the existing row from D1 so we can merge incoming fields over it,
+ * preventing INSERT OR REPLACE from NULL-ing omitted columns.
+ */
+async function fetchExistingRow(
+  db: D1Database,
+  table: string,
+  pkColumns: string[],
+  incomingRecord: Record<string, unknown>,
+): Promise<Record<string, unknown> | null> {
+  const whereClauses = pkColumns.map((col) => `${col} = ?`);
+  const whereValues = pkColumns.map((col) => incomingRecord[col]);
+
+  // If any PK value is missing, can't look up existing row
+  if (whereValues.some((v) => v === undefined || v === null)) return null;
+
+  const sql = `SELECT * FROM ${table} WHERE ${whereClauses.join(" AND ")} LIMIT 1`;
+  const result = await db
+    .prepare(sql)
+    .bind(...whereValues)
+    .first();
+  return result as Record<string, unknown> | null;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204 });
+    }
+
+    // Health check endpoint
+    if (request.method === "GET") {
+      let d1Status: "connected" | "error" = "error";
+      let tablesOk = false;
+      try {
+        const result = await env.DB.prepare(
+          "SELECT COUNT(*) as cnt FROM thoughts LIMIT 1",
+        ).first<{ cnt: number }>();
+        if (result && typeof result.cnt === "number") {
+          d1Status = "connected";
+          tablesOk = true;
+        }
+      } catch {
+        d1Status = "error";
+      }
+      return jsonResponse({
+        app: "ingest",
+        ok: d1Status === "connected",
+        d1: d1Status,
+        tables_ok: tablesOk,
+        ts: new Date().toISOString(),
+      });
     }
 
     if (request.method !== "POST") {
@@ -106,6 +162,7 @@ export default {
     const category = payload.category;
     const table = CATEGORY_TABLE[category];
     const allowedColumns = TABLE_COLUMNS[category];
+    const pkColumns = PK_COLUMNS[category];
     const tsColumn = TS_COLUMN[category];
     const rows = Array.isArray(payload.data) ? payload.data : [payload.data];
 
@@ -117,29 +174,50 @@ export default {
     let rowsWritten = 0;
 
     try {
-      const statements = rows.map((row) => {
+      const statements = [];
+
+      for (const row of rows) {
         // Filter to allowlisted columns only, add timestamp
-        const record: Record<string, unknown> = {};
+        const incoming: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(row)) {
           if (allowedColumns.has(k)) {
-            record[k] =
+            incoming[k] =
               typeof v === "object" && v !== null ? JSON.stringify(v) : v;
           }
         }
-        record[tsColumn] = ts;
+        incoming[tsColumn] = ts;
 
-        const keys = Object.keys(record);
-        if (keys.length === 0) {
+        if (Object.keys(incoming).length === 0) {
           throw new Error("No valid columns in row");
         }
 
+        // Merge: fetch existing row so omitted columns keep their values
+        const existing = await fetchExistingRow(
+          env.DB,
+          table,
+          pkColumns,
+          incoming,
+        );
+        const merged = existing ? { ...existing, ...incoming } : incoming;
+
+        // Only write allowlisted columns + timestamp
+        const record: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(merged)) {
+          if (allowedColumns.has(k)) {
+            record[k] = v;
+          }
+        }
+
+        const keys = Object.keys(record);
         const placeholders = keys.map(() => "?").join(", ");
         const values = Object.values(record);
 
-        return env.DB.prepare(
-          `INSERT OR REPLACE INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
-        ).bind(...values);
-      });
+        statements.push(
+          env.DB.prepare(
+            `INSERT OR REPLACE INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
+          ).bind(...values),
+        );
+      }
 
       await env.DB.batch(statements);
       rowsWritten = rows.length;

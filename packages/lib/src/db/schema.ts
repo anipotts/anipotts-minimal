@@ -388,3 +388,23 @@ export const codeHealth = sqliteTable("code_health", {
   deployment_status: text("deployment_status"),
   updated_at: text("updated_at"),
 });
+
+// ---------------------------------------------------------------------------
+// 19. email_queue (failed emails for retry)
+// ---------------------------------------------------------------------------
+
+export const emailQueue = sqliteTable(
+  "email_queue",
+  {
+    id: text("id").primaryKey(),
+    subject: text("subject").notNull(),
+    html: text("html").notNull(),
+    to_address: text("to_address").notNull(),
+    status: text("status").default("pending"),
+    attempts: integer("attempts").default(0),
+    last_error: text("last_error"),
+    created_at: text("created_at"),
+    updated_at: text("updated_at"),
+  },
+  (table) => [index("idx_email_queue_status").on(table.status)],
+);

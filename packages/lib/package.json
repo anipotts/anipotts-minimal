@@ -50,6 +50,10 @@
     "./validation": {
       "types": "./dist/validation/index.d.ts",
       "import": "./dist/validation/index.js"
+    },
+    "./money": {
+      "types": "./dist/money/index.d.ts",
+      "import": "./dist/money/index.js"
     }
   },
   "scripts": {

@@ -1,0 +1,17 @@
+name = "anipotts-weekly-email"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = "src/index.ts"
+workers_dev = true
+
+# D1 database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "anipotts-db"
+database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
+# Sunday 9am EDT = 13:00 UTC (during DST, arrives 8am EST in winter)
+# DST covers ~8 months of the year, so optimizing for EDT
+[triggers]
+crons = ["0 13 * * 0"]
