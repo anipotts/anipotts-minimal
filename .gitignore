@@ -67,3 +67,4 @@ output.md
 sample_event.md
 task_*.md
 qaqc-scaling.md
+scripts/d1-migration-data.sql
