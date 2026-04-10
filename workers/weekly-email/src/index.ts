@@ -15,6 +15,20 @@ interface ThoughtRow {
   status: string;
 }
 
+interface CodeHealthRow {
+  repo: string;
+  dirty: number;
+  unpushed_count: number;
+  updated_at: string | null;
+}
+
+interface OpsSnapshotRow {
+  key: string;
+  category: string;
+  value: string;
+  updated_at: string | null;
+}
+
 interface MercuryAccount {
   currentBalance: number;
   availableBalance: number;
@@ -151,6 +165,27 @@ async function getMercuryData(env: Env): Promise<{
   return { checking, savings, recentTx };
 }
 
+function esc(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function fmtDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
 function fmtUsd(n: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -174,9 +209,21 @@ function generateEmailHtml(data: {
     isOverdue: boolean;
   }[];
   content: { drafts: number; ready: number; published: number };
+  dirtyRepos: { repo: string; unpushed: number }[];
+  failedCrons: { name: string; exitCode: number }[];
+  miniLastSeen: string | null;
   weekOf: string;
 }): string {
-  const { mercury, deals, deadlines, content, weekOf } = data;
+  const {
+    mercury,
+    deals,
+    deadlines,
+    content,
+    dirtyRepos,
+    failedCrons,
+    miniLastSeen,
+    weekOf,
+  } = data;
 
   const activeDeals = deals.filter(
     (d) => d.status === "active" || d.status === "negotiating",
@@ -217,19 +264,19 @@ function generateEmailHtml(data: {
       ${mercury.checking !== null ? `<div class="row"><span class="label">Checking</span><span class="value">${fmtUsd(mercury.checking)}</span></div>` : ""}
       ${mercury.savings !== null ? `<div class="row"><span class="label">Savings</span><span class="value">${fmtUsd(mercury.savings)}</span></div>` : ""}
       ${mercury.checking === null && mercury.savings === null ? '<div class="muted">Mercury not configured</div>' : ""}
-      ${mercury.recentTx.length > 0 ? `<hr>${mercury.recentTx.map((tx) => `<div class="row"><span class="label">${tx.name}</span><span class="${tx.kind === "credit" ? "green" : "value"}">${tx.kind === "credit" ? "+" : "-"}${fmtUsd(Math.abs(tx.amount))}</span></div>`).join("")}` : ""}
+      ${mercury.recentTx.length > 0 ? `<hr>${mercury.recentTx.map((tx) => `<div class="row"><span class="label">${esc(tx.name)}</span><span class="${tx.kind === "credit" ? "green" : "value"}">${tx.kind === "credit" ? "+" : "-"}${fmtUsd(Math.abs(tx.amount))}</span></div>`).join("")}` : ""}
     </div>
 
     <h2>Deals (${activeDeals.length} active)</h2>
     <div class="section">
-      ${deals.length > 0 ? deals.map((d) => `<div class="row"><span class="label">${d.company}</span><span class="value">${d.status} · ${d.payment_status}</span></div>`).join("") : '<div class="muted">No deals in database</div>'}
+      ${deals.length > 0 ? deals.map((d) => `<div class="row"><span class="label">${esc(d.company)}</span><span class="value">${esc(d.status)} · ${esc(d.payment_status)}</span></div>`).join("") : '<div class="muted">No deals in database</div>'}
     </div>
 
-    ${overdueDeadlines.length > 0 ? `<h2 class="red">Overdue (${overdueDeadlines.length})</h2><div class="section">${overdueDeadlines.map((d) => `<div class="row"><span class="red">${d.description}</span><span class="red">${d.date}</span></div>`).join("")}</div>` : ""}
+    ${overdueDeadlines.length > 0 ? `<h2 class="red">Overdue (${overdueDeadlines.length})</h2><div class="section">${overdueDeadlines.map((d) => `<div class="row"><span class="red">${esc(d.description)}</span><span class="red">${esc(d.date)}</span></div>`).join("")}</div>` : ""}
 
     <h2>Upcoming Deadlines</h2>
     <div class="section">
-      ${upcomingDeadlines.length > 0 ? upcomingDeadlines.map((d) => `<div class="row"><span class="label">${d.description}</span><span class="${d.daysUntil <= 3 ? "amber" : "value"}">${d.date} (${d.daysUntil}d)</span></div>`).join("") : '<div class="muted">Nothing in the next 14 days</div>'}
+      ${upcomingDeadlines.length > 0 ? upcomingDeadlines.map((d) => `<div class="row"><span class="label">${esc(d.description)}</span><span class="${d.daysUntil <= 3 ? "amber" : "value"}">${esc(d.date)} (${d.daysUntil}d)</span></div>`).join("") : '<div class="muted">Nothing in the next 14 days</div>'}
     </div>
 
     <h2>Content Pipeline</h2>
@@ -237,6 +284,15 @@ function generateEmailHtml(data: {
       <div class="row"><span class="label">Drafts</span><span class="value">${content.drafts}</span></div>
       <div class="row"><span class="label">Ready</span><span class="value">${content.ready}</span></div>
       <div class="row"><span class="label">Published</span><span class="green">${content.published}</span></div>
+    </div>
+
+    ${dirtyRepos.length > 0 ? `<h2 class="amber">Dirty Repos (${dirtyRepos.length})</h2><div class="section">${dirtyRepos.map((r) => `<div class="row"><span class="label">${esc(r.repo)}</span><span class="amber">${r.unpushed > 0 ? `${r.unpushed} unpushed` : "uncommitted changes"}</span></div>`).join("")}</div>` : ""}
+
+    ${failedCrons.length > 0 ? `<h2 class="red">Failed Crons (${failedCrons.length})</h2><div class="section">${failedCrons.map((c) => `<div class="row"><span class="label">${esc(c.name)}</span><span class="red">exit ${c.exitCode}</span></div>`).join("")}</div>` : ""}
+
+    <h2>Mac Mini</h2>
+    <div class="section">
+      <div class="row"><span class="label">Last seen</span><span class="${miniLastSeen ? "value" : "red"}">${miniLastSeen ? fmtDate(miniLastSeen) : "No data"}</span></div>
     </div>
 
     <div class="footer">Sent by anipotts-weekly-email Worker</div>
@@ -359,9 +415,7 @@ async function retryQueuedEmails(env: Env): Promise<number> {
   return sent;
 }
 
-async function buildAndSendReport(
-  env: Env,
-): Promise<{
+async function buildAndSendReport(env: Env): Promise<{
   sent: boolean;
   queued: boolean;
   retried: number;
@@ -379,11 +433,24 @@ async function buildAndSendReport(
     const weekOf = new Date().toISOString().slice(0, 10);
 
     // Fetch all data in parallel
-    const [mercury, dealsRaw, deadlinesRaw, thoughtRows] = await Promise.all([
+    const [
+      mercury,
+      dealsRaw,
+      deadlinesRaw,
+      thoughtRows,
+      codeHealthRows,
+      opsRows,
+    ] = await Promise.all([
       getMercuryData(env),
       getBusinessData(env.DB, "brand-deals"),
       getBusinessData(env.DB, "deadlines"),
       env.DB.prepare("SELECT status FROM thoughts").all<ThoughtRow>(),
+      env.DB.prepare(
+        "SELECT repo, dirty, unpushed_count, updated_at FROM code_health WHERE dirty = 1 OR unpushed_count > 0",
+      ).all<CodeHealthRow>(),
+      env.DB.prepare(
+        "SELECT key, category, value, updated_at FROM ops_snapshots WHERE category IN ('crons', 'system') ORDER BY updated_at DESC",
+      ).all<OpsSnapshotRow>(),
     ]);
 
     // Parse deals
@@ -429,12 +496,47 @@ async function buildAndSendReport(
       else if (row.status === "published") published++;
     }
 
+    // Parse dirty repos
+    const dirtyRepos = codeHealthRows.results.map((r) => ({
+      repo: r.repo,
+      unpushed: r.unpushed_count ?? 0,
+    }));
+
+    // Parse failed crons from ops_snapshots
+    const failedCrons: { name: string; exitCode: number }[] = [];
+    for (const row of opsRows.results) {
+      if (row.category !== "crons") continue;
+      try {
+        const parsed = JSON.parse(row.value);
+        const items = Array.isArray(parsed) ? parsed : [parsed];
+        for (const item of items) {
+          if (item.exit_code != null && item.exit_code !== 0) {
+            failedCrons.push({
+              name: String(item.name ?? row.key),
+              exitCode: item.exit_code,
+            });
+          }
+        }
+      } catch {
+        // skip unparseable
+      }
+    }
+
+    // Mini last seen: use the most recent system-category row
+    const systemRow = opsRows.results.find(
+      (r) => r.category === "system" && r.key === "system",
+    );
+    const miniLastSeen = systemRow?.updated_at ?? null;
+
     const subject = `Weekly Report: ${weekOf}`;
     const html = generateEmailHtml({
       mercury,
       deals,
       deadlines: rawDeadlines,
       content: { drafts, ready, published },
+      dirtyRepos,
+      failedCrons,
+      miniLastSeen,
       weekOf,
     });
 

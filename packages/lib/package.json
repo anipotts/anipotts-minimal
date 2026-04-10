@@ -54,6 +54,14 @@
     "./money": {
       "types": "./dist/money/index.d.ts",
       "import": "./dist/money/index.js"
+    },
+    "./code": {
+      "types": "./dist/code/index.d.ts",
+      "import": "./dist/code/index.js"
+    },
+    "./ops": {
+      "types": "./dist/ops/index.d.ts",
+      "import": "./dist/ops/index.js"
     }
   },
   "scripts": {

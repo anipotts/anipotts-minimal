@@ -14,6 +14,8 @@ export default defineConfig({
     "cms/index": "src/cms/index.ts",
     "validation/index": "src/validation/index.ts",
     "money/index": "src/money/index.ts",
+    "code/index": "src/code/index.ts",
+    "ops/index": "src/ops/index.ts",
   },
   format: ["esm"],
   dts: true,
