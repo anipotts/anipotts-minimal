@@ -18,8 +18,10 @@ pnpm update-claude-stats                    # Regenerate /claude stats from sess
 ## Architecture
 
 ```
-apps/www/           Next.js site + /admin
-packages/lib/       D1 database, CMS fetchers, data
+apps/www/           Public site (anipotts.com) -> CF Worker
+apps/admin/         Admin dashboard (admin.anipotts.com) -> CF Worker, CF Access protected
+workers/ingest/     Data ingest endpoint -> CF Worker (API key auth)
+packages/lib/       Shared D1 client (Drizzle ORM), CMS fetchers, query functions
 packages/types/     TypeScript interfaces
 packages/ui/        Shared React components (Stagger, FadeIn, ExpandableNav)
 content/thoughts/   Blog posts (auto-synced from ~/Content/pillars/)

@@ -33,11 +33,11 @@ export default async function RootLayout({
   const isAuthenticated = token && secret && verifySessionToken(token, secret);
 
   return (
-    <html lang="en" className={jetbrainsMono.variable}>
+    <html lang="en" className={`dark ${jetbrainsMono.variable}`}>
       <head>
-        <meta name="theme-color" content="#09090b" />
+        <meta name="theme-color" content="#020308" />
       </head>
-      <body className="bg-zinc-950 text-zinc-100 font-mono antialiased">
+      <body className="font-mono antialiased">
         {!isAuthenticated ? (
           <div className="min-h-screen flex items-center justify-center p-4">
             <LoginForm />
