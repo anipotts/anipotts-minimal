@@ -17,8 +17,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate:
+    name: Build, lint, typecheck, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo build
+
+      - name: Lint
+        run: pnpm turbo lint
+
+      - name: Typecheck
+        run: pnpm turbo typecheck
+
+      - name: Test
+        run: pnpm turbo test
+
   deploy-www:
     name: Deploy www
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +91,7 @@ jobs:
 
   deploy-admin:
     name: Deploy admin
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -97,6 +131,7 @@ jobs:
 
   deploy-ingest:
     name: Deploy ingest worker
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
