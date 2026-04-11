@@ -113,6 +113,7 @@ const spokes = [
 
 const contentSubTabs = [
   { label: "Pipeline", href: "/content" },
+  { label: "Analytics", href: "/content/analytics" },
   { label: "Record", href: "/record" },
   { label: "Subscribers", href: "/subscribers" },
   { label: "New", href: "/quick" },
@@ -157,7 +158,9 @@ export default function AdminNav() {
             {contentSubTabs.map((tab) => {
               const isSubActive =
                 tab.href === "/content"
-                  ? pathname === "/content" || pathname.startsWith("/content/")
+                  ? pathname === "/content" ||
+                    (pathname.startsWith("/content/") &&
+                      !pathname.startsWith("/content/analytics"))
                   : pathname.startsWith(tab.href);
               return (
                 <Link
