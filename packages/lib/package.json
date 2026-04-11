@@ -70,6 +70,10 @@
     "./mini/stream": {
       "types": "./dist/mini/stream.d.ts",
       "import": "./dist/mini/stream.js"
+    },
+    "./analytics": {
+      "types": "./dist/analytics/index.d.ts",
+      "import": "./dist/analytics/index.js"
     }
   },
   "scripts": {
