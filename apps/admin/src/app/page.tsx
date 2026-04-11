@@ -5,7 +5,12 @@ import {
   getContentPipelineStats,
   getMercurySnapshot,
 } from "@anipotts/lib/money";
-import { getMiniHealth } from "@anipotts/lib/mini";
+import {
+  getMiniHealth,
+  getMiniRudy,
+  getMiniVaultStats,
+  getMiniSessions,
+} from "@anipotts/lib/mini";
 
 export const dynamic = "force-dynamic";
 
@@ -268,6 +273,79 @@ async function ContentPanel() {
   );
 }
 
+async function RudyPanel() {
+  const [rudy, vault] = await Promise.all([getMiniRudy(), getMiniVaultStats()]);
+
+  const available = rudy?.available ?? false;
+
+  if (!available) {
+    return (
+      <PanelShell title="Rudy">
+        <p className="text-[12px] text-zinc-600">Mini offline</p>
+      </PanelShell>
+    );
+  }
+
+  const stats = [
+    { label: "Entities", value: rudy?.entities ?? 0 },
+    { label: "Events", value: rudy?.events ?? 0 },
+    { label: "Vault notes", value: vault?.total_notes ?? 0 },
+    { label: "DB size", value: `${rudy?.db_size_mb ?? 0} MB` },
+    { label: "Changes (24h)", value: vault?.recent_changes_24h ?? 0 },
+  ];
+
+  return (
+    <PanelShell title="Rudy">
+      <div className="space-y-1.5">
+        {stats.map((s) => (
+          <div key={s.label} className="flex justify-between items-baseline">
+            <span className="text-[12px] text-zinc-500">{s.label}</span>
+            <span className="text-[13px] font-mono text-[#61AEBA]">
+              {s.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </PanelShell>
+  );
+}
+
+async function SessionsPanel() {
+  const sessions = await getMiniSessions();
+
+  const available = sessions?.available ?? false;
+
+  if (!available) {
+    const reason = sessions?.reason ?? "mine.db unavailable";
+    return (
+      <PanelShell title="CC Sessions">
+        <p className="text-[12px] text-zinc-600">{reason}</p>
+      </PanelShell>
+    );
+  }
+
+  const today = sessions?.today;
+
+  return (
+    <PanelShell title="CC Sessions">
+      <div className="space-y-1.5">
+        <div className="flex justify-between items-baseline">
+          <span className="text-[12px] text-zinc-500">Today</span>
+          <span className="text-[13px] font-mono text-[#61AEBA]">
+            {today?.sessions ?? 0} sessions
+          </span>
+        </div>
+        <div className="flex justify-between items-baseline">
+          <span className="text-[12px] text-zinc-500">Tool calls</span>
+          <span className="text-[13px] font-mono text-[#61AEBA]">
+            {today?.tool_calls ?? 0}
+          </span>
+        </div>
+      </div>
+    </PanelShell>
+  );
+}
+
 export default function DashboardPage() {
   return (
     <div className="h-full flex flex-col">
@@ -290,6 +368,12 @@ export default function DashboardPage() {
           </Suspense>
           <Suspense fallback={<PanelSkeleton title="Content" />}>
             <ContentPanel />
+          </Suspense>
+          <Suspense fallback={<PanelSkeleton title="Rudy" />}>
+            <RudyPanel />
+          </Suspense>
+          <Suspense fallback={<PanelSkeleton title="CC Sessions" />}>
+            <SessionsPanel />
           </Suspense>
         </div>
       </div>
