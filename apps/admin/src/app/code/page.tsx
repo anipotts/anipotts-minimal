@@ -3,12 +3,16 @@ import {
   getDeploymentStatus,
   getNpmStats,
   getGitHubOverview,
+  getClaudeMonHealth,
+  getNpmVersions,
 } from "@anipotts/lib/code";
 import type {
   WorkerDeployment,
   FlyMachine,
   NpmPackageStats,
   GitHubRepoStats,
+  ClaudeMonHealth,
+  NpmVersionInfo,
 } from "@anipotts/lib/code";
 import { getMiniRepos, getMiniSessions } from "@anipotts/lib/mini";
 import LiveCodeSections from "./live-repos";
@@ -278,6 +282,99 @@ async function GitHubSection() {
   );
 }
 
+// ── ClaudeMon ──
+
+function ClaudeMonStatus({ health }: { health: ClaudeMonHealth }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={`inline-block w-2 h-2 rounded-full ${health.up ? "bg-emerald-400" : "bg-zinc-600"}`}
+        role="img"
+        aria-label={health.up ? "up" : "down"}
+      />
+      <span className="text-[12px] text-zinc-300">
+        {health.up ? "ClaudeMon: up" : "ClaudeMon: check manually"}
+      </span>
+      {health.error && (
+        <span className="text-[10px] text-zinc-600">{health.error}</span>
+      )}
+    </div>
+  );
+}
+
+async function ClaudeMonSection() {
+  const health = await getClaudeMonHealth();
+  return (
+    <Section title="ClaudeMon">
+      <ClaudeMonStatus health={health} />
+      <p className="text-[10px] text-zinc-600 mt-2">
+        Checked{" "}
+        {new Date(health.fetchedAt).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        })}
+      </p>
+    </Section>
+  );
+}
+
+// ── Package Versions ──
+
+function VersionRow({ pkg }: { pkg: NpmVersionInfo }) {
+  return (
+    <div className="flex items-center gap-3 py-1.5 px-2 rounded hover:bg-zinc-800/20">
+      <span className="text-[12px] text-zinc-300 font-medium font-mono flex-1">
+        {pkg.name}
+      </span>
+      <span className="text-[10px] text-zinc-500 font-mono">
+        {pkg.current ?? "?"}
+      </span>
+      <span className="text-[10px] text-zinc-600 px-1">vs</span>
+      <span className="text-[10px] text-zinc-500 font-mono">
+        {pkg.latest ?? "?"}
+      </span>
+      {pkg.error ? (
+        <span className="admin-badge bg-zinc-800/40 text-zinc-500 border border-zinc-700/30">
+          error
+        </span>
+      ) : pkg.updateAvailable ? (
+        <span className="admin-badge bg-amber-950/40 text-amber-400 border border-amber-900/30">
+          update available
+        </span>
+      ) : (
+        <span className="admin-badge bg-emerald-950/40 text-emerald-400 border border-emerald-900/30">
+          up to date
+        </span>
+      )}
+    </div>
+  );
+}
+
+async function PackageVersionsSection() {
+  const versions = await getNpmVersions();
+  return (
+    <Section title="Package Versions">
+      <div className="space-y-px">
+        {versions.map((pkg) => (
+          <VersionRow key={pkg.name} pkg={pkg} />
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+// ── Vercel ──
+
+function VercelPlaceholder() {
+  return (
+    <Section title="Vercel">
+      <div className="py-6 text-center">
+        <p className="text-[12px] text-zinc-600">Connect Vercel</p>
+      </div>
+    </Section>
+  );
+}
+
 // ── Page ──
 
 async function LiveCodeWrapper() {
@@ -316,9 +413,21 @@ export default function CodePage() {
           </Suspense>
         </div>
 
-        <Suspense fallback={<SectionSkeleton title="GitHub" />}>
-          <GitHubSection />
-        </Suspense>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Suspense fallback={<SectionSkeleton title="ClaudeMon" />}>
+            <ClaudeMonSection />
+          </Suspense>
+          <Suspense fallback={<SectionSkeleton title="Package Versions" />}>
+            <PackageVersionsSection />
+          </Suspense>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Suspense fallback={<SectionSkeleton title="GitHub" />}>
+            <GitHubSection />
+          </Suspense>
+          <VercelPlaceholder />
+        </div>
       </div>
     </div>
   );

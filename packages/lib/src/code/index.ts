@@ -3,6 +3,8 @@ export {
   getDeploymentStatus,
   getNpmStats,
   getGitHubOverview,
+  getClaudeMonHealth,
+  getNpmVersions,
 } from "./queries";
 export type {
   RepoHealth,
@@ -12,4 +14,6 @@ export type {
   NpmPackageStats,
   GitHubRepoStats,
   GitHubOverview,
+  ClaudeMonHealth,
+  NpmVersionInfo,
 } from "./types";

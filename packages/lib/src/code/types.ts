@@ -53,3 +53,17 @@ export interface GitHubOverview {
   totalOpenPRs: number;
   fetchedAt: string;
 }
+
+export interface ClaudeMonHealth {
+  up: boolean;
+  error?: string;
+  fetchedAt: string;
+}
+
+export interface NpmVersionInfo {
+  name: string;
+  current: string | null;
+  latest: string | null;
+  updateAvailable: boolean;
+  error?: string;
+}
