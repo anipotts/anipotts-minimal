@@ -51,7 +51,7 @@ export interface FooterContent {
 }
 
 // ---------------------------------------------------------------------------
-// Projects table row (Supabase)
+// Projects table row
 // ---------------------------------------------------------------------------
 
 export interface ProjectRow {
@@ -80,7 +80,7 @@ export interface ProjectRow {
 }
 
 // ---------------------------------------------------------------------------
-// Social links table row (Supabase)
+// Social links table row
 // ---------------------------------------------------------------------------
 
 export interface SocialLinkRow {

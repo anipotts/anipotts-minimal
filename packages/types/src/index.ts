@@ -57,5 +57,5 @@ export type {
 } from "./cms";
 export { projectRowToProject } from "./cms";
 
-// Database types (typed Supabase client)
+// Database types
 export type { Database } from "./database";

@@ -1,7 +1,7 @@
 /**
  * WakaTime API helpers for coding metrics.
  * Uses the v1 API with API key authentication.
- * Free tier: 14-day history — we cache in Supabase to preserve longer history.
+ * Free tier: 14-day history — we cache in D1 to preserve longer history.
  */
 
 import { LANGUAGE_COLORS, getLanguageColor } from "../utils/languages";

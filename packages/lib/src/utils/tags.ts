@@ -1,5 +1,5 @@
 /**
- * Normalize tags from Supabase (can be string, string[], or null) into a clean array.
+ * Normalize tags from D1 (can be string, string[], or null) into a clean array.
  */
 export function parseTags(tags: string | string[] | null): string[] {
   if (!tags) return [];

@@ -28,7 +28,7 @@ jobs:
             2. Performance regressions (unnecessary re-renders, N+1 queries, missing memoization)
             3. Accessibility violations (missing labels, keyboard nav, ARIA)
             4. Anti-corny guardrails (no em dashes, no triplet lists, no fake vulnerability)
-            5. Type safety (no `as` assertions on Supabase responses, no `any`)
+            5. Type safety (no `as` assertions on D1 responses, no `any`)
             6. Dead code or duplicated logic
 
             Be concise. Only flag real issues, not style preferences.
