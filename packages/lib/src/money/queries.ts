@@ -118,14 +118,26 @@ export async function getDomainPortfolio(): Promise<Domain[]> {
   const parsed = parseBusinessData<{ domains: unknown }>(raw);
   if (!parsed || !isRecordArray(parsed.domains)) return [];
 
-  return parsed.domains.map((d) => ({
-    name: String(d.name ?? ""),
-    registrar: String(d.registrar ?? ""),
-    project: String(d.project ?? ""),
-    verdict: String(d.verdict ?? ""),
-    tier: d.tier ? String(d.tier) : undefined,
-    notes: d.notes ? String(d.notes) : undefined,
-  }));
+  const now = Date.now();
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
+  return parsed.domains.map((d) => {
+    const renewalDate = d.renewal_date ? String(d.renewal_date) : undefined;
+    const renewalMs = renewalDate ? safeDate(renewalDate) : 0;
+    const renewalSoon =
+      renewalMs > 0 && renewalMs - now > 0 && renewalMs - now <= thirtyDaysMs;
+
+    return {
+      name: String(d.name ?? ""),
+      registrar: String(d.registrar ?? ""),
+      project: String(d.project ?? ""),
+      verdict: String(d.verdict ?? ""),
+      tier: d.tier ? String(d.tier) : undefined,
+      notes: d.notes ? String(d.notes) : undefined,
+      renewalDate,
+      renewalSoon,
+    };
+  });
 }
 
 const VENTURE_URLS: { name: string; url: string; platform: string }[] = [

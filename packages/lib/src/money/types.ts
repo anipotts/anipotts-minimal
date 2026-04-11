@@ -68,6 +68,8 @@ export interface Domain {
   verdict: string;
   tier?: string;
   notes?: string;
+  renewalDate?: string;
+  renewalSoon: boolean;
 }
 
 export interface VentureHealth {
