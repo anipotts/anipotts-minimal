@@ -1,8 +1,15 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import { useMiniStream } from "@anipotts/lib/mini/stream";
-import type { MiniRepos, MiniSessions } from "@anipotts/lib/mini";
+import type {
+  MiniRepos,
+  MiniRepoStatus,
+  MiniSessions,
+} from "@anipotts/lib/mini";
 import { LiveValue } from "../../components/live-value";
+
+type SortKey = "name" | "dirty" | "unpushed";
 
 interface InitialCodeData {
   repos: MiniRepos | null;
@@ -33,6 +40,51 @@ function Section({
   );
 }
 
+function sortRepos(repos: MiniRepoStatus[], sortBy: SortKey): MiniRepoStatus[] {
+  return [...repos].sort((a, b) => {
+    switch (sortBy) {
+      case "dirty":
+        // dirty first, then by name
+        if (a.dirty !== b.dirty) return a.dirty ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      case "unpushed":
+        // most unpushed first, then by name
+        if (a.unpushed_count !== b.unpushed_count)
+          return b.unpushed_count - a.unpushed_count;
+        return a.name.localeCompare(b.name);
+      case "name":
+      default:
+        return a.name.localeCompare(b.name);
+    }
+  });
+}
+
+function SortHeader({
+  label,
+  sortKey,
+  activeSortKey,
+  onSort,
+  className = "",
+}: {
+  label: string;
+  sortKey: SortKey;
+  activeSortKey: SortKey;
+  onSort: (key: SortKey) => void;
+  className?: string;
+}) {
+  const isActive = sortKey === activeSortKey;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(sortKey)}
+      className={`${className} cursor-pointer select-none transition-colors ${isActive ? "text-zinc-300" : "text-zinc-500 hover:text-zinc-400"}`}
+    >
+      {label}
+      {isActive && <span className="ml-0.5 text-[8px]">&#9660;</span>}
+    </button>
+  );
+}
+
 function ReposSection({
   repos,
   live,
@@ -40,6 +92,17 @@ function ReposSection({
   repos: MiniRepos | null;
   live: boolean;
 }) {
+  const [sortBy, setSortBy] = useState<SortKey>("dirty");
+
+  const handleSort = useCallback((key: SortKey) => {
+    setSortBy(key);
+  }, []);
+
+  const sorted = useMemo(
+    () => (repos ? sortRepos(repos.repos, sortBy) : []),
+    [repos, sortBy],
+  );
+
   if (!repos || repos.repos.length === 0) {
     return (
       <Section title="Repos">
@@ -63,13 +126,31 @@ function ReposSection({
           )}
         </div>
       </div>
-      <div className="admin-row text-[10px] text-zinc-500 uppercase tracking-wide border-b border-zinc-800/40">
-        <div className="flex-1">Repo</div>
-        <div className="w-14 text-center">Status</div>
-        <div className="w-16 text-right">Unpushed</div>
-        <div className="w-24 text-right">Last commit</div>
+      <div className="admin-row text-[10px] uppercase tracking-wide border-b border-zinc-800/40">
+        <SortHeader
+          label="Repo"
+          sortKey="name"
+          activeSortKey={sortBy}
+          onSort={handleSort}
+          className="flex-1 text-left"
+        />
+        <SortHeader
+          label="Status"
+          sortKey="dirty"
+          activeSortKey={sortBy}
+          onSort={handleSort}
+          className="w-14 text-center"
+        />
+        <SortHeader
+          label="Unpushed"
+          sortKey="unpushed"
+          activeSortKey={sortBy}
+          onSort={handleSort}
+          className="w-16 text-right"
+        />
+        <div className="w-24 text-right text-zinc-500">Last commit</div>
       </div>
-      {repos.repos.map((r) => (
+      {sorted.map((r) => (
         <div key={r.name} className="admin-row text-[12px]">
           <div className="flex-1 min-w-0">
             <div className="text-zinc-200 font-medium font-mono">{r.name}</div>

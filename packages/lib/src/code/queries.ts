@@ -8,6 +8,8 @@ import type {
   NpmPackageStats,
   GitHubOverview,
   GitHubRepoStats,
+  ClaudeMonHealth,
+  NpmVersionInfo,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -377,4 +379,88 @@ export async function getGitHubOverview(env: {
     totalOpenPRs: repos.reduce((sum, r) => sum + r.openPRs, 0),
     fetchedAt,
   };
+}
+
+// ---------------------------------------------------------------------------
+// 5. getClaudeMonHealth — ping ClaudeMon API
+// ---------------------------------------------------------------------------
+
+export async function getClaudeMonHealth(): Promise<ClaudeMonHealth> {
+  const fetchedAt = new Date().toISOString();
+  try {
+    const res = await fetch("https://api.claudemon.com/health", {
+      signal: AbortSignal.timeout(5000),
+      cache: "no-store",
+    });
+    return { up: res.ok, fetchedAt };
+  } catch (e) {
+    return {
+      up: false,
+      error: e instanceof Error ? e.message : "Unreachable",
+      fetchedAt,
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6. getNpmVersions — current vs latest for key packages
+// ---------------------------------------------------------------------------
+
+interface NpmRegistryLatest {
+  version?: string;
+}
+
+const VERSION_PACKAGES: Array<{ name: string; current: string }> = [
+  { name: "imessage-mcp", current: "1.0.0" },
+  { name: "claudemon-cli", current: "1.0.0" },
+];
+
+export async function getNpmVersions(): Promise<NpmVersionInfo[]> {
+  const results = await Promise.allSettled(
+    VERSION_PACKAGES.map(async ({ name, current }) => {
+      try {
+        const res = await fetch(`https://registry.npmjs.org/${name}/latest`, {
+          signal: AbortSignal.timeout(5000),
+          next: { revalidate: 3600 },
+        } as RequestInit);
+        if (!res.ok) {
+          return {
+            name,
+            current,
+            latest: null,
+            updateAvailable: false,
+            error: `HTTP ${res.status}`,
+          };
+        }
+        const data = (await res.json()) as NpmRegistryLatest;
+        const latest = data.version ?? null;
+        return {
+          name,
+          current,
+          latest,
+          updateAvailable: latest !== null && latest !== current,
+        };
+      } catch (e) {
+        return {
+          name,
+          current,
+          latest: null,
+          updateAvailable: false,
+          error: e instanceof Error ? e.message : "Fetch failed",
+        };
+      }
+    }),
+  );
+
+  return results.map((r) =>
+    r.status === "fulfilled"
+      ? r.value
+      : {
+          name: "unknown",
+          current: null,
+          latest: null,
+          updateAvailable: false,
+          error: "Failed",
+        },
+  );
 }
