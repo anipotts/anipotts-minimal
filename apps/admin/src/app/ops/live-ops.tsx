@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useMiniStream } from "@anipotts/lib/mini/stream";
 import type {
   MiniVitalsLive,
@@ -8,6 +9,9 @@ import type {
   MiniSessions,
   MiniPresence,
   MiniVault,
+  MiniSyncthing,
+  MiniProcesses,
+  MiniProcess,
 } from "@anipotts/lib/mini";
 import { LiveValue } from "../../components/live-value";
 
@@ -18,6 +22,8 @@ interface InitialData {
   sessions: MiniSessions | null;
   presence: MiniPresence | null;
   vault: MiniVault | null;
+  syncthing: MiniSyncthing | null;
+  processes: MiniProcesses | null;
 }
 
 // ── Shared Components ─────────────────────────────────────────────────
@@ -42,6 +48,27 @@ function Section({
         )}
       </div>
       <div className="p-4">{children}</div>
+    </section>
+  );
+}
+
+function PlaceholderSection({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
+  return (
+    <section className="rounded-lg border border-zinc-800/30 bg-zinc-950/30">
+      <div className="px-4 py-2.5 border-b border-zinc-800/20 flex items-center gap-2">
+        <h3 className="text-[11px] font-medium tracking-wide text-zinc-600 uppercase">
+          {title}
+        </h3>
+      </div>
+      <div className="p-4">
+        <p className="text-[11px] text-zinc-600 italic">{message}</p>
+      </div>
     </section>
   );
 }
@@ -217,7 +244,7 @@ function RudySection({ rudy, live }: { rudy: MiniRudy | null; live: boolean }) {
           <span className="text-[12px] text-zinc-300">
             {rudy.daemon_running ? "Running" : "Stopped"}
           </span>
-          {rudy.db_size_mb && (
+          {rudy.db_size_mb !== undefined && (
             <span className="ml-auto text-[10px] text-zinc-600 font-mono">
               {rudy.db_size_mb} MB
             </span>
@@ -387,6 +414,236 @@ function VaultSection({
   );
 }
 
+// ── Syncthing Section ─────────────────────────────────────────────────
+
+function SyncthingSection({
+  syncthing,
+  live,
+}: {
+  syncthing: MiniSyncthing | null;
+  live: boolean;
+}) {
+  if (!syncthing || !syncthing.available) {
+    return (
+      <Section title="Syncthing">
+        <div className="py-6 text-center">
+          <p className="text-[12px] text-zinc-500">Syncthing not running</p>
+        </div>
+      </Section>
+    );
+  }
+
+  return (
+    <Section title="Syncthing" live={live}>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <StatusDot active />
+          <span className="text-[12px] text-zinc-300">Connected</span>
+          {syncthing.uptime !== undefined && (
+            <span className="ml-auto text-[10px] text-zinc-600 font-mono">
+              up {formatUptime(syncthing.uptime)}
+            </span>
+          )}
+        </div>
+        {syncthing.my_id && (
+          <div className="text-[10px] text-zinc-600 font-mono truncate">
+            {syncthing.my_id}
+          </div>
+        )}
+      </div>
+    </Section>
+  );
+}
+
+// ── Presence Section ──────────────────────────────────────────────────
+
+function PresenceSection({
+  presence,
+  live,
+}: {
+  presence: MiniPresence | null;
+  live: boolean;
+}) {
+  if (!presence || !presence.available) {
+    return (
+      <Section title="Presence">
+        <div className="py-6 text-center">
+          <p className="text-[12px] text-zinc-500">No presence data</p>
+        </div>
+      </Section>
+    );
+  }
+
+  const latest =
+    presence.snapshots && presence.snapshots.length > 0
+      ? presence.snapshots[presence.snapshots.length - 1]
+      : null;
+
+  if (!latest) {
+    return (
+      <Section title="Presence" live={live}>
+        <div className="py-6 text-center">
+          <p className="text-[12px] text-zinc-500">No snapshots yet</p>
+        </div>
+      </Section>
+    );
+  }
+
+  const confidenceColor =
+    latest.confidence >= 0.8
+      ? "text-emerald-400"
+      : latest.confidence >= 0.5
+        ? "text-amber-400"
+        : "text-zinc-500";
+
+  return (
+    <Section title="Presence" live={live}>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-[13px] text-zinc-200">
+            <LiveValue value={latest.location} />
+          </span>
+          <span className={`ml-auto text-[10px] font-mono ${confidenceColor}`}>
+            {(latest.confidence * 100).toFixed(0)}%
+          </span>
+        </div>
+        <div className="flex gap-3">
+          <PresenceIndicator label="Laptop" active={latest.nearLaptop} />
+          <PresenceIndicator label="Phone" active={latest.phoneOnNetwork} />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function PresenceIndicator({
+  label,
+  active,
+}: {
+  label: string;
+  active: boolean | null;
+}) {
+  const dotColor =
+    active === true
+      ? "bg-emerald-400"
+      : active === false
+        ? "bg-zinc-600"
+        : "bg-zinc-700";
+  const textColor = active === true ? "text-zinc-300" : "text-zinc-600";
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+      <span className={`text-[11px] ${textColor}`}>{label}</span>
+    </div>
+  );
+}
+
+// ── Process Monitor Section ───────────────────────────────────────────
+
+type SortField = "cpu" | "mem" | "command";
+
+function ProcessSection({
+  processes,
+  live,
+}: {
+  processes: MiniProcesses | null;
+  live: boolean;
+}) {
+  const [sortBy, setSortBy] = useState<SortField>("cpu");
+
+  const sorted = useMemo(() => {
+    if (!processes || processes.processes.length === 0) return [];
+    const list = [...processes.processes];
+    list.sort((a: MiniProcess, b: MiniProcess) => {
+      if (sortBy === "cpu") return b.cpu - a.cpu;
+      if (sortBy === "mem") return b.mem - a.mem;
+      return a.command.localeCompare(b.command);
+    });
+    return list.slice(0, 12);
+  }, [processes, sortBy]);
+
+  if (!processes || processes.processes.length === 0) {
+    return (
+      <Section title="Processes">
+        <div className="py-6 text-center">
+          <p className="text-[12px] text-zinc-500">No process data</p>
+        </div>
+      </Section>
+    );
+  }
+
+  return (
+    <Section title={`Processes (${processes.processes.length})`} live={live}>
+      <div className="space-y-1">
+        <div className="flex items-center text-[10px] text-zinc-600 uppercase tracking-wide px-1 pb-1">
+          <span className="flex-1">Command</span>
+          <SortButton
+            label="CPU%"
+            field="cpu"
+            current={sortBy}
+            onSort={setSortBy}
+          />
+          <SortButton
+            label="MEM%"
+            field="mem"
+            current={sortBy}
+            onSort={setSortBy}
+          />
+        </div>
+        {sorted.map((p: MiniProcess) => (
+          <div
+            key={`${p.pid}-${p.command}`}
+            className="flex items-center gap-2 py-1 px-1 rounded hover:bg-zinc-800/20 text-[11px] font-mono"
+          >
+            <span className="flex-1 truncate text-zinc-400" title={p.command}>
+              {truncateCommand(p.command)}
+            </span>
+            <span className="w-12 text-right text-zinc-500">
+              <LiveValue value={p.cpu.toFixed(1)} />
+            </span>
+            <span className="w-12 text-right text-zinc-500">
+              <LiveValue value={p.mem.toFixed(1)} />
+            </span>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function SortButton({
+  label,
+  field,
+  current,
+  onSort,
+}: {
+  label: string;
+  field: SortField;
+  current: SortField;
+  onSort: (f: SortField) => void;
+}) {
+  const isActive = current === field;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(field)}
+      className={`w-12 text-right text-[10px] uppercase tracking-wide cursor-pointer ${
+        isActive ? "text-[#61AEBA]" : "text-zinc-600 hover:text-zinc-400"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function truncateCommand(cmd: string): string {
+  // Strip common path prefixes for readability
+  const cleaned = cmd.replace(/^\/usr\/(?:local\/)?(?:bin|sbin)\//, "");
+  if (cleaned.length <= 40) return cleaned;
+  return cleaned.slice(0, 37) + "...";
+}
+
 // ── Connection Status ─────────────────────────────────────────────────
 
 function ConnectionStatus({ connected }: { connected: boolean }) {
@@ -414,11 +671,10 @@ export default function LiveOpsPage({ initial }: { initial: InitialData }) {
   const sessions = stream.sessions ?? initial.sessions;
   const presence = stream.presence ?? initial.presence;
   const vault = stream.vault ?? initial.vault;
+  const syncthing = stream.syncthing ?? initial.syncthing;
+  const processes = stream.processes ?? initial.processes;
 
   const isLive = stream.connected;
-
-  // Suppress unused variable warning (presence used for future expansion)
-  void presence;
 
   return (
     <div className="h-full flex flex-col">
@@ -437,6 +693,21 @@ export default function LiveOpsPage({ initial }: { initial: InitialData }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <SessionsSection sessions={sessions} live={isLive} />
           <VaultSection vault={vault} live={isLive} />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <SyncthingSection syncthing={syncthing} live={isLive} />
+          <PresenceSection presence={presence} live={isLive} />
+        </div>
+
+        <ProcessSection processes={processes} live={isLive} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <PlaceholderSection
+            title="Tailscale"
+            message="Add /ops/tailscale to Mini API"
+          />
+          <PlaceholderSection title="MacBook Agents" message="Check locally" />
         </div>
       </div>
     </div>
