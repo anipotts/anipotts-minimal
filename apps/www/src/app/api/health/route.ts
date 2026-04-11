@@ -1,4 +1,4 @@
-import { getDrizzle, sql } from "@anipotts/lib/db";
+import { getDB } from "@anipotts/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -7,12 +7,12 @@ export async function GET() {
   let tablesOk = false;
 
   try {
-    const db = getDrizzle();
+    const db = getDB();
     if (db) {
-      const result = await db.all(
-        sql`SELECT COUNT(*) as cnt FROM thoughts LIMIT 1`,
-      );
-      if (result.length > 0) {
+      const result = await db
+        .prepare("SELECT COUNT(*) as cnt FROM thoughts LIMIT 1")
+        .first<{ cnt: number }>();
+      if (result && result.cnt >= 0) {
         d1Status = "connected";
         tablesOk = true;
       }
