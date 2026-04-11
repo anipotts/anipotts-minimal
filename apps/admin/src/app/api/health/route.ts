@@ -1,5 +1,3 @@
-import { getDB } from "@anipotts/lib/db";
-
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -7,12 +5,15 @@ export async function GET() {
   let tablesOk = false;
 
   try {
-    const db = getDB();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getCloudflareContext } = require("@opennextjs/cloudflare");
+    const ctx = getCloudflareContext();
+    const db = ctx?.env?.DB;
     if (db) {
       const result = await db
         .prepare("SELECT COUNT(*) as cnt FROM thoughts LIMIT 1")
-        .first<{ cnt: number }>();
-      if (result && result.cnt >= 0) {
+        .first();
+      if (result && (result as { cnt: number }).cnt >= 0) {
         d1Status = "connected";
         tablesOk = true;
       }
