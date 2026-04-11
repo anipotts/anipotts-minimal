@@ -357,3 +357,32 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   ts INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_rate_limits_key_ts ON rate_limits(key, ts);
+
+-- ---------------------------------------------------------------------------
+-- 19. daily_rollups (historical aggregates from Mini API, hourly push)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS daily_rollups (
+  id TEXT PRIMARY KEY,
+  date TEXT NOT NULL,
+  hour INTEGER NOT NULL,
+  metric TEXT NOT NULL,
+  value REAL NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_rollups_date ON daily_rollups(date, metric);
+
+-- ---------------------------------------------------------------------------
+-- 20. email_queue (failed emails for retry)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS email_queue (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL,
+  html TEXT NOT NULL,
+  to_address TEXT NOT NULL,
+  status TEXT DEFAULT 'pending',
+  attempts INTEGER DEFAULT 0,
+  last_error TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_email_queue_status ON email_queue(status);
