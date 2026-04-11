@@ -62,7 +62,7 @@ function HealthDot({ status }: { status: "up" | "down" | "unknown" }) {
 }
 
 const HEALTH_ENDPOINTS = [
-  { name: "www", url: "https://anipotts.com/_health" },
+  { name: "www", url: "https://anipotts.com/api/health" },
   { name: "admin", url: "https://admin.anipotts.com/_health" },
   { name: "ingest", url: "https://anipotts-ingest.anipotts.workers.dev" },
 ];
