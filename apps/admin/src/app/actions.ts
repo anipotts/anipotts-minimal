@@ -114,18 +114,36 @@ async function getThoughtById(id: string, columns = "*") {
 
 // ── D1 helper: update thought fields by ID ──
 
+const THOUGHT_COLUMNS = new Set([
+  "title",
+  "slug",
+  "content",
+  "summary",
+  "series_type",
+  "content_type",
+  "status",
+  "published",
+  "published_at",
+  "tags",
+  "platforms_posted",
+  "voice_mode",
+  "updated_at",
+  "views",
+]);
+
 async function updateThought(
   id: string,
   fields: Record<string, unknown>,
 ): Promise<{ error?: string }> {
   const db = getDB();
   if (db) {
-    const sets = Object.keys(fields)
-      .map((k) => `${k} = ?`)
-      .join(", ");
+    const safe = Object.keys(fields).filter((k) => THOUGHT_COLUMNS.has(k));
+    if (safe.length === 0) return { error: "No valid columns" };
+    const sets = safe.map((k) => `${k} = ?`).join(", ");
+    const vals = safe.map((k) => fields[k]);
     await db
       .prepare(`UPDATE thoughts SET ${sets} WHERE id = ?`)
-      .bind(...Object.values(fields), id)
+      .bind(...vals, id)
       .run();
     return {};
   }
@@ -147,18 +165,31 @@ async function getAtomById(id: string) {
 
 // ── D1 helper: update atom fields by ID ──
 
+const ATOM_COLUMNS = new Set([
+  "thought_id",
+  "platform",
+  "content",
+  "media_urls",
+  "status",
+  "scheduled_for",
+  "posted_at",
+  "engagement_metrics",
+  "updated_at",
+]);
+
 async function updateAtomFields(
   id: string,
   fields: Record<string, unknown>,
 ): Promise<{ error?: string }> {
   const db = getDB();
   if (db) {
-    const sets = Object.keys(fields)
-      .map((k) => `${k} = ?`)
-      .join(", ");
+    const safe = Object.keys(fields).filter((k) => ATOM_COLUMNS.has(k));
+    if (safe.length === 0) return { error: "No valid columns" };
+    const sets = safe.map((k) => `${k} = ?`).join(", ");
+    const vals = safe.map((k) => fields[k]);
     await db
       .prepare(`UPDATE atoms SET ${sets} WHERE id = ?`)
-      .bind(...Object.values(fields), id)
+      .bind(...vals, id)
       .run();
     return {};
   }
