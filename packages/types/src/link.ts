@@ -4,12 +4,3 @@ export interface SocialLink {
   icon: string;
   description?: string;
 }
-
-export interface LinkInBio {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  icon?: string;
-  order: number;
-}

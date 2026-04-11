@@ -29,11 +29,3 @@ export interface TypefullyQueueSummary {
   postsRemaining: number;
   monthlyLimit: number;
 }
-
-export interface TypefullySocialSet {
-  id: number;
-  name: string;
-  username?: string;
-  team?: { name: string } | null;
-  platforms: Record<string, { username?: string; connected: boolean }>;
-}
