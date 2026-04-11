@@ -182,10 +182,12 @@ async function MercurySection() {
 
 // ── Deals Table ──
 
+const PAGE_LOAD_TIME = Date.now();
+
 function DealRow({ deal }: { deal: Deal }) {
   const daysSince = deal.firstContact
     ? Math.floor(
-        (Date.now() - new Date(deal.firstContact).getTime()) /
+        (PAGE_LOAD_TIME - new Date(deal.firstContact).getTime()) /
           (1000 * 60 * 60 * 24),
       )
     : null;

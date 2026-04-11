@@ -359,7 +359,10 @@ export default function AtomManager({
                 </button>
               ) : (
                 <button
-                  onClick={() => handleCheckTypefully(atom.typefully_draft_id!)}
+                  onClick={() =>
+                    atom.typefully_draft_id &&
+                    handleCheckTypefully(atom.typefully_draft_id)
+                  }
                   disabled={isPending}
                   className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-indigo-400 transition-colors disabled:opacity-50"
                 >

@@ -9,7 +9,7 @@ import type {
   MiniPresence,
   MiniVault,
 } from "@anipotts/lib/mini";
-import { useRef, useEffect, useState } from "react";
+import { LiveValue } from "../../components/live-value";
 
 interface InitialData {
   vitals: MiniVitalsLive | null;
@@ -43,36 +43,6 @@ function Section({
       </div>
       <div className="p-4">{children}</div>
     </section>
-  );
-}
-
-function LiveValue({
-  value,
-  prevValue,
-  className = "",
-}: {
-  value: string | number;
-  prevValue?: string | number;
-  className?: string;
-}) {
-  const [flash, setFlash] = useState(false);
-  const prev = useRef(prevValue ?? value);
-
-  useEffect(() => {
-    if (String(value) !== String(prev.current)) {
-      setFlash(true);
-      prev.current = value;
-      const t = setTimeout(() => setFlash(false), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [value]);
-
-  return (
-    <span
-      className={`font-mono transition-colors duration-500 ${flash ? "text-[#61AEBA]" : ""} ${className}`}
-    >
-      {value}
-    </span>
   );
 }
 

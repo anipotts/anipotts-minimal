@@ -2,39 +2,11 @@
 
 import { useMiniStream } from "@anipotts/lib/mini/stream";
 import type { MiniRepos, MiniSessions } from "@anipotts/lib/mini";
-import { useRef, useEffect, useState } from "react";
+import { LiveValue } from "../../components/live-value";
 
 interface InitialCodeData {
   repos: MiniRepos | null;
   sessions: MiniSessions | null;
-}
-
-function LiveValue({
-  value,
-  className = "",
-}: {
-  value: string | number;
-  className?: string;
-}) {
-  const [flash, setFlash] = useState(false);
-  const prev = useRef(value);
-
-  useEffect(() => {
-    if (String(value) !== String(prev.current)) {
-      setFlash(true);
-      prev.current = value;
-      const t = setTimeout(() => setFlash(false), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [value]);
-
-  return (
-    <span
-      className={`font-mono transition-colors duration-500 ${flash ? "text-[#61AEBA]" : ""} ${className}`}
-    >
-      {value}
-    </span>
-  );
 }
 
 function Section({

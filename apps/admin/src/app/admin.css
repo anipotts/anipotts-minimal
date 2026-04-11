@@ -144,6 +144,19 @@
   color: rgba(228, 228, 231, 0.9);
 }
 
+/* ── Live value flash animation ── */
+@keyframes flash-brand {
+  0% {
+    color: #61aeba;
+  }
+  100% {
+    color: inherit;
+  }
+}
+.animate-flash-brand {
+  animation: flash-brand 1s ease-out;
+}
+
 /* ── Status badge (inline) ── */
 .admin-badge {
   font-size: 10px;

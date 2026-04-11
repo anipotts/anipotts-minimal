@@ -121,7 +121,8 @@ const contentSubTabs = [
 export default function AdminNav() {
   const pathname = usePathname();
 
-  const isContentSpoke = spokes[2]!.match(pathname);
+  const contentSpoke = spokes[2];
+  const isContentSpoke = contentSpoke?.match(pathname) ?? false;
 
   return (
     <aside className="w-44 shrink-0 bg-zinc-950 border-r border-zinc-800/60 flex flex-col h-screen sticky top-0">

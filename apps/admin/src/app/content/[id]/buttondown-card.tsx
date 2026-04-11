@@ -60,7 +60,7 @@ export default function ButtondownCard({
     if (!emailState.emailId) return;
     startTransition(async () => {
       setFeedback(null);
-      const result = await fetchButtondownEmailStatus(emailState.emailId!);
+      const result = await fetchButtondownEmailStatus(emailState.emailId ?? "");
       if ("error" in result) {
         setFeedback({
           type: "error",
@@ -87,7 +87,7 @@ export default function ButtondownCard({
     if (!emailState.emailId) return;
     startTransition(async () => {
       setFeedback(null);
-      const result = await editButtondownEmail(emailState.emailId!, {
+      const result = await editButtondownEmail(emailState.emailId ?? "", {
         subject: editSubject,
         body: editBody,
       });
@@ -118,7 +118,7 @@ export default function ButtondownCard({
       return;
     startTransition(async () => {
       setFeedback(null);
-      const result = await editButtondownEmail(emailState.emailId!, {
+      const result = await editButtondownEmail(emailState.emailId ?? "", {
         status: "scheduled",
         publish_date: new Date(scheduleDate).toISOString(),
       });
@@ -138,7 +138,7 @@ export default function ButtondownCard({
     if (!emailState.emailId || !confirm("Delete this email?")) return;
     startTransition(async () => {
       setFeedback(null);
-      const result = await removeButtondownEmail(emailState.emailId!);
+      const result = await removeButtondownEmail(emailState.emailId ?? "");
       if ("error" in result) {
         setFeedback({
           type: "error",
