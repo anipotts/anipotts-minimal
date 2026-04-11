@@ -7,6 +7,7 @@ import {
   getDomainPortfolio,
   getVentureHealth,
 } from "@anipotts/lib/money";
+import { getEnv } from "@anipotts/lib/env";
 import type {
   Deal,
   Deadline,
@@ -84,9 +85,9 @@ const fmt = (n: number) =>
 
 async function MercurySection() {
   const snapshot = await getMercurySnapshot({
-    MERCURY_API_TOKEN: process.env.MERCURY_API_TOKEN,
-    MERCURY_ACCOUNT_ID_CHECKING: process.env.MERCURY_ACCOUNT_ID_CHECKING,
-    MERCURY_ACCOUNT_ID_SAVINGS: process.env.MERCURY_ACCOUNT_ID_SAVINGS,
+    MERCURY_API_TOKEN: getEnv("MERCURY_API_TOKEN"),
+    MERCURY_ACCOUNT_ID_CHECKING: getEnv("MERCURY_ACCOUNT_ID_CHECKING"),
+    MERCURY_ACCOUNT_ID_SAVINGS: getEnv("MERCURY_ACCOUNT_ID_SAVINGS"),
   });
 
   const hasData = snapshot.checking || snapshot.savings;

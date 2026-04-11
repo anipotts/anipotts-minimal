@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, ADMIN_COOKIE } from "@anipotts/lib/admin";
+import { getEnv } from "@anipotts/lib/env";
 import { JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import LoginForm from "./login-form";
@@ -19,6 +20,13 @@ export const metadata: Metadata = {
     template: "%s | Admin",
   },
   robots: { index: false, follow: false },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({
@@ -28,7 +36,7 @@ export default async function RootLayout({
 }) {
   const jar = await cookies();
   const token = jar.get(ADMIN_COOKIE)?.value;
-  const secret = process.env.ADMIN_PASSWORD;
+  const secret = getEnv("ADMIN_PASSWORD");
 
   const isAuthenticated = token && secret && verifySessionToken(token, secret);
 

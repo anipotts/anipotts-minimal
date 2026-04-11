@@ -10,6 +10,7 @@ import {
   ADMIN_COOKIE_OPTIONS,
 } from "@anipotts/lib/admin";
 import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
+import { getEnv } from "@anipotts/lib/env";
 import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
 import { headers } from "next/headers";
 import type {
@@ -91,7 +92,7 @@ function buildLinkedInPost(
 async function requireAuth(): Promise<{ error: string } | null> {
   const jar = await cookies();
   const token = jar.get(ADMIN_COOKIE)?.value;
-  const secret = process.env.ADMIN_PASSWORD;
+  const secret = getEnv("ADMIN_PASSWORD");
   if (!token || !secret || !verifySessionToken(token, secret)) {
     return { error: "Unauthorized" };
   }
@@ -189,22 +190,23 @@ export async function login(formData: FormData) {
 
   const { password, totp } = parsed.data;
 
-  const pwResult = verifyAdminPassword(password, process.env.ADMIN_PASSWORD);
+  const pwResult = verifyAdminPassword(password, getEnv("ADMIN_PASSWORD"));
   if (!pwResult.success) {
     return { error: pwResult.error || "Invalid password" };
   }
 
-  if (process.env.ADMIN_TOTP_SECRET) {
+  const totpSecret = getEnv("ADMIN_TOTP_SECRET");
+  if (totpSecret) {
     if (!totp) {
       return { error: "TOTP code is required" };
     }
-    const totpResult = verifyAdminTotp(totp, process.env.ADMIN_TOTP_SECRET);
+    const totpResult = verifyAdminTotp(totp, totpSecret);
     if (!totpResult.success) {
       return { error: totpResult.error || "Invalid TOTP" };
     }
   }
 
-  const secret = process.env.ADMIN_PASSWORD ?? "";
+  const secret = getEnv("ADMIN_PASSWORD") ?? "";
   const token = createSessionToken(secret);
   const jar = await cookies();
   jar.set(ADMIN_COOKIE, token, {

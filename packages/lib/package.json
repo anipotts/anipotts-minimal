@@ -74,6 +74,10 @@
     "./analytics": {
       "types": "./dist/analytics/index.d.ts",
       "import": "./dist/analytics/index.js"
+    },
+    "./env": {
+      "types": "./dist/env.d.ts",
+      "import": "./dist/env.js"
     }
   },
   "scripts": {

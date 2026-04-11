@@ -1,3 +1,4 @@
+import { getEnv } from "../env";
 import type {
   MiniVitalsLive,
   MiniAgents,
@@ -11,20 +12,26 @@ import type {
   MiniProcesses,
 } from "./types";
 
-const MINI_API_URL =
-  process.env.MINI_API_URL || "https://api.mini.anipotts.com";
-const MINI_API_KEY = process.env.MINI_API_KEY || "";
 const TIMEOUT_MS = 5_000;
 
+function getMiniUrl(): string {
+  return getEnv("MINI_API_URL") || "https://api.mini.anipotts.com";
+}
+
+function getMiniKey(): string {
+  return getEnv("MINI_API_KEY") || "";
+}
+
 async function fetchMini<T>(path: string): Promise<T | null> {
-  if (!MINI_API_KEY) return null;
+  const key = getMiniKey();
+  if (!key) return null;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const res = await fetch(`${MINI_API_URL}${path}`, {
-      headers: { Authorization: `Bearer ${MINI_API_KEY}` },
+    const res = await fetch(`${getMiniUrl()}${path}`, {
+      headers: { Authorization: `Bearer ${key}` },
       signal: controller.signal,
       cache: "no-store",
     });
@@ -38,11 +45,10 @@ async function fetchMini<T>(path: string): Promise<T | null> {
 }
 
 export async function getMiniHealth(): Promise<MiniHealth | null> {
-  // Health endpoint has no auth
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-    const res = await fetch(`${MINI_API_URL}/health`, {
+    const res = await fetch(`${getMiniUrl()}/health`, {
       signal: controller.signal,
       cache: "no-store",
     });

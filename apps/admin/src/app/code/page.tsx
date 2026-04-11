@@ -6,6 +6,7 @@ import {
   getClaudeMonHealth,
   getNpmVersions,
 } from "@anipotts/lib/code";
+import { getEnv } from "@anipotts/lib/env";
 import type {
   WorkerDeployment,
   FlyMachine,
@@ -135,9 +136,9 @@ function FlyRow({ m }: { m: FlyMachine }) {
 
 async function DeploymentsSection() {
   const deployment = await getDeploymentStatus({
-    CF_API_TOKEN: process.env.CF_API_TOKEN,
-    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
-    FLY_API_TOKEN: process.env.FLY_API_TOKEN,
+    CF_API_TOKEN: getEnv("CF_API_TOKEN"),
+    CF_ACCOUNT_ID: getEnv("CF_ACCOUNT_ID"),
+    FLY_API_TOKEN: getEnv("FLY_API_TOKEN"),
   });
 
   return (
@@ -244,7 +245,7 @@ function GhRepoRow({ repo }: { repo: GitHubRepoStats }) {
 
 async function GitHubSection() {
   const overview = await getGitHubOverview({
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    GITHUB_TOKEN: getEnv("GITHUB_TOKEN"),
   });
 
   if (overview.repos.length === 0) {

@@ -117,6 +117,7 @@ jobs:
           BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
           TYPEFULLY_API_KEY: ${{ secrets.TYPEFULLY_API_KEY }}
           TYPEFULLY_SOCIAL_SET_ID: ${{ secrets.TYPEFULLY_SOCIAL_SET_ID }}
+          NEXT_PUBLIC_MINI_API_KEY: ${{ secrets.MINI_API_KEY }}
 
       - name: Build for Cloudflare
         run: npx opennextjs-cloudflare build

@@ -68,7 +68,9 @@ export async function getMercurySnapshot(env: {
   MERCURY_ACCOUNT_ID_CHECKING?: string;
   MERCURY_ACCOUNT_ID_SAVINGS?: string;
 }): Promise<MercurySnapshot> {
-  const token = env.MERCURY_API_TOKEN;
+  // Strip secret-token: URI prefix if present (RFC 8959)
+  const raw = env.MERCURY_API_TOKEN;
+  const token = raw?.startsWith("secret-token:") ? raw.slice(13) : raw;
   const fetchedAt = new Date().toISOString();
 
   if (!token) {

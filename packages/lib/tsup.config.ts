@@ -19,6 +19,7 @@ export default defineConfig({
     "mini/index": "src/mini/index.ts",
     "mini/stream": "src/mini/stream.ts",
     "analytics/index": "src/analytics/index.ts",
+    env: "src/env.ts",
   },
   format: ["esm"],
   dts: true,

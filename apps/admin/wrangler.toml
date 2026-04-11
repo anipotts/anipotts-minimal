@@ -14,6 +14,10 @@ zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+# Non-secret env vars available at runtime
+[vars]
+CF_ACCOUNT_ID = "0f856093bdcd34a7da1bde5ee4385163"
+
 # D1 database binding
 [[d1_databases]]
 binding = "DB"
