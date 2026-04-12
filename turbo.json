@@ -46,7 +46,9 @@
         "ADMIN_TOTP_SECRET",
         "BUTTONDOWN_API_KEY",
         "TYPEFULLY_API_KEY",
-        "TYPEFULLY_SOCIAL_SET_ID"
+        "TYPEFULLY_SOCIAL_SET_ID",
+        "QUANTERCISE_ADMIN_TOKEN",
+        "QUANTERCISE_BASE_URL"
       ]
     },
     "dev": {
