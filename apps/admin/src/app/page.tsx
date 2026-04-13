@@ -195,8 +195,14 @@ async function DeadlinePanel() {
             )}
           </p>
         </div>
-      ) : (
+      ) : deadlines.length === 0 ? (
+        <p className="text-[12px] text-zinc-600">
+          No deadlines in D1. Run YAML sync to populate.
+        </p>
+      ) : overdue.length > 0 ? (
         <p className="text-[12px] text-zinc-600">No upcoming deadlines</p>
+      ) : (
+        <p className="text-[12px] text-zinc-600">All deadlines clear</p>
       )}
     </PanelShell>
   );
@@ -256,12 +262,16 @@ async function ContentPanel() {
     <PanelShell title="Content">
       <div className="flex gap-4">
         {[
-          { label: "Draft", value: stats.drafts },
-          { label: "Ready", value: stats.ready },
-          { label: "Published", value: stats.published },
+          { label: "Draft", value: stats.drafts, color: "text-yellow-400" },
+          { label: "Ready", value: stats.ready, color: "text-blue-400" },
+          {
+            label: "Published",
+            value: stats.published,
+            color: "text-green-400",
+          },
         ].map((s) => (
           <div key={s.label} className="text-center">
-            <div className="text-[16px] font-medium text-zinc-200">
+            <div className={`text-[16px] font-medium ${s.color}`}>
               {s.value}
             </div>
             <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
@@ -326,6 +336,15 @@ async function SessionsPanel() {
   }
 
   const today = sessions?.today;
+  const week = sessions?.last_7d;
+
+  const fmtCost = (n: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n);
 
   return (
     <PanelShell title="CC Sessions">
@@ -342,16 +361,41 @@ async function SessionsPanel() {
             {today?.tool_calls ?? 0}
           </span>
         </div>
+        {today?.cost != null && (
+          <div className="flex justify-between items-baseline">
+            <span className="text-[12px] text-zinc-500">Cost</span>
+            <span className="text-[13px] font-mono text-[#61AEBA]">
+              {fmtCost(today.cost)}
+            </span>
+          </div>
+        )}
+        {week && (
+          <div className="mt-2 pt-2 border-t border-zinc-800/40">
+            <div className="flex justify-between items-baseline">
+              <span className="text-[12px] text-zinc-500">7d</span>
+              <span className="text-[12px] font-mono text-zinc-400">
+                {week.sessions} sessions
+                {week.cost != null && ` / ${fmtCost(week.cost)}`}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </PanelShell>
   );
 }
 
 export default function DashboardPage() {
+  const renderedAt = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
   return (
     <div className="h-full flex flex-col">
-      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3">
+      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3 flex items-baseline justify-between">
         <h2 className="text-[13px] font-medium text-zinc-200">Dashboard</h2>
+        <span className="text-[10px] text-zinc-600">{renderedAt}</span>
       </div>
       <div className="flex-1 overflow-y-auto admin-scroll p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
