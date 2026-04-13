@@ -1,18 +1,30 @@
+import { getQCTwitterStatus } from "@anipotts/lib/quantercise";
+import { getQCEnv } from "@/lib/qc-env";
+import { QCPageLayout } from "../quantercise/components";
+import MarketingTabs from "./marketing-tabs";
+
 export const dynamic = "force-dynamic";
 
-export default function MarketingPage() {
+export default async function MarketingPage() {
+  let twitterConfigured = false;
+
+  try {
+    const status = await getQCTwitterStatus(getQCEnv());
+    twitterConfigured = status.configured;
+  } catch {
+    twitterConfigured = false;
+  }
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3">
-        <h2 className="text-[13px] font-medium text-zinc-200">Marketing</h2>
-      </div>
-      <div className="flex-1 overflow-y-auto admin-scroll p-6">
-        <div className="rounded-lg border border-zinc-800/60 bg-zinc-950/50 p-6">
-          <p className="text-[12px] text-zinc-500">
-            Twitter and Reddit monitoring coming in Phase 4.
-          </p>
-        </div>
-      </div>
-    </div>
+    <QCPageLayout
+      title="Marketing"
+      actions={
+        <span className="text-[10px] text-zinc-600">
+          Quantercise social monitoring
+        </span>
+      }
+    >
+      <MarketingTabs twitterConfigured={twitterConfigured} />
+    </QCPageLayout>
   );
 }

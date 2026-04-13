@@ -1,18 +1,32 @@
+import { getQCFeedback } from "@anipotts/lib/quantercise";
+import { getQCEnv } from "@/lib/qc-env";
+import { QCPageLayout } from "../quantercise/components";
+import FeedbackList from "./feedback-list";
+
 export const dynamic = "force-dynamic";
 
-export default function FeedbackPage() {
+export default async function FeedbackPage() {
+  let feedback: Awaited<ReturnType<typeof getQCFeedback>> | null = null;
+
+  try {
+    feedback = await getQCFeedback(getQCEnv());
+  } catch {
+    feedback = null;
+  }
+
+  const issues = feedback?.data?.feedback ?? [];
+  const hasMore = feedback?.meta?.hasMore ?? false;
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3">
-        <h2 className="text-[13px] font-medium text-zinc-200">Feedback</h2>
-      </div>
-      <div className="flex-1 overflow-y-auto admin-scroll p-6">
-        <div className="rounded-lg border border-zinc-800/60 bg-zinc-950/50 p-6">
-          <p className="text-[12px] text-zinc-500">
-            Multi-source feedback aggregation coming in Phase 4.
-          </p>
-        </div>
-      </div>
-    </div>
+    <QCPageLayout
+      title="Feedback"
+      actions={
+        <span className="text-[10px] text-zinc-600">
+          Quantercise GitHub issues
+        </span>
+      }
+    >
+      <FeedbackList initialFeedback={issues} initialHasMore={hasMore} />
+    </QCPageLayout>
   );
 }
