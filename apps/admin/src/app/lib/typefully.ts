@@ -1,14 +1,22 @@
+import { getEnv } from "@anipotts/lib/env";
+import { retry } from "./retry";
+
 const BASE_URL = "https://api.typefully.com/v1";
 
+export type ApiSuccess<T> = { success: true; data: T };
+export type ApiError = { success: false; error: string };
+export type ApiResult<T> = ApiSuccess<T> | ApiError;
+export type DeleteResult = { success: true } | { success: false; error: string };
+
 function getConfig() {
-  const apiKey = process.env.TYPEFULLY_API_KEY;
-  const socialSetId = process.env.TYPEFULLY_SOCIAL_SET_ID;
+  const apiKey = getEnv("TYPEFULLY_API_KEY");
+  const socialSetId = getEnv("TYPEFULLY_SOCIAL_SET_ID");
   if (!socialSetId) throw new Error("TYPEFULLY_SOCIAL_SET_ID not configured");
   if (!apiKey) throw new Error("TYPEFULLY_API_KEY not configured");
   return { apiKey, socialSetId };
 }
 
-function headers(apiKey: string) {
+function authHeaders(apiKey: string) {
   return {
     "X-API-KEY": apiKey,
     "Content-Type": "application/json",
@@ -34,42 +42,52 @@ export interface TypefullyDraft {
 
 export async function listDrafts(
   status?: TypefullyDraftStatus,
-): Promise<{ data: TypefullyDraft[]; error?: string }> {
+): Promise<ApiResult<TypefullyDraft[]>> {
   try {
     const { apiKey, socialSetId } = getConfig();
     const params = new URLSearchParams();
     if (status) params.set("status", status);
     const url = `${BASE_URL}/drafts/?${params.toString()}`;
-    const res = await fetch(url, {
-      headers: { ...headers(apiKey), "X-SOCIAL-SET-ID": socialSetId },
-    });
+    const res = await retry(() =>
+      fetch(url, {
+        headers: { ...authHeaders(apiKey), "X-SOCIAL-SET-ID": socialSetId },
+      }),
+    );
     if (!res.ok) {
       return {
-        data: [],
+        success: false,
         error: `Typefully ${res.status}: ${await res.text()}`,
       };
     }
     const data = await res.json();
-    return { data: Array.isArray(data) ? data : data.results || [] };
+    return {
+      success: true,
+      data: Array.isArray(data) ? data : data.results || [],
+    };
   } catch (e) {
-    return { data: [], error: String(e) };
+    return { success: false, error: String(e) };
   }
 }
 
 export async function getDraft(
   draftId: string,
-): Promise<{ data?: TypefullyDraft; error?: string }> {
+): Promise<ApiResult<TypefullyDraft>> {
   try {
     const { apiKey } = getConfig();
-    const res = await fetch(`${BASE_URL}/drafts/${draftId}/`, {
-      headers: headers(apiKey),
-    });
+    const res = await retry(() =>
+      fetch(`${BASE_URL}/drafts/${draftId}/`, {
+        headers: authHeaders(apiKey),
+      }),
+    );
     if (!res.ok) {
-      return { error: `Typefully ${res.status}: ${await res.text()}` };
+      return {
+        success: false,
+        error: `Typefully ${res.status}: ${await res.text()}`,
+      };
     }
-    return { data: await res.json() };
+    return { success: true, data: await res.json() };
   } catch (e) {
-    return { error: String(e) };
+    return { success: false, error: String(e) };
   }
 }
 
@@ -79,7 +97,7 @@ export async function createDraft(
     schedule?: string;
     threadify?: boolean;
   },
-): Promise<{ data?: TypefullyDraft; error?: string }> {
+): Promise<ApiResult<TypefullyDraft>> {
   try {
     const { apiKey, socialSetId } = getConfig();
     const body: Record<string, unknown> = {
@@ -89,49 +107,59 @@ export async function createDraft(
     if (options?.schedule) body["schedule-date"] = options.schedule;
     if (options?.threadify) body.threadify = true;
 
-    const res = await fetch(`${BASE_URL}/drafts/`, {
-      method: "POST",
-      headers: headers(apiKey),
-      body: JSON.stringify(body),
-    });
+    const res = await retry(() =>
+      fetch(`${BASE_URL}/drafts/`, {
+        method: "POST",
+        headers: authHeaders(apiKey),
+        body: JSON.stringify(body),
+      }),
+    );
     if (!res.ok) {
-      return { error: `Typefully ${res.status}: ${await res.text()}` };
+      return {
+        success: false,
+        error: `Typefully ${res.status}: ${await res.text()}`,
+      };
     }
-    return { data: await res.json() };
+    return { success: true, data: await res.json() };
   } catch (e) {
-    return { error: String(e) };
+    return { success: false, error: String(e) };
   }
 }
 
 export async function updateDraft(
   draftId: string,
   content: string,
-): Promise<{ data?: TypefullyDraft; error?: string }> {
+): Promise<ApiResult<TypefullyDraft>> {
   try {
     const { apiKey } = getConfig();
-    const res = await fetch(`${BASE_URL}/drafts/${draftId}/`, {
-      method: "PUT",
-      headers: headers(apiKey),
-      body: JSON.stringify({ content }),
-    });
+    const res = await retry(() =>
+      fetch(`${BASE_URL}/drafts/${draftId}/`, {
+        method: "PUT",
+        headers: authHeaders(apiKey),
+        body: JSON.stringify({ content }),
+      }),
+    );
     if (!res.ok) {
-      return { error: `Typefully ${res.status}: ${await res.text()}` };
+      return {
+        success: false,
+        error: `Typefully ${res.status}: ${await res.text()}`,
+      };
     }
-    return { data: await res.json() };
+    return { success: true, data: await res.json() };
   } catch (e) {
-    return { error: String(e) };
+    return { success: false, error: String(e) };
   }
 }
 
-export async function deleteDraft(
-  draftId: string,
-): Promise<{ success: boolean; error?: string }> {
+export async function deleteDraft(draftId: string): Promise<DeleteResult> {
   try {
     const { apiKey } = getConfig();
-    const res = await fetch(`${BASE_URL}/drafts/${draftId}/`, {
-      method: "DELETE",
-      headers: headers(apiKey),
-    });
+    const res = await retry(() =>
+      fetch(`${BASE_URL}/drafts/${draftId}/`, {
+        method: "DELETE",
+        headers: authHeaders(apiKey),
+      }),
+    );
     if (!res.ok && res.status !== 204) {
       return {
         success: false,

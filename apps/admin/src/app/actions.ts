@@ -99,6 +99,16 @@ export async function requireAuth(): Promise<{ error: string } | null> {
   return null;
 }
 
+export function withAuth<Args extends unknown[], R>(
+  fn: (...args: Args) => Promise<R>,
+): (...args: Args) => Promise<R | { error: string }> {
+  return async (...args: Args) => {
+    const authError = await requireAuth();
+    if (authError) return authError;
+    return fn(...args);
+  };
+}
+
 // ── D1 helper: read a single thought by ID ──
 
 async function getThoughtById(id: string, columns = "*") {
@@ -256,9 +266,7 @@ export async function logout() {
 
 // ── Content Status ──
 
-export async function approveContent(id: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+export const approveContent = withAuth(async (id: string) => {
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
   const result = await updateThought(id, {
@@ -267,33 +275,30 @@ export async function approveContent(id: string) {
   });
   if (result.error) return { error: result.error };
   return { success: true };
-}
+});
 
-export async function updateContentStatus(id: string, status: ContentStatus) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-  if (!VALID_STATUSES.includes(status)) return { error: "Invalid status" };
+export const updateContentStatus = withAuth(
+  async (id: string, status: ContentStatus) => {
+    if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
+    if (!VALID_STATUSES.includes(status)) return { error: "Invalid status" };
 
-  const update: Record<string, string> = {
-    status,
-    updated_at: now(),
-  };
-  if (status === "published") {
-    update.published_at = now();
-  }
+    const update: Record<string, string> = {
+      status,
+      updated_at: now(),
+    };
+    if (status === "published") {
+      update.published_at = now();
+    }
 
-  const result = await updateThought(id, update);
-  if (result.error) return { error: result.error };
-  return { success: true };
-}
+    const result = await updateThought(id, update);
+    if (result.error) return { error: result.error };
+    return { success: true };
+  },
+);
 
 // ── Content CRUD ──
 
-export async function createThought(formData: FormData) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
+export const createThought = withAuth(async (formData: FormData) => {
   const title = (formData.get("title") as string)?.trim();
   const content = (formData.get("content") as string)?.trim();
   const seriesType = formData.get("series_type") as SeriesType;
@@ -336,44 +341,42 @@ export async function createThought(formData: FormData) {
   }
 
   return { error: "Database not configured" };
-}
+});
 
-export async function updateThoughtContent(
-  id: string,
-  fields: {
-    title?: string;
-    summary?: string;
-    content?: string;
-    tags?: string[];
+export const updateThoughtContent = withAuth(
+  async (
+    id: string,
+    fields: {
+      title?: string;
+      summary?: string;
+      content?: string;
+      tags?: string[];
+    },
+  ) => {
+    if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
+
+    const update: Record<string, unknown> = { updated_at: now() };
+    if (fields.title !== undefined) {
+      if (!fields.title.trim()) return { error: "Title cannot be empty" };
+      update.title = fields.title;
+    }
+    if (fields.summary !== undefined) update.summary = fields.summary;
+    if (fields.content !== undefined) update.content = fields.content;
+
+    const db = getDB();
+    if (fields.tags !== undefined) {
+      update.tags = db ? toJsonArray(fields.tags) : fields.tags;
+    }
+
+    const result = await updateThought(id, update);
+    if (result.error) return { error: result.error };
+    return { success: true };
   },
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-  const update: Record<string, unknown> = { updated_at: now() };
-  if (fields.title !== undefined) {
-    if (!fields.title.trim()) return { error: "Title cannot be empty" };
-    update.title = fields.title;
-  }
-  if (fields.summary !== undefined) update.summary = fields.summary;
-  if (fields.content !== undefined) update.content = fields.content;
-
-  const db = getDB();
-  if (fields.tags !== undefined) {
-    update.tags = db ? toJsonArray(fields.tags) : fields.tags;
-  }
-
-  const result = await updateThought(id, update);
-  if (result.error) return { error: result.error };
-  return { success: true };
-}
+);
 
 // ── Distribution: Buttondown ──
 
-export async function pushToButtondown(id: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+export const pushToButtondown = withAuth(async (id: string) => {
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
   const thought = await getThoughtById(id, "title, content");
@@ -384,16 +387,13 @@ export async function pushToButtondown(id: string) {
     String(thought.content || ""),
     "draft",
   );
-  if (result.error) return { error: result.error };
-  if (!result.data?.id) return { error: "Buttondown returned no email ID" };
+  if (!result.success) return { error: result.error };
   return { success: true, emailId: result.data.id };
-}
+});
 
 // ── Distribution: Typefully ──
 
-export async function pushToTypefully(id: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+export const pushToTypefully = withAuth(async (id: string) => {
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
   const thought = await getThoughtById(id, "title, content, slug");
@@ -403,21 +403,21 @@ export async function pushToTypefully(id: string) {
   const content = String(thought.content || "");
 
   const xResult = await typefullyCreateDraft(buildXPost(content, link));
-  if (xResult.error) return { error: `X: ${xResult.error}` };
+  if (!xResult.success) return { error: `X: ${xResult.error}` };
 
   const liResult = await typefullyCreateDraft(
     buildLinkedInPost(String(thought.title), content, link),
   );
-  if (liResult.error) return { error: `LinkedIn: ${liResult.error}` };
+  if (!liResult.success) return { error: `LinkedIn: ${liResult.error}` };
 
   return {
     success: true,
     drafts: {
-      x: xResult.data?.id,
-      linkedin: liResult.data?.id,
+      x: xResult.data.id,
+      linkedin: liResult.data.id,
     },
   };
-}
+});
 
 // ── Publish Everywhere ──
 
@@ -430,156 +430,167 @@ export interface PublishResult {
   buttondown: { success: boolean; error?: string; emailId?: string };
 }
 
-export async function publishEverywhere(
-  id: string,
-): Promise<PublishResult | { error: string }> {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
+export const publishEverywhere = withAuth(
+  async (id: string): Promise<PublishResult | { error: string }> => {
+    if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
 
-  const thought = await getThoughtById(id);
-  if (!thought) return { error: "Thought not found" };
+    const thought = await getThoughtById(id);
+    if (!thought) return { error: "Thought not found" };
 
-  const link = `${SITE_URL}/thoughts/${thought.slug}`;
-  const content = String(thought.content || "");
+    const link = `${SITE_URL}/thoughts/${thought.slug}`;
+    const content = String(thought.content || "");
 
-  const [xResult, liResult, bdResult] = await Promise.allSettled([
-    typefullyCreateDraft(buildXPost(content, link)),
-    typefullyCreateDraft(
-      buildLinkedInPost(String(thought.title), content, link),
-    ),
-    buttondownCreateEmail(String(thought.title), content, "draft"),
-  ]);
+    const [xResult, liResult, bdResult] = await Promise.allSettled([
+      typefullyCreateDraft(buildXPost(content, link)),
+      typefullyCreateDraft(
+        buildLinkedInPost(String(thought.title), content, link),
+      ),
+      buttondownCreateEmail(String(thought.title), content, "draft"),
+    ]);
 
-  const result: PublishResult = {
-    status: { success: false },
-    typefully: {
-      x: {
-        success: xResult.status === "fulfilled" && !xResult.value.error,
-        error:
-          xResult.status === "rejected"
-            ? String(xResult.reason)
-            : xResult.value.error,
-        draftId:
-          xResult.status === "fulfilled" ? xResult.value.data?.id : undefined,
+    const result: PublishResult = {
+      status: { success: false },
+      typefully: {
+        x: {
+          success:
+            xResult.status === "fulfilled" && xResult.value.success,
+          error:
+            xResult.status === "rejected"
+              ? String(xResult.reason)
+              : !xResult.value.success
+                ? xResult.value.error
+                : undefined,
+          draftId:
+            xResult.status === "fulfilled" && xResult.value.success
+              ? xResult.value.data.id
+              : undefined,
+        },
+        linkedin: {
+          success:
+            liResult.status === "fulfilled" && liResult.value.success,
+          error:
+            liResult.status === "rejected"
+              ? String(liResult.reason)
+              : !liResult.value.success
+                ? liResult.value.error
+                : undefined,
+          draftId:
+            liResult.status === "fulfilled" && liResult.value.success
+              ? liResult.value.data.id
+              : undefined,
+        },
       },
-      linkedin: {
-        success: liResult.status === "fulfilled" && !liResult.value.error,
+      buttondown: {
+        success:
+          bdResult.status === "fulfilled" && bdResult.value.success,
         error:
-          liResult.status === "rejected"
-            ? String(liResult.reason)
-            : liResult.value.error,
-        draftId:
-          liResult.status === "fulfilled" ? liResult.value.data?.id : undefined,
+          bdResult.status === "rejected"
+            ? String(bdResult.reason)
+            : !bdResult.value.success
+              ? bdResult.value.error
+              : undefined,
+        emailId:
+          bdResult.status === "fulfilled" && bdResult.value.success
+            ? bdResult.value.data.id
+            : undefined,
       },
-    },
-    buttondown: {
-      success: bdResult.status === "fulfilled" && !bdResult.value.error,
-      error:
-        bdResult.status === "rejected"
-          ? String(bdResult.reason)
-          : bdResult.value.error,
-      emailId:
-        bdResult.status === "fulfilled" ? bdResult.value.data?.id : undefined,
-    },
-  };
-
-  const anyDistributionSucceeded =
-    result.typefully.x.success ||
-    result.typefully.linkedin.success ||
-    result.buttondown.success;
-
-  if (anyDistributionSucceeded) {
-    const ts = now();
-    const existingPosted = parseJsonArray<Platform>(thought.platforms_posted);
-    const posted: Platform[] = [...existingPosted];
-    if (result.typefully.x.success && !posted.includes("twitter"))
-      posted.push("twitter");
-    if (result.typefully.linkedin.success && !posted.includes("linkedin"))
-      posted.push("linkedin");
-
-    const db = getDB();
-    const updateResult = await updateThought(id, {
-      status: "published" as ContentStatus,
-      published_at: ts,
-      updated_at: ts,
-      platforms_posted: db ? toJsonArray(posted) : (posted as unknown),
-    });
-
-    result.status = {
-      success: !updateResult.error,
-      error: updateResult.error,
     };
-  } else {
-    result.status = {
-      success: false,
-      error: "All distribution channels failed. Status not changed.",
-    };
-  }
 
-  return result;
-}
+    const anyDistributionSucceeded =
+      result.typefully.x.success ||
+      result.typefully.linkedin.success ||
+      result.buttondown.success;
+
+    if (anyDistributionSucceeded) {
+      const ts = now();
+      const existingPosted = parseJsonArray<Platform>(thought.platforms_posted);
+      const posted: Platform[] = [...existingPosted];
+      if (result.typefully.x.success && !posted.includes("twitter"))
+        posted.push("twitter");
+      if (result.typefully.linkedin.success && !posted.includes("linkedin"))
+        posted.push("linkedin");
+
+      const db = getDB();
+      const updateResult = await updateThought(id, {
+        status: "published" as ContentStatus,
+        published_at: ts,
+        updated_at: ts,
+        platforms_posted: db ? toJsonArray(posted) : (posted as unknown),
+      });
+
+      result.status = {
+        success: !updateResult.error,
+        error: updateResult.error,
+      };
+    } else {
+      result.status = {
+        success: false,
+        error: "All distribution channels failed. Status not changed.",
+      };
+    }
+
+    return result;
+  },
+);
 
 // ── Atom CRUD ──
 
-export async function createAtom(
-  contentId: string,
-  platform: Platform,
-  atomContent: string,
-  voiceMode?: VoiceMode,
-  hashtags?: string[],
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!UUID_RE.test(contentId)) return { error: "Invalid content ID" };
+export const createAtom = withAuth(
+  async (
+    contentId: string,
+    platform: Platform,
+    atomContent: string,
+    voiceMode?: VoiceMode,
+    hashtags?: string[],
+  ) => {
+    if (!UUID_RE.test(contentId)) return { error: "Invalid content ID" };
 
-  if (!getDB()) return { error: "Database not configured" };
+    if (!getDB()) return { error: "Database not configured" };
 
-  try {
-    const data = await upsertAtomRecord({
-      content_id: contentId,
-      platform,
-      atom_content: atomContent,
-      voice_mode: voiceMode,
-      hashtags: hashtags || [],
-      status: "draft",
-    });
-    return { success: true, atom: data };
-  } catch (e) {
-    return { error: String(e) };
-  }
-}
-
-export async function updateAtom(
-  atomId: string,
-  fields: {
-    atom_content?: string;
-    voice_mode?: VoiceMode;
-    hashtags?: string[];
-    status?: "draft" | "scheduled" | "posted";
+    try {
+      const data = await upsertAtomRecord({
+        content_id: contentId,
+        platform,
+        atom_content: atomContent,
+        voice_mode: voiceMode,
+        hashtags: hashtags || [],
+        status: "draft",
+      });
+      return { success: true, atom: data };
+    } catch (e) {
+      return { error: String(e) };
+    }
   },
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
+);
 
-  if (!getDB()) return { error: "Database not configured" };
+export const updateAtom = withAuth(
+  async (
+    atomId: string,
+    fields: {
+      atom_content?: string;
+      voice_mode?: VoiceMode;
+      hashtags?: string[];
+      status?: "draft" | "scheduled" | "posted";
+    },
+  ) => {
+    if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
-  try {
-    const data = await upsertAtomRecord({
-      id: atomId,
-      ...fields,
-      updated_at: now(),
-    });
-    return { success: true, atom: data };
-  } catch (e) {
-    return { error: String(e) };
-  }
-}
+    if (!getDB()) return { error: "Database not configured" };
 
-export async function deleteAtom(atomId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+    try {
+      const data = await upsertAtomRecord({
+        id: atomId,
+        ...fields,
+        updated_at: now(),
+      });
+      return { success: true, atom: data };
+    } catch (e) {
+      return { error: String(e) };
+    }
+  },
+);
+
+export const deleteAtom = withAuth(async (atomId: string) => {
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
   if (!getDB()) return { error: "Database not configured" };
@@ -590,106 +601,101 @@ export async function deleteAtom(atomId: string) {
   } catch (e) {
     return { error: String(e) };
   }
-}
+});
 
-export async function pushAtomToTypefully(atomId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+export const pushAtomToTypefully = withAuth(async (atomId: string) => {
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
 
   const atom = await getAtomById(atomId);
   if (!atom) return { error: "Atom not found" };
 
   const result = await typefullyCreateDraft(String(atom.atom_content));
-  if (result.error) return { error: result.error };
+  if (!result.success) return { error: result.error };
 
   await updateAtomFields(atomId, {
-    typefully_draft_id: result.data?.id,
+    typefully_draft_id: result.data.id,
     updated_at: now(),
   });
 
-  return { success: true, draftId: result.data?.id };
-}
+  return { success: true, draftId: result.data.id };
+});
 
 // ── Typefully Management ──
 
-export async function fetchTypefullyDraftStatus(draftId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
+export const fetchTypefullyDraftStatus = withAuth(
+  async (draftId: string) => {
+    if (!SAFE_EXTERNAL_ID_RE.test(draftId))
+      return { error: "Invalid draft ID" };
 
-  const result = await typefullyGetDraft(draftId);
-  if (result.error) return { error: result.error };
-  return { success: true, draft: result.data };
-}
+    const result = await typefullyGetDraft(draftId);
+    if (!result.success) return { error: result.error };
+    return { success: true, draft: result.data };
+  },
+);
 
-export async function editTypefullyDraft(draftId: string, content: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
+export const editTypefullyDraft = withAuth(
+  async (draftId: string, content: string) => {
+    if (!SAFE_EXTERNAL_ID_RE.test(draftId))
+      return { error: "Invalid draft ID" };
 
-  const result = await typefullyUpdateDraft(draftId, content);
-  if (result.error) return { error: result.error };
-  return { success: true, draft: result.data };
-}
+    const result = await typefullyUpdateDraft(draftId, content);
+    if (!result.success) return { error: result.error };
+    return { success: true, draft: result.data };
+  },
+);
 
-export async function removeTypefullyDraft(draftId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+export const removeTypefullyDraft = withAuth(async (draftId: string) => {
   if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
 
   const result = await typefullyDeleteDraft(draftId);
   if (!result.success) return { error: result.error };
   return { success: true };
-}
+});
 
 // ── Buttondown Management ──
 
-export async function fetchButtondownEmailStatus(emailId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
+export const fetchButtondownEmailStatus = withAuth(
+  async (emailId: string) => {
+    if (!SAFE_EXTERNAL_ID_RE.test(emailId))
+      return { error: "Invalid email ID" };
 
-  const result = await buttondownGetEmail(emailId);
-  if (result.error) return { error: result.error };
-  return { success: true, email: result.data };
-}
-
-export async function editButtondownEmail(
-  emailId: string,
-  fields: {
-    subject?: string;
-    body?: string;
-    status?: "draft" | "scheduled" | "about_to_send" | "in_flight" | "sent";
-    publish_date?: string;
+    const result = await buttondownGetEmail(emailId);
+    if (!result.success) return { error: result.error };
+    return { success: true, email: result.data };
   },
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
+);
 
-  const result = await buttondownUpdateEmail(emailId, fields);
-  if (result.error) return { error: result.error };
-  return { success: true, email: result.data };
-}
+export const editButtondownEmail = withAuth(
+  async (
+    emailId: string,
+    fields: {
+      subject?: string;
+      body?: string;
+      status?: "draft" | "scheduled" | "about_to_send" | "in_flight" | "sent";
+      publish_date?: string;
+    },
+  ) => {
+    if (!SAFE_EXTERNAL_ID_RE.test(emailId))
+      return { error: "Invalid email ID" };
 
-export async function removeButtondownEmail(emailId: string) {
-  const authError = await requireAuth();
-  if (authError) return authError;
+    const result = await buttondownUpdateEmail(emailId, fields);
+    if (!result.success) return { error: result.error };
+    return { success: true, email: result.data };
+  },
+);
+
+export const removeButtondownEmail = withAuth(async (emailId: string) => {
   if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
 
   const result = await buttondownDeleteEmail(emailId);
   if (!result.success) return { error: result.error };
   return { success: true };
-}
+});
 
 // ── Subscribers ──
 
-export async function fetchSubscribers() {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
+export const fetchSubscribers = withAuth(async () => {
   const result = await buttondownListSubscribers("regular");
-  if (result.error) return { error: result.error };
+  if (!result.success) return { error: result.error };
   return { success: true, subscribers: result.data, count: result.count };
-}
+});
