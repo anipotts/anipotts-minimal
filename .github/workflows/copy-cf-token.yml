@@ -1,0 +1,25 @@
+name: Copy CF_API_TOKEN to ingest worker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copy-secret:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      - name: Set CF_API_TOKEN on ingest worker
+        working-directory: workers/ingest
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: echo "$CLOUDFLARE_API_TOKEN" | wrangler secret put CF_API_TOKEN
