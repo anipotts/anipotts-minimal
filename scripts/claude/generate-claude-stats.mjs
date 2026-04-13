@@ -89,7 +89,8 @@ async function findJsonlFiles(rootDir, depth = 0, acc = []) {
       continue;
     }
     if (isFileEntry(entry) && entry.name.endsWith(".jsonl")) {
-      acc.push(fullPath);
+      const isSubagent = fullPath.includes("/subagents/");
+      acc.push({ path: fullPath, isSubagent });
     }
   }
 
@@ -265,26 +266,31 @@ function calculateFastestCommitCadence(repos) {
   return best;
 }
 
+// Cap per-session duration to filter stale/overnight sessions (6 hours)
+const MAX_SESSION_MINUTES = 360;
+
 async function main() {
   const jsonlFiles = await findJsonlFiles(projectsDir);
-  const sessions = [];
+  const mainSessions = [];
   const toolTotals = {};
   const dailyMap = new Map();
   const allFiles = new Set();
   const sessionDates = [];
 
-  let totalToolCalls = 0;
-  let totalHumanMinutes = 0;
+  let mainToolCalls = 0;
+  let subagentToolCalls = 0;
+  let subagentCount = 0;
+  let totalHoursUsed = 0;
   let mostFilesChanged = { files: 0, session: null };
   let longestSession = { duration: 0, session: null };
   let mostToolCalls = { toolCalls: 0, session: null };
 
   let latestMtime = null;
 
-  for (const filePath of jsonlFiles) {
+  for (const file of jsonlFiles) {
     let stat;
     try {
-      stat = fs.statSync(filePath);
+      stat = fs.statSync(file.path);
     } catch (error) {
       continue;
     }
@@ -293,22 +299,38 @@ async function main() {
       latestMtime = stat.mtime;
     }
 
-    const session = await parseSession(filePath);
+    const session = await parseSession(file.path);
     if (!session) continue;
 
+    // Track subagent stats separately
+    if (file.isSubagent) {
+      subagentToolCalls += session.toolCalls;
+      subagentCount += 1;
+      // Subagent file mutations still count toward total impact
+      for (const f of session.filesMutated) allFiles.add(f);
+      // Subagent tool counts still count toward tool diversity
+      for (const [toolName, count] of Object.entries(session.toolCounts)) {
+        toolTotals[toolName] = (toolTotals[toolName] || 0) + count;
+      }
+      continue;
+    }
+
+    // Main session processing
     const dayKey = toDateKey(session.startTime);
     sessionDates.push(dayKey);
 
-    totalToolCalls += session.toolCalls;
+    mainToolCalls += session.toolCalls;
 
     for (const [toolName, count] of Object.entries(session.toolCounts)) {
       toolTotals[toolName] = (toolTotals[toolName] || 0) + count;
-      const minutes = TOOL_MINUTES.get(toolName) || 0;
-      totalHumanMinutes += minutes * count;
     }
 
     const filesCount = session.filesMutated.size;
-    for (const file of session.filesMutated) allFiles.add(file);
+    for (const f of session.filesMutated) allFiles.add(f);
+
+    // Accumulate hours (capped per session to exclude stale/overnight)
+    const cappedMinutes = Math.min(session.durationMinutes, MAX_SESSION_MINUTES);
+    totalHoursUsed += cappedMinutes / 60;
 
     const dailyEntry = dailyMap.get(dayKey) || { toolCalls: 0, files: 0 };
     dailyEntry.toolCalls += session.toolCalls;
@@ -319,20 +341,21 @@ async function main() {
       mostFilesChanged = { files: filesCount, session };
     }
 
-    if (session.durationMinutes > longestSession.duration) {
-      longestSession = { duration: session.durationMinutes, session };
+    // Use capped duration for records to avoid stale session outliers
+    if (cappedMinutes > longestSession.duration) {
+      longestSession = { duration: cappedMinutes, session };
     }
 
     if (session.toolCalls > mostToolCalls.toolCalls) {
       mostToolCalls = { toolCalls: session.toolCalls, session };
     }
 
-    sessions.push(session);
+    mainSessions.push(session);
   }
 
-  sessions.sort((a, b) => b.startTime - a.startTime);
+  mainSessions.sort((a, b) => b.startTime - a.startTime);
 
-  const totalSessions = sessions.length;
+  const totalMainSessions = mainSessions.length;
   const streakDays = calculateStreak(sessionDates);
   const recentDays = getRecentDays(90);
   const daily = recentDays.map((date) => ({
@@ -363,20 +386,30 @@ async function main() {
     generatedAt: now.toISOString(),
     timezone: timeZone,
     totals: {
-      sessions: totalSessions,
-      toolCalls: totalToolCalls,
+      sessions: totalMainSessions,
+      hoursUsed: Math.round(totalHoursUsed),
+      toolCalls: mainToolCalls,
       filesMutated: allFiles.size,
-      humanMinutesSaved: Math.round(totalHumanMinutes),
       streakDays,
+    },
+    subagents: {
+      sessions: subagentCount,
+      toolCalls: subagentToolCalls,
+    },
+    combined: {
+      totalToolCalls: mainToolCalls + subagentToolCalls,
+      totalSessions: totalMainSessions + subagentCount,
     },
     tools: toolTotals,
     daily,
-    sessions: sessions.slice(0, 20).map((session) => ({
+    sessions: mainSessions.slice(0, 20).map((session) => ({
       id: session.id,
       project: session.project,
       start: session.startTime.toISOString(),
       end: session.endTime.toISOString(),
-      durationMinutes: Math.round(session.durationMinutes * 10) / 10,
+      durationMinutes: Math.round(
+        Math.min(session.durationMinutes, MAX_SESSION_MINUTES) * 10,
+      ) / 10,
       toolCalls: session.toolCalls,
       filesMutated: session.filesMutated.size,
     })),
@@ -418,8 +451,9 @@ async function main() {
     meta: {
       projectCount: repoDirs.size,
       sinceDays: gitSinceDays,
-      sourceSessions: totalSessions,
-      sourceFiles: jsonlFiles.length,
+      mainSessionFiles: jsonlFiles.filter((f) => !f.isSubagent).length,
+      subagentSessionFiles: jsonlFiles.filter((f) => f.isSubagent).length,
+      maxSessionMinutesCap: MAX_SESSION_MINUTES,
     },
     labels: {
       generatedAtLocal: formatDateTime(now),
@@ -431,7 +465,7 @@ async function main() {
 
   console.log(`Wrote ${outPath}`);
   console.log(
-    `Sessions: ${totalSessions} | Tool calls: ${totalToolCalls} | Files mutated: ${allFiles.size}`,
+    `Main sessions: ${totalMainSessions} | Hours: ${Math.round(totalHoursUsed)} | Tool calls: ${mainToolCalls} | Subagents: ${subagentCount}`,
   );
 }
 

@@ -35,15 +35,6 @@ export const metadata: Metadata = {
 
 const formatNumber = (value: number) => value.toLocaleString();
 
-const formatHumanTime = (minutes: number) => {
-  const hours = Math.round(minutes / 60);
-  if (hours < 48) {
-    return `${hours.toLocaleString()}h`;
-  }
-  const days = Math.round(hours / 8);
-  return `${hours.toLocaleString()}h (${days.toLocaleString()}d @ 8h)`;
-};
-
 const formatUpdatedDate = (value: string, timeZone: string) =>
   new Intl.DateTimeFormat("en-US", {
     timeZone,
@@ -110,10 +101,10 @@ export default function ClaudePage() {
           </CardBlock>
           <CardBlock>
             <p className="text-[10px] uppercase tracking-[0.16em] text-faint">
-              human time saved
+              hours used
             </p>
             <p className="text-2xl font-heading text-accent-400 mt-1">
-              {formatHumanTime(claudeStats.totals.humanMinutesSaved)}
+              {formatNumber(claudeStats.totals.hoursUsed)}
             </p>
           </CardBlock>
           <CardBlock>
