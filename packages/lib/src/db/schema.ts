@@ -47,6 +47,11 @@ export const thoughts = sqliteTable(
 
     // scheduling
     scheduled_at: text("scheduled_at"),
+
+    // distribution IDs (migration 003)
+    buttondown_email_id: text("buttondown_email_id"),
+    typefully_x_draft_id: text("typefully_x_draft_id"),
+    typefully_linkedin_draft_id: text("typefully_linkedin_draft_id"),
   },
   (table) => [
     index("idx_thoughts_slug").on(table.slug),

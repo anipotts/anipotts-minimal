@@ -188,7 +188,7 @@ export default async function ContentDetailPage({
 
             <section>
               <h4 className="admin-label">Email</h4>
-              <ButtondownCard contentId={t.id} />
+              <ButtondownCard contentId={t.id} initialEmailId={t.buttondown_email_id ?? undefined} />
             </section>
 
             <section>
