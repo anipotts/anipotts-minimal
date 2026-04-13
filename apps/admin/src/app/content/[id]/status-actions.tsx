@@ -37,7 +37,11 @@ export default function StatusActions({
   function handlePublishEverywhere() {
     if (
       !confirm(
-        "Publish this content everywhere? This will push to Typefully and Buttondown.",
+        "Publish this content to:\n\n" +
+          "- X (via Typefully)\n" +
+          "- LinkedIn (via Typefully)\n" +
+          "- Email subscribers (via Buttondown)\n\n" +
+          "Continue?",
       )
     )
       return;

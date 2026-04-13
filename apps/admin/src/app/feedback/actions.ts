@@ -1,34 +1,34 @@
 "use server";
 
 import { getQCFeedback, updateQCFeedback } from "@anipotts/lib/quantercise";
-import { requireAuth } from "../actions";
+import { withAuth } from "../actions";
 import { getQCEnvForProject } from "@/lib/project-env-adapter";
 
-export async function getFeedback(
-  slug: string,
-  params?: {
-    status?: string;
-    type?: string;
-    page?: number;
+export const getFeedback = withAuth(
+  async (
+    slug: string,
+    params?: {
+      status?: string;
+      type?: string;
+      page?: number;
+    },
+  ) => {
+    return getQCFeedback(getQCEnvForProject(slug), params);
   },
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  return getQCFeedback(getQCEnvForProject(slug), params);
-}
+);
 
-export async function updateFeedback(
-  slug: string,
-  issueNumber: number,
-  action: "close" | "reopen" | "comment",
-  comment?: string,
-) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-  return updateQCFeedback(
-    getQCEnvForProject(slug),
-    issueNumber,
-    action,
-    comment,
-  );
-}
+export const updateFeedback = withAuth(
+  async (
+    slug: string,
+    issueNumber: number,
+    action: "close" | "reopen" | "comment",
+    comment?: string,
+  ) => {
+    return updateQCFeedback(
+      getQCEnvForProject(slug),
+      issueNumber,
+      action,
+      comment,
+    );
+  },
+);
