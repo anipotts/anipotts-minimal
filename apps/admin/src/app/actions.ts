@@ -89,7 +89,7 @@ function buildLinkedInPost(
   return `${title}\n\n${body}\n\n${link}`;
 }
 
-async function requireAuth(): Promise<{ error: string } | null> {
+export async function requireAuth(): Promise<{ error: string } | null> {
   const jar = await cookies();
   const token = jar.get(ADMIN_COOKIE)?.value;
   const secret = getEnv("ADMIN_PASSWORD");

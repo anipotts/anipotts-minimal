@@ -1,45 +1,15 @@
 import { Suspense } from "react";
 import { getQCDashboard } from "@anipotts/lib/quantercise";
-import { getEnv } from "@anipotts/lib/env";
 import type { QCDashboard } from "@anipotts/lib/quantercise";
+import {
+  getQCEnv,
+  PanelShell,
+  PanelSkeleton,
+  MetricCard,
+  ErrorPanel,
+} from "./components";
 
 export const dynamic = "force-dynamic";
-
-function Skeleton({ className = "" }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded bg-zinc-800/40 ${className}`} />
-  );
-}
-
-function PanelShell({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-lg border border-zinc-800/60 bg-zinc-950/50">
-      <div className="px-4 py-2.5 border-b border-zinc-800/40">
-        <h3 className="text-[11px] font-medium tracking-wide text-zinc-500 uppercase">
-          {title}
-        </h3>
-      </div>
-      <div className="p-4">{children}</div>
-    </div>
-  );
-}
-
-function PanelSkeleton({ title }: { title: string }) {
-  return (
-    <PanelShell title={title}>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-    </PanelShell>
-  );
-}
 
 function fmt(cents: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -47,28 +17,6 @@ function fmt(cents: number): string {
     currency: "USD",
     minimumFractionDigits: 0,
   }).format(cents / 100);
-}
-
-function MetricCard({
-  label,
-  value,
-  sub,
-  color = "text-zinc-200",
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div>
-      <div className={`text-[16px] font-medium ${color}`}>{value}</div>
-      <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
-        {label}
-      </div>
-      {sub && <div className="text-[10px] text-zinc-600 mt-0.5">{sub}</div>}
-    </div>
-  );
 }
 
 function MetricsPanel({ data }: { data: QCDashboard }) {
@@ -175,6 +123,10 @@ function QuickStatsPanel({ data }: { data: QCDashboard }) {
       value: quickStats.submissionsToday,
     },
     {
+      label: "Avg session",
+      value: `${Math.round(quickStats.avgSessionSeconds / 60)}m`,
+    },
+    {
       label: "Churn rate",
       value: `${quickStats.churnRate}%`,
     },
@@ -266,10 +218,7 @@ function ContentStatsPanel({ data }: { data: QCDashboard }) {
 }
 
 async function QCDashboardContent() {
-  const env = {
-    QUANTERCISE_ADMIN_TOKEN: getEnv("QUANTERCISE_ADMIN_TOKEN"),
-    QUANTERCISE_BASE_URL: getEnv("QUANTERCISE_BASE_URL"),
-  };
+  const env = getQCEnv();
 
   let data: QCDashboard;
   try {
@@ -278,12 +227,11 @@ async function QCDashboardContent() {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return (
       <div className="col-span-full">
-        <PanelShell title="Quantercise">
-          <p className="text-[12px] text-red-400">{msg}</p>
-          <p className="text-[10px] text-zinc-600 mt-1">
-            Check QUANTERCISE_ADMIN_TOKEN and QUANTERCISE_BASE_URL secrets.
-          </p>
-        </PanelShell>
+        <ErrorPanel
+          title="Quantercise"
+          message={msg}
+          hint="Check QUANTERCISE_ADMIN_TOKEN and QUANTERCISE_BASE_URL secrets."
+        />
       </div>
     );
   }

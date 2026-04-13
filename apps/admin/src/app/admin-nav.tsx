@@ -179,7 +179,16 @@ const subTabs: Record<string, Array<{ label: string; href: string }>> = {
     { label: "Subscribers", href: "/subscribers" },
     { label: "New", href: "/quick" },
   ],
-  Quantercise: [{ label: "Dashboard", href: "/quantercise" }],
+  Quantercise: [
+    { label: "Dashboard", href: "/quantercise" },
+    { label: "Users", href: "/quantercise/users" },
+    { label: "Problems", href: "/quantercise/problems" },
+    { label: "QA", href: "/quantercise/qa" },
+    { label: "Analytics", href: "/quantercise/analytics" },
+    { label: "Payments", href: "/quantercise/payments" },
+    { label: "Flags", href: "/quantercise/flags" },
+    { label: "Health", href: "/quantercise/health" },
+  ],
 };
 
 export default function AdminNav() {
