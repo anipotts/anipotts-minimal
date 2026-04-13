@@ -2,7 +2,7 @@
 
 import { qcMutate } from "@anipotts/lib/quantercise";
 import type { QCActionResponse, QCUserAction } from "@anipotts/lib/quantercise";
-import { withAuth } from "../actions";
+import { withAuth } from "../lib/with-auth";
 import { getQCEnv } from "@/lib/qc-env";
 
 export const userAction = withAuth(

@@ -99,7 +99,7 @@ export async function requireAuth(): Promise<{ error: string } | null> {
   return null;
 }
 
-export function withAuth<Args extends unknown[], R>(
+function withAuth<Args extends unknown[], R>(
   fn: (...args: Args) => Promise<R>,
 ): (...args: Args) => Promise<R | { error: string }> {
   return async (...args: Args) => {

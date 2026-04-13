@@ -1,7 +1,7 @@
 "use server";
 
 import { getQCFeedback, updateQCFeedback } from "@anipotts/lib/quantercise";
-import { withAuth } from "../actions";
+import { withAuth } from "../lib/with-auth";
 import { getQCEnvForProject } from "@/lib/project-env-adapter";
 
 export const getFeedback = withAuth(
