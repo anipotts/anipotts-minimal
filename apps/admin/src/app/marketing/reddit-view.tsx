@@ -35,7 +35,7 @@ const RESPONSE_TEMPLATES = [
 
 type SortKey = "score" | "date" | "comments" | "relevance";
 
-export default function RedditView() {
+export default function RedditView({ slug }: { slug: string }) {
   const [posts, setPosts] = useState<QCRedditPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function RedditView() {
     setLoading(true);
     setError(null);
     try {
-      const result = await searchReddit({
+      const result = await searchReddit(slug, {
         subreddits: DEFAULT_SUBREDDITS,
         keywords: DEFAULT_KEYWORDS,
         days: 7,
@@ -73,7 +73,7 @@ export default function RedditView() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [slug]);
 
   const uniqueSubreddits = [...new Set(posts.map((p) => p.subreddit))].sort();
 

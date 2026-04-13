@@ -2,24 +2,33 @@
 
 import { getQCFeedback, updateQCFeedback } from "@anipotts/lib/quantercise";
 import { requireAuth } from "../actions";
-import { getQCEnv } from "@/lib/qc-env";
+import { getQCEnvForProject } from "@/lib/project-env-adapter";
 
-export async function getFeedback(params?: {
-  status?: string;
-  type?: string;
-  page?: number;
-}) {
+export async function getFeedback(
+  slug: string,
+  params?: {
+    status?: string;
+    type?: string;
+    page?: number;
+  },
+) {
   const authError = await requireAuth();
   if (authError) return authError;
-  return getQCFeedback(getQCEnv(), params);
+  return getQCFeedback(getQCEnvForProject(slug), params);
 }
 
 export async function updateFeedback(
+  slug: string,
   issueNumber: number,
   action: "close" | "reopen" | "comment",
   comment?: string,
 ) {
   const authError = await requireAuth();
   if (authError) return authError;
-  return updateQCFeedback(getQCEnv(), issueNumber, action, comment);
+  return updateQCFeedback(
+    getQCEnvForProject(slug),
+    issueNumber,
+    action,
+    comment,
+  );
 }

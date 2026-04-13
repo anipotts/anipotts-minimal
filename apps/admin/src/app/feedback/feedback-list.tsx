@@ -10,11 +10,13 @@ type StatusFilter = "open" | "closed" | "reopened" | "all";
 interface FeedbackListProps {
   initialFeedback: QCFeedbackIssue[];
   initialHasMore: boolean;
+  slug: string;
 }
 
 export default function FeedbackList({
   initialFeedback,
   initialHasMore,
+  slug,
 }: FeedbackListProps) {
   const [feedback, setFeedback] = useState<QCFeedbackIssue[]>(initialFeedback);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -31,7 +33,7 @@ export default function FeedbackList({
       setLoading(true);
       setError(null);
       try {
-        const result = await getFeedback({
+        const result = await getFeedback(slug, {
           page: newPage,
           status: status === "all" ? undefined : status,
           type: type === "all" ? undefined : type,
@@ -46,7 +48,7 @@ export default function FeedbackList({
         setLoading(false);
       }
     },
-    [],
+    [slug],
   );
 
   const handleStatusFilter = (s: StatusFilter) => {
@@ -74,7 +76,7 @@ export default function FeedbackList({
     setUpdatingIds((prev) => new Set([...prev, issue.id]));
 
     try {
-      const result = await updateFeedback(issue.number, action);
+      const result = await updateFeedback(slug, issue.number, action);
       if ("error" in result) {
         // Revert on error
         setFeedback((prev) =>

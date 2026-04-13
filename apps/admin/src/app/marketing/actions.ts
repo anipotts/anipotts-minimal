@@ -2,25 +2,31 @@
 
 import { searchQCTwitter, searchQCReddit } from "@anipotts/lib/quantercise";
 import { requireAuth } from "../actions";
-import { getQCEnv } from "@/lib/qc-env";
+import { getQCEnvForProject } from "@/lib/project-env-adapter";
 
-export async function searchTwitter(params?: {
-  queries?: string;
-  limit?: number;
-  days?: number;
-}) {
+export async function searchTwitter(
+  slug: string,
+  params?: {
+    queries?: string;
+    limit?: number;
+    days?: number;
+  },
+) {
   const authError = await requireAuth();
   if (authError) return authError;
-  return searchQCTwitter(getQCEnv(), params);
+  return searchQCTwitter(getQCEnvForProject(slug), params);
 }
 
-export async function searchReddit(params?: {
-  subreddits?: string;
-  keywords?: string;
-  days?: number;
-  limit?: number;
-}) {
+export async function searchReddit(
+  slug: string,
+  params?: {
+    subreddits?: string;
+    keywords?: string;
+    days?: number;
+    limit?: number;
+  },
+) {
   const authError = await requireAuth();
   if (authError) return authError;
-  return searchQCReddit(getQCEnv(), params);
+  return searchQCReddit(getQCEnvForProject(slug), params);
 }

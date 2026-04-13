@@ -30,8 +30,10 @@ const RESPONSE_TEMPLATES = [
 
 export default function TwitterView({
   twitterConfigured,
+  slug,
 }: {
   twitterConfigured: boolean;
+  slug: string;
 }) {
   const [tweets, setTweets] = useState<QCTweet[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ export default function TwitterView({
     setLoading(true);
     setError(null);
     try {
-      const result = await searchTwitter({ days: 7, limit: 50 });
+      const result = await searchTwitter(slug, { days: 7, limit: 50 });
       if ("error" in result) {
         setError(result.error);
         return;
@@ -59,7 +61,7 @@ export default function TwitterView({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [slug]);
 
   const copyText = async (text: string, id: string) => {
     try {

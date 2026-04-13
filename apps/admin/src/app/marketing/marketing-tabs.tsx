@@ -8,8 +8,10 @@ type Tab = "reddit" | "twitter";
 
 export default function MarketingTabs({
   twitterConfigured,
+  slug,
 }: {
   twitterConfigured: boolean;
+  slug: string;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("reddit");
 
@@ -46,9 +48,9 @@ export default function MarketingTabs({
       </div>
 
       {/* Tab Content */}
-      {activeTab === "reddit" && <RedditView />}
+      {activeTab === "reddit" && <RedditView slug={slug} />}
       {activeTab === "twitter" && (
-        <TwitterView twitterConfigured={twitterConfigured} />
+        <TwitterView twitterConfigured={twitterConfigured} slug={slug} />
       )}
     </div>
   );
