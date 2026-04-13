@@ -15,10 +15,12 @@ const SERIES = [
 export default function PipelineFilters({
   currentStatus,
   currentSeries,
+  currentView = "list",
   statusCounts,
 }: {
   currentStatus: string;
   currentSeries: string;
+  currentView?: string;
   statusCounts: Record<string, number>;
 }) {
   const router = useRouter();
@@ -26,7 +28,8 @@ export default function PipelineFilters({
 
   function setFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (value === "all") {
+    const defaults: Record<string, string> = { view: "list" };
+    if (value === "all" || value === defaults[key]) {
       params.delete(key);
     } else {
       params.set(key, value);
@@ -92,6 +95,72 @@ export default function PipelineFilters({
             {s === "all" ? "All" : s}
           </button>
         ))}
+
+        <span className="ml-auto" />
+        <span className="w-px h-3 bg-zinc-800 mx-1" />
+        <button
+          onClick={() => setFilter("view", "list")}
+          data-active={currentView === "list"}
+          className="admin-pill"
+          title="List view"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="inline-block"
+          >
+            <path
+              d="M2 4h12M2 8h12M2 12h12"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <button
+          onClick={() => setFilter("view", "board")}
+          data-active={currentView === "board"}
+          className="admin-pill"
+          title="Board view"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="inline-block"
+          >
+            <rect
+              x="1"
+              y="2"
+              width="4"
+              height="12"
+              rx="1"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            <rect
+              x="6"
+              y="2"
+              width="4"
+              height="8"
+              rx="1"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            <rect
+              x="11"
+              y="2"
+              width="4"
+              height="10"
+              rx="1"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );
