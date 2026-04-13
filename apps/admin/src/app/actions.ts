@@ -129,6 +129,9 @@ const THOUGHT_COLUMNS = new Set([
   "voice_mode",
   "updated_at",
   "views",
+  "buttondown_email_id",
+  "typefully_x_draft_id",
+  "typefully_linkedin_draft_id",
 ]);
 
 async function updateThought(
@@ -391,7 +394,13 @@ export async function pushToButtondown(id: string) {
     "draft",
   );
   if (result.error) return { error: result.error };
-  if (typeof result.data?.id !== "string" || !result.data.id) return { error: "Buttondown returned no email ID" };
+  if (typeof result.data?.id !== "string" || !result.data.id)
+    return { error: "Buttondown returned no email ID" };
+
+  await updateThought(id, {
+    buttondown_email_id: result.data.id,
+    updated_at: now(),
+  });
   return { success: true, emailId: result.data.id };
 }
 
@@ -416,11 +425,21 @@ export async function pushToTypefully(id: string) {
   );
   if (liResult.error) return { error: `LinkedIn: ${liResult.error}` };
 
+  const xId = xResult.data?.id;
+  const liId = liResult.data?.id;
+  if (xId || liId) {
+    await updateThought(id, {
+      ...(xId ? { typefully_x_draft_id: xId } : {}),
+      ...(liId ? { typefully_linkedin_draft_id: liId } : {}),
+      updated_at: now(),
+    });
+  }
+
   return {
     success: true,
     drafts: {
-      x: xResult.data?.id,
-      linkedin: liResult.data?.id,
+      x: xId,
+      linkedin: liId,
     },
   };
 }
@@ -510,6 +529,15 @@ export async function publishEverywhere(
       published_at: ts,
       updated_at: ts,
       platforms_posted: db ? toJsonArray(posted) : (posted as unknown),
+      ...(result.buttondown.emailId
+        ? { buttondown_email_id: result.buttondown.emailId }
+        : {}),
+      ...(result.typefully.x.draftId
+        ? { typefully_x_draft_id: result.typefully.x.draftId }
+        : {}),
+      ...(result.typefully.linkedin.draftId
+        ? { typefully_linkedin_draft_id: result.typefully.linkedin.draftId }
+        : {}),
     });
 
     result.status = {

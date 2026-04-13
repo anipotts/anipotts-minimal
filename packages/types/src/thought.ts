@@ -72,6 +72,11 @@ export interface Thought {
   published_at?: string;
   scheduled_at?: string;
 
+  // Distribution IDs (migration 003)
+  buttondown_email_id?: string;
+  typefully_x_draft_id?: string;
+  typefully_linkedin_draft_id?: string;
+
   // Section scoping
   section?: Section;
 }

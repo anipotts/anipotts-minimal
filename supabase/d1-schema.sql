@@ -46,7 +46,12 @@ CREATE TABLE IF NOT EXISTS thoughts (
   published_at TEXT,
 
   -- scheduling (migration 002)
-  scheduled_at TEXT
+  scheduled_at TEXT,
+
+  -- distribution IDs (migration 003)
+  buttondown_email_id TEXT,
+  typefully_x_draft_id TEXT,
+  typefully_linkedin_draft_id TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_thoughts_slug ON thoughts(slug);
