@@ -66,7 +66,7 @@ const VALID_CONTENT_TYPES: ContentType[] = [
   "tip",
 ];
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://anipotts.com";
+const SITE_URL = getEnv("SITE_URL") || "https://anipotts.com";
 
 const X_CONTENT_LIMIT = 250;
 const LINKEDIN_CONTENT_LIMIT = 2500;
@@ -356,8 +356,14 @@ export async function updateThoughtContent(
     if (!fields.title.trim()) return { error: "Title cannot be empty" };
     update.title = fields.title;
   }
-  if (fields.summary !== undefined) update.summary = fields.summary;
-  if (fields.content !== undefined) update.content = fields.content;
+  if (fields.summary !== undefined) {
+    if (typeof fields.summary !== "string") return { error: "Invalid summary" };
+    update.summary = fields.summary;
+  }
+  if (fields.content !== undefined) {
+    if (typeof fields.content !== "string") return { error: "Invalid content" };
+    update.content = fields.content;
+  }
 
   const db = getDB();
   if (fields.tags !== undefined) {
@@ -385,7 +391,7 @@ export async function pushToButtondown(id: string) {
     "draft",
   );
   if (result.error) return { error: result.error };
-  if (!result.data?.id) return { error: "Buttondown returned no email ID" };
+  if (typeof result.data?.id !== "string" || !result.data.id) return { error: "Buttondown returned no email ID" };
   return { success: true, emailId: result.data.id };
 }
 

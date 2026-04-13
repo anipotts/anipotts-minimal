@@ -11,7 +11,10 @@ const TRANSITIONS: Record<string, { label: string; next: ContentStatus }[]> = {
   draft: [{ label: "Approve", next: "ready" }],
   ready: [{ label: "Mark Atomized", next: "atomized" }],
   atomized: [{ label: "Revert to Ready", next: "ready" }],
-  published: [{ label: "Revert to Draft", next: "draft" }],
+  published: [
+    { label: "Reset to Ready", next: "ready" },
+    { label: "Revert to Draft", next: "draft" },
+  ],
 };
 
 export default function StatusActions({
