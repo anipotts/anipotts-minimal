@@ -187,6 +187,7 @@ const ATOM_COLUMNS = new Set([
   "scheduled_for",
   "posted_at",
   "engagement_metrics",
+  "typefully_draft_id",
   "updated_at",
 ]);
 
