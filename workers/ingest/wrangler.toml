@@ -5,6 +5,14 @@ account_id = "0f856093bdcd34a7da1bde5ee4385163"
 main = "src/index.ts"
 workers_dev = true
 
+# Non-secret env vars (secrets set via `wrangler secret put`)
+[vars]
+CF_ACCOUNT_ID = "0f856093bdcd34a7da1bde5ee4385163"
+
+# Cron: fires every minute, dispatcher picks jobs by minute offset
+[triggers]
+crons = ["* * * * *"]
+
 # D1 database binding
 [[d1_databases]]
 binding = "DB"

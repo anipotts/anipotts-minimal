@@ -1,6 +1,9 @@
 interface Env {
   DB: D1Database;
   MAC_MINI_INGEST_KEY: string;
+  GITHUB_TOKEN: string;
+  CF_API_TOKEN: string;
+  CF_ACCOUNT_ID: string;
 }
 
 type Category = "ops" | "code" | "analytics" | "business" | "rollup";
@@ -102,6 +105,409 @@ async function fetchExistingRow(
   return result as Record<string, unknown> | null;
 }
 
+// ---------------------------------------------------------------------------
+// Shared write helper: used by both the HTTP ingest path and cron jobs
+// ---------------------------------------------------------------------------
+
+async function writeToTable(
+  db: D1Database,
+  category: Category,
+  data: Record<string, unknown> | Record<string, unknown>[],
+): Promise<number> {
+  const table = CATEGORY_TABLE[category];
+  const allowedColumns = TABLE_COLUMNS[category];
+  const pkColumns = PK_COLUMNS[category];
+  const tsColumn = TS_COLUMN[category];
+  const rows = Array.isArray(data) ? data : [data];
+
+  if (rows.length === 0) return 0;
+
+  const ts = new Date().toISOString();
+  const statements = [];
+
+  for (const row of rows) {
+    // Filter to allowlisted columns only, add timestamp
+    const incoming: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(row)) {
+      if (allowedColumns.has(k)) {
+        incoming[k] =
+          typeof v === "object" && v !== null ? JSON.stringify(v) : v;
+      }
+    }
+    incoming[tsColumn] = ts;
+
+    if (Object.keys(incoming).length <= 1) {
+      // Only the timestamp column. Nothing useful to write.
+      throw new Error("No valid columns in row");
+    }
+
+    // Merge: fetch existing row so omitted columns keep their values
+    const existing = await fetchExistingRow(db, table, pkColumns, incoming);
+    const merged = existing ? { ...existing, ...incoming } : incoming;
+
+    // Only write allowlisted columns + timestamp
+    const record: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(merged)) {
+      if (allowedColumns.has(k)) {
+        record[k] = v;
+      }
+    }
+
+    const keys = Object.keys(record);
+    const placeholders = keys.map(() => "?").join(", ");
+    const values = Object.values(record);
+
+    statements.push(
+      db
+        .prepare(
+          `INSERT OR REPLACE INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
+        )
+        .bind(...values),
+    );
+  }
+
+  await db.batch(statements);
+  return rows.length;
+}
+
+// ---------------------------------------------------------------------------
+// Cron job: Health probes (every minute)
+// ---------------------------------------------------------------------------
+
+const HEALTH_ENDPOINTS = [
+  { key: "www", url: "https://anipotts.com/api/health" },
+  { key: "admin", url: "https://admin.anipotts.com/_health" },
+  { key: "ingest", url: "https://anipotts-ingest.anipotts.workers.dev" },
+  { key: "mini", url: "https://api.mini.anipotts.com/health" },
+];
+
+async function runHealthProbes(db: D1Database): Promise<void> {
+  const results = await Promise.allSettled(
+    HEALTH_ENDPOINTS.map(async (endpoint) => {
+      const start = Date.now();
+      try {
+        const res = await fetch(endpoint.url, {
+          signal: AbortSignal.timeout(5000),
+        });
+        const ms = Date.now() - start;
+        return {
+          key: endpoint.key,
+          category: "health_probe",
+          value: JSON.stringify({
+            ok: res.ok,
+            status: res.status,
+            ms,
+            ts: new Date().toISOString(),
+          }),
+        };
+      } catch (e) {
+        const ms = Date.now() - start;
+        return {
+          key: endpoint.key,
+          category: "health_probe",
+          value: JSON.stringify({
+            ok: false,
+            status: 0,
+            ms,
+            error: e instanceof Error ? e.message : "Fetch failed",
+            ts: new Date().toISOString(),
+          }),
+        };
+      }
+    }),
+  );
+
+  const rows: Record<string, unknown>[] = [];
+  for (const r of results) {
+    if (r.status === "fulfilled") rows.push(r.value);
+  }
+
+  if (rows.length > 0) {
+    await writeToTable(db, "ops", rows);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cron job: GitHub stats (every 5 min)
+// ---------------------------------------------------------------------------
+
+const GITHUB_REPOS = [
+  "anipotts/anipotts.com",
+  "anipotts/claude-code-tips",
+  "anipotts/imessage-mcp",
+  "anipotts/claudemon",
+  "anipotts/antileak",
+  "anipotts/vector-seo",
+  "anipotts/quantercise",
+  "anipotts/rudy",
+];
+
+interface GhRepoResponse {
+  stargazers_count: number;
+  open_issues_count: number;
+}
+
+interface GhSearchResponse {
+  total_count: number;
+}
+
+async function runGitHubStats(db: D1Database, token: string): Promise<void> {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+
+  const now = new Date();
+  const dateHour = `${now.toISOString().slice(0, 13)}`; // YYYY-MM-DDTHH
+
+  const results = await Promise.allSettled(
+    GITHUB_REPOS.map(async (fullName) => {
+      const repoName = fullName.split("/")[1] ?? fullName;
+
+      try {
+        const [repoRes, prRes] = await Promise.all([
+          fetch(`https://api.github.com/repos/${fullName}`, {
+            headers,
+            signal: AbortSignal.timeout(5000),
+          }),
+          fetch(
+            `https://api.github.com/search/issues?q=repo:${fullName}+type:pr+state:open&per_page=1`,
+            {
+              headers,
+              signal: AbortSignal.timeout(5000),
+            },
+          ),
+        ]);
+
+        let stars = 0;
+        let openIssues = 0;
+        let openPRs = 0;
+
+        if (repoRes.ok) {
+          const repoData = (await repoRes.json()) as GhRepoResponse;
+          stars = repoData.stargazers_count;
+          openIssues = repoData.open_issues_count;
+        }
+
+        if (prRes.ok) {
+          const prData = (await prRes.json()) as GhSearchResponse;
+          openPRs = prData.total_count ?? 0;
+          // open_issues_count includes PRs, so subtract
+          openIssues = Math.max(0, openIssues - openPRs);
+        }
+
+        return [
+          {
+            id: `github-${repoName}-stars-${dateHour}`,
+            source: "github",
+            metric: "stars",
+            value: JSON.stringify({ repo: repoName, count: stars }),
+          },
+          {
+            id: `github-${repoName}-issues-${dateHour}`,
+            source: "github",
+            metric: "open_issues",
+            value: JSON.stringify({ repo: repoName, count: openIssues }),
+          },
+          {
+            id: `github-${repoName}-prs-${dateHour}`,
+            source: "github",
+            metric: "open_prs",
+            value: JSON.stringify({ repo: repoName, count: openPRs }),
+          },
+        ];
+      } catch {
+        return [];
+      }
+    }),
+  );
+
+  const rows: Record<string, unknown>[] = [];
+  for (const r of results) {
+    if (r.status === "fulfilled") rows.push(...r.value);
+  }
+
+  if (rows.length > 0) {
+    await writeToTable(db, "analytics", rows);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cron job: CF Worker deployments (every 5 min)
+// ---------------------------------------------------------------------------
+
+const CF_WORKERS = [
+  "anipotts-www",
+  "anipotts-admin",
+  "anipotts-ingest",
+  "claudemon-api",
+];
+
+interface CfWorkerResponse {
+  success: boolean;
+  result?: {
+    id: string;
+    modified_on?: string;
+    size?: number;
+  };
+}
+
+async function runCfDeployments(
+  db: D1Database,
+  token: string,
+  accountId: string,
+): Promise<void> {
+  const results = await Promise.allSettled(
+    CF_WORKERS.map(async (name) => {
+      try {
+        const res = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/scripts/${name}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: AbortSignal.timeout(5000),
+          },
+        );
+
+        if (!res.ok) {
+          return {
+            key: name,
+            category: "cf_deployment",
+            value: JSON.stringify({
+              status: "error",
+              error: `HTTP ${res.status}`,
+              ts: new Date().toISOString(),
+            }),
+          };
+        }
+
+        const data = (await res.json()) as CfWorkerResponse;
+        return {
+          key: name,
+          category: "cf_deployment",
+          value: JSON.stringify({
+            status: data.success ? "active" : "error",
+            modified_on: data.result?.modified_on ?? null,
+            size: data.result?.size ?? null,
+            ts: new Date().toISOString(),
+          }),
+        };
+      } catch (e) {
+        return {
+          key: name,
+          category: "cf_deployment",
+          value: JSON.stringify({
+            status: "error",
+            error: e instanceof Error ? e.message : "Fetch failed",
+            ts: new Date().toISOString(),
+          }),
+        };
+      }
+    }),
+  );
+
+  const rows: Record<string, unknown>[] = [];
+  for (const r of results) {
+    if (r.status === "fulfilled") rows.push(r.value);
+  }
+
+  if (rows.length > 0) {
+    await writeToTable(db, "ops", rows);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cron job: npm download counts (every hour)
+// ---------------------------------------------------------------------------
+
+const NPM_PACKAGES = ["imessage-mcp", "claudemon-cli"];
+
+interface NpmDownloadsResponse {
+  downloads: number;
+}
+
+async function runNpmDownloads(db: D1Database): Promise<void> {
+  const dateHour = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
+
+  const results = await Promise.allSettled(
+    NPM_PACKAGES.map(async (pkg) => {
+      try {
+        const res = await fetch(
+          `https://api.npmjs.org/downloads/point/last-week/${pkg}`,
+          { signal: AbortSignal.timeout(5000) },
+        );
+
+        if (!res.ok) return null;
+
+        const data = (await res.json()) as NpmDownloadsResponse;
+        return {
+          id: `npm-${pkg}-weekly-${dateHour}`,
+          source: "npm",
+          metric: "downloads_weekly",
+          value: JSON.stringify({
+            package: pkg,
+            downloads: data.downloads ?? 0,
+          }),
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const rows: Record<string, unknown>[] = [];
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value !== null) rows.push(r.value);
+  }
+
+  if (rows.length > 0) {
+    await writeToTable(db, "analytics", rows);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Scheduler dispatcher
+// ---------------------------------------------------------------------------
+
+async function runScheduledJobs(env: Env, minute: number): Promise<void> {
+  // Health probes: every minute
+  try {
+    await runHealthProbes(env.DB);
+  } catch (e) {
+    console.error("Health probes failed:", e instanceof Error ? e.message : e);
+  }
+
+  // GitHub + CF deployments: every 5 minutes
+  if (minute % 5 === 0) {
+    const [ghResult, cfResult] = await Promise.allSettled([
+      runGitHubStats(env.DB, env.GITHUB_TOKEN),
+      runCfDeployments(env.DB, env.CF_API_TOKEN, env.CF_ACCOUNT_ID),
+    ]);
+    if (ghResult.status === "rejected") {
+      console.error("GitHub stats failed:", ghResult.reason);
+    }
+    if (cfResult.status === "rejected") {
+      console.error("CF deployments failed:", cfResult.reason);
+    }
+  }
+
+  // npm downloads: every hour
+  if (minute === 0) {
+    try {
+      await runNpmDownloads(env.DB);
+    } catch (e) {
+      console.error(
+        "npm downloads failed:",
+        e instanceof Error ? e.message : e,
+      );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Worker exports
+// ---------------------------------------------------------------------------
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") {
@@ -164,68 +570,14 @@ export default {
       return jsonResponse({ error: "Missing data field" }, 400);
     }
 
-    const category = payload.category;
-    const table = CATEGORY_TABLE[category];
-    const allowedColumns = TABLE_COLUMNS[category];
-    const pkColumns = PK_COLUMNS[category];
-    const tsColumn = TS_COLUMN[category];
     const rows = Array.isArray(payload.data) ? payload.data : [payload.data];
-
     if (rows.length === 0) {
       return jsonResponse({ error: "Empty data array" }, 400);
     }
 
-    const ts = new Date().toISOString();
-    let rowsWritten = 0;
-
     try {
-      const statements = [];
-
-      for (const row of rows) {
-        // Filter to allowlisted columns only, add timestamp
-        const incoming: Record<string, unknown> = {};
-        for (const [k, v] of Object.entries(row)) {
-          if (allowedColumns.has(k)) {
-            incoming[k] =
-              typeof v === "object" && v !== null ? JSON.stringify(v) : v;
-          }
-        }
-        incoming[tsColumn] = ts;
-
-        if (Object.keys(incoming).length === 0) {
-          throw new Error("No valid columns in row");
-        }
-
-        // Merge: fetch existing row so omitted columns keep their values
-        const existing = await fetchExistingRow(
-          env.DB,
-          table,
-          pkColumns,
-          incoming,
-        );
-        const merged = existing ? { ...existing, ...incoming } : incoming;
-
-        // Only write allowlisted columns + timestamp
-        const record: Record<string, unknown> = {};
-        for (const [k, v] of Object.entries(merged)) {
-          if (allowedColumns.has(k)) {
-            record[k] = v;
-          }
-        }
-
-        const keys = Object.keys(record);
-        const placeholders = keys.map(() => "?").join(", ");
-        const values = Object.values(record);
-
-        statements.push(
-          env.DB.prepare(
-            `INSERT OR REPLACE INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
-          ).bind(...values),
-        );
-      }
-
-      await env.DB.batch(statements);
-      rowsWritten = rows.length;
+      const rowsWritten = await writeToTable(env.DB, payload.category, rows);
+      return jsonResponse({ success: true, rows_written: rowsWritten });
     } catch (e) {
       const isValidation =
         e instanceof Error && e.message === "No valid columns in row";
@@ -234,7 +586,14 @@ export default {
         isValidation ? 400 : 500,
       );
     }
+  },
 
-    return jsonResponse({ success: true, rows_written: rowsWritten });
+  async scheduled(
+    event: ScheduledEvent,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<void> {
+    const minute = new Date(event.scheduledTime).getMinutes();
+    ctx.waitUntil(runScheduledJobs(env, minute));
   },
 };
