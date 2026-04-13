@@ -269,6 +269,82 @@ function calculateFastestCommitCadence(repos) {
 // Cap per-session duration to filter stale/overnight sessions (6 hours)
 const MAX_SESSION_MINUTES = 360;
 
+const mineDbPath =
+  process.env.MINE_DB_PATH ||
+  path.join(os.homedir(), ".claude", "mine.db");
+
+/** Query mine.db for authoritative headline stats (sessions, hours, streak). */
+function queryMineDb() {
+  try {
+    if (!fs.existsSync(mineDbPath)) return null;
+
+    const raw = execSync(
+      `sqlite3 "${mineDbPath}" "
+        SELECT
+          COUNT(*) as sessions,
+          COALESCE(ROUND(SUM(MIN(duration_wall_seconds, 21600)) / 3600.0), 0) as hours_wall,
+          COALESCE(ROUND(SUM(duration_active_seconds) / 3600.0), 0) as hours_active,
+          COALESCE(SUM(tool_use_count), 0) as tool_calls
+        FROM sessions
+        WHERE is_subagent = 0
+      "`,
+      { stdio: ["ignore", "pipe", "ignore"] },
+    ).toString().trim();
+
+    const [sessions, hoursWall, hoursActive, toolCalls] = raw.split("|").map(Number);
+
+    // Subagent stats
+    const subRaw = execSync(
+      `sqlite3 "${mineDbPath}" "
+        SELECT COUNT(*), COALESCE(SUM(tool_use_count), 0)
+        FROM sessions WHERE is_subagent = 1
+      "`,
+      { stdio: ["ignore", "pipe", "ignore"] },
+    ).toString().trim();
+    const [subSessions, subToolCalls] = subRaw.split("|").map(Number);
+
+    // Streak (consecutive days with activity ending today or yesterday)
+    const streakRaw = execSync(
+      `sqlite3 "${mineDbPath}" "
+        WITH daily AS (
+          SELECT DISTINCT date(start_time, 'localtime') as d
+          FROM sessions WHERE is_subagent = 0 AND start_time IS NOT NULL
+        ),
+        streak AS (
+          SELECT d, ROW_NUMBER() OVER (ORDER BY d DESC) as rn,
+                 CAST(julianday(date('now', 'localtime')) - julianday(d) AS INTEGER) as days_ago
+          FROM daily
+        )
+        SELECT COUNT(*) FROM streak WHERE days_ago = rn - 1 OR (rn = 1 AND days_ago <= 1)
+      "`,
+      { stdio: ["ignore", "pipe", "ignore"] },
+    ).toString().trim();
+    const streakDays = Number(streakRaw) || 0;
+
+    // Project count
+    const projectsRaw = execSync(
+      `sqlite3 "${mineDbPath}" "
+        SELECT COUNT(DISTINCT project_name) FROM sessions WHERE is_subagent = 0
+      "`,
+      { stdio: ["ignore", "pipe", "ignore"] },
+    ).toString().trim();
+    const projectCount = Number(projectsRaw) || 0;
+
+    return {
+      sessions,
+      hoursWall: Math.round(hoursWall),
+      hoursActive: Math.round(hoursActive),
+      toolCalls,
+      streakDays,
+      projectCount,
+      subagents: { sessions: subSessions, toolCalls: subToolCalls },
+    };
+  } catch (error) {
+    console.warn("Could not query mine.db, falling back to JSONL scan:", error.message);
+    return null;
+  }
+}
+
 async function main() {
   const jsonlFiles = await findJsonlFiles(projectsDir);
   const mainSessions = [];
@@ -382,23 +458,36 @@ async function main() {
     Array.from(repoDirs),
   );
 
+  // mine.db is the source of truth for headline stats.
+  // JSONL scan provides tool breakdown, file mutations, daily chart, session logs.
+  const mineStats = queryMineDb();
+
+  const headlineSessions = mineStats?.sessions ?? totalMainSessions;
+  const headlineHours = mineStats?.hoursWall ?? Math.round(totalHoursUsed);
+  const headlineToolCalls = mineStats?.toolCalls ?? mainToolCalls;
+  const headlineStreak = mineStats?.streakDays ?? streakDays;
+  const headlineProjects = mineStats?.projectCount ?? repoDirs.size;
+  const headlineSubagents = mineStats?.subagents ?? {
+    sessions: subagentCount,
+    toolCalls: subagentToolCalls,
+  };
+
   const stats = {
     generatedAt: now.toISOString(),
     timezone: timeZone,
+    source: mineStats ? "mine.db" : "jsonl-scan",
     totals: {
-      sessions: totalMainSessions,
-      hoursUsed: Math.round(totalHoursUsed),
-      toolCalls: mainToolCalls,
+      sessions: headlineSessions,
+      hoursUsed: headlineHours,
+      hoursActive: mineStats?.hoursActive ?? null,
+      toolCalls: headlineToolCalls,
       filesMutated: allFiles.size,
-      streakDays,
+      streakDays: headlineStreak,
     },
-    subagents: {
-      sessions: subagentCount,
-      toolCalls: subagentToolCalls,
-    },
+    subagents: headlineSubagents,
     combined: {
-      totalToolCalls: mainToolCalls + subagentToolCalls,
-      totalSessions: totalMainSessions + subagentCount,
+      totalToolCalls: headlineToolCalls + headlineSubagents.toolCalls,
+      totalSessions: headlineSessions + headlineSubagents.sessions,
     },
     tools: toolTotals,
     daily,
@@ -449,10 +538,8 @@ async function main() {
       lastModifiedAt: latestMtime ? latestMtime.toISOString() : null,
     },
     meta: {
-      projectCount: repoDirs.size,
+      projectCount: headlineProjects,
       sinceDays: gitSinceDays,
-      mainSessionFiles: jsonlFiles.filter((f) => !f.isSubagent).length,
-      subagentSessionFiles: jsonlFiles.filter((f) => f.isSubagent).length,
       maxSessionMinutesCap: MAX_SESSION_MINUTES,
     },
     labels: {
@@ -463,9 +550,9 @@ async function main() {
   await fs.promises.mkdir(path.dirname(outPath), { recursive: true });
   await fs.promises.writeFile(outPath, JSON.stringify(stats, null, 2));
 
-  console.log(`Wrote ${outPath}`);
+  console.log(`Wrote ${outPath} (source: ${stats.source})`);
   console.log(
-    `Main sessions: ${totalMainSessions} | Hours: ${Math.round(totalHoursUsed)} | Tool calls: ${mainToolCalls} | Subagents: ${subagentCount}`,
+    `Sessions: ${headlineSessions} | Hours: ${headlineHours} | Active: ${mineStats?.hoursActive ?? "n/a"}h | Tool calls: ${headlineToolCalls} | Streak: ${headlineStreak}d`,
   );
 }
 
