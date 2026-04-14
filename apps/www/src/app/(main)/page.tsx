@@ -50,26 +50,30 @@ export default async function Home() {
       <Stagger as="section" className="flex flex-col gap-4" offset={0.18}>
         <PagePrelude>about</PagePrelude>
         <ContentBlocks>
-          {homeContent.about.map((line) => (
+          {homeContent.about.map((line, i) => (
             <p
               key={line}
               className="text-body leading-relaxed text-base md:text-lg"
             >
               {line}
+              {i === homeContent.about.length - 1 && (
+                <>
+                  {" "}
+                  Recently featured in{" "}
+                  <a
+                    href="https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-4 decoration-zinc-500 hover:decoration-zinc-300 transition-colors"
+                  >
+                    Business Insider
+                  </a>{" "}
+                  on how developers are restructuring their days around AI
+                  tools.
+                </>
+              )}
             </p>
           ))}
-          <p className="text-body leading-relaxed text-base md:text-lg">
-            Recently featured in{" "}
-            <a
-              href="https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-4 decoration-zinc-500 hover:decoration-zinc-300 transition-colors"
-            >
-              Business Insider
-            </a>{" "}
-            on how developers are restructuring their days around AI tools.
-          </p>
         </ContentBlocks>
       </Stagger>
 
