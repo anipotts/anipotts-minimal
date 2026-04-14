@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-13T23:39:43.093Z",
+  "generatedAt": "2026-04-14T00:43:05.697Z",
   "timezone": "America/New_York",
   "source": "mine.db",
   "totals": {
@@ -7,33 +7,33 @@
     "hoursUsed": 1072,
     "hoursActive": 339,
     "toolCalls": 61538,
-    "filesMutated": 4011,
+    "filesMutated": 4024,
     "streakDays": 30
   },
   "subagents": {
-    "sessions": 7876,
-    "toolCalls": 140822
+    "sessions": 7885,
+    "toolCalls": 141142
   },
   "combined": {
-    "totalToolCalls": 202360,
-    "totalSessions": 8501
+    "totalToolCalls": 202680,
+    "totalSessions": 8510
   },
   "tools": {
-    "Glob": 10183,
-    "Read": 65402,
+    "Glob": 10189,
+    "Read": 65533,
     "WebSearch": 6046,
     "WebFetch": 4422,
-    "Bash": 47641,
-    "Grep": 13109,
-    "ToolSearch": 927,
-    "TaskCreate": 1022,
-    "TaskUpdate": 2061,
-    "Agent": 2183,
-    "Write": 4507,
-    "Edit": 15030,
-    "AskUserQuestion": 229,
-    "ExitPlanMode": 428,
-    "Skill": 159,
+    "Bash": 47846,
+    "Grep": 13117,
+    "ToolSearch": 931,
+    "TaskCreate": 1027,
+    "TaskUpdate": 2074,
+    "Agent": 2191,
+    "Write": 4524,
+    "Edit": 15053,
+    "AskUserQuestion": 231,
+    "ExitPlanMode": 434,
+    "Skill": 160,
     "mcp__plugin_playwright_playwright__browser_navigate": 237,
     "mcp__plugin_playwright_playwright__browser_snapshot": 62,
     "mcp__plugin_playwright_playwright__browser_click": 53,
@@ -575,8 +575,8 @@
     },
     {
       "date": "2026-04-13",
-      "toolCalls": 1859,
-      "filesMutated": 183
+      "toolCalls": 2018,
+      "filesMutated": 195
     }
   ],
   "sessions": [
@@ -584,18 +584,18 @@
       "id": "ade4199e-a58d-45ff-bfb6-5e2253193644",
       "project": "quantercise.com",
       "start": "2026-04-13T23:28:04.692Z",
-      "end": "2026-04-13T23:38:11.062Z",
-      "durationMinutes": 10.1,
-      "toolCalls": 19,
-      "filesMutated": 0
+      "end": "2026-04-14T00:25:21.362Z",
+      "durationMinutes": 57.3,
+      "toolCalls": 74,
+      "filesMutated": 1
     },
     {
       "id": "ad0cb9d0-8ba9-4e2b-a8b4-8f52050a24e0",
       "project": "anipotts",
       "start": "2026-04-13T21:40:49.032Z",
-      "end": "2026-04-13T23:35:47.223Z",
-      "durationMinutes": 115,
-      "toolCalls": 28,
+      "end": "2026-04-14T00:33:46.453Z",
+      "durationMinutes": 173,
+      "toolCalls": 36,
       "filesMutated": 1
     },
     {
@@ -611,19 +611,19 @@
       "id": "a03cc0e7-4eb1-4d8d-8c6f-74b24737d16b",
       "project": "anipotts.com",
       "start": "2026-04-13T20:53:06.301Z",
-      "end": "2026-04-13T23:39:42.234Z",
-      "durationMinutes": 166.6,
-      "toolCalls": 174,
-      "filesMutated": 13
+      "end": "2026-04-14T00:43:05.571Z",
+      "durationMinutes": 230,
+      "toolCalls": 195,
+      "filesMutated": 16
     },
     {
       "id": "f9540229-d3d2-4535-8b50-002da07908be",
       "project": "merizo",
       "start": "2026-04-13T20:39:25.666Z",
-      "end": "2026-04-13T23:39:51.331Z",
-      "durationMinutes": 180.4,
-      "toolCalls": 124,
-      "filesMutated": 16
+      "end": "2026-04-14T00:42:17.369Z",
+      "durationMinutes": 242.9,
+      "toolCalls": 190,
+      "filesMutated": 24
     },
     {
       "id": "cfc7b6dd-b1b5-4d2e-b25e-d4475a36e826",
@@ -674,9 +674,9 @@
       "id": "05d5f970-d915-4e0f-bafe-793ef3ac374b",
       "project": "quantercise.com",
       "start": "2026-04-13T16:55:12.070Z",
-      "end": "2026-04-13T23:36:31.807Z",
+      "end": "2026-04-14T00:42:27.624Z",
       "durationMinutes": 360,
-      "toolCalls": 206,
+      "toolCalls": 215,
       "filesMutated": 12
     },
     {
@@ -788,7 +788,7 @@
   },
   "live": {
     "isCodingNow": true,
-    "lastModifiedAt": "2026-04-13T23:39:51.480Z"
+    "lastModifiedAt": "2026-04-14T00:43:05.702Z"
   },
   "meta": {
     "projectCount": 64,
@@ -796,6 +796,6 @@
     "maxSessionMinutesCap": 360
   },
   "labels": {
-    "generatedAtLocal": "Apr 13, 2026, 07:39 PM"
+    "generatedAtLocal": "Apr 13, 2026, 08:43 PM"
   }
 }
