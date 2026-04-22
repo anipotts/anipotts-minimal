@@ -9,6 +9,7 @@ import {
   Article,
   Code,
   HardDrives,
+  Stack,
   Brain,
   Megaphone,
   ChatCircleDots,
@@ -49,6 +50,12 @@ const spokes = [
     href: "/ops",
     match: (p: string) => p.startsWith("/ops"),
     icon: <HardDrives size={16} weight="duotone" />,
+  },
+  {
+    label: "Services",
+    href: "/services",
+    match: (p: string) => p.startsWith("/services"),
+    icon: <Stack size={16} weight="duotone" />,
   },
   {
     label: "Quantercise",

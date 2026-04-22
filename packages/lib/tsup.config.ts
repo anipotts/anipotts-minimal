@@ -16,6 +16,7 @@ export default defineConfig({
     "money/index": "src/money/index.ts",
     "code/index": "src/code/index.ts",
     "ops/index": "src/ops/index.ts",
+    "services/index": "src/services/index.ts",
     "mini/index": "src/mini/index.ts",
     "mini/stream": "src/mini/stream.ts",
     "analytics/index": "src/analytics/index.ts",

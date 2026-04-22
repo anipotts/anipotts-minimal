@@ -63,6 +63,10 @@
       "types": "./dist/ops/index.d.ts",
       "import": "./dist/ops/index.js"
     },
+    "./services": {
+      "types": "./dist/services/index.d.ts",
+      "import": "./dist/services/index.js"
+    },
     "./mini": {
       "types": "./dist/mini/index.d.ts",
       "import": "./dist/mini/index.js"
