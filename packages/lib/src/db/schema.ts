@@ -307,9 +307,14 @@ export const statusChecks = sqliteTable(
     response_time_ms: integer("response_time_ms").notNull(),
     is_up: integer("is_up", { mode: "boolean" }).notNull(),
     checked_at: text("checked_at").notNull(),
+    service_id: text("service_id"),
   },
   (table) => [
     index("idx_status_checks_lookup").on(table.service_url, table.checked_at),
+    index("idx_status_checks_service_id").on(
+      table.service_id,
+      table.checked_at,
+    ),
   ],
 );
 
@@ -429,4 +434,32 @@ export const emailQueue = sqliteTable(
     updated_at: text("updated_at"),
   },
   (table) => [index("idx_email_queue_status").on(table.status)],
+);
+
+// ---------------------------------------------------------------------------
+// 21. service_registry (declarative state for platform-managed services)
+// ---------------------------------------------------------------------------
+// First table authored via @anipotts/services-platform. Tracks one row per
+// service (mini-api, reel, etc.). status_checks.service_id joins here.
+
+export const serviceRegistry = sqliteTable(
+  "service_registry",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull().unique(),
+    hostname: text("hostname").notNull(),
+    visibility: text("visibility").notNull(),
+    owner: text("owner").notNull(),
+    port: integer("port"),
+    manifest_sha: text("manifest_sha"),
+    manifest_path: text("manifest_path"),
+    deployed_at: text("deployed_at"),
+    retired_at: text("retired_at"),
+    created_at: text("created_at"),
+    updated_at: text("updated_at"),
+  },
+  (table) => [
+    index("idx_service_registry_name").on(table.name),
+    index("idx_service_registry_active").on(table.retired_at),
+  ],
 );

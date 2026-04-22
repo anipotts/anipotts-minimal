@@ -272,6 +272,31 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.30)(lightningcss@1.30.2)(terser@5.16.9)
 
+  packages/services-platform:
+    dependencies:
+      '@anipotts/lib':
+        specifier: workspace:*
+        version: link:../lib
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@cloudflare/workers-types@4.20260409.1)(@opentelemetry/api@1.9.0)
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^20
+        version: 20.19.30
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   packages/styles: {}
 
   packages/types:
@@ -310,6 +335,12 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+
+  services:
+    dependencies:
+      '@anipotts/services-platform':
+        specifier: workspace:*
+        version: link:../packages/services-platform
 
   workers/ingest:
     devDependencies:
@@ -2280,6 +2311,9 @@ packages:
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
+
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -7371,6 +7405,8 @@ snapshots:
   '@types/hast@3.0.4':
     dependencies:
       '@types/unist': 3.0.3
+
+  '@types/js-yaml@4.0.9': {}
 
   '@types/json-schema@7.0.15': {}
 
