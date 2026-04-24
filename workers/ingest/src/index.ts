@@ -1,12 +1,19 @@
 interface Env {
   DB: D1Database;
   MAC_MINI_INGEST_KEY: string;
+  BRANDS_INGEST_KEY: string;
   GITHUB_TOKEN: string;
   CF_API_TOKEN: string;
   CF_ACCOUNT_ID: string;
 }
 
-type Category = "ops" | "code" | "analytics" | "business" | "rollup";
+type Category =
+  | "ops"
+  | "code"
+  | "analytics"
+  | "business"
+  | "rollup"
+  | "brands_email";
 
 const CATEGORY_TABLE: Record<Category, string> = {
   ops: "ops_snapshots",
@@ -14,6 +21,7 @@ const CATEGORY_TABLE: Record<Category, string> = {
   analytics: "analytics_events",
   business: "business_data",
   rollup: "daily_rollups",
+  brands_email: "brands_emails",
 };
 
 const VALID_CATEGORIES = new Set<Category>([
@@ -22,7 +30,21 @@ const VALID_CATEGORIES = new Set<Category>([
   "analytics",
   "business",
   "rollup",
+  "brands_email",
 ]);
+
+/**
+ * Categories writable with a scoped secret (BRANDS_INGEST_KEY).
+ * Anything NOT in this set requires the global MAC_MINI_INGEST_KEY.
+ */
+const SCOPED_CATEGORIES: Record<Category, "mac_mini" | "brands"> = {
+  ops: "mac_mini",
+  code: "mac_mini",
+  analytics: "mac_mini",
+  business: "mac_mini",
+  rollup: "mac_mini",
+  brands_email: "brands",
+};
 
 /** Allowlisted columns per table. Only these can be written via ingest. */
 const TABLE_COLUMNS: Record<Category, Set<string>> = {
@@ -49,6 +71,17 @@ const TABLE_COLUMNS: Record<Category, Set<string>> = {
   ]),
   business: new Set(["key", "value", "source_file", "updated_at"]),
   rollup: new Set(["id", "date", "hour", "metric", "value", "created_at"]),
+  // Apps Script sends identity fields only; status/notes/deal_slug are edited
+  // through other paths (admin UI) and must not be overwritten by re-ingest.
+  brands_email: new Set([
+    "message_id",
+    "thread_id",
+    "received_at",
+    "from_addr",
+    "subject",
+    "label",
+    "ingested_at",
+  ]),
 };
 
 /** Primary key column(s) per table, used to look up existing rows for merging. */
@@ -58,6 +91,7 @@ const PK_COLUMNS: Record<Category, string[]> = {
   analytics: ["id"],
   business: ["key"],
   rollup: ["id"],
+  brands_email: ["message_id"],
 };
 
 /** Timestamp column name per table (set automatically on ingest). */
@@ -67,6 +101,7 @@ const TS_COLUMN: Record<Category, string> = {
   analytics: "fetched_at",
   business: "updated_at",
   rollup: "created_at",
+  brands_email: "ingested_at",
 };
 
 interface IngestPayload {
@@ -542,13 +577,12 @@ export default {
       return jsonResponse({ error: "Method not allowed" }, 405);
     }
 
-    // Auth: require MAC_MINI_INGEST_KEY header
     const apiKey = request.headers.get("X-Ingest-Key");
-    if (!apiKey || apiKey !== env.MAC_MINI_INGEST_KEY) {
+    if (!apiKey) {
       return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
-    // Parse body
+    // Parse body (bounded by Worker request size limits)
     let payload: IngestPayload;
     try {
       payload = await request.json();
@@ -564,6 +598,17 @@ export default {
         },
         400,
       );
+    }
+
+    // Scoped auth:
+    //   - MAC_MINI_INGEST_KEY can write any category (superset)
+    //   - BRANDS_INGEST_KEY can write only the "brands" scope (brands_email)
+    const requiredScope = SCOPED_CATEGORIES[payload.category];
+    const mainKeyOk = apiKey === env.MAC_MINI_INGEST_KEY;
+    const brandsKeyOk = apiKey === env.BRANDS_INGEST_KEY;
+    const authOk = mainKeyOk || (requiredScope === "brands" && brandsKeyOk);
+    if (!authOk) {
+      return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
     if (!payload.data) {
