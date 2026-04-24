@@ -463,3 +463,31 @@ export const serviceRegistry = sqliteTable(
     index("idx_service_registry_active").on(table.retired_at),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 22. brands_emails (Gmail brand-outreach log from email-labeler Apps Script)
+// ---------------------------------------------------------------------------
+// Replaces Content/logs/brands.yaml. Apps Script POSTs to the ingest worker
+// (category "brands_email") on every Brands-labeled email. Dedup on Gmail
+// message_id; backfilled rows use synthetic IDs prefixed "bf:".
+
+export const brandsEmails = sqliteTable(
+  "brands_emails",
+  {
+    message_id: text("message_id").primaryKey(), // Gmail ID or "bf:<hash>" for backfill
+    thread_id: text("thread_id").notNull(),
+    received_at: text("received_at").notNull(), // ISO-8601 from Gmail
+    from_addr: text("from_addr").notNull(),
+    subject: text("subject").notNull(),
+    label: text("label").notNull(), // "Brands", "Brands/Paid", etc.
+    deal_slug: text("deal_slug"), // optional link to Content/deals/<slug>/
+    status: text("status").default("inbox"), // inbox | responding | won | lost | ghosted
+    notes: text("notes"),
+    ingested_at: text("ingested_at").notNull(), // auto-set by ingest worker
+  },
+  (table) => [
+    index("idx_brands_emails_received_at").on(table.received_at),
+    index("idx_brands_emails_from_addr").on(table.from_addr),
+    index("idx_brands_emails_status").on(table.status),
+  ],
+);
