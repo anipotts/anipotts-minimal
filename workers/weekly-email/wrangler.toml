@@ -11,6 +11,12 @@ binding = "DB"
 database_name = "anipotts-db"
 database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
 
+# Cloudflare Email Routing send binding (weekly status digest)
+# Destination must be verified in CF dashboard -> Email Routing.
+[[send_email]]
+name = "SEND_EMAIL"
+destination_address = "hello@anipotts.com"
+
 # Sunday 9am EDT = 13:00 UTC (during DST, arrives 8am EST in winter)
 # DST covers ~8 months of the year, so optimizing for EDT
 [triggers]

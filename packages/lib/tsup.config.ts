@@ -21,11 +21,12 @@ export default defineConfig({
     "mini/stream": "src/mini/stream.ts",
     "analytics/index": "src/analytics/index.ts",
     "quantercise/index": "src/quantercise/index.ts",
+    "email/index": "src/email/index.ts",
     env: "src/env.ts",
   },
   format: ["esm"],
   dts: true,
   splitting: true,
   sourcemap: false,
-  external: ["posthog-node", "react"],
+  external: ["posthog-node", "react", "cloudflare:email"],
 });

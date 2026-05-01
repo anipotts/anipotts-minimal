@@ -1,6 +1,8 @@
+import { sendViaBinding, type SendEmailBinding } from "@anipotts/lib/email";
+
 interface Env {
   DB: D1Database;
-  RESEND_API_KEY: string;
+  SEND_EMAIL: SendEmailBinding;
   MERCURY_API_TOKEN?: string;
   MERCURY_ACCOUNT_ID_CHECKING?: string;
   MERCURY_ACCOUNT_ID_SAVINGS?: string;
@@ -338,62 +340,24 @@ function generateEmailHtml(data: {
 </html>`;
 }
 
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Send email via Resend with exponential backoff retry.
- * Returns null on success, error string on failure after all retries.
- */
-async function sendEmailWithRetry(
-  apiKey: string,
+async function sendWeeklyEmail(
+  env: Env,
   to: string,
   subject: string,
   html: string,
 ): Promise<string | null> {
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    if (attempt > 0) {
-      const delayMs = BACKOFF_BASE_MS * Math.pow(4, attempt - 1); // 1s, 4s, 16s
-      await sleep(delayMs);
-    }
-
-    try {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Ani Potts LLC <weekly@anipotts.com>",
-          to: [to],
-          subject,
-          html,
-        }),
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (res.ok) return null; // Success
-
-      const status = res.status;
-      // Don't retry on 4xx (except 429)
-      if (status >= 400 && status < 500 && status !== 429) {
-        return `Resend ${status}: ${await res.text()}`;
-      }
-
-      // 429 or 5xx: retry
-      if (attempt === MAX_RETRIES - 1) {
-        return `Resend ${status} after ${MAX_RETRIES} attempts`;
-      }
-    } catch (e) {
-      if (attempt === MAX_RETRIES - 1) {
-        return e instanceof Error ? e.message : "Network error";
-      }
-    }
-  }
-
-  return "Max retries exceeded";
+  const result = await sendViaBinding(
+    env.SEND_EMAIL,
+    {
+      from: "Ani Potts LLC <noreply@anipotts.com>",
+      to,
+      replyTo: "hello@anipotts.com",
+      subject,
+      html,
+    },
+    { maxAttempts: MAX_RETRIES, backoffBaseMs: BACKOFF_BASE_MS },
+  );
+  return result.ok ? null : (result.error ?? "send failed");
 }
 
 /**
@@ -424,8 +388,8 @@ async function retryQueuedEmails(env: Env): Promise<number> {
 
   let sent = 0;
   for (const email of pending.results) {
-    const error = await sendEmailWithRetry(
-      env.RESEND_API_KEY,
+    const error = await sendWeeklyEmail(
+      env,
       email.to_address,
       email.subject,
       email.html,
@@ -586,8 +550,8 @@ async function buildAndSendReport(env: Env): Promise<{
       weekOf,
     });
 
-    const sendError = await sendEmailWithRetry(
-      env.RESEND_API_KEY,
+    const sendError = await sendWeeklyEmail(
+      env,
       "hello@anipotts.com",
       subject,
       html,

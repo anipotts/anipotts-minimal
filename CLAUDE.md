@@ -53,7 +53,7 @@ ADMIN_PASSWORD, TYPEFULLY_API_KEY, BUTTONDOWN_API_KEY
 ```
 
 Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/env`):
-`ADMIN_PASSWORD`, `MERCURY_API_TOKEN`, `MERCURY_ACCOUNT_ID_CHECKING`, `MERCURY_ACCOUNT_ID_SAVINGS`, `GITHUB_TOKEN`, `CF_API_TOKEN`, `MINI_API_KEY`, `BUTTONDOWN_API_KEY`, `TYPEFULLY_API_KEY`, `RESEND_API_KEY`
+`ADMIN_PASSWORD`, `MERCURY_API_TOKEN`, `MERCURY_ACCOUNT_ID_CHECKING`, `MERCURY_ACCOUNT_ID_SAVINGS`, `GITHUB_TOKEN`, `CF_API_TOKEN`, `MINI_API_KEY`, `BUTTONDOWN_API_KEY`, `TYPEFULLY_API_KEY`
 
 `NEXT_PUBLIC_MINI_API_KEY` is baked at build time (set in CI/CD, not Wrangler secrets).
 `CF_ACCOUNT_ID` is set as `[vars]` in admin wrangler.toml (not a secret).
@@ -66,6 +66,7 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 - PostHog proxied through Next.js rewrites to `/ingest/*`
 - Admin: cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com
 - `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`)
+- Email sending uses CF Email Routing `[[send_email]]` bindings (no Resend). Helper: `sendViaBinding` from `@anipotts/lib/email`. Destinations (`contact@anipotts.com`, `hello@anipotts.com`) must be verified in CF dashboard. From-address is `noreply@anipotts.com` on the verified domain.
 - Routing: 5 pages in `(main)/` route group, redirects in `proxy.ts`
 - Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api
 

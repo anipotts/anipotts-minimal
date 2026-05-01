@@ -19,3 +19,9 @@ binding = "ASSETS"
 binding = "DB"
 database_name = "anipotts-db"
 database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
+# Cloudflare Email Routing send binding (contact form)
+# Destination must be verified in CF dashboard -> Email Routing.
+[[send_email]]
+name = "SEND_EMAIL"
+destination_address = "contact@anipotts.com"

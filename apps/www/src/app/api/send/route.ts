@@ -1,21 +1,25 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { checkOrigin } from "@/lib/cors";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { parseContactPayload } from "@anipotts/lib";
+import { sendViaBinding, type SendEmailBinding } from "@anipotts/lib/email";
+
+function getSendEmailBinding(): SendEmailBinding | undefined {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getCloudflareContext } = require("@opennextjs/cloudflare");
+    const ctx = getCloudflareContext();
+    return ctx?.env?.SEND_EMAIL as SendEmailBinding | undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function POST(request: Request) {
   try {
     const forbidden = checkOrigin(request);
     if (forbidden) return forbidden;
-
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: "Email service not configured" },
-        { status: 500 },
-      );
-    }
 
     const rate = await checkRateLimit(request);
     if (!rate.success) {
@@ -50,18 +54,39 @@ export async function POST(request: Request) {
       }
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const binding = getSendEmailBinding();
 
-    const { error: sendError } = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
-      to: ["contact@anipotts.com"],
-      subject: `New Message from ${name}`,
-      replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-    });
+    if (!binding) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          JSON.stringify({
+            event: "email.send.dev",
+            note: "no SEND_EMAIL binding; would send",
+            from: name,
+            email,
+          }),
+        );
+        return NextResponse.json({ success: true, dev: true });
+      }
+      return NextResponse.json(
+        { error: "Email service not configured" },
+        { status: 500 },
+      );
+    }
 
-    if (sendError) {
-      console.error("Resend error:", sendError);
+    const result = await sendViaBinding(
+      binding,
+      {
+        from: "Contact Form <noreply@anipotts.com>",
+        to: "contact@anipotts.com",
+        replyTo: email,
+        subject: `New Message from ${name}`,
+        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+      },
+      { maxAttempts: 1 },
+    );
+
+    if (!result.ok) {
       return NextResponse.json(
         { error: "Failed to send email" },
         { status: 502 },

@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const serverSchema = z.object({
   ADMIN_PASSWORD: z.string().min(1),
-  RESEND_API_KEY: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
   TYPEFULLY_API_KEY: z.string().optional(),
   ADMIN_TOTP_SECRET: z.string().optional(),

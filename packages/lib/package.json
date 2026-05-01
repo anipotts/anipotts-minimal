@@ -83,6 +83,10 @@
       "types": "./dist/quantercise/index.d.ts",
       "import": "./dist/quantercise/index.js"
     },
+    "./email": {
+      "types": "./dist/email/index.d.ts",
+      "import": "./dist/email/index.js"
+    },
     "./env": {
       "types": "./dist/env.d.ts",
       "import": "./dist/env.js"
@@ -98,6 +102,7 @@
     "@anipotts/types": "workspace:*",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "mimetext": "^3.0.27",
     "otplib": "^12.0.1",
     "posthog-node": "^5.17.0",
     "tailwind-merge": "^3.4.0",

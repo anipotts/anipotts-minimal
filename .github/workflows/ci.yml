@@ -28,6 +28,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: No Resend regressions
+        run: |
+          if grep -rEn 'resend|RESEND_API_KEY' apps packages workers \
+              --include='*.ts' --include='*.tsx' \
+              --include='*.toml' --include='*.json'; then
+            echo "::error::Resend reference reintroduced. This repo uses CF Email Routing send_email bindings."
+            exit 1
+          fi
+
       - name: Build
         run: pnpm turbo build
 
