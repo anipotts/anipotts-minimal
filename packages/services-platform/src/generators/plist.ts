@@ -89,11 +89,9 @@ export async function planPlist(
     existing = null;
   }
   const changed = existing === null || existing.trim() !== body.trim();
-  const summary =
-    existing === null
-      ? `create ${path}`
-      : changed
-        ? `update ${path}`
-        : `unchanged ${path}`;
-  return { kind: "plist", path, changed, summary, body };
+  let verb: "create" | "update" | "unchanged";
+  if (existing === null) verb = "create";
+  else if (changed) verb = "update";
+  else verb = "unchanged";
+  return { kind: "plist", path, changed, summary: `${verb} ${path}`, body };
 }
