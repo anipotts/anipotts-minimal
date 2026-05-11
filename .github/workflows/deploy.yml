@@ -5,18 +5,68 @@
 #   BUTTONDOWN_API_KEY      - Buttondown newsletter API key
 #   TYPEFULLY_API_KEY       - Typefully API key
 #   TYPEFULLY_SOCIAL_SET_ID - Typefully social set ID
+#
+# Path-filtered deploys: each deploy-X job only runs when files relevant to
+# that target actually changed. Lockfile / root package.json changes trigger
+# all four (dep updates can affect any target). Docs-only commits skip the
+# workflow entirely via paths-ignore. No untrusted input is interpolated
+# into run: blocks anywhere in this workflow.
 
 name: Deploy
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
 
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      www: ${{ steps.filter.outputs.www }}
+      admin: ${{ steps.filter.outputs.admin }}
+      ingest: ${{ steps.filter.outputs.ingest }}
+      weekly-email: ${{ steps.filter.outputs.weekly-email }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - "turbo.json"
+              - "packages/**"
+              - ".github/workflows/deploy.yml"
+            www:
+              - *shared
+              - "apps/www/**"
+            admin:
+              - *shared
+              - "apps/admin/**"
+              - "services/**"
+            ingest:
+              - "workers/ingest/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - ".github/workflows/deploy.yml"
+            weekly-email:
+              - "workers/weekly-email/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - ".github/workflows/deploy.yml"
+
   validate:
     name: Build, lint, typecheck, test
     runs-on: ubuntu-latest
@@ -51,7 +101,8 @@ jobs:
 
   deploy-www:
     name: Deploy www
-    needs: validate
+    needs: [changes, validate]
+    if: needs.changes.outputs.www == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +142,8 @@ jobs:
 
   deploy-admin:
     name: Deploy admin
-    needs: validate
+    needs: [changes, validate]
+    if: needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -132,7 +184,8 @@ jobs:
 
   deploy-ingest:
     name: Deploy ingest worker
-    needs: validate
+    needs: [changes, validate]
+    if: needs.changes.outputs.ingest == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -160,7 +213,8 @@ jobs:
 
   deploy-weekly-email:
     name: Deploy weekly email worker
-    needs: validate
+    needs: [changes, validate]
+    if: needs.changes.outputs.weekly-email == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
