@@ -1,0 +1,50 @@
+# Dependabot config: minimize PR noise, batch updates, hand off to auto-merge.
+#
+# Strategy:
+#   - npm: weekly Monday morning, grouped by update-type. Security updates still
+#     open immediately (dependabot doesn't honor `schedule` for security).
+#   - github-actions: monthly, low traffic.
+#   - open-pull-requests-limit caps the queue so a quiet week doesn't pile up.
+#
+# Auto-merge (.github/workflows/dependabot-automerge.yml) handles patches and
+# security advisories without human review once CI passes. Minor + major
+# updates wait for manual review.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    versioning-strategy: "increase"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-patches:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps(dev)"
+      include: "scope"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+      - "dependencies"
