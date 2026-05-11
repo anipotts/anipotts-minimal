@@ -138,10 +138,6 @@ CREATE VIRTUAL TABLE projects_fts USING fts5(
   content='projects',
   content_rowid='rowid'
 );
-CREATE TABLE 'projects_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TABLE 'projects_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE 'projects_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE 'projects_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE rate_limits (key TEXT NOT NULL, ts INTEGER NOT NULL);
 CREATE TABLE site_settings (
   id TEXT PRIMARY KEY,
@@ -205,10 +201,6 @@ CREATE VIRTUAL TABLE thoughts_fts USING fts5(
   content='thoughts',
   content_rowid='rowid'
 );
-CREATE TABLE 'thoughts_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TABLE 'thoughts_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE 'thoughts_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE 'thoughts_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE update_alerts (
   id TEXT PRIMARY KEY,
   source TEXT NOT NULL,
