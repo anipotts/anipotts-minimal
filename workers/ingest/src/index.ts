@@ -104,6 +104,26 @@ const TS_COLUMN: Record<Category, string> = {
   brands_email: "ingested_at",
 };
 
+/**
+ * Conflict strategy per category.
+ *
+ * - "replace": INSERT OR REPLACE — overwrites the existing row. Safe for
+ *   categories where the ingest path owns every column in the table.
+ * - "ignore":  INSERT OR IGNORE  — drops the new row on PK collision.
+ *   Required when non-allowlisted columns (e.g. admin-set status/notes on
+ *   brands_emails) must not be clobbered by re-ingest. INSERT OR REPLACE
+ *   would delete the existing row, then re-insert with DEFAULTs for any
+ *   columns the worker doesn't write.
+ */
+const CONFLICT_STRATEGY: Record<Category, "replace" | "ignore"> = {
+  ops: "replace",
+  code: "replace",
+  analytics: "replace",
+  business: "replace",
+  rollup: "replace",
+  brands_email: "ignore",
+};
+
 interface IngestPayload {
   category: Category;
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -176,26 +196,36 @@ async function writeToTable(
       throw new Error("No valid columns in row");
     }
 
-    // Merge: fetch existing row so omitted columns keep their values
-    const existing = await fetchExistingRow(db, table, pkColumns, incoming);
-    const merged = existing ? { ...existing, ...incoming } : incoming;
+    const strategy = CONFLICT_STRATEGY[category];
+    let record: Record<string, unknown>;
 
-    // Only write allowlisted columns + timestamp
-    const record: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(merged)) {
-      if (allowedColumns.has(k)) {
-        record[k] = v;
+    if (strategy === "replace") {
+      // Merge: fetch existing row so columns the ingest path owns but didn't
+      // include in this payload keep their values across re-ingest.
+      const existing = await fetchExistingRow(db, table, pkColumns, incoming);
+      const merged = existing ? { ...existing, ...incoming } : incoming;
+
+      record = {};
+      for (const [k, v] of Object.entries(merged)) {
+        if (allowedColumns.has(k)) {
+          record[k] = v;
+        }
       }
+    } else {
+      // IGNORE — never touches existing rows; merge/fetch is dead weight here.
+      record = incoming;
     }
 
     const keys = Object.keys(record);
     const placeholders = keys.map(() => "?").join(", ");
     const values = Object.values(record);
+    const verb =
+      strategy === "ignore" ? "INSERT OR IGNORE" : "INSERT OR REPLACE";
 
     statements.push(
       db
         .prepare(
-          `INSERT OR REPLACE INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
+          `${verb} INTO ${table} (${keys.join(", ")}) VALUES (${placeholders})`,
         )
         .bind(...values),
     );
