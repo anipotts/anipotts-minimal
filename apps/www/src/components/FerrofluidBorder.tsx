@@ -20,6 +20,8 @@ const FERRO = {
   spadeSize: 28,
   spadeDissolveDist: 30,
   spadeBubbleDepth: 40,
+  spadeMorphRange: 20,
+  spadeMorphSmooth: 0.1,
 
   // Cursor glow
   glowRadius: 90,
@@ -157,7 +159,94 @@ const SPADE_PTS: [number, number][] = [
   [0, -18],
 ];
 
-function buildSpadePath(
+// ── Additional suit shapes (37 points each, matching spade) ──
+function genHeartPts(): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let i = 0; i < 36; i++) {
+    const t = (i / 36) * Math.PI * 2;
+    const x = 16 * Math.sin(t) ** 3 * 0.94;
+    const yr = -(
+      13 * Math.cos(t) -
+      5 * Math.cos(2 * t) -
+      2 * Math.cos(3 * t) -
+      Math.cos(4 * t)
+    );
+    pts.push([x, ((yr + 12) / 29) * 34 - 18]);
+  }
+  pts.push([...pts[0]!]);
+  return pts;
+}
+
+function genDiamondPts(): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let i = 0; i < 36; i++) {
+    const t = (i / 36) * Math.PI * 2;
+    const s = Math.sin(t),
+      c = Math.cos(t);
+    const d = Math.abs(s) + Math.abs(c) || 0.001;
+    pts.push([(15 * s) / d, (-17 * c) / d]);
+  }
+  pts.push([...pts[0]!]);
+  return pts;
+}
+
+const CLUB_PTS: [number, number][] = [
+  [0, -18],
+  [3, -17],
+  [6, -15],
+  [7, -12],
+  [7, -9],
+  [5, -7],
+  [3, -6],
+  [6, -5],
+  [9, -6],
+  [12, -4],
+  [14, -1],
+  [14, 2],
+  [12, 5],
+  [9, 6],
+  [6, 5],
+  [3, 6],
+  [4, 10],
+  [6, 16],
+  [0, 16],
+  [-6, 16],
+  [-4, 10],
+  [-3, 6],
+  [-6, 5],
+  [-9, 6],
+  [-12, 5],
+  [-14, 2],
+  [-14, -1],
+  [-12, -4],
+  [-9, -6],
+  [-6, -5],
+  [-3, -6],
+  [-5, -7],
+  [-7, -9],
+  [-7, -12],
+  [-6, -15],
+  [-3, -17],
+  [0, -18],
+];
+
+const HEART_PTS = genHeartPts();
+const DIAMOND_PTS = genDiamondPts();
+const SUIT_SHAPES = [SPADE_PTS, HEART_PTS, DIAMOND_PTS, CLUB_PTS];
+
+function blendShapes(
+  a: [number, number][],
+  b: [number, number][],
+  t: number,
+): [number, number][] {
+  return a.map((p, i) => [
+    p[0] + (b[i]![0] - p[0]) * t,
+    p[1] + (b[i]![1] - p[1]) * t,
+  ]);
+}
+
+function buildShapePath(
+  pts: [number, number][],
   x: number,
   y: number,
   angle: number,
@@ -166,11 +255,11 @@ function buildSpadePath(
   const s = size / 18;
   const cos = Math.cos(angle - Math.PI / 2);
   const sin = Math.sin(angle - Math.PI / 2);
-  const n = SPADE_PTS.length;
+  const n = pts.length;
 
   const worldPts: { x: number; y: number }[] = [];
   for (let i = 0; i < n; i++) {
-    const [lx, ly] = SPADE_PTS[i]!;
+    const [lx, ly] = pts[i]!;
     const px = lx * s,
       py = ly * s;
     worldPts.push({ x: x + px * cos - py * sin, y: y + px * sin + py * cos });
@@ -206,6 +295,7 @@ export function FerrofluidBorder() {
     set: false,
   });
   const angleRef = useRef(0);
+  const morphRef = useRef(0);
   const frameRef = useRef<number | null>(null);
   const isVisibleRef = useRef(true);
   const winRectRef = useRef({ x: 0, y: 0, w: 0, h: 0, r: 8 });
@@ -529,7 +619,30 @@ export function FerrofluidBorder() {
       }
       if (spadeScale < 1) return depth;
 
-      const spadePath = buildSpadePath(
+      // Shape morph: spade -> heart -> diamond -> club as cursor nears cards
+      let morphTarget = 0;
+      if (nearestCardDist < FERRO.spadeMorphRange) {
+        morphTarget = Math.min(
+          3,
+          (1 - nearestCardDist / FERRO.spadeMorphRange) * 3,
+        );
+      }
+      morphRef.current +=
+        (morphTarget - morphRef.current) * FERRO.spadeMorphSmooth;
+
+      let cursorPts: [number, number][] = SPADE_PTS;
+      if (morphRef.current > 0.01) {
+        const idx = Math.floor(morphRef.current);
+        const frac = morphRef.current - idx;
+        cursorPts = blendShapes(
+          SUIT_SHAPES[Math.min(idx, 3)]!,
+          SUIT_SHAPES[Math.min(idx + 1, 3)]!,
+          frac,
+        );
+      }
+
+      const spadePath = buildShapePath(
+        cursorPts,
         m.sx,
         m.sy,
         angleRef.current,
