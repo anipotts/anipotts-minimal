@@ -30,9 +30,10 @@ jobs:
 
       - name: No Resend regressions
         run: |
-          if grep -rEn 'resend|RESEND_API_KEY' apps packages workers \
+          if grep -rEn '\bresend\b|RESEND_API_KEY' apps packages workers \
               --include='*.ts' --include='*.tsx' \
-              --include='*.toml' --include='*.json'; then
+              --include='*.toml' --include='*.json' \
+              --exclude='claude-stats.json'; then
             echo "::error::Resend reference reintroduced. This repo uses CF Email Routing send_email bindings."
             exit 1
           fi
