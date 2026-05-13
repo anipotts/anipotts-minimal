@@ -30,10 +30,16 @@ jobs:
 
       - name: No Resend regressions
         run: |
-          if grep -rEn '\bresend\b|RESEND_API_KEY' apps packages workers \
+          if grep -rEn '\bresend\b|RESEND_API_KEY' . \
               --include='*.ts' --include='*.tsx' \
               --include='*.toml' --include='*.json' \
-              --exclude='claude-stats.json'; then
+              --include='*.md' --include='*.env*' \
+              --exclude='claude-stats.json' \
+              --exclude-dir=node_modules \
+              --exclude-dir=.next \
+              --exclude-dir=.open-next \
+              --exclude-dir=.turbo \
+              --exclude-dir=dist; then
             echo "::error::Resend reference reintroduced. This repo uses CF Email Routing send_email bindings."
             exit 1
           fi

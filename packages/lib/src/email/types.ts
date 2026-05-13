@@ -2,14 +2,15 @@ export interface SendEmailBinding {
   send(message: unknown): Promise<void>;
 }
 
-export interface OutboundEmail {
+interface OutboundEmailBase {
   from: string;
   to: string;
   subject: string;
   replyTo?: string;
-  text?: string;
-  html?: string;
 }
+
+export type OutboundEmail = OutboundEmailBase &
+  ({ text: string; html?: string } | { html: string; text?: string });
 
 export interface SendOptions {
   maxAttempts?: number;
