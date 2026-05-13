@@ -340,12 +340,17 @@ function generateEmailHtml(data: {
 </html>`;
 }
 
+interface WeeklySendOutcome {
+  error: string | null;
+  timedOut: boolean;
+}
+
 async function sendWeeklyEmail(
   env: Env,
   to: string,
   subject: string,
   html: string,
-): Promise<string | null> {
+): Promise<WeeklySendOutcome> {
   const result = await sendViaBinding(
     env.SEND_EMAIL,
     {
@@ -357,7 +362,11 @@ async function sendWeeklyEmail(
     },
     { maxAttempts: MAX_RETRIES, backoffBaseMs: BACKOFF_BASE_MS },
   );
-  return result.ok ? null : (result.error ?? "send failed");
+  if (result.ok) return { error: null, timedOut: false };
+  return {
+    error: result.error ?? "send failed",
+    timedOut: result.timedOut === true,
+  };
 }
 
 /**
@@ -388,7 +397,7 @@ async function retryQueuedEmails(env: Env): Promise<number> {
 
   let sent = 0;
   for (const email of pending.results) {
-    const error = await sendWeeklyEmail(
+    const { error, timedOut } = await sendWeeklyEmail(
       env,
       email.to_address,
       email.subject,
@@ -402,6 +411,15 @@ async function retryQueuedEmails(env: Env): Promise<number> {
         .bind(now(), email.id)
         .run();
       sent++;
+    } else if (timedOut) {
+      // Unknown delivery: original send may still complete in flight.
+      // Mark as 'unknown' so we never retry it (no idempotency key on CF
+      // email). Counted as resolved from the queue's perspective.
+      await env.DB.prepare(
+        "UPDATE email_queue SET status = 'unknown', last_error = ?, updated_at = ? WHERE id = ?",
+      )
+        .bind(error, now(), email.id)
+        .run();
     } else {
       const newAttempts = email.attempts + 1;
       const newStatus = newAttempts >= 5 ? "failed" : "pending";
@@ -550,12 +568,23 @@ async function buildAndSendReport(env: Env): Promise<{
       weekOf,
     });
 
-    const sendError = await sendWeeklyEmail(
+    const { error: sendError, timedOut } = await sendWeeklyEmail(
       env,
       "hello@anipotts.com",
       subject,
       html,
     );
+
+    if (timedOut) {
+      // Unknown delivery: do not queue (would risk duplicate digest).
+      console.error("Weekly email timed out; not queuing:", sendError);
+      return {
+        sent: false,
+        queued: false,
+        retried,
+        error: sendError ?? undefined,
+      };
+    }
 
     if (sendError) {
       // All retries failed. Queue for next cron run.

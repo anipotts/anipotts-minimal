@@ -32,6 +32,7 @@ export async function sendViaBinding(
 
   const raw = buildMime(msg);
   const envelopeFrom = parseAddress(msg.from).addr;
+  const TIMEOUT_SENTINEL = Symbol("timeout");
 
   let lastError: string | undefined;
 
@@ -39,15 +40,38 @@ export async function sendViaBinding(
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
       const send = binding.send(new EmailMessage(envelopeFrom, msg.to, raw));
-      const timeout = new Promise<never>((_, reject) => {
+      const timeout = new Promise<typeof TIMEOUT_SENTINEL>((resolve) => {
         timeoutId = setTimeout(
-          () =>
-            reject(new Error(`send timed out after ${perAttemptTimeoutMs}ms`)),
+          () => resolve(TIMEOUT_SENTINEL),
           perAttemptTimeoutMs,
         );
       });
-      await Promise.race([send, timeout]);
+      const outcome = await Promise.race([send, timeout]);
       clearTimeout(timeoutId);
+
+      if (outcome === TIMEOUT_SENTINEL) {
+        const error = `send timed out after ${perAttemptTimeoutMs}ms`;
+        log({
+          ok: false,
+          timedOut: true,
+          attempt,
+          correlationId,
+          subject: msg.subject,
+          to: msg.to,
+          error,
+        });
+        // Unknown delivery state. Do NOT retry: binding.send may still
+        // complete in flight, and CF email has no idempotency key, so a
+        // retry would risk a duplicate.
+        return {
+          ok: false,
+          timedOut: true,
+          attempts: attempt,
+          correlationId,
+          error,
+        };
+      }
+
       log({
         ok: true,
         attempt,

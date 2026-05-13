@@ -24,4 +24,10 @@ export interface SendResult {
   attempts: number;
   correlationId: string;
   error?: string;
+  /**
+   * True iff the last attempt timed out locally. The underlying send may
+   * still complete in flight, so callers MUST treat this as
+   * unknown-delivery: do not retry or requeue.
+   */
+  timedOut?: boolean;
 }

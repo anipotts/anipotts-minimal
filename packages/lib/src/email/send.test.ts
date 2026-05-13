@@ -72,16 +72,19 @@ describe("sendViaBinding", () => {
     expect(result.correlationId).toBe("fixed-id");
   });
 
-  it("times out a stalled send", async () => {
+  it("returns timedOut without retrying on stalled send", async () => {
     const send = vi.fn().mockImplementation(() => new Promise(() => {}));
     const result = await sendViaBinding({ send }, baseMsg, {
-      maxAttempts: 2,
+      maxAttempts: 3,
       backoffBaseMs: 1,
       perAttemptTimeoutMs: 10,
     });
     expect(result.ok).toBe(false);
-    expect(result.attempts).toBe(2);
+    expect(result.timedOut).toBe(true);
+    expect(result.attempts).toBe(1);
     expect(result.error).toMatch(/timed out/);
-    expect(send).toHaveBeenCalledTimes(2);
+    // Critical: must NOT retry — CF email has no idempotency key and the
+    // original send may still complete in flight.
+    expect(send).toHaveBeenCalledTimes(1);
   });
 });
