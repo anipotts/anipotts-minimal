@@ -19,6 +19,7 @@ export async function sendViaBinding(
 ): Promise<SendResult> {
   const maxAttempts = opts.maxAttempts ?? 1;
   const backoffBaseMs = opts.backoffBaseMs ?? 1000;
+  const perAttemptTimeoutMs = opts.perAttemptTimeoutMs ?? 10_000;
   const correlationId = opts.correlationId ?? crypto.randomUUID();
 
   const { EmailMessage } = (await import(
@@ -35,8 +36,18 @@ export async function sendViaBinding(
   let lastError: string | undefined;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
-      await binding.send(new EmailMessage(envelopeFrom, msg.to, raw));
+      const send = binding.send(new EmailMessage(envelopeFrom, msg.to, raw));
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(
+          () =>
+            reject(new Error(`send timed out after ${perAttemptTimeoutMs}ms`)),
+          perAttemptTimeoutMs,
+        );
+      });
+      await Promise.race([send, timeout]);
+      clearTimeout(timeoutId);
       log({
         ok: true,
         attempt,
@@ -46,6 +57,7 @@ export async function sendViaBinding(
       });
       return { ok: true, attempts: attempt, correlationId };
     } catch (e) {
+      if (timeoutId) clearTimeout(timeoutId);
       lastError = e instanceof Error ? e.message : String(e);
       log({
         ok: false,

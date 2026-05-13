@@ -63,6 +63,7 @@ jobs:
               - ".github/workflows/deploy.yml"
             weekly-email:
               - "workers/weekly-email/**"
+              - "packages/lib/**"
               - "package.json"
               - "pnpm-lock.yaml"
               - ".github/workflows/deploy.yml"
@@ -232,6 +233,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm turbo build --filter=@anipotts/lib
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

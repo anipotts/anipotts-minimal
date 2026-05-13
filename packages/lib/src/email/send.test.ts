@@ -71,4 +71,17 @@ describe("sendViaBinding", () => {
     });
     expect(result.correlationId).toBe("fixed-id");
   });
+
+  it("times out a stalled send", async () => {
+    const send = vi.fn().mockImplementation(() => new Promise(() => {}));
+    const result = await sendViaBinding({ send }, baseMsg, {
+      maxAttempts: 2,
+      backoffBaseMs: 1,
+      perAttemptTimeoutMs: 10,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.attempts).toBe(2);
+    expect(result.error).toMatch(/timed out/);
+    expect(send).toHaveBeenCalledTimes(2);
+  });
 });

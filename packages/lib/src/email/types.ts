@@ -16,6 +16,7 @@ export interface SendOptions {
   maxAttempts?: number;
   backoffBaseMs?: number;
   correlationId?: string;
+  perAttemptTimeoutMs?: number;
 }
 
 export interface SendResult {
