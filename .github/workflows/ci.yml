@@ -39,6 +39,8 @@ jobs:
               --exclude-dir=.next \
               --exclude-dir=.open-next \
               --exclude-dir=.turbo \
+              --exclude-dir=.claude \
+              --exclude-dir=.github \
               --exclude-dir=dist; then
             echo "::error::Resend reference reintroduced. This repo uses CF Email Routing send_email bindings."
             exit 1
