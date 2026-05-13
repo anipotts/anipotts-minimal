@@ -86,6 +86,17 @@ export async function POST(request: Request) {
       { maxAttempts: 1 },
     );
 
+    if (result.timedOut) {
+      // Unknown delivery: the binding.send may still complete in flight,
+      // and CF email has no idempotency key. Surfacing a failure here
+      // would prompt the user to resubmit and risk a duplicate. Return
+      // 202 Accepted instead so the form shows success.
+      return NextResponse.json(
+        { success: true, deliveryUncertain: true },
+        { status: 202 },
+      );
+    }
+
     if (!result.ok) {
       return NextResponse.json(
         { error: "Failed to send email" },
