@@ -51,6 +51,19 @@
         "QUANTERCISE_BASE_URL"
       ]
     },
+    "@anipotts/labs#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "scripts/**",
+        "content/experiments/**",
+        "tsconfig.json",
+        "package.json",
+        "next.config.ts",
+        "tailwind.config.mjs"
+      ],
+      "env": ["NODE_ENV", "SKIP_LABS_FETCH"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
