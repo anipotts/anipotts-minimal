@@ -181,6 +181,135 @@ Week 4:
 15. Build the preview environment workflow (`preview.yml` + Workers Versions).
 16. Pick off P1 issues (#5, #6, #9, #10).
 
+## Account-wide Vercel inventory (beyond this repo)
+
+This doc started as a per-repo plan but the wider goal is moving every domain-bearing project off Vercel onto Cloudflare. Playground projects on `*.vercel.app` stay on Vercel.
+
+Inventory captured 2026-05-13 via `vercel projects ls` + `vercel domains ls` + per-domain `dig` and `curl -I` probes.
+
+### Vestigial Vercel projects (delete, no migration needed)
+
+| Vercel project               | Why it's dead                                                                                                                | Action                                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `anipotts.com`               | DNS resolves to Cloudflare (`server: cloudflare`). The Vercel project still claims the apex domain but nothing routes there. | Delete project at `vercel.com/anipotts/anipotts.com/settings`. Detach `anipotts.com` from the project first. |
+| `linear-tinkering-starlight` | Stub auto-created when running `vercel ls` from this worktree dir. Never had a deploy.                                       | Delete project at `vercel.com/anipotts/linear-tinkering-starlight/settings`.                                 |
+
+### Active Vercel-hosted custom-domain projects (migrate)
+
+12 domain-bearing projects, all confirmed `server: Vercel` on probe.
+
+| Wave | Domain                                    | Vercel project        | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---- | ----------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `coolfollowers.com`                       | coolfollowers.com     | Probably small/static. Good first migration to validate the Workers recipe end-to-end.                                                                                                                                                                                                                                                                                                                                                                           |
+| 1    | `wigglesburg.com`                         | wigglesburg.com       | Probably small/static.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 1    | `nyupuritytest.com` + `nyuricepurity.com` | nyupuritytest.com     | Two domains, one project. Second domain currently doesn't resolve, so it tags along for free.                                                                                                                                                                                                                                                                                                                                                                    |
+| 2    | `howoldamiactually.com`                   | howoldamiactually.com | Single page-y. Probable Next or static.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 2    | `fourtwenty.nyc`                          | fourtwenty.nyc        | Listed as a portfolio project in `packages/lib/src/money/queries.ts`.                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2    | `chained.chat`                            | chained.chat          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 3    | `getknowport.com` + `knowport.app`        | knowport              | Two custom domains pointing at one project; CF custom-domain bind handles both via repeated `[[routes]]` entries.                                                                                                                                                                                                                                                                                                                                                |
+| 3    | `www.prcart.dev`                          | prcart                | `.dev` TLD, looks shipped product.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 3    | `www.ashasreen.com`                       | ashasreen.com         | Personal site. Confirm with owner before flipping DNS.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 4    | `www.saeshify.com`                        | saeshify              | Real product. Migrate after the recipe is shaken out on smaller sites.                                                                                                                                                                                                                                                                                                                                                                                           |
+| 5    | `quantercise.com`                         | quantercise.com       | **Highest risk.** Symphony daemon on `ap-mini` autonomously commits + deploys against this project (`~/Code/external/symphony/elixir/`). The Symphony workflow assumes the deploy URL is the Vercel-style `https://quantercise.com`. Migration must coordinate: either swap Symphony's deploy logic to call `wrangler deploy`, or run both stacks in parallel for a verification window before the cutover. Do this last; the rest of the migration is practice. |
+
+### Playground projects (leave on Vercel)
+
+`*.vercel.app` only, no custom domain. Vercel keeps them, no churn:
+
+`rudy`, `invideo`, `valentine`, `pgi`, `vector-seo`, `dashboard`, `resonance`, `poojatrehan`, `chalk`, `mamadigital`, `answerlowkey`.
+
+### GitHub App scoping
+
+The Vercel GitHub App is currently installed across all 127 anipotts repos. **Do not uninstall** (would yank it from the playground projects too). Instead, in `github.com/settings/installations/53160308`:
+
+1. Switch **Repository access** from "All repositories" → "Only select repositories".
+2. In the multi-select, deselect every repo that hosts a domain-bearing project (this repo, then each of the 12 above as they migrate).
+3. Save.
+
+Net effect: Vercel CI keeps building previews for the playground stuff, stops touching anything that's been migrated.
+
+### Per-project migration template
+
+Same recipe each time. Total time per project, given a typical Next.js app: ~30-60 min including DNS verification. Static-only sites: closer to 15.
+
+**Step 0: assess.** Clone the project's repo. Read `package.json` + `next.config` + look for serverless functions, ISR, image optimization, edge middleware, env vars.
+
+| Trait                                | Lift                                                                 |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| Next.js 13+ App Router, fully SSG    | trivial                                                              |
+| Next.js with API routes / SSR        | use OpenNext, mirror `apps/www` recipe                               |
+| Next.js with ISR or `unstable_cache` | OpenNext supports it; verify your specific patterns                  |
+| Next.js Edge Middleware              | OpenNext converts to Worker entrypoint logic                         |
+| `next/image` with remote hosts       | OpenNext bundles, or swap to CF Images binding                       |
+| Plain Vite/SvelteKit/Remix/Astro     | use Workers Static Assets (`[assets]` directive) instead of OpenNext |
+| Anything calling Vercel KV/Postgres  | port to CF KV / D1 (this is the heaviest piece — flag early)         |
+| Anything calling Vercel Blob         | port to CF R2                                                        |
+
+**Step 1: scaffold the Worker.** In the project repo, create `wrangler.toml` mirroring `apps/labs/wrangler.toml`:
+
+```toml
+name = "<project-name>"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = ".open-next/worker.js"
+workers_dev = true   # leave on while testing, flip to false at cutover
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+```
+
+Add `@opennextjs/cloudflare` and `wrangler` to devDependencies. Add `open-next.config.ts` (one-liner: `export default defineCloudflareConfig({});`).
+
+**Step 2: build + smoke test on `*.workers.dev`.**
+
+```bash
+pnpm build  # or npm run build
+npx opennextjs-cloudflare build
+npx wrangler deploy
+```
+
+Hit the resulting `https://<project-name>.<account>.workers.dev` URL. Verify everything that worked on Vercel still works.
+
+**Step 3: detach the domain from Vercel.** In the Vercel project's Settings → Domains, remove the custom domain. This frees Cloudflare to claim it.
+
+**Step 4: bind the domain on the Worker.** Append to `wrangler.toml`:
+
+```toml
+[[routes]]
+pattern = "<domain.com>"
+custom_domain = true
+zone_id = "<zone-id-from-cf-dashboard>"
+```
+
+Re-deploy. Wrangler attaches the hostname. **No DNS edit at the registrar level if the domain is already in a Cloudflare zone**; if it's still on Vercel's nameservers, change the registrar to point at Cloudflare nameservers first (or move the apex CNAME to `cname.vercel-dns.com` → `cf-cname-target` carefully).
+
+**Step 5: smoke test, decommission Vercel.** `curl -I https://<domain>` should report `cf-ray:` headers. Once verified, archive or delete the Vercel project. Remove the repo from the Vercel GitHub App's selected list.
+
+**Rollback:** re-attach the domain to the Vercel project. The Vercel build is still cached; rollback is immediate.
+
+### Things that need explicit decisions before starting
+
+- **Repo locations.** Are these one-repo-per-project, or do some live in monorepos? Migration approach differs (per-app `wrangler.toml` if monorepo, root if standalone).
+- **Env vars.** Vercel env vars need to migrate to `wrangler secret put` per Worker. Inventory per project before cutover.
+- **Database/storage.** If any project uses Vercel KV / Postgres / Blob, those don't have one-line CF equivalents. Flag those during the per-project assessment.
+- **Quantercise + Symphony coordination.** Symphony runs autonomous deploy loops against `quantercise.com` from `ap-mini`. Before migrating Quantercise, decide: pause Symphony, modify Symphony's deploy step to call `wrangler deploy` instead of pushing to Vercel, or run both stacks side-by-side for a verification window.
+- **Branch deploys / preview URLs per project.** Vercel gives PR preview URLs free. The CF equivalent is `wrangler versions upload` per PR. Worth wiring up per-project once the recipe is solid; not blocking initial cutover.
+
+### Suggested order
+
+1. **Wave 1** (small/static, low risk): coolfollowers.com, wigglesburg.com, nyupuritytest.com. Validates the recipe.
+2. **Wave 2** (single-page-ish): howoldamiactually.com, fourtwenty.nyc, chained.chat.
+3. **Wave 3** (real product domains): knowport (two domains), prcart.dev, ashasreen.com.
+4. **Wave 4** (saeshify.com): real product, do once the recipe is muscle memory.
+5. **Wave 5** (quantercise.com): coordinate Symphony first.
+
+Aim for 1 wave per week if doing solo, faster with batching.
+
 ## Update rule
 
 When you ship infrastructure that changes the deploy graph (a new Worker, a custom-domain swap, a new binding type, a CF feature toggled on/off), update this doc in the same PR. Future contributors trust this over guesswork.
