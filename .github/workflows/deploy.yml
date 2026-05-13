@@ -34,6 +34,7 @@ jobs:
     outputs:
       www: ${{ steps.filter.outputs.www }}
       admin: ${{ steps.filter.outputs.admin }}
+      labs: ${{ steps.filter.outputs.labs }}
       ingest: ${{ steps.filter.outputs.ingest }}
       weekly-email: ${{ steps.filter.outputs.weekly-email }}
     steps:
@@ -56,6 +57,9 @@ jobs:
               - *shared
               - "apps/admin/**"
               - "services/**"
+            labs:
+              - *shared
+              - "apps/labs/**"
             ingest:
               - "workers/ingest/**"
               - "package.json"
@@ -81,7 +85,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -115,7 +119,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -156,7 +160,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -182,6 +186,42 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+  deploy-labs:
+    name: Deploy labs
+    needs: [changes, validate]
+    if: needs.changes.outputs.labs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build labs
+        run: pnpm turbo build --filter=@anipotts/labs
+
+      - name: Build for Cloudflare
+        run: npx opennextjs-cloudflare build
+        working-directory: apps/labs
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          workingDirectory: apps/labs
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
   deploy-ingest:
     name: Deploy ingest worker
     needs: [changes, validate]
@@ -198,7 +238,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -227,7 +267,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies

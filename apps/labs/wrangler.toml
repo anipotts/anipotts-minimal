@@ -1,0 +1,24 @@
+name = "anipotts-labs"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = ".open-next/worker.js"
+workers_dev = false
+
+# Custom domain (CF DNS already manages anipotts.com).
+# Custom-domain routes do not require DNS edits; wrangler binds the
+# Worker to the hostname on deploy and the existing CNAME flips to
+# the Worker's serving stack automatically.
+[[routes]]
+pattern = "labs.anipotts.com"
+custom_domain = true
+zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# Workers Logs (free tier, 7-day retention; opt in here so 'wrangler tail'
+# and the Workers dashboard log stream both work without per-Worker setup)
+[observability]
+enabled = true
