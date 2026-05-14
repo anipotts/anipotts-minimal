@@ -19,12 +19,10 @@ new_sqlite_classes = ["LinkVault"]
 # CORS allowlist for the admin frontend. Override at deploy time
 # with `wrangler secret put` if a different origin needs access.
 [vars]
-ALLOWED_ORIGINS = "https://admin-v2.anipotts.com,http://localhost:3000,http://localhost:3001"
+ALLOWED_ORIGINS = "https://admin.anipotts.com,http://localhost:3000,http://localhost:3001"
 
-# Custom domain bind. Uncomment after the api.anipotts.com hostname
-# is bound to this Worker (do via wrangler routes or CF dashboard).
-#
-# [[routes]]
-# pattern = "api.anipotts.com"
-# custom_domain = true
-# zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
+# Custom domain bound 2026-05-14 via CF API. Lives at api.anipotts.com.
+[[routes]]
+pattern = "api.anipotts.com"
+custom_domain = true
+zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
