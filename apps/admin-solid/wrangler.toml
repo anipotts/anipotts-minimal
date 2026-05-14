@@ -1,0 +1,25 @@
+name = "anipotts-admin-solid"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = ".output/server/index.mjs"
+workers_dev = true
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+# Build-time inlined as PUBLIC_*; runtime override available via wrangler vars
+[vars]
+PUBLIC_STATE_API = "https://anipotts-state.anipotts.workers.dev"
+
+# Custom domain. Uncomment after admin-v2.anipotts.com is added in CF dashboard
+# (or auto-bound via wrangler routes once token has zone:edit).
+#
+# [[routes]]
+# pattern = "admin-v2.anipotts.com"
+# custom_domain = true
+# zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
