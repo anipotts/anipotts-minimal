@@ -5,9 +5,18 @@ account_id = "0f856093bdcd34a7da1bde5ee4385163"
 main = ".open-next/worker.js"
 workers_dev = false
 
-# Custom domain
+# Custom domain. Renamed from admin.anipotts.com to legacy-admin.anipotts.com
+# on 2026-05-14 to free up admin.anipotts.com for the SolidStart admin v2
+# (apps/admin-solid). Cutover sequence:
+#   1. Land this PR (worker still serves on whichever route is bound).
+#   2. In CF dashboard: Workers & Pages > anipotts-admin > Settings > Triggers.
+#      Add Custom Domain "legacy-admin.anipotts.com". Wait for cert (~30s).
+#   3. Update CF Access policy to cover legacy-admin.anipotts.com (same group).
+#   4. Verify legacy-admin loads + auth works.
+#   5. Remove "admin.anipotts.com" custom domain from this Worker.
+#   6. Add "admin.anipotts.com" to anipotts-admin-solid Worker (PR #44).
 [[routes]]
-pattern = "admin.anipotts.com/*"
+pattern = "legacy-admin.anipotts.com/*"
 zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
 
 [assets]
