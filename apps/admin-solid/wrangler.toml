@@ -16,18 +16,10 @@ enabled = true
 [vars]
 PUBLIC_STATE_API = "https://api.anipotts.com"
 
-# Custom domain. Claims admin.anipotts.com directly (legacy Next admin moves
-# to legacy-admin.anipotts.com in apps/admin/wrangler.toml). Cutover sequence
-# documented in apps/admin/wrangler.toml.
-#
-# Either:
-#   (a) Add via CF dashboard once the legacy admin has vacated the hostname:
-#       Workers & Pages > anipotts-admin-solid > Settings > Triggers >
-#       Add Custom Domain > admin.anipotts.com
-#   (b) Set CLOUDFLARE_API_TOKEN with Zone:Edit + Workers Routes:Edit and
-#       uncomment the block below; `wrangler deploy` will manage the binding.
-#
-# [[routes]]
-# pattern = "admin.anipotts.com"
-# custom_domain = true
-# zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
+# Custom domain bound 2026-05-14 via CF API. Lives at admin.anipotts.com,
+# fronted by the existing Cloudflare Access policy that previously protected
+# the legacy Next admin (which now serves at legacy-admin.anipotts.com).
+[[routes]]
+pattern = "admin.anipotts.com"
+custom_domain = true
+zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
