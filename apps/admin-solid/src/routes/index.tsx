@@ -1,3 +1,4 @@
+import { CommitFeed } from "~/components/CommitFeed";
 import { LinkVaultPanel } from "~/components/LinkVaultPanel";
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
         polling.
       </p>
       <LinkVaultPanel />
+      <CommitFeed />
     </main>
   );
 }

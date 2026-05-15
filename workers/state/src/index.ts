@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import type { Bindings } from "./types";
 
 export { LinkVault } from "./do/link-vault";
+export { CodeStats } from "./do/code-stats";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -21,12 +22,19 @@ app.use("*", async (c, next) => {
 app.get("/", (c) =>
   c.json({
     service: "anipotts-state",
-    durableObjects: ["LinkVault"],
+    durableObjects: ["LinkVault", "CodeStats"],
     endpoints: {
-      list: "GET /api/links",
-      add: "POST /api/links",
-      remove: "DELETE /api/links/:id",
-      subscribe: "GET /api/links/ws (websocket upgrade)",
+      links: {
+        list: "GET /api/links",
+        add: "POST /api/links",
+        remove: "DELETE /api/links/:id",
+        subscribe: "GET /api/links/ws",
+      },
+      commits: {
+        list: "GET /api/commits",
+        publish: "POST /api/commits (bearer auth)",
+        subscribe: "GET /api/commits/ws",
+      },
     },
   }),
 );
@@ -36,6 +44,30 @@ app.get("/health", (c) => c.json({ ok: true, ts: new Date().toISOString() }));
 function linkVaultStub(env: Bindings): DurableObjectStub {
   const id = env.LINK_VAULT.idFromName("default");
   return env.LINK_VAULT.get(id);
+}
+
+function codeStatsStub(env: Bindings): DurableObjectStub {
+  const id = env.CODE_STATS.idFromName("default");
+  return env.CODE_STATS.get(id);
+}
+
+function requirePublishKey(c: {
+  env: Bindings;
+  req: { header: (name: string) => string | undefined };
+}): Response | null {
+  const expected = c.env.STATE_PUBLISH_KEY;
+  if (!expected) {
+    return Response.json(
+      { error: "STATE_PUBLISH_KEY not configured" },
+      { status: 503 },
+    );
+  }
+  const header = c.req.header("authorization") ?? "";
+  const provided = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (provided !== expected) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+  return null;
 }
 
 app.get("/api/links", async (c) => {
@@ -72,6 +104,36 @@ app.get("/api/links/ws", async (c) => {
     return c.text("expected websocket upgrade", 426);
   }
   const stub = linkVaultStub(c.env);
+  return stub.fetch(c.req.raw);
+});
+
+app.get("/api/commits", async (c) => {
+  const limit = c.req.query("limit") ?? "100";
+  const stub = codeStatsStub(c.env);
+  const res = await stub.fetch(
+    `https://internal/commits?limit=${encodeURIComponent(limit)}`,
+  );
+  return new Response(res.body, res);
+});
+
+app.post("/api/commits", async (c) => {
+  const denied = requirePublishKey(c);
+  if (denied) return denied;
+  const body = await c.req.json();
+  const stub = codeStatsStub(c.env);
+  const res = await stub.fetch("https://internal/commits", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return new Response(res.body, res);
+});
+
+app.get("/api/commits/ws", async (c) => {
+  if (c.req.header("upgrade")?.toLowerCase() !== "websocket") {
+    return c.text("expected websocket upgrade", 426);
+  }
+  const stub = codeStatsStub(c.env);
   return stub.fetch(c.req.raw);
 });
 
