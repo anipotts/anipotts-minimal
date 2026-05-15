@@ -12,9 +12,17 @@ enabled = true
 name = "LINK_VAULT"
 class_name = "LinkVault"
 
+[[durable_objects.bindings]]
+name = "CODE_STATS"
+class_name = "CodeStats"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["LinkVault"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["CodeStats"]
 
 # CORS allowlist for the admin frontend. Override at deploy time
 # with `wrangler secret put` if a different origin needs access.
