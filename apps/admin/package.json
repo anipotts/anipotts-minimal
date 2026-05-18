@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@anipotts/config": "workspace:*",
-    "@opennextjs/cloudflare": "^1.19.9",
+    "@opennextjs/cloudflare": "^1.19.10",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
