@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@anipotts/config": "workspace:*",
-    "@opennextjs/cloudflare": "^1.19.9",
+    "@opennextjs/cloudflare": "^1.19.10",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
@@ -32,6 +32,6 @@
     "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "wrangler": "^4.90.0"
+    "wrangler": "^4.92.0"
   }
 }
