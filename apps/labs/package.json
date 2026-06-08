@@ -1,35 +1,28 @@
 {
-  "name": "@anipotts/www",
+  "name": "@anipotts/labs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "fetch-bot-content": "node scripts/fetch-bot-content.mjs",
+    "prebuild": "node scripts/fetch-bot-content.mjs",
+    "predev": "node scripts/fetch-bot-content.mjs",
+    "dev": "next dev --port 3002",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit",
-    "test:unit": "VITE_CJS_IGNORE_WARNING=true vitest run --passWithNoTests",
-    "test:e2e": "env -u NO_COLOR NODE_NO_WARNINGS=1 playwright test",
-    "test": "VITE_CJS_IGNORE_WARNING=true vitest run --passWithNoTests"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anipotts/lib": "workspace:*",
-    "@anipotts/styles": "workspace:^",
-    "@anipotts/types": "workspace:*",
-    "@anipotts/ui": "workspace:*",
-    "@phosphor-icons/react": "^2.1.10",
-    "clsx": "^2.1.1",
+    "gray-matter": "^4.0.3",
     "next": "^16.2.6",
-    "posthog-js": "^1.300.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-markdown": "^10.1.0",
-    "zod": "^4.3.6"
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
     "@anipotts/config": "workspace:*",
     "@opennextjs/cloudflare": "^1.19.10",
-    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
@@ -39,6 +32,6 @@
     "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^1.6.0"
+    "wrangler": "^4.92.0"
   }
 }

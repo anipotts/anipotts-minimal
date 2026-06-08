@@ -5,9 +5,12 @@ account_id = "0f856093bdcd34a7da1bde5ee4385163"
 main = ".open-next/worker.js"
 workers_dev = false
 
-# Custom domain
+# Custom domain bound 2026-05-14 via CF API. Lives at legacy-admin.anipotts.com.
+# Renamed from admin.anipotts.com to make room for the SolidStart admin v2
+# (apps/admin-solid) which now claims the canonical admin.anipotts.com slot.
 [[routes]]
-pattern = "admin.anipotts.com/*"
+pattern = "legacy-admin.anipotts.com"
+custom_domain = true
 zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
 
 [assets]

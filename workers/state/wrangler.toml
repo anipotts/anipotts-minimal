@@ -1,0 +1,36 @@
+name = "anipotts-state"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = "src/index.ts"
+workers_dev = true
+
+[observability]
+enabled = true
+
+[[durable_objects.bindings]]
+name = "LINK_VAULT"
+class_name = "LinkVault"
+
+[[durable_objects.bindings]]
+name = "CODE_STATS"
+class_name = "CodeStats"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LinkVault"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["CodeStats"]
+
+# CORS allowlist for the admin frontend. Override at deploy time
+# with `wrangler secret put` if a different origin needs access.
+[vars]
+ALLOWED_ORIGINS = "https://admin.anipotts.com,http://localhost:3000,http://localhost:3001"
+
+# Custom domain bound 2026-05-14 via CF API. Lives at api.anipotts.com.
+[[routes]]
+pattern = "api.anipotts.com"
+custom_domain = true
+zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
