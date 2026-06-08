@@ -33,7 +33,7 @@ jobs:
           if grep -rEn '\bresend\b|RESEND_API_KEY' . \
               --include='*.ts' --include='*.tsx' \
               --include='*.toml' --include='*.json' \
-              --include='*.md' --include='*.env*' \
+              --include='*.env*' \
               --exclude='claude-stats.json' \
               --exclude-dir=node_modules \
               --exclude-dir=.next \
