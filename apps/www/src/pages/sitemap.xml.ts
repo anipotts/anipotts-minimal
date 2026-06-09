@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
     { path: "/projects", priority: 0.8 },
     { path: "/writing", priority: 0.85 },
     { path: "/running", priority: 0.7 },
-    { path: "/claude", priority: 0.9 },
+    { path: "/orchestrating", priority: 0.9 },
     { path: "/connect", priority: 0.8 },
     ...writingEntries.map((t) => ({
       path: `/writing/${writingSlug(t)}`,

@@ -124,12 +124,13 @@ const fmtSessionTime = (iso: string) =>
 ---
 
 <Shell
-  title="claude"
-  description="Claude Code systems, playbooks, and implementation patterns from ani potts"
-  path="/claude"
+  title="orchestrating"
+  description="How ani orchestrates Claude Code with workflows, hooks, and agents. Real session data, real systems shipping."
+  path="/orchestrating"
+  mood="alert"
 >
   <section data-rise id="proof" class="stack">
-    <h1 class="hero-title">claude code systems that ship</h1>
+    <h1 class="hero-title">orchestrating claude code</h1>
     <p class="hero-summary">
       How I actually use Claude Code. Hooks, agents, plugins, real session
       data. Everything is open source.
@@ -319,7 +320,7 @@ const fmtSessionTime = (iso: string) =>
   }
 
   .stat-value {
-    font-family: var(--display);
+    font-family: var(--sans);
     font-size: var(--d-section);
     line-height: 1;
     color: var(--accent);
@@ -401,7 +402,7 @@ const fmtSessionTime = (iso: string) =>
   }
 
   .record-value {
-    font-family: var(--display);
+    font-family: var(--sans);
     font-size: var(--p-h2);
     color: var(--accent);
     display: block;
@@ -444,7 +445,7 @@ const fmtSessionTime = (iso: string) =>
   }
 
   .install code {
-    background: var(--surface);
+    background: var(--bg);
     border-radius: 0.3rem;
     padding: 0.3em 0.6em;
   }

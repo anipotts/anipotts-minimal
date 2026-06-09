@@ -4,10 +4,10 @@ import { defineMiddleware } from "astro:middleware";
 const REDIRECTS: Record<string, string> = {
   "/lab": "/running",
   "/links": "/connect",
-  "/dev": "/claude",
-  "/updates": "/claude#proof",
-  "/metrics": "/claude#playbooks",
-  "/status": "/claude#work-together",
+  "/dev": "/orchestrating",
+  "/updates": "/orchestrating#proof",
+  "/metrics": "/orchestrating#playbooks",
+  "/status": "/orchestrating#work-together",
   "/docs": "/",
 };
 
@@ -18,6 +18,7 @@ const RENAMES: Record<string, string> = {
   "/thoughts": "/writing",
   "/work": "/shipping",
   "/labs": "/running",
+  "/claude": "/orchestrating",
 };
 
 const SECURITY_HEADERS: Record<string, string> = {

@@ -19,7 +19,7 @@ export const navItems = [
   { name: "writing", path: "/writing" },
   { name: "shipping", path: "/shipping" },
   { name: "running", path: "/running" },
-  { name: "claude", path: "/claude" },
+  { name: "orchestrating", path: "/orchestrating" },
   { name: "connect", path: "/connect" },
 ] as const;
 
