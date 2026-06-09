@@ -1,0 +1,17 @@
+-- 0004_drop_dead_tables.sql
+-- The 9 dead objects flagged by the 2026-06-08 reconcile (zero code callers).
+--
+-- ENTIRELY DESTRUCTIVE. DO NOT RUN. Phase-3 supervised reconcile only,
+-- after ani eyeballs row counts:
+--   SELECT COUNT(*) FROM <table>;  -- for each, --remote
+-- and exports anything non-empty. Every statement stays commented out until
+-- that review happens.
+--
+-- DROP TABLE IF EXISTS github_events;        -- webhook store, never wired
+-- DROP TABLE IF EXISTS contact_submissions;  -- /api/send only emails, never inserts
+-- DROP TABLE IF EXISTS content_config;       -- superseded by markdown-in-repo
+-- DROP TABLE IF EXISTS content_schedule;     -- editorial calendar, never used
+-- DROP TABLE IF EXISTS update_alerts;        -- AI-update tracking, never wired
+-- DROP TABLE IF EXISTS favorite_numbers;     -- dead toy feature
+-- DROP TABLE IF EXISTS analytics_events;     -- aspirational, no writer
+-- (projects_fts + its 3 triggers are in 0003_reconcile.sql's gated half)

@@ -1,14 +1,16 @@
 # drizzle/
 
-Drizzle-kit output for `anipotts-db` (Cloudflare D1, SQLite dialect).
+Migrations for `anipotts-db` (Cloudflare D1, SQLite dialect).
 
-Schema source: `packages/lib/src/db/schema.ts`. Config: root `drizzle.config.ts`.
+**`packages/lib/src/db/schema.ts` is the one canonical schema source** for all 23 regular tables, including `rate_limits`. The previous authorities are gone: `supabase/` (historical relic, deleted 2026-06-09) and `baseline.sql` (stale snapshot missing the migration-003 distribution columns, deleted 2026-06-09).
+
+Out-of-ORM objects Drizzle cannot express — the `thoughts_fts` FTS5 virtual table and its 3 triggers — live in the hand-authored companion migration `migrations/0003_reconcile.sql`. They are part of the same versioned migration set; drizzle-kit never touches them.
 
 ## Migration baseline
 
-Tables 1-20 are baseline — they were created via `wrangler d1 execute anipotts-db --file=supabase/d1-schema.sql` before drizzle-kit was adopted. The `supabase/` folder is a historical migration relic; Supabase itself is not used.
+The baseline tables were created via raw SQL before drizzle-kit was adopted. Migration `0001_service_registry.sql` is the first Drizzle-tracked migration, authored by hand (not `drizzle-kit generate`) to avoid regenerating the baseline `CREATE TABLE` statements.
 
-Migration `0001_service_registry.sql` is the first Drizzle-tracked migration, authored by hand (not `drizzle-kit generate`) to avoid regenerating the 20 baseline `CREATE TABLE` statements.
+`0003_reconcile.sql` (additive FTS5 canon + gated projects_fts drop) and `0004_drop_dead_tables.sql` (fully gated, phase-3 supervised) are authored but NOT applied. Snapshot before any apply.
 
 ## Apply
 
