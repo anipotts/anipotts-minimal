@@ -77,6 +77,8 @@ app.get("/api/links", async (c) => {
 });
 
 app.post("/api/links", async (c) => {
+  const denied = requirePublishKey(c);
+  if (denied) return denied;
   const body = await c.req.json();
   const stub = linkVaultStub(c.env);
   const res = await stub.fetch("https://internal/links", {
@@ -88,6 +90,8 @@ app.post("/api/links", async (c) => {
 });
 
 app.delete("/api/links/:id", async (c) => {
+  const denied = requirePublishKey(c);
+  if (denied) return denied;
   const id = c.req.param("id");
   const stub = linkVaultStub(c.env);
   const res = await stub.fetch(
