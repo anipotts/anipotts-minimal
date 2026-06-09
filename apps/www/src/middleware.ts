@@ -1,15 +1,23 @@
 import { defineMiddleware } from "astro:middleware";
 
-/** ported redirect map. /lab now points at /labs (the old /lab to /work
- *  mapping collided with the new /labs section, resolved per the rebuild plan). */
+/** flat redirect map: pathname (exact or prefix) -> destination. */
 const REDIRECTS: Record<string, string> = {
-  "/lab": "/labs",
+  "/lab": "/running",
   "/links": "/connect",
   "/dev": "/claude",
   "/updates": "/claude#proof",
   "/metrics": "/claude#playbooks",
   "/status": "/claude#work-together",
   "/docs": "/",
+};
+
+/** segment renames (noun -> verb). preserve subpaths and query. these are
+ *  external link-equity redirects: every old anipotts.com/thoughts/* url
+ *  ever shared keeps resolving. */
+const RENAMES: Record<string, string> = {
+  "/thoughts": "/writing",
+  "/work": "/shipping",
+  "/labs": "/running",
 };
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -32,8 +40,21 @@ const SECURITY_HEADERS: Record<string, string> = {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
 
-  // exact-segment redirect match: "/lab" and "/lab/..." redirect,
-  // "/labs" never does (distinct segment).
+  // segment renames: preserve the tail. /thoughts/foo -> /writing/foo.
+  for (const [from, to] of Object.entries(RENAMES)) {
+    if (pathname === from) {
+      return context.redirect(`${to}${search}`, 301);
+    }
+    if (pathname.startsWith(`${from}/`)) {
+      return context.redirect(
+        `${to}${pathname.slice(from.length)}${search}`,
+        301,
+      );
+    }
+  }
+
+  // flat redirects: tail is discarded. "/lab" and "/lab/..." both land
+  // on the destination; "/running" is a distinct segment, never matches.
   for (const [from, to] of Object.entries(REDIRECTS)) {
     if (pathname === from || pathname.startsWith(`${from}/`)) {
       return context.redirect(to, 301);

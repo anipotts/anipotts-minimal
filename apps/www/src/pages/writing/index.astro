@@ -1,19 +1,19 @@
 ---
 import Shell from "../../layouts/Shell.astro";
-import ThoughtRow from "../../components/ThoughtRow.astro";
+import WritingRow from "../../components/WritingRow.astro";
 import { Icon } from "astro-icon/components";
-import { publishedThoughts } from "../../lib/content";
+import { publishedWriting } from "../../lib/content";
 
-const thoughts = await publishedThoughts();
+const writingEntries = await publishedWriting();
 ---
 
 <Shell
-  title="thoughts"
-  description="Technical writings and reflections from ani potts"
-  path="/thoughts"
+  title="writing"
+  description="What ani is writing. Claude Code workflows, agentic systems, occasional music takes."
+  path="/writing"
 >
   <section data-rise>
-    <h1 class="hero-title">thoughts</h1>
+    <h1 class="hero-title">writing</h1>
     <p class="hero-summary">
       Technical writing as I build. Claude Code workflows, agentic systems,
       occasional music takes.
@@ -27,13 +27,13 @@ const thoughts = await publishedThoughts();
         id="thoughts-search"
         class="field search"
         type="search"
-        placeholder="search thoughts"
+        placeholder="search writing"
         autocomplete="off"
       />
     </label>
     <p class="count mono" id="search-count" aria-live="polite"></p>
     <div class="list" id="thoughts-list">
-      {thoughts.map((thought) => <ThoughtRow thought={thought} />)}
+      {writingEntries.map((item) => <WritingRow item={item} />)}
     </div>
   </section>
 </Shell>
@@ -123,7 +123,7 @@ const thoughts = await publishedThoughts();
       count.textContent = `${data.results.length} result${data.results.length === 1 ? "" : "s"}`;
       list.innerHTML = data.results
         .map(
-          (r) => `<a href="/thoughts/${esc(r.slug)}" class="row-link">
+          (r) => `<a href="/writing/${esc(r.slug)}" class="row-link">
             <span class="row-title">${esc(r.title)}</span>
             <span class="mono" style="font-size:.8rem;color:var(--ink-muted)">${esc(r.date.slice(0, 10))}</span>
             <span style="color:var(--ink-muted);font-size:var(--p-small)">${esc(r.summary)}</span>

@@ -4,24 +4,24 @@ import Shell from "../../layouts/Shell.astro";
 import { Icon } from "astro-icon/components";
 import {
   formatDate,
-  publishedThoughts,
+  publishedWriting,
   readingTime,
-  thoughtSlug,
+  writingSlug,
 } from "../../lib/content";
 
 export async function getStaticPaths() {
-  const thoughts = await publishedThoughts();
-  return thoughts.map((thought) => ({
-    params: { slug: thoughtSlug(thought) },
-    props: { thought },
+  const writingEntries = await publishedWriting();
+  return writingEntries.map((item) => ({
+    params: { slug: writingSlug(item) },
+    props: { item },
   }));
 }
 
-const { thought } = Astro.props;
-const slug = thoughtSlug(thought);
-const { Content } = await render(thought);
-const d = thought.data;
-const minutes = readingTime(thought.body ?? "");
+const { item } = Astro.props;
+const slug = writingSlug(item);
+const { Content } = await render(item);
+const d = item.data;
+const minutes = readingTime(item.body ?? "");
 
 const articleLd = {
   "@context": "https://schema.org",
@@ -30,21 +30,21 @@ const articleLd = {
   description: d.summary,
   datePublished: d.published_at?.toISOString(),
   author: { "@type": "Person", name: "Ani Potts", url: "https://anipotts.com" },
-  mainEntityOfPage: `https://anipotts.com/thoughts/${slug}`,
+  mainEntityOfPage: `https://anipotts.com/writing/${slug}`,
 };
 ---
 
 <Shell
   title={d.title}
   description={d.summary}
-  path={`/thoughts/${slug}`}
+  path={`/writing/${slug}`}
   ogType="article"
   jsonLd={articleLd}
 >
   <article class="article">
     <header data-rise class="head">
-      <a href="/thoughts" class="quiet-link mono back">
-        <Icon name="ph:arrow-bend-up-left" /> all thoughts
+      <a href="/writing" class="quiet-link mono back">
+        <Icon name="ph:arrow-bend-up-left" /> all writing
       </a>
       <h1 class="title">{d.title}</h1>
       <p class="meta mono muted">

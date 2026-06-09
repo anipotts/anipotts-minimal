@@ -16,10 +16,9 @@ export const siteConfig = {
 } as const;
 
 export const navItems = [
-  { name: "work", path: "/work" },
-  { name: "projects", path: "/projects" },
-  { name: "thoughts", path: "/thoughts" },
-  { name: "labs", path: "/labs" },
+  { name: "writing", path: "/writing" },
+  { name: "shipping", path: "/shipping" },
+  { name: "running", path: "/running" },
   { name: "claude", path: "/claude" },
   { name: "connect", path: "/connect" },
 ] as const;

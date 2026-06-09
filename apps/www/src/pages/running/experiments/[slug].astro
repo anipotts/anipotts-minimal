@@ -25,12 +25,12 @@ const d = experiment.data;
 <Shell
   title={d.title}
   description={d.summary ?? `experiment: ${d.title}`}
-  path={`/labs/experiments/${slug}`}
+  path={`/running/experiments/${slug}`}
   ogType="article"
 >
   <section data-rise class="head">
-    <a href="/labs" class="quiet-link mono back">
-      <Icon name="ph:arrow-bend-up-left" /> labs
+    <a href="/running" class="quiet-link mono back">
+      <Icon name="ph:arrow-bend-up-left" /> running
     </a>
     <h1 class="title">{d.title}</h1>
     <p class="meta mono muted">

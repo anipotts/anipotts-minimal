@@ -1,16 +1,16 @@
 ---
-import { formatDate, thoughtSlug, type Thought } from "../lib/content";
+import { formatDate, writingSlug, type Writing } from "../lib/content";
 
 interface Props {
-  thought: Thought;
+  item: Writing;
 }
 
-const { thought } = Astro.props;
-const slug = thoughtSlug(thought);
-const { title, summary, published_at, tags } = thought.data;
+const { item } = Astro.props;
+const slug = writingSlug(item);
+const { title, summary, published_at, tags } = item.data;
 ---
 
-<a href={`/thoughts/${slug}`} class="row-link">
+<a href={`/writing/${slug}`} class="row-link">
   <span class="row-title">{title}</span>
   <span class="row-meta mono">
     {published_at && <span>{formatDate(published_at)}</span>}

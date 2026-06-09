@@ -7,8 +7,8 @@ const phosphor = z
   .regex(/^[a-z-]+$/, "phosphor icon name only")
   .optional();
 
-const thoughts = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/thoughts" }),
+const writing = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./src/content/writing" }),
   schema: z
     .object({
       title: z.string(),
@@ -27,10 +27,10 @@ const thoughts = defineCollection({
         .optional(),
     })
     .refine((d) => d.status !== "published" || Boolean(d.published_at), {
-      message: "published thoughts need published_at",
+      message: "published writing needs published_at",
     })
     .refine((d) => d.status !== "scheduled" || Boolean(d.scheduled_at), {
-      message: "scheduled thoughts need scheduled_at",
+      message: "scheduled writing needs scheduled_at",
     }),
 });
 
@@ -68,7 +68,7 @@ const projects = defineCollection({
 });
 
 const weekly = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/labs/weekly" }),
+  loader: glob({ pattern: "*.md", base: "./src/content/running/weekly" }),
   schema: z.object({
     week: z.string().regex(/^\d{4}-W\d{2}$/),
     window_start: z.coerce.date(),
@@ -83,7 +83,7 @@ const weekly = defineCollection({
 });
 
 const experiments = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/labs/experiments" }),
+  loader: glob({ pattern: "*.md", base: "./src/content/running/experiments" }),
   schema: z.object({
     title: z.string(),
     slug: z.string().optional(),
@@ -94,4 +94,4 @@ const experiments = defineCollection({
   }),
 });
 
-export const collections = { thoughts, projects, weekly, experiments };
+export const collections = { writing, projects, weekly, experiments };

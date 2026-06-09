@@ -12,7 +12,10 @@ account_id = "0f856093bdcd34a7da1bde5ee4385163"
 [assets]
 binding = "ASSETS"
 directory = "./dist"
-run_worker_first = true
+# assets serve first; the worker only fires for paths with no static file.
+# this is what lets the middleware redirect map see /lab, /thoughts, /work,
+# /labs without intercepting prerendered /writing/[slug] HTML.
+run_worker_first = false
 
 [[d1_databases]]
 binding = "DB"

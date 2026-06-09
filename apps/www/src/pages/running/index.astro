@@ -12,16 +12,16 @@ const experiments = await publishedExperiments();
 ---
 
 <Shell
-  title="labs"
-  description="The lab notebook: weekly autonomous activity digests and hand-authored experiments"
-  path="/labs"
+  title="running"
+  description="What's running: weekly digests from the autonomous framework, and human-authored experiments."
+  path="/running"
 >
   <section data-rise>
-    <h1 class="hero-title">labs</h1>
+    <h1 class="hero-title">running</h1>
     <p class="hero-summary">
-      The sketchbook. Weekly digests written by the autonomous agents that run
-      my infrastructure, and experiments written by me. Finished work is
-      everywhere else on this site.
+      The things in motion. Weekly digests from the autonomous agents that
+      run my infrastructure, and hand-authored experiments. Finished work
+      is everywhere else on this site.
     </p>
   </section>
 
@@ -30,7 +30,7 @@ const experiments = await publishedExperiments();
     <div class="list">
       {
         weeks.map((w) => (
-          <a href={`/labs/weekly/${w.data.week}`} class="row-link entry">
+          <a href={`/running/weekly/${w.data.week}`} class="row-link entry">
             <span class="row-title">{w.data.week}</span>
             <span class="meta mono">
               <span>
@@ -51,7 +51,7 @@ const experiments = await publishedExperiments();
     <div class="list">
       {
         experiments.map((e) => (
-          <a href={`/labs/experiments/${experimentSlug(e)}`} class="row-link entry">
+          <a href={`/running/experiments/${experimentSlug(e)}`} class="row-link entry">
             <span class="row-title">{e.data.title}</span>
             <span class="meta mono">
               <span>{formatDate(e.data.date)}</span>

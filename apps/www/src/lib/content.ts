@@ -1,17 +1,17 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
-export type Thought = CollectionEntry<"thoughts">;
+export type Writing = CollectionEntry<"writing">;
 export type Project = CollectionEntry<"projects">;
 export type Weekly = CollectionEntry<"weekly">;
 export type Experiment = CollectionEntry<"experiments">;
 
-export const thoughtSlug = (t: Thought): string => t.data.slug ?? t.id;
+export const writingSlug = (t: Writing): string => t.data.slug ?? t.id;
 export const projectSlug = (p: Project): string => p.data.slug ?? p.id;
 export const experimentSlug = (e: Experiment): string => e.data.slug ?? e.id;
 
-export async function publishedThoughts(): Promise<Thought[]> {
+export async function publishedWriting(): Promise<Writing[]> {
   const all = await getCollection(
-    "thoughts",
+    "writing",
     (t) => t.data.status === "published",
   );
   return all.sort(

@@ -3,8 +3,8 @@ import {
   experimentSlug,
   projectSlug,
   publishedExperiments,
-  publishedThoughts,
-  thoughtSlug,
+  publishedWriting,
+  writingSlug,
   visibleProjects,
   weeklyDigests,
 } from "../lib/content";
@@ -18,21 +18,21 @@ interface Entry {
 }
 
 export const GET: APIRoute = async () => {
-  const thoughts = await publishedThoughts();
+  const writingEntries = await publishedWriting();
   const projects = await visibleProjects();
   const weeks = await weeklyDigests();
   const experiments = await publishedExperiments();
 
   const entries: Entry[] = [
     { path: "/", priority: 1 },
-    { path: "/work", priority: 0.9 },
+    { path: "/shipping", priority: 0.9 },
     { path: "/projects", priority: 0.8 },
-    { path: "/thoughts", priority: 0.85 },
-    { path: "/labs", priority: 0.7 },
+    { path: "/writing", priority: 0.85 },
+    { path: "/running", priority: 0.7 },
     { path: "/claude", priority: 0.9 },
     { path: "/connect", priority: 0.8 },
-    ...thoughts.map((t) => ({
-      path: `/thoughts/${thoughtSlug(t)}`,
+    ...writingEntries.map((t) => ({
+      path: `/writing/${writingSlug(t)}`,
       priority: 0.65,
       lastmod: t.data.published_at?.toISOString(),
     })),
@@ -41,12 +41,12 @@ export const GET: APIRoute = async () => {
       priority: 0.7,
     })),
     ...weeks.map((w) => ({
-      path: `/labs/weekly/${w.data.week}`,
+      path: `/running/weekly/${w.data.week}`,
       priority: 0.5,
       lastmod: w.data.generated_at?.toISOString(),
     })),
     ...experiments.map((e) => ({
-      path: `/labs/experiments/${experimentSlug(e)}`,
+      path: `/running/experiments/${experimentSlug(e)}`,
       priority: 0.5,
       lastmod: e.data.date.toISOString(),
     })),

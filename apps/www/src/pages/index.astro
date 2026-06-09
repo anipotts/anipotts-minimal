@@ -1,14 +1,14 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
-import ThoughtRow from "../components/ThoughtRow.astro";
+import WritingRow from "../components/WritingRow.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
 import { Icon } from "astro-icon/components";
 import { homeContent } from "../data/site";
-import { featuredProjects, publishedThoughts } from "../lib/content";
+import { featuredProjects, publishedWriting } from "../lib/content";
 
 const projects = await featuredProjects(4);
-const thoughts = (await publishedThoughts()).slice(0, 3);
+const writingEntries = (await publishedWriting()).slice(0, 3);
 const bi = homeContent.businessInsider;
 ---
 
@@ -42,8 +42,8 @@ const bi = homeContent.businessInsider;
 
   <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">selected work</h2>
-      <a href="/work" class="quiet-link mono view-all"
+      <h2 class="section-label">shipping</h2>
+      <a href="/shipping" class="quiet-link mono view-all"
         >view all<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
@@ -54,13 +54,13 @@ const bi = homeContent.businessInsider;
 
   <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">latest thoughts</h2>
-      <a href="/thoughts" class="quiet-link mono view-all"
+      <h2 class="section-label">writing</h2>
+      <a href="/writing" class="quiet-link mono view-all"
         >view all<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
     <div class="list">
-      {thoughts.map((thought) => <ThoughtRow thought={thought} />)}
+      {writingEntries.map((item) => <WritingRow item={item} />)}
     </div>
   </section>
 
