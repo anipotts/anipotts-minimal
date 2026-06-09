@@ -1,0 +1,203 @@
+---
+/* the cursor pet: one ember (~14px) that follows the mouse with a
+   spring-damped lag and stretches toward velocity through a gooey svg
+   filter. mood is set per-page via data-mood on the host element and
+   tunes spring + jitter:
+     - "drowsy"  (writing)       slow spring, longer lag
+     - "alert"   (shipping, orch) tight spring, snappy
+     - "jittery" (running)       low-amplitude idle jitter
+     - "calm"    (everything else, default)
+   disabled on touch (no cursor) and prefers-reduced-motion. */
+interface Props {
+  mood?: "drowsy" | "alert" | "jittery" | "calm";
+}
+const { mood = "calm" } = Astro.props;
+---
+
+<div id="cursor-pet" data-mood={mood} aria-hidden="true">
+  <svg viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="cursor-goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b" />
+        <feColorMatrix
+          in="b"
+          mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"
+        />
+      </filter>
+    </defs>
+    <g filter="url(#cursor-goo)">
+      <circle id="cursor-blob" cx="0" cy="0" r="5" fill="currentColor" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  #cursor-pet {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    pointer-events: none;
+    z-index: 9999;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    will-change: transform;
+    /* mobile: no cursor, no pet. */
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    #cursor-pet {
+      display: block;
+    }
+  }
+
+  #cursor-pet svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+</style>
+
+<script>
+  type Mood = "drowsy" | "alert" | "jittery" | "calm";
+
+  type Tuning = {
+    spring: number;
+    damping: number;
+    stretch: number;
+    jitter: number;
+    snapStrength: number;
+    snapRadius: number;
+  };
+
+  const TUNINGS: Record<Mood, Tuning> = {
+    drowsy: { spring: 0.08, damping: 0.82, stretch: 1.6, jitter: 0, snapStrength: 0.18, snapRadius: 60 },
+    alert: { spring: 0.22, damping: 0.7, stretch: 2.4, jitter: 0, snapStrength: 0.32, snapRadius: 70 },
+    jittery: { spring: 0.18, damping: 0.74, stretch: 2.0, jitter: 0.6, snapStrength: 0.22, snapRadius: 60 },
+    calm: { spring: 0.14, damping: 0.76, stretch: 2.0, jitter: 0, snapStrength: 0.22, snapRadius: 60 },
+  };
+
+  const pet = document.getElementById("cursor-pet") as HTMLElement | null;
+  if (pet) {
+    const mood = (pet.dataset.mood as Mood) || "calm";
+    const t = TUNINGS[mood];
+
+    let tx = window.innerWidth / 2;
+    let ty = window.innerHeight / 2;
+    let x = tx;
+    let y = ty;
+    let vx = 0;
+    let vy = 0;
+    let lastMove = 0;
+    let running = false;
+    let visible = false;
+
+    // magnetic snap: when the cursor is near a magnetic element, the pet
+    // bends toward its center. cheap interaction signal that the cursor
+    // pet does something useful, not just decorative.
+    const MAGNETIC = "a, button, [data-magnetic]";
+
+    function nearestMagnet(cx: number, cy: number) {
+      const candidates = document.elementsFromPoint(cx, cy);
+      for (const el of candidates) {
+        const magnet = (el as HTMLElement).closest?.(MAGNETIC) as HTMLElement | null;
+        if (magnet) {
+          const r = magnet.getBoundingClientRect();
+          if (r.width === 0 || r.height === 0) continue;
+          return {
+            cx: r.left + r.width / 2,
+            cy: r.top + r.height / 2,
+          };
+        }
+      }
+      return null;
+    }
+
+    function tick() {
+      // spring toward target (with optional magnetic pull)
+      let goalX = tx;
+      let goalY = ty;
+      const m = nearestMagnet(tx, ty);
+      if (m) {
+        goalX = tx + (m.cx - tx) * t.snapStrength;
+        goalY = ty + (m.cy - ty) * t.snapStrength;
+      }
+
+      // idle jitter for the "running" mood; only when nearly settled
+      if (t.jitter > 0 && Math.hypot(vx, vy) < 0.3) {
+        goalX += (Math.random() - 0.5) * t.jitter;
+        goalY += (Math.random() - 0.5) * t.jitter;
+      }
+
+      const ax = (goalX - x) * t.spring;
+      const ay = (goalY - y) * t.spring;
+      vx = (vx + ax) * t.damping;
+      vy = (vy + ay) * t.damping;
+      x += vx;
+      y += vy;
+
+      // velocity -> stretch along direction of motion
+      const speed = Math.hypot(vx, vy);
+      const angle = (Math.atan2(vy, vx) * 180) / Math.PI;
+      const stretch = 1 + Math.min(speed / 12, 1) * (t.stretch - 1);
+      const squish = 1 / Math.sqrt(stretch);
+
+      pet!.style.transform =
+        `translate3d(${x}px, ${y}px, 0)` +
+        ` rotate(${angle}deg)` +
+        ` scale(${stretch.toFixed(3)}, ${squish.toFixed(3)})`;
+
+      // park the loop when nothing's happening
+      if (speed < 0.05 && performance.now() - lastMove > 5000 && t.jitter === 0) {
+        running = false;
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      requestAnimationFrame(tick);
+    }
+
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        // first real movement reveals the pet
+        if (!visible) {
+          visible = true;
+          x = tx = e.clientX;
+          y = ty = e.clientY;
+          pet!.style.opacity = "1";
+        }
+        tx = e.clientX;
+        ty = e.clientY;
+        lastMove = performance.now();
+        start();
+      },
+      { passive: true },
+    );
+
+    window.addEventListener("pointerdown", () => {
+      // brief amplitude pulse on click
+      vx += (Math.random() - 0.5) * 8;
+      vy += (Math.random() - 0.5) * 8;
+      start();
+    });
+
+    window.addEventListener("pointerleave", () => {
+      pet!.style.opacity = "0";
+      visible = false;
+    });
+
+    // start the rAF once even if the user lands on the page without moving
+    // (so jittery mode has something to animate against).
+    if (t.jitter > 0) start();
+  }
+</script>
