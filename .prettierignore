@@ -2,3 +2,7 @@ dist/
 .next/
 node_modules/
 pnpm-lock.yaml
+
+# content collection bodies are data, not code. the markdown -> d1 sync
+# depends on byte fidelity, so no formatter ever touches them.
+apps/www/src/content/
