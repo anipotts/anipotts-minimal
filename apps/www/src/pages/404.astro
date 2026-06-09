@@ -1,0 +1,34 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Shell title="not found" description="This page does not exist" path="/404">
+  <section data-rise>
+    <h1 class="hero-title">nothing here<span class="spark">.</span></h1>
+    <p class="hero-summary">
+      The page you wanted does not exist, or it moved during the rebuild.
+    </p>
+    <a href="/" class="quiet-link mono home">
+      <Icon name="ph:arrow-bend-up-left" /> back home
+    </a>
+  </section>
+</Shell>
+
+<style>
+  .spark {
+    color: var(--accent);
+  }
+
+  .hero-title {
+    margin-bottom: var(--s-3);
+  }
+
+  .home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--s-4);
+    min-height: 44px;
+  }
+</style>

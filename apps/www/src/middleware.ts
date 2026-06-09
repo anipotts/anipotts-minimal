@@ -1,48 +1,61 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { defineMiddleware } from "astro:middleware";
 
-export function middleware(request: NextRequest) {
-  const hostname = request.headers.get("host") ?? "";
-  const { pathname } = request.nextUrl;
+/** ported redirect map. /lab now points at /labs (the old /lab to /work
+ *  mapping collided with the new /labs section, resolved per the rebuild plan). */
+const REDIRECTS: Record<string, string> = {
+  "/lab": "/labs",
+  "/links": "/connect",
+  "/dev": "/claude",
+  "/updates": "/claude#proof",
+  "/metrics": "/claude#playbooks",
+  "/status": "/claude#work-together",
+  "/docs": "/",
+};
 
-  // Skip static assets and internal paths
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/ingest") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/brand") ||
-    pathname === "/favicon.ico" ||
-    pathname.endsWith(".png") ||
-    pathname.endsWith(".jpg") ||
-    pathname.endsWith(".jpeg") ||
-    pathname.endsWith(".svg") ||
-    pathname.endsWith(".ico") ||
-    pathname.endsWith(".webmanifest") ||
-    pathname.endsWith(".xml") ||
-    pathname.endsWith(".txt")
-  ) {
-    return NextResponse.next();
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self'",
+    "connect-src 'self' https://us.i.posthog.com https://us-assets.i.posthog.com",
+    "frame-src https://challenges.cloudflare.com",
+  ].join("; "),
+};
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const { pathname, search } = context.url;
+
+  // exact-segment redirect match: "/lab" and "/lab/..." redirect,
+  // "/labs" never does (distinct segment).
+  for (const [from, to] of Object.entries(REDIRECTS)) {
+    if (pathname === from || pathname.startsWith(`${from}/`)) {
+      return context.redirect(to, 301);
+    }
   }
 
-  // Redirect /admin/* to admin subdomain
-  const host = hostname.split(":")[0] ?? "";
+  // /admin moved to the admin subdomain
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const adminPath = pathname.replace(/^\/admin/, "") || "/";
-    const port = hostname.includes("localhost")
-      ? `:${hostname.split(":")[1] ?? "3000"}`
-      : "";
-    const adminHost = hostname.includes("localhost")
-      ? `admin.localhost${port}`
-      : "admin.anipotts.com";
-    const protocol = host === "localhost" ? "http" : "https";
-    const url = new URL(`${protocol}://${adminHost}${adminPath}`);
-    url.search = request.nextUrl.search;
-    return NextResponse.redirect(url, 308);
+    return context.redirect(
+      `https://admin.anipotts.com${adminPath}${search}`,
+      308,
+    );
   }
 
-  return NextResponse.next();
-}
+  const response = await next();
 
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico).*)"],
-};
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("text/html")) {
+    for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+      response.headers.set(key, value);
+    }
+  }
+  return response;
+});

@@ -1,0 +1,143 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import ThoughtRow from "../../components/ThoughtRow.astro";
+import { Icon } from "astro-icon/components";
+import { publishedThoughts } from "../../lib/content";
+
+const thoughts = await publishedThoughts();
+---
+
+<Shell
+  title="thoughts"
+  description="Technical writings and reflections from ani potts"
+  path="/thoughts"
+>
+  <section data-rise>
+    <h1 class="hero-title">thoughts</h1>
+    <p class="hero-summary">
+      Technical writing as I build. Claude Code workflows, agentic systems,
+      occasional music takes.
+    </p>
+  </section>
+
+  <section data-rise class="stack">
+    <label class="search-wrap" for="thoughts-search">
+      <Icon name="ph:magnifying-glass" class="search-glyph" />
+      <input
+        id="thoughts-search"
+        class="field search"
+        type="search"
+        placeholder="search thoughts"
+        autocomplete="off"
+      />
+    </label>
+    <p class="count mono" id="search-count" aria-live="polite"></p>
+    <div class="list" id="thoughts-list">
+      {thoughts.map((thought) => <ThoughtRow thought={thought} />)}
+    </div>
+  </section>
+</Shell>
+
+<style>
+  .hero-title {
+    margin-bottom: var(--s-3);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .search-wrap {
+    position: relative;
+    display: block;
+    max-width: 28rem;
+  }
+
+  .search-glyph {
+    position: absolute;
+    left: var(--s-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-muted);
+    pointer-events: none;
+  }
+
+  .search {
+    padding-left: 2.6rem;
+  }
+
+  .count {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    min-height: 1em;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+</style>
+
+<script>
+  const input = document.getElementById("thoughts-search") as HTMLInputElement;
+  const list = document.getElementById("thoughts-list")!;
+  const count = document.getElementById("search-count")!;
+  const original = list.innerHTML;
+
+  let timer: ReturnType<typeof setTimeout>;
+
+  const esc = (s: string) =>
+    s.replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c]!,
+    );
+
+  async function run(q: string) {
+    if (!q) {
+      list.innerHTML = original;
+      count.textContent = "";
+      return;
+    }
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error(String(res.status));
+      const data = (await res.json()) as {
+        results: {
+          slug: string;
+          title: string;
+          summary: string;
+          date: string;
+        }[];
+      };
+      count.textContent = `${data.results.length} result${data.results.length === 1 ? "" : "s"}`;
+      list.innerHTML = data.results
+        .map(
+          (r) => `<a href="/thoughts/${esc(r.slug)}" class="row-link">
+            <span class="row-title">${esc(r.title)}</span>
+            <span class="mono" style="font-size:.8rem;color:var(--ink-muted)">${esc(r.date.slice(0, 10))}</span>
+            <span style="color:var(--ink-muted);font-size:var(--p-small)">${esc(r.summary)}</span>
+          </a>`,
+        )
+        .join("");
+    } catch {
+      count.textContent = "search unavailable, showing everything";
+      list.innerHTML = original;
+    }
+  }
+
+  input?.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => run(input.value.trim()), 250);
+  });
+</script>

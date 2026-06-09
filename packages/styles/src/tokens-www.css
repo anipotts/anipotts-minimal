@@ -1,0 +1,50 @@
+/* tokens-www.css
+   the rebuilt public-site design system (2026-06 astro rebuild).
+   one display face (Newsreader), one reading face (Hanken Grotesk),
+   one mono (JetBrains Mono). one accent hue expressed as a tonal pair,
+   AA-verified on both surfaces. separation is space + surface tint only. */
+
+:root {
+  --display: "Newsreader Variable", Georgia, serif;
+  --body: "Hanken Grotesk Variable", system-ui, sans-serif;
+  --mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --surface: #f4f1ea;
+  --surface-deep: #ece5d4;
+  --ink: #1a1614;
+  --ink-muted: #6f6856;
+  --accent: #a8381c;
+  --accent-soft: rgba(168, 56, 28, 0.08);
+
+  --d-hero: clamp(3.4rem, 14vw, 9rem);
+  --d-title: clamp(2.6rem, 7vw, 5rem);
+  --d-section: clamp(1.9rem, 4vw, 3rem);
+  --p-h1: clamp(2rem, 4vw, 2.9rem);
+  --p-h2: clamp(1.5rem, 3vw, 2rem);
+  --p-h3: 1.25rem;
+  --p-body: clamp(1.0625rem, 1vw + 0.9rem, 1.1875rem);
+  --p-small: 0.9375rem;
+  --p-mono: 0.9rem;
+
+  --s-1: 0.5rem;
+  --s-2: 0.75rem;
+  --s-3: 1rem;
+  --s-4: 1.5rem;
+  --s-5: 2rem;
+  --s-6: 3rem;
+  --s-7: 4rem;
+  --s-8: 6rem;
+
+  --measure: 65ch;
+  --lh-body: 1.65;
+  --lh-tight: 1.1;
+}
+
+:root[data-theme="dark"] {
+  --surface: #14110d;
+  --surface-deep: #1d1813;
+  --ink: #ece5d4;
+  --ink-muted: #9a917f;
+  --accent: #e8853a;
+  --accent-soft: rgba(232, 133, 58, 0.1);
+}

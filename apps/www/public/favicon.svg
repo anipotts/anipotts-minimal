@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .bg { fill: #f4f1ea; }
+    .glyph { fill: #1a1614; font: italic 600 44px Georgia, serif; }
+    .spark { fill: #a8381c; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #14110d; }
+      .glyph { fill: #ece5d4; }
+      .spark { fill: #e8853a; }
+    }
+  </style>
+  <rect class="bg" width="64" height="64" rx="14" />
+  <text class="glyph" x="16" y="46">a</text>
+  <circle class="spark" cx="46" cy="42" r="5" />
+</svg>

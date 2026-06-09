@@ -1,0 +1,237 @@
+---
+import Shell from "../layouts/Shell.astro";
+import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+import { Icon } from "astro-icon/components";
+import { socialLinks } from "../data/site";
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const intents = ["hire", "collab", "claude consulting", "other"];
+---
+
+<Shell title="connect" description="Get in touch with ani potts" path="/connect">
+  <section data-rise class="stack">
+    <h1 class="hero-title">get in touch</h1>
+    <p class="hero-summary">
+      Work, collabs, Claude Code consulting, or just to say hey.
+    </p>
+    <div class="socials">
+      {
+        socialLinks.map((social) => (
+          <a
+            href={social.url}
+            class="quiet-link social"
+            target={social.name === "email" ? undefined : "_blank"}
+            rel={social.name === "email" ? undefined : "noopener noreferrer"}
+          >
+            <Icon name={social.icon} />
+            <span>{social.description}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise>
+    <NewsletterSubscribe />
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">send a message</h2>
+    <form id="contact-form" class="form" aria-live="polite">
+      <div class="chips" role="radiogroup" aria-label="message intent">
+        {
+          intents.map((intent) => (
+            <button type="button" class="chip" data-intent={intent} aria-pressed="false">
+              {intent}
+            </button>
+          ))
+        }
+      </div>
+      <textarea
+        class="field"
+        name="message"
+        rows="6"
+        maxlength="900"
+        placeholder="What's on your mind? The more context the better."
+        aria-label="message"
+        required></textarea>
+      <div class="pair">
+        <input class="field" name="name" placeholder="Name" aria-label="name" required />
+        <input
+          class="field"
+          name="email"
+          type="email"
+          placeholder="Email"
+          aria-label="email"
+          required
+        />
+      </div>
+      {
+        turnstileSiteKey && (
+          <div
+            class="cf-turnstile"
+            data-sitekey={turnstileSiteKey}
+            data-callback="turnstileCallback"
+            data-expired-callback="turnstileExpiredCallback"
+          />
+        )
+      }
+      <button class="fill" type="submit">send</button>
+      <p class="status mono" id="contact-status"></p>
+    </form>
+  </section>
+</Shell>
+
+<style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .hero-title {
+    margin-bottom: 0;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+  }
+
+  .social {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: var(--p-small);
+    min-height: 44px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+    gap: var(--s-2);
+  }
+
+  textarea.field {
+    resize: vertical;
+    font-family: var(--body);
+  }
+
+  .fill {
+    align-self: flex-start;
+  }
+
+  .status {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    min-height: 1em;
+  }
+
+  .status.ok {
+    color: var(--accent);
+  }
+</style>
+
+{turnstileSiteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<script>
+  const form = document.getElementById("contact-form") as HTMLFormElement;
+  const status = document.getElementById("contact-status")!;
+  const chips = Array.from(
+    form.querySelectorAll<HTMLButtonElement>("[data-intent]"),
+  );
+  let intent = "";
+
+  function setIntent(value: string) {
+    intent = value;
+    chips.forEach((c) =>
+      c.setAttribute("aria-pressed", String(c.dataset.intent === value)),
+    );
+  }
+
+  chips.forEach((chip) =>
+    chip.addEventListener("click", () => setIntent(chip.dataset.intent ?? "")),
+  );
+
+  // deep-link prefill, e.g. /connect?intent=claude-consulting
+  const fromUrl = new URLSearchParams(location.search)
+    .get("intent")
+    ?.trim()
+    .toLowerCase();
+  if (fromUrl) {
+    const match = chips.find(
+      (c) =>
+        c.dataset.intent === fromUrl ||
+        c.dataset.intent?.replace(/\s+/g, "-") === fromUrl,
+    );
+    if (match) setIntent(match.dataset.intent ?? "");
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = (
+      form.elements.namedItem("name") as HTMLInputElement
+    ).value.trim();
+    const email = (
+      form.elements.namedItem("email") as HTMLInputElement
+    ).value.trim();
+    const message = (
+      form.elements.namedItem("message") as HTMLTextAreaElement
+    ).value.trim();
+
+    if (!intent) {
+      status.textContent = "pick an intent first.";
+      return;
+    }
+    if (message.length < 10) {
+      status.textContent = "a little more context, please (10+ chars).";
+      return;
+    }
+
+    const captchaToken =
+      (
+        document.querySelector(
+          'input[name="cf-turnstile-response"]',
+        ) as HTMLInputElement|null
+      )?.value ?? "";
+
+    status.classList.remove("ok");
+    status.textContent = "sending...";
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          message: `[${intent}]\n${message}`,
+          captchaToken: captchaToken ? captchaToken : undefined,
+        }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      status.textContent = "sent. i read everything, expect a reply.";
+      status.classList.add("ok");
+      form.reset();
+      setIntent("");
+      (window as any).posthog?.capture("contact_submitted", { intent });
+    } catch {
+      status.textContent =
+        "failed to send. try again or email contact@anipotts.com directly.";
+    }
+  });
+</script>

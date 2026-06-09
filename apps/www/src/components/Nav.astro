@@ -1,0 +1,121 @@
+---
+import { Icon } from "astro-icon/components";
+import { navItems } from "../data/site";
+
+const current = Astro.url.pathname;
+---
+
+<header class="frame nav">
+  <a href="/" class="wordmark" aria-label="home">
+    ani<span class="dot">.</span>
+  </a>
+  <nav aria-label="primary">
+    {
+      navItems.map((item) => (
+        <a
+          href={item.path}
+          class="nav-link"
+          aria-current={
+            current === item.path || current.startsWith(`${item.path}/`)
+              ? "page"
+              : undefined
+          }
+        >
+          {item.name}
+        </a>
+      ))
+    }
+  </nav>
+  <button
+    id="theme-toggle"
+    class="theme-toggle"
+    type="button"
+    aria-pressed="false"
+    aria-label="toggle theme"
+  >
+    <Icon name="ph:circle-half" />
+  </button>
+</header>
+
+<style>
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    padding-block: var(--s-4);
+    margin-bottom: var(--s-6);
+  }
+
+  .wordmark {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--ink);
+    margin-right: auto;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .dot {
+    color: var(--accent);
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-4);
+  }
+
+  .nav-link {
+    font-size: var(--p-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--accent);
+  }
+
+  .theme-toggle {
+    background: none;
+    border: 0;
+    color: var(--ink-muted);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: color 0.2s;
+  }
+
+  .theme-toggle:hover {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  const btn = document.getElementById("theme-toggle");
+  const sync = () => {
+    btn?.setAttribute(
+      "aria-pressed",
+      String(document.documentElement.dataset.theme === "dark"),
+    );
+  };
+  sync();
+  btn?.addEventListener("click", () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("theme", next);
+    sync();
+  });
+</script>

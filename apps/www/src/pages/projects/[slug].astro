@@ -1,0 +1,217 @@
+---
+import { render } from "astro:content";
+import Shell from "../../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+import { projectSlug, visibleProjects } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const projects = await visibleProjects();
+  return projects.map((project) => ({
+    params: { slug: projectSlug(project) },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const slug = projectSlug(project);
+const { Content } = await render(project);
+const hasBody = Boolean(project.body?.trim());
+const d = project.data;
+---
+
+<Shell
+  title={d.title}
+  description={d.description}
+  path={`/projects/${slug}`}
+>
+  <section data-rise class="head">
+    <a href="/work" class="quiet-link mono back">
+      <Icon name="ph:arrow-bend-up-left" /> back to work
+    </a>
+    <span class="title-row">
+      <h1 class="hero-title">{d.title}</h1>
+      <span class="pill">{d.status}</span>
+    </span>
+    {d.subtitle && <p class="hero-summary">{d.subtitle}</p>}
+    <p class="meta mono muted">
+      <span>role: {d.role}</span>
+      <span>duration: {d.duration}</span>
+    </p>
+    <p class="meta mono muted">
+      {d.tags.map((t) => (
+        <span>{t.toLowerCase()}</span>
+      ))}
+    </p>
+    <span class="links mono">
+      {
+        d.link_live && (
+          <a href={d.link_live} class="accent-link ext" target="_blank" rel="noopener noreferrer">
+            live site <Icon name="ph:arrow-bend-right-up" />
+          </a>
+        )
+      }
+      {
+        d.link_repo && (
+          <a href={d.link_repo} class="quiet-link ext" target="_blank" rel="noopener noreferrer">
+            source <Icon name="ph:arrow-bend-right-up" />
+          </a>
+        )
+      }
+    </span>
+  </section>
+
+  <section data-rise class="block">
+    <h2 class="section-label">overview</h2>
+    {
+      hasBody ? (
+        <div class="article-body">
+          <Content />
+        </div>
+      ) : (
+        <p class="overview">{d.description}</p>
+      )
+    }
+  </section>
+
+  {
+    d.technical && (
+      <section data-rise class="block">
+        <h2 class="section-label">technical</h2>
+        <div class="tech">
+          {d.technical.map((t) => (
+            <div class="card">
+              <h3 class="tech-title">{t.title}</h3>
+              <p class="tech-body">{t.content}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    d.roadmap && (
+      <section data-rise class="block">
+        <h2 class="section-label">next</h2>
+        <ul class="roadmap">
+          {d.roadmap.map((item) => (
+            <li class={item.status}>
+              <Icon
+                name={
+                  item.status === "done"
+                    ? "ph:check-circle"
+                    : item.status === "in-progress"
+                      ? "ph:circle-half"
+                      : "ph:circle"
+                }
+              />
+              <span>{item.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Shell>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: 0.85rem;
+    width: fit-content;
+    min-height: 44px;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-4);
+    margin: 0;
+    font-size: 0.85rem;
+  }
+
+  .links {
+    display: flex;
+    gap: var(--s-4);
+    font-size: 0.9rem;
+  }
+
+  .ext {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    min-height: 44px;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .overview {
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .tech {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--s-4);
+  }
+
+  .tech-title {
+    font-size: var(--p-h3);
+    margin-bottom: var(--s-2);
+  }
+
+  .tech-body {
+    margin: 0;
+    font-size: var(--p-small);
+    color: var(--ink-muted);
+  }
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    max-width: var(--measure);
+  }
+
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+  }
+
+  .roadmap li.done {
+    color: var(--ink-muted);
+  }
+
+  .roadmap li.done [data-icon],
+  .roadmap li.in-progress [data-icon] {
+    color: var(--accent);
+  }
+
+  .roadmap li.planned [data-icon] {
+    color: var(--ink-muted);
+  }
+</style>

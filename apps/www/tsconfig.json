@@ -1,17 +1,9 @@
 {
-  "extends": "@anipotts/config/typescript/next",
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "src/**/*"],
+  "exclude": ["dist"],
   "compilerOptions": {
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": ["node_modules"]
+    "types": ["@cloudflare/workers-types"],
+    "resolveJsonModule": true
+  }
 }

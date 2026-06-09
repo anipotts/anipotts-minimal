@@ -1,0 +1,88 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  ogType?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, path, ogType = "website", jsonLd } = Astro.props;
+const canonical = `${siteConfig.url}${path === "/" ? "" : path}`;
+const fullTitle = path === "/" ? "ani potts" : `${title} / ani potts`;
+const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: siteConfig.name,
+  alternateName: siteConfig.fullName,
+  url: siteConfig.url,
+  jobTitle: siteConfig.title,
+  email: siteConfig.email,
+  sameAs: [
+    "https://github.com/anipotts",
+    "https://www.linkedin.com/in/anipotts",
+    "https://x.com/anipottsbuilds",
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f1ea" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14110d" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${siteConfig.url}${siteConfig.ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteConfig.url}${siteConfig.ogImage}`} />
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem("theme");
+        const theme =
+          stored === "dark" || stored === "light"
+            ? stored
+            : matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {
+      posthogKey && (
+        <script
+          is:inline
+          define:vars={{ posthogKey }}
+        >{`!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init(posthogKey,{api_host:"/ingest",ui_host:"https://us.posthog.com",defaults:"2025-05-24"});`}</script>
+      )
+    }
+  </head>
+  <body>
+    <Nav />
+    <main class="frame page">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

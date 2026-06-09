@@ -1,0 +1,106 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import {
+  experimentSlug,
+  formatDate,
+  publishedExperiments,
+  weeklyDigests,
+} from "../../lib/content";
+
+const weeks = await weeklyDigests();
+const experiments = await publishedExperiments();
+---
+
+<Shell
+  title="labs"
+  description="The lab notebook: weekly autonomous activity digests and hand-authored experiments"
+  path="/labs"
+>
+  <section data-rise>
+    <h1 class="hero-title">labs</h1>
+    <p class="hero-summary">
+      The sketchbook. Weekly digests written by the autonomous agents that run
+      my infrastructure, and experiments written by me. Finished work is
+      everywhere else on this site.
+    </p>
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">weekly digests</h2>
+    <div class="list">
+      {
+        weeks.map((w) => (
+          <a href={`/labs/weekly/${w.data.week}`} class="row-link entry">
+            <span class="row-title">{w.data.week}</span>
+            <span class="meta mono">
+              <span>
+                {formatDate(w.data.window_start)} to{" "}
+                {formatDate(w.data.window_end)}
+              </span>
+              <span>{w.data.events} events</span>
+              <span>{w.data.agents} agents</span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">experiments</h2>
+    <div class="list">
+      {
+        experiments.map((e) => (
+          <a href={`/labs/experiments/${experimentSlug(e)}`} class="row-link entry">
+            <span class="row-title">{e.data.title}</span>
+            <span class="meta mono">
+              <span>{formatDate(e.data.date)}</span>
+              {e.data.tags.map((t) => (
+                <span>{t}</span>
+              ))}
+            </span>
+            {e.data.summary && <span class="dek">{e.data.summary}</span>}
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Shell>
+
+<style>
+  .hero-title {
+    margin-bottom: var(--s-3);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+
+  .dek {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    max-width: var(--measure);
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+import Shell from "../layouts/Shell.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ThoughtRow from "../components/ThoughtRow.astro";
+import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+import { Icon } from "astro-icon/components";
+import { homeContent } from "../data/site";
+import { featuredProjects, publishedThoughts } from "../lib/content";
+
+const projects = await featuredProjects(4);
+const thoughts = (await publishedThoughts()).slice(0, 3);
+const bi = homeContent.businessInsider;
+---
+
+<Shell
+  title="software engineer"
+  description="software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code."
+  path="/"
+>
+  <section data-rise>
+    <h1 class="home-hero">
+      {homeContent.heading}<span class="spark">.</span>
+    </h1>
+    <p class="hero-summary">{homeContent.summary}</p>
+  </section>
+
+  <section data-rise class="about">
+    <h2 class="section-label">about</h2>
+    {homeContent.about.map((line, i) => (
+      <p>
+        {line}
+        {i === homeContent.about.length - 1 && (
+          <>
+            {" "}{bi.lead}{" "}
+            <a href={bi.href} class="accent-link" target="_blank" rel="noopener noreferrer">{bi.label}</a>{" "}
+            {bi.tail}
+          </>
+        )}
+      </p>
+    ))}
+  </section>
+
+  <section data-rise class="stack">
+    <span class="head-row">
+      <h2 class="section-label">selected work</h2>
+      <a href="/work" class="quiet-link mono view-all"
+        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      >
+    </span>
+    <div class="grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section data-rise class="stack">
+    <span class="head-row">
+      <h2 class="section-label">latest thoughts</h2>
+      <a href="/thoughts" class="quiet-link mono view-all"
+        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      >
+    </span>
+    <div class="list">
+      {thoughts.map((thought) => <ThoughtRow thought={thought} />)}
+    </div>
+  </section>
+
+  <section data-rise>
+    <NewsletterSubscribe />
+  </section>
+</Shell>
+
+<style>
+  .home-hero {
+    font-size: var(--d-hero);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    margin-bottom: var(--s-4);
+  }
+
+  .spark {
+    color: var(--accent);
+  }
+
+  .about {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .about p {
+    margin: 0;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.85rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--s-4);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+</style>

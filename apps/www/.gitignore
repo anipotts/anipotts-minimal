@@ -1,1 +1,8 @@
-.vercel
+# generated
+dist/
+.astro/
+.wrangler/
+
+# env
+.env
+.env.*

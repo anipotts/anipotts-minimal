@@ -1,0 +1,525 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { docs, hooks, minePlugin, MINE_REPO, TIPS_REPO } from "../data/claude";
+import { featuredProjects, projectSlug } from "../lib/content";
+import statsJson from "../data/claude-stats.json";
+
+interface SessionRow {
+  id: string;
+  project: string;
+  start: string;
+  end: string;
+  durationMinutes: number;
+  toolCalls: number;
+  filesMutated: number;
+}
+
+interface DailyRow {
+  date: string;
+  toolCalls: number;
+  filesMutated: number;
+}
+
+const stats = statsJson as unknown as {
+  generatedAt: string;
+  timezone: string;
+  totals: {
+    sessions: number;
+    hoursUsed: number;
+    toolCalls: number;
+    filesMutated: number;
+    streakDays: number;
+  };
+  daily: DailyRow[];
+  sessions: SessionRow[];
+  records: {
+    fastestCommitCadence: {
+      commitsPerHour: number;
+      repo: string|null;
+      windowStart: string|null;
+    };
+    mostFilesChanged: {
+      files: number;
+      project: string|null;
+      startedAt: string|null;
+    };
+    longestSession: {
+      durationMinutes: number;
+      project: string|null;
+      startedAt: string|null;
+    };
+    mostToolCalls: {
+      toolCalls: number;
+      project: string|null;
+      startedAt: string|null;
+    };
+  };
+  live: { isCodingNow: boolean };
+};
+
+const selectedProjects = await featuredProjects(3);
+const fmt = (n: number) => n.toLocaleString("en-US");
+const updated = new Date(stats.generatedAt).toLocaleString("en-US", {
+  timeZone: stats.timezone,
+  year: "numeric",
+  month: "short",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+const heroStats = [
+  { label: "sessions", value: fmt(stats.totals.sessions) },
+  { label: "tool calls", value: fmt(stats.totals.toolCalls) },
+  { label: "files mutated", value: fmt(stats.totals.filesMutated) },
+  { label: "hours used", value: fmt(stats.totals.hoursUsed) },
+  { label: "current streak", value: `${stats.totals.streakDays}d` },
+];
+
+const r = stats.records;
+const records = [
+  {
+    label: "fastest commit cadence",
+    value: `${fmt(r.fastestCommitCadence.commitsPerHour)} commits/hour`,
+    detail: r.fastestCommitCadence.repo
+      ? `${r.fastestCommitCadence.repo} ${r.fastestCommitCadence.windowStart?.slice(0, 10) ?? ""}`
+      : "no git data",
+  },
+  {
+    label: "most files changed",
+    value: `${fmt(r.mostFilesChanged.files)} files`,
+    detail: r.mostFilesChanged.project
+      ? `${r.mostFilesChanged.project} ${r.mostFilesChanged.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+  {
+    label: "longest session",
+    value: `${Math.round(r.longestSession.durationMinutes)} min`,
+    detail: r.longestSession.project
+      ? `${r.longestSession.project} ${r.longestSession.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+  {
+    label: "most tool calls",
+    value: `${fmt(r.mostToolCalls.toolCalls)} calls`,
+    detail: r.mostToolCalls.project
+      ? `${r.mostToolCalls.project} ${r.mostToolCalls.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+];
+
+const maxDaily = Math.max(
+  1,
+  ...stats.daily.map((d) => d.toolCalls + d.filesMutated),
+);
+
+const fmtSessionTime = (iso: string) =>
+  new Date(iso).toLocaleString("en-US", {
+    timeZone: stats.timezone,
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+---
+
+<Shell
+  title="claude"
+  description="Claude Code systems, playbooks, and implementation patterns from ani potts"
+  path="/claude"
+>
+  <section data-rise id="proof" class="stack">
+    <h1 class="hero-title">claude code systems that ship</h1>
+    <p class="hero-summary">
+      How I actually use Claude Code. Hooks, agents, plugins, real session
+      data. Everything is open source.
+    </p>
+    <div class="stat-grid">
+      {
+        heroStats.map((s) => (
+          <div class="stat">
+            <span class="stat-value">{s.value}</span>
+            <span class="stat-label mono">{s.label}</span>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mono muted updated">
+      <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
+      {stats.live.isCodingNow ? "coding now" : "idle"}
+      <span>last updated {updated} ({stats.timezone})</span>
+    </p>
+  </section>
+
+  <section data-rise class="stack" id="throughput">
+    <h2 class="section-label">throughput, last 90 days</h2>
+    <div class="card chart-card">
+      <div class="chart" role="img" aria-label="daily tool calls and file mutations, last 90 days">
+        {
+          stats.daily.map((d) => (
+            <span
+              class="bar"
+              style={`height:${Math.max(2, Math.round(((d.toolCalls + d.filesMutated) / maxDaily) * 100))}%`}
+              title={`${d.date}: ${d.toolCalls} tool calls, ${d.filesMutated} files`}
+            />
+          ))
+        }
+      </div>
+      <p class="mono muted chart-note">
+        tool calls + file mutations per day ({stats.timezone})
+      </p>
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="burst-records">
+    <h2 class="section-label">burst records</h2>
+    <div class="grid-2">
+      {
+        records.map((rec) => (
+          <div class="card">
+            <span class="stat-label mono">{rec.label}</span>
+            <span class="record-value">{rec.value}</span>
+            <span class="mono muted detail">{rec.detail}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="systems">
+    <h2 class="section-label">selected systems</h2>
+    <div class="list">
+      {
+        selectedProjects.map((p) => (
+          <a href={`/projects/${projectSlug(p)}`} class="row-link">
+            <span class="row-title">{p.data.title}</span>
+            <span class="dek">{p.data.subtitle ?? p.data.description}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="plugin">
+    <h2 class="section-label">plugin + hooks</h2>
+    <div class="card mine">
+      <span class="row-title">{minePlugin.name}</span>
+      <p class="dek">{minePlugin.tagline}</p>
+      <span class="install mono">
+        <code id="install-cmd">{minePlugin.install}</code>
+        <button id="copy-install" class="chip" type="button">copy</button>
+      </span>
+      <div class="features">
+        {
+          minePlugin.features.map((f) => (
+            <span class="feature">
+              <span class="mono feature-name">{f.name}</span>
+              <span class="mono muted feature-desc">{f.desc}</span>
+            </span>
+          ))
+        }
+      </div>
+    </div>
+    <div class="grid-2">
+      {
+        hooks.map((hook) => (
+          <a href={hook.href} class="card hook" target="_blank" rel="noopener noreferrer">
+            <span class="hook-head">
+              <span class="mono hook-name">{hook.name}</span>
+              <span class="pill">{hook.event}</span>
+            </span>
+            <span class="mono muted detail">{hook.desc}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="playbooks">
+    <h2 class="section-label">docs + playbooks</h2>
+    <div class="grid-2">
+      {
+        docs.map((doc) => (
+          <a href={doc.href} class="row-link" target="_blank" rel="noopener noreferrer">
+            <span class="row-title">{doc.name}</span>
+            <span class="dek">{doc.desc}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="work-together">
+    <h2 class="section-label">work together</h2>
+    <div class="card">
+      <p class="pitch">
+        If you want help setting up Claude Code workflows or agent systems for
+        your team, I consult on that.
+      </p>
+      <span class="links mono">
+        <a href="/connect?intent=claude-consulting" class="accent-link">claude consulting</a>
+        <a href={TIPS_REPO} class="quiet-link" target="_blank" rel="noopener noreferrer">tips repo</a>
+        <a href={MINE_REPO} class="quiet-link" target="_blank" rel="noopener noreferrer">mine plugin</a>
+      </span>
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="sessions">
+    <h2 class="section-label">session log</h2>
+    <div class="table-wrap">
+      <table class="stat-table">
+        <thead>
+          <tr>
+            <th>project</th>
+            <th>started</th>
+            <th class="num">minutes</th>
+            <th class="num">tool calls</th>
+            <th class="num">files</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            stats.sessions.map((s) => (
+              <tr>
+                <td>{s.project}</td>
+                <td>{fmtSessionTime(s.start)}</td>
+                <td class="num">{s.durationMinutes.toFixed(1)}</td>
+                <td class="num">{fmt(s.toolCalls)}</td>
+                <td class="num">{fmt(s.filesMutated)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Shell>
+
+<style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .hero-title {
+    margin-bottom: 0;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+    gap: var(--s-4);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: var(--d-section);
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .updated {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .pulse,
+  .idle-dot {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--ink-muted);
+    display: inline-block;
+  }
+
+  .pulse {
+    background: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse {
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      50% {
+        opacity: 0.35;
+      }
+    }
+  }
+
+  .chart-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 9rem;
+  }
+
+  .bar {
+    flex: 1;
+    background: var(--accent);
+    opacity: 0.75;
+    border-radius: 2px 2px 0 0;
+    min-width: 2px;
+  }
+
+  .bar:hover {
+    opacity: 1;
+  }
+
+  .chart-note {
+    margin: 0;
+    font-size: 0.8rem;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--s-4);
+  }
+
+  .record-value {
+    font-family: var(--display);
+    font-size: var(--p-h2);
+    color: var(--accent);
+    display: block;
+    margin-block: var(--s-1);
+  }
+
+  .detail {
+    font-size: 0.8rem;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .dek {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    display: block;
+    max-width: var(--measure);
+  }
+
+  .mine {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .mine .dek {
+    margin: 0;
+  }
+
+  .install {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+  }
+
+  .install code {
+    background: var(--surface);
+    border-radius: 0.3rem;
+    padding: 0.3em 0.6em;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+    gap: var(--s-2) var(--s-4);
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .feature-name {
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .feature-desc {
+    font-size: 0.8rem;
+  }
+
+  .hook {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    transition: background 0.2s;
+  }
+
+  .hook:hover {
+    background: var(--accent-soft);
+  }
+
+  .hook-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+  }
+
+  .hook-name {
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+
+  .pitch {
+    margin: 0 0 var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById("copy-install");
+  const cmd = document.getElementById("install-cmd");
+  btn?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(cmd?.textContent?.trim() ?? "");
+      btn.textContent = "copied";
+      setTimeout(() => (btn.textContent = "copy"), 1600);
+    } catch {
+      btn.textContent = "copy failed";
+    }
+  });
+</script>

@@ -1,0 +1,99 @@
+---
+import { Icon } from "astro-icon/components";
+import { projectSlug, type Project } from "../lib/content";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const slug = projectSlug(project);
+const { title, subtitle, year, status, category, tags } = project.data;
+---
+
+<a href={`/projects/${slug}`} class="card project-card" data-category={category}>
+  <span class="head">
+    <span class="title">{title}</span>
+    <Icon name="ph:arrow-bend-right-up" class="affordance" />
+  </span>
+  <span class="sub">{subtitle ?? project.data.description}</span>
+  <span class="meta mono">
+    <span class="status"><span class={`dot ${status}`}></span>{status}</span>
+    <span>{year}</span>
+    {tags.slice(0, 3).map((t) => <span class="muted">{t.toLowerCase()}</span>)}
+  </span>
+</a>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .project-card:hover {
+    background: var(--accent-soft);
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .title {
+    font-family: var(--display);
+    font-size: var(--p-h2);
+    line-height: var(--lh-tight);
+  }
+
+  .project-card:hover .title {
+    color: var(--accent);
+  }
+
+  .affordance {
+    color: var(--ink-muted);
+    flex-shrink: 0;
+    transition:
+      color 0.2s,
+      transform 0.2s;
+  }
+
+  .project-card:hover .affordance {
+    color: var(--accent);
+    transform: translate(0.14em, -0.14em);
+  }
+
+  .sub {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  .dot {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--ink-muted);
+  }
+
+  .dot.live {
+    background: var(--accent);
+  }
+</style>
