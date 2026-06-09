@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import CursorPet from "../components/CursorPet.astro";
 import { siteConfig } from "../data/site";
 
 interface Props {
@@ -10,9 +11,17 @@ interface Props {
   path: string;
   ogType?: string;
   jsonLd?: Record<string, unknown>;
+  mood?: "drowsy" | "alert" | "jittery" | "calm";
 }
 
-const { title, description, path, ogType = "website", jsonLd } = Astro.props;
+const {
+  title,
+  description,
+  path,
+  ogType = "website",
+  jsonLd,
+  mood = "calm",
+} = Astro.props;
 const canonical = `${siteConfig.url}${path === "/" ? "" : path}`;
 const fullTitle = path === "/" ? "ani potts" : `${title} / ani potts`;
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
@@ -43,8 +52,8 @@ const personLd = {
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f1ea" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14110d" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11111b" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
@@ -79,6 +88,7 @@ posthog.init(posthogKey,{api_host:"/ingest",ui_host:"https://us.posthog.com",def
     }
   </head>
   <body>
+    <CursorPet mood={mood} />
     <Nav />
     <main class="frame page">
       <slot />

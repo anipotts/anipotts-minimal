@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <style>
-    .bg { fill: #f4f1ea; }
-    .glyph { fill: #1a1614; font: italic 600 44px Georgia, serif; }
-    .spark { fill: #a8381c; }
+    .bg { fill: #fbfaf7; }
+    .glyph { fill: #1a1a1a; font: 600 44px "Inter", system-ui, sans-serif; letter-spacing: -0.02em; }
+    .spark { fill: #2563eb; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #14110d; }
-      .glyph { fill: #ece5d4; }
-      .spark { fill: #e8853a; }
+      .bg { fill: #11111b; }
+      .glyph { fill: #cdd6f4; }
+      .spark { fill: #89b4fa; }
     }
   </style>
   <rect class="bg" width="64" height="64" rx="14" />

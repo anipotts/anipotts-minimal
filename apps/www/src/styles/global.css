@@ -1,13 +1,11 @@
 @import "@anipotts/styles/tokens-www.css";
-@import "@fontsource-variable/newsreader";
-@import "@fontsource-variable/newsreader/wght-italic.css";
-@import "@fontsource-variable/hanken-grotesk";
+@import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
 
-/* shiki css-variables theme: warm tint-on-tint, accent on one token role only */
+/* shiki css-variables theme: tint-on-tint, accent on one token role */
 :root {
   --astro-code-foreground: var(--ink);
-  --astro-code-background: var(--surface-deep);
+  --astro-code-background: var(--surface);
   --astro-code-token-constant: var(--ink);
   --astro-code-token-string: var(--ink-muted);
   --astro-code-token-comment: var(--ink-muted);
@@ -24,7 +22,7 @@
 }
 
 html {
-  background: var(--surface);
+  background: var(--bg);
   color-scheme: light;
 }
 
@@ -34,49 +32,19 @@ html[data-theme="dark"] {
 
 body {
   margin: 0;
-  background: var(--surface);
+  background: var(--bg);
   color: var(--ink);
-  font-family: var(--body);
+  font-family: var(--sans);
   font-size: var(--p-body);
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
-}
-
-/* grain: ~.045 opacity fractal noise, pinned so it never scrolls under content */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* soft radial vignette toward surface-deep, top-left anchored */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    120% 90% at 12% 8%,
-    transparent 55%,
-    var(--surface-deep) 100%
-  );
-}
-
-main,
-header,
-footer {
-  position: relative;
-  z-index: 1;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
   background: var(--accent);
-  color: var(--surface);
+  color: var(--bg);
 }
 
 a {
@@ -86,39 +54,27 @@ a {
 h1,
 h2,
 h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-weight: 500;
   line-height: var(--lh-tight);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* the one orchestrated motion: a staggered rise on first paint.
-   opacity lives INSIDE the no-preference query so reduced-motion users
-   always see content. */
+/* one orchestrated reveal on first paint. opacity:0 stays INSIDE the
+   no-preference query so reduced-motion users never see invisible content. */
 @media (prefers-reduced-motion: no-preference) {
   [data-rise] {
     opacity: 0;
     transform: translateY(14px);
     animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
   }
-  [data-rise]:nth-child(1) {
-    animation-delay: 0.06s;
-  }
-  [data-rise]:nth-child(2) {
-    animation-delay: 0.16s;
-  }
-  [data-rise]:nth-child(3) {
-    animation-delay: 0.26s;
-  }
-  [data-rise]:nth-child(4) {
-    animation-delay: 0.36s;
-  }
-  [data-rise]:nth-child(5) {
-    animation-delay: 0.46s;
-  }
-  [data-rise]:nth-child(n + 6) {
-    animation-delay: 0.54s;
-  }
+  [data-rise]:nth-child(1) { animation-delay: 0.06s; }
+  [data-rise]:nth-child(2) { animation-delay: 0.16s; }
+  [data-rise]:nth-child(3) { animation-delay: 0.26s; }
+  [data-rise]:nth-child(4) { animation-delay: 0.36s; }
+  [data-rise]:nth-child(5) { animation-delay: 0.46s; }
+  [data-rise]:nth-child(n + 6) { animation-delay: 0.54s; }
   @keyframes rise {
     to {
       opacity: 1;
@@ -130,9 +86,9 @@ h3 {
 /* ---------- layout primitives ---------- */
 
 .frame {
-  max-width: 72rem;
+  max-width: 64rem;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  padding-inline: clamp(1.25rem, 5vw, 2.5rem);
 }
 
 .page {
@@ -144,15 +100,16 @@ h3 {
 
 .section-label {
   font-family: var(--mono);
-  font-size: var(--p-small);
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--ink-muted);
 }
 
 .hero-title {
-  font-size: var(--d-title);
+  font-size: var(--p-hero);
   letter-spacing: -0.02em;
+  font-weight: 500;
 }
 
 .hero-summary {
@@ -173,6 +130,10 @@ h3 {
 
 .accent-link {
   color: var(--accent);
+  text-decoration: none;
+}
+
+.accent-link:hover {
   text-decoration: underline;
   text-underline-offset: 0.18em;
   text-decoration-thickness: 0.06em;
@@ -199,7 +160,7 @@ h3 {
 }
 
 .row-link:hover {
-  background: var(--accent-soft);
+  background: var(--surface);
 }
 
 .row-link:hover .row-title {
@@ -207,19 +168,18 @@ h3 {
 }
 
 .row-title {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: var(--p-h3);
+  font-weight: 500;
   transition: color 0.2s;
 }
 
-/* recessed card: tint + radius + gap separate cards, nothing else */
 .card {
-  background: var(--surface-deep);
+  background: var(--surface);
   border-radius: 0.75rem;
   padding: var(--s-5);
 }
 
-/* pill: fill-only */
 .pill {
   display: inline-block;
   background: var(--accent-soft);
@@ -227,10 +187,10 @@ h3 {
   border-radius: 99px;
   padding: 0.15rem 0.6rem;
   font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
-/* stat / session tables: zebra tint, alignment, zero rules */
+/* stat / session tables */
 .stat-table {
   width: 100%;
   border-collapse: collapse;
@@ -241,10 +201,10 @@ h3 {
 
 .stat-table th {
   color: var(--ink-muted);
-  text-transform: lowercase;
-  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
   font-weight: 400;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-align: left;
   padding: var(--s-2) var(--s-3);
 }
@@ -259,15 +219,15 @@ h3 {
 }
 
 .stat-table tbody tr:nth-child(even) {
-  background: var(--surface-deep);
+  background: var(--surface);
 }
 
-/* form fields: tinted fill, focus ring via shadow */
+/* form fields */
 .field {
-  font-family: var(--body);
+  font-family: var(--sans);
   font-size: var(--p-small);
   color: var(--ink);
-  background: var(--surface-deep);
+  background: var(--surface);
   border: 0;
   border-radius: 0.5rem;
   padding: var(--s-3);
@@ -284,11 +244,11 @@ h3 {
 }
 
 button.fill {
-  font-family: var(--body);
-  font-weight: 600;
+  font-family: var(--sans);
+  font-weight: 500;
   font-size: var(--p-small);
   background: var(--accent);
-  color: var(--surface);
+  color: var(--bg);
   border: 0;
   border-radius: 0.5rem;
   min-height: 44px;
@@ -303,9 +263,9 @@ button.fill:disabled {
 
 .chip {
   font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--ink-muted);
-  background: var(--surface-deep);
+  background: var(--surface);
   border: 0;
   border-radius: 99px;
   padding: 0.45rem 0.9rem;
@@ -318,14 +278,14 @@ button.fill:disabled {
   color: var(--accent);
 }
 
-/* ---------- article prose (measure-capped) ---------- */
+/* article prose (measure-capped) */
 
 .article-body {
   max-width: var(--measure);
 }
 
-.article-body > p:first-child {
-  font-size: calc(var(--p-body) * 1.12);
+.article-body > p:first-of-type {
+  font-size: calc(var(--p-body) * 1.1);
 }
 
 .article-body p {
@@ -334,11 +294,13 @@ button.fill:disabled {
 
 .article-body h2 {
   font-size: var(--p-h2);
+  font-weight: 500;
   margin: var(--s-7) 0 var(--s-3);
 }
 
 .article-body h3 {
   font-size: var(--p-h3);
+  font-weight: 500;
   margin: var(--s-6) 0 var(--s-2);
 }
 
@@ -366,7 +328,6 @@ button.fill:disabled {
 .article-body blockquote {
   margin: 0 0 var(--s-4);
   padding-left: var(--s-4);
-  font-family: var(--display);
   font-style: italic;
   color: var(--ink-muted);
 }
@@ -378,7 +339,7 @@ button.fill:disabled {
 }
 
 .article-body pre {
-  background: var(--surface-deep) !important;
+  background: var(--surface) !important;
   border-radius: 0.5rem;
   padding: var(--s-4);
   overflow-x: auto;
@@ -393,7 +354,7 @@ button.fill:disabled {
 }
 
 .article-body :not(pre) > code {
-  background: var(--surface-deep);
+  background: var(--surface);
   border-radius: 0.3rem;
   padding: 0.1em 0.35em;
 }
@@ -408,8 +369,8 @@ button.fill:disabled {
 
 .article-body th {
   color: var(--ink-muted);
-  text-transform: lowercase;
-  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   font-weight: 500;
   text-align: left;
   padding: var(--s-2) var(--s-3);
@@ -420,5 +381,5 @@ button.fill:disabled {
 }
 
 .article-body tbody tr:nth-child(even) {
-  background: var(--surface-deep);
+  background: var(--surface);
 }
