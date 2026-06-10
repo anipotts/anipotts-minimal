@@ -3,8 +3,8 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "Software engineer building agent orchestration platforms. Shares workflow tips and open source tools for Claude Code.",
-  shortBio: "software engineer, nyc",
+  bio: "ani potts. what i'm building, writing, and running. mostly with claude code.",
+  shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
   email: "contact@anipotts.com",
@@ -95,17 +95,10 @@ export const socialLinks: SocialLink[] = [
 ];
 
 export const homeContent = {
-  heading: "hi, i'm ani potts",
-  summary:
-    "Software engineer in NYC building autonomous agentic systems. I post my best workflow tips online as I build.",
-  about: [
-    "I design multi-agent systems that orchestrate combinatorial verification tasks. Autonomous QA/QC pipelines for AEC, SEO auditing at scale, document extraction across regulatory domains. Previously full stack at a YC F25 startup (under NDA).",
-    "Everything I build ships with Claude Code. I publish the workflows, tooling, and real usage data as I go.",
-  ],
-  businessInsider: {
+  heading: "hi, i'm ani",
+  summary: "what i'm building, writing, and running. mostly with claude code.",
+  press: {
     href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
-    lead: "Recently featured in",
-    label: "Business Insider",
-    tail: "on how developers are restructuring their days around AI tools.",
+    label: "business insider, 2026",
   },
 } as const;

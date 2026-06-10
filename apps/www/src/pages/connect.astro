@@ -8,11 +8,15 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 const intents = ["hire", "collab", "claude consulting", "other"];
 ---
 
-<Shell title="connect" description="Get in touch with ani potts" path="/connect">
+<Shell
+  title="connect"
+  description="how to reach ani. hire, collab, claude code consulting, hey."
+  path="/connect"
+>
   <section data-rise class="stack">
-    <h1 class="hero-title">get in touch</h1>
+    <h1 class="hero-title">connect</h1>
     <p class="hero-summary">
-      Work, collabs, Claude Code consulting, or just to say hey.
+      hire me, work with me, ask me something, say hey.
     </p>
     <div class="socials">
       {
@@ -128,7 +132,7 @@ const intents = ["hire", "collab", "claude consulting", "other"];
 
   textarea.field {
     resize: vertical;
-    font-family: var(--body);
+    font-family: var(--sans);
   }
 
   .fill {

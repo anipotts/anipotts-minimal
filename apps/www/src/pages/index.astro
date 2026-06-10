@@ -9,12 +9,11 @@ import { featuredProjects, publishedWriting } from "../lib/content";
 
 const projects = await featuredProjects(4);
 const writingEntries = (await publishedWriting()).slice(0, 3);
-const bi = homeContent.businessInsider;
 ---
 
 <Shell
-  title="software engineer"
-  description="software engineer in nyc building agent orchestration platforms. shares workflow tips and open source tools for claude code."
+  title="ani potts"
+  description="ani potts. what i'm building, writing, and running. mostly with claude code."
   path="/"
 >
   <section data-rise>
@@ -22,22 +21,14 @@ const bi = homeContent.businessInsider;
       {homeContent.heading}<span class="spark">.</span>
     </h1>
     <p class="hero-summary">{homeContent.summary}</p>
-  </section>
-
-  <section data-rise class="about">
-    <h2 class="section-label">about</h2>
-    {homeContent.about.map((line, i) => (
-      <p>
-        {line}
-        {i === homeContent.about.length - 1 && (
-          <>
-            {" "}{bi.lead}{" "}
-            <a href={bi.href} class="accent-link" target="_blank" rel="noopener noreferrer">{bi.label}</a>{" "}
-            {bi.tail}
-          </>
-        )}
-      </p>
-    ))}
+    <a
+      href={homeContent.press.href}
+      class="press"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Icon name="ph:arrow-bend-right-up" /> {homeContent.press.label}
+    </a>
   </section>
 
   <section data-rise class="stack">
@@ -71,25 +62,33 @@ const bi = homeContent.businessInsider;
 
 <style>
   .home-hero {
-    font-size: var(--d-hero);
-    letter-spacing: -0.02em;
+    font-size: clamp(3rem, 12vw, 7rem);
+    letter-spacing: -0.03em;
     line-height: 0.95;
     margin-bottom: var(--s-4);
+    font-weight: 600;
   }
 
   .spark {
     color: var(--accent);
   }
 
-  .about {
-    max-width: var(--measure);
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
+  .press {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--s-3);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    min-height: 44px;
   }
 
-  .about p {
-    margin: 0;
+  .press:hover {
+    color: var(--accent);
   }
 
   .stack {

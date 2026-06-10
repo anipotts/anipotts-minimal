@@ -6,7 +6,8 @@ export const GET: APIRoute = async (context) => {
   const writingEntries = (await publishedWriting()).slice(0, 50);
   return rss({
     title: "ani potts",
-    description: "Technical writings and reflections from ani potts",
+    description:
+      "ani potts. stuff i've figured out and felt like writing down.",
     site: context.site ?? "https://anipotts.com",
     items: writingEntries.map((t) => ({
       title: t.data.title,
