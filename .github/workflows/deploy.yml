@@ -24,6 +24,44 @@ on:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - "LICENSE"
+  workflow_dispatch:
+    inputs:
+      www:
+        description: "deploy anipotts.com"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      admin:
+        description: "deploy admin.anipotts.com"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      labs:
+        description: "deploy labs.anipotts.com"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      ingest:
+        description: "deploy ingest worker"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      newsletter:
+        description: "deploy newsletter worker"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+      weekly_email:
+        description: "deploy weekly email worker"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -43,6 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
+        if: github.event_name == 'push'
         id: filter
         with:
           filters: |
@@ -83,7 +122,9 @@ jobs:
   deploy-www:
     name: Deploy www
     needs: [changes]
-    if: needs.changes.outputs.www == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.www == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.www == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -124,7 +165,9 @@ jobs:
   deploy-admin:
     name: Deploy admin
     needs: [changes]
-    if: needs.changes.outputs.admin == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.admin == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -167,7 +210,9 @@ jobs:
   deploy-labs:
     name: Deploy labs
     needs: [changes]
-    if: needs.changes.outputs.labs == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.labs == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.labs == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -204,7 +249,9 @@ jobs:
   deploy-ingest:
     name: Deploy ingest worker
     needs: [changes]
-    if: needs.changes.outputs.ingest == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.ingest == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.ingest == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -237,7 +284,9 @@ jobs:
   deploy-weekly-email:
     name: Deploy weekly email worker
     needs: [changes]
-    if: needs.changes.outputs.weekly-email == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.weekly_email == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.weekly-email == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -267,7 +316,9 @@ jobs:
   deploy-newsletter:
     name: Deploy newsletter worker
     needs: [changes]
-    if: needs.changes.outputs.newsletter == 'true'
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.newsletter == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.newsletter == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
