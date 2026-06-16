@@ -49,6 +49,7 @@ const projects = (await visibleProjects())
 const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 const workLabel = "making";
 const workHref = "/making";
+const ycMention = homeContent.mentions.yCombinatorF25;
 ---
 
 <Shell
@@ -67,12 +68,7 @@ const workHref = "/making";
         <>
           previously worked on real-time agent i/o at{" "}
           <InlineMention {...homeContent.mentions.structuredAi} />{" "}
-          <span class="no-break"
-            >(<InlineMention
-              {...homeContent.mentions.yCombinatorF25}
-              suffix=")"
-            /></span
-          >{" "}
+          <span class="brand-parens"><span>(</span><InlineMention {...ycMention} /><span>)</span></span>{" "}
           and{" "}
           <InlineMention {...homeContent.mentions.badHabit} suffix="," /> an{" "}
           <span class="no-break"
@@ -157,6 +153,22 @@ const workHref = "/making";
     align-items: baseline;
     gap: 0 0.35em;
     white-space: nowrap;
+  }
+
+  .brand-parens {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 0;
+    white-space: nowrap;
+  }
+
+  .brand-parens > span,
+  .brand-parens :global(.inline-mention) {
+    font-size: var(--p-body);
+  }
+
+  .brand-parens > span:first-child {
+    margin-right: 0.14rem;
   }
 
   .text-link {
