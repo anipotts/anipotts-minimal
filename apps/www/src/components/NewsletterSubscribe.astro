@@ -1,26 +1,54 @@
 ---
+interface Props {
+  mode?: "link" | "form";
+  lede?: string;
+  href?: string;
+  ctaLabel?: string;
+}
+
+const {
+  mode = "link",
+  lede = "notes on agent workflows and product builds, including the parts that broke while shipping.",
+  href = "https://news.anipotts.com",
+  ctaLabel = "subscribe",
+} = Astro.props;
 ---
 
 <div class="subscribe card">
   <div class="copy">
     <span class="label mono">newsletter</span>
-    <p class="lede">
-      notes on agent workflows and product builds, including the parts that
-      broke while shipping.
-    </p>
+    <p class="lede">{lede}</p>
   </div>
-  <form id="subscribe-form" class="row">
-    <input
-      class="field"
-      type="email"
-      name="email"
-      placeholder="you@wherever.com"
-      aria-label="email address"
-      required
-    />
-    <button class="fill" type="submit">subscribe</button>
-  </form>
-  <p class="status mono" id="subscribe-status" aria-live="polite"></p>
+  {
+    mode === "form" ? (
+      <>
+        <form id="subscribe-form" class="row">
+          <input
+            class="hp"
+            type="text"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+          <input
+            class="field"
+            type="email"
+            name="email"
+            placeholder="you@wherever.com"
+            aria-label="email address"
+            required
+          />
+          <button class="fill" type="submit">{ctaLabel}</button>
+        </form>
+        <p class="status mono" id="subscribe-status" aria-live="polite" />
+      </>
+    ) : (
+      <a class="fill cta" href={href}>
+        {ctaLabel}
+      </a>
+    )
+  }
 </div>
 
 <style>
@@ -76,6 +104,14 @@
     color: var(--ink-muted);
   }
 
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
   .row .field:focus {
     box-shadow: none;
     border-color: var(--accent);
@@ -86,6 +122,17 @@
     min-height: 44px;
     border-radius: 0.45rem;
     padding-inline: var(--s-4);
+  }
+
+  .cta {
+    justify-self: end;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.45rem;
+    padding-inline: var(--s-4);
+    text-decoration: none;
   }
 
   .status {
@@ -110,36 +157,47 @@
       grid-template-columns: 1fr;
     }
 
+    .cta {
+      justify-self: stretch;
+    }
+
     .status {
       grid-column: auto;
     }
   }
 </style>
 
-<script>
-  const form = document.getElementById("subscribe-form") as HTMLFormElement;
-  const status = document.getElementById("subscribe-status")!;
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = (
-      form.elements.namedItem("email") as HTMLInputElement
-    ).value.trim();
-    if (!email) return;
-    status.textContent = "subscribing...";
-    status.classList.remove("ok");
-    try {
-      const res = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email }),
+{
+  mode === "form" && (
+    <script>
+      const form = document.getElementById("subscribe-form") as HTMLFormElement;
+      const status = document.getElementById("subscribe-status")!;
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = (
+          form.elements.namedItem("email") as HTMLInputElement
+        ).value.trim();
+        if (!email) return;
+        status.textContent = "subscribing...";
+        status.classList.remove("ok");
+        try {
+          const website = (
+            form.elements.namedItem("website") as HTMLInputElement
+          ).value;
+          const res = await fetch("/api/newsletter/subscribe", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ email, website }),
+          });
+          if (!res.ok) throw new Error(String(res.status));
+          status.textContent = "subscribed. check your inbox.";
+          status.classList.add("ok");
+          form.reset();
+          (window as any).posthog?.capture("newsletter_subscribed");
+        } catch {
+          status.textContent = "could not subscribe. try again in a minute.";
+        }
       });
-      if (!res.ok) throw new Error(String(res.status));
-      status.textContent = "subscribed. check your inbox.";
-      status.classList.add("ok");
-      form.reset();
-      (window as any).posthog?.capture("newsletter_subscribed");
-    } catch {
-      status.textContent = "could not subscribe. try again in a minute.";
-    }
-  });
-</script>
+    </script>
+  )
+}

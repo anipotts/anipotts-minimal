@@ -1,0 +1,65 @@
+---
+import Shell from "../layouts/Shell.astro";
+import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+
+const archiveUrl = "/archive";
+---
+
+<Shell
+  title="newsletter"
+  description="ani's notes on building with agents, software, and the small systems around them."
+  path="/newsletter"
+  canonicalUrl="https://news.anipotts.com"
+>
+  <section data-rise class="hero">
+    <p class="section-label">newsletter</p>
+    <h1 class="hero-title">notes from the build loop</h1>
+    <p class="hero-summary">
+      occasional notes on building with claude code, codex, small software
+      systems, and the operational details that survive contact with real work.
+    </p>
+  </section>
+
+  <section data-rise>
+    <NewsletterSubscribe
+      mode="form"
+      lede="get the next note in your inbox. confirm once, unsubscribe anytime."
+    />
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">archive</h2>
+    <p class="copy">
+      published notes live here as the archive fills in.
+    </p>
+    <a href={archiveUrl} class="quiet-link archive">
+      read the archive
+    </a>
+  </section>
+</Shell>
+
+<style>
+  .hero,
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .section-label {
+    margin: 0;
+  }
+
+  .copy {
+    margin: 0;
+    max-width: var(--measure);
+    color: var(--ink-muted);
+  }
+
+  .archive {
+    align-self: flex-start;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

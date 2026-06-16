@@ -1,7 +1,7 @@
 /**
  * Drizzle ORM schema for anipotts-db (Cloudflare D1 / SQLite).
  *
- * THE canonical schema source. Defines all 23 regular tables that exist in
+ * THE canonical schema source. Defines all regular tables that exist in
  * the live database, including rate_limits (created by SQL migration, not
  * auto-created at runtime).
  *
@@ -514,4 +514,174 @@ export const rateLimits = sqliteTable(
     ts: integer("ts").notNull(),
   },
   (table) => [index("idx_rate_limits_key_ts").on(table.key, table.ts)],
+);
+
+// ---------------------------------------------------------------------------
+// 24. first-party newsletter system
+// ---------------------------------------------------------------------------
+
+export const newsletterSubscribers = sqliteTable(
+  "newsletter_subscribers",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    status: text("status").notNull().default("pending"),
+    source: text("source").notNull().default("website"),
+    tags: text("tags").notNull().default("[]"),
+    metadata: text("metadata").notNull().default("{}"),
+    subscribed_at: text("subscribed_at"),
+    confirmed_at: text("confirmed_at"),
+    unsubscribed_at: text("unsubscribed_at"),
+    suppressed_at: text("suppressed_at"),
+    suppression_reason: text("suppression_reason"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_newsletter_subscribers_status").on(table.status),
+    index("idx_newsletter_subscribers_email").on(table.email),
+  ],
+);
+
+export const newsletterPreferences = sqliteTable(
+  "newsletter_preferences",
+  {
+    subscriber_id: text("subscriber_id")
+      .notNull()
+      .references(() => newsletterSubscribers.id),
+    key: text("key").notNull(),
+    value: text("value").notNull(),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.subscriber_id, table.key] })],
+);
+
+export const newsletterIssues = sqliteTable(
+  "newsletter_issues",
+  {
+    id: text("id").primaryKey(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    subject: text("subject").notNull(),
+    summary: text("summary"),
+    html: text("html"),
+    text: text("text"),
+    status: text("status").notNull().default("draft"),
+    scheduled_at: text("scheduled_at"),
+    published_at: text("published_at"),
+    source_thought_id: text("source_thought_id"),
+    buttondown_id: text("buttondown_id"),
+    metadata: text("metadata").notNull().default("{}"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_newsletter_issues_status").on(table.status, table.scheduled_at),
+  ],
+);
+
+export const newsletterDeliveries = sqliteTable(
+  "newsletter_deliveries",
+  {
+    id: text("id").primaryKey(),
+    issue_id: text("issue_id").references(() => newsletterIssues.id),
+    subscriber_id: text("subscriber_id")
+      .notNull()
+      .references(() => newsletterSubscribers.id),
+    email: text("email").notNull(),
+    kind: text("kind").notNull(),
+    status: text("status").notNull().default("queued"),
+    resend_email_id: text("resend_email_id"),
+    attempt_count: integer("attempt_count").notNull().default(0),
+    last_error: text("last_error"),
+    queued_at: text("queued_at").notNull(),
+    sent_at: text("sent_at"),
+    delivered_at: text("delivered_at"),
+    opened_at: text("opened_at"),
+    clicked_at: text("clicked_at"),
+    bounced_at: text("bounced_at"),
+    complained_at: text("complained_at"),
+    unsubscribed_at: text("unsubscribed_at"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_newsletter_deliveries_issue_status").on(
+      table.issue_id,
+      table.status,
+    ),
+    index("idx_newsletter_deliveries_subscriber").on(
+      table.subscriber_id,
+      table.updated_at,
+    ),
+    index("idx_newsletter_deliveries_resend_email").on(table.resend_email_id),
+  ],
+);
+
+export const newsletterEvents = sqliteTable(
+  "newsletter_events",
+  {
+    id: text("id").primaryKey(),
+    subscriber_id: text("subscriber_id").references(
+      () => newsletterSubscribers.id,
+    ),
+    issue_id: text("issue_id").references(() => newsletterIssues.id),
+    delivery_id: text("delivery_id").references(() => newsletterDeliveries.id),
+    email: text("email"),
+    type: text("type").notNull(),
+    provider: text("provider"),
+    provider_event_id: text("provider_event_id"),
+    provider_email_id: text("provider_email_id"),
+    payload: text("payload").notNull().default("{}"),
+    created_at: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_newsletter_events_type_created").on(
+      table.type,
+      table.created_at,
+    ),
+  ],
+);
+
+export const newsletterTokens = sqliteTable(
+  "newsletter_tokens",
+  {
+    id: text("id").primaryKey(),
+    subscriber_id: text("subscriber_id")
+      .notNull()
+      .references(() => newsletterSubscribers.id),
+    email: text("email").notNull(),
+    purpose: text("purpose").notNull(),
+    token_hash: text("token_hash").notNull().unique(),
+    expires_at: text("expires_at").notNull(),
+    used_at: text("used_at"),
+    created_at: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_newsletter_tokens_lookup").on(
+      table.purpose,
+      table.token_hash,
+      table.expires_at,
+    ),
+  ],
+);
+
+export const newsletterSuppressions = sqliteTable(
+  "newsletter_suppressions",
+  {
+    email: text("email").primaryKey(),
+    subscriber_id: text("subscriber_id").references(
+      () => newsletterSubscribers.id,
+    ),
+    reason: text("reason").notNull(),
+    provider: text("provider"),
+    provider_event_id: text("provider_event_id"),
+    created_at: text("created_at").notNull(),
+    metadata: text("metadata").notNull().default("{}"),
+  },
+  (table) => [
+    index("idx_newsletter_suppressions_reason").on(
+      table.reason,
+      table.created_at,
+    ),
+  ],
 );

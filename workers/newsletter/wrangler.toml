@@ -1,0 +1,26 @@
+name = "anipotts-newsletter-worker"
+compatibility_date = "2026-06-16"
+compatibility_flags = ["nodejs_compat"]
+main = "src/index.ts"
+workers_dev = true
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+
+[vars]
+NEWSLETTER_BASE_URL = "https://news.anipotts.com"
+NEWSLETTER_FROM = "Ani Potts <news@anipotts.com>"
+NEWSLETTER_REPLY_TO = "contact@anipotts.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "anipotts-db"
+database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
+[[queues.consumers]]
+queue = "newsletter-send"
+dead_letter_queue = "newsletter-send-dlq"
+max_batch_size = 20
+max_batch_timeout = 10
+max_retries = 5
+
+[observability]
+enabled = true

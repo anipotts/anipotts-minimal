@@ -8,6 +8,11 @@ export default defineConfig({
   output: "static",
   trailingSlash: "never",
   build: { format: "file" },
+  vite: {
+    server: {
+      allowedHosts: ["news.anipotts.com"],
+    },
+  },
   adapter: cloudflare({
     platformProxy: { enabled: true },
     imageService: "passthrough",
