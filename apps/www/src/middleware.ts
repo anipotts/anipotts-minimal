@@ -55,10 +55,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (host === NEWS_HOST) {
     if (pathname === "/") {
-      const page = await context.locals.runtime.env.ASSETS.fetch(
-        new URL("/newsletter", context.url),
-      );
-      return applyHtmlSecurityHeaders(new Response(page.body, page));
+      const page = await next(new URL("/newsletter", context.url));
+      return applyHtmlSecurityHeaders(page);
     }
 
     if (pathname === "/newsletter") {
@@ -66,10 +64,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     if (pathname === "/archive" || pathname.startsWith("/archive/")) {
-      const page = await context.locals.runtime.env.ASSETS.fetch(
-        new URL("/newsletter/archive", context.url),
-      );
-      return applyHtmlSecurityHeaders(new Response(page.body, page));
+      const page = await next(new URL("/newsletter/archive", context.url));
+      return applyHtmlSecurityHeaders(page);
     }
   }
 
