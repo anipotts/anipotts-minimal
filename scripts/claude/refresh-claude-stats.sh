@@ -23,7 +23,7 @@ fi
 
 pnpm update-claude-stats
 
-git add apps/www/src/app/(main)/claude/claude-stats.json
+git add apps/www/src/data/claude-stats.json
 
 if git diff --cached --quiet; then
   echo "No changes to claude-stats.json."

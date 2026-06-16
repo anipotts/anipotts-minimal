@@ -1,0 +1,84 @@
+---
+---
+
+<div class="subscribe card">
+  <p class="lede">
+    stuff i write, sent when i write it. no schedule, no filler.
+  </p>
+  <form id="subscribe-form" class="row">
+    <input
+      class="field"
+      type="email"
+      name="email"
+      placeholder="you@wherever.com"
+      aria-label="email address"
+      required
+    />
+    <button class="fill" type="submit">subscribe</button>
+  </form>
+  <p class="status mono" id="subscribe-status" aria-live="polite"></p>
+</div>
+
+<style>
+  .subscribe {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--p-small);
+    color: var(--ink-muted);
+  }
+
+  .row {
+    display: flex;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+  }
+
+  .row .field {
+    flex: 1 1 14rem;
+  }
+
+  .status {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    min-height: 1em;
+  }
+
+  .status.ok {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  const form = document.getElementById("subscribe-form") as HTMLFormElement;
+  const status = document.getElementById("subscribe-status")!;
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = (
+      form.elements.namedItem("email") as HTMLInputElement
+    ).value.trim();
+    if (!email) return;
+    status.textContent = "subscribing...";
+    status.classList.remove("ok");
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      status.textContent = "subscribed. check your inbox.";
+      status.classList.add("ok");
+      form.reset();
+      (window as any).posthog?.capture("newsletter_subscribed");
+    } catch {
+      status.textContent = "could not subscribe. try again in a minute.";
+    }
+  });
+</script>

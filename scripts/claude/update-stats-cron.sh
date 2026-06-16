@@ -4,10 +4,10 @@
 
 set -euo pipefail
 
-REPO_DIR="$HOME/Code/active/websites/anipotts.com"
+REPO_DIR="$HOME/Code/projects/anipotts-com"
 LOG_DIR="$HOME/.claude/logs"
 LOG_FILE="$LOG_DIR/stats-update.log"
-MEMORY_FILE="$HOME/.claude/projects/-Users-anipotts-Code-active-websites-anipotts-com/memory/claude_stats_verified.md"
+MEMORY_FILE="$HOME/.claude/projects/-Users-anipotts-Code-projects-anipotts-com/memory/claude_stats_verified.md"
 MINE_DB="$HOME/.claude/mine.db"
 
 mkdir -p "$LOG_DIR"

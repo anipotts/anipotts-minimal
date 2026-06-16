@@ -11,16 +11,7 @@ const projectsDir =
   path.join(os.homedir(), ".claude", "projects");
 const outPath =
   process.env.CLAUDE_STATS_OUT ||
-  path.join(
-    projectRoot,
-    "apps",
-    "www",
-    "src",
-    "app",
-    "(main)",
-    "claude",
-    "claude-stats.json",
-  );
+  path.join(projectRoot, "apps", "www", "src", "data", "claude-stats.json");
 const maxDepth = Number(process.env.CLAUDE_STATS_MAX_DEPTH || 6);
 const gitSinceDays = Number(process.env.CLAUDE_STATS_GIT_SINCE_DAYS || 180);
 const now = new Date();

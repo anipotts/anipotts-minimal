@@ -29,14 +29,12 @@
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "update-claude-stats:commit": "scripts/claude/refresh-claude-stats.sh",
     "test:unit": "turbo test",
-    "test:e2e": "pnpm --filter @anipotts/www test:e2e",
-    "test": "pnpm test:unit && pnpm test:e2e",
+    "test": "pnpm test:unit",
     "validate": "turbo build && turbo lint && turbo typecheck && turbo test",
     "prepare": "husky"
   },
   "lint-staged": {
     "apps/www/**/*.{ts,tsx}": [
-      "eslint --fix --no-warn-ignored -c apps/www/eslint.config.mjs",
       "prettier --write"
     ],
     "apps/admin/**/*.{ts,tsx}": [

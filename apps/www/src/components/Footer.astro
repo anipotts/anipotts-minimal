@@ -1,0 +1,66 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<footer class="frame foot">
+  <a href="mailto:contact@anipotts.com" class="quiet-link mono"
+    >contact@anipotts.com</a
+  >
+  <span class="glyphs">
+    <a
+      href="https://github.com/anipotts"
+      class="glyph"
+      aria-label="github"
+      target="_blank"
+      rel="noopener noreferrer"><Icon name="ph:github-logo" /></a
+    >
+    <a
+      href="https://x.com/anipottsbuilds"
+      class="glyph"
+      aria-label="x"
+      target="_blank"
+      rel="noopener noreferrer"><Icon name="ph:x-logo" /></a
+    >
+    <a
+      href="https://www.linkedin.com/in/anipotts"
+      class="glyph"
+      aria-label="linkedin"
+      target="_blank"
+      rel="noopener noreferrer"><Icon name="ph:linkedin-logo" /></a
+    >
+    <a href="/feed.xml" class="glyph" aria-label="rss feed"
+      ><Icon name="ph:rss-simple" /></a
+    >
+  </span>
+</footer>
+
+<style>
+  .foot {
+    margin-top: var(--s-8);
+    padding-block: var(--s-6);
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    font-size: var(--p-small);
+  }
+
+  .glyphs {
+    display: inline-flex;
+    gap: var(--s-2);
+  }
+
+  .glyph {
+    color: var(--ink-muted);
+    transition: color 0.2s;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .glyph:hover {
+    color: var(--accent);
+  }
+</style>

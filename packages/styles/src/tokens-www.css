@@ -1,0 +1,52 @@
+/* tokens-www.css
+   brand-aligned tokens for the public site, lifted directly from the
+   labs site (the layout ani liked): warm bone-white paper, cobalt blue
+   accent, catppuccin-mocha dark mode. Inter for text, JetBrains Mono
+   for code + technical surfaces. no display face — type-led using one
+   sans family at scale. */
+
+:root {
+  --sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
+    "SF Pro Text", system-ui, sans-serif;
+  --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+    "SF Mono", Menlo, monospace;
+
+  --bg: #fbfaf7;
+  --surface: #f3f1ec;
+  --ink: #1a1a1a;
+  --ink-muted: #6b6b6b;
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.08);
+  --border: rgba(0, 0, 0, 0.08);
+
+  --p-h1: clamp(2rem, 4vw, 2.9rem);
+  --p-h2: clamp(1.5rem, 3vw, 2rem);
+  --p-h3: 1.25rem;
+  --p-hero: clamp(2.4rem, 6vw, 4rem);
+  --p-body: clamp(1rem, 0.5vw + 0.9rem, 1.0625rem);
+  --p-small: 0.875rem;
+  --p-mono: 0.85rem;
+
+  --s-1: 0.5rem;
+  --s-2: 0.75rem;
+  --s-3: 1rem;
+  --s-4: 1.5rem;
+  --s-5: 2rem;
+  --s-6: 3rem;
+  --s-7: 4rem;
+  --s-8: 6rem;
+
+  --measure: 65ch;
+  --lh-body: 1.65;
+  --lh-tight: 1.1;
+}
+
+:root[data-theme="dark"] {
+  --bg: #11111b;
+  --surface: #1e1e2e;
+  --ink: #cdd6f4;
+  --ink-muted: #7f849c;
+  --accent: #89b4fa;
+  --accent-soft: rgba(137, 180, 250, 0.12);
+  --border: rgba(205, 214, 244, 0.08);
+}

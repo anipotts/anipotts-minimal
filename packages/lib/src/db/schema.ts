@@ -1,8 +1,16 @@
 /**
  * Drizzle ORM schema for anipotts-db (Cloudflare D1 / SQLite).
  *
- * Covers all 18 regular tables from d1-schema.sql.
- * FTS5 virtual tables and rate_limits are excluded (unsupported by Drizzle / managed separately).
+ * THE canonical schema source. Defines all 23 regular tables that exist in
+ * the live database, including rate_limits (created by SQL migration, not
+ * auto-created at runtime).
+ *
+ * Out-of-ORM objects (Drizzle cannot express them) live in the companion
+ * migration drizzle/migrations/0003_reconcile.sql:
+ *   - thoughts_fts (FTS5 virtual table)
+ *   - thoughts_fts_insert / thoughts_fts_delete / thoughts_fts_update triggers
+ * Companion migrations are applied manually via `wrangler d1 execute`,
+ * never auto-run. See drizzle/README.md.
  */
 
 import {
@@ -490,4 +498,20 @@ export const brandsEmails = sqliteTable(
     index("idx_brands_emails_from_addr").on(table.from_addr),
     index("idx_brands_emails_status").on(table.status),
   ],
+);
+
+// ---------------------------------------------------------------------------
+// 23. rate_limits (sliding-window rate limiting for /api/send + /api/subscribe)
+// ---------------------------------------------------------------------------
+// Created by SQL migration (supabase-era baseline), NOT auto-created at
+// runtime. The runtime keeps using raw db.prepare for the sliding window;
+// this definition exists so the table is visible in the typed schema.
+
+export const rateLimits = sqliteTable(
+  "rate_limits",
+  {
+    key: text("key").notNull(),
+    ts: integer("ts").notNull(),
+  },
+  (table) => [index("idx_rate_limits_key_ts").on(table.key, table.ts)],
 );

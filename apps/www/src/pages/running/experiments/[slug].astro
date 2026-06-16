@@ -1,0 +1,76 @@
+---
+import { render } from "astro:content";
+import Shell from "../../../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+import {
+  experimentSlug,
+  formatDate,
+  publishedExperiments,
+} from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const experiments = await publishedExperiments();
+  return experiments.map((experiment) => ({
+    params: { slug: experimentSlug(experiment) },
+    props: { experiment },
+  }));
+}
+
+const { experiment } = Astro.props;
+const slug = experimentSlug(experiment);
+const { Content } = await render(experiment);
+const d = experiment.data;
+---
+
+<Shell
+  title={d.title}
+  description={d.summary ?? `experiment: ${d.title}`}
+  path={`/running/experiments/${slug}`}
+  ogType="article"
+  mood="jittery"
+>
+  <section data-rise class="head">
+    <a href="/running" class="quiet-link mono back">
+      <Icon name="ph:arrow-bend-up-left" /> running
+    </a>
+    <h1 class="title">{d.title}</h1>
+    <p class="meta mono muted">
+      <span>{formatDate(d.date)}</span>
+      {d.tags.map((t) => <span>{t}</span>)}
+    </p>
+  </section>
+
+  <div data-rise class="article-body">
+    <Content />
+  </div>
+</Shell>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: 0.85rem;
+    width: fit-content;
+    min-height: 44px;
+  }
+
+  .title {
+    font-size: var(--p-h1);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin: 0;
+    font-size: 0.85rem;
+  }
+</style>

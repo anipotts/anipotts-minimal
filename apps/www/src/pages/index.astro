@@ -1,0 +1,124 @@
+---
+import Shell from "../layouts/Shell.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import WritingRow from "../components/WritingRow.astro";
+import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+import { Icon } from "astro-icon/components";
+import { homeContent } from "../data/site";
+import { featuredProjects, publishedWriting } from "../lib/content";
+
+const projects = await featuredProjects(4);
+const writingEntries = (await publishedWriting()).slice(0, 3);
+---
+
+<Shell
+  title="ani potts"
+  description="ani potts. what i'm building, writing, and running. mostly with claude code."
+  path="/"
+>
+  <section data-rise>
+    <h1 class="home-hero">
+      {homeContent.heading}<span class="spark">.</span>
+    </h1>
+    <p class="hero-summary">{homeContent.summary}</p>
+    <a
+      href={homeContent.press.href}
+      class="press"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Icon name="ph:arrow-bend-right-up" /> {homeContent.press.label}
+    </a>
+  </section>
+
+  <section data-rise class="stack">
+    <span class="head-row">
+      <h2 class="section-label">shipping</h2>
+      <a href="/shipping" class="quiet-link mono view-all"
+        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      >
+    </span>
+    <div class="grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section data-rise class="stack">
+    <span class="head-row">
+      <h2 class="section-label">writing</h2>
+      <a href="/writing" class="quiet-link mono view-all"
+        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      >
+    </span>
+    <div class="list">
+      {writingEntries.map((item) => <WritingRow item={item} />)}
+    </div>
+  </section>
+
+  <section data-rise>
+    <NewsletterSubscribe />
+  </section>
+</Shell>
+
+<style>
+  .home-hero {
+    font-size: clamp(3rem, 12vw, 7rem);
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin-bottom: var(--s-4);
+    font-weight: 600;
+  }
+
+  .spark {
+    color: var(--accent);
+  }
+
+  .press {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--s-3);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    min-height: 44px;
+  }
+
+  .press:hover {
+    color: var(--accent);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.85rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--s-4);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+</style>

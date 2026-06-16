@@ -5,6 +5,7 @@
   "exports": {
     "./globals.css": "./src/globals.css",
     "./tokens.css": "./src/tokens.css",
-    "./base.css": "./src/base.css"
+    "./base.css": "./src/base.css",
+    "./tokens-www.css": "./src/tokens-www.css"
   }
 }

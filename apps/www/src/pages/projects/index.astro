@@ -1,0 +1,84 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+import { projectSlug, visibleProjects } from "../../lib/content";
+
+const projects = await visibleProjects();
+---
+
+<Shell
+  title="projects"
+  description="every project with a page. flat list."
+  path="/projects"
+  mood="alert"
+>
+  <section data-rise>
+    <h1 class="hero-title">archive</h1>
+    <p class="hero-summary">
+      every project with a page. the curated story is at <a
+        href="/shipping"
+        class="accent-link">/shipping</a
+      >.
+    </p>
+  </section>
+
+  <section data-rise class="list">
+    {
+      projects.map((p) => (
+        <a href={`/projects/${projectSlug(p)}`} class="row-link entry">
+          <span class="line">
+            <span class="row-title">{p.data.title}</span>
+            <span class="mono muted">{p.data.year}</span>
+            <span class="mono muted">{p.data.status}</span>
+            <Icon name="ph:arrow-bend-right-up" class="affordance" />
+          </span>
+          <span class="dek">{p.data.subtitle ?? p.data.description}</span>
+        </a>
+      ))
+    }
+  </section>
+</Shell>
+
+<style>
+  .hero-title {
+    margin-bottom: var(--s-3);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .line {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+
+  .line .affordance {
+    color: var(--ink-muted);
+    margin-left: auto;
+    transition:
+      color 0.2s,
+      transform 0.2s;
+  }
+
+  .entry:hover .affordance {
+    color: var(--accent);
+    transform: translate(0.14em, -0.14em);
+  }
+
+  .dek {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    max-width: var(--measure);
+  }
+</style>
