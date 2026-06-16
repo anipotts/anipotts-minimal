@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "ani potts. i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
+  bio: "ani potts. previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -97,7 +97,7 @@ export const socialLinks: SocialLink[] = [
 export const homeContent = {
   heading: "hi, i'm ani",
   summary:
-    "i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
+    "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
   proof: [
     {
       label: "structured ai",
@@ -139,8 +139,11 @@ export const homeContent = {
       logoSrc: "/images/brand/structured-ai-favicon.png",
       logoAlt: "structured ai",
       logoTone: "white",
-      badgeSrc: "/images/brand/ycombinator-favicon.ico",
-      badgeAlt: "y combinator",
+    },
+    yCombinatorF25: {
+      label: "F25",
+      logoSrc: "/images/brand/ycombinator-favicon.ico",
+      logoAlt: "y combinator",
     },
     badHabit: {
       label: "our bad habit",
@@ -151,8 +154,9 @@ export const homeContent = {
     atlanticRecords: {
       label: "atlantic records",
       href: "https://www.atlanticrecords.com/",
-      logoSrc: "/images/brand/atlantic-records-logo-square.jpg",
+      logoSrc: "/images/brand/atlantic-records-logo-cropped.png",
       logoAlt: "atlantic records",
+      logoShape: "large",
     },
     businessInsider: {
       label: "business insider",

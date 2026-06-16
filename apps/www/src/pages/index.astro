@@ -47,26 +47,26 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         intro.subheading ?? homeContent.summary
       ) : (
         <>
-          <span>
-            i build realtime agent workflows where state, tools, citations, and
-            debugging have to hold up in production.
-          </span>
-          <span>proof from</span>
-          <InlineMention {...homeContent.mentions.structuredAi} />
-          <span>,</span>
-          <a href="https://quantercise.com" class="text-link">quantercise</a>
-          <span>,</span>
-          <a href="https://paragoninvestments.org" class="text-link">pgi</a>
-          <span>, and public tools like</span>
-          <a href="/projects/claude-code-tips" class="text-link"
-            >claude-code-tips</a
-          >
-          <span>plus</span>
-          <a href="/projects/imessage-mcp" class="text-link">imessage mcp</a>
-          <span class="no-break">
-            (as featured on{" "}
-            <InlineMention {...homeContent.mentions.businessInsider} />).
-          </span>
+          previously worked on real-time agent i/o at{" "}
+          <InlineMention {...homeContent.mentions.structuredAi} />{" "}
+          <span class="no-break"
+            >(<InlineMention
+              {...homeContent.mentions.yCombinatorF25}
+              suffix=")"
+            /></span
+          >{" "}
+          and{" "}
+          <InlineMention {...homeContent.mentions.badHabit} suffix="," /> an{" "}
+          <span class="no-break"
+            ><InlineMention {...homeContent.mentions.atlanticRecords} />
+            venture.</span
+          >{" "}
+          every now and then i post about what i'm doing with claude code and
+          codex, as featured on{" "}
+          <InlineMention
+            {...homeContent.mentions.businessInsider}
+            suffix="."
+          />
         </>
       )}
     </p>
@@ -131,10 +131,6 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
   }
 
   .hero-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0 0.35em;
     max-width: none;
   }
 

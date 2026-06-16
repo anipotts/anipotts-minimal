@@ -40,7 +40,6 @@ export const monitoredServices: MonitoredService[] = [
     url: "https://quantercise.com",
     category: "project",
   },
-  { name: "chained.chat", url: "https://chained.chat", category: "project" },
   {
     name: "nyupuritytest.com",
     url: "https://nyupuritytest.com",
