@@ -73,6 +73,15 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 - `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`).
 - Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api.
 
+## Agent PR Flow
+
+- Work on `codex/*`, `claude/*`, or `worktree-*` branches.
+- Open same-repo PRs. The agent auto-merge workflow enables merge-commit auto-merge once required checks pass.
+- Required PR gates are `Build, lint, typecheck, test` and `security`.
+- CI uses Turbo affected validation, so agents should keep changes scoped and let the package graph decide what to test.
+- Security review is expensive only for infra, admin, worker, package, dependency, and API/middleware changes. Static public-site copy/layout changes get the required `security` check without a Claude review run.
+- Main pushes auto-deploy through the path-filtered Deploy workflow. Deploy jobs build and ship only targets touched by the merge instead of rebuilding the whole monorepo first.
+
 ## Anti-Corny Guardrails (NON-NEGOTIABLE)
 
 1. **No fake vulnerability.** Don't perform honesty. Just be honest.

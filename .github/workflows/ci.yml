@@ -11,8 +11,11 @@ jobs:
   ci:
     name: Build, lint, typecheck, test
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -22,20 +25,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm turbo build
-
-      - name: Lint
-        run: pnpm turbo lint
-
-      - name: Typecheck
-        run: pnpm turbo typecheck
-
-      - name: Test
-        run: pnpm turbo test
+      - name: Validate affected packages
+        run: pnpm turbo build lint typecheck test --affected --output-logs=errors-only
