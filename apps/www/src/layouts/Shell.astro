@@ -73,6 +73,17 @@ const personLd = {
               ? "dark"
               : "light";
         document.documentElement.dataset.theme = theme;
+
+        const requestedFont = new URLSearchParams(location.search).get("font");
+        const storedFont = localStorage.getItem("font");
+        const font =
+          requestedFont === "geist" || requestedFont === "instrument"
+            ? requestedFont
+            : storedFont === "geist" || storedFont === "instrument"
+              ? storedFont
+              : "instrument";
+        document.documentElement.dataset.font = font;
+        localStorage.setItem("font", font);
       })();
     </script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(personLd)} />

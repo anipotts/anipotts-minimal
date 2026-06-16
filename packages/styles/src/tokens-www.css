@@ -1,13 +1,13 @@
 /* tokens-www.css
    brand-aligned tokens for the public site, lifted directly from the
    labs site (the layout ani liked): warm bone-white paper, cobalt blue
-   accent, catppuccin-mocha dark mode. Inter for text, JetBrains Mono
-   for code + technical surfaces. no display face — type-led using one
+   accent, catppuccin-mocha dark mode. Instrument Sans for text,
+   JetBrains Mono for code + technical surfaces. no display face - type-led using one
    sans family at scale. */
 
 :root {
-  --sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
-    "SF Pro Text", system-ui, sans-serif;
+  --sans: "Instrument Sans Variable", "Instrument Sans", -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
     "SF Mono", Menlo, monospace;
 
@@ -39,6 +39,11 @@
   --measure: 65ch;
   --lh-body: 1.65;
   --lh-tight: 1.1;
+}
+
+:root[data-font="geist"] {
+  --sans: "Geist Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    system-ui, sans-serif;
 }
 
 :root[data-theme="dark"] {

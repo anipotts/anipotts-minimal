@@ -7,7 +7,6 @@ category: ai
 role: Creator
 duration: Ongoing
 status: live
-featured: true
 sort_order: 92
 link_repo: https://github.com/anipotts/claude-code-tips
 tags: [Python, Claude Code, Hooks, Agents, MCP, Plugins]

@@ -1,5 +1,6 @@
 @import "@anipotts/styles/tokens-www.css";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource/geist-sans";
 @import "@fontsource-variable/jetbrains-mono";
 
 /* shiki css-variables theme: tint-on-tint, accent on one token role */

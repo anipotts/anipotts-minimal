@@ -7,6 +7,7 @@ category: ai
 role: Creator
 duration: Ongoing
 status: live
+featured: true
 sort_order: 91
 link_repo: https://github.com/anipotts/imessage-mcp
 link_live: https://npmjs.com/package/imessage-mcp

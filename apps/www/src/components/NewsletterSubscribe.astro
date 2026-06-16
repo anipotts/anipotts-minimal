@@ -2,9 +2,12 @@
 ---
 
 <div class="subscribe card">
-  <p class="lede">
-    stuff i write, sent when i write it. no schedule, no filler.
-  </p>
+  <div class="copy">
+    <span class="label mono">newsletter</span>
+    <p class="lede">
+      join my newsletter to hear about my thoughts and what i'm building.
+    </p>
+  </div>
   <form id="subscribe-form" class="row">
     <input
       class="field"
@@ -21,29 +24,71 @@
 
 <style>
   .subscribe {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.82fr);
+    align-items: end;
+    gap: var(--s-5);
+    width: 100%;
+    max-width: none;
+    padding: var(--s-4) 0;
+    background: transparent;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .copy {
     display: flex;
     flex-direction: column;
-    gap: var(--s-3);
-    max-width: var(--measure);
+    gap: var(--s-2);
+  }
+
+  .label {
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
   .lede {
     margin: 0;
-    font-size: var(--p-small);
-    color: var(--ink-muted);
+    max-width: none;
+    color: var(--ink);
+    font-size: var(--p-body);
+    line-height: 1.45;
   }
 
   .row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
     gap: var(--s-2);
-    flex-wrap: wrap;
   }
 
   .row .field {
-    flex: 1 1 14rem;
+    min-width: 0;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-muted);
+  }
+
+  .row .field:focus {
+    box-shadow: none;
+    border-color: var(--accent);
+  }
+
+  .row .fill {
+    height: 44px;
+    min-height: 44px;
+    border-radius: 0.45rem;
+    padding-inline: var(--s-4);
   }
 
   .status {
+    grid-column: 2;
     margin: 0;
     font-size: 0.8rem;
     color: var(--ink-muted);
@@ -52,6 +97,21 @@
 
   .status.ok {
     color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .subscribe {
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+
+    .row {
+      grid-template-columns: 1fr;
+    }
+
+    .status {
+      grid-column: auto;
+    }
   }
 </style>
 
