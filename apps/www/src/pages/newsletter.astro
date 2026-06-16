@@ -1,8 +1,16 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+import { fetchPageContent, normalizeNewsletterContent } from "@anipotts/lib/cms";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
 
 const archiveUrl = "/archive";
+export const prerender = false;
+
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+const page = await fetchPageContent("newsletter");
+const copy = normalizeNewsletterContent(page?.content);
 ---
 
 <Shell
@@ -13,17 +21,20 @@ const archiveUrl = "/archive";
 >
   <section data-rise class="hero">
     <p class="section-label">newsletter</p>
-    <h1 class="hero-title">notes from the build loop</h1>
+    <h1 class="hero-title">{copy.headline}</h1>
     <p class="hero-summary">
-      occasional notes on building with claude code, codex, small software
-      systems, and the operational details that survive contact with real work.
+      {copy.deck}
     </p>
   </section>
 
   <section data-rise>
     <NewsletterSubscribe
       mode="form"
-      lede="get the next note in your inbox. confirm once, unsubscribe anytime."
+      lede={copy.deck}
+      ctaLabel={copy.cta_label}
+      footerText={copy.footer_text}
+      successMessage={copy.success_message}
+      errorMessage={copy.error_message}
     />
   </section>
 

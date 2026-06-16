@@ -4,6 +4,9 @@ interface Props {
   lede?: string;
   href?: string;
   ctaLabel?: string;
+  footerText?: string;
+  successMessage?: string;
+  errorMessage?: string;
 }
 
 const {
@@ -11,6 +14,9 @@ const {
   lede = "notes on agent workflows and product builds, including the parts that broke while shipping.",
   href = "https://news.anipotts.com",
   ctaLabel = "subscribe",
+  footerText = "",
+  successMessage = "subscribed. check your inbox.",
+  errorMessage = "could not subscribe. try again in a minute.",
 } = Astro.props;
 ---
 
@@ -22,7 +28,12 @@ const {
   {
     mode === "form" ? (
       <>
-        <form id="subscribe-form" class="row">
+        <form
+          id="subscribe-form"
+          class="row"
+          data-success-message={successMessage}
+          data-error-message={errorMessage}
+        >
           <input
             class="hp"
             type="text"
@@ -49,6 +60,7 @@ const {
       </a>
     )
   }
+  {footerText && <p class="footer mono">{footerText}</p>}
 </div>
 
 <style>
@@ -143,6 +155,13 @@ const {
     min-height: 1em;
   }
 
+  .footer {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
   .status.ok {
     color: var(--accent);
   }
@@ -190,12 +209,15 @@ const {
             body: JSON.stringify({ email, website }),
           });
           if (!res.ok) throw new Error(String(res.status));
-          status.textContent = "subscribed. check your inbox.";
+          status.textContent =
+            form.dataset.successMessage ?? "subscribed. check your inbox.";
           status.classList.add("ok");
           form.reset();
           (window as any).posthog?.capture("newsletter_subscribed");
         } catch {
-          status.textContent = "could not subscribe. try again in a minute.";
+          status.textContent =
+            form.dataset.errorMessage ??
+            "could not subscribe. try again in a minute.";
         }
       });
     </script>
