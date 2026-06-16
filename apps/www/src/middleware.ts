@@ -11,6 +11,8 @@ const REDIRECTS: Record<string, string> = {
   "/docs": "/",
 };
 
+const NEWS_HOST = "news.anipotts.com";
+
 /** segment renames (noun -> verb). preserve subpaths and query. these are
  *  external link-equity redirects: every old anipotts.com/thoughts/* url
  *  ever shared keeps resolving. */
@@ -38,8 +40,38 @@ const SECURITY_HEADERS: Record<string, string> = {
   ].join("; "),
 };
 
+function applyHtmlSecurityHeaders(response: Response): Response {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("text/html")) return response;
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname, search } = context.url;
+  const host = context.url.hostname.toLowerCase();
+
+  if (host === NEWS_HOST) {
+    if (pathname === "/") {
+      const page = await context.locals.runtime.env.ASSETS.fetch(
+        new URL("/newsletter", context.url),
+      );
+      return applyHtmlSecurityHeaders(new Response(page.body, page));
+    }
+
+    if (pathname === "/newsletter") {
+      return context.redirect("/", 301);
+    }
+
+    if (pathname === "/archive" || pathname.startsWith("/archive/")) {
+      const page = await context.locals.runtime.env.ASSETS.fetch(
+        new URL("/newsletter/archive", context.url),
+      );
+      return applyHtmlSecurityHeaders(new Response(page.body, page));
+    }
+  }
 
   // segment renames: preserve the tail. /thoughts/foo -> /writing/foo.
   for (const [from, to] of Object.entries(RENAMES)) {
@@ -73,11 +105,5 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const response = await next();
 
-  const contentType = response.headers.get("content-type") ?? "";
-  if (contentType.includes("text/html")) {
-    for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-      response.headers.set(key, value);
-    }
-  }
-  return response;
+  return applyHtmlSecurityHeaders(response);
 });

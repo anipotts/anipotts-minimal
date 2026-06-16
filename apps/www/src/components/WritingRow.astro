@@ -14,7 +14,7 @@ const { title, summary, published_at, tags } = item.data;
   <span class="row-title">{title}</span>
   <span class="row-meta mono">
     {published_at && <span>{formatDate(published_at)}</span>}
-    {tags.slice(0, 3).map((t) => <span>{t}</span>)}
+    {tags.slice(0, 4).map((t) => <span>{t}</span>)}
   </span>
   <span class="row-dek">{summary}</span>
 </a>

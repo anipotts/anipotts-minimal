@@ -1,7 +1,7 @@
 ---
-title: Mental Math
-subtitle: Practice mental math drills in your browser.
-description: Practice mental math drills in your browser. Keyboard-driven, sound feedback, progress tracking. Vanilla JS, Manifest V3, zero external dependencies.
+title: mental math extension
+subtitle: browser drills for fast mental math reps.
+description: Built a zero-dependency Chrome extension for keyboard-driven mental math practice. Includes sound feedback, progress tracking, Manifest V3 packaging, and no external services.
 year: "2026"
 category: product
 role: Creator

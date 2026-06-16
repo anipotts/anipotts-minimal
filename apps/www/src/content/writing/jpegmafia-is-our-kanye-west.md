@@ -1,13 +1,13 @@
 ---
 slug: jpegmafia-is-our-kanye-west
-title: JPEGMAFIA is our kanye west
-summary: Why boundary-pushing builders ship faster when they ignore consensus and optimize for signal.
+title: jpegmafia is our kanye west
+summary: a short note on taste, consensus, feedback, and shipping with strong defaults.
 tags: [music, product, execution]
 status: published
 published_at: 2026-02-12
 ---
 
-Most teams over-index on being understood early
+Teams often over-index on being understood early
 
 The highest leverage work often looks wrong in public before it looks obvious in hindsight
 

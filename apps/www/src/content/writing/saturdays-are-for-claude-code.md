@@ -1,7 +1,7 @@
 ---
 slug: saturdays-are-for-claude-code
-title: Saturdays are for Claude Code
-summary: Business Insider interviewed me about AI usage limits. Here's what the article captured, what it couldn't, and why I think the limits are a feature.
+title: saturdays are for claude code
+summary: business insider interviewed me about ai usage limits. the useful part was less the quote and more the workflow it forced.
 tags: [claude-code, press, workflow, building]
 status: published
 published_at: 2026-04-13

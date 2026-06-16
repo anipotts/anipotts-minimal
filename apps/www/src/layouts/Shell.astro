@@ -12,6 +12,7 @@ interface Props {
   ogType?: string;
   jsonLd?: Record<string, unknown>;
   mood?: "drowsy" | "alert" | "jittery" | "calm";
+  canonicalUrl?: string;
 }
 
 const {
@@ -21,8 +22,10 @@ const {
   ogType = "website",
   jsonLd,
   mood = "calm",
+  canonicalUrl,
 } = Astro.props;
-const canonical = `${siteConfig.url}${path === "/" ? "" : path}`;
+const canonical =
+  canonicalUrl ?? `${siteConfig.url}${path === "/" ? "" : path}`;
 const fullTitle = path === "/" ? "ani potts" : `${title} / ani potts`;
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 

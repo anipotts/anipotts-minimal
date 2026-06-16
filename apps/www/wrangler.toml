@@ -10,6 +10,11 @@ main = "./dist/_worker.js/index.js"
 workers_dev = true
 account_id = "0f856093bdcd34a7da1bde5ee4385163"
 
+[vars]
+NEWSLETTER_BASE_URL = "https://news.anipotts.com"
+NEWSLETTER_FROM = "Ani Potts <news@anipotts.com>"
+NEWSLETTER_REPLY_TO = "contact@anipotts.com"
+
 [[routes]]
 pattern = "staging.anipotts.com"
 custom_domain = true
@@ -20,18 +25,26 @@ pattern = "anipotts.com"
 custom_domain = true
 zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
 
+[[routes]]
+pattern = "news.anipotts.com"
+custom_domain = true
+zone_id = "d56476e2905a2a19ad86aaa4b7c719c2"
+
 [assets]
 binding = "ASSETS"
 directory = "./dist"
-# assets serve first; the worker only fires for paths with no static file.
-# this is what lets the middleware redirect map see /lab, /thoughts, /work,
-# /labs without intercepting prerendered /writing/[slug] HTML.
-run_worker_first = false
+# run the worker before assets so host-aware middleware can make
+# news.anipotts.com/ canonical instead of serving the apex index.html.
+run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"
 database_name = "anipotts-db"
 database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
+[[queues.producers]]
+binding = "NEWSLETTER_QUEUE"
+queue = "newsletter-send"
 
 [observability]
 enabled = true

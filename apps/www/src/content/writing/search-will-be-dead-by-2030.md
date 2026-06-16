@@ -1,7 +1,7 @@
 ---
 slug: search-will-be-dead-by-2030
-title: Search will be dead by 2030
-summary: Search does not disappear, but the interface collapses into agents, context memory, and proactive retrieval.
+title: search will be dead by 2030
+summary: search does not disappear. the main interface collapses into agents, memory, retrieval, and synthesis.
 tags: [ai, search, product]
 status: published
 published_at: 2026-01-31

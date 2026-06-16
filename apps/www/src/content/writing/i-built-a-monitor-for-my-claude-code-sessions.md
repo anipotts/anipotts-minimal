@@ -1,7 +1,7 @@
 ---
 slug: i-built-a-monitor-for-my-claude-code-sessions
-title: I built a monitor for my Claude Code sessions
-summary: Claude Code has no dashboard for multiple sessions. So I'm building one called Claudemon.
+title: i built a monitor for my claude code sessions
+summary: claude code has no dashboard for parallel sessions, so i'm building claudemon.
 tags: [claude-code, claudemon, observability, building]
 status: published
 published_at: 2026-04-07
@@ -9,7 +9,7 @@ published_at: 2026-04-07
 
 At any given time I've got like 3-5 Claude Code sessions running across different projects. One on a side project, one doing a refactor I kicked off before dinner, one on something else I already forgot about. And I have no idea what any of them are doing.
 
-Claude Code doesn't have a dashboard. There's no "here's what all your agents are up to" view. You get one terminal per session. If you're not staring at it, you're blind.
+Claude Code doesn't have a dashboard. There's no "what are all your agents doing" view. You get one terminal per session. If you're not staring at it, you're blind.
 
 So I started building something. I'm calling it Claudemon.
 
@@ -31,6 +31,6 @@ Cost correlates with context, not complexity. The expensive sessions aren't doin
 
 The tool call distribution tells you everything. Healthy session: a few reads, burst of writes, bash command to test. Struggling session: read read read read read with no writes. If you see that pattern, your prompt was bad.
 
-Everyone writes about prompting. How to talk to AI. Almost nobody writes about observing. How to understand what your agents are actually doing once you let them loose. You wouldn't deploy a production service without monitoring. Why are we running AI coding agents without it?
+Everyone writes about prompting. How to talk to AI. Almost nobody writes about observing. How to understand what your agents are actually doing once you let them loose. You wouldn't deploy a production service without monitoring. AI coding agents need the same visibility.
 
 More posts coming on specific things I've found in the data. And yeah, screen recordings incoming.

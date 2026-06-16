@@ -1,0 +1,31 @@
+---
+import Shell from "../../layouts/Shell.astro";
+---
+
+<Shell
+  title="newsletter archive"
+  description="published issues from ani's first-party newsletter."
+  path="/newsletter/archive"
+  canonicalUrl="https://news.anipotts.com/archive"
+>
+  <section data-rise class="stack">
+    <p class="section-label">archive</p>
+    <h1 class="hero-title">newsletter archive</h1>
+    <p class="hero-summary">
+      published issues will appear here after the first-party send path is
+      verified.
+    </p>
+  </section>
+</Shell>
+
+<style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .section-label {
+    margin: 0;
+  }
+</style>
