@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import {
   verifyAdminPassword,
   verifyAdminTotp,
@@ -41,6 +42,11 @@ import {
   deleteEmail as buttondownDeleteEmail,
   listSubscribers as buttondownListSubscribers,
 } from "./lib/buttondown";
+import {
+  normalizeHomepageContent,
+  validateHomepageContent,
+} from "@anipotts/lib/cms";
+import type { HomepageContent } from "@anipotts/types";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -268,6 +274,68 @@ export async function logout() {
   return { success: true };
 }
 
+// ── Site Copy ──
+
+export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
+  const content = normalizeHomepageContent(draft);
+  const validation = validateHomepageContent(content);
+  if (!validation.ok) return { error: validation.error ?? "Invalid homepage" };
+
+  const db = getDB();
+  if (!db) return { error: "Database not configured" };
+
+  const ts = now();
+  try {
+    const existing = await db
+      .prepare(
+        `SELECT id, version
+         FROM page_content
+         WHERE page_key = ? AND published = 1
+         ORDER BY version DESC
+         LIMIT 1`,
+      )
+      .bind("home")
+      .first<{ id: string; version: number | null }>();
+
+    const id = existing?.id ?? uuid();
+    const version = (existing?.version ?? 0) + 1;
+    const contentJson = JSON.stringify(content);
+
+    if (existing) {
+      await db
+        .prepare(
+          `UPDATE page_content
+           SET content = ?, version = ?, published = 1, updated_at = ?, updated_by = ?
+           WHERE id = ?`,
+        )
+        .bind(contentJson, version, ts, "admin", id)
+        .run();
+    } else {
+      await db
+        .prepare(
+          `INSERT INTO page_content
+           (id, page_key, content, version, published, updated_at, updated_by, created_at, version_history)
+           VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)`,
+        )
+        .bind(id, "home", contentJson, version, ts, "admin", ts, "[]")
+        .run();
+    }
+
+    await db
+      .prepare(
+        "UPDATE page_content SET published = 0 WHERE page_key = ? AND id <> ?",
+      )
+      .bind("home", id)
+      .run();
+
+    revalidatePath("/");
+
+    return { success: true, updatedAt: ts, version, content };
+  } catch (error) {
+    return { error: `D1 save failed: ${String(error)}` };
+  }
+});
+
 // ── Content Status ──
 
 export const approveContent = withAuth(async (id: string) => {
@@ -481,8 +549,7 @@ export const publishEverywhere = withAuth(
       status: { success: false },
       typefully: {
         x: {
-          success:
-            xResult.status === "fulfilled" && xResult.value.success,
+          success: xResult.status === "fulfilled" && xResult.value.success,
           error:
             xResult.status === "rejected"
               ? String(xResult.reason)
@@ -495,8 +562,7 @@ export const publishEverywhere = withAuth(
               : undefined,
         },
         linkedin: {
-          success:
-            liResult.status === "fulfilled" && liResult.value.success,
+          success: liResult.status === "fulfilled" && liResult.value.success,
           error:
             liResult.status === "rejected"
               ? String(liResult.reason)
@@ -510,8 +576,7 @@ export const publishEverywhere = withAuth(
         },
       },
       buttondown: {
-        success:
-          bdResult.status === "fulfilled" && bdResult.value.success,
+        success: bdResult.status === "fulfilled" && bdResult.value.success,
         error:
           bdResult.status === "rejected"
             ? String(bdResult.reason)
@@ -660,16 +725,13 @@ export const pushAtomToTypefully = withAuth(async (atomId: string) => {
 
 // ── Typefully Management ──
 
-export const fetchTypefullyDraftStatus = withAuth(
-  async (draftId: string) => {
-    if (!SAFE_EXTERNAL_ID_RE.test(draftId))
-      return { error: "Invalid draft ID" };
+export const fetchTypefullyDraftStatus = withAuth(async (draftId: string) => {
+  if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
 
-    const result = await typefullyGetDraft(draftId);
-    if (!result.success) return { error: result.error };
-    return { success: true, draft: result.data };
-  },
-);
+  const result = await typefullyGetDraft(draftId);
+  if (!result.success) return { error: result.error };
+  return { success: true, draft: result.data };
+});
 
 export const editTypefullyDraft = withAuth(
   async (draftId: string, content: string) => {
@@ -692,16 +754,13 @@ export const removeTypefullyDraft = withAuth(async (draftId: string) => {
 
 // ── Buttondown Management ──
 
-export const fetchButtondownEmailStatus = withAuth(
-  async (emailId: string) => {
-    if (!SAFE_EXTERNAL_ID_RE.test(emailId))
-      return { error: "Invalid email ID" };
+export const fetchButtondownEmailStatus = withAuth(async (emailId: string) => {
+  if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
 
-    const result = await buttondownGetEmail(emailId);
-    if (!result.success) return { error: result.error };
-    return { success: true, email: result.data };
-  },
-);
+  const result = await buttondownGetEmail(emailId);
+  if (!result.success) return { error: result.error };
+  return { success: true, email: result.data };
+});
 
 export const editButtondownEmail = withAuth(
   async (

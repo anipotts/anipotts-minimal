@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import {
   getDealsFromD1,
   getDeadlines,
@@ -6,6 +7,8 @@ import {
   getMercurySnapshot,
 } from "@anipotts/lib/money";
 import { getEnv } from "@anipotts/lib/env";
+import { fetchPageContent, normalizeHomepageContent } from "@anipotts/lib/cms";
+import type { HomepageContent } from "@anipotts/types";
 import {
   getMiniHealth,
   getMiniRudy,
@@ -13,6 +16,7 @@ import {
   getMiniSessions,
 } from "@anipotts/lib/mini";
 import LiveDashboard from "./live-dashboard";
+import HomeCopyEditor from "./home-copy-editor";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +51,49 @@ function PanelSkeleton({ title }: { title: string }) {
       <div className="space-y-2">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
+      </div>
+    </PanelShell>
+  );
+}
+
+async function SiteCopyPanel() {
+  const page = await fetchPageContent<HomepageContent>("home");
+
+  return (
+    <HomeCopyEditor
+      content={normalizeHomepageContent(page?.content)}
+      source={page ? "cms" : "fallback"}
+      updatedAt={page?.updated_at ?? null}
+      version={page?.version ?? null}
+    />
+  );
+}
+
+function AdminIndexPanel() {
+  const links = [
+    { label: "thoughts", href: "/content", meta: "pipeline" },
+    { label: "new post", href: "/quick", meta: "draft" },
+    { label: "newsletter", href: "/subscribers", meta: "buttondown" },
+    { label: "money", href: "/money", meta: "mercury" },
+  ];
+
+  return (
+    <PanelShell title="Admin index">
+      <div className="grid gap-2 sm:grid-cols-2">
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="rounded-md border border-zinc-800/50 px-3 py-2 transition-colors hover:border-zinc-700 hover:bg-zinc-900/70"
+          >
+            <span className="block text-[12px] font-medium text-zinc-200">
+              {link.label}
+            </span>
+            <span className="mt-1 block text-[10px] text-zinc-600">
+              {link.meta}
+            </span>
+          </Link>
+        ))}
       </div>
     </PanelShell>
   );
@@ -303,12 +350,16 @@ export default function DashboardPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="shrink-0 border-b border-zinc-800/60 px-6 py-3 flex items-baseline justify-between">
-        <h2 className="text-[13px] font-medium text-zinc-200">Dashboard</h2>
+      <div className="shrink-0 border-b border-zinc-800/60 px-4 py-3 flex items-baseline justify-between sm:px-6">
+        <h2 className="text-[13px] font-medium text-zinc-200">Site</h2>
         <span className="text-[10px] text-zinc-600">{renderedAt}</span>
       </div>
-      <div className="flex-1 overflow-y-auto admin-scroll p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto admin-scroll p-4 space-y-5 sm:p-6">
+        <Suspense fallback={<PanelSkeleton title="Site copy" />}>
+          <SiteCopyPanel />
+        </Suspense>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <AdminIndexPanel />
           <Suspense fallback={<PanelSkeleton title="Health" />}>
             <HealthPanel />
           </Suspense>

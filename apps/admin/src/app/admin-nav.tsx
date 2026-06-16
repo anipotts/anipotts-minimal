@@ -18,7 +18,7 @@ import {
 
 const spokes = [
   {
-    label: "Dashboard",
+    label: "Site",
     href: "/",
     match: (p: string) => p === "/",
     icon: <SquaresFour size={16} weight="duotone" />,
@@ -101,10 +101,13 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-44 shrink-0 bg-zinc-950 border-r border-zinc-800/60 flex flex-col h-screen sticky top-0">
-      <div className="px-4 py-3.5 border-b border-zinc-800/60">
-        <span className="text-[11px] font-medium tracking-wide text-zinc-500 uppercase">
+    <aside className="w-14 shrink-0 bg-zinc-950 border-r border-zinc-800/60 flex flex-col h-screen sticky top-0 sm:w-44">
+      <div className="px-2 py-3.5 border-b border-zinc-800/60 text-center sm:px-4 sm:text-left">
+        <span className="hidden text-[11px] font-medium tracking-wide text-zinc-500 uppercase sm:inline">
           Admin
+        </span>
+        <span className="text-[11px] font-medium tracking-wide text-zinc-500 uppercase sm:hidden">
+          A
         </span>
       </div>
 
@@ -116,17 +119,18 @@ export default function AdminNav() {
             <div key={spoke.href}>
               <Link
                 href={spoke.href}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition-colors ${
+                title={spoke.label}
+                className={`flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] transition-colors sm:justify-start ${
                   isActive
                     ? "bg-zinc-800/60 text-zinc-100"
                     : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30"
                 }`}
               >
                 {spoke.icon}
-                {spoke.label}
+                <span className="hidden sm:inline">{spoke.label}</span>
               </Link>
               {isActive && tabs && tabs.length > 1 && (
-                <div className="ml-5 mt-1 space-y-px border-l border-zinc-800/40 pl-2">
+                <div className="ml-5 mt-1 hidden space-y-px border-l border-zinc-800/40 pl-2 sm:block">
                   {tabs.map((tab) => {
                     const isSubActive =
                       tab.href === spoke.href
@@ -162,10 +166,11 @@ export default function AdminNav() {
       <div className="px-1.5 py-2 border-t border-zinc-800/60">
         <button
           onClick={() => logout()}
-          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[11px] text-zinc-600 hover:text-zinc-400 hover:bg-zinc-800/30 transition-colors w-full"
+          title="Sign out"
+          className="flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-md text-[11px] text-zinc-600 hover:text-zinc-400 hover:bg-zinc-800/30 transition-colors w-full sm:justify-start"
         >
           <SignOut size={14} />
-          Sign out
+          <span className="hidden sm:inline">Sign out</span>
         </button>
       </div>
     </aside>
