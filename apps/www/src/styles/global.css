@@ -279,6 +279,34 @@ button.fill:disabled {
   color: var(--accent);
 }
 
+@media (max-width: 720px) {
+  .mobile-carousel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(17rem, 84vw);
+    grid-template-columns: none !important;
+    gap: var(--s-3);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: var(--s-3);
+    scroll-snap-type: inline mandatory;
+    margin-inline: calc(-1 * var(--s-3));
+    padding-inline: var(--s-3);
+    padding-bottom: var(--s-2);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-carousel > * {
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+}
+
 /* article prose (measure-capped) */
 
 .article-body {

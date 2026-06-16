@@ -143,7 +143,6 @@ export async function getDomainPortfolio(): Promise<Domain[]> {
 const VENTURE_URLS: { name: string; url: string; platform: string }[] = [
   { name: "anipotts.com", url: "https://anipotts.com", platform: "cloudflare" },
   { name: "admin", url: "https://admin.anipotts.com", platform: "cloudflare" },
-  { name: "chained.chat", url: "https://chained.chat", platform: "cloudflare" },
   { name: "quantercise", url: "https://quantercise.com", platform: "vercel" },
   {
     name: "nyupuritytest",

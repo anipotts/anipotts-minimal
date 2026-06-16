@@ -6,7 +6,7 @@ import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
 import InlineMention from "../components/InlineMention.astro";
 import { Icon } from "astro-icon/components";
 import { homeContent } from "../data/site";
-import { featuredProjects, publishedWriting } from "../lib/content";
+import { publishedWriting, visibleProjects } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 import {
@@ -29,7 +29,23 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const thoughts = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
-const projects = await featuredProjects(work.limit ?? 4);
+const homeShippingSlugs = [
+  "quantercise-extension",
+  "saeshify",
+  "nyu-purity-test",
+  "habittracker-obh",
+] as const;
+const homeShippingOrder = new Map<string, number>(
+  homeShippingSlugs.map((slug, index) => [slug, index]),
+);
+const projects = (await visibleProjects())
+  .filter((project) => homeShippingOrder.has(project.slug))
+  .sort(
+    (a, b) =>
+      (homeShippingOrder.get(a.slug) ?? 0) -
+      (homeShippingOrder.get(b.slug) ?? 0),
+  )
+  .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 ---
 
@@ -47,30 +63,30 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         intro.subheading ?? homeContent.summary
       ) : (
         <>
-          <span>
-            i build realtime agent workflows where state, tools, citations, and
-            debugging have to hold up in production.
-          </span>
-          <span>proof from</span>
-          <InlineMention {...homeContent.mentions.structuredAi} />
-          <span>,</span>
-          <a href="https://quantercise.com" class="text-link">quantercise</a>
-          <span>,</span>
-          <a href="https://paragoninvestments.org" class="text-link">pgi</a>
-          <span>, and public tools like</span>
-          <a href="/projects/claude-code-tips" class="text-link"
-            >claude-code-tips</a
-          >
-          <span>plus</span>
-          <a href="/projects/imessage-mcp" class="text-link">imessage mcp</a>
-          <span class="no-break">
-            (as featured on{" "}
-            <InlineMention {...homeContent.mentions.businessInsider} />).
-          </span>
+          previously worked on real-time agent i/o at{" "}
+          <InlineMention {...homeContent.mentions.structuredAi} />{" "}
+          <span class="no-break"
+            >(<InlineMention
+              {...homeContent.mentions.yCombinatorF25}
+              suffix=")"
+            /></span
+          >{" "}
+          and{" "}
+          <InlineMention {...homeContent.mentions.badHabit} suffix="," /> an{" "}
+          <span class="no-break"
+            ><InlineMention {...homeContent.mentions.atlanticRecords} />
+            venture.</span
+          >{" "}
+          every now and then i post about what i'm doing with claude code and
+          codex, as featured on{" "}
+          <InlineMention
+            {...homeContent.mentions.businessInsider}
+            suffix="."
+          />
         </>
       )}
     </p>
-    <div class="proof-grid" aria-label="selected engineering proof">
+    <div class="proof-grid mobile-carousel" aria-label="selected engineering proof">
       {
         homeContent.proof.map((item) => (
           <a href={item.href} class="proof-card">
@@ -90,7 +106,7 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
-    <div class="grid">
+    <div class="grid mobile-carousel">
       {projects.map((project) => <ProjectCard project={project} />)}
     </div>
   </section>}
@@ -131,10 +147,6 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
   }
 
   .hero-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0 0.35em;
     max-width: none;
   }
 

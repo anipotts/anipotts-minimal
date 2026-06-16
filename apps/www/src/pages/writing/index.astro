@@ -85,6 +85,16 @@ const writingEntries = await publishedWriting();
     flex-direction: column;
     gap: var(--s-4);
   }
+
+  .search-date {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+
+  .search-summary {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+  }
 </style>
 
 <script>
@@ -95,18 +105,33 @@ const writingEntries = await publishedWriting();
 
   let timer: ReturnType<typeof setTimeout>;
 
-  const esc = (s: string) =>
-    s.replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c]!,
-    );
+  function resultRow(r: {
+    slug: string;
+    title: string;
+    summary: string;
+    date: string;
+  }) {
+    const row = document.createElement("a");
+    row.href = "/writing/" + encodeURIComponent(r.slug);
+    row.className = "row-link";
+
+    const title = document.createElement("span");
+    title.className = "row-title";
+    title.textContent = r.title;
+
+    const date = document.createElement("span");
+    date.className = "mono search-date";
+    date.textContent = r.date.slice(0, 10);
+
+    const summary = document.createElement("span");
+    summary.className = "search-summary";
+    summary.textContent = r.summary;
+
+    row.appendChild(title);
+    row.appendChild(date);
+    row.appendChild(summary);
+    return row;
+  }
 
   async function run(q: string) {
     if (!q) {
@@ -126,15 +151,7 @@ const writingEntries = await publishedWriting();
         }[];
       };
       count.textContent = `${data.results.length} result${data.results.length === 1 ? "" : "s"}`;
-      list.innerHTML = data.results
-        .map(
-          (r) => `<a href="/writing/${esc(r.slug)}" class="row-link">
-            <span class="row-title">${esc(r.title)}</span>
-            <span class="mono" style="font-size:.8rem;color:var(--ink-muted)">${esc(r.date.slice(0, 10))}</span>
-            <span style="color:var(--ink-muted);font-size:var(--p-small)">${esc(r.summary)}</span>
-          </a>`,
-        )
-        .join("");
+      list.replaceChildren(...data.results.map(resultRow));
     } catch {
       count.textContent = "search unavailable, showing everything";
       list.innerHTML = original;

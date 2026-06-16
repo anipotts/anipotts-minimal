@@ -9,9 +9,10 @@ interface Props {
   logoSrc?: string;
   logoAlt?: string;
   logoTone?: "native" | "white";
-  logoShape?: "square" | "wide" | "mark";
+  logoShape?: "square" | "wide" | "mark" | "large";
   badgeSrc?: string;
   badgeAlt?: string;
+  suffix?: string;
 }
 
 const {
@@ -25,6 +26,7 @@ const {
   logoShape,
   badgeSrc,
   badgeAlt,
+  suffix,
 } = Astro.props;
 const Tag = href ? "a" : "span";
 const logoClass = [
@@ -32,6 +34,7 @@ const logoClass = [
   logoTone === "white" ? "logo-white" : "",
   logoShape === "wide" ? "logo-wide" : "",
   logoShape === "mark" ? "logo-mark" : "",
+  logoShape === "large" ? "logo-large" : "",
 ]
   .filter(Boolean)
   .join(" ");
@@ -57,7 +60,7 @@ const logoClass = [
   }
   {icon && <Icon name={icon} />}
   {mark && <span class="mark" aria-hidden="true">{mark}</span>}
-  <span class="text">{label}</span>
+  <span class="text">{label}{suffix}</span>
   {
     badgeSrc && (
       <img
@@ -114,6 +117,13 @@ const logoClass = [
 
   .logo-mark {
     width: 1.52em;
+  }
+
+  .logo-large {
+    width: 1.42em;
+    height: 1.04em;
+    border-radius: 0.12em;
+    transform: translateY(0.07em);
   }
 
   .logo-white {

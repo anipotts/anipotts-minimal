@@ -138,9 +138,8 @@ export const projects: Project[] = [
       "Stripe",
       "TailwindCSS",
     ],
-    status: "live",
+    status: "coming-soon",
     links: {
-      live: "https://chained.chat",
       repo: "https://github.com/anipotts/chained-chat",
     },
   },

@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "ani potts. i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
+  bio: "ani potts. previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -97,35 +97,35 @@ export const socialLinks: SocialLink[] = [
 export const homeContent = {
   heading: "hi, i'm ani",
   summary:
-    "i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
+    "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
   proof: [
     {
       label: "structured ai",
       href: "https://getstructured.ai/",
-      title: "document chat for architectural drawings",
+      title: "drawing chat with page-level citations",
       detail:
-        "streamed claude and gemini over drawing sets. answers cite the source pdfs; redis streams handle replay and live spectating.",
+        "architectural PDFs in, cited answers out. streamed claude/gemini and kept redis replay for live spectating and later debugging.",
     },
     {
       label: "quantercise",
       href: "https://quantercise.com",
-      title: "quant prep with real grading paths",
+      title: "quant prep with real grading",
       detail:
-        "next.js, typescript, postgres, drizzle, stripe, and sandboxed python grading for code and math-heavy interview practice.",
+        "next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.",
     },
     {
       label: "paragon global investments",
       href: "https://paragoninvestments.org",
-      title: "research portal for an nyu quant fund",
+      title: "research portal for a quant fund",
       detail:
-        "next.js and typescript portal on supabase for surfacing fund research and making internal material usable from mobile.",
+        "next.js and typescript on supabase. made fund research searchable and usable from mobile instead of buried in scattered docs.",
     },
     {
       label: "public tooling",
       href: "/projects/claude-code-tips",
-      title: "agent-native taste, proven in public",
+      title: "tools i actually use",
       detail:
-        "claude-code-tips and imessage mcp show the operating style: local-first tools, mcp surfaces, hooks, and debuggable agent workflows.",
+        "claude-code-tips and imessage mcp are small public receipts from the same local-first workflow i run every day.",
     },
   ],
   press: {
@@ -139,8 +139,11 @@ export const homeContent = {
       logoSrc: "/images/brand/structured-ai-favicon.png",
       logoAlt: "structured ai",
       logoTone: "white",
-      badgeSrc: "/images/brand/ycombinator-favicon.ico",
-      badgeAlt: "y combinator",
+    },
+    yCombinatorF25: {
+      label: "F25",
+      logoSrc: "/images/brand/ycombinator-favicon.ico",
+      logoAlt: "y combinator",
     },
     badHabit: {
       label: "our bad habit",
@@ -151,8 +154,9 @@ export const homeContent = {
     atlanticRecords: {
       label: "atlantic records",
       href: "https://www.atlanticrecords.com/",
-      logoSrc: "/images/brand/atlantic-records-logo-square.jpg",
+      logoSrc: "/images/brand/atlantic-records-logo-cropped.png",
       logoAlt: "atlantic records",
+      logoShape: "large",
     },
     businessInsider: {
       label: "business insider",

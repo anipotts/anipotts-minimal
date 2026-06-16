@@ -15,8 +15,7 @@
 # not free-form PR body / commit message text, so no injection surface.
 #
 # Mechanics: gh pr merge --auto sets the PR to merge once required status
-# checks pass. Branch protection on main requires the "Build, lint, typecheck,
-# test" check from ci.yml.
+# checks pass. Branch protection on main requires the blocking checks.
 
 name: Dependabot Auto-Merge
 
@@ -46,4 +45,4 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr merge --auto --merge "$PR_URL"

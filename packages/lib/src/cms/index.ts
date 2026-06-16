@@ -51,7 +51,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       label: "index",
       heading: "hi, i'm ani",
       subheading:
-        "previously built ai agents at structured ai and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
+        "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
     },
     about: {
       visible: true,
@@ -395,7 +395,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     range: "Ongoing",
     tags: ["typescript", "mcp", "sqlite", "macos", "privacy"],
     summary: "local-first mcp over imessage search and stats.",
-    body: "Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as proof of agent-native tooling taste.",
+    body: "Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as a small local-first tool.",
     links: [
       { label: "source", url: "https://github.com/anipotts/imessage-mcp" },
       { label: "live site", url: "https://npmjs.com/package/imessage-mcp" },
@@ -426,14 +426,13 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   {
     slug: "chainedchat",
     title: "chainedchat",
-    status: "live",
+    status: "archived",
     year: "2025",
     range: "Summer 2025",
     tags: ["next.js", "typescript", "convex", "langgraph", "stripe"],
     summary: "multi-model chat with shared context and routing.",
     body: "Built a full-stack app for running a conversation across multiple LLMs without losing context. Added shared-context caching, model routing, prompt-chain UI, and Stripe billing.",
     links: [
-      { label: "live site", url: "https://chained.chat" },
       { label: "source", url: "https://github.com/anipotts/chained-chat" },
     ],
     featured: false,

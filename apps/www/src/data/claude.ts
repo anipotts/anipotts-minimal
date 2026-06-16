@@ -12,11 +12,11 @@ export interface MineFeature {
 export const minePlugin = {
   name: "mine",
   tagline:
-    "mines every claude code session into a local sqlite database. search, stats, cost breakdowns, error patterns.",
+    "turns local claude code logs into sqlite so sessions are searchable, comparable, and easier to debug.",
   install: "claude plugin marketplace add anipotts/claude-code-tips",
   href: MINE_REPO,
   features: [
-    { name: "/mine", desc: "7-day dashboard with projects, tools, models" },
+    { name: "/mine", desc: "7-day dashboard over projects and tool use" },
     {
       name: "/mine search",
       desc: "full-text search across all conversations",
@@ -26,7 +26,7 @@ export const minePlugin = {
     { name: "/mine loops", desc: "where you got stuck" },
     {
       name: "/mine cost",
-      desc: "cost breakdown by project, model, daily trend",
+      desc: "cost breakdown by project and model",
     },
   ] satisfies MineFeature[],
 };
@@ -79,13 +79,13 @@ export const hooks: Hook[] = [
     name: "replay-capture",
     event: "Stop",
     desc: "captures session summary for replay and handoffs",
-    href: `${TIPS_BLOB}/hooks/replay-capture.sh`,
+    href: TIPS_REPO,
   },
   {
     name: "stats-refresh",
     event: "SessionStart",
     desc: "refreshes repo stats from mine.db once per day",
-    href: `${TIPS_BLOB}/hooks/stats-refresh.sh`,
+    href: TIPS_REPO,
   },
 ];
 
@@ -124,7 +124,7 @@ export const docs: Doc[] = [
   {
     name: "my stack",
     desc: "the 12 CI pipelines that maintain this repo",
-    href: `${TIPS_BLOB}/docs/my-stack.md`,
+    href: TIPS_REPO,
   },
   {
     name: "session workflow",
