@@ -76,11 +76,11 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 ## Agent PR Flow
 
 - Work on `codex/*`, `claude/*`, or `worktree-*` branches.
-- Open same-repo PRs. The agent auto-merge workflow enables merge-commit auto-merge once required checks pass.
+- Open same-repo PRs. The agent auto-merge workflow waits for required checks and dispatches Deploy with touched targets after the merge commit lands.
 - Required PR gates are `Build, lint, typecheck, test` and `security`.
 - CI uses Turbo affected validation, so agents should keep changes scoped and let the package graph decide what to test.
 - Security review is expensive only for infra, admin, worker, package, dependency, and API/middleware changes. Static public-site copy/layout changes get the required `security` check without a Claude review run.
-- Main pushes auto-deploy through the path-filtered Deploy workflow. Deploy jobs build and ship only targets touched by the merge instead of rebuilding the whole monorepo first.
+- Main pushes auto-deploy through the path-filtered Deploy workflow. Agent merges also dispatch Deploy directly because `GITHUB_TOKEN` merges do not reliably create follow-on push workflow runs. Deploy jobs build and ship only targets touched by the merge instead of rebuilding the whole monorepo first.
 
 ## Anti-Corny Guardrails (NON-NEGOTIABLE)
 
