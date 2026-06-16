@@ -16,6 +16,8 @@ next-env.d.ts
 .typefully
 .claude/plans
 .claude/memories
+.claude/worktrees/
+.claude/skills/typefully
 apps/www/test-results
 apps/www/playwright-report
 .playwright-cli
@@ -41,6 +43,11 @@ playground*.html
 .claude/hooks/
 .claude/settings.local.json
 .claude/plugins/
+
+# Local agent app state
+.agents/
+.codex/
+HANDOFF.md
 
 # Agent/research docs (never commit)
 agent-*.md
