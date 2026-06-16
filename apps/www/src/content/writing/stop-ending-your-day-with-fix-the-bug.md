@@ -1,7 +1,7 @@
 ---
 slug: stop-ending-your-day-with-fix-the-bug
-title: Stop ending your day with "fix the bug"
-summary: Vague todos cost you 10+ minutes of wasted context-building. Specific prompts let Claude Code start working immediately.
+title: stop ending your day with "fix the bug"
+summary: vague todos waste context. specific prompts let claude code start from the right file.
 tags: [claude-code, productivity, ai-tools]
 status: published
 published_at: 2026-04-07

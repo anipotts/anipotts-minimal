@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "ani potts. previously built ai agents at structured ai and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
+  bio: "ani potts. i build software with agents, infra, product systems, and content tooling. recently: structured ai, our bad habit, claude code tooling, and quantercise.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -97,7 +97,7 @@ export const socialLinks: SocialLink[] = [
 export const homeContent = {
   heading: "hi, i'm ani",
   summary:
-    "previously built ai agents at structured ai and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
+    "i build software with agents, infra, product systems, and content tooling. recently: structured ai, our bad habit, claude code tooling, and quantercise.",
   press: {
     href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
     label: "business insider",

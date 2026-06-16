@@ -1,7 +1,7 @@
 ---
-title: Claude Code Tips
-subtitle: "Practical patterns for agentic coding: hooks, agents, automation."
-description: Reference repo built from hundreds of Claude Code sessions. Hooks, custom agents, MCP servers, plugin development, automation patterns.
+title: claude code tips
+subtitle: hooks, agents, mcp, and automation patterns from real sessions.
+description: Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MCP servers, plugin notes, and automation patterns I actually use.
 year: "2025-"
 category: ai
 role: Creator

@@ -22,9 +22,13 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
       {homeContent.heading}<span class="spark">.</span>
     </h1>
     <p class="hero-summary hero-line">
-      <span>previously built ai agents at</span>
+      <span>
+        i build software with agents, infra, product systems, and content
+        tooling.
+      </span>
+      <span>recently:</span>
       <InlineMention {...homeContent.mentions.structuredAi} />
-      <span>and</span>
+      <span>,</span>
       <InlineMention {...homeContent.mentions.badHabit} />
       <span class="no-break">
         , an
@@ -32,8 +36,8 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
         venture.
       </span>
       <span>
-        every now and then i post about what i'm doing with claude code and
-        codex
+        i write about claude code workflows, product builds, and what broke
+        while shipping.
       </span>
       <span class="no-break">
         (as featured on

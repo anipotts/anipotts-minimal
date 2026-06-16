@@ -20,7 +20,7 @@ const { title, subtitle, year, status, category, tags } = project.data;
   <span class="meta mono">
     <span class="status"><span class={`dot ${status}`}></span>{status}</span>
     <span>{year}</span>
-    {tags.slice(0, 3).map((t) => <span class="muted">{t.toLowerCase()}</span>)}
+    {tags.slice(0, 4).map((t) => <span class="muted">{t.toLowerCase()}</span>)}
   </span>
 </a>
 

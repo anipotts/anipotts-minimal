@@ -1,7 +1,7 @@
 ---
-title: PGI Research Portal
-subtitle: Macro research platform for 300+ quants.
-description: Rebuilt PGI's static site into a TypeScript PWA backed by Postgres, aggregating RSS feeds and cutting manual research overhead. Enables analysts to monitor macro catalysts and event signals directly from mobile.
+title: pgi research portal
+subtitle: macro research portal for 300+ quants.
+description: Rebuilt PGI's static site into a TypeScript PWA backed by Postgres. Aggregated RSS feeds and event signals so analysts could monitor macro catalysts from mobile.
 year: "2025"
 category: quant
 role: Chief Tech Officer

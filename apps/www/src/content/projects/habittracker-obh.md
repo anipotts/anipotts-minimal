@@ -1,7 +1,7 @@
 ---
-title: Artist Scouting Dashboard
-subtitle: Cross-platform artist growth tracking for an Atlantic Records venture.
-description: Aggregated Chartmetric, YouTube, TikTok, and Instagram signals into a centralized scouting dashboard. Implemented geo-based artist discovery to find emerging talent in targeted campaign markets.
+title: artist scouting dashboard
+subtitle: growth tracking for an atlantic records venture.
+description: Built a scouting dashboard that pulled Chartmetric, YouTube, TikTok, and Instagram signals into one workflow. Added geo-based discovery for finding emerging artists in campaign markets.
 year: "2024"
 category: music
 role: Data Engineering Intern

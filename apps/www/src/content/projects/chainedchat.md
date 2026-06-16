@@ -1,7 +1,7 @@
 ---
-title: ChainedChat
-subtitle: Multi-LLM workflow orchestration platform.
-description: Built a full-stack platform for interacting with multiple LLMs in a single conversational workflow. Implements shared-context caching, multi-model routing, and intuitive UI for cost-efficient prompt chaining.
+title: chainedchat
+subtitle: multi-model chat with shared context and routing.
+description: Built a full-stack app for running a conversation across multiple LLMs without losing context. Added shared-context caching, model routing, prompt-chain UI, and Stripe billing.
 year: "2025"
 category: ai
 role: Founder

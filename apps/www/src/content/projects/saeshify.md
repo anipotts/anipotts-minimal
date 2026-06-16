@@ -1,7 +1,7 @@
 ---
-title: Saeshify
-subtitle: Real-time rhyme scheme visualization.
-description: GPU-accelerated rendering pipeline that visualizes rhyme patterns in real time as lyrics play. Built with WebGL and Web Audio API.
+title: saeshify
+subtitle: real-time rhyme scheme visualization.
+description: Built a WebGL and Web Audio pipeline for visualizing rhyme patterns as lyrics play. Focused on fast rendering and timing accuracy.
 year: "2025-"
 category: music
 role: Creator

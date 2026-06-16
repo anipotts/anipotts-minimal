@@ -1,7 +1,7 @@
 ---
-title: NYU Purity Test
-subtitle: A campus quiz taken by 3,000+ NYU students (200k+ visits).
-description: Launched and marketed a TypeScript web app in 4 hours of a purity questionnaire tailored to NYU culture. Reached 1,000+ completions in under 17 hours.
+title: nyu purity test
+subtitle: campus quiz with 3,000+ student completions.
+description: Built and launched a TypeScript campus quiz in one night. It reached 1,000+ completions in under 17 hours and 200k+ visits through NYU group chats and social sharing.
 year: "2024"
 category: product
 role: Creator

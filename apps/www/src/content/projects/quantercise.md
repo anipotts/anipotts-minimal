@@ -1,7 +1,7 @@
 ---
-title: Quantercise
-subtitle: Quant interview prep for Jane Street, Citadel, Two Sigma.
-description: 400+ problems with Python code editor, KaTeX math rendering, instant grading, and gamification. Next.js 15, React 19, Postgres (Aurora to Neon migration), Lambda for sandboxed execution.
+title: quantercise
+subtitle: quant interview prep with code execution and math rendering.
+description: Built a quant interview prep app with 400+ problems, a Python editor, KaTeX math rendering, instant grading, and user progress. Next.js 15, React 19, Postgres, Lambda sandboxing, and Stripe.
 year: "2024-"
 category: product
 role: Founder and Engineer
@@ -31,4 +31,4 @@ roadmap:
   - { text: "Firm-specific problem packs", status: planned }
 ---
 
-Quantercise is a platform I built to help candidates prepare for quantitative finance interviews at firms like Jane Street, Citadel, and Two Sigma. It started as a personal study tool and evolved into a full product with 400+ problems, real-time Python execution, and a gamification system to keep users engaged.
+Quantercise started as my own quant interview prep tool and turned into a full product: 400+ problems, real-time Python execution, math rendering, progress tracking, and payments.
