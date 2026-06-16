@@ -43,6 +43,8 @@ import {
   listSubscribers as buttondownListSubscribers,
 } from "./lib/buttondown";
 import {
+  cmsProjectPageKey,
+  cmsWritingPageKey,
   normalizeCmsProject,
   normalizeCmsWriting,
   normalizeHomepageContent,
@@ -377,101 +379,18 @@ export const saveProjectContent = withAuth(async (draft: CmsProjectContent) => {
   const validation = validateCmsProject(project);
   if (!validation.ok) return { error: validation.error ?? "Invalid project" };
 
-  const db = getDB();
-  if (!db) return { error: "Database not configured" };
-  const ts = now();
-  try {
-    const id = project.id || uuid();
-    const liveLink = project.links.find((link) =>
-      ["live", "live site", "site"].includes(link.label.toLowerCase()),
-    );
-    const repoLink = project.links.find((link) =>
-      ["source", "repo", "github"].includes(link.label.toLowerCase()),
-    );
-    const pageLink = project.links.find(
-      (link) => link !== liveLink && link !== repoLink,
-    );
-    const existing = project.id
-      ? await db
-          .prepare("SELECT id FROM projects WHERE id = ?")
-          .bind(project.id)
-          .first<{ id: string }>()
-      : await db
-          .prepare("SELECT id FROM projects WHERE slug = ?")
-          .bind(project.slug)
-          .first<{ id: string }>();
-
-    if (existing) {
-      await db
-        .prepare(
-          `UPDATE projects
-           SET slug = ?, title = ?, subtitle = ?, description = ?, year = ?,
-               category = COALESCE(category, 'other'), role = COALESCE(role, ''),
-               duration = ?, tags = ?, status = ?, featured = ?, link_live = ?,
-               link_repo = ?, link_page = ?, sort_order = ?, visible = ?,
-               updated_at = ?
-           WHERE id = ?`,
-        )
-        .bind(
-          project.slug,
-          project.title,
-          project.summary,
-          project.body,
-          project.year,
-          project.range,
-          toJsonArray(project.tags),
-          project.status,
-          project.featured ? 1 : 0,
-          liveLink?.url ?? null,
-          repoLink?.url ?? null,
-          pageLink?.url ?? null,
-          project.order,
-          project.visible ? 1 : 0,
-          ts,
-          existing.id,
-        )
-        .run();
-    } else {
-      await db
-        .prepare(
-          `INSERT INTO projects
-           (id, slug, title, subtitle, description, year, category, role,
-            duration, tags, status, featured, link_live, link_repo, link_page,
-            sort_order, visible, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, 'other', '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          id,
-          project.slug,
-          project.title,
-          project.summary,
-          project.body,
-          project.year,
-          project.range,
-          toJsonArray(project.tags),
-          project.status,
-          project.featured ? 1 : 0,
-          liveLink?.url ?? null,
-          repoLink?.url ?? null,
-          pageLink?.url ?? null,
-          project.order,
-          project.visible ? 1 : 0,
-          ts,
-          ts,
-        )
-        .run();
-    }
-
-    revalidatePath("/");
-    revalidatePath("/projects");
-    revalidatePath("/shipping");
-    return {
-      success: true,
-      project: { ...project, id: existing?.id ?? id, updated_at: ts },
-    };
-  } catch (error) {
-    return { error: `D1 save failed: ${String(error)}` };
-  }
+  const result = await savePageContent(
+    cmsProjectPageKey(project.slug),
+    project,
+  );
+  if ("error" in result) return result;
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath("/shipping");
+  return {
+    success: true,
+    project: { ...result.content, updated_at: result.updatedAt },
+  };
 });
 
 export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
@@ -479,81 +398,17 @@ export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
   const validation = validateCmsWriting(writing);
   if (!validation.ok) return { error: validation.error ?? "Invalid writing" };
 
-  const db = getDB();
-  if (!db) return { error: "Database not configured" };
-  const ts = now();
-  try {
-    const id = writing.id || uuid();
-    const source = writing.sourceLinks[0];
-    const existing = writing.id
-      ? await db
-          .prepare("SELECT id FROM thoughts WHERE id = ?")
-          .bind(writing.id)
-          .first<{ id: string }>()
-      : await db
-          .prepare("SELECT id FROM thoughts WHERE slug = ?")
-          .bind(writing.slug)
-          .first<{ id: string }>();
-
-    if (existing) {
-      await db
-        .prepare(
-          `UPDATE thoughts
-           SET slug = ?, title = ?, summary = ?, content = ?, tags = ?,
-               published = ?, status = ?, published_at = ?, artifact_url = ?,
-               artifact_type = ?, updated_at = ?
-           WHERE id = ?`,
-        )
-        .bind(
-          writing.slug,
-          writing.title,
-          writing.preview,
-          writing.body,
-          toJsonArray(writing.tags),
-          writing.visible ? 1 : 0,
-          writing.visible ? "published" : "draft",
-          writing.visible ? writing.date : null,
-          source?.url ?? null,
-          source?.label ?? null,
-          ts,
-          existing.id,
-        )
-        .run();
-    } else {
-      await db
-        .prepare(
-          `INSERT INTO thoughts
-           (id, slug, title, summary, content, tags, created_at, updated_at,
-            published, status, published_at, views, artifact_url, artifact_type)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
-        )
-        .bind(
-          id,
-          writing.slug,
-          writing.title,
-          writing.preview,
-          writing.body,
-          toJsonArray(writing.tags),
-          ts,
-          ts,
-          writing.visible ? 1 : 0,
-          writing.visible ? "published" : "draft",
-          writing.visible ? writing.date : null,
-          source?.url ?? null,
-          source?.label ?? null,
-        )
-        .run();
-    }
-
-    revalidatePath("/");
-    revalidatePath("/writing");
-    return {
-      success: true,
-      writing: { ...writing, id: existing?.id ?? id, updated_at: ts },
-    };
-  } catch (error) {
-    return { error: `D1 save failed: ${String(error)}` };
-  }
+  const result = await savePageContent(
+    cmsWritingPageKey(writing.slug),
+    writing,
+  );
+  if ("error" in result) return result;
+  revalidatePath("/");
+  revalidatePath("/writing");
+  return {
+    success: true,
+    writing: { ...result.content, updated_at: result.updatedAt },
+  };
 });
 
 // ── Content Status ──

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  cmsProjectPageKey,
+  cmsWritingPageKey,
+  DEFAULT_CMS_PROJECTS,
+  DEFAULT_CMS_WRITING,
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
   normalizeCmsProject,
@@ -91,6 +95,17 @@ describe("homepage cms validation", () => {
 });
 
 describe("owner editor cms validation", () => {
+  it("keeps page-content keys and fallback inventory stable", () => {
+    expect(cmsProjectPageKey("Claude Code Tips!")).toBe(
+      "project:claude-code-tips",
+    );
+    expect(cmsWritingPageKey('Stop Ending Your Day With "Fix The Bug"')).toBe(
+      "writing:stop-ending-your-day-with-fix-the-bug",
+    );
+    expect(DEFAULT_CMS_PROJECTS.length).toBeGreaterThan(0);
+    expect(DEFAULT_CMS_WRITING.length).toBeGreaterThan(0);
+  });
+
   it("normalizes project editor content from d1-shaped rows", () => {
     const project = normalizeCmsProject({
       slug: "My Project!",

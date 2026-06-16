@@ -3,20 +3,29 @@ import { render } from "astro:content";
 import Shell from "../../layouts/Shell.astro";
 import { Icon } from "astro-icon/components";
 import { projectSlug, visibleProjects } from "../../lib/content";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
 
-export async function getStaticPaths() {
-  const projects = await visibleProjects();
-  return projects.map((project) => ({
-    params: { slug: projectSlug(project) },
-    props: { project },
-  }));
-}
+export const prerender = false;
 
-const { project } = Astro.props;
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+const requestedSlug = Astro.params.slug ?? "";
+const project = (await visibleProjects()).find(
+  (candidate) => projectSlug(candidate) === requestedSlug,
+);
+if (!project) return Astro.redirect("/projects", 302);
 const slug = projectSlug(project);
-const { Content } = await render(project);
+const rendered =
+  project.source === "markdown" && project.entry
+    ? await render(project.entry)
+    : null;
+const Content = rendered?.Content;
 const hasBody = Boolean(project.body?.trim());
 const d = project.data;
+const cmsParagraphs = project.body
+  .split(/\n{2,}/)
+  .map((paragraph) => paragraph.trim())
+  .filter(Boolean);
 ---
 
 <Shell
@@ -66,7 +75,11 @@ const d = project.data;
     {
       hasBody ? (
         <div class="article-body">
-          <Content />
+          {Content ? (
+            <Content />
+          ) : (
+            cmsParagraphs.map((paragraph) => <p>{paragraph}</p>)
+          )}
         </div>
       ) : (
         <p class="overview">{d.description}</p>

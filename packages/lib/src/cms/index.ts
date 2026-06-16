@@ -341,6 +341,239 @@ export const DEFAULT_NEWSLETTER_CONTENT: NewsletterContent = {
   reply_to: "contact@anipotts.com",
 };
 
+export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
+  {
+    slug: "quantercise",
+    title: "quantercise",
+    status: "live",
+    year: "2024-",
+    range: "Ongoing",
+    tags: ["next.js", "typescript", "postgres", "drizzle", "stripe", "python"],
+    summary:
+      "quant prep with postgres, drizzle, stripe, and sandboxed python grading.",
+    body: "Built a quant interview prep app with 400+ problems, a Python editor, KaTeX math rendering, instant grading, and user progress. Next.js, TypeScript, Postgres, Drizzle, Stripe, and sandboxed Python grading.",
+    links: [{ label: "live site", url: "https://quantercise.com" }],
+    featured: true,
+    order: 100,
+    visible: true,
+  },
+  {
+    slug: "pgi-research-platform",
+    title: "pgi research portal",
+    status: "live",
+    year: "2025",
+    range: "2025-",
+    tags: ["next.js", "typescript", "supabase", "tailwindcss", "research"],
+    summary: "next.js and supabase portal for an nyu quant fund.",
+    body: "Built a Next.js and TypeScript research portal backed by Supabase for Paragon Global Investments, NYU's quant fund. Organized internal research so members could read and share fund material from mobile.",
+    links: [{ label: "live site", url: "https://paragoninvestments.org" }],
+    featured: false,
+    order: 95,
+    visible: true,
+  },
+  {
+    slug: "claude-code-tips",
+    title: "claude code tips",
+    status: "live",
+    year: "2025-",
+    range: "Ongoing",
+    tags: ["python", "claude code", "hooks", "agents", "mcp", "plugins"],
+    summary: "public notes from running agent workflows in real repos.",
+    body: "Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MCP servers, plugin notes, and automation patterns that make agent work easier to debug.",
+    links: [
+      { label: "source", url: "https://github.com/anipotts/claude-code-tips" },
+    ],
+    featured: false,
+    order: 92,
+    visible: true,
+  },
+  {
+    slug: "imessage-mcp",
+    title: "imessage mcp",
+    status: "live",
+    year: "2025-",
+    range: "Ongoing",
+    tags: ["typescript", "mcp", "sqlite", "macos", "privacy"],
+    summary: "local-first mcp over imessage search and stats.",
+    body: "Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as proof of agent-native tooling taste.",
+    links: [
+      { label: "source", url: "https://github.com/anipotts/imessage-mcp" },
+      { label: "live site", url: "https://npmjs.com/package/imessage-mcp" },
+    ],
+    featured: true,
+    order: 91,
+    visible: true,
+  },
+  {
+    slug: "quantercise-extension",
+    title: "mental math extension",
+    status: "live",
+    year: "2026",
+    range: "Winter 2026",
+    tags: ["chrome extension", "javascript", "manifest v3"],
+    summary: "browser drills for fast mental math reps.",
+    body: "Built a zero-dependency Chrome extension for keyboard-driven mental math practice. Includes sound feedback, progress tracking, Manifest V3 packaging, and no external services.",
+    links: [
+      {
+        label: "source",
+        url: "https://github.com/anipotts/quantercise-mental-math-extension",
+      },
+    ],
+    featured: false,
+    order: 90,
+    visible: true,
+  },
+  {
+    slug: "chainedchat",
+    title: "chainedchat",
+    status: "live",
+    year: "2025",
+    range: "Summer 2025",
+    tags: ["next.js", "typescript", "convex", "langgraph", "stripe"],
+    summary: "multi-model chat with shared context and routing.",
+    body: "Built a full-stack app for running a conversation across multiple LLMs without losing context. Added shared-context caching, model routing, prompt-chain UI, and Stripe billing.",
+    links: [
+      { label: "live site", url: "https://chained.chat" },
+      { label: "source", url: "https://github.com/anipotts/chained-chat" },
+    ],
+    featured: false,
+    order: 89,
+    visible: true,
+  },
+  {
+    slug: "saeshify",
+    title: "saeshify",
+    status: "live",
+    year: "2025-",
+    range: "Ongoing",
+    tags: ["typescript", "webgl", "audio", "visualization"],
+    summary: "real-time rhyme scheme visualization.",
+    body: "Built a WebGL and Web Audio pipeline for visualizing rhyme patterns as lyrics play. Focused on fast rendering and timing accuracy.",
+    links: [
+      { label: "source", url: "https://github.com/anipotts/saeshify" },
+      { label: "live site", url: "https://saeshify.vercel.app" },
+    ],
+    featured: false,
+    order: 85,
+    visible: true,
+  },
+  {
+    slug: "nyu-purity-test",
+    title: "nyu purity test",
+    status: "live",
+    year: "2024",
+    range: "Fall 2024",
+    tags: ["typescript", "react", "next.js", "tailwindcss", "analytics"],
+    summary: "campus quiz with 3,000+ student completions.",
+    body: "Built and launched a TypeScript campus quiz in one night. It reached 1,000+ completions in under 17 hours and 200k+ visits through NYU group chats and social sharing.",
+    links: [{ label: "live site", url: "https://nyupuritytest.com" }],
+    featured: false,
+    order: 84,
+    visible: true,
+  },
+  {
+    slug: "habittracker-obh",
+    title: "artist scouting dashboard",
+    status: "live",
+    year: "2024",
+    range: "Summer 2024",
+    tags: ["python", "streamlit", "sql", "apis", "data pipelines"],
+    summary: "growth tracking for an atlantic records venture.",
+    body: "Built a scouting dashboard that pulled Chartmetric, YouTube, TikTok, and Instagram signals into one workflow. Added geo-based discovery for finding emerging artists in campaign markets.",
+    links: [],
+    featured: false,
+    order: 41,
+    visible: true,
+  },
+  {
+    slug: "options-pricing-sensitivity",
+    title: "options pricing + sensitivity analysis",
+    status: "live",
+    year: "2023",
+    range: "Spring 2023",
+    tags: ["python", "numpy", "pandas", "quantitative finance"],
+    summary: "black-scholes and binomial pricing with volatility sweeps.",
+    body: "Wrote a Python tool for pricing European options with Black-Scholes and binomial models, then swept volatility to show how model behavior changes.",
+    links: [
+      {
+        label: "source",
+        url: "https://github.com/anirudhp15/Options-Pricing-and-Sensitivity-Analysis-Tool",
+      },
+    ],
+    featured: false,
+    order: 40,
+    visible: true,
+  },
+];
+
+export const DEFAULT_CMS_WRITING: CmsWritingContent[] = [
+  {
+    slug: "saturdays-are-for-claude-code",
+    title: "saturdays are for claude code",
+    date: "2026-04-13",
+    tags: ["claude-code", "press", "workflow", "building"],
+    preview:
+      "business insider interviewed me about ai usage limits. the useful part was less the quote and more the workflow it forced.",
+    body: "A reporter from Business Insider reached out a couple weeks ago. He was writing about how usage limits on AI tools are changing the way people work. Somebody pointed him to me because I've been pretty vocal about how I use Claude Code. The article went live today.\n\nHe nailed the broad strokes. I do plan my work around session limits. I do save the hardest tasks for when I'm far from the cap. And yes, Saturdays are for Claude Code. That quote is real. My friends think I'm joking when I say that. I'm not.",
+    sourceLinks: [
+      {
+        label: "source",
+        url: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
+      },
+    ],
+    visible: true,
+    order: 50,
+  },
+  {
+    slug: "i-built-a-monitor-for-my-claude-code-sessions",
+    title: "i built a monitor for my claude code sessions",
+    date: "2026-04-07",
+    tags: ["claude-code", "claudemon", "observability", "building"],
+    preview:
+      "claude code has no dashboard for parallel sessions, so i'm building claudemon.",
+    body: "At any given time I've got like 3-5 Claude Code sessions running across different projects. One on a side project, one doing a refactor I kicked off before dinner, one on something else I already forgot about. And I have no idea what any of them are doing.\n\nClaude Code doesn't have a dashboard. There's no \"what are all your agents doing\" view. You get one terminal per session. If you're not staring at it, you're blind.\n\nSo I started building something. I'm calling it Claudemon.",
+    sourceLinks: [],
+    visible: true,
+    order: 49,
+  },
+  {
+    slug: "stop-ending-your-day-with-fix-the-bug",
+    title: 'stop ending your day with "fix the bug"',
+    date: "2026-04-07",
+    tags: ["claude-code", "productivity", "ai-tools"],
+    preview:
+      "vague todos waste context. specific prompts let claude code start from the right file.",
+    body: 'I used to end my day with todos like "fix auth" and "clean up API" and then wake up the next morning having no idea what I actually meant.\n\nFix auth how? Which auth? The login flow? The token refresh? The middleware? I\'d spend the first 20 minutes of my next session just rebuilding the context I had the night before.\n\nThis is 10x worse with Claude Code. When you hand a vague todo to an AI coding agent, it doesn\'t just lose context. It actively goes searching for context.',
+    sourceLinks: [],
+    visible: true,
+    order: 48,
+  },
+  {
+    slug: "jpegmafia-is-our-kanye-west",
+    title: "jpegmafia is our kanye west",
+    date: "2026-02-12",
+    tags: ["music", "product", "execution"],
+    preview:
+      "a short note on taste, consensus, feedback, and shipping with strong defaults.",
+    body: "Teams often over-index on being understood early\n\nThe highest leverage work often looks wrong in public before it looks obvious in hindsight\n\nJPEGMAFIA reminds me of that builder pattern\n\n- hard constraints\n- aggressive iteration\n- distinct taste\n- zero permission waiting\n\nConsensus can improve distribution, but it rarely creates a category-defining product",
+    sourceLinks: [],
+    visible: true,
+    order: 47,
+  },
+  {
+    slug: "search-will-be-dead-by-2030",
+    title: "search will be dead by 2030",
+    date: "2026-01-31",
+    tags: ["ai", "search", "product"],
+    preview:
+      "search does not disappear. the main interface collapses into agents, memory, retrieval, and synthesis.",
+    body: "Classic search assumes users can translate intent into keywords\n\nThe next interface assumes the system already understands intent from context and history\n\nWhat changes first:\n\n- query boxes become fallback UX\n- ranking systems become orchestration systems\n- links become evidence, not destination\n\nSearch is not dead as infrastructure\n\nSearch is dead as a primary interaction model",
+    sourceLinks: [],
+    visible: true,
+    order: 46,
+  },
+];
+
 function coerceNumber(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value)
     ? Math.trunc(value)
@@ -354,6 +587,14 @@ function normalizeSlug(value: unknown, fallback = "untitled"): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   return (raw || fallback).slice(0, CMS_TEXT_LIMITS.slug);
+}
+
+export function cmsProjectPageKey(slug: string): string {
+  return `project:${normalizeSlug(slug, "project")}`;
+}
+
+export function cmsWritingPageKey(slug: string): string {
+  return `writing:${normalizeSlug(slug, "writing")}`;
 }
 
 function normalizeTags(value: unknown): string[] {
@@ -705,96 +946,45 @@ function pageMeta(page: PageContent<unknown> | null): CmsEditorMeta {
   };
 }
 
+async function fetchProjectEditorContent(
+  fallback: CmsProjectContent,
+): Promise<CmsProjectContent> {
+  const page = await fetchPageContent<CmsProjectContent>(
+    cmsProjectPageKey(fallback.slug),
+  );
+  if (!page) return fallback;
+  return {
+    ...normalizeCmsProject(page.content, fallback),
+    updated_at: page.updated_at,
+  };
+}
+
+async function fetchWritingEditorContent(
+  fallback: CmsWritingContent,
+): Promise<CmsWritingContent> {
+  const page = await fetchPageContent<CmsWritingContent>(
+    cmsWritingPageKey(fallback.slug),
+  );
+  if (!page) return fallback;
+  return {
+    ...normalizeCmsWriting(page.content, fallback),
+    updated_at: page.updated_at,
+  };
+}
+
 export async function fetchCmsEditorSnapshot(): Promise<CmsEditorSnapshot> {
-  const [homePage, newsletterPage] = await Promise.all([
+  const [homePage, newsletterPage, projects, writing] = await Promise.all([
     fetchPageContent<HomepageContent>("home"),
     fetchPageContent<NewsletterContent>("newsletter"),
+    Promise.all(DEFAULT_CMS_PROJECTS.map(fetchProjectEditorContent)),
+    Promise.all(DEFAULT_CMS_WRITING.map(fetchWritingEditorContent)),
   ]);
-
-  const projects: CmsProjectContent[] = [];
-  const writing: CmsWritingContent[] = [];
-  const d1 = getDB();
-  if (d1) {
-    try {
-      const { results } = await d1
-        .prepare(
-          `SELECT id, slug, title, status, year, duration, tags, subtitle, description,
-                  link_live, link_repo, link_page, featured, sort_order, visible, updated_at
-           FROM projects
-           ORDER BY sort_order DESC, updated_at DESC, title ASC`,
-        )
-        .all<Record<string, unknown>>();
-      projects.push(
-        ...(results ?? []).map((row) =>
-          normalizeCmsProject({
-            ...row,
-            tags: parseJsonArray(row.tags),
-            range: row.duration,
-            summary: row.subtitle,
-            body: row.description,
-            order: row.sort_order,
-            links: [
-              row.link_live
-                ? { label: "live site", url: String(row.link_live) }
-                : null,
-              row.link_repo
-                ? { label: "source", url: String(row.link_repo) }
-                : null,
-              row.link_page
-                ? { label: "page", url: String(row.link_page) }
-                : null,
-            ].filter(Boolean),
-          }),
-        ),
-      );
-    } catch (err) {
-      logger.warn("cms", "D1 fetch editor projects failed", {
-        error: String(err),
-      });
-    }
-
-    try {
-      const { results } = await d1
-        .prepare(
-          `SELECT id, slug, title, summary, content, tags, created_at, updated_at,
-                  published_at, published, status, artifact_url, artifact_type
-           FROM thoughts
-           ORDER BY COALESCE(published_at, updated_at, created_at) DESC`,
-        )
-        .all<Record<string, unknown>>();
-      writing.push(
-        ...(results ?? []).map((row, index) =>
-          normalizeCmsWriting({
-            ...row,
-            tags: parseJsonArray(row.tags),
-            date: row.published_at ?? row.created_at,
-            preview: row.summary,
-            body: row.content,
-            visible: Boolean(row.published) || row.status === "published",
-            order: index,
-            sourceLinks: row.artifact_url
-              ? [
-                  {
-                    label: coerceString(row.artifact_type, "source"),
-                    url: String(row.artifact_url),
-                  },
-                ]
-              : [],
-          }),
-        ),
-      );
-    } catch (err) {
-      logger.warn("cms", "D1 fetch editor writing failed", {
-        error: String(err),
-      });
-    }
-  }
 
   return {
     homepage: normalizeHomepageContent(homePage?.content),
     homepageMeta: pageMeta(homePage as PageContent<unknown> | null),
-    projects,
-    writing,
+    projects: projects.sort((a, b) => b.order - a.order),
+    writing: writing.sort((a, b) => b.order - a.order),
     newsletter: normalizeNewsletterContent(newsletterPage?.content),
     newsletterMeta: pageMeta(newsletterPage as PageContent<unknown> | null),
   };

@@ -1,29 +1,179 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import {
+  cmsProjectPageKey,
+  cmsWritingPageKey,
+  fetchPageContent,
+  normalizeCmsProject,
+  normalizeCmsWriting,
+} from "@anipotts/lib/cms";
 
-export type Writing = CollectionEntry<"writing">;
-export type Project = CollectionEntry<"projects">;
 export type Weekly = CollectionEntry<"weekly">;
 export type Experiment = CollectionEntry<"experiments">;
 
-export const writingSlug = (t: Writing): string => t.data.slug ?? t.id;
-export const projectSlug = (p: Project): string => p.data.slug ?? p.id;
+type ProjectEntry = CollectionEntry<"projects">;
+type WritingEntry = CollectionEntry<"writing">;
+
+export interface Project {
+  id: string;
+  slug: string;
+  body: string;
+  source: "markdown" | "cms";
+  entry?: ProjectEntry;
+  data: ProjectEntry["data"];
+}
+
+export interface Writing {
+  id: string;
+  slug: string;
+  body: string;
+  source: "markdown" | "cms";
+  entry?: WritingEntry;
+  data: WritingEntry["data"];
+}
+
+export const writingSlug = (t: Writing): string => t.slug;
+export const projectSlug = (p: Project): string => p.slug;
 export const experimentSlug = (e: Experiment): string => e.data.slug ?? e.id;
 
+function cmsLink(
+  links: { label: string; url: string }[],
+  labels: string[],
+): string | undefined {
+  const normalized = labels.map((label) => label.toLowerCase());
+  return links.find((link) => normalized.includes(link.label.toLowerCase()))
+    ?.url;
+}
+
+async function projectFromEntry(entry: ProjectEntry): Promise<Project> {
+  const slug = entry.data.slug ?? entry.id;
+  const page = await fetchPageContent(cmsProjectPageKey(slug));
+  if (!page) {
+    return {
+      id: entry.id,
+      slug,
+      body: entry.body ?? "",
+      source: "markdown",
+      entry,
+      data: entry.data,
+    };
+  }
+
+  const cms = normalizeCmsProject(page.content, {
+    slug,
+    title: entry.data.title,
+    status: entry.data.status,
+    year: entry.data.year,
+    range: entry.data.duration,
+    tags: entry.data.tags,
+    summary: entry.data.subtitle ?? entry.data.description,
+    body: entry.body || entry.data.description,
+    featured: entry.data.featured,
+    order: entry.data.sort_order,
+    visible: entry.data.visible,
+  });
+  const live = cmsLink(cms.links, ["live", "live site", "site"]);
+  const repo = cmsLink(cms.links, ["source", "repo", "github"]);
+
+  return {
+    id: entry.id,
+    slug: cms.slug,
+    body: cms.body,
+    source: "cms",
+    entry,
+    data: {
+      ...entry.data,
+      title: cms.title,
+      slug: cms.slug,
+      subtitle: cms.summary,
+      description: cms.body,
+      year: cms.year,
+      duration: cms.range,
+      status: cms.status,
+      featured: cms.featured,
+      visible: cms.visible,
+      sort_order: cms.order,
+      tags: cms.tags,
+      link_live: live,
+      link_repo: repo,
+    },
+  };
+}
+
+async function writingFromEntry(entry: WritingEntry): Promise<Writing> {
+  const slug = entry.data.slug ?? entry.id;
+  const page = await fetchPageContent(cmsWritingPageKey(slug));
+  if (!page) {
+    return {
+      id: entry.id,
+      slug,
+      body: entry.body ?? "",
+      source: "markdown",
+      entry,
+      data: entry.data,
+    };
+  }
+
+  const cms = normalizeCmsWriting(page.content, {
+    slug,
+    title: entry.data.title,
+    date: entry.data.published_at?.toISOString().slice(0, 10) ?? "",
+    tags: entry.data.tags,
+    preview: entry.data.summary,
+    body: entry.body ?? "",
+    visible: entry.data.status === "published",
+  });
+  const source = cms.sourceLinks[0];
+
+  return {
+    id: entry.id,
+    slug: cms.slug,
+    body: cms.body,
+    source: "cms",
+    entry,
+    data: {
+      ...entry.data,
+      title: cms.title,
+      slug: cms.slug,
+      summary: cms.preview,
+      tags: cms.tags,
+      status: cms.visible ? "published" : "draft",
+      published_at: cms.visible
+        ? new Date(`${cms.date}T00:00:00.000Z`)
+        : undefined,
+      artifact_url: source?.url,
+      artifact_type:
+        source?.label === "repo" ||
+        source?.label === "gist" ||
+        source?.label === "demo" ||
+        source?.label === "screenshot" ||
+        source?.label === "recording"
+          ? source.label
+          : entry.data.artifact_type,
+    },
+  };
+}
+
 export async function publishedWriting(): Promise<Writing[]> {
-  const all = await getCollection(
+  const entries = await getCollection(
     "writing",
     (t) => t.data.status === "published",
   );
-  return all.sort(
-    (a, b) =>
-      (b.data.published_at?.getTime() ?? 0) -
-      (a.data.published_at?.getTime() ?? 0),
-  );
+  const all = await Promise.all(entries.map(writingFromEntry));
+  return all
+    .filter((item) => item.data.status === "published")
+    .sort(
+      (a, b) =>
+        (b.data.published_at?.getTime() ?? 0) -
+        (a.data.published_at?.getTime() ?? 0),
+    );
 }
 
 export async function visibleProjects(): Promise<Project[]> {
-  const all = await getCollection("projects", (p) => p.data.visible);
-  return all.sort((a, b) => b.data.sort_order - a.data.sort_order);
+  const entries = await getCollection("projects", (p) => p.data.visible);
+  const all = await Promise.all(entries.map(projectFromEntry));
+  return all
+    .filter((project) => project.data.visible)
+    .sort((a, b) => b.data.sort_order - a.data.sort_order);
 }
 
 export async function featuredProjects(limit = 4): Promise<Project[]> {
@@ -47,7 +197,7 @@ export async function weeklyDigests(): Promise<Weekly[]> {
 }
 
 export function readingTime(body: string): number {
-  const words = body.trim().split(/\s+/).length;
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 220));
 }
 

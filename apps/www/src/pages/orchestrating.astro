@@ -3,6 +3,12 @@ import Shell from "../layouts/Shell.astro";
 import { docs, hooks, minePlugin, MINE_REPO, TIPS_REPO } from "../data/claude";
 import { featuredProjects, projectSlug } from "../lib/content";
 import statsJson from "../data/claude-stats.json";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
+
+export const prerender = false;
+
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
 
 interface SessionRow {
   id: string;

@@ -3,7 +3,12 @@ import Shell from "../../layouts/Shell.astro";
 import WritingRow from "../../components/WritingRow.astro";
 import { Icon } from "astro-icon/components";
 import { publishedWriting } from "../../lib/content";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
 
+export const prerender = false;
+
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
 const writingEntries = await publishedWriting();
 ---
 
