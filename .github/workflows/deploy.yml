@@ -3,12 +3,14 @@
 #   CLOUDFLARE_ACCOUNT_ID   - 0f856093bdcd34a7da1bde5ee4385163
 #   ADMIN_PASSWORD          - Admin UI password
 #   BUTTONDOWN_API_KEY      - Buttondown newsletter API key
+#   RESEND_API_KEY          - Resend API key for newsletter worker deployments
+#   NEWSLETTER_MAILING_ADDRESS - Physical mailing address for newsletter issue footers
 #   TYPEFULLY_API_KEY       - Typefully API key
 #   TYPEFULLY_SOCIAL_SET_ID - Typefully social set ID
 #
 # Path-filtered deploys: each deploy-X job only runs when files relevant to
 # that target actually changed. Lockfile / root package.json changes trigger
-# all four (dep updates can affect any target). Docs-only commits skip the
+# every deployed target (dep updates can affect any target). Docs-only commits skip the
 # workflow entirely via paths-ignore. No untrusted input is interpolated
 # into run: blocks anywhere in this workflow.
 
@@ -36,6 +38,7 @@ jobs:
       admin: ${{ steps.filter.outputs.admin }}
       labs: ${{ steps.filter.outputs.labs }}
       ingest: ${{ steps.filter.outputs.ingest }}
+      newsletter: ${{ steps.filter.outputs.newsletter }}
       weekly-email: ${{ steps.filter.outputs.weekly-email }}
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +67,12 @@ jobs:
               - "workers/ingest/**"
               - "package.json"
               - "pnpm-lock.yaml"
+              - ".github/workflows/deploy.yml"
+            newsletter:
+              - "workers/newsletter/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
               - ".github/workflows/deploy.yml"
             weekly-email:
               - "workers/weekly-email/**"
@@ -278,3 +287,58 @@ jobs:
           workingDirectory: workers/weekly-email
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-newsletter:
+    name: Deploy newsletter worker
+    needs: [changes, validate]
+    if: needs.changes.outputs.newsletter == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck newsletter worker
+        run: pnpm --filter @anipotts/newsletter-worker typecheck
+
+      - name: Prepare newsletter secrets
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const path = process.env.NEWSLETTER_SECRETS_FILE;
+          const secrets = {};
+          if (!process.env.RESEND_API_KEY) {
+            console.error("::error::RESEND_API_KEY GitHub secret is missing");
+            process.exit(1);
+          }
+          secrets.RESEND_API_KEY = process.env.RESEND_API_KEY;
+          if (process.env.NEWSLETTER_MAILING_ADDRESS) {
+            secrets.NEWSLETTER_MAILING_ADDRESS = process.env.NEWSLETTER_MAILING_ADDRESS;
+          } else {
+            console.warn("::warning::NEWSLETTER_MAILING_ADDRESS is missing; issue sends will fail until it is set");
+          }
+          fs.writeFileSync(path, JSON.stringify(secrets));
+          NODE
+        env:
+          NEWSLETTER_SECRETS_FILE: ${{ runner.temp }}/newsletter-secrets.json
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NEWSLETTER_MAILING_ADDRESS: ${{ secrets.NEWSLETTER_MAILING_ADDRESS }}
+
+      - name: Deploy to Cloudflare Workers
+        run: pnpm exec wrangler --cwd workers/newsletter deploy --keep-vars --secrets-file "$NEWSLETTER_SECRETS_FILE"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEWSLETTER_SECRETS_FILE: ${{ runner.temp }}/newsletter-secrets.json
