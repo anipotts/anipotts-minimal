@@ -102,30 +102,30 @@ export const homeContent = {
     {
       label: "structured ai",
       href: "https://getstructured.ai/",
-      title: "document chat for architectural drawings",
+      title: "drawing chat with page-level citations",
       detail:
-        "streamed claude and gemini over drawing sets. answers cite the source pdfs; redis streams handle replay and live spectating.",
+        "architectural PDFs in, cited answers out. streamed claude/gemini and kept redis replay for live spectating and later debugging.",
     },
     {
       label: "quantercise",
       href: "https://quantercise.com",
-      title: "quant prep with real grading paths",
+      title: "quant prep with real grading",
       detail:
-        "next.js, typescript, postgres, drizzle, stripe, and sandboxed python grading for code and math-heavy interview practice.",
+        "next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.",
     },
     {
       label: "paragon global investments",
       href: "https://paragoninvestments.org",
-      title: "research portal for an nyu quant fund",
+      title: "research portal for a quant fund",
       detail:
-        "next.js and typescript portal on supabase for surfacing fund research and making internal material usable from mobile.",
+        "next.js and typescript on supabase. made fund research searchable and usable from mobile instead of buried in scattered docs.",
     },
     {
       label: "public tooling",
       href: "/projects/claude-code-tips",
-      title: "agent-native taste, proven in public",
+      title: "tools i actually use",
       detail:
-        "claude-code-tips and imessage mcp show the operating style: local-first tools, mcp surfaces, hooks, and debuggable agent workflows.",
+        "claude-code-tips and imessage mcp are small public receipts from the same local-first workflow i run every day.",
     },
   ],
   press: {

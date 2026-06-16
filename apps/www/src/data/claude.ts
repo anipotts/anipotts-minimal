@@ -12,11 +12,11 @@ export interface MineFeature {
 export const minePlugin = {
   name: "mine",
   tagline:
-    "mines every claude code session into a local sqlite database. search, stats, cost breakdowns, error patterns.",
+    "turns local claude code logs into sqlite so sessions are searchable, comparable, and easier to debug.",
   install: "claude plugin marketplace add anipotts/claude-code-tips",
   href: MINE_REPO,
   features: [
-    { name: "/mine", desc: "7-day dashboard with projects, tools, models" },
+    { name: "/mine", desc: "7-day dashboard over projects and tool use" },
     {
       name: "/mine search",
       desc: "full-text search across all conversations",
@@ -26,7 +26,7 @@ export const minePlugin = {
     { name: "/mine loops", desc: "where you got stuck" },
     {
       name: "/mine cost",
-      desc: "cost breakdown by project, model, daily trend",
+      desc: "cost breakdown by project and model",
     },
   ] satisfies MineFeature[],
 };

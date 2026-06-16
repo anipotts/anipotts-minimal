@@ -6,7 +6,7 @@ import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
 import InlineMention from "../components/InlineMention.astro";
 import { Icon } from "astro-icon/components";
 import { homeContent } from "../data/site";
-import { featuredProjects, publishedWriting } from "../lib/content";
+import { publishedWriting, visibleProjects } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 import {
@@ -29,7 +29,23 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const thoughts = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
-const projects = await featuredProjects(work.limit ?? 4);
+const homeShippingSlugs = [
+  "quantercise-extension",
+  "saeshify",
+  "nyu-purity-test",
+  "habittracker-obh",
+] as const;
+const homeShippingOrder = new Map<string, number>(
+  homeShippingSlugs.map((slug, index) => [slug, index]),
+);
+const projects = (await visibleProjects())
+  .filter((project) => homeShippingOrder.has(project.slug))
+  .sort(
+    (a, b) =>
+      (homeShippingOrder.get(a.slug) ?? 0) -
+      (homeShippingOrder.get(b.slug) ?? 0),
+  )
+  .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 ---
 
@@ -70,7 +86,7 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         </>
       )}
     </p>
-    <div class="proof-grid" aria-label="selected engineering proof">
+    <div class="proof-grid mobile-carousel" aria-label="selected engineering proof">
       {
         homeContent.proof.map((item) => (
           <a href={item.href} class="proof-card">
@@ -90,7 +106,7 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
-    <div class="grid">
+    <div class="grid mobile-carousel">
       {projects.map((project) => <ProjectCard project={project} />)}
     </div>
   </section>}

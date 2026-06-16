@@ -395,7 +395,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     range: "Ongoing",
     tags: ["typescript", "mcp", "sqlite", "macos", "privacy"],
     summary: "local-first mcp over imessage search and stats.",
-    body: "Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as proof of agent-native tooling taste.",
+    body: "Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as a small local-first tool.",
     links: [
       { label: "source", url: "https://github.com/anipotts/imessage-mcp" },
       { label: "live site", url: "https://npmjs.com/package/imessage-mcp" },

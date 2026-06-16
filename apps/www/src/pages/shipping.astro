@@ -43,7 +43,7 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
             {quarters.map(({ quarter, projects: qProjects }) => (
               <div class="quarter-group" data-quarter-group>
                 {quarter && <h3 class="quarter mono">{quarter}</h3>}
-                <div class="grid">
+                <div class="grid mobile-carousel">
                   {qProjects.map((project) => (
                     <ProjectCard project={project} />
                   ))}

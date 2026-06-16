@@ -1,7 +1,6 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import { docs, hooks, minePlugin, MINE_REPO, TIPS_REPO } from "../data/claude";
-import { featuredProjects, projectSlug } from "../lib/content";
 import statsJson from "../data/claude-stats.json";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
@@ -41,29 +40,28 @@ const stats = statsJson as unknown as {
   records: {
     fastestCommitCadence: {
       commitsPerHour: number;
-      repo: string|null;
-      windowStart: string|null;
+      repo: string | null;
+      windowStart: string | null;
     };
     mostFilesChanged: {
       files: number;
-      project: string|null;
-      startedAt: string|null;
+      project: string | null;
+      startedAt: string | null;
     };
     longestSession: {
       durationMinutes: number;
-      project: string|null;
-      startedAt: string|null;
+      project: string | null;
+      startedAt: string | null;
     };
     mostToolCalls: {
       toolCalls: number;
-      project: string|null;
-      startedAt: string|null;
+      project: string | null;
+      startedAt: string | null;
     };
   };
   live: { isCodingNow: boolean };
 };
 
-const selectedProjects = await featuredProjects(3);
 const fmt = (n: number) => n.toLocaleString("en-US");
 const updated = new Date(stats.generatedAt).toLocaleString("en-US", {
   timeZone: stats.timezone,
@@ -77,9 +75,36 @@ const updated = new Date(stats.generatedAt).toLocaleString("en-US", {
 const heroStats = [
   { label: "sessions", value: fmt(stats.totals.sessions) },
   { label: "tool calls", value: fmt(stats.totals.toolCalls) },
-  { label: "files mutated", value: fmt(stats.totals.filesMutated) },
+  { label: "files touched", value: fmt(stats.totals.filesMutated) },
   { label: "hours used", value: fmt(stats.totals.hoursUsed) },
-  { label: "current streak", value: `${stats.totals.streakDays}d` },
+  { label: "streak", value: `${stats.totals.streakDays}d` },
+];
+
+const loop = [
+  {
+    label: "capture",
+    title: "sessions become data",
+    detail:
+      "mine turns local claude code logs into sqlite so work, cost, loops, and file hotspots are searchable later.",
+  },
+  {
+    label: "guard",
+    title: "hooks catch bad moves",
+    detail:
+      "the hook set blocks force pushes and risky shell patterns before they become cleanup work.",
+  },
+  {
+    label: "split",
+    title: "worktrees keep jobs separate",
+    detail:
+      "parallel agents can move fast when each job has its own branch, tests, and commit trail.",
+  },
+  {
+    label: "publish",
+    title: "useful pieces leave the notebook",
+    detail:
+      "when a workflow survives real repos, it becomes a small repo tool or a note someone else can inspect.",
+  },
 ];
 
 const r = stats.records;
@@ -131,17 +156,35 @@ const fmtSessionTime = (iso: string) =>
 
 <Shell
   title="orchestrating"
-  description="how ani actually uses claude code. hooks, agents, the mine plugin, real session data."
+  description="how ani runs claude code and codex with local logs, hooks, worktrees, and public tooling."
   path="/orchestrating"
   mood="alert"
 >
-  <section data-rise id="proof" class="stack">
-    <h1 class="hero-title">orchestrating claude code</h1>
-    <p class="hero-summary">
-      how i actually use it. hooks, agents, the mine plugin, real session
-      data. open source all the way down.
-    </p>
-    <div class="stat-grid">
+  <section data-rise id="proof" class="hero-shell">
+    <div class="hero-copy">
+      <span class="section-label">orchestrating</span>
+      <h1 class="hero-title">how i run agent work</h1>
+      <p class="hero-summary">
+        i use claude code and codex across real repos. local logs keep memory,
+        hooks catch bad moves, worktrees keep jobs separate, and the public
+        tools are the parts that survived daily use.
+      </p>
+      <p class="mono muted updated">
+        <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
+        {stats.live.isCodingNow ? "coding now" : "idle"}
+        <span>last updated {updated} ({stats.timezone})</span>
+      </p>
+    </div>
+    <aside class="hero-panel" aria-label="live session totals">
+      <span class="mono panel-label">last 90 days</span>
+      <span class="panel-number">{fmt(stats.totals.toolCalls)}</span>
+      <span class="panel-copy">tool calls tracked from local session logs.</span>
+    </aside>
+  </section>
+
+  <section data-rise class="stack" id="shape">
+    <h2 class="section-label">current shape</h2>
+    <div class="stat-grid mobile-carousel">
       {
         heroStats.map((s) => (
           <div class="stat">
@@ -151,16 +194,29 @@ const fmtSessionTime = (iso: string) =>
         ))
       }
     </div>
-    <p class="mono muted updated">
-      <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
-      {stats.live.isCodingNow ? "coding now" : "idle"}
-      <span>last updated {updated} ({stats.timezone})</span>
-    </p>
+  </section>
+
+  <section data-rise class="stack" id="loop">
+    <h2 class="section-label">operating loop</h2>
+    <div class="loop-grid mobile-carousel">
+      {
+        loop.map((item) => (
+          <article class="loop-card">
+            <span class="mono loop-label">{item.label}</span>
+            <h3>{item.title}</h3>
+            <p>{item.detail}</p>
+          </article>
+        ))
+      }
+    </div>
   </section>
 
   <section data-rise class="stack" id="throughput">
-    <h2 class="section-label">throughput, last 90 days</h2>
-    <div class="card chart-card">
+    <span class="split-head">
+      <h2 class="section-label">activity</h2>
+      <span class="mono muted">tool calls + file mutations</span>
+    </span>
+    <div class="chart-card">
       <div class="chart" role="img" aria-label="daily tool calls and file mutations, last 90 days">
         {
           stats.daily.map((d) => (
@@ -172,18 +228,15 @@ const fmtSessionTime = (iso: string) =>
           ))
         }
       </div>
-      <p class="mono muted chart-note">
-        tool calls + file mutations per day ({stats.timezone})
-      </p>
     </div>
   </section>
 
-  <section data-rise class="stack" id="burst-records">
-    <h2 class="section-label">burst records</h2>
-    <div class="grid-2">
+  <section data-rise class="stack" id="edges">
+    <h2 class="section-label">edges</h2>
+    <div class="grid-2 mobile-carousel">
       {
         records.map((rec) => (
-          <div class="card">
+          <div class="record-card">
             <span class="stat-label mono">{rec.label}</span>
             <span class="record-value">{rec.value}</span>
             <span class="mono muted detail">{rec.detail}</span>
@@ -193,30 +246,18 @@ const fmtSessionTime = (iso: string) =>
     </div>
   </section>
 
-  <section data-rise class="stack" id="systems">
-    <h2 class="section-label">selected systems</h2>
-    <div class="list">
-      {
-        selectedProjects.map((p) => (
-          <a href={`/projects/${projectSlug(p)}`} class="row-link">
-            <span class="row-title">{p.data.title}</span>
-            <span class="dek">{p.data.subtitle ?? p.data.description}</span>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
   <section data-rise class="stack" id="plugin">
-    <h2 class="section-label">plugin + hooks</h2>
-    <div class="card mine">
-      <span class="row-title">{minePlugin.name}</span>
-      <p class="dek">{minePlugin.tagline}</p>
-      <span class="install mono">
-        <code id="install-cmd">{minePlugin.install}</code>
-        <button id="copy-install" class="chip" type="button">copy</button>
-      </span>
-      <div class="features">
+    <h2 class="section-label">mine</h2>
+    <div class="mine-card">
+      <div class="mine-copy">
+        <span class="row-title">{minePlugin.name}</span>
+        <p class="dek">{minePlugin.tagline}</p>
+        <span class="install mono">
+          <code id="install-cmd">{minePlugin.install}</code>
+          <button id="copy-install" class="chip" type="button">copy</button>
+        </span>
+      </div>
+      <div class="features mobile-carousel">
         {
           minePlugin.features.map((f) => (
             <span class="feature">
@@ -227,10 +268,17 @@ const fmtSessionTime = (iso: string) =>
         }
       </div>
     </div>
-    <div class="grid-2">
+  </section>
+
+  <section data-rise class="stack" id="hooks">
+    <span class="split-head">
+      <h2 class="section-label">guardrails</h2>
+      <a href={TIPS_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">tips repo</a>
+    </span>
+    <div class="grid-2 mobile-carousel">
       {
         hooks.map((hook) => (
-          <a href={hook.href} class="card hook" target="_blank" rel="noopener noreferrer">
+          <a href={hook.href} class="hook-card" target="_blank" rel="noopener noreferrer">
             <span class="hook-head">
               <span class="mono hook-name">{hook.name}</span>
               <span class="pill">{hook.event}</span>
@@ -243,30 +291,19 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="playbooks">
-    <h2 class="section-label">docs + playbooks</h2>
-    <div class="grid-2">
+    <span class="split-head">
+      <h2 class="section-label">docs</h2>
+      <a href={MINE_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">mine repo</a>
+    </span>
+    <div class="grid-2 mobile-carousel">
       {
         docs.map((doc) => (
-          <a href={doc.href} class="row-link" target="_blank" rel="noopener noreferrer">
+          <a href={doc.href} class="doc-card" target="_blank" rel="noopener noreferrer">
             <span class="row-title">{doc.name}</span>
             <span class="dek">{doc.desc}</span>
           </a>
         ))
       }
-    </div>
-  </section>
-
-  <section data-rise class="stack" id="work-together">
-    <h2 class="section-label">work together</h2>
-    <div class="card">
-      <p class="pitch">
-        want this set up for your team? ping me.
-      </p>
-      <span class="links mono">
-        <a href="/connect?intent=claude-consulting" class="accent-link">claude consulting</a>
-        <a href={TIPS_REPO} class="quiet-link" target="_blank" rel="noopener noreferrer">tips repo</a>
-        <a href={MINE_REPO} class="quiet-link" target="_blank" rel="noopener noreferrer">mine plugin</a>
-      </span>
     </div>
   </section>
 
@@ -308,39 +345,31 @@ const fmtSessionTime = (iso: string) =>
     gap: var(--s-4);
   }
 
-  .hero-title {
-    margin-bottom: 0;
+  .hero-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.42fr);
+    align-items: end;
+    gap: var(--s-6);
   }
 
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
     gap: var(--s-4);
   }
 
-  .stat {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
+  .hero-title {
+    margin: 0;
   }
 
-  .stat-value {
-    font-family: var(--sans);
-    font-size: var(--d-section);
-    line-height: 1;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .stat-label {
-    font-size: 0.8rem;
-    color: var(--ink-muted);
-    letter-spacing: 0.08em;
+  .hero-summary {
+    max-width: 48rem;
   }
 
   .updated {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--s-3);
     font-size: 0.8rem;
     margin: 0;
@@ -363,6 +392,7 @@ const fmtSessionTime = (iso: string) =>
     .pulse {
       animation: pulse 1.6s ease-in-out infinite;
     }
+
     @keyframes pulse {
       50% {
         opacity: 0.35;
@@ -370,23 +400,136 @@ const fmtSessionTime = (iso: string) =>
     }
   }
 
-  .chart-card {
+  .hero-panel {
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: var(--s-4);
+    background:
+      linear-gradient(180deg, var(--accent-soft), transparent 72%),
+      var(--surface);
+  }
+
+  .panel-label {
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .panel-number {
+    display: block;
+    color: var(--accent);
+    font-size: clamp(2.6rem, 7vw, 4.8rem);
+    line-height: 0.92;
+    margin-block: var(--s-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .panel-copy {
+    display: block;
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    line-height: 1.45;
+  }
+
+  .split-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  .stat,
+  .record-card,
+  .loop-card,
+  .hook-card,
+  .doc-card {
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: var(--s-4);
+    background: var(--surface);
+  }
+
+  .stat {
     display: flex;
     flex-direction: column;
+    gap: var(--s-1);
+    min-height: 8rem;
+    justify-content: end;
+  }
+
+  .stat-value {
+    font-family: var(--sans);
+    font-size: var(--d-section);
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .loop-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--s-3);
+  }
+
+  .loop-card {
+    display: flex;
+    min-height: 16rem;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+
+  .loop-card h3 {
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+  }
+
+  .loop-card p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    line-height: 1.5;
+  }
+
+  .loop-label {
+    color: var(--accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .chart-card {
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: var(--s-4);
+    background: var(--surface);
+    overflow: hidden;
   }
 
   .chart {
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    height: 9rem;
+    height: clamp(9rem, 24vw, 14rem);
+    overflow: hidden;
   }
 
   .bar {
     flex: 1;
     background: var(--accent);
-    opacity: 0.75;
+    opacity: 0.68;
     border-radius: 2px 2px 0 0;
     min-width: 2px;
   }
@@ -395,15 +538,10 @@ const fmtSessionTime = (iso: string) =>
     opacity: 1;
   }
 
-  .chart-note {
-    margin: 0;
-    font-size: 0.8rem;
-  }
-
   .grid-2 {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
-    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+    gap: var(--s-3);
   }
 
   .record-value {
@@ -411,17 +549,34 @@ const fmtSessionTime = (iso: string) =>
     font-size: var(--p-h2);
     color: var(--accent);
     display: block;
-    margin-block: var(--s-1);
+    margin-block: var(--s-2);
   }
 
   .detail {
     font-size: 0.8rem;
   }
 
-  .list {
+  .mine-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: var(--s-4);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: var(--s-4);
+    background: var(--surface);
+  }
+
+  .mine-copy {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
+  }
+
+  .row-title {
+    font-family: var(--sans);
+    font-size: var(--p-h3);
+    font-weight: 500;
+    transition: color 0.2s;
   }
 
   .dek {
@@ -431,20 +586,15 @@ const fmtSessionTime = (iso: string) =>
     max-width: var(--measure);
   }
 
-  .mine {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-
-  .mine .dek {
+  .mine .dek,
+  .mine-copy .dek {
     margin: 0;
   }
 
   .install {
     display: flex;
     align-items: center;
-    gap: var(--s-3);
+    gap: var(--s-2);
     flex-wrap: wrap;
     font-size: 0.85rem;
   }
@@ -457,13 +607,20 @@ const fmtSessionTime = (iso: string) =>
 
   .features {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
-    gap: var(--s-2) var(--s-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
+    gap: var(--s-2);
   }
 
   .feature {
     display: flex;
+    min-height: 7rem;
     flex-direction: column;
+    justify-content: space-between;
+    gap: var(--s-2);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: var(--s-3);
+    background: var(--bg);
   }
 
   .feature-name {
@@ -475,16 +632,27 @@ const fmtSessionTime = (iso: string) =>
     font-size: 0.8rem;
   }
 
-  .hook {
-    text-decoration: none;
+  .hook-card,
+  .doc-card {
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
-    transition: background 0.2s;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 160ms ease,
+      transform 160ms ease;
   }
 
-  .hook:hover {
-    background: var(--accent-soft);
+  .hook-card:hover,
+  .doc-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .hook-card:hover .hook-name,
+  .doc-card:hover .row-title {
+    color: var(--accent);
   }
 
   .hook-head {
@@ -495,24 +663,56 @@ const fmtSessionTime = (iso: string) =>
   }
 
   .hook-name {
-    color: var(--accent);
+    color: var(--ink);
     font-size: 0.9rem;
-  }
-
-  .pitch {
-    margin: 0 0 var(--s-3);
-    max-width: var(--measure);
-  }
-
-  .links {
-    display: flex;
-    gap: var(--s-4);
-    flex-wrap: wrap;
-    font-size: 0.9rem;
+    transition: color 0.2s;
   }
 
   .table-wrap {
     overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero-shell,
+    .mine-card {
+      grid-template-columns: 1fr;
+    }
+
+    .stat-grid,
+    .loop-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .hero-shell {
+      gap: var(--s-4);
+    }
+
+    .hero-panel {
+      padding: var(--s-3);
+    }
+
+    .stat,
+    .record-card,
+    .loop-card,
+    .hook-card,
+    .doc-card {
+      min-height: 11rem;
+    }
+
+    .features.mobile-carousel {
+      grid-auto-columns: minmax(13rem, 70vw);
+      margin-inline: calc(-1 * var(--s-3));
+    }
+
+    .split-head {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--s-1);
+    }
   }
 </style>
 
