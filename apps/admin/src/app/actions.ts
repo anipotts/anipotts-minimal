@@ -43,10 +43,21 @@ import {
   listSubscribers as buttondownListSubscribers,
 } from "./lib/buttondown";
 import {
+  normalizeCmsProject,
+  normalizeCmsWriting,
   normalizeHomepageContent,
+  normalizeNewsletterContent,
+  validateCmsProject,
+  validateCmsWriting,
   validateHomepageContent,
+  validateNewsletterContent,
 } from "@anipotts/lib/cms";
-import type { HomepageContent } from "@anipotts/types";
+import type {
+  CmsProjectContent,
+  CmsWritingContent,
+  HomepageContent,
+  NewsletterContent,
+} from "@anipotts/types";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -276,11 +287,13 @@ export async function logout() {
 
 // ── Site Copy ──
 
-export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
-  const content = normalizeHomepageContent(draft);
-  const validation = validateHomepageContent(content);
-  if (!validation.ok) return { error: validation.error ?? "Invalid homepage" };
-
+async function savePageContent<T>(
+  pageKey: string,
+  content: T,
+): Promise<
+  | { success: true; updatedAt: string; version: number; content: T }
+  | { error: string }
+> {
   const db = getDB();
   if (!db) return { error: "Database not configured" };
 
@@ -294,7 +307,7 @@ export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
          ORDER BY version DESC
          LIMIT 1`,
       )
-      .bind("home")
+      .bind(pageKey)
       .first<{ id: string; version: number | null }>();
 
     const id = existing?.id ?? uuid();
@@ -317,7 +330,7 @@ export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
            (id, page_key, content, version, published, updated_at, updated_by, created_at, version_history)
            VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)`,
         )
-        .bind(id, "home", contentJson, version, ts, "admin", ts, "[]")
+        .bind(id, pageKey, contentJson, version, ts, "admin", ts, "[]")
         .run();
     }
 
@@ -325,12 +338,219 @@ export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
       .prepare(
         "UPDATE page_content SET published = 0 WHERE page_key = ? AND id <> ?",
       )
-      .bind("home", id)
+      .bind(pageKey, id)
       .run();
 
-    revalidatePath("/");
-
     return { success: true, updatedAt: ts, version, content };
+  } catch (error) {
+    return { error: `D1 save failed: ${String(error)}` };
+  }
+}
+
+export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
+  const content = normalizeHomepageContent(draft);
+  const validation = validateHomepageContent(content);
+  if (!validation.ok) return { error: validation.error ?? "Invalid homepage" };
+
+  const result = await savePageContent("home", content);
+  if ("error" in result) return result;
+  revalidatePath("/");
+  return result;
+});
+
+export const saveNewsletterContent = withAuth(
+  async (draft: NewsletterContent) => {
+    const content = normalizeNewsletterContent(draft);
+    const validation = validateNewsletterContent(content);
+    if (!validation.ok)
+      return { error: validation.error ?? "Invalid newsletter" };
+
+    const result = await savePageContent("newsletter", content);
+    if ("error" in result) return result;
+    revalidatePath("/");
+    return result;
+  },
+);
+
+export const saveProjectContent = withAuth(async (draft: CmsProjectContent) => {
+  const project = normalizeCmsProject(draft);
+  const validation = validateCmsProject(project);
+  if (!validation.ok) return { error: validation.error ?? "Invalid project" };
+
+  const db = getDB();
+  if (!db) return { error: "Database not configured" };
+  const ts = now();
+  try {
+    const id = project.id || uuid();
+    const liveLink = project.links.find((link) =>
+      ["live", "live site", "site"].includes(link.label.toLowerCase()),
+    );
+    const repoLink = project.links.find((link) =>
+      ["source", "repo", "github"].includes(link.label.toLowerCase()),
+    );
+    const pageLink = project.links.find(
+      (link) => link !== liveLink && link !== repoLink,
+    );
+    const existing = project.id
+      ? await db
+          .prepare("SELECT id FROM projects WHERE id = ?")
+          .bind(project.id)
+          .first<{ id: string }>()
+      : await db
+          .prepare("SELECT id FROM projects WHERE slug = ?")
+          .bind(project.slug)
+          .first<{ id: string }>();
+
+    if (existing) {
+      await db
+        .prepare(
+          `UPDATE projects
+           SET slug = ?, title = ?, subtitle = ?, description = ?, year = ?,
+               category = COALESCE(category, 'other'), role = COALESCE(role, ''),
+               duration = ?, tags = ?, status = ?, featured = ?, link_live = ?,
+               link_repo = ?, link_page = ?, sort_order = ?, visible = ?,
+               updated_at = ?
+           WHERE id = ?`,
+        )
+        .bind(
+          project.slug,
+          project.title,
+          project.summary,
+          project.body,
+          project.year,
+          project.range,
+          toJsonArray(project.tags),
+          project.status,
+          project.featured ? 1 : 0,
+          liveLink?.url ?? null,
+          repoLink?.url ?? null,
+          pageLink?.url ?? null,
+          project.order,
+          project.visible ? 1 : 0,
+          ts,
+          existing.id,
+        )
+        .run();
+    } else {
+      await db
+        .prepare(
+          `INSERT INTO projects
+           (id, slug, title, subtitle, description, year, category, role,
+            duration, tags, status, featured, link_live, link_repo, link_page,
+            sort_order, visible, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, 'other', '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(
+          id,
+          project.slug,
+          project.title,
+          project.summary,
+          project.body,
+          project.year,
+          project.range,
+          toJsonArray(project.tags),
+          project.status,
+          project.featured ? 1 : 0,
+          liveLink?.url ?? null,
+          repoLink?.url ?? null,
+          pageLink?.url ?? null,
+          project.order,
+          project.visible ? 1 : 0,
+          ts,
+          ts,
+        )
+        .run();
+    }
+
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath("/shipping");
+    return {
+      success: true,
+      project: { ...project, id: existing?.id ?? id, updated_at: ts },
+    };
+  } catch (error) {
+    return { error: `D1 save failed: ${String(error)}` };
+  }
+});
+
+export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
+  const writing = normalizeCmsWriting(draft);
+  const validation = validateCmsWriting(writing);
+  if (!validation.ok) return { error: validation.error ?? "Invalid writing" };
+
+  const db = getDB();
+  if (!db) return { error: "Database not configured" };
+  const ts = now();
+  try {
+    const id = writing.id || uuid();
+    const source = writing.sourceLinks[0];
+    const existing = writing.id
+      ? await db
+          .prepare("SELECT id FROM thoughts WHERE id = ?")
+          .bind(writing.id)
+          .first<{ id: string }>()
+      : await db
+          .prepare("SELECT id FROM thoughts WHERE slug = ?")
+          .bind(writing.slug)
+          .first<{ id: string }>();
+
+    if (existing) {
+      await db
+        .prepare(
+          `UPDATE thoughts
+           SET slug = ?, title = ?, summary = ?, content = ?, tags = ?,
+               published = ?, status = ?, published_at = ?, artifact_url = ?,
+               artifact_type = ?, updated_at = ?
+           WHERE id = ?`,
+        )
+        .bind(
+          writing.slug,
+          writing.title,
+          writing.preview,
+          writing.body,
+          toJsonArray(writing.tags),
+          writing.visible ? 1 : 0,
+          writing.visible ? "published" : "draft",
+          writing.visible ? writing.date : null,
+          source?.url ?? null,
+          source?.label ?? null,
+          ts,
+          existing.id,
+        )
+        .run();
+    } else {
+      await db
+        .prepare(
+          `INSERT INTO thoughts
+           (id, slug, title, summary, content, tags, created_at, updated_at,
+            published, status, published_at, views, artifact_url, artifact_type)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+        )
+        .bind(
+          id,
+          writing.slug,
+          writing.title,
+          writing.preview,
+          writing.body,
+          toJsonArray(writing.tags),
+          ts,
+          ts,
+          writing.visible ? 1 : 0,
+          writing.visible ? "published" : "draft",
+          writing.visible ? writing.date : null,
+          source?.url ?? null,
+          source?.label ?? null,
+        )
+        .run();
+    }
+
+    revalidatePath("/");
+    revalidatePath("/writing");
+    return {
+      success: true,
+      writing: { ...writing, id: existing?.id ?? id, updated_at: ts },
+    };
   } catch (error) {
     return { error: `D1 save failed: ${String(error)}` };
   }

@@ -12,7 +12,9 @@
     "deploy:preview": "wrangler deploy"
   },
   "dependencies": {
+    "@anipotts/lib": "workspace:*",
     "@anipotts/styles": "workspace:*",
+    "@anipotts/types": "workspace:*",
     "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/rss": "^4.0.12",
     "@fontsource-variable/instrument-sans": "^5.2.8",

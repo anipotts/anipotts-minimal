@@ -7,8 +7,7 @@ import {
   getMercurySnapshot,
 } from "@anipotts/lib/money";
 import { getEnv } from "@anipotts/lib/env";
-import { fetchPageContent, normalizeHomepageContent } from "@anipotts/lib/cms";
-import type { HomepageContent } from "@anipotts/types";
+import { fetchCmsEditorSnapshot } from "@anipotts/lib/cms";
 import {
   getMiniHealth,
   getMiniRudy,
@@ -17,6 +16,7 @@ import {
 } from "@anipotts/lib/mini";
 import LiveDashboard from "./live-dashboard";
 import HomeCopyEditor from "./home-copy-editor";
+import SiteContentEditor from "./site-content-editor";
 
 export const dynamic = "force-dynamic";
 
@@ -57,15 +57,23 @@ function PanelSkeleton({ title }: { title: string }) {
 }
 
 async function SiteCopyPanel() {
-  const page = await fetchPageContent<HomepageContent>("home");
+  const snapshot = await fetchCmsEditorSnapshot();
 
   return (
-    <HomeCopyEditor
-      content={normalizeHomepageContent(page?.content)}
-      source={page ? "cms" : "fallback"}
-      updatedAt={page?.updated_at ?? null}
-      version={page?.version ?? null}
-    />
+    <div className="space-y-4">
+      <HomeCopyEditor
+        content={snapshot.homepage}
+        source={snapshot.homepageMeta.source === "cms" ? "cms" : "fallback"}
+        updatedAt={snapshot.homepageMeta.updated_at}
+        version={snapshot.homepageMeta.version}
+      />
+      <SiteContentEditor
+        projects={snapshot.projects}
+        writing={snapshot.writing}
+        newsletter={snapshot.newsletter}
+        newsletterMeta={snapshot.newsletterMeta}
+      />
+    </div>
   );
 }
 

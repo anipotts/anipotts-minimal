@@ -7,9 +7,30 @@ import InlineMention from "../components/InlineMention.astro";
 import { Icon } from "astro-icon/components";
 import { homeContent } from "../data/site";
 import { featuredProjects, publishedWriting } from "../lib/content";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
+import {
+  fetchPageContent,
+  normalizeHomepageContent,
+  normalizeNewsletterContent,
+} from "@anipotts/lib/cms";
 
-const projects = await featuredProjects(4);
-const writingEntries = (await publishedWriting()).slice(0, 3);
+export const prerender = false;
+
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+const [homePage, newsletterPage] = await Promise.all([
+  fetchPageContent("home"),
+  fetchPageContent("newsletter"),
+]);
+const cmsHome = normalizeHomepageContent(homePage?.content);
+const newsletterCopy = normalizeNewsletterContent(newsletterPage?.content);
+const hasCmsHome = Boolean(homePage);
+const intro = cmsHome.sections.intro;
+const work = cmsHome.sections.past_work;
+const thoughts = cmsHome.sections.latest_thoughts;
+const heading = hasCmsHome ? intro.heading : homeContent.heading;
+const projects = await featuredProjects(work.limit ?? 4);
+const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 ---
 
 <Shell
@@ -19,29 +40,35 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
 >
   <section data-rise>
     <h1 class="home-hero">
-      {homeContent.heading}<span class="spark">.</span>
+      {heading}<span class="spark">.</span>
     </h1>
     <p class="hero-summary hero-line">
-      <span>
-        i build realtime agent workflows where state, tools, citations, and
-        debugging have to hold up in production.
-      </span>
-      <span>proof from</span>
-      <InlineMention {...homeContent.mentions.structuredAi} />
-      <span>,</span>
-      <a href="https://quantercise.com" class="text-link">quantercise</a>
-      <span>,</span>
-      <a href="https://paragoninvestments.org" class="text-link">pgi</a>
-      <span>, and public tools like</span>
-      <a href="/projects/claude-code-tips" class="text-link"
-        >claude-code-tips</a
-      >
-      <span>plus</span>
-      <a href="/projects/imessage-mcp" class="text-link">imessage mcp</a>
-      <span class="no-break">
-        (as featured on
-        <InlineMention {...homeContent.mentions.businessInsider} />).
-      </span>
+      {hasCmsHome ? (
+        intro.subheading ?? homeContent.summary
+      ) : (
+        <>
+          <span>
+            i build realtime agent workflows where state, tools, citations, and
+            debugging have to hold up in production.
+          </span>
+          <span>proof from</span>
+          <InlineMention {...homeContent.mentions.structuredAi} />
+          <span>,</span>
+          <a href="https://quantercise.com" class="text-link">quantercise</a>
+          <span>,</span>
+          <a href="https://paragoninvestments.org" class="text-link">pgi</a>
+          <span>, and public tools like</span>
+          <a href="/projects/claude-code-tips" class="text-link"
+            >claude-code-tips</a
+          >
+          <span>plus</span>
+          <a href="/projects/imessage-mcp" class="text-link">imessage mcp</a>
+          <span class="no-break">
+            (as featured on{" "}
+            <InlineMention {...homeContent.mentions.businessInsider} />).
+          </span>
+        </>
+      )}
     </p>
     <div class="proof-grid" aria-label="selected engineering proof">
       {
@@ -56,32 +83,37 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
     </div>
   </section>
 
-  <section data-rise class="stack">
+  {work.visible && <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">shipping</h2>
-      <a href="/shipping" class="quiet-link mono view-all"
-        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      <h2 class="section-label">{work.label}</h2>
+      <a href={work.view_all ?? "/shipping"} class="quiet-link mono view-all"
+        >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
     <div class="grid">
       {projects.map((project) => <ProjectCard project={project} />)}
     </div>
-  </section>
+  </section>}
 
-  <section data-rise class="stack">
+  {thoughts.visible && <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">writing</h2>
-      <a href="/writing" class="quiet-link mono view-all"
-        >view all<Icon name="ph:arrow-bend-right-up" /></a
+      <h2 class="section-label">{thoughts.label}</h2>
+      <a href={thoughts.view_all ?? "/writing"} class="quiet-link mono view-all"
+        >{thoughts.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
     <div class="list">
       {writingEntries.map((item) => <WritingRow item={item} />)}
     </div>
-  </section>
+  </section>}
 
   <section data-rise>
-    <NewsletterSubscribe />
+    <NewsletterSubscribe
+      lede={newsletterCopy.deck}
+      href={newsletterCopy.buttondown_url}
+      ctaLabel={newsletterCopy.cta_label}
+      footerText={newsletterCopy.footer_text}
+    />
   </section>
 </Shell>
 

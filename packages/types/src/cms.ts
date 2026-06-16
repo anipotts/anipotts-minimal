@@ -41,6 +41,74 @@ export interface HomepageContent {
 }
 
 // ---------------------------------------------------------------------------
+// Owner editor schemas
+// ---------------------------------------------------------------------------
+
+export interface CmsEditorMeta {
+  source: "cms" | "d1" | "fallback";
+  updated_at: string | null;
+  version: number | null;
+}
+
+export interface CmsEditorLink {
+  label: string;
+  url: string;
+}
+
+export interface CmsProjectContent {
+  id?: string;
+  slug: string;
+  title: string;
+  status: "live" | "wip" | "archived";
+  year: string;
+  range: string;
+  tags: string[];
+  summary: string;
+  body: string;
+  links: CmsEditorLink[];
+  featured: boolean;
+  order: number;
+  visible: boolean;
+  updated_at?: string | null;
+}
+
+export interface CmsWritingContent {
+  id?: string;
+  slug: string;
+  title: string;
+  date: string;
+  tags: string[];
+  preview: string;
+  body: string;
+  sourceLinks: CmsEditorLink[];
+  visible: boolean;
+  order: number;
+  updated_at?: string | null;
+}
+
+export interface NewsletterContent {
+  headline: string;
+  deck: string;
+  cta_label: string;
+  success_message: string;
+  error_message: string;
+  footer_text: string;
+  buttondown_url: string;
+  sender_name: string;
+  sender_email: string;
+  reply_to: string;
+}
+
+export interface CmsEditorSnapshot {
+  homepage: HomepageContent;
+  homepageMeta: CmsEditorMeta;
+  projects: CmsProjectContent[];
+  writing: CmsWritingContent[];
+  newsletter: NewsletterContent;
+  newsletterMeta: CmsEditorMeta;
+}
+
+// ---------------------------------------------------------------------------
 // Footer content schema
 // ---------------------------------------------------------------------------
 
