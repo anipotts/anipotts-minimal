@@ -19,10 +19,13 @@ git worktree add ../anipotts-v1 v1-nextjs-monorepo   # full browsable checkout
 - admin: solidstart (`apps/admin-solid`) in progress. the legacy next admin (`apps/admin`)
   still serves admin.anipotts.com until the solid admin replaces it.
 - content is markdown-in-repo (`apps/www/src/content`) synced to d1. email via resend.
-- landed on `main`: PR #50, merge commit `773f18d`, 2026-06-15.
-- live: https://anipotts.com. note the apex worker route was cut over out-of-band; the
-  in-repo `apps/www/wrangler.toml` is still the preview worker (`anipotts-www-astro`,
-  workers_dev only) pending the supervised in-repo apex cutover.
+- landed on `main`: PR #50 (merge `773f18d`) plus the production cutover commit
+  `85a07b5` ("ship astro production cutover", the live homepage + apex bind), both
+  2026-06-15. that cutover commit was stranded unpushed in a local worktree; it is also
+  preserved on branch `safety/astro-production-cutover-2026-06-15`.
+- live: https://anipotts.com. `apps/www/wrangler.toml` now binds the apex + staging
+  custom domains (worker `anipotts-www-astro`). the Deploy github workflow is currently
+  disabled; re-enable it to arm CI deploys.
 
 ### v1 — next.js 16 turborepo (dec 2025 to jun 2026)
 

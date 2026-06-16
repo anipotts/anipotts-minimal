@@ -1,7 +1,8 @@
-# PREVIEW worker for the astro rebuild.
-# Production now serves the astro rebuild after the supervised cutover.
-# The previous production worker and page snapshot are preserved at:
-# /Users/anipotts/Infra/archives/anipotts-com/20260616T012737Z-pre-astro-cutover
+# Production worker for the astro public site. Serves the apex (anipotts.com) and
+# staging.anipotts.com after the supervised cutover from the old Next.js worker.
+# The pre-astro site is preserved at git tag v1-nextjs-monorepo plus the filesystem
+# snapshot under ~/Archive; see archives/README.md. (A prior comment pointed at
+# ~/Infra/archives/anipotts-com/... which does not exist on disk.)
 name = "anipotts-www-astro"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
