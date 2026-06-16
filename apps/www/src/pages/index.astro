@@ -3,6 +3,7 @@ import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import WritingRow from "../components/WritingRow.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
+import InlineMention from "../components/InlineMention.astro";
 import { Icon } from "astro-icon/components";
 import { homeContent } from "../data/site";
 import { featuredProjects, publishedWriting } from "../lib/content";
@@ -13,22 +14,32 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
 
 <Shell
   title="ani potts"
-  description="ani potts. what i'm building, writing, and running. mostly with claude code."
+  description={homeContent.summary}
   path="/"
 >
   <section data-rise>
     <h1 class="home-hero">
       {homeContent.heading}<span class="spark">.</span>
     </h1>
-    <p class="hero-summary">{homeContent.summary}</p>
-    <a
-      href={homeContent.press.href}
-      class="press"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Icon name="ph:arrow-bend-right-up" /> {homeContent.press.label}
-    </a>
+    <p class="hero-summary hero-line">
+      <span>previously built ai agents at</span>
+      <InlineMention {...homeContent.mentions.structuredAi} />
+      <span>and</span>
+      <InlineMention {...homeContent.mentions.badHabit} />
+      <span class="no-break">
+        , an
+        <InlineMention {...homeContent.mentions.atlanticRecords} />
+        venture.
+      </span>
+      <span>
+        every now and then i post about what i'm doing with claude code and
+        codex
+      </span>
+      <span class="no-break">
+        (as featured on
+        <InlineMention {...homeContent.mentions.businessInsider} />).
+      </span>
+    </p>
   </section>
 
   <section data-rise class="stack">
@@ -73,22 +84,19 @@ const writingEntries = (await publishedWriting()).slice(0, 3);
     color: var(--accent);
   }
 
-  .press {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    margin-top: var(--s-3);
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.02em;
-    color: var(--ink-muted);
-    text-decoration: none;
-    transition: color 0.2s;
-    min-height: 44px;
+  .hero-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.35em;
+    max-width: none;
   }
 
-  .press:hover {
-    color: var(--accent);
+  .no-break {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0 0.35em;
+    white-space: nowrap;
   }
 
   .stack {

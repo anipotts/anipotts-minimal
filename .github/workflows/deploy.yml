@@ -125,18 +125,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build www
+      - name: Build www (Astro)
         run: pnpm turbo build --filter=@anipotts/www
         env:
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
-          TYPEFULLY_API_KEY: ${{ secrets.TYPEFULLY_API_KEY }}
-          TYPEFULLY_SOCIAL_SET_ID: ${{ secrets.TYPEFULLY_SOCIAL_SET_ID }}
+          # Astro's static build bakes PUBLIC_* vars at build time. Add these as
+          # GitHub Actions secrets to enable analytics + the connect-form turnstile.
+          # Absent = those features no-op and the build still succeeds.
+          PUBLIC_POSTHOG_KEY: ${{ secrets.PUBLIC_POSTHOG_KEY }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
 
-      - name: Build for Cloudflare
-        run: npx opennextjs-cloudflare build
-        working-directory: apps/www
-
+      # apps/www is Astro (@astrojs/cloudflare). `astro build` already emits the
+      # worker bundle at dist/_worker.js; no opennextjs adapter step here.
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:

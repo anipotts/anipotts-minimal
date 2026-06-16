@@ -1,0 +1,139 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  label: string;
+  href?: string;
+  icon?: string;
+  mark?: string;
+  logoSrc?: string;
+  logoAlt?: string;
+  logoTone?: "native" | "white";
+  logoShape?: "square" | "wide" | "mark";
+  badgeSrc?: string;
+  badgeAlt?: string;
+}
+
+const {
+  label,
+  href,
+  icon,
+  mark,
+  logoSrc,
+  logoAlt,
+  logoTone,
+  logoShape,
+  badgeSrc,
+  badgeAlt,
+} = Astro.props;
+const Tag = href ? "a" : "span";
+const logoClass = [
+  "logo",
+  logoTone === "white" ? "logo-white" : "",
+  logoShape === "wide" ? "logo-wide" : "",
+  logoShape === "mark" ? "logo-mark" : "",
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<Tag
+  href={href}
+  class="inline-mention"
+  target={href ? "_blank" : undefined}
+  rel={href ? "noopener noreferrer" : undefined}
+  aria-label={label}
+>
+  {
+    logoSrc && (
+      <img
+        src={logoSrc}
+        alt={logoAlt ?? ""}
+        class={logoClass}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+  {icon && <Icon name={icon} />}
+  {mark && <span class="mark" aria-hidden="true">{mark}</span>}
+  <span class="text">{label}</span>
+  {
+    badgeSrc && (
+      <img
+        src={badgeSrc}
+        alt={badgeAlt ?? ""}
+        class="logo badge"
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+</Tag>
+
+<style>
+  .inline-mention {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.26em;
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: baseline;
+  }
+
+  a.inline-mention {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.18em;
+  }
+
+  a.inline-mention:hover {
+    color: var(--accent);
+  }
+
+  .inline-mention svg {
+    width: 0.95em;
+    height: 0.95em;
+    transform: translateY(0.1em);
+  }
+
+  .logo {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 0.18em;
+    object-fit: contain;
+    transform: translateY(0.02em);
+  }
+
+  .logo-wide {
+    width: 1.28em;
+  }
+
+  .logo-mark {
+    width: 1.52em;
+  }
+
+  .logo-white {
+    filter: brightness(0) invert(1);
+  }
+
+  .badge {
+    margin-left: -0.08em;
+  }
+
+  a.inline-mention:hover .logo {
+    opacity: 0.86;
+  }
+
+  .mark {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.72em;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+</style>

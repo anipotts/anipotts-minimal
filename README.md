@@ -1,85 +1,58 @@
 # anipotts.com
 
-Monorepo for `anipotts.com`.
+Monorepo for anipotts.com and its admin + labs surfaces.
 
 ## Stack
 
-- Next.js App Router (`apps/www`)
-- Shared UI/styles/types packages (`packages/*`)
-- Git-first content (local markdown + typed content modules)
+- Public site: Astro 5 (`apps/www`) on `@astrojs/cloudflare`, static output, served via Cloudflare Workers.
+- Legacy admin (`apps/admin`, Next.js) being replaced by `apps/admin-solid` (SolidStart).
+- `apps/labs` (Next.js), Cloudflare Workers under `workers/*`, shared `packages/*`.
+- Git-first content: markdown collections under `apps/www/src/content`, synced to Cloudflare D1.
 
-## Quick Start
+## Quick start
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev          # all apps
+pnpm dev:www      # just the astro site (astro defaults to http://localhost:4321)
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-## Key Commands
+## Key commands
 
 ```bash
 pnpm build
 pnpm test
+pnpm validate     # build + lint + typecheck + test
 pnpm github:audit
-pnpm demo:capture anipotts-home
-pnpm demo:capture:all
 ```
 
-## Content Model
+## Content model
 
-- Thoughts markdown: `apps/www/content/thoughts/*.md`
-- Shared content outputs: `content/work/*`
-- Project/thought templates: `content/templates/*`
+- Astro www collections: `apps/www/src/content/{projects,running,writing}` (schema in `apps/www/src/content.config.ts`).
+- Synced to Cloudflare D1 (`anipotts-db`) for full-text search.
 
-## Route Map
+## Route map (astro www)
 
-- `/`
-- `/work`
-- `/projects/[slug]`
-- `/thoughts`
-- `/thoughts/[slug]`
-- `/claude`
-- `/connect`
-- `/dev` -> permanent redirect to `/claude`
+- `/`, `/writing`, `/writing/[slug]`
+- `/shipping`
+- `/running`, `/running/weekly/[slug]`, `/running/experiments/[slug]`
+- `/projects`, `/projects/[slug]`
+- `/orchestrating` (formerly `/claude`), `/connect`
+- legacy paths (`/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) redirect via `apps/www/src/middleware.ts`
 
-## Scripts
+## Claude stats
 
-- GitHub scoring audit: `scripts/github/audit-public-repos.mjs`
-- Demo capture pipeline: `scripts/demos/capture-project-demo.mjs`
-- Claude stats refresh: `pnpm update-claude-stats`
-- Claude stats refresh + commit: `pnpm update-claude-stats:commit`
-
-## Claude Leaderboard Stats
-
-The `/claude` page reads a generated JSON snapshot at:
-`apps/www/src/app/(main)/claude/claude-stats.json`.
-
-Manual refresh:
+The `/orchestrating` page reads a generated snapshot at `apps/www/src/data/claude-stats.json`.
 
 ```bash
-pnpm update-claude-stats
-```
-
-Daily scheduled refresh (macOS launchd, runs at 6:00 AM local time):
-
-```bash
-launchctl bootstrap gui/$UID /Users/anipotts/Code/active/websites/anipotts.com/scripts/claude/launchd/com.anipotts.claude-stats.plist
-```
-
-Disable the schedule:
-
-```bash
-launchctl bootout gui/$UID /Users/anipotts/Code/active/websites/anipotts.com/scripts/claude/launchd/com.anipotts.claude-stats.plist
-```
-
-Codex automation (daily auto-commit):
-
-```bash
-pnpm update-claude-stats:commit
+pnpm update-claude-stats          # regenerate
+pnpm update-claude-stats:commit   # regenerate + commit
 ```
 
 ## Environment
 
-Only set env vars for features you use (contact email, captcha, analytics, etc.).
+The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`, `PUBLIC_TURNSTILE_SITE_KEY`). Only set env for features you use.
+
+## Archives
+
+Site version history and how to reach the pre-astro code: see [`archives/README.md`](archives/README.md).

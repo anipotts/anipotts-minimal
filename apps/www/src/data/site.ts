@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "ani potts. what i'm building, writing, and running. mostly with claude code.",
+  bio: "ani potts. previously built ai agents at structured ai and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -96,9 +96,39 @@ export const socialLinks: SocialLink[] = [
 
 export const homeContent = {
   heading: "hi, i'm ani",
-  summary: "what i'm building, writing, and running. mostly with claude code.",
+  summary:
+    "previously built ai agents at structured ai and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
   press: {
     href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
-    label: "business insider, 2026",
+    label: "business insider",
+  },
+  mentions: {
+    structuredAi: {
+      label: "structured ai",
+      href: "https://getstructured.ai/",
+      logoSrc: "/images/brand/structured-ai-favicon.png",
+      logoAlt: "structured ai",
+      logoTone: "white",
+      badgeSrc: "/images/brand/ycombinator-favicon.ico",
+      badgeAlt: "y combinator",
+    },
+    badHabit: {
+      label: "our bad habit",
+      href: "https://ourbadhabit.com/",
+      logoSrc: "/images/brand/bad-habit-favicon.png",
+      logoAlt: "our bad habit",
+    },
+    atlanticRecords: {
+      label: "atlantic records",
+      href: "https://www.atlanticrecords.com/",
+      logoSrc: "/images/brand/atlantic-records-wikipedia.svg",
+      logoAlt: "atlantic records",
+    },
+    businessInsider: {
+      label: "business insider",
+      href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
+      logoSrc: "/images/brand/business-insider-favicon.svg",
+      logoAlt: "business insider",
+    },
   },
 } as const;
