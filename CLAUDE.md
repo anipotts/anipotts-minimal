@@ -18,23 +18,28 @@ pnpm update-claude-stats                    # Regenerate /claude stats from sess
 ## Architecture
 
 ```
-apps/www/              Public site (anipotts.com) -> CF Worker
-apps/admin/            Admin dashboard (admin.anipotts.com) -> CF Worker, CF Access protected
+apps/www/              Public site (anipotts.com) -> Astro 5 static (@astrojs/cloudflare), Cloudflare Workers
+apps/admin/            Legacy admin (admin.anipotts.com) -> Next.js on CF Worker, CF Access. Being replaced by apps/admin-solid.
+apps/admin-solid/      New admin -> SolidStart (in progress, phase 2)
+apps/labs/             labs.anipotts.com -> Next.js on CF Worker
 workers/ingest/        YAML sync + hourly rollups -> CF Worker (API key auth)
+workers/state/         Personal-cloud state + CodeStats DO -> CF Worker (api.anipotts.com)
 workers/weekly-email/  Sunday 9am newsletter -> CF Worker (cron trigger)
 packages/lib/          Shared D1 client (Drizzle ORM), env helper, query modules:
                          money/ (Mercury), code/ (GitHub, CF, npm), ops/, mini/ (REST + SSE),
                          analytics/, cms/, admin/, validation/, status/
-packages/types/        TypeScript interfaces
-packages/ui/           Shared React components (Stagger, FadeIn, ExpandableNav)
-content/thoughts/      Blog posts (auto-synced from ~/Content/pillars/)
+packages/styles/       Design tokens + global css (used by the astro www)
+packages/config/       Shared config. packages/types/ TS interfaces. packages/services-platform/ platform svc clients.
+packages/ui/           Legacy React components (Stagger/FadeIn/ExpandableNav). NOT used by the astro www, no current importer.
+packages/brand/        Legacy brand package. No current importer.
+content/thoughts/      Legacy next-era blog markdown. The astro www reads apps/www/src/content instead.
 scripts/claude/        Stats generation from ~/.claude session logs
 scripts/sync-yaml-to-d1.sh  Manual YAML sync from ~/Business/data/ to D1
 ```
 
 Admin sidebar: 5 spokes (Dashboard, Money, Content, Code, Ops). Live data via Mini API SSE at api.mini.anipotts.com.
 
-Content flow: `~/Content/pillars/*.md` auto-syncs to `content/thoughts/` via git post-commit hook. Pillars with `status: ready` and a non-empty summary get copied with `published: true`.
+Content: the astro www renders markdown collections under `apps/www/src/content` (projects, running, writing), schema in `apps/www/src/content.config.ts`. The legacy `~/Content/pillars` -> `content/thoughts/` post-commit sync was the next-era flow; the markdown -> D1 sync for the astro site is phase-2 work.
 
 ## Cloudflare D1
 
@@ -42,7 +47,7 @@ Database: `anipotts-db` (SQLite at edge via CF Workers)
 Tables: `thoughts`, `atoms`, `page_content`, `projects`, `social_links`, `site_settings`, `rate_limits`, `business_data`, `daily_rollups`, `email_queue`, `analytics_events`
 FTS5 virtual tables for full-text search on thoughts and projects.
 
-Static fallback data lives in `packages/lib/src/data/`. CMS pages use `revalidate = 0`, file-based pages use `revalidate = 3600`.
+Static fallback data lives in `packages/lib/src/data/`. (The old `revalidate` guidance was Next.js-only; the astro www is statically built so it no longer applies.)
 
 ## Environment Variables
 
@@ -60,14 +65,13 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 
 ## Key Patterns
 
-- `Stagger` for section animations (auto-staggers children with fadeInUp). Gap classes go ON the Stagger className, not on a wrapper.
-- `PageFrame` for page layout (gap-12 md:gap-16 pb-20). Never add max-w to PageFrame (terminal window handles width).
-- `PageScaffold` primitives: BackLink, MetaLine, TagList, StatusBadge, SectionBlock, SectionLabel
-- PostHog proxied through Next.js rewrites to `/ingest/*`
-- Admin: cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com
-- `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`)
-- Routing: 5 pages in `(main)/` route group, redirects in `proxy.ts`
-- Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api
+- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/shipping`, `/running`, `/projects`, `/orchestrating`, `/connect`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
+- Legacy route redirects (`/claude` -> `/orchestrating`, plus `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) are handled in `apps/www/src/middleware.ts`.
+- PostHog is proxied via the astro endpoint `apps/www/src/pages/ingest/[...path].ts` (not Next.js rewrites).
+- The React `Stagger` / `PageFrame` / `PageScaffold` primitives in `packages/ui` are next-era; the astro www does not use them.
+- Admin (legacy next): cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com.
+- `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`).
+- Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api.
 
 ## Anti-Corny Guardrails (NON-NEGOTIABLE)
 
