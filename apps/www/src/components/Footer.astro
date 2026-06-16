@@ -37,6 +37,9 @@ import { Icon } from "astro-icon/components";
     <a href="/feed.xml" class="glyph" aria-label="rss feed"
       ><Icon name="ph:rss-simple" /></a
     >
+    <a href="/admin" class="glyph admin-glyph" aria-label="admin"
+      ><Icon name="ph:lock-key" /></a
+    >
   </span>
 </footer>
 
@@ -72,5 +75,10 @@ import { Icon } from "astro-icon/components";
 
   .glyph:hover {
     color: var(--accent);
+  }
+
+  .admin-glyph {
+    font-size: 0.95rem;
+    opacity: 0.78;
   }
 </style>

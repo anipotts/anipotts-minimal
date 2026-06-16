@@ -29,24 +29,26 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const thoughts = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
-const homeShippingSlugs = [
+const homeMakingSlugs = [
   "quantercise-extension",
   "saeshify",
   "nyu-purity-test",
   "habittracker-obh",
 ] as const;
-const homeShippingOrder = new Map<string, number>(
-  homeShippingSlugs.map((slug, index) => [slug, index]),
+const homeMakingOrder = new Map<string, number>(
+  homeMakingSlugs.map((slug, index) => [slug, index]),
 );
 const projects = (await visibleProjects())
-  .filter((project) => homeShippingOrder.has(project.slug))
+  .filter((project) => homeMakingOrder.has(project.slug))
   .sort(
     (a, b) =>
-      (homeShippingOrder.get(a.slug) ?? 0) -
-      (homeShippingOrder.get(b.slug) ?? 0),
+      (homeMakingOrder.get(a.slug) ?? 0) -
+      (homeMakingOrder.get(b.slug) ?? 0),
   )
   .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
+const workLabel = "making";
+const workHref = "/making";
 ---
 
 <Shell
@@ -101,8 +103,8 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 
   {work.visible && <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">{work.label}</h2>
-      <a href={work.view_all ?? "/shipping"} class="quiet-link mono view-all"
+      <h2 class="section-label">{workLabel}</h2>
+      <a href={workHref} class="quiet-link mono view-all"
         >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>

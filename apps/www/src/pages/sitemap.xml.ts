@@ -1,12 +1,9 @@
 import type { APIRoute } from "astro";
 import {
-  experimentSlug,
   projectSlug,
-  publishedExperiments,
   publishedWriting,
   writingSlug,
   visibleProjects,
-  weeklyDigests,
 } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
@@ -25,17 +22,13 @@ export const GET: APIRoute = async (context) => {
   setDB(context.locals.runtime.env.DB as unknown as D1Database);
   const writingEntries = await publishedWriting();
   const projects = await visibleProjects();
-  const weeks = await weeklyDigests();
-  const experiments = await publishedExperiments();
 
   const entries: Entry[] = [
     { path: "/", priority: 1 },
-    { path: "/shipping", priority: 0.9 },
+    { path: "/making", priority: 0.9 },
     { path: "/projects", priority: 0.8 },
     { path: "/writing", priority: 0.85 },
-    { path: "/running", priority: 0.7 },
     { path: "/orchestrating", priority: 0.9 },
-    { path: "/connect", priority: 0.8 },
     ...writingEntries.map((t) => ({
       path: `/writing/${writingSlug(t)}`,
       priority: 0.65,
@@ -44,16 +37,6 @@ export const GET: APIRoute = async (context) => {
     ...projects.map((p) => ({
       path: `/projects/${projectSlug(p)}`,
       priority: 0.7,
-    })),
-    ...weeks.map((w) => ({
-      path: `/running/weekly/${w.data.week}`,
-      priority: 0.5,
-      lastmod: w.data.generated_at?.toISOString(),
-    })),
-    ...experiments.map((e) => ({
-      path: `/running/experiments/${experimentSlug(e)}`,
-      priority: 0.5,
-      lastmod: e.data.date.toISOString(),
     })),
   ];
 
