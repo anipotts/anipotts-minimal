@@ -151,7 +151,7 @@ export const homeContent = {
     atlanticRecords: {
       label: "atlantic records",
       href: "https://www.atlanticrecords.com/",
-      logoSrc: "/images/brand/atlantic-records-wikipedia.svg",
+      logoSrc: "/images/brand/atlantic-records-logo-square.jpg",
       logoAlt: "atlantic records",
     },
     businessInsider: {
