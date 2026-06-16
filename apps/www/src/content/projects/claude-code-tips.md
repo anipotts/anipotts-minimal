@@ -1,7 +1,7 @@
 ---
 title: claude code tips
-subtitle: hooks, agents, mcp, and automation patterns from real sessions.
-description: Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MCP servers, plugin notes, and automation patterns I actually use.
+subtitle: public notes from running agent workflows in real repos.
+description: Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MCP servers, plugin notes, and automation patterns that make agent work easier to debug.
 year: "2025-"
 category: ai
 role: Creator

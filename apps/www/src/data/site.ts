@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Anirudh Pottammal",
   title: "Software Engineer",
   location: "NYC",
-  bio: "ani potts. i build software with agents, infra, product systems, and content tooling. recently: structured ai, our bad habit, claude code tooling, and quantercise.",
+  bio: "ani potts. i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -97,7 +97,37 @@ export const socialLinks: SocialLink[] = [
 export const homeContent = {
   heading: "hi, i'm ani",
   summary:
-    "i build software with agents, infra, product systems, and content tooling. recently: structured ai, our bad habit, claude code tooling, and quantercise.",
+    "i build realtime agent workflows where state, tools, citations, and debugging have to hold up in production.",
+  proof: [
+    {
+      label: "structured ai",
+      href: "https://getstructured.ai/",
+      title: "document chat for architectural drawings",
+      detail:
+        "streamed claude and gemini over drawing sets. answers cite the source pdfs; redis streams handle replay and live spectating.",
+    },
+    {
+      label: "quantercise",
+      href: "https://quantercise.com",
+      title: "quant prep with real grading paths",
+      detail:
+        "next.js, typescript, postgres, drizzle, stripe, and sandboxed python grading for code and math-heavy interview practice.",
+    },
+    {
+      label: "paragon global investments",
+      href: "https://paragoninvestments.org",
+      title: "research portal for an nyu quant fund",
+      detail:
+        "next.js and typescript portal on supabase for surfacing fund research and making internal material usable from mobile.",
+    },
+    {
+      label: "public tooling",
+      href: "/projects/claude-code-tips",
+      title: "agent-native taste, proven in public",
+      detail:
+        "claude-code-tips and imessage mcp show the operating style: local-first tools, mcp surfaces, hooks, and debuggable agent workflows.",
+    },
+  ],
   press: {
     href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
     label: "business insider",

@@ -6,7 +6,7 @@ this is the content shape that should feed the next admin editor pass. it stays 
 
 | surface              | source                                                                    | current shape                                                                                                    | notes                                                         |
 | -------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| homepage hero        | `apps/www/src/data/site.ts`, rendered in `apps/www/src/pages/index.astro` | heading, summary, press mention, inline brand mentions                                                           | copy is now more direct and less credential-first             |
+| homepage hero        | `apps/www/src/data/site.ts`, rendered in `apps/www/src/pages/index.astro` | heading, summary, proof cards, press mention, inline links                                                       | now framed around startup engineering proof                   |
 | project cards        | `apps/www/src/content/projects/*.md`                                      | title, subtitle, description, year, category, role, duration, status, featured, visible, sort order, links, tags | source is already markdown-backed and editor-ready            |
 | project detail pages | same project markdown body plus optional `technical` and `roadmap` arrays | overview, technical blocks, next steps                                                                           | only quantercise has meaningful body sections today           |
 | writing previews     | `apps/www/src/content/writing/*.md`                                       | title, slug, summary, tags, status, published date, body                                                         | five published posts, mostly claude code and ai workflow      |
@@ -18,7 +18,8 @@ this is the content shape that should feed the next admin editor pass. it stays 
 
 | priority | cleanup                                                 | why it matters                                                           | owner fit                     |
 | -------- | ------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------- |
-| p0       | expose project card fields in admin                     | homepage credibility comes from four cards                               | admin editor                  |
+| p0       | expose homepage proof cards in admin                    | above-fold credibility now depends on four concrete engineering receipts | admin editor                  |
+| p0       | expose project card fields in admin                     | shipping cards still carry the browsable proof trail                     | admin editor                  |
 | p0       | add `body` editing for project detail pages             | several projects have no narrative beyond a card                         | admin editor                  |
 | p1       | add writing preview controls                            | titles and summaries are the actual newsletter backfill queue            | admin editor                  |
 | p1       | add newsletter headline, deck, cta, and status messages | the subscribe module should be editable without code                     | admin editor                  |
@@ -41,6 +42,15 @@ this is the content shape that should feed the next admin editor pass. it stays 
 | `role`        |       string |       no | useful for work vs personal projects                                     |
 | `featured`    |      boolean |       no | controls homepage cards                                                  |
 | `sort_order`  |       number |       no | keep for deterministic ordering                                          |
+
+### homepage proof cards
+
+| field    |   type | required | editorial note                                                                    |
+| -------- | -----: | -------: | --------------------------------------------------------------------------------- |
+| `label`  | string |      yes | short surface name, for example `structured ai` or `quantercise`                  |
+| `href`   |    url |      yes | can be internal or external                                                       |
+| `title`  | string |      yes | one concrete engineering outcome                                                  |
+| `detail` | string |      yes | mention stack, constraint, proof, and link target without turning it into ad copy |
 
 ### writing
 
