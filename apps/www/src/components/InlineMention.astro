@@ -21,7 +21,6 @@ const {
   icon,
   mark,
   logoSrc,
-  logoAlt,
   logoTone,
   logoShape,
   badgeSrc,
@@ -29,12 +28,17 @@ const {
   suffix,
 } = Astro.props;
 const Tag = href ? "a" : "span";
+const hasVisual = Boolean(logoSrc || icon || mark);
+const markClass = [
+  "brand-mark",
+  logoTone === "white" ? "brand-mark-white" : "",
+  logoShape === "wide" ? "brand-mark-wide" : "",
+]
+  .filter(Boolean)
+  .join(" ");
 const logoClass = [
   "logo",
   logoTone === "white" ? "logo-white" : "",
-  logoShape === "wide" ? "logo-wide" : "",
-  logoShape === "mark" ? "logo-mark" : "",
-  logoShape === "large" ? "logo-large" : "",
 ]
   .filter(Boolean)
   .join(" ");
@@ -47,83 +51,81 @@ const logoClass = [
   rel={href ? "noopener noreferrer" : undefined}
   aria-label={label}
 >
-  {
-    logoSrc && (
-      <img
-        src={logoSrc}
-        alt={logoAlt ?? ""}
-        class={logoClass}
-        loading="lazy"
-        decoding="async"
-      />
-    )
-  }
-  {icon && <Icon name={icon} />}
-  {mark && <span class="mark" aria-hidden="true">{mark}</span>}
-  <span class="text">{label}{suffix}</span>
-  {
-    badgeSrc && (
-      <img
-        src={badgeSrc}
-        alt={badgeAlt ?? ""}
-        class="logo badge"
-        loading="lazy"
-        decoding="async"
-      />
-    )
-  }
+  {hasVisual && <span class={markClass} aria-hidden="true">{logoSrc && <img src={logoSrc} alt="" class={logoClass} loading="lazy" decoding="async" />}{icon && <Icon name={icon} />}{mark && <span class="mark">{mark}</span>}</span>}<span class="text">{label}{suffix}</span>{badgeSrc && <img src={badgeSrc} alt={badgeAlt ?? ""} class="logo badge" loading="lazy" decoding="async" />}
 </Tag>
 
 <style>
   .inline-mention {
     display: inline-flex;
     align-items: center;
-    gap: 0.26em;
+    gap: 0.28em;
     color: var(--ink);
     text-decoration: none;
     white-space: nowrap;
-    vertical-align: baseline;
+    vertical-align: -0.08em;
   }
 
   a.inline-mention {
+    text-decoration: none;
+  }
+
+  a.inline-mention .text {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
-    text-decoration-thickness: 0.06em;
-    text-underline-offset: 0.18em;
+    text-decoration-color: color-mix(in srgb, var(--accent) 72%, transparent);
+    text-decoration-thickness: 0.052em;
+    text-underline-offset: 0.22em;
   }
 
   a.inline-mention:hover {
     color: var(--accent);
   }
 
-  .inline-mention svg {
-    width: 0.95em;
-    height: 0.95em;
-    transform: translateY(0.1em);
+  a.inline-mention:hover .text {
+    text-decoration-color: var(--accent);
   }
 
-  .logo {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    border-radius: 0.18em;
-    object-fit: contain;
+  .brand-mark {
+    width: 1.08em;
+    height: 1.08em;
+    flex: 0 0 1.08em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.06em;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0.24em;
+    background: color-mix(in srgb, var(--surface) 78%, var(--ink) 22%);
+    box-shadow:
+      inset 0 0 0 1px var(--border),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
     transform: translateY(0.02em);
   }
 
-  .logo-wide {
-    width: 1.28em;
+  .brand-mark-white {
+    background: color-mix(in srgb, var(--surface) 84%, var(--ink) 16%);
   }
 
-  .logo-mark {
-    width: 1.52em;
+  .brand-mark-wide {
+    width: 1.48em;
+    flex-basis: 1.48em;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
-  .logo-large {
-    width: 1.42em;
-    height: 1.04em;
-    border-radius: 0.12em;
-    transform: translateY(0.07em);
+  .brand-mark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.14em;
+    object-fit: contain;
   }
 
   .logo-white {
@@ -142,8 +144,8 @@ const logoClass = [
     color: var(--accent);
     font-family: var(--mono);
     font-size: 0.72em;
+    line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
   }
-
 </style>

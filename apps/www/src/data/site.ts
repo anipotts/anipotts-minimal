@@ -17,10 +17,8 @@ export const siteConfig = {
 
 export const navItems = [
   { name: "writing", path: "/writing" },
-  { name: "shipping", path: "/shipping" },
-  { name: "running", path: "/running" },
+  { name: "making", path: "/making" },
   { name: "orchestrating", path: "/orchestrating" },
-  { name: "connect", path: "/connect" },
 ] as const;
 
 export interface SocialLink {
@@ -156,7 +154,7 @@ export const homeContent = {
       href: "https://www.atlanticrecords.com/",
       logoSrc: "/images/brand/atlantic-records-logo-cropped.png",
       logoAlt: "atlantic records",
-      logoShape: "large",
+      logoShape: "wide",
     },
     businessInsider: {
       label: "business insider",

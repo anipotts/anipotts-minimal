@@ -29,24 +29,27 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const thoughts = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
-const homeShippingSlugs = [
+const homeMakingSlugs = [
   "quantercise-extension",
   "saeshify",
   "nyu-purity-test",
   "habittracker-obh",
 ] as const;
-const homeShippingOrder = new Map<string, number>(
-  homeShippingSlugs.map((slug, index) => [slug, index]),
+const homeMakingOrder = new Map<string, number>(
+  homeMakingSlugs.map((slug, index) => [slug, index]),
 );
 const projects = (await visibleProjects())
-  .filter((project) => homeShippingOrder.has(project.slug))
+  .filter((project) => homeMakingOrder.has(project.slug))
   .sort(
     (a, b) =>
-      (homeShippingOrder.get(a.slug) ?? 0) -
-      (homeShippingOrder.get(b.slug) ?? 0),
+      (homeMakingOrder.get(a.slug) ?? 0) -
+      (homeMakingOrder.get(b.slug) ?? 0),
   )
   .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
+const workLabel = "making";
+const workHref = "/making";
+const ycMention = homeContent.mentions.yCombinatorF25;
 ---
 
 <Shell
@@ -65,12 +68,7 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
         <>
           previously worked on real-time agent i/o at{" "}
           <InlineMention {...homeContent.mentions.structuredAi} />{" "}
-          <span class="no-break"
-            >(<InlineMention
-              {...homeContent.mentions.yCombinatorF25}
-              suffix=")"
-            /></span
-          >{" "}
+          <span class="brand-parens"><span>(</span><InlineMention {...ycMention} /><span>)</span></span>{" "}
           and{" "}
           <InlineMention {...homeContent.mentions.badHabit} suffix="," /> an{" "}
           <span class="no-break"
@@ -101,8 +99,8 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
 
   {work.visible && <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">{work.label}</h2>
-      <a href={work.view_all ?? "/shipping"} class="quiet-link mono view-all"
+      <h2 class="section-label">{workLabel}</h2>
+      <a href={workHref} class="quiet-link mono view-all"
         >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
@@ -155,6 +153,22 @@ const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
     align-items: baseline;
     gap: 0 0.35em;
     white-space: nowrap;
+  }
+
+  .brand-parens {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 0;
+    white-space: nowrap;
+  }
+
+  .brand-parens > span,
+  .brand-parens :global(.inline-mention) {
+    font-size: var(--p-body);
+  }
+
+  .brand-parens > span:first-child {
+    margin-right: 0.14rem;
   }
 
   .text-link {

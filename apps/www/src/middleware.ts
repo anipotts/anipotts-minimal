@@ -2,13 +2,17 @@ import { defineMiddleware } from "astro:middleware";
 
 /** flat redirect map: pathname (exact or prefix) -> destination. */
 const REDIRECTS: Record<string, string> = {
-  "/lab": "/running",
+  "/shipping": "/making",
+  "/running": "/making",
+  "/lab": "/orchestrating",
   "/links": "/connect",
   "/dev": "/orchestrating",
-  "/updates": "/orchestrating#proof",
-  "/metrics": "/orchestrating#playbooks",
-  "/status": "/orchestrating#work-together",
+  "/updates": "/orchestrating",
+  "/metrics": "/orchestrating#status",
+  "/status": "/orchestrating#systems",
   "/docs": "/",
+  "/work": "/making",
+  "/labs": "/orchestrating",
 };
 
 const NEWS_HOST = "news.anipotts.com";
@@ -18,8 +22,6 @@ const NEWS_HOST = "news.anipotts.com";
  *  ever shared keeps resolving. */
 const RENAMES: Record<string, string> = {
   "/thoughts": "/writing",
-  "/work": "/shipping",
-  "/labs": "/running",
   "/claude": "/orchestrating",
 };
 
@@ -83,7 +85,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // flat redirects: tail is discarded. "/lab" and "/lab/..." both land
-  // on the destination; "/running" is a distinct segment, never matches.
+  // on the destination instead of preserving stale subpaths.
   for (const [from, to] of Object.entries(REDIRECTS)) {
     if (pathname === from || pathname.startsWith(`${from}/`)) {
       return context.redirect(to, 301);

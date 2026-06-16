@@ -82,28 +82,28 @@ const heroStats = [
 
 const loop = [
   {
-    label: "capture",
-    title: "sessions become data",
+    label: "logs",
+    title: "everything leaves a trail",
     detail:
-      "mine turns local claude code logs into sqlite so work, cost, loops, and file hotspots are searchable later.",
+      "local sessions and cron output get captured so future me can debug instead of guess.",
   },
   {
-    label: "guard",
-    title: "hooks catch bad moves",
+    label: "edges",
+    title: "experiments stay inspectable",
     detail:
-      "the hook set blocks force pushes and risky shell patterns before they become cleanup work.",
+      "labs and odd tools can be public without pretending to be products.",
   },
   {
-    label: "split",
-    title: "worktrees keep jobs separate",
+    label: "guards",
+    title: "sharp tools get rails",
     detail:
-      "parallel agents can move fast when each job has its own branch, tests, and commit trail.",
+      "small checks keep agents and scripts from doing expensive dumb things while still letting them move.",
   },
   {
-    label: "publish",
-    title: "useful pieces leave the notebook",
+    label: "controls",
+    title: "repeated work gets a surface",
     detail:
-      "when a workflow survives real repos, it becomes a small repo tool or a note someone else can inspect.",
+      "if an action matters twice, it becomes a command, dashboard, admin field, or tiny page.",
   },
 ];
 
@@ -156,18 +156,18 @@ const fmtSessionTime = (iso: string) =>
 
 <Shell
   title="orchestrating"
-  description="how ani runs claude code and codex with local logs, hooks, worktrees, and public tooling."
+  description="personal systems, labs, experiments, and local automation around ani's work."
   path="/orchestrating"
   mood="alert"
 >
-  <section data-rise id="proof" class="hero-shell">
+  <section data-rise id="operating-room" class="hero-shell">
     <div class="hero-copy">
       <span class="section-label">orchestrating</span>
-      <h1 class="hero-title">how i run agent work</h1>
+      <h1 class="hero-title">weird operating room</h1>
       <p class="hero-summary">
-        i use claude code and codex across real repos. local logs keep memory,
-        hooks catch bad moves, worktrees keep jobs separate, and the public
-        tools are the parts that survived daily use.
+        where the private machinery goes when it is useful to see: local logs,
+        small checks, cron traces, admin surfaces, and experiments that do not
+        need a whole product around them.
       </p>
       <p class="mono muted updated">
         <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
@@ -176,14 +176,14 @@ const fmtSessionTime = (iso: string) =>
       </p>
     </div>
     <aside class="hero-panel" aria-label="live session totals">
-      <span class="mono panel-label">last 90 days</span>
+      <span class="mono panel-label">machine noise</span>
       <span class="panel-number">{fmt(stats.totals.toolCalls)}</span>
-      <span class="panel-copy">tool calls tracked from local session logs.</span>
+      <span class="panel-copy">tool calls captured from local session logs.</span>
     </aside>
   </section>
 
-  <section data-rise class="stack" id="shape">
-    <h2 class="section-label">current shape</h2>
+  <section data-rise class="stack" id="systems">
+    <h2 class="section-label">systems</h2>
     <div class="stat-grid mobile-carousel">
       {
         heroStats.map((s) => (
@@ -197,7 +197,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="loop">
-    <h2 class="section-label">operating loop</h2>
+    <h2 class="section-label">how it stays useful</h2>
     <div class="loop-grid mobile-carousel">
       {
         loop.map((item) => (
@@ -211,9 +211,9 @@ const fmtSessionTime = (iso: string) =>
     </div>
   </section>
 
-  <section data-rise class="stack" id="throughput">
+  <section data-rise class="stack" id="status">
     <span class="split-head">
-      <h2 class="section-label">activity</h2>
+      <h2 class="section-label">status</h2>
       <span class="mono muted">tool calls + file mutations</span>
     </span>
     <div class="chart-card">
@@ -232,7 +232,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="edges">
-    <h2 class="section-label">edges</h2>
+    <h2 class="section-label">strange highs</h2>
     <div class="grid-2 mobile-carousel">
       {
         records.map((rec) => (
@@ -247,7 +247,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="plugin">
-    <h2 class="section-label">mine</h2>
+    <h2 class="section-label">local console</h2>
     <div class="mine-card">
       <div class="mine-copy">
         <span class="row-title">{minePlugin.name}</span>
@@ -272,7 +272,7 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="hooks">
     <span class="split-head">
-      <h2 class="section-label">guardrails</h2>
+      <h2 class="section-label">safety rails</h2>
       <a href={TIPS_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">tips repo</a>
     </span>
     <div class="grid-2 mobile-carousel">
@@ -292,7 +292,7 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="playbooks">
     <span class="split-head">
-      <h2 class="section-label">docs</h2>
+      <h2 class="section-label">notes</h2>
       <a href={MINE_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">mine repo</a>
     </span>
     <div class="grid-2 mobile-carousel">
@@ -308,7 +308,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="sessions">
-    <h2 class="section-label">session log</h2>
+    <h2 class="section-label">recent traces</h2>
     <div class="table-wrap">
       <table class="stat-table">
         <thead>
