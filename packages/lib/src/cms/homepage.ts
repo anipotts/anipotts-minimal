@@ -4,6 +4,7 @@ import {
   HOMEPAGE_FIELD_LIMITS,
   HOME_SECTION_ORDER,
 } from "./defaults";
+import { fetchPageContent } from "./page";
 
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === "string" ? value : fallback;
@@ -222,4 +223,9 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
     },
     section_order: HOME_SECTION_ORDER,
   };
+}
+
+export async function fetchHomepageContent(): Promise<HomepageContent> {
+  const page = await fetchPageContent<HomepageContent>("home");
+  return normalizeHomepageContent(page?.content);
 }
