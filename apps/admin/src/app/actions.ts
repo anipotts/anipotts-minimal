@@ -21,6 +21,13 @@ import type {
   VoiceMode,
 } from "@anipotts/types";
 import { withAuth } from "./lib/with-auth";
+import {
+  getAtomById,
+  getThoughtById,
+  updateAtomFields,
+  updateThought,
+} from "./lib/content-records";
+import { savePageContent } from "./lib/page-content";
 import { upsertAtomRecord, deleteAtomRecord } from "@anipotts/lib/admin";
 import {
   getDB,
@@ -110,108 +117,6 @@ function buildLinkedInPost(
   return `${title}\n\n${body}\n\n${link}`;
 }
 
-// ── D1 helper: read a single writing row by ID ──
-
-async function getThoughtById(id: string, columns = "*") {
-  const db = getDB();
-  if (db) {
-    return db
-      .prepare(`SELECT ${columns} FROM thoughts WHERE id = ?`)
-      .bind(id)
-      .first<Record<string, unknown>>();
-  }
-  return null;
-}
-
-// ── D1 helper: update writing fields by ID ──
-
-const THOUGHT_COLUMNS = new Set([
-  "title",
-  "slug",
-  "content",
-  "summary",
-  "series_type",
-  "content_type",
-  "status",
-  "published",
-  "published_at",
-  "tags",
-  "platforms_posted",
-  "voice_mode",
-  "updated_at",
-  "views",
-  "buttondown_email_id",
-  "typefully_x_draft_id",
-  "typefully_linkedin_draft_id",
-]);
-
-async function updateThought(
-  id: string,
-  fields: Record<string, unknown>,
-): Promise<{ error?: string }> {
-  const db = getDB();
-  if (db) {
-    const safe = Object.keys(fields).filter((k) => THOUGHT_COLUMNS.has(k));
-    if (safe.length === 0) return { error: "No valid columns" };
-    const sets = safe.map((k) => `${k} = ?`).join(", ");
-    const vals = safe.map((k) => fields[k]);
-    await db
-      .prepare(`UPDATE thoughts SET ${sets} WHERE id = ?`)
-      .bind(...vals, id)
-      .run();
-    return {};
-  }
-  return { error: "Database not configured" };
-}
-
-// ── D1 helper: read a single atom by ID ──
-
-async function getAtomById(id: string) {
-  const db = getDB();
-  if (db) {
-    return db
-      .prepare("SELECT * FROM atoms WHERE id = ?")
-      .bind(id)
-      .first<Record<string, unknown>>();
-  }
-  return null;
-}
-
-// ── D1 helper: update atom fields by ID ──
-
-const ATOM_COLUMNS = new Set([
-  "content_id",
-  "platform",
-  "atom_content",
-  "voice_mode",
-  "hashtags",
-  "status",
-  "scheduled_at",
-  "posted_at",
-  "external_url",
-  "typefully_draft_id",
-  "updated_at",
-]);
-
-async function updateAtomFields(
-  id: string,
-  fields: Record<string, unknown>,
-): Promise<{ error?: string }> {
-  const db = getDB();
-  if (db) {
-    const safe = Object.keys(fields).filter((k) => ATOM_COLUMNS.has(k));
-    if (safe.length === 0) return { error: "No valid columns" };
-    const sets = safe.map((k) => `${k} = ?`).join(", ");
-    const vals = safe.map((k) => fields[k]);
-    await db
-      .prepare(`UPDATE atoms SET ${sets} WHERE id = ?`)
-      .bind(...vals, id)
-      .run();
-    return {};
-  }
-  return { error: "Database not configured" };
-}
-
 // ── Auth ──
 
 export async function login(formData: FormData) {
@@ -271,66 +176,6 @@ export async function logout() {
 }
 
 // ── Site Copy ──
-
-async function savePageContent<T>(
-  pageKey: string,
-  content: T,
-): Promise<
-  | { success: true; updatedAt: string; version: number; content: T }
-  | { error: string }
-> {
-  const db = getDB();
-  if (!db) return { error: "Database not configured" };
-
-  const ts = now();
-  try {
-    const existing = await db
-      .prepare(
-        `SELECT id, version
-         FROM page_content
-         WHERE page_key = ? AND published = 1
-         ORDER BY version DESC
-         LIMIT 1`,
-      )
-      .bind(pageKey)
-      .first<{ id: string; version: number | null }>();
-
-    const id = existing?.id ?? uuid();
-    const version = (existing?.version ?? 0) + 1;
-    const contentJson = JSON.stringify(content);
-
-    if (existing) {
-      await db
-        .prepare(
-          `UPDATE page_content
-           SET content = ?, version = ?, published = 1, updated_at = ?, updated_by = ?
-           WHERE id = ?`,
-        )
-        .bind(contentJson, version, ts, "admin", id)
-        .run();
-    } else {
-      await db
-        .prepare(
-          `INSERT INTO page_content
-           (id, page_key, content, version, published, updated_at, updated_by, created_at, version_history)
-           VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)`,
-        )
-        .bind(id, pageKey, contentJson, version, ts, "admin", ts, "[]")
-        .run();
-    }
-
-    await db
-      .prepare(
-        "UPDATE page_content SET published = 0 WHERE page_key = ? AND id <> ?",
-      )
-      .bind(pageKey, id)
-      .run();
-
-    return { success: true, updatedAt: ts, version, content };
-  } catch (error) {
-    return { error: `D1 save failed: ${String(error)}` };
-  }
-}
 
 export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
   const content = normalizeHomepageContent(draft);
