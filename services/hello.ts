@@ -10,7 +10,7 @@
 //   2. `bun run services/hello.ts apply` — registers plist, cloudflared
 //      ingress, CF Access policy (email allowlist), and D1 registry row.
 //   3. Confirm hello.anipotts.com prompts for Access email, then returns "hi".
-//   4. Retire via `bun run services/hello.ts retire` (keeps history).
+//   4. Retire through a future D1-bound admin action (keeps history).
 
 import { defineService } from "@anipotts/services-platform";
 
