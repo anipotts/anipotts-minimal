@@ -6,7 +6,7 @@ import PipelineBoard from "./pipeline-board";
 import type { BoardItem } from "./pipeline-board";
 import { SERIES_COLORS, STATUS_COLORS, PLATFORM_ABBREV } from "@/lib/constants";
 
-interface ThoughtWithCount {
+interface WritingPipelineItem {
   id: string;
   title: string;
   slug: string;
@@ -27,19 +27,19 @@ interface ThoughtWithCount {
   atom_count: number;
 }
 
-async function getThoughtsWithAtomCounts(): Promise<ThoughtWithCount[]> {
+async function getWritingPipelineItems(): Promise<WritingPipelineItem[]> {
   const db = getDrizzle();
   if (!db) return [];
 
-  const thoughts = await db
+  const thoughtRows = await db
     .select()
     .from(schema.thoughts)
     .orderBy(desc(schema.thoughts.updated_at));
 
-  if (thoughts.length === 0) return [];
+  if (thoughtRows.length === 0) return [];
 
   // Get atom counts per thought using raw count query
-  const thoughtIds = thoughts.map((t) => t.id);
+  const thoughtIds = thoughtRows.map((t) => t.id);
   const placeholders = thoughtIds.map(() => "?").join(", ");
 
   // Use the raw D1 for the IN query since Drizzle's inArray requires importing
@@ -60,7 +60,7 @@ async function getThoughtsWithAtomCounts(): Promise<ThoughtWithCount[]> {
     }
   }
 
-  return thoughts.map((t) => ({
+  return thoughtRows.map((t) => ({
     id: t.id,
     title: t.title,
     slug: t.slug,
@@ -95,7 +95,7 @@ export default async function PipelinePage({
     view?: string;
   }>;
 }) {
-  const thoughts = await getThoughtsWithAtomCounts();
+  const writingItems = await getWritingPipelineItems();
   const params = await searchParams;
   const statusFilter = params.status || "all";
   const seriesFilter = params.series || "all";
@@ -103,8 +103,8 @@ export default async function PipelinePage({
   const sortBy = params.sort || "updated";
   const currentView = params.view || "list";
 
-  const filtered = thoughts
-    .filter((t: ThoughtWithCount) => {
+  const filtered = writingItems
+    .filter((t: WritingPipelineItem) => {
       if (statusFilter !== "all" && (t.status || "draft") !== statusFilter)
         return false;
       if (seriesFilter !== "all" && t.series_type !== seriesFilter)
@@ -113,7 +113,7 @@ export default async function PipelinePage({
         return false;
       return true;
     })
-    .sort((a: ThoughtWithCount, b: ThoughtWithCount) => {
+    .sort((a: WritingPipelineItem, b: WritingPipelineItem) => {
       switch (sortBy) {
         case "created":
           return (
@@ -132,7 +132,7 @@ export default async function PipelinePage({
     });
 
   const statusCounts: Record<string, number> = {};
-  for (const t of thoughts) {
+  for (const t of writingItems) {
     const s = t.status || "draft";
     statusCounts[s] = (statusCounts[s] || 0) + 1;
   }
@@ -143,7 +143,7 @@ export default async function PipelinePage({
         <div className="flex items-baseline gap-3">
           <h2 className="text-[13px] font-medium text-zinc-200">Pipeline</h2>
           <span className="text-[11px] text-zinc-600">
-            {filtered.length} of {thoughts.length}
+            {filtered.length} of {writingItems.length}
           </span>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default async function PipelinePage({
         <div className="flex-1 overflow-hidden">
           <PipelineBoard
             items={filtered.map(
-              (t: ThoughtWithCount): BoardItem => ({
+              (t: WritingPipelineItem): BoardItem => ({
                 id: t.id,
                 title: t.title,
                 status: t.status || "draft",
@@ -185,7 +185,7 @@ export default async function PipelinePage({
             </div>
           )}
 
-          {filtered.map((thought: ThoughtWithCount) => {
+          {filtered.map((thought: WritingPipelineItem) => {
             const status = thought.status || "draft";
             const date = new Date(
               thought.updated_at || thought.created_at,

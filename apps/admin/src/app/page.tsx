@@ -79,7 +79,7 @@ async function SiteCopyPanel() {
 
 function AdminIndexPanel() {
   const links = [
-    { label: "thoughts", href: "/content", meta: "pipeline" },
+    { label: "writing", href: "/content", meta: "pipeline" },
     { label: "new post", href: "/quick", meta: "draft" },
     { label: "newsletter", href: "/subscribers", meta: "buttondown" },
     { label: "money", href: "/money", meta: "mercury" },
