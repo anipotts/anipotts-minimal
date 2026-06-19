@@ -73,7 +73,7 @@ describe("homepage cms validation", () => {
 
     expect(validateHomepageContent(content)).toEqual({
       ok: false,
-      error: "Thoughts link must start with / or https://",
+      error: "Writing link must start with / or https://",
     });
   });
 

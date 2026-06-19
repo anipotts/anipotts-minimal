@@ -119,11 +119,11 @@ function validateDraft(content: HomepageContent) {
     validateLink(past_work, "Work") ??
     validateText(
       latest_thoughts.label,
-      "Thoughts label",
+      "Writing label",
       FIELD_LIMITS.label,
       latest_thoughts.visible,
     ) ??
-    validateLink(latest_thoughts, "Thoughts")
+    validateLink(latest_thoughts, "Writing")
   );
 }
 
@@ -401,7 +401,7 @@ export default function HomeCopyEditor({
             onLinkChange={(patch) => updateSectionLink("past_work", patch)}
           />
           <SectionControls
-            title="latest thoughts"
+            title="latest writing"
             section={sections.latest_thoughts}
             onVisibleChange={(visible) =>
               updateSection("latest_thoughts", { visible })

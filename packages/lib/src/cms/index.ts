@@ -264,10 +264,10 @@ export function validateHomepageContent(content: HomepageContent): {
     validateSectionLink(past_work, "Work");
   if (workError) return { ok: false, error: workError };
 
-  const thoughtsError =
-    validateSectionLabel(latest_thoughts, "Thoughts label") ??
-    validateSectionLink(latest_thoughts, "Thoughts");
-  if (thoughtsError) return { ok: false, error: thoughtsError };
+  const writingError =
+    validateSectionLabel(latest_thoughts, "Writing label") ??
+    validateSectionLink(latest_thoughts, "Writing");
+  if (writingError) return { ok: false, error: writingError };
 
   return { ok: true };
 }
