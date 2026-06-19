@@ -10,11 +10,7 @@ export {
 } from "./social";
 
 // Site metadata
-export { site, sections, publicSections } from "./site";
+export { site } from "./site";
 
 // Constants
 export { SITE_VERSION } from "../constants";
-
-// Monitored services
-export { monitoredServices } from "./services";
-export type { MonitoredService } from "./services";
