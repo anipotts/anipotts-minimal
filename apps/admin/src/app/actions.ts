@@ -132,7 +132,7 @@ function withAuth<Args extends unknown[], R>(
   };
 }
 
-// ── D1 helper: read a single thought by ID ──
+// ── D1 helper: read a single writing row by ID ──
 
 async function getThoughtById(id: string, columns = "*") {
   const db = getDB();
@@ -145,7 +145,7 @@ async function getThoughtById(id: string, columns = "*") {
   return null;
 }
 
-// ── D1 helper: update thought fields by ID ──
+// ── D1 helper: update writing fields by ID ──
 
 const THOUGHT_COLUMNS = new Set([
   "title",
@@ -202,14 +202,15 @@ async function getAtomById(id: string) {
 // ── D1 helper: update atom fields by ID ──
 
 const ATOM_COLUMNS = new Set([
-  "thought_id",
+  "content_id",
   "platform",
-  "content",
-  "media_urls",
+  "atom_content",
+  "voice_mode",
+  "hashtags",
   "status",
-  "scheduled_for",
+  "scheduled_at",
   "posted_at",
-  "engagement_metrics",
+  "external_url",
   "typefully_draft_id",
   "updated_at",
 ]);
