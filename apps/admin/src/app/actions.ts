@@ -6,7 +6,6 @@ import {
   verifyAdminPassword,
   verifyAdminTotp,
   createSessionToken,
-  verifySessionToken,
   ADMIN_COOKIE,
   ADMIN_COOKIE_OPTIONS,
 } from "@anipotts/lib/admin";
@@ -21,6 +20,7 @@ import type {
   Platform,
   VoiceMode,
 } from "@anipotts/types";
+import { withAuth } from "./lib/with-auth";
 import { upsertAtomRecord, deleteAtomRecord } from "@anipotts/lib/admin";
 import {
   getDB,
@@ -108,26 +108,6 @@ function buildLinkedInPost(
       ? content.slice(0, LINKEDIN_CONTENT_LIMIT - 3) + "..."
       : content;
   return `${title}\n\n${body}\n\n${link}`;
-}
-
-export async function requireAuth(): Promise<{ error: string } | null> {
-  const jar = await cookies();
-  const token = jar.get(ADMIN_COOKIE)?.value;
-  const secret = getEnv("ADMIN_PASSWORD");
-  if (!token || !secret || !verifySessionToken(token, secret)) {
-    return { error: "Unauthorized" };
-  }
-  return null;
-}
-
-function withAuth<Args extends unknown[], R>(
-  fn: (...args: Args) => Promise<R>,
-): (...args: Args) => Promise<R | { error: string }> {
-  return async (...args: Args) => {
-    const authError = await requireAuth();
-    if (authError) return authError;
-    return fn(...args);
-  };
 }
 
 // ── D1 helper: read a single writing row by ID ──
