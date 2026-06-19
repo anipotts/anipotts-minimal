@@ -1,11 +1,5 @@
 // Project types
-export type {
-  Project,
-  ProjectCategory,
-  ProjectStatus,
-  WorkPublishState,
-  DemoAsset,
-} from "./project";
+export type { Project, ProjectCategory, ProjectStatus } from "./project";
 
 // Writing/content types
 export type {
