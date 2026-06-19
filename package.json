@@ -23,7 +23,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
-    "update-claude-stats:commit": "scripts/claude/refresh-claude-stats.sh",
+    "update-claude-stats:commit": "bash scripts/claude/refresh-claude-stats.sh",
     "test:unit": "turbo test",
     "test": "pnpm test:unit",
     "validate": "turbo build && turbo lint && turbo typecheck && turbo test",
