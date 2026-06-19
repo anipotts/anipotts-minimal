@@ -30,7 +30,6 @@ packages/lib/          Shared D1 client (Drizzle ORM), env helper, query modules
                          analytics/, cms/, admin/, validation/, status/
 packages/styles/       Design tokens + global css (used by the astro www)
 packages/config/       Shared config. packages/types/ TS interfaces. packages/services-platform/ platform svc clients.
-packages/ui/           Legacy React components (Stagger/FadeIn/ExpandableNav). NOT used by the astro www, no current importer.
 packages/brand/        Legacy brand package. No current importer.
 content/thoughts/      Legacy next-era blog markdown. The astro www reads apps/www/src/content instead.
 scripts/claude/        Stats generation from ~/.claude session logs
@@ -68,7 +67,6 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 - www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/making`, `/projects`, `/orchestrating`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
 - Legacy route redirects are handled in `apps/www/src/middleware.ts`: `/shipping`, `/running`, and `/work` -> `/making`; `/connect`, `/links`, `/claude`, `/lab`, `/labs`, `/dev`, and `/updates` -> `/orchestrating`; `/metrics` -> `/orchestrating#status`; `/status` -> `/orchestrating#systems`; `/thoughts` -> `/writing`; `/docs` -> `/`.
 - PostHog is proxied via the astro endpoint `apps/www/src/pages/ingest/[...path].ts` (not Next.js rewrites).
-- The React `Stagger` / `PageFrame` / `PageScaffold` primitives in `packages/ui` are next-era; the astro www does not use them.
 - Admin (legacy next): cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com.
 - `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`).
 - Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api.
