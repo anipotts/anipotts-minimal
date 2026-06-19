@@ -7,7 +7,7 @@ export type {
   DemoAsset,
 } from "./project";
 
-// Thought/blog types
+// Writing/content types
 export type {
   Thought,
   ThoughtSummary,
@@ -22,6 +22,7 @@ export type {
   ArtifactType,
   Platform,
   AtomStatus,
+  ContentSection,
   Section,
   Subdomain,
 } from "./thought";

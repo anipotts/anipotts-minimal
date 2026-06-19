@@ -34,16 +34,23 @@ export type Platform =
   | "substack"
   | "reddit";
 
-// Valid sections for content scoping
-export type Section =
+// Valid sections for content scoping.
+// D1 may still contain legacy section names from earlier route eras.
+export type ContentSection =
   | "www"
+  | "writing"
+  | "making"
+  | "orchestrating"
+  | "connect"
   | "thoughts"
   | "dev"
+  | "lab"
   | "work"
-  | "connect"
   | "claude";
-/** @deprecated Use Section */
-export type Subdomain = Section;
+/** @deprecated Use ContentSection */
+export type Section = ContentSection;
+/** @deprecated Use ContentSection */
+export type Subdomain = ContentSection;
 
 export interface Thought {
   id: string;

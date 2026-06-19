@@ -1,16 +1,22 @@
 /**
- * Query helpers for the thoughts/blog system.
+ * Query helpers for the writing/content D1 table.
  * Uses Drizzle ORM for typed D1 queries.
  */
 
-import type { Thought, Subdomain } from "@anipotts/types";
+import type { Thought, ContentSection } from "@anipotts/types";
 import { eq, desc, sql, and } from "drizzle-orm";
 import { logger } from "../logger";
 import { getDrizzle, parseJsonArray, toJsonArray, uuid, now } from "../db";
 import * as s from "../db/schema";
 
 export interface QueryOptions {
-  subdomain?: Subdomain;
+  section?: ContentSection;
+  /** @deprecated Use section. */
+  subdomain?: ContentSection;
+}
+
+function querySection(options?: QueryOptions) {
+  return options?.section ?? options?.subdomain;
 }
 
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
@@ -20,8 +26,9 @@ export async function fetchAllThoughts(options?: QueryOptions) {
 
   try {
     const conditions = [];
-    if (options?.subdomain) {
-      conditions.push(eq(s.thoughts.section, options.subdomain));
+    const section = querySection(options);
+    if (section) {
+      conditions.push(eq(s.thoughts.section, section));
     }
 
     const results = await db
@@ -142,8 +149,9 @@ export async function fetchThoughtStats(options?: QueryOptions) {
 
   try {
     const conditions = [];
-    if (options?.subdomain) {
-      conditions.push(eq(s.thoughts.section, options.subdomain));
+    const section = querySection(options);
+    if (section) {
+      conditions.push(eq(s.thoughts.section, section));
     }
 
     const results = await db
