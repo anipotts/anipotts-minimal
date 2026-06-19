@@ -386,7 +386,7 @@ export const saveProjectContent = withAuth(async (draft: CmsProjectContent) => {
   if ("error" in result) return result;
   revalidatePath("/");
   revalidatePath("/projects");
-  revalidatePath("/shipping");
+  revalidatePath("/making");
   return {
     success: true,
     project: { ...result.content, updated_at: result.updatedAt },

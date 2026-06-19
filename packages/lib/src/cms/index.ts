@@ -64,11 +64,11 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     },
     past_work: {
       visible: true,
-      label: "shipping",
+      label: "making",
       heading: "",
       limit: 4,
-      links: [{ label: "view all", href: "/shipping" }],
-      view_all: "/shipping",
+      links: [{ label: "view all", href: "/making" }],
+      view_all: "/making",
     },
     latest_thoughts: {
       visible: true,

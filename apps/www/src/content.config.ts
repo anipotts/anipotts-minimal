@@ -68,7 +68,7 @@ const projects = defineCollection({
 });
 
 const weekly = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/running/weekly" }),
+  loader: glob({ pattern: "*.md", base: "./src/content/making/weekly" }),
   schema: z.object({
     week: z.string().regex(/^\d{4}-W\d{2}$/),
     window_start: z.coerce.date(),
@@ -83,7 +83,7 @@ const weekly = defineCollection({
 });
 
 const experiments = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/running/experiments" }),
+  loader: glob({ pattern: "*.md", base: "./src/content/making/experiments" }),
   schema: z.object({
     title: z.string(),
     slug: z.string().optional(),
