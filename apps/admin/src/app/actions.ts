@@ -21,32 +21,22 @@ import type {
   VoiceMode,
 } from "@anipotts/types";
 import { withAuth } from "./lib/with-auth";
-import {
-  getAtomById,
-  getThoughtById,
-  updateAtomFields,
-  updateThought,
-} from "./lib/content-records";
+import { updateThought } from "./lib/content-records";
 import { savePageContent } from "./lib/page-content";
 import { upsertAtomRecord, deleteAtomRecord } from "@anipotts/lib/admin";
+import { getDB, uuid, now, toJsonArray } from "@anipotts/lib/db";
 import {
-  getDB,
-  uuid,
-  now,
-  toJsonArray,
-  parseJsonArray,
-} from "@anipotts/lib/db";
-import {
-  createDraft as typefullyCreateDraft,
-  getDraft as typefullyGetDraft,
-} from "./lib/typefully";
-import {
-  createEmail as buttondownCreateEmail,
-  getEmail as buttondownGetEmail,
-  updateEmail as buttondownUpdateEmail,
-  deleteEmail as buttondownDeleteEmail,
-  listSubscribers as buttondownListSubscribers,
-} from "./lib/buttondown";
+  editButtondownEmail as editButtondownEmailRecord,
+  fetchButtondownEmail,
+  fetchRegularSubscribers,
+  fetchTypefullyDraft,
+  publishThoughtEverywhere,
+  pushAtomDraftToTypefully,
+  pushThoughtToButtondown,
+  removeButtondownEmail as removeButtondownEmailRecord,
+  type ButtondownEmailUpdate,
+  type PublishResult,
+} from "./lib/distribution";
 import {
   cmsProjectPageKey,
   cmsWritingPageKey,
@@ -65,6 +55,7 @@ import type {
   HomepageContent,
   NewsletterContent,
 } from "@anipotts/types";
+export type { PublishResult } from "./lib/distribution";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -89,33 +80,6 @@ const VALID_CONTENT_TYPES: ContentType[] = [
   "thread",
   "tip",
 ];
-
-const SITE_URL = getEnv("SITE_URL") || "https://anipotts.com";
-
-const X_CONTENT_LIMIT = 250;
-const LINKEDIN_CONTENT_LIMIT = 2500;
-
-function publicWritingUrl(slug: string): string {
-  return `${SITE_URL}/writing/${slug}`;
-}
-
-function buildXPost(content: string, link: string): string {
-  return content.length > X_CONTENT_LIMIT
-    ? `${content.slice(0, X_CONTENT_LIMIT - 3)}...\n\n${link}`
-    : `${content}\n\n${link}`;
-}
-
-function buildLinkedInPost(
-  title: string,
-  content: string,
-  link: string,
-): string {
-  const body =
-    content.length > LINKEDIN_CONTENT_LIMIT
-      ? content.slice(0, LINKEDIN_CONTENT_LIMIT - 3) + "..."
-      : content;
-  return `${title}\n\n${body}\n\n${link}`;
-}
 
 // ── Auth ──
 
@@ -348,143 +312,15 @@ export const updateThoughtContent = withAuth(
 
 export const pushToButtondown = withAuth(async (id: string) => {
   if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-  const thought = await getThoughtById(id, "title, content");
-  if (!thought) return { error: "Thought not found" };
-
-  const result = await buttondownCreateEmail(
-    String(thought.title),
-    String(thought.content || ""),
-    "draft",
-  );
-  if (!result.success) return { error: result.error };
-  if (typeof result.data.id !== "string" || !result.data.id)
-    return { error: "Buttondown returned no email ID" };
-
-  await updateThought(id, {
-    buttondown_email_id: result.data.id,
-    updated_at: now(),
-  });
-  return { success: true, emailId: result.data.id };
+  return pushThoughtToButtondown(id);
 });
 
 // ── Publish Everywhere ──
 
-export interface PublishResult {
-  status: { success: boolean; error?: string };
-  typefully: {
-    x: { success: boolean; error?: string; draftId?: string };
-    linkedin: { success: boolean; error?: string; draftId?: string };
-  };
-  buttondown: { success: boolean; error?: string; emailId?: string };
-}
-
 export const publishEverywhere = withAuth(
   async (id: string): Promise<PublishResult | { error: string }> => {
     if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-    const thought = await getThoughtById(id);
-    if (!thought) return { error: "Thought not found" };
-
-    const link = publicWritingUrl(String(thought.slug));
-    const content = String(thought.content || "");
-
-    const [xResult, liResult, bdResult] = await Promise.allSettled([
-      typefullyCreateDraft(buildXPost(content, link)),
-      typefullyCreateDraft(
-        buildLinkedInPost(String(thought.title), content, link),
-      ),
-      buttondownCreateEmail(String(thought.title), content, "draft"),
-    ]);
-
-    const result: PublishResult = {
-      status: { success: false },
-      typefully: {
-        x: {
-          success: xResult.status === "fulfilled" && xResult.value.success,
-          error:
-            xResult.status === "rejected"
-              ? String(xResult.reason)
-              : !xResult.value.success
-                ? xResult.value.error
-                : undefined,
-          draftId:
-            xResult.status === "fulfilled" && xResult.value.success
-              ? xResult.value.data.id
-              : undefined,
-        },
-        linkedin: {
-          success: liResult.status === "fulfilled" && liResult.value.success,
-          error:
-            liResult.status === "rejected"
-              ? String(liResult.reason)
-              : !liResult.value.success
-                ? liResult.value.error
-                : undefined,
-          draftId:
-            liResult.status === "fulfilled" && liResult.value.success
-              ? liResult.value.data.id
-              : undefined,
-        },
-      },
-      buttondown: {
-        success: bdResult.status === "fulfilled" && bdResult.value.success,
-        error:
-          bdResult.status === "rejected"
-            ? String(bdResult.reason)
-            : !bdResult.value.success
-              ? bdResult.value.error
-              : undefined,
-        emailId:
-          bdResult.status === "fulfilled" && bdResult.value.success
-            ? bdResult.value.data.id
-            : undefined,
-      },
-    };
-
-    const anyDistributionSucceeded =
-      result.typefully.x.success ||
-      result.typefully.linkedin.success ||
-      result.buttondown.success;
-
-    if (anyDistributionSucceeded) {
-      const ts = now();
-      const existingPosted = parseJsonArray<Platform>(thought.platforms_posted);
-      const posted: Platform[] = [...existingPosted];
-      if (result.typefully.x.success && !posted.includes("twitter"))
-        posted.push("twitter");
-      if (result.typefully.linkedin.success && !posted.includes("linkedin"))
-        posted.push("linkedin");
-
-      const db = getDB();
-      const updateResult = await updateThought(id, {
-        status: "published" as ContentStatus,
-        published_at: ts,
-        updated_at: ts,
-        platforms_posted: db ? toJsonArray(posted) : (posted as unknown),
-        ...(result.buttondown.emailId
-          ? { buttondown_email_id: result.buttondown.emailId }
-          : {}),
-        ...(result.typefully.x.draftId
-          ? { typefully_x_draft_id: result.typefully.x.draftId }
-          : {}),
-        ...(result.typefully.linkedin.draftId
-          ? { typefully_linkedin_draft_id: result.typefully.linkedin.draftId }
-          : {}),
-      });
-
-      result.status = {
-        success: !updateResult.error,
-        error: updateResult.error,
-      };
-    } else {
-      result.status = {
-        success: false,
-        error: "All distribution channels failed. Status not changed.",
-      };
-    }
-
-    return result;
+    return publishThoughtEverywhere(id);
   },
 );
 
@@ -560,39 +396,21 @@ export const deleteAtom = withAuth(async (atomId: string) => {
 
 export const pushAtomToTypefully = withAuth(async (atomId: string) => {
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
-
-  const atom = await getAtomById(atomId);
-  if (!atom) return { error: "Atom not found" };
-
-  const result = await typefullyCreateDraft(String(atom.atom_content));
-  if (!result.success) return { error: result.error };
-
-  await updateAtomFields(atomId, {
-    typefully_draft_id: result.data.id,
-    updated_at: now(),
-  });
-
-  return { success: true, draftId: result.data.id };
+  return pushAtomDraftToTypefully(atomId);
 });
 
 // ── Typefully Management ──
 
 export const fetchTypefullyDraftStatus = withAuth(async (draftId: string) => {
   if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
-
-  const result = await typefullyGetDraft(draftId);
-  if (!result.success) return { error: result.error };
-  return { success: true, draft: result.data };
+  return fetchTypefullyDraft(draftId);
 });
 
 // ── Buttondown Management ──
 
 export const fetchButtondownEmailStatus = withAuth(async (emailId: string) => {
   if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
-
-  const result = await buttondownGetEmail(emailId);
-  if (!result.success) return { error: result.error };
-  return { success: true, email: result.data };
+  return fetchButtondownEmail(emailId);
 });
 
 export const editButtondownEmail = withAuth(
@@ -601,31 +419,23 @@ export const editButtondownEmail = withAuth(
     fields: {
       subject?: string;
       body?: string;
-      status?: "draft" | "scheduled" | "about_to_send" | "in_flight" | "sent";
+      status?: ButtondownEmailUpdate["status"];
       publish_date?: string;
     },
   ) => {
     if (!SAFE_EXTERNAL_ID_RE.test(emailId))
       return { error: "Invalid email ID" };
-
-    const result = await buttondownUpdateEmail(emailId, fields);
-    if (!result.success) return { error: result.error };
-    return { success: true, email: result.data };
+    return editButtondownEmailRecord(emailId, fields);
   },
 );
 
 export const removeButtondownEmail = withAuth(async (emailId: string) => {
   if (!SAFE_EXTERNAL_ID_RE.test(emailId)) return { error: "Invalid email ID" };
-
-  const result = await buttondownDeleteEmail(emailId);
-  if (!result.success) return { error: result.error };
-  return { success: true };
+  return removeButtondownEmailRecord(emailId);
 });
 
 // ── Subscribers ──
 
 export const fetchSubscribers = withAuth(async () => {
-  const result = await buttondownListSubscribers("regular");
-  if (!result.success) return { error: result.error };
-  return { success: true, subscribers: result.data, count: result.count };
+  return fetchRegularSubscribers();
 });
