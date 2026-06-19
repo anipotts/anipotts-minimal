@@ -10,10 +10,10 @@ import type {
   ProjectCategory,
 } from "@anipotts/types";
 import { projectRowToProject } from "@anipotts/types";
-import { eq, desc, asc, and } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 import { logger } from "../logger";
 import { projects as FALLBACK_PROJECTS } from "../data/projects";
-import { getDrizzle, parseJsonArray, parseJson } from "../db";
+import { getDrizzle, parseJsonArray } from "../db";
 import * as s from "../db/schema";
 import { DEFAULT_CMS_PROJECTS, DEFAULT_CMS_WRITING } from "./defaults";
 import {
@@ -24,6 +24,7 @@ import {
   normalizeNewsletterContent,
 } from "./editor";
 import { normalizeHomepageContent } from "./homepage";
+import { fetchPageContent } from "./page";
 
 export {
   DEFAULT_CMS_PROJECTS,
@@ -42,6 +43,7 @@ export {
   validateNewsletterContent,
 } from "./editor";
 export { normalizeHomepageContent, validateHomepageContent } from "./homepage";
+export { fetchPageContent } from "./page";
 export {
   fetchAllSiteSettings,
   fetchSiteConfig,
@@ -105,50 +107,6 @@ export async function fetchCmsEditorSnapshot(): Promise<CmsEditorSnapshot> {
     newsletter: normalizeNewsletterContent(newsletterPage?.content),
     newsletterMeta: pageMeta(newsletterPage as PageContent<unknown> | null),
   };
-}
-
-// ---------------------------------------------------------------------------
-// Page content
-// ---------------------------------------------------------------------------
-
-export async function fetchPageContent<T = unknown>(
-  pageKey: string,
-): Promise<PageContent<T> | null> {
-  const db = getDrizzle();
-  if (db) {
-    try {
-      const rows = await db
-        .select()
-        .from(s.pageContent)
-        .where(
-          and(
-            eq(s.pageContent.page_key, pageKey),
-            eq(s.pageContent.published, true),
-          ),
-        )
-        .orderBy(desc(s.pageContent.version))
-        .limit(1);
-      const row = rows[0];
-      if (!row) return null;
-      return {
-        id: row.id,
-        page_key: row.page_key,
-        content: parseJson<T>(row.content) as T,
-        version: row.version ?? 1,
-        published: row.published ?? false,
-        updated_at: row.updated_at ?? "",
-        updated_by: row.updated_by ?? null,
-        created_at: row.created_at ?? "",
-      };
-    } catch (err) {
-      logger.error("cms", `D1 fetchPageContent("${pageKey}") failed`, {
-        error: String(err),
-      });
-      return null;
-    }
-  }
-
-  return null;
 }
 
 // ---------------------------------------------------------------------------
