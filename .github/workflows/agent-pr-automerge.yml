@@ -129,8 +129,10 @@ jobs:
           steps.targets.outputs.weekly_email == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           gh workflow run deploy.yml \
+            --repo "$GH_REPO" \
             --ref main \
             -f www=${{ steps.targets.outputs.www }} \
             -f admin=${{ steps.targets.outputs.admin }} \
