@@ -39,7 +39,7 @@ scripts/sync-yaml-to-d1.sh  Manual YAML sync from ~/Business/data/ to D1
 
 Admin sidebar: 5 spokes (Dashboard, Money, Content, Code, Ops). Live data via Mini API SSE at api.mini.anipotts.com.
 
-Content: the astro www renders markdown collections under `apps/www/src/content` (projects, running, writing), schema in `apps/www/src/content.config.ts`. The legacy `~/Content/pillars` -> `content/thoughts/` post-commit sync was the next-era flow; the markdown -> D1 sync for the astro site is phase-2 work.
+Content: the astro www renders markdown collections under `apps/www/src/content` (projects, making, writing), schema in `apps/www/src/content.config.ts`. The legacy `~/Content/pillars` -> `content/thoughts/` post-commit sync was the next-era flow; the markdown -> D1 sync for the astro site is phase-2 work.
 
 ## Cloudflare D1
 
@@ -65,8 +65,8 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 
 ## Key Patterns
 
-- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/shipping`, `/running`, `/projects`, `/orchestrating`, `/connect`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
-- Legacy route redirects (`/claude` -> `/orchestrating`, plus `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) are handled in `apps/www/src/middleware.ts`.
+- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/making`, `/projects`, `/orchestrating`, `/connect`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
+- Legacy route redirects (`/shipping` and `/running` -> `/making`, `/claude` -> `/orchestrating`, plus `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) are handled in `apps/www/src/middleware.ts`.
 - PostHog is proxied via the astro endpoint `apps/www/src/pages/ingest/[...path].ts` (not Next.js rewrites).
 - The React `Stagger` / `PageFrame` / `PageScaffold` primitives in `packages/ui` are next-era; the astro www does not use them.
 - Admin (legacy next): cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com.

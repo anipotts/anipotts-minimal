@@ -28,17 +28,16 @@ pnpm github:audit
 
 ## Content model
 
-- Astro www collections: `apps/www/src/content/{projects,running,writing}` (schema in `apps/www/src/content.config.ts`).
+- Astro www collections: `apps/www/src/content/{projects,making,writing}` (schema in `apps/www/src/content.config.ts`).
 - Synced to Cloudflare D1 (`anipotts-db`) for full-text search.
 
 ## Route map (astro www)
 
 - `/`, `/writing`, `/writing/[slug]`
-- `/shipping`
-- `/running`, `/running/weekly/[slug]`, `/running/experiments/[slug]`
+- `/making`
 - `/projects`, `/projects/[slug]`
 - `/orchestrating` (formerly `/claude`), `/connect`
-- legacy paths (`/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) redirect via `apps/www/src/middleware.ts`
+- legacy paths (`/shipping`, `/running`, `/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) redirect via `apps/www/src/middleware.ts`
 
 ## Claude stats
 
