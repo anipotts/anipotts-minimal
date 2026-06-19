@@ -23,7 +23,11 @@ import type {
 import { withAuth } from "./lib/with-auth";
 import { updateThought } from "./lib/content-records";
 import { savePageContent } from "./lib/page-content";
-import { upsertAtomRecord, deleteAtomRecord } from "@anipotts/lib/admin";
+import {
+  createAtomDraft,
+  deleteAtomDraft,
+  updateAtomDraft,
+} from "./lib/atom-records";
 import { getDB, uuid, now, toJsonArray } from "@anipotts/lib/db";
 import {
   editButtondownEmail as editButtondownEmailRecord,
@@ -335,22 +339,13 @@ export const createAtom = withAuth(
     hashtags?: string[],
   ) => {
     if (!UUID_RE.test(contentId)) return { error: "Invalid content ID" };
-
-    if (!getDB()) return { error: "Database not configured" };
-
-    try {
-      const data = await upsertAtomRecord({
-        content_id: contentId,
-        platform,
-        atom_content: atomContent,
-        voice_mode: voiceMode,
-        hashtags: hashtags || [],
-        status: "draft",
-      });
-      return { success: true, atom: data };
-    } catch (e) {
-      return { error: String(e) };
-    }
+    return createAtomDraft(
+      contentId,
+      platform,
+      atomContent,
+      voiceMode,
+      hashtags,
+    );
   },
 );
 
@@ -365,33 +360,13 @@ export const updateAtom = withAuth(
     },
   ) => {
     if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
-
-    if (!getDB()) return { error: "Database not configured" };
-
-    try {
-      const data = await upsertAtomRecord({
-        id: atomId,
-        ...fields,
-        updated_at: now(),
-      });
-      return { success: true, atom: data };
-    } catch (e) {
-      return { error: String(e) };
-    }
+    return updateAtomDraft(atomId, fields);
   },
 );
 
 export const deleteAtom = withAuth(async (atomId: string) => {
   if (!UUID_RE.test(atomId)) return { error: "Invalid atom ID" };
-
-  if (!getDB()) return { error: "Database not configured" };
-
-  try {
-    await deleteAtomRecord(atomId);
-    return { success: true };
-  } catch (e) {
-    return { error: String(e) };
-  }
+  return deleteAtomDraft(atomId);
 });
 
 export const pushAtomToTypefully = withAuth(async (atomId: string) => {
