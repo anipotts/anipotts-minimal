@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import {
   verifyAdminPassword,
   verifyAdminTotp,
@@ -20,7 +19,6 @@ import {
   updateThoughtContentFields,
   updateThoughtStatus,
 } from "./lib/content-records";
-import { savePageContent } from "./lib/page-content";
 import {
   createAtomDraft,
   deleteAtomDraft,
@@ -39,17 +37,11 @@ import {
   type PublishResult,
 } from "./lib/distribution";
 import {
-  cmsProjectPageKey,
-  cmsWritingPageKey,
-  normalizeCmsProject,
-  normalizeCmsWriting,
-  normalizeHomepageContent,
-  normalizeNewsletterContent,
-  validateCmsProject,
-  validateCmsWriting,
-  validateHomepageContent,
-  validateNewsletterContent,
-} from "@anipotts/lib/cms";
+  saveHomepageDraft,
+  saveNewsletterDraft,
+  saveProjectDraft,
+  saveWritingDraft,
+} from "./lib/site-content";
 import type {
   CmsProjectContent,
   CmsWritingContent,
@@ -123,65 +115,21 @@ export async function logout() {
 // ── Site Copy ──
 
 export const saveHomepageContent = withAuth(async (draft: HomepageContent) => {
-  const content = normalizeHomepageContent(draft);
-  const validation = validateHomepageContent(content);
-  if (!validation.ok) return { error: validation.error ?? "Invalid homepage" };
-
-  const result = await savePageContent("home", content);
-  if ("error" in result) return result;
-  revalidatePath("/");
-  return result;
+  return saveHomepageDraft(draft);
 });
 
 export const saveNewsletterContent = withAuth(
   async (draft: NewsletterContent) => {
-    const content = normalizeNewsletterContent(draft);
-    const validation = validateNewsletterContent(content);
-    if (!validation.ok)
-      return { error: validation.error ?? "Invalid newsletter" };
-
-    const result = await savePageContent("newsletter", content);
-    if ("error" in result) return result;
-    revalidatePath("/");
-    return result;
+    return saveNewsletterDraft(draft);
   },
 );
 
 export const saveProjectContent = withAuth(async (draft: CmsProjectContent) => {
-  const project = normalizeCmsProject(draft);
-  const validation = validateCmsProject(project);
-  if (!validation.ok) return { error: validation.error ?? "Invalid project" };
-
-  const result = await savePageContent(
-    cmsProjectPageKey(project.slug),
-    project,
-  );
-  if ("error" in result) return result;
-  revalidatePath("/");
-  revalidatePath("/projects");
-  revalidatePath("/making");
-  return {
-    success: true,
-    project: { ...result.content, updated_at: result.updatedAt },
-  };
+  return saveProjectDraft(draft);
 });
 
 export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
-  const writing = normalizeCmsWriting(draft);
-  const validation = validateCmsWriting(writing);
-  if (!validation.ok) return { error: validation.error ?? "Invalid writing" };
-
-  const result = await savePageContent(
-    cmsWritingPageKey(writing.slug),
-    writing,
-  );
-  if ("error" in result) return result;
-  revalidatePath("/");
-  revalidatePath("/writing");
-  return {
-    success: true,
-    writing: { ...result.content, updated_at: result.updatedAt },
-  };
+  return saveWritingDraft(draft);
 });
 
 export const updateContentStatus = withAuth(
