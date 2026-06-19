@@ -1,7 +1,7 @@
 # Contributor Checklist
 
 - Keep `#61abea` as the brand accent.
-- Reuse `PageFrame` scaffold for all main pages.
+- Reuse the local page scaffold for the app you are editing, such as `apps/labs/src/components/PageFrame.tsx` for labs.
 - Prefer server components unless client state is required.
 - Add/maintain content in local git-first files.
 - Validate project/thought frontmatter before publishing.
