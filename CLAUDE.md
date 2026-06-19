@@ -64,8 +64,8 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 
 ## Key Patterns
 
-- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/making`, `/projects`, `/orchestrating`, `/connect`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
-- Legacy route redirects (`/shipping` and `/running` -> `/making`, `/claude` -> `/orchestrating`, plus `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) are handled in `apps/www/src/middleware.ts`.
+- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/making`, `/projects`, `/orchestrating`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
+- Legacy route redirects are handled in `apps/www/src/middleware.ts`: `/shipping`, `/running`, and `/work` -> `/making`; `/connect`, `/links`, `/claude`, `/lab`, `/labs`, `/dev`, and `/updates` -> `/orchestrating`; `/metrics` -> `/orchestrating#status`; `/status` -> `/orchestrating#systems`; `/thoughts` -> `/writing`; `/docs` -> `/`.
 - PostHog is proxied via the astro endpoint `apps/www/src/pages/ingest/[...path].ts` (not Next.js rewrites).
 - The React `Stagger` / `PageFrame` / `PageScaffold` primitives in `packages/ui` are next-era; the astro www does not use them.
 - Admin (legacy next): cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com.

@@ -67,24 +67,3 @@ export async function checkRateLimit(
     return true;
   }
 }
-
-export async function verifyTurnstile(
-  token: string,
-  secret: string,
-  ip: string,
-): Promise<boolean> {
-  try {
-    const res = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ secret, response: token, remoteip: ip }),
-      },
-    );
-    const data = (await res.json()) as { success: boolean };
-    return data.success;
-  } catch {
-    return false;
-  }
-}

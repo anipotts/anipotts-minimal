@@ -17,12 +17,6 @@ const primaryItems = [
   { name: "claude", path: "/claude", section: "claude" },
 ] as const;
 
-const connectItem = {
-  name: "connect",
-  path: "/connect",
-  section: "connect",
-} as const;
-
 function isItemActive(
   section: string,
   path: string,
@@ -49,13 +43,6 @@ export function ExpandableNav({
     href: item.path,
     isActive: isItemActive(item.section, item.path, currentSection, pathname),
   }));
-
-  const connectActive = isItemActive(
-    connectItem.section,
-    connectItem.path,
-    currentSection,
-    pathname,
-  );
 
   useEffect(() => {
     setMenuOpen(false);
@@ -114,20 +101,6 @@ export function ExpandableNav({
               {item.name}
             </Link>
           ))}
-
-          <Link
-            href={connectItem.path}
-            className={`px-3 py-1.5 rounded-sm border text-xs uppercase tracking-[0.2em] transition-colors ${
-              connectActive
-                ? "border-accent-400 bg-accent-400/15 text-accent-400"
-                : "border-accent-400/40 text-accent-400 hover:bg-accent-400/10"
-            }`}
-            onClick={() => onNavClick?.(connectItem.name, connectItem.path)}
-            onMouseEnter={() => router.prefetch(connectItem.path)}
-            aria-current={connectActive ? "page" : undefined}
-          >
-            {connectItem.name}
-          </Link>
         </div>
 
         <button
@@ -154,14 +127,7 @@ export function ExpandableNav({
         }`}
       >
         <div className="flex flex-col py-2">
-          {[
-            ...items,
-            {
-              name: connectItem.name,
-              href: connectItem.path,
-              isActive: connectActive,
-            },
-          ].map((item, index) => (
+          {items.map((item, index) => (
             <Link
               key={item.name}
               href={item.href}

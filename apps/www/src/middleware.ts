@@ -4,8 +4,9 @@ import { defineMiddleware } from "astro:middleware";
 const REDIRECTS: Record<string, string> = {
   "/shipping": "/making",
   "/running": "/making",
+  "/connect": "/orchestrating",
   "/lab": "/orchestrating",
-  "/links": "/connect",
+  "/links": "/orchestrating",
   "/dev": "/orchestrating",
   "/updates": "/orchestrating",
   "/metrics": "/orchestrating#status",
@@ -33,12 +34,11 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
   "Content-Security-Policy": [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+    "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self'",
     "connect-src 'self' https://us.i.posthog.com https://us-assets.i.posthog.com",
-    "frame-src https://challenges.cloudflare.com",
   ].join("; "),
 };
 

@@ -36,8 +36,8 @@ pnpm validate     # build + lint + typecheck + test
 - `/`, `/writing`, `/writing/[slug]`
 - `/making`
 - `/projects`, `/projects/[slug]`
-- `/orchestrating` (formerly `/claude`), `/connect`
-- legacy paths (`/shipping`, `/running`, `/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`) redirect via `apps/www/src/middleware.ts`
+- `/orchestrating` (formerly `/claude`)
+- legacy paths (`/shipping`, `/running`, `/connect`, `/links`, `/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`, `/updates`, `/metrics`, `/status`, `/docs`) redirect via `apps/www/src/middleware.ts`
 
 ## Claude stats
 
@@ -50,7 +50,7 @@ pnpm update-claude-stats:commit   # regenerate + commit
 
 ## Environment
 
-The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`, `PUBLIC_TURNSTILE_SITE_KEY`). Only set env for features you use.
+The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`). Only set env for features you use.
 
 ## Archives
 

@@ -501,7 +501,7 @@ export const brandsEmails = sqliteTable(
 );
 
 // ---------------------------------------------------------------------------
-// 23. rate_limits (sliding-window rate limiting for /api/send + /api/subscribe)
+// 23. rate_limits (sliding-window rate limiting for newsletter subscribe)
 // ---------------------------------------------------------------------------
 // Created by SQL migration (supabase-era baseline), NOT auto-created at
 // runtime. The runtime keeps using raw db.prepare for the sliding window;
