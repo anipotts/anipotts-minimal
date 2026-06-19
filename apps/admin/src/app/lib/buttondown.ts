@@ -6,7 +6,9 @@ const BASE_URL = "https://api.buttondown.com/v1";
 export type ApiSuccess<T> = { success: true; data: T };
 export type ApiError = { success: false; error: string };
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
-export type DeleteResult = { success: true } | { success: false; error: string };
+export type DeleteResult =
+  | { success: true }
+  | { success: false; error: string };
 
 export type SubscriberListResult =
   | { success: true; data: ButtondownSubscriber[]; count: number }
@@ -78,31 +80,6 @@ export async function listSubscribers(
       data: data.results || [],
       count: data.count || 0,
     };
-  } catch (e) {
-    return { success: false, error: String(e) };
-  }
-}
-
-export async function listEmails(
-  status?: ButtondownEmailStatus,
-): Promise<ApiResult<ButtondownEmail[]>> {
-  try {
-    const { apiKey } = getConfig();
-    const params = new URLSearchParams();
-    if (status) params.set("status", status);
-    const res = await retry(() =>
-      fetch(`${BASE_URL}/emails?${params.toString()}`, {
-        headers: authHeaders(apiKey),
-      }),
-    );
-    if (!res.ok) {
-      return {
-        success: false,
-        error: `Buttondown ${res.status}: ${await res.text()}`,
-      };
-    }
-    const data = await res.json();
-    return { success: true, data: data.results || [] };
   } catch (e) {
     return { success: false, error: String(e) };
   }
