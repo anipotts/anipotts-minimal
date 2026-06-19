@@ -1102,15 +1102,16 @@ export async function fetchProjects(options?: {
 }
 
 // ---------------------------------------------------------------------------
-// Thoughts
+// Writing (D1 table: thoughts)
 // ---------------------------------------------------------------------------
 
 export type { ThoughtSummary } from "@anipotts/types";
+export type WritingSummary = ThoughtSummary;
 
-export async function fetchThoughts(options?: {
+export async function fetchWriting(options?: {
   published?: boolean;
   limit?: number;
-}): Promise<ThoughtSummary[]> {
+}): Promise<WritingSummary[]> {
   const db = getDrizzle();
   if (db) {
     try {
@@ -1148,7 +1149,7 @@ export async function fetchThoughts(options?: {
         tags: parseJsonArray(row.tags),
       }));
     } catch (err) {
-      logger.warn("cms", "D1 fetchThoughts() failed, using fallback", {
+      logger.warn("cms", "D1 fetchWriting() failed, using fallback", {
         error: String(err),
       });
       return [];
@@ -1158,7 +1159,9 @@ export async function fetchThoughts(options?: {
   return [];
 }
 
-export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
+export const fetchThoughts = fetchWriting;
+
+export async function searchWriting(query: string): Promise<WritingSummary[]> {
   const trimmed = query.trim();
   if (!trimmed) return [];
 
@@ -1194,13 +1197,15 @@ export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
         tags: parseJsonArray(row.tags),
       }));
     } catch (err) {
-      logger.warn("cms", "D1 searchThoughts() failed", { error: String(err) });
+      logger.warn("cms", "D1 searchWriting() failed", { error: String(err) });
       return [];
     }
   }
 
   return [];
 }
+
+export const searchThoughts = searchWriting;
 
 // ---------------------------------------------------------------------------
 // Social links

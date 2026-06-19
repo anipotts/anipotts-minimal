@@ -12,6 +12,7 @@ import {
   normalizeHomepageContent,
   normalizeNewsletterContent,
   searchThoughts,
+  searchWriting,
   validateCmsProject,
   validateCmsWriting,
   validateHomepageContent,
@@ -180,7 +181,9 @@ describe("writing search", () => {
 
     setDB(db);
 
-    const results = await searchThoughts('claude "code"');
+    expect(searchThoughts).toBe(searchWriting);
+
+    const results = await searchWriting('claude "code"');
 
     expect(preparedSql).toContain("t.published_at");
     expect(preparedSql).toContain(

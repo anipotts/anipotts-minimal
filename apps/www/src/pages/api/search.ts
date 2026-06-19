@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { json } from "../../lib/api";
-import { searchThoughts } from "@anipotts/lib/cms";
+import { searchWriting } from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 
@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
   setDB(locals.runtime.env.DB as unknown as D1Database);
 
   try {
-    const results = await searchThoughts(q);
+    const results = await searchWriting(q);
 
     return json({
       results: results.map((thought) => ({
