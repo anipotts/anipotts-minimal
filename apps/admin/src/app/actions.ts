@@ -13,22 +13,19 @@ import { adminLoginSchema, formatZodError } from "@anipotts/lib/validation";
 import { getEnv } from "@anipotts/lib/env";
 import { checkAdminLoginRateLimit } from "@/lib/rateLimit";
 import { headers } from "next/headers";
-import type {
-  SeriesType,
-  ContentStatus,
-  ContentType,
-  Platform,
-  VoiceMode,
-} from "@anipotts/types";
+import type { ContentStatus, Platform, VoiceMode } from "@anipotts/types";
 import { withAuth } from "./lib/with-auth";
-import { updateThought } from "./lib/content-records";
+import {
+  createThoughtDraft,
+  updateThoughtContentFields,
+  updateThoughtStatus,
+} from "./lib/content-records";
 import { savePageContent } from "./lib/page-content";
 import {
   createAtomDraft,
   deleteAtomDraft,
   updateAtomDraft,
 } from "./lib/atom-records";
-import { getDB, uuid, now, toJsonArray } from "@anipotts/lib/db";
 import {
   editButtondownEmail as editButtondownEmailRecord,
   fetchButtondownEmail,
@@ -64,26 +61,6 @@ export type { PublishResult } from "./lib/distribution";
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SAFE_EXTERNAL_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
-const VALID_STATUSES: ContentStatus[] = [
-  "idea",
-  "draft",
-  "ready",
-  "atomized",
-  "published",
-];
-const VALID_SERIES: SeriesType[] = [
-  "tip",
-  "news",
-  "tutorial",
-  "essay",
-  "behind-the-scenes",
-];
-const VALID_CONTENT_TYPES: ContentType[] = [
-  "video",
-  "article",
-  "thread",
-  "tip",
-];
 
 // ── Auth ──
 
@@ -210,67 +187,19 @@ export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
 export const updateContentStatus = withAuth(
   async (id: string, status: ContentStatus) => {
     if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-    if (!VALID_STATUSES.includes(status)) return { error: "Invalid status" };
-
-    const update: Record<string, string> = {
-      status,
-      updated_at: now(),
-    };
-    if (status === "published") {
-      update.published_at = now();
-    }
-
-    const result = await updateThought(id, update);
-    if (result.error) return { error: result.error };
-    return { success: true };
+    return updateThoughtStatus(id, status);
   },
 );
 
 // ── Content CRUD ──
 
 export const createThought = withAuth(async (formData: FormData) => {
-  const title = (formData.get("title") as string)?.trim();
-  const content = (formData.get("content") as string)?.trim();
-  const seriesType = formData.get("series_type") as SeriesType;
-  const contentType =
-    (formData.get("content_type") as ContentType) || "article";
-
-  if (!title) return { error: "Title is required" };
-  if (seriesType && !VALID_SERIES.includes(seriesType))
-    return { error: "Invalid series type" };
-  if (!VALID_CONTENT_TYPES.includes(contentType))
-    return { error: "Invalid content type" };
-
-  const base = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  const slug = `${base}-${Date.now().toString(36)}`;
-  const id = uuid();
-  const ts = now();
-
-  const db = getDB();
-  if (db) {
-    await db
-      .prepare(
-        `INSERT INTO thoughts (id, title, slug, content, summary, series_type, content_type, status, published, tags, views, created_at, updated_at)
-         VALUES (?, ?, ?, ?, '', ?, ?, 'draft', 0, '[]', 0, ?, ?)`,
-      )
-      .bind(
-        id,
-        title,
-        slug,
-        content || "",
-        seriesType || null,
-        contentType,
-        ts,
-        ts,
-      )
-      .run();
-    return { success: true, id };
-  }
-
-  return { error: "Database not configured" };
+  return createThoughtDraft({
+    title: formData.get("title") as string | null,
+    content: formData.get("content") as string | null,
+    seriesType: formData.get("series_type") as string | null,
+    contentType: formData.get("content_type") as string | null,
+  });
 });
 
 export const updateThoughtContent = withAuth(
@@ -284,31 +213,7 @@ export const updateThoughtContent = withAuth(
     },
   ) => {
     if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-    const update: Record<string, unknown> = { updated_at: now() };
-    if (fields.title !== undefined) {
-      if (!fields.title.trim()) return { error: "Title cannot be empty" };
-      update.title = fields.title;
-    }
-    if (fields.summary !== undefined) {
-      if (typeof fields.summary !== "string")
-        return { error: "Invalid summary" };
-      update.summary = fields.summary;
-    }
-    if (fields.content !== undefined) {
-      if (typeof fields.content !== "string")
-        return { error: "Invalid content" };
-      update.content = fields.content;
-    }
-
-    const db = getDB();
-    if (fields.tags !== undefined) {
-      update.tags = db ? toJsonArray(fields.tags) : fields.tags;
-    }
-
-    const result = await updateThought(id, update);
-    if (result.error) return { error: result.error };
-    return { success: true };
+    return updateThoughtContentFields(id, fields);
   },
 );
 
