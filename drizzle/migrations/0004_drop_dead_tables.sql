@@ -8,7 +8,7 @@
 -- that review happens.
 --
 -- DROP TABLE IF EXISTS github_events;        -- webhook store, never wired
--- DROP TABLE IF EXISTS contact_submissions;  -- /api/send only emails, never inserts
+-- DROP TABLE IF EXISTS contact_submissions;  -- old contact-route table, never wired
 -- DROP TABLE IF EXISTS content_config;       -- superseded by markdown-in-repo
 -- DROP TABLE IF EXISTS content_schedule;     -- editorial calendar, never used
 -- DROP TABLE IF EXISTS update_alerts;        -- AI-update tracking, never wired

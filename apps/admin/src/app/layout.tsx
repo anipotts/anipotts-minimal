@@ -1,10 +1,8 @@
-import { cookies } from "next/headers";
-import { verifySessionToken, ADMIN_COOKIE } from "@anipotts/lib/admin";
-import { getEnv } from "@anipotts/lib/env";
 import { JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import LoginForm from "./login-form";
 import AdminNav from "./admin-nav";
+import { requireAuth } from "./lib/session";
 import "./globals.css";
 import "./admin.css";
 
@@ -34,11 +32,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jar = await cookies();
-  const token = jar.get(ADMIN_COOKIE)?.value;
-  const secret = getEnv("ADMIN_PASSWORD");
-
-  const isAuthenticated = token && secret && verifySessionToken(token, secret);
+  const isAuthenticated = !(await requireAuth());
 
   return (
     <html lang="en" className={`dark ${jetbrainsMono.variable}`}>

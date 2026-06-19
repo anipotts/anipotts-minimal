@@ -7,7 +7,9 @@ status: published
 published_at: 2026-04-13
 ---
 
-A reporter from Business Insider reached out a couple weeks ago. He was writing about how usage limits on AI tools are changing the way people work. Somebody pointed him to me because I've been pretty vocal about how I use Claude Code. The article went live today: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4).
+The original Business Insider piece is here: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4).
+
+A reporter from Business Insider reached out a couple weeks ago. He was writing about how usage limits on AI tools are changing the way people work. Somebody pointed him to me because I've been pretty vocal about how I use Claude Code.
 
 He nailed the broad strokes. I do plan my work around session limits. I do save the hardest tasks for when I'm far from the cap. And yes, Saturdays are for Claude Code. That quote is real. My friends think I'm joking when I say that. I'm not.
 
@@ -35,8 +37,8 @@ The best sessions aren't the ones where Claude runs the longest. They're the one
 
 ## What I'm building with it
 
-I've logged over 1,000 hours of Claude Code across 600+ sessions. Right now I'm running 5 Claude Code sessions across different projects in a given week. The admin dashboard for this site, a quantitative interview prep app, a Mac Mini monitoring system, and open source tooling for other Claude Code users. I built [Claudemon](/thoughts/i-built-a-monitor-for-my-claude-code-sessions) to watch all of them from one place.
+I've logged over 1,000 hours of Claude Code across 600+ sessions. Right now I'm running 5 Claude Code sessions across different projects in a given week. The admin dashboard for this site, a quantitative interview prep app, a Mac Mini monitoring system, and open source tooling for other Claude Code users. I built [Claudemon](/writing/i-built-a-monitor-for-my-claude-code-sessions) to watch all of them from one place.
 
-The irony of getting interviewed about usage limits is that my entire workflow is designed to be maximally efficient with those limits. Specific prompts. Tight session scopes. [End-of-day todos written as agent instructions](/thoughts/stop-ending-your-day-with-fix-the-bug). Parallel agents in worktrees. None of this is because I'm trying to game the system. It's because it produces better code.
+The irony of getting interviewed about usage limits is that my entire workflow is designed to be maximally efficient with those limits. Specific prompts. Tight session scopes. [End-of-day todos written as agent instructions](/writing/stop-ending-your-day-with-fix-the-bug). Parallel agents in worktrees. None of this is because I'm trying to game the system. It's because it produces better code.
 
 The limits just made me figure that out faster.

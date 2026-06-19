@@ -28,7 +28,7 @@ export interface ServiceManifestInput {
   description?: string;
 }
 
-export type Action = "apply" | "diff" | "retire" | "status";
+export type Action = "apply" | "diff";
 
 export interface ApplyOptions {
   dryRun?: boolean;
@@ -48,6 +48,4 @@ export interface ServiceHandle {
   runFromArgv(argv?: string[]): Promise<void>;
   apply(opts?: ApplyOptions): Promise<PlannedWrite[]>;
   diff(): Promise<PlannedWrite[]>;
-  retire(): Promise<void>;
-  status(): Promise<unknown>;
 }

@@ -30,14 +30,13 @@ packages/lib/          Shared D1 client (Drizzle ORM), env helper, query modules
                          analytics/, cms/, admin/, validation/, status/
 packages/styles/       Design tokens + global css (used by the astro www)
 packages/config/       Shared config. packages/types/ TS interfaces. packages/services-platform/ platform svc clients.
-content/thoughts/      Legacy next-era blog markdown. The astro www reads apps/www/src/content instead.
 scripts/claude/        Stats generation from ~/.claude session logs
 scripts/sync-yaml-to-d1.sh  Manual YAML sync from ~/Business/data/ to D1
 ```
 
 Admin sidebar: 5 spokes (Dashboard, Money, Content, Code, Ops). Live data via Mini API SSE at api.mini.anipotts.com.
 
-Content: the astro www renders markdown collections under `apps/www/src/content` (projects, making, writing), schema in `apps/www/src/content.config.ts`. The legacy `~/Content/pillars` -> `content/thoughts/` post-commit sync was the next-era flow; the markdown -> D1 sync for the astro site is phase-2 work.
+Content: the astro www renders canonical markdown collections under `apps/www/src/content` (projects, making, writing), schema in `apps/www/src/content.config.ts`. Do not recreate the old root `content/` mirror in this renderer repo. Content operations still live in `~/Content`; this repo owns the published site shape and admin UI.
 
 ## Cloudflare D1
 

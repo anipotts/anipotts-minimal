@@ -4,7 +4,7 @@ import type { ServiceManifestInput, PlannedWrite } from "../types";
 // this returns the payload a future apply step would POST to
 // /accounts/:id/access/apps. Actual API call is wired in Session 2b.
 
-export interface CfAccessPlan {
+interface CfAccessPlan {
   app: {
     name: string;
     domain: string;
@@ -18,7 +18,7 @@ export interface CfAccessPlan {
   }>;
 }
 
-export function renderCfAccess(m: ServiceManifestInput): CfAccessPlan | null {
+function renderCfAccess(m: ServiceManifestInput): CfAccessPlan | null {
   if (m.visibility !== "public") return null;
   const emails = m.access?.emails ?? [];
   return {

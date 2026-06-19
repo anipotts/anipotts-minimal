@@ -3,35 +3,17 @@
 import { useState, useCallback } from "react";
 import type { QCRedditPost } from "@anipotts/lib/quantercise";
 import { searchReddit } from "./actions";
+import {
+  DEFAULT_REDDIT_KEYWORDS,
+  DEFAULT_REDDIT_SUBREDDITS,
+  REDDIT_RESPONSE_TEMPLATES,
+} from "./marketing-model";
+import {
+  MarketingError,
+  MarketingStatsBar,
+  MarketingTemplateRows,
+} from "./marketing-ui";
 import { useTracking } from "./use-tracking";
-
-const DEFAULT_SUBREDDITS =
-  "quant,QuantFinance,algotrading,financialcareers,cscareerquestions,mentalmath,learnmath,trading";
-const DEFAULT_KEYWORDS =
-  "mental math,quantitative,quant interview,math practice";
-
-const RESPONSE_TEMPLATES = [
-  {
-    label: "Mental Math Practice",
-    text: `If you're looking to sharpen your mental math for quant interviews, I built Quantercise for exactly this. It has timed drills across difficulty levels that mirror actual interview questions. Free tier available: https://quantercise.com`,
-  },
-  {
-    label: "Quant Interview Prep",
-    text: `For quant interview prep, I found that consistent daily practice matters more than cramming. Quantercise lets you do timed problem sets that scale in difficulty. The question bank covers probability, mental math, estimation, and logic: https://quantercise.com`,
-  },
-  {
-    label: "Looking for Resources",
-    text: `One resource I'd add to the list is Quantercise (https://quantercise.com). It focuses specifically on the quantitative reasoning and mental math side of things, with timed practice that adapts to your level.`,
-  },
-  {
-    label: "Specific Firm Interview",
-    text: `For that firm's interview style, the mental math round is usually the first filter. Quantercise has drills specifically designed for speed and accuracy under time pressure. Worth a look: https://quantercise.com`,
-  },
-  {
-    label: "Generic",
-    text: `Check out Quantercise (https://quantercise.com) if you haven't already. It's a practice platform for quantitative reasoning and mental math, designed around how these skills actually get tested in interviews.`,
-  },
-] as const;
 
 type SortKey = "score" | "date" | "comments" | "relevance";
 
@@ -54,8 +36,8 @@ export default function RedditView({ slug }: { slug: string }) {
     setError(null);
     try {
       const result = await searchReddit(slug, {
-        subreddits: DEFAULT_SUBREDDITS,
-        keywords: DEFAULT_KEYWORDS,
+        subreddits: DEFAULT_REDDIT_SUBREDDITS,
+        keywords: DEFAULT_REDDIT_KEYWORDS,
         days: 7,
         limit: 50,
       });
@@ -96,25 +78,6 @@ export default function RedditView({ slug }: { slug: string }) {
     }
   };
 
-  const statsBar = (
-    <div className="flex items-center gap-4 text-[10px] text-zinc-500">
-      <span>
-        Found: <span className="text-zinc-300">{posts.length}</span>
-      </span>
-      <span>
-        Responded:{" "}
-        <span className="text-emerald-400">{tracking.responded.length}</span>
-      </span>
-      <span>
-        Saved: <span className="text-blue-400">{tracking.saved.length}</span>
-      </span>
-      <span>
-        Skipped:{" "}
-        <span className="text-zinc-400">{tracking.skipped.length}</span>
-      </span>
-    </div>
-  );
-
   return (
     <div className="space-y-4">
       {/* Controls */}
@@ -133,14 +96,10 @@ export default function RedditView({ slug }: { slug: string }) {
             </span>
           )}
         </div>
-        {statsBar}
+        <MarketingStatsBar found={posts.length} tracking={tracking} />
       </div>
 
-      {error && (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-          <p className="text-[11px] text-red-400">{error}</p>
-        </div>
-      )}
+      {error && <MarketingError error={error} />}
 
       {/* Filters */}
       {posts.length > 0 && (
@@ -300,38 +259,19 @@ export default function RedditView({ slug }: { slug: string }) {
                     </button>
                   </div>
 
-                  {/* Response Templates */}
-                  <div className="mt-3 space-y-1.5">
-                    <span className="text-[10px] text-zinc-600 uppercase tracking-wide">
-                      Response templates
-                    </span>
-                    {RESPONSE_TEMPLATES.map((tpl) => (
-                      <div
-                        key={tpl.label}
-                        className="flex items-start justify-between gap-2 rounded border border-zinc-800/40 bg-zinc-900/50 p-2"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] font-medium text-zinc-400">
-                            {tpl.label}
-                          </span>
-                          <p className="text-[10px] text-zinc-500 mt-0.5 line-clamp-2">
-                            {tpl.text}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => {
-                            copyTemplate(tpl.text, `${post.id}-${tpl.label}`);
-                            track(post.id, "responded");
-                          }}
-                          className="shrink-0 px-2 py-1 rounded text-[10px] font-medium bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700/50 transition-colors"
-                        >
-                          {copiedId === `${post.id}-${tpl.label}`
-                            ? "Copied!"
-                            : "Copy"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  <MarketingTemplateRows
+                    heading="Response templates"
+                    templates={REDDIT_RESPONSE_TEMPLATES}
+                    copiedId={copiedId}
+                    getCopyId={(template) => `${post.id}-${template.label}`}
+                    onCopy={(template) => {
+                      copyTemplate(
+                        template.text,
+                        `${post.id}-${template.label}`,
+                      );
+                      track(post.id, "responded");
+                    }}
+                  />
                 </div>
               )}
             </div>

@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { json } from "./api";
 
-export const newsletterEmailSchema = z.string().trim().email().max(320);
+const newsletterEmailSchema = z.string().trim().email().max(320);
 
 export const subscribePayloadSchema = z.object({
   email: newsletterEmailSchema,
   website: z.string().max(0).optional().default(""),
 });
 
-export type NewsletterQueueMessage =
+type NewsletterQueueMessage =
   | {
       type: "confirm";
       subscriberId: string;
@@ -48,11 +48,8 @@ type TokenRow = {
 };
 
 const CONFIRM_TTL_MS = 1000 * 60 * 60 * 24 * 7;
-const UNSUBSCRIBE_TTL_MS = 1000 * 60 * 60 * 24 * 365 * 5;
-const DEFAULT_NEWSLETTER_FROM = "Ani Potts <news@anipotts.com>";
-const DEFAULT_NEWSLETTER_REPLY_TO = "contact@anipotts.com";
 
-export function nowIso(): string {
+function nowIso(): string {
   return new Date().toISOString();
 }
 
@@ -60,21 +57,8 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-export function baseUrl(
-  env: { NEWSLETTER_BASE_URL?: string },
-  request: Request,
-) {
+function baseUrl(env: { NEWSLETTER_BASE_URL?: string }, request: Request) {
   return env.NEWSLETTER_BASE_URL ?? new URL(request.url).origin;
-}
-
-export function newsletterIdentity(env: {
-  NEWSLETTER_FROM?: string;
-  NEWSLETTER_REPLY_TO?: string;
-}): { from: string; replyTo: string } {
-  return {
-    from: env.NEWSLETTER_FROM ?? DEFAULT_NEWSLETTER_FROM,
-    replyTo: env.NEWSLETTER_REPLY_TO ?? DEFAULT_NEWSLETTER_REPLY_TO,
-  };
 }
 
 export function html(body: string, status = 200): Response {
@@ -84,13 +68,13 @@ export function html(body: string, status = 200): Response {
   });
 }
 
-export async function tokenHash(token: string): Promise<string> {
+async function tokenHash(token: string): Promise<string> {
   const bytes = new TextEncoder().encode(token);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return hex(new Uint8Array(digest));
 }
 
-export function randomToken(): string {
+function randomToken(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
   let binary = "";
@@ -101,7 +85,7 @@ export function randomToken(): string {
     .replace(/=+$/g, "");
 }
 
-export async function createToken(
+async function createToken(
   db: D1Database,
   input: {
     subscriberId: string;
@@ -130,7 +114,7 @@ export async function createToken(
   return token;
 }
 
-export async function upsertPendingSubscriber(
+async function upsertPendingSubscriber(
   db: D1Database,
   email: string,
 ): Promise<SubscriberRow> {
@@ -315,19 +299,6 @@ export async function unsubscribeByToken(
       .bind(crypto.randomUUID(), token.subscriber_id, token.email, ts),
   ]);
   return "unsubscribed";
-}
-
-export async function createUnsubscribeToken(
-  db: D1Database,
-  subscriberId: string,
-  email: string,
-): Promise<string> {
-  return createToken(db, {
-    subscriberId,
-    email,
-    purpose: "unsubscribe",
-    ttlMs: UNSUBSCRIBE_TTL_MS,
-  });
 }
 
 export async function suppressEmail(

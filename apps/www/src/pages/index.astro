@@ -27,7 +27,7 @@ const newsletterCopy = normalizeNewsletterContent(newsletterPage?.content);
 const hasCmsHome = Boolean(homePage);
 const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
-const thoughts = cmsHome.sections.latest_thoughts;
+const writing = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
 const homeMakingSlugs = [
   "quantercise-extension",
@@ -46,7 +46,7 @@ const projects = (await visibleProjects())
       (homeMakingOrder.get(b.slug) ?? 0),
   )
   .slice(0, work.limit ?? 4);
-const writingEntries = (await publishedWriting()).slice(0, thoughts.limit ?? 3);
+const writingEntries = (await publishedWriting()).slice(0, writing.limit ?? 3);
 const workLabel = "making";
 const workHref = "/making";
 const ycMention = homeContent.mentions.yCombinatorF25;
@@ -109,11 +109,11 @@ const ycMention = homeContent.mentions.yCombinatorF25;
     </div>
   </section>}
 
-  {thoughts.visible && <section data-rise class="stack">
+  {writing.visible && <section data-rise class="stack">
     <span class="head-row">
-      <h2 class="section-label">{thoughts.label}</h2>
-      <a href={thoughts.view_all ?? "/writing"} class="quiet-link mono view-all"
-        >{thoughts.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
+      <h2 class="section-label">{writing.label}</h2>
+      <a href={writing.view_all ?? "/writing"} class="quiet-link mono view-all"
+        >{writing.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
       >
     </span>
     <div class="list">

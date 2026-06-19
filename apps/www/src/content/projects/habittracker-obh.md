@@ -7,6 +7,7 @@ category: music
 role: Data Engineering Intern
 duration: Summer 2024
 status: live
+visible: false
 sort_order: 41
 tags: [Python, Streamlit, SQL, APIs, Data Pipelines]
 ---

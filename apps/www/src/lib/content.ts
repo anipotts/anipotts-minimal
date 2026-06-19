@@ -35,6 +35,8 @@ export const writingSlug = (t: Writing): string => t.slug;
 export const projectSlug = (p: Project): string => p.slug;
 export const experimentSlug = (e: Experiment): string => e.data.slug ?? e.id;
 
+const HIDDEN_PUBLIC_PROJECTS = new Set(["habittracker-obh"]);
+
 function cmsLink(
   links: { label: string; url: string }[],
   labels: string[],
@@ -172,15 +174,11 @@ export async function visibleProjects(): Promise<Project[]> {
   const entries = await getCollection("projects", (p) => p.data.visible);
   const all = await Promise.all(entries.map(projectFromEntry));
   return all
-    .filter((project) => project.data.visible)
+    .filter(
+      (project) =>
+        project.data.visible && !HIDDEN_PUBLIC_PROJECTS.has(project.slug),
+    )
     .sort((a, b) => b.data.sort_order - a.data.sort_order);
-}
-
-export async function featuredProjects(limit = 4): Promise<Project[]> {
-  const all = await visibleProjects();
-  const featured = all.filter((p) => p.data.featured);
-  const rest = all.filter((p) => !p.data.featured);
-  return [...featured, ...rest].slice(0, limit);
 }
 
 export async function publishedExperiments(): Promise<Experiment[]> {
@@ -217,7 +215,7 @@ const SEASON_TO_QUARTER: Record<string, string> = {
   fall: "Q4",
 };
 
-export function getPeriod(p: Project): string {
+function getPeriod(p: Project): string {
   const d = p.data.duration.toLowerCase();
   if (d === "ongoing") return "ongoing";
   for (const [season, quarter] of Object.entries(SEASON_TO_QUARTER)) {
@@ -232,7 +230,7 @@ export function getPeriod(p: Project): string {
   return "ongoing";
 }
 
-export interface QuarterGroup {
+interface QuarterGroup {
   quarter: string | null;
   projects: Project[];
 }

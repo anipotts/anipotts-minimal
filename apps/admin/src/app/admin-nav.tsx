@@ -13,6 +13,7 @@ import {
   Brain,
   Megaphone,
   ChatCircleDots,
+  LockKey,
   SignOut,
 } from "@phosphor-icons/react";
 
@@ -74,6 +75,12 @@ const spokes = [
     href: "/feedback",
     match: (p: string) => p.startsWith("/feedback"),
     icon: <ChatCircleDots size={16} weight="duotone" />,
+  },
+  {
+    label: "Security",
+    href: "/security",
+    match: (p: string) => p.startsWith("/security"),
+    icon: <LockKey size={16} weight="duotone" />,
   },
 ];
 

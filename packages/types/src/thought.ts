@@ -34,16 +34,19 @@ export type Platform =
   | "substack"
   | "reddit";
 
-// Valid sections for content scoping
-export type Section =
+// Valid sections for content scoping.
+// D1 may still contain legacy section names from earlier route eras.
+export type ContentSection =
   | "www"
+  | "writing"
+  | "making"
+  | "orchestrating"
+  | "connect"
   | "thoughts"
   | "dev"
+  | "lab"
   | "work"
-  | "connect"
   | "claude";
-/** @deprecated Use Section */
-export type Subdomain = Section;
 
 export interface Thought {
   id: string;
@@ -78,7 +81,7 @@ export interface Thought {
   typefully_linkedin_draft_id?: string;
 
   // Section scoping
-  section?: Section;
+  section?: ContentSection;
 }
 
 export interface ThoughtStats {
@@ -115,7 +118,7 @@ export interface Atom {
   updated_at: string;
 
   // Section scoping
-  section?: Section;
+  section?: ContentSection;
 }
 
 export interface AtomWithContent extends Atom {
@@ -127,8 +130,11 @@ export interface ThoughtSummary {
   title: string;
   summary: string;
   created_at: string;
+  published_at?: string;
   views?: number;
   id?: string;
   series_type?: SeriesType | null;
   tags?: string | string[] | null;
 }
+
+export type WritingSummary = ThoughtSummary;

@@ -7,7 +7,7 @@ Monorepo for anipotts.com and its admin + labs surfaces.
 - Public site: Astro 5 (`apps/www`) on `@astrojs/cloudflare`, static output, served via Cloudflare Workers.
 - Legacy admin (`apps/admin`, Next.js) being replaced by `apps/admin-solid` (SolidStart).
 - `apps/labs` (Next.js), Cloudflare Workers under `workers/*`, shared `packages/*`.
-- Git-first content: markdown collections under `apps/www/src/content`, synced to Cloudflare D1.
+- Git-first public content: canonical markdown collections under `apps/www/src/content`, synced to Cloudflare D1.
 
 ## Quick start
 
@@ -28,6 +28,7 @@ pnpm validate     # build + lint + typecheck + test
 ## Content model
 
 - Astro www collections: `apps/www/src/content/{projects,making,writing}` (schema in `apps/www/src/content.config.ts`).
+- Do not add a root `content/` mirror in this repo. Content commands and drafts belong in `~/Content`; this repo owns the published renderer/admin shape.
 - Synced to Cloudflare D1 (`anipotts-db`) for full-text search.
 - Public brand logos live in `apps/www/public/images/brand` and should match `logoSrc` references in `apps/www/src/data/site.ts`.
 

@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-export const visibilitySchema = z.enum(["internal", "public"]);
+const visibilitySchema = z.enum(["internal", "public"]);
 
-export const miniSpecSchema = z.object({
+const miniSpecSchema = z.object({
   port: z.number().int().min(1).max(65535),
   workingDir: z.string().min(1),
   command: z.array(z.string()).min(1),
@@ -11,7 +11,7 @@ export const miniSpecSchema = z.object({
   preserveExistingPlist: z.boolean().optional(),
 });
 
-export const accessSpecSchema = z.object({
+const accessSpecSchema = z.object({
   emails: z.array(z.string().email()).optional(),
   serviceTokenIds: z.array(z.string()).optional(),
 });
@@ -28,5 +28,3 @@ export const serviceManifestSchema = z.object({
   owner: z.string().min(1),
   description: z.string().optional(),
 });
-
-export type ValidatedManifest = z.infer<typeof serviceManifestSchema>;

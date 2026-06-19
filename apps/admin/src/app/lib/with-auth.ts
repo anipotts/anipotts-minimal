@@ -1,4 +1,4 @@
-import { requireAuth } from "../actions";
+import { requireAuth } from "./session";
 
 export function withAuth<Args extends unknown[], R>(
   fn: (...args: Args) => Promise<R>,

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/claude/refresh-claude-stats.sh",
+        "scripts/sync-yaml-to-d1.sh",
+        "scripts/backfill-brands-emails.ts",
+        "scripts/mini/commit-publisher.ts"
+      ],
+      "ignoreDependencies": ["eslint"]
+    },
+    "apps/admin": {
+      "entry": ["open-next.config.ts"]
+    },
+    "apps/admin-solid": {
+      "entry": [
+        "app.config.ts",
+        "src/app.tsx",
+        "src/entry-client.tsx",
+        "src/entry-server.tsx",
+        "src/routes/**/*.tsx"
+      ]
+    },
+    "apps/labs": {
+      "entry": ["open-next.config.ts"]
+    },
+    "apps/www": {
+      "ignoreDependencies": ["@iconify-json/ph"]
+    },
+    "packages/lib": {
+      "ignoreDependencies": ["@opennextjs/cloudflare", "react"]
+    },
+    "services": {
+      "entry": ["*.ts"]
+    },
+    "workers/state": {
+      "ignoreDependencies": ["cloudflare"]
+    }
+  }
+}
