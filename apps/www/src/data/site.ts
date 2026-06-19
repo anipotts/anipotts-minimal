@@ -127,7 +127,7 @@ export const homeContent = {
     },
   ],
   press: {
-    href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
+    href: "/writing/saturdays-are-for-claude-code",
     label: "business insider",
   },
   mentions: {
@@ -158,7 +158,7 @@ export const homeContent = {
     },
     businessInsider: {
       label: "business insider",
-      href: "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
+      href: "/writing/saturdays-are-for-claude-code",
       logoSrc: "/images/brand/business-insider-favicon.svg",
       logoAlt: "business insider",
     },

@@ -1,5 +1,5 @@
 export type ProjectCategory = "ai" | "product" | "quant" | "music" | "other";
-export type ProjectStatus = "live" | "in-progress" | "coming-soon";
+export type ProjectStatus = "live" | "in-progress" | "coming-soon" | "archived";
 export type WorkPublishState =
   | "publish_now"
   | "placeholder"
@@ -26,6 +26,7 @@ export interface Project {
   tags: string[];
   status?: ProjectStatus;
   featured?: boolean;
+  visible?: boolean;
   icon?: "chrome";
   priority?: number;
   publishState?: WorkPublishState;

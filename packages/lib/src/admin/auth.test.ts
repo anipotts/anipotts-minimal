@@ -3,10 +3,16 @@ import { describe, expect, it, vi } from "vitest";
 import {
   verifyAdminPassword,
   verifyAdminTotp,
+  validateAdminPasswordCandidate,
+  hashAdminPassword,
+  createAdminCsrfToken,
   createSessionToken,
   verifySessionToken,
   ADMIN_COOKIE,
+  ADMIN_CSRF_COOKIE,
   ADMIN_COOKIE_OPTIONS,
+  ADMIN_CSRF_COOKIE_OPTIONS,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
 } from "./auth";
 
 describe("verifyAdminPassword", () => {
@@ -38,9 +44,37 @@ describe("verifyAdminPassword", () => {
     expect(result).toEqual({ success: true });
   });
 
+  it("verifies pbkdf2 hashed passwords", () => {
+    const stored = hashAdminPassword("long-enough-secret");
+    expect(verifyAdminPassword("long-enough-secret", stored)).toEqual({
+      success: true,
+    });
+    expect(verifyAdminPassword("wrong-secret", stored).success).toBe(false);
+  });
+
   it("is case-sensitive", () => {
     const result = verifyAdminPassword("Password", "password");
     expect(result.success).toBe(false);
+  });
+});
+
+describe("validateAdminPasswordCandidate", () => {
+  it("rejects short passwords", () => {
+    const result = validateAdminPasswordCandidate("short");
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a 12-character password", () => {
+    const result = validateAdminPasswordCandidate("twelve-chars");
+    expect(result).toEqual({ success: true });
+  });
+});
+
+describe("createAdminCsrfToken", () => {
+  it("returns a random hex token", () => {
+    const token = createAdminCsrfToken();
+    expect(token).toMatch(/^[a-f0-9]{64}$/);
+    expect(createAdminCsrfToken()).not.toBe(token);
   });
 });
 
@@ -112,13 +146,13 @@ describe("createSessionToken / verifySessionToken", () => {
     expect(verifySessionToken("a.b.c", secret)).toBe(false);
   });
 
-  it("rejects expired token (8+ hours old)", () => {
+  it("rejects expired token after the admin session age", () => {
     const now = Date.now();
     // Restore Date.now for verification
     vi.restoreAllMocks();
 
     // Manually create an expired token
-    const ts = (now - 28800 * 1000 - 1).toString();
+    const ts = (now - ADMIN_SESSION_MAX_AGE_SECONDS * 1000 - 1).toString();
     const hmac = crypto.createHmac("sha256", secret).update(ts).digest("hex");
     const expiredToken = `${ts}.${hmac}`;
 
@@ -131,10 +165,23 @@ describe("constants", () => {
     expect(ADMIN_COOKIE).toBe("admin_session");
   });
 
+  it("exports ADMIN_CSRF_COOKIE name", () => {
+    expect(ADMIN_CSRF_COOKIE).toBe("admin_csrf");
+  });
+
   it("exports secure cookie options", () => {
     expect(ADMIN_COOKIE_OPTIONS.httpOnly).toBe(true);
     expect(ADMIN_COOKIE_OPTIONS.secure).toBe(true);
     expect(ADMIN_COOKIE_OPTIONS.sameSite).toBe("lax");
-    expect(ADMIN_COOKIE_OPTIONS.maxAge).toBe(28800);
+    expect(ADMIN_COOKIE_OPTIONS.maxAge).toBe(ADMIN_SESSION_MAX_AGE_SECONDS);
+  });
+
+  it("exports secure csrf cookie options", () => {
+    expect(ADMIN_CSRF_COOKIE_OPTIONS.httpOnly).toBe(true);
+    expect(ADMIN_CSRF_COOKIE_OPTIONS.secure).toBe(true);
+    expect(ADMIN_CSRF_COOKIE_OPTIONS.sameSite).toBe("lax");
+    expect(ADMIN_CSRF_COOKIE_OPTIONS.maxAge).toBe(
+      ADMIN_SESSION_MAX_AGE_SECONDS,
+    );
   });
 });

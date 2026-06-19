@@ -9,6 +9,10 @@ import { authenticator } from "otplib";
 
 /** Cookie name used across all admin sessions */
 export const ADMIN_COOKIE = "admin_session";
+export const ADMIN_CSRF_COOKIE = "admin_csrf";
+export const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+const ADMIN_PASSWORD_HASH_PREFIX = "pbkdf2_sha256";
+const ADMIN_PASSWORD_HASH_ITERATIONS = 210000;
 
 /** Cookie options for admin session */
 export const ADMIN_COOKIE_OPTIONS: {
@@ -20,8 +24,77 @@ export const ADMIN_COOKIE_OPTIONS: {
   httpOnly: true,
   secure: true,
   sameSite: "lax",
-  maxAge: 28800,
+  maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
 };
+
+export const ADMIN_CSRF_COOKIE_OPTIONS: {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "strict" | "lax" | "none";
+  maxAge: number;
+} = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax",
+  maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
+};
+
+export function createAdminCsrfToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+export function hashAdminPassword(password: string, salt?: string): string {
+  const resolvedSalt = salt ?? crypto.randomBytes(16).toString("hex");
+  const hash = crypto
+    .pbkdf2Sync(
+      password,
+      resolvedSalt,
+      ADMIN_PASSWORD_HASH_ITERATIONS,
+      32,
+      "sha256",
+    )
+    .toString("hex");
+  return [
+    ADMIN_PASSWORD_HASH_PREFIX,
+    ADMIN_PASSWORD_HASH_ITERATIONS.toString(),
+    resolvedSalt,
+    hash,
+  ].join("$");
+}
+
+function verifyAdminPasswordHash(password: string, stored: string): boolean {
+  const [prefix, iterationsRaw, salt, expected] = stored.split("$");
+  if (
+    prefix !== ADMIN_PASSWORD_HASH_PREFIX ||
+    !iterationsRaw ||
+    !salt ||
+    !expected
+  ) {
+    return false;
+  }
+  const iterations = Number(iterationsRaw);
+  if (!Number.isInteger(iterations) || iterations < 100000) return false;
+  const actual = crypto
+    .pbkdf2Sync(password, salt, iterations, 32, "sha256")
+    .toString("hex");
+  const actualBuf = Buffer.from(actual, "hex");
+  const expectedBuf = Buffer.from(expected, "hex");
+  if (actualBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(actualBuf, expectedBuf);
+}
+
+export function validateAdminPasswordCandidate(password: string): {
+  success: boolean;
+  error?: string;
+} {
+  if (password.length < 12) {
+    return { success: false, error: "Password must be at least 12 characters" };
+  }
+  if (password.length > 200) {
+    return { success: false, error: "Password is too long" };
+  }
+  return { success: true };
+}
 
 /**
  * Verify a password against the provided admin password.
@@ -37,6 +110,11 @@ export function verifyAdminPassword(
 } {
   if (!adminPassword) {
     return { success: false, error: "Admin password not configured on server" };
+  }
+  if (adminPassword.startsWith(`${ADMIN_PASSWORD_HASH_PREFIX}$`)) {
+    return verifyAdminPasswordHash(password, adminPassword)
+      ? { success: true }
+      : { success: false, error: "Invalid password" };
   }
   // Hash both values so timingSafeEqual always compares equal-length buffers,
   // avoiding a timing leak on password length differences.
@@ -88,9 +166,13 @@ export function createSessionToken(secret: string): string {
 
 /**
  * Verify an HMAC-signed session token.
- * Returns true only if the signature is valid and the token is less than 8 hours old.
+ * Returns true only if the signature is valid and the token is not expired.
  */
-export function verifySessionToken(token: string, secret: string): boolean {
+export function verifySessionToken(
+  token: string,
+  secret: string,
+  maxAgeSeconds = ADMIN_SESSION_MAX_AGE_SECONDS,
+): boolean {
   const parts = token.split(".");
   if (parts.length !== 2) return false;
   const [ts, hmac] = parts;
@@ -102,8 +184,7 @@ export function verifySessionToken(token: string, secret: string): boolean {
   if (hmacBuf.length !== expectedBuf.length) return false;
   if (!crypto.timingSafeEqual(hmacBuf, expectedBuf)) return false;
 
-  // Check timestamp is not older than 8 hours (28800 seconds)
-  if (Date.now() - parseInt(ts) >= 28800 * 1000) return false;
+  if (Date.now() - parseInt(ts) >= maxAgeSeconds * 1000) return false;
 
   return true;
 }

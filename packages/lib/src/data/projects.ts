@@ -60,7 +60,7 @@ export const projects: Project[] = [
     duration: "Ongoing",
     tags: ["Python", "Claude Code", "Hooks", "Agents", "MCP", "Plugins"],
     status: "live",
-    featured: true,
+    featured: false,
     links: {
       repo: "https://github.com/anipotts/claude-code-tips",
     },
@@ -88,9 +88,9 @@ export const projects: Project[] = [
   {
     slug: "saeshify",
     title: "Saeshify",
-    subtitle: "Real-time rhyme scheme visualization.",
+    subtitle: "Real-time rhyme visualizer for lyrics and audio.",
     description:
-      "GPU-accelerated rendering pipeline that visualizes rhyme patterns in real time as lyrics play. Built with WebGL and Web Audio API.",
+      "WebGL and Web Audio pipeline that follows lyrics as they play and makes rhyme patterns visible in real time.",
     year: "2025-",
     category: "music",
     role: "Creator",
@@ -123,9 +123,9 @@ export const projects: Project[] = [
   {
     slug: "chainedchat",
     title: "ChainedChat",
-    subtitle: "Multi-LLM workflow orchestration platform.",
+    subtitle: "Sunsetted multi-LLM chat with shared context.",
     description:
-      "Built a full-stack platform for interacting with multiple LLMs in a single conversational workflow. Implements shared-context caching, multi-model routing, and intuitive UI for cost-efficient prompt chaining.",
+      "Archived Convex and Clerk app for interacting with multiple LLMs in a single conversational workflow. Useful as a snapshot, not an active product.",
     year: "2025",
     category: "ai",
     role: "Founder",
@@ -138,7 +138,7 @@ export const projects: Project[] = [
       "Stripe",
       "TailwindCSS",
     ],
-    status: "coming-soon",
+    status: "archived",
     links: {
       repo: "https://github.com/anipotts/chained-chat",
     },
@@ -175,6 +175,7 @@ export const projects: Project[] = [
     duration: "Summer 2024",
     tags: ["Python", "Streamlit", "SQL", "APIs", "Data Pipelines"],
     status: "live",
+    visible: false,
   },
 
   // === QUANT/FINANCE ===
