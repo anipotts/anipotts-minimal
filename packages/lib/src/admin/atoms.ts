@@ -4,14 +4,14 @@
  */
 
 import type { Atom } from "@anipotts/types";
-import type { QueryOptions } from "./thoughts";
+import type { ContentQueryOptions } from "./writing";
 import { eq, desc } from "drizzle-orm";
 import { logger } from "../logger";
 import { getDrizzle, parseJsonArray, toJsonArray, uuid, now } from "../db";
 import * as s from "../db/schema";
 
 /** Fetch all atoms, ordered by newest first. */
-export async function fetchAllAtoms(_options?: QueryOptions) {
+export async function fetchAllAtoms(_options?: ContentQueryOptions) {
   const db = getDrizzle();
   if (!db) return [];
 
@@ -37,7 +37,7 @@ export async function fetchAllAtoms(_options?: QueryOptions) {
 /** Fetch atoms for a specific content piece. */
 export async function fetchAtomsByContent(
   contentId: string,
-  _options?: QueryOptions,
+  _options?: ContentQueryOptions,
 ) {
   const db = getDrizzle();
   if (!db) return [];

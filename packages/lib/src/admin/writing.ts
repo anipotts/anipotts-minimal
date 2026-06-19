@@ -9,18 +9,21 @@ import { logger } from "../logger";
 import { getDrizzle, parseJsonArray, toJsonArray, uuid, now } from "../db";
 import * as s from "../db/schema";
 
-export interface QueryOptions {
+export interface ContentQueryOptions {
   section?: ContentSection;
   /** @deprecated Use section. */
   subdomain?: ContentSection;
 }
 
-function querySection(options?: QueryOptions) {
+/** @deprecated Use ContentQueryOptions. */
+export type QueryOptions = ContentQueryOptions;
+
+function querySection(options?: ContentQueryOptions) {
   return options?.section ?? options?.subdomain;
 }
 
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */
-export async function fetchAllThoughts(options?: QueryOptions) {
+export async function fetchAllThoughts(options?: ContentQueryOptions) {
   const db = getDrizzle();
   if (!db) return [];
 
@@ -143,7 +146,7 @@ export async function incrementThoughtViewCount(slug: string) {
 }
 
 /** Fetch aggregated stats for the admin analytics monitor. */
-export async function fetchThoughtStats(options?: QueryOptions) {
+export async function fetchThoughtStats(options?: ContentQueryOptions) {
   const db = getDrizzle();
   if (!db) return null;
 
