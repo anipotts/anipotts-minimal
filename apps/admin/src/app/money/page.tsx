@@ -430,54 +430,6 @@ async function VenturesSection() {
   );
 }
 
-// ── Revenue Trend (placeholder) ──
-
-function RevenueTrendPlaceholder() {
-  return (
-    <Section title="Revenue Trend">
-      <div className="flex flex-col items-center justify-center py-6">
-        <div className="text-[11px] text-zinc-600 mb-1">Collecting data...</div>
-        <div className="text-[10px] text-zinc-700">
-          Mercury transactions will populate this chart once enough history
-          accumulates in daily_rollups.
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-// ── Calendar (placeholder) ──
-
-function CalendarPlaceholder() {
-  return (
-    <Section title="Calendar">
-      <div className="flex flex-col items-center justify-center py-6">
-        <div className="text-[11px] text-zinc-500">Connect Calendar</div>
-        <div className="text-[10px] text-zinc-700 mt-1">
-          Mini API has no calendar endpoint yet. Add one to surface upcoming
-          meetings here.
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-// ── Invoices (placeholder) ──
-
-function InvoicePlaceholder() {
-  return (
-    <Section title="Invoices">
-      <div className="flex flex-col items-center justify-center py-6">
-        <div className="text-[11px] text-zinc-500">Connect Gmail</div>
-        <div className="text-[10px] text-zinc-700 mt-1">
-          Future integration will pull invoice attachments from Gmail and
-          surface outstanding payments here.
-        </div>
-      </div>
-    </Section>
-  );
-}
-
 // ── Page ──
 
 export default function MoneyPage() {
@@ -508,17 +460,9 @@ export default function MoneyPage() {
           <DomainsSection />
         </Suspense>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Suspense fallback={<SectionSkeleton title="Ventures" />}>
-            <VenturesSection />
-          </Suspense>
-          <RevenueTrendPlaceholder />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <CalendarPlaceholder />
-          <InvoicePlaceholder />
-        </div>
+        <Suspense fallback={<SectionSkeleton title="Ventures" />}>
+          <VenturesSection />
+        </Suspense>
       </div>
     </div>
   );
