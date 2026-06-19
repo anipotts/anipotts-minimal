@@ -32,4 +32,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate affected packages
-        run: pnpm turbo build lint typecheck test --affected --output-logs=errors-only
+        env:
+          TURBO_SCM_BASE: origin/${{ github.base_ref }}
+          TURBO_SCM_HEAD: HEAD
+        run: |
+          pnpm turbo build --affected --output-logs=errors-only
+          pnpm turbo lint --affected --output-logs=errors-only
+          pnpm turbo typecheck --affected --output-logs=errors-only
+          pnpm turbo test --affected --output-logs=errors-only
