@@ -87,7 +87,7 @@ export default async function ContentDetailPage({
           )}
         </div>
         <a
-          href={`https://anipotts.com/thoughts/${t.slug}`}
+          href={`https://anipotts.com/writing/${t.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-1 shrink-0"

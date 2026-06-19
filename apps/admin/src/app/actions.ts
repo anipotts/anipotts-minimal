@@ -90,6 +90,10 @@ const SITE_URL = getEnv("SITE_URL") || "https://anipotts.com";
 const X_CONTENT_LIMIT = 250;
 const LINKEDIN_CONTENT_LIMIT = 2500;
 
+function publicWritingUrl(slug: string): string {
+  return `${SITE_URL}/writing/${slug}`;
+}
+
 function buildXPost(content: string, link: string): string {
   return content.length > X_CONTENT_LIMIT
     ? `${content.slice(0, X_CONTENT_LIMIT - 3)}...\n\n${link}`
@@ -561,7 +565,7 @@ export const pushToTypefully = withAuth(async (id: string) => {
   const thought = await getThoughtById(id, "title, content, slug");
   if (!thought) return { error: "Thought not found" };
 
-  const link = `${SITE_URL}/thoughts/${thought.slug}`;
+  const link = publicWritingUrl(String(thought.slug));
   const content = String(thought.content || "");
 
   const xResult = await typefullyCreateDraft(buildXPost(content, link));
@@ -609,7 +613,7 @@ export const publishEverywhere = withAuth(
     const thought = await getThoughtById(id);
     if (!thought) return { error: "Thought not found" };
 
-    const link = `${SITE_URL}/thoughts/${thought.slug}`;
+    const link = publicWritingUrl(String(thought.slug));
     const content = String(thought.content || "");
 
     const [xResult, liResult, bdResult] = await Promise.allSettled([
