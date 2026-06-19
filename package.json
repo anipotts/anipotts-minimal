@@ -22,7 +22,6 @@
     "clean": "turbo clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
-    "sync-thoughts": "npx tsx scripts/sync-thoughts.ts",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "update-claude-stats:commit": "scripts/claude/refresh-claude-stats.sh",
     "test:unit": "turbo test",
