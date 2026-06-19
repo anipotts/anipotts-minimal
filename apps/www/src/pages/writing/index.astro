@@ -26,10 +26,10 @@ const writingEntries = await publishedWriting();
   </section>
 
   <section data-rise class="stack">
-    <label class="search-wrap" for="thoughts-search">
+    <label class="search-wrap" for="writing-search">
       <Icon name="ph:magnifying-glass" class="search-glyph" />
       <input
-        id="thoughts-search"
+        id="writing-search"
         class="field search"
         type="search"
         placeholder="search writing"
@@ -37,7 +37,7 @@ const writingEntries = await publishedWriting();
       />
     </label>
     <p class="count mono" id="search-count" aria-live="polite"></p>
-    <div class="list" id="thoughts-list">
+    <div class="list" id="writing-list">
       {writingEntries.map((item) => <WritingRow item={item} />)}
     </div>
   </section>
@@ -98,8 +98,8 @@ const writingEntries = await publishedWriting();
 </style>
 
 <script>
-  const input = document.getElementById("thoughts-search") as HTMLInputElement;
-  const list = document.getElementById("thoughts-list")!;
+  const input = document.getElementById("writing-search") as HTMLInputElement;
+  const list = document.getElementById("writing-list")!;
   const count = document.getElementById("search-count")!;
   const original = list.innerHTML;
 

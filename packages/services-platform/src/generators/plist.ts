@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { ServiceManifestInput, PlannedWrite } from "../types";
 
 // Expand leading ~ in a path to the user's home dir.
-export function expandHome(p: string): string {
+function expandHome(p: string): string {
   if (p === "~") return homedir();
   if (p.startsWith("~/")) return join(homedir(), p.slice(2));
   return p;

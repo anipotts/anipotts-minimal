@@ -27,5 +27,5 @@ export default defineConfig({
   dts: true,
   splitting: true,
   sourcemap: false,
-  external: ["posthog-node", "react"],
+  external: ["react"],
 });

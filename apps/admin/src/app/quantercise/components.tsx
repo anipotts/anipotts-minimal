@@ -1,6 +1,6 @@
 export { getQCEnv } from "@/lib/qc-env";
 
-export function Skeleton({ className = "" }: { className?: string }) {
+function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div className={`animate-pulse rounded bg-zinc-800/40 ${className}`} />
   );

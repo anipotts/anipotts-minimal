@@ -1,16 +1,11 @@
 // Project types
-export type {
-  Project,
-  ProjectCategory,
-  ProjectStatus,
-  WorkPublishState,
-  DemoAsset,
-} from "./project";
+export type { Project, ProjectCategory, ProjectStatus } from "./project";
 
-// Thought/blog types
+// Writing/content types
 export type {
   Thought,
   ThoughtSummary,
+  WritingSummary,
   ThoughtStats,
   Atom,
   AtomWithContent,
@@ -21,8 +16,7 @@ export type {
   ArtifactType,
   Platform,
   AtomStatus,
-  Section,
-  Subdomain,
+  ContentSection,
 } from "./thought";
 
 // Link types

@@ -1,10 +1,8 @@
 import type { ServiceManifestInput, PlannedWrite, Action } from "./types";
 import { apply } from "./actions/apply";
 import { diff } from "./actions/diff";
-import { retire } from "./actions/retire";
-import { status } from "./actions/status";
 
-const ACTIONS: Action[] = ["apply", "diff", "retire", "status"];
+const ACTIONS: Action[] = ["apply", "diff"];
 
 function formatPlans(plans: PlannedWrite[]): string {
   return plans
@@ -47,16 +45,6 @@ export async function runFromArgv(
       console.log(
         "applied: local plist only. cloudflared/cf-access/d1 deferred to 2b.",
       );
-    return;
-  }
-  if (action === "retire") {
-    await retire(m);
-    console.log("retire stubbed in 2a (needs D1 binding)");
-    return;
-  }
-  if (action === "status") {
-    const s = await status(m);
-    console.log(s.message);
     return;
   }
 }

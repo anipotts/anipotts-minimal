@@ -99,14 +99,17 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "otplib": "^12.0.1",
-    "posthog-node": "^5.17.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },
   "peerDependencies": {
+    "@opennextjs/cloudflare": "^1.19.10",
     "react": "^18 || ^19"
   },
   "peerDependenciesMeta": {
+    "@opennextjs/cloudflare": {
+      "optional": true
+    },
     "react": {
       "optional": true
     }

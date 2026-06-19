@@ -19,8 +19,8 @@ export {
   deleteThoughtRecord,
   incrementThoughtViewCount,
   fetchThoughtStats,
-  type QueryOptions,
-} from "./thoughts";
+  type ContentQueryOptions,
+} from "./writing";
 
 export {
   fetchAllAtoms,

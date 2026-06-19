@@ -26,17 +26,6 @@ export const updateFeatureFlag = withAuth(
   },
 );
 
-export const updateProblem = withAuth(
-  async (id: string, data: Record<string, unknown>) => {
-    return qcMutate<{ success: boolean }>(
-      `/api/admin/problems/${encodeURIComponent(id)}`,
-      getQCEnv(),
-      data,
-      "PATCH",
-    );
-  },
-);
-
 export const resolveFailedEvent = withAuth(
   async (id: string, source: string, notes?: string) => {
     return qcMutate<{ success: boolean }>(

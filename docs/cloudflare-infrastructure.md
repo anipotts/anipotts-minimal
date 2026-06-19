@@ -59,7 +59,7 @@ DNS for `anipotts.com` is in Cloudflare zone `d56476e2905a2a19ad86aaa4b7c719c2` 
 ### P3: nice-to-have, low-priority
 
 11. **Zaraz.** Server-side third-party scripts (PostHog, GA, etc.) at the edge. Removes client JS bundles. Only matters if perf budget tightens.
-12. **Turnstile.** Already in use on `apps/www` contact form (per the security headers in `next.config.ts`). Confirm it's wired and the secret is set on the live Worker.
+12. **Turnstile.** No current public form uses it after the stale `/connect` contact route was removed. Reintroduce Turnstile only with a new user-facing form and document the Worker secret at that point.
 13. **D1 read replicas + sessions.** Once read traffic to `anipotts-db` justifies it (it doesn't yet). Park.
 14. **Hyperdrive.** Only if we ever add an external Postgres. We don't have one. Park.
 
@@ -72,7 +72,7 @@ DNS for `anipotts.com` is in Cloudflare zone `d56476e2905a2a19ad86aaa4b7c719c2` 
 | Product              | PostHog (already wired on www)    | "Did the conversion funnel change?"     |
 | App errors           | Sentry on Workers                 | "What stack trace just fired?"          |
 | Raw logs             | Workers Logs (7d) + Logpush to R2 | "What did the Worker actually do?"      |
-| Email deliverability | CF Email Routing dashboard        | "Did the contact form mail get sent?"   |
+| Email deliverability | Resend and worker logs            | "Did newsletter mail send or bounce?"   |
 | DB health            | D1 metrics in CF dashboard        | "How many rows? How many slow queries?" |
 | CI                   | GitHub Actions                    | "Did the deploy go green?"              |
 
@@ -128,16 +128,16 @@ All issues are code-quality findings from a March audit. None are blocked by Ver
 
 **P2 medium (8):**
 
-| #   | Title                                                            | Action                                                                                                          |
-| --- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| 11  | Add a11y labels to all form inputs and search                    | Bundle into next www UI PR.                                                                                     |
-| 12  | Fix TipCard nested interactive elements (a11y violation)         | Bundle into next www UI PR.                                                                                     |
-| 13  | Remove dead code: unused exports across codebase                 | Bundle when convenient. Use `ts-prune` or `knip`.                                                               |
-| 14  | Add error boundary for admin routes                              | Trivial in App Router. Bundle into next admin PR.                                                               |
-| 15  | Fix `logger.info` using `console.warn` instead of `console.info` | Trivial bug fix.                                                                                                |
-| 16  | Memoize ThemeContext value to prevent unnecessary re-renders     | Trivial perf fix.                                                                                               |
-| 19  | Add Turnstile fetch timeout and CSRF origin check on `/api/send` | Real security improvement. Bundle into PR #30 or its successor since `/api/send` is being touched there anyway. |
-| 20  | Add cache headers to `/api/icon` route                           | Trivial. Bundle into next www PR.                                                                               |
+| #   | Title                                                            | Action                                                                                                                     |
+| --- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 11  | Add a11y labels to all form inputs and search                    | Bundle into next www UI PR.                                                                                                |
+| 12  | Fix TipCard nested interactive elements (a11y violation)         | Bundle into next www UI PR.                                                                                                |
+| 13  | Remove dead code: unused exports across codebase                 | Bundle when convenient. Use `ts-prune` or `knip`.                                                                          |
+| 14  | Add error boundary for admin routes                              | Trivial in App Router. Bundle into next admin PR.                                                                          |
+| 15  | Fix `logger.info` using `console.warn` instead of `console.info` | Trivial bug fix.                                                                                                           |
+| 16  | Memoize ThemeContext value to prevent unnecessary re-renders     | Trivial perf fix.                                                                                                          |
+| 19  | Add Turnstile fetch timeout and CSRF origin check on `/api/send` | Obsolete. `/api/send` was removed with the stale contact route cleanup; revisit only if a new public write endpoint ships. |
+| 20  | Add cache headers to `/api/icon` route                           | Trivial. Bundle into next www PR.                                                                                          |
 
 **P3 low (5):**
 

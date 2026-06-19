@@ -2,7 +2,7 @@ import { JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import LoginForm from "./login-form";
 import AdminNav from "./admin-nav";
-import { requireAuth } from "./actions";
+import { requireAuth } from "./lib/session";
 import "./globals.css";
 import "./admin.css";
 

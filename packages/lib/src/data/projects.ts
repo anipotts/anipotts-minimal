@@ -197,8 +197,5 @@ export const projects: Project[] = [
   },
 ];
 
-/** Alias for static fallback data */
-export const FALLBACK_PROJECTS = projects;
-
 /** Projects with an external live URL (for status monitoring, links page, etc.) */
 export const liveProjects = projects.filter((p) => p.links?.live);

@@ -67,9 +67,6 @@ export const socialLinks: SocialLink[] = [
   },
 ];
 
-/** Alias for static fallback data */
-export const FALLBACK_SOCIAL_LINKS = socialLinks;
-
 /** Social handle used across platforms */
 export const SOCIAL_HANDLE = "@anipottsbuilds";
 

@@ -2,12 +2,6 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export { LANGUAGE_COLORS, getLanguageColor } from "./languages";
-export {
-  isDevelopment,
-  getSubdomainUrl,
-  getHomeUrl,
-  getAllSubdomainUrls,
-} from "./urls";
 export { formatShortRelativeTime, formatNumber } from "./formatters";
 export { parseTags } from "./tags";
 
