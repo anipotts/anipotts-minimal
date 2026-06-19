@@ -12,7 +12,6 @@ this is the content shape that should feed the next admin editor pass. it stays 
 | writing previews     | `apps/www/src/content/writing/*.md`                                       | title, slug, summary, tags, status, published date, body                                                         | five published posts, mostly claude code and ai workflow      |
 | newsletter block     | `apps/www/src/components/NewsletterSubscribe.astro`                       | static label, lede, email form, status messages                                                                  | copy now makes the promise specific without inventing cadence |
 | making notes         | `apps/www/src/content/making/**`                                          | weekly digests and experiments                                                                                   | useful as source material, not polished newsletter archive    |
-| legacy mirrors       | root `content/thoughts`                                                   | older content mirror                                                                                             | do not treat as canonical without confirming sync direction   |
 
 ## highest-leverage cleanup batch
 
@@ -111,4 +110,3 @@ do not invent fake archives. these are candidates from existing work and should 
 | should project `subtitle` be renamed to `summary` in the editor while staying mapped to markdown frontmatter | editor copy should match how ani thinks about cards                                |
 | should writing stay file-backed or move into D1 first                                                        | admin currently edits D1 thoughts, while www uses astro content collections        |
 | should newsletter copy live in `page_content` or static site config                                          | this decides whether non-article homepage copy can be edited with the same surface |
-| should old root `content/thoughts` keep syncing into `apps/www/src/content/writing`                          | there are duplicate content paths and the owner of truth needs to be explicit      |
