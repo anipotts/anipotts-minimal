@@ -52,7 +52,10 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           files="$RUNNER_TEMP/pr-files.txt"
-          gh pr diff "$PR_URL" --name-only > "$files"
+          pr_number="${PR_URL##*/}"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" \
+            --paginate \
+            --jq '.[].filename' > "$files"
 
           www=false
           admin=false
