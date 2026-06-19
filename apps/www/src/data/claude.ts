@@ -2,7 +2,7 @@ const TIPS_REPO = "https://github.com/anipotts/claude-code-tips";
 const TIPS_BLOB = `${TIPS_REPO}/blob/main`;
 const MINE_REPO = "https://github.com/anipotts/mine";
 
-export { TIPS_REPO, TIPS_BLOB, MINE_REPO };
+export { TIPS_REPO, MINE_REPO };
 
 export interface MineFeature {
   name: string;
