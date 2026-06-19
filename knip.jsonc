@@ -28,6 +28,9 @@
     "apps/www": {
       "ignoreDependencies": ["@iconify-json/ph"]
     },
+    "packages/lib": {
+      "ignoreDependencies": ["@opennextjs/cloudflare", "react"]
+    },
     "services": {
       "entry": ["*.ts"]
     },

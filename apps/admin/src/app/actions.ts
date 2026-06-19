@@ -32,8 +32,6 @@ import {
 import {
   createDraft as typefullyCreateDraft,
   getDraft as typefullyGetDraft,
-  updateDraft as typefullyUpdateDraft,
-  deleteDraft as typefullyDeleteDraft,
 } from "./lib/typefully";
 import {
   createEmail as buttondownCreateEmail,
@@ -416,19 +414,6 @@ export const saveWritingContent = withAuth(async (draft: CmsWritingContent) => {
   };
 });
 
-// ── Content Status ──
-
-export const approveContent = withAuth(async (id: string) => {
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-  const result = await updateThought(id, {
-    status: "ready",
-    updated_at: now(),
-  });
-  if (result.error) return { error: result.error };
-  return { success: true };
-});
-
 export const updateContentStatus = withAuth(
   async (id: string, status: ContentStatus) => {
     if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
@@ -556,44 +541,6 @@ export const pushToButtondown = withAuth(async (id: string) => {
     updated_at: now(),
   });
   return { success: true, emailId: result.data.id };
-});
-
-// ── Distribution: Typefully ──
-
-export const pushToTypefully = withAuth(async (id: string) => {
-  if (!UUID_RE.test(id)) return { error: "Invalid content ID" };
-
-  const thought = await getThoughtById(id, "title, content, slug");
-  if (!thought) return { error: "Thought not found" };
-
-  const link = publicWritingUrl(String(thought.slug));
-  const content = String(thought.content || "");
-
-  const xResult = await typefullyCreateDraft(buildXPost(content, link));
-  if (!xResult.success) return { error: `X: ${xResult.error}` };
-
-  const liResult = await typefullyCreateDraft(
-    buildLinkedInPost(String(thought.title), content, link),
-  );
-  if (!liResult.success) return { error: `LinkedIn: ${liResult.error}` };
-
-  const xId = xResult.data?.id;
-  const liId = liResult.data?.id;
-  if (xId || liId) {
-    await updateThought(id, {
-      ...(xId ? { typefully_x_draft_id: xId } : {}),
-      ...(liId ? { typefully_linkedin_draft_id: liId } : {}),
-      updated_at: now(),
-    });
-  }
-
-  return {
-    success: true,
-    drafts: {
-      x: xId,
-      linkedin: liId,
-    },
-  };
 });
 
 // ── Publish Everywhere ──
@@ -811,25 +758,6 @@ export const fetchTypefullyDraftStatus = withAuth(async (draftId: string) => {
   const result = await typefullyGetDraft(draftId);
   if (!result.success) return { error: result.error };
   return { success: true, draft: result.data };
-});
-
-export const editTypefullyDraft = withAuth(
-  async (draftId: string, content: string) => {
-    if (!SAFE_EXTERNAL_ID_RE.test(draftId))
-      return { error: "Invalid draft ID" };
-
-    const result = await typefullyUpdateDraft(draftId, content);
-    if (!result.success) return { error: result.error };
-    return { success: true, draft: result.data };
-  },
-);
-
-export const removeTypefullyDraft = withAuth(async (draftId: string) => {
-  if (!SAFE_EXTERNAL_ID_RE.test(draftId)) return { error: "Invalid draft ID" };
-
-  const result = await typefullyDeleteDraft(draftId);
-  if (!result.success) return { error: result.error };
-  return { success: true };
 });
 
 // ── Buttondown Management ──

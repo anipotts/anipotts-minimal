@@ -11,7 +11,6 @@ import {
   normalizeCmsWriting,
   normalizeHomepageContent,
   normalizeNewsletterContent,
-  searchThoughts,
   searchWriting,
   validateCmsProject,
   validateCmsWriting,
@@ -180,8 +179,6 @@ describe("writing search", () => {
     };
 
     setDB(db);
-
-    expect(searchThoughts).toBe(searchWriting);
 
     const results = await searchWriting('claude "code"');
 

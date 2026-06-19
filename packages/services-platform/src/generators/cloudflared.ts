@@ -11,16 +11,16 @@ import type { ServiceManifestInput, PlannedWrite } from "../types";
 // Local reference copy: ~/.cloudflared/config.yml on MacBook (may not exist;
 // that's fine for Session 2a — diff still prints the intended rule).
 
-export function cloudflaredPath(): string {
+function cloudflaredPath(): string {
   return join(homedir(), ".cloudflared", "config.yml");
 }
 
-export interface IngressRule {
+interface IngressRule {
   hostname: string;
   service: string;
 }
 
-export function renderIngressRule(m: ServiceManifestInput): IngressRule {
+function renderIngressRule(m: ServiceManifestInput): IngressRule {
   return {
     hostname: m.hostname,
     service: `http://localhost:${m.mini.port}`,

@@ -3,8 +3,8 @@ import { retry } from "./retry";
 
 const BASE_URL = "https://api.buttondown.com/v1";
 
-export type ApiSuccess<T> = { success: true; data: T };
-export type ApiError = { success: false; error: string };
+type ApiSuccess<T> = { success: true; data: T };
+type ApiError = { success: false; error: string };
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
 export type DeleteResult =
   | { success: true }
@@ -46,7 +46,7 @@ export interface ButtondownEmail {
   email_type: string;
 }
 
-export interface ButtondownSubscriber {
+interface ButtondownSubscriber {
   id: string;
   email: string;
   creation_date: string;

@@ -17,8 +17,8 @@ import type {
 import { projectRowToProject } from "@anipotts/types";
 import { eq, desc, asc, and } from "drizzle-orm";
 import { logger } from "../logger";
-import { FALLBACK_PROJECTS } from "../data/projects";
-import { FALLBACK_SOCIAL_LINKS } from "../data/social";
+import { projects as FALLBACK_PROJECTS } from "../data/projects";
+import { socialLinks as FALLBACK_SOCIAL_LINKS } from "../data/social";
 import { getDrizzle, getDB, parseJsonArray, parseJson } from "../db";
 import * as s from "../db/schema";
 
@@ -1158,8 +1158,6 @@ export async function fetchWriting(options?: {
   return [];
 }
 
-export const fetchThoughts = fetchWriting;
-
 export async function searchWriting(query: string): Promise<WritingSummary[]> {
   const trimmed = query.trim();
   if (!trimmed) return [];
@@ -1203,8 +1201,6 @@ export async function searchWriting(query: string): Promise<WritingSummary[]> {
 
   return [];
 }
-
-export const searchThoughts = searchWriting;
 
 // ---------------------------------------------------------------------------
 // Social links

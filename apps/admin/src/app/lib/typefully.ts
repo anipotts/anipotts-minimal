@@ -3,12 +3,9 @@ import { retry } from "./retry";
 
 const BASE_URL = "https://api.typefully.com/v1";
 
-export type ApiSuccess<T> = { success: true; data: T };
-export type ApiError = { success: false; error: string };
+type ApiSuccess<T> = { success: true; data: T };
+type ApiError = { success: false; error: string };
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
-export type DeleteResult =
-  | { success: true }
-  | { success: false; error: string };
 
 function getConfig() {
   const apiKey = getEnv("TYPEFULLY_API_KEY");
@@ -25,7 +22,7 @@ function authHeaders(apiKey: string) {
   };
 }
 
-export type TypefullyDraftStatus =
+type TypefullyDraftStatus =
   | "draft"
   | "scheduled"
   | "published"
@@ -94,52 +91,6 @@ export async function createDraft(
       };
     }
     return { success: true, data: await res.json() };
-  } catch (e) {
-    return { success: false, error: String(e) };
-  }
-}
-
-export async function updateDraft(
-  draftId: string,
-  content: string,
-): Promise<ApiResult<TypefullyDraft>> {
-  try {
-    const { apiKey } = getConfig();
-    const res = await retry(() =>
-      fetch(`${BASE_URL}/drafts/${draftId}/`, {
-        method: "PUT",
-        headers: authHeaders(apiKey),
-        body: JSON.stringify({ content }),
-      }),
-    );
-    if (!res.ok) {
-      return {
-        success: false,
-        error: `Typefully ${res.status}: ${await res.text()}`,
-      };
-    }
-    return { success: true, data: await res.json() };
-  } catch (e) {
-    return { success: false, error: String(e) };
-  }
-}
-
-export async function deleteDraft(draftId: string): Promise<DeleteResult> {
-  try {
-    const { apiKey } = getConfig();
-    const res = await retry(() =>
-      fetch(`${BASE_URL}/drafts/${draftId}/`, {
-        method: "DELETE",
-        headers: authHeaders(apiKey),
-      }),
-    );
-    if (!res.ok && res.status !== 204) {
-      return {
-        success: false,
-        error: `Typefully ${res.status}: ${await res.text()}`,
-      };
-    }
-    return { success: true };
   } catch (e) {
     return { success: false, error: String(e) };
   }
