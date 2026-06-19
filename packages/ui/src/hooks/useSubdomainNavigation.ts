@@ -2,7 +2,6 @@ const SECTION_TO_ROUTE: Record<string, string> = {
   www: "/",
   work: "/work",
   thoughts: "/thoughts",
-  connect: "/connect",
   claude: "/claude",
 };
 

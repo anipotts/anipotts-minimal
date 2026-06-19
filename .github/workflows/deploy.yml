@@ -147,11 +147,10 @@ jobs:
       - name: Build www (Astro)
         run: pnpm turbo build --filter=@anipotts/www
         env:
-          # Astro's static build bakes PUBLIC_* vars at build time. Add these as
-          # GitHub Actions secrets to enable analytics + the connect-form turnstile.
+          # Astro's static build bakes PUBLIC_* vars at build time. Add this
+          # GitHub Actions secret to enable analytics.
           # Absent = those features no-op and the build still succeeds.
           PUBLIC_POSTHOG_KEY: ${{ secrets.PUBLIC_POSTHOG_KEY }}
-          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
 
       # apps/www is Astro (@astrojs/cloudflare). `astro build` already emits the
       # worker bundle at dist/_worker.js; no opennextjs adapter step here.

@@ -10,6 +10,8 @@ afterEach(() => {
 describe("getSectionUrl", () => {
   it("returns mapped sections", () => {
     expect(getSectionUrl("thoughts")).toBe("/thoughts");
+    expect(getSectionUrl("connect")).toBe("/orchestrating");
+    expect(getSectionUrl("links")).toBe("/orchestrating");
     expect(getSectionUrl("www")).toBe("/");
   });
 

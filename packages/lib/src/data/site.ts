@@ -53,14 +53,6 @@ export const sections = [
     permissions: "dr-xr-xr-x",
     hidden: false,
   },
-  {
-    name: "connect",
-    url: "https://anipotts.com/connect",
-    desc: "links & contact",
-    path: "/home/ani/connect",
-    permissions: "drwxr-xr-x",
-    hidden: false,
-  },
 ] as const;
 
 /** Sections visible in public navigation */

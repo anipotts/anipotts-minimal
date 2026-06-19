@@ -18,7 +18,6 @@ type CfEnv = {
   NEWSLETTER_FROM?: string;
   NEWSLETTER_REPLY_TO?: string;
   NEWSLETTER_MAILING_ADDRESS?: string;
-  TURNSTILE_SECRET_KEY?: string;
 };
 
 type Runtime = import("@astrojs/cloudflare").Runtime<CfEnv>;

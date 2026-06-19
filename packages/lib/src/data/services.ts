@@ -24,13 +24,8 @@ export const monitoredServices: MonitoredService[] = [
     category: "anipotts",
   },
   {
-    name: "anipotts.com/connect",
-    url: "https://anipotts.com/connect",
-    category: "anipotts",
-  },
-  {
-    name: "anipotts.com/dev",
-    url: "https://anipotts.com/dev",
+    name: "anipotts.com/orchestrating",
+    url: "https://anipotts.com/orchestrating",
     category: "anipotts",
   },
 
