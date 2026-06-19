@@ -3,8 +3,8 @@ import { json } from "../../lib/api";
 
 export const prerender = false;
 
-/** thoughts full-text search over d1 fts5 (thoughts_fts). feeds the
- *  /thoughts search island. */
+/** writing full-text search over d1 fts5 (thoughts_fts). feeds the
+ *  /writing search surface. */
 export const GET: APIRoute = async ({ url, locals }) => {
   const q = (url.searchParams.get("q") ?? "").trim().toLowerCase();
   if (!q) return json({ results: [] });

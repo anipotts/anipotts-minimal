@@ -35,8 +35,8 @@ The best sessions aren't the ones where Claude runs the longest. They're the one
 
 ## What I'm building with it
 
-I've logged over 1,000 hours of Claude Code across 600+ sessions. Right now I'm running 5 Claude Code sessions across different projects in a given week. The admin dashboard for this site, a quantitative interview prep app, a Mac Mini monitoring system, and open source tooling for other Claude Code users. I built [Claudemon](/thoughts/i-built-a-monitor-for-my-claude-code-sessions) to watch all of them from one place.
+I've logged over 1,000 hours of Claude Code across 600+ sessions. Right now I'm running 5 Claude Code sessions across different projects in a given week. The admin dashboard for this site, a quantitative interview prep app, a Mac Mini monitoring system, and open source tooling for other Claude Code users. I built [Claudemon](/writing/i-built-a-monitor-for-my-claude-code-sessions) to watch all of them from one place.
 
-The irony of getting interviewed about usage limits is that my entire workflow is designed to be maximally efficient with those limits. Specific prompts. Tight session scopes. [End-of-day todos written as agent instructions](/thoughts/stop-ending-your-day-with-fix-the-bug). Parallel agents in worktrees. None of this is because I'm trying to game the system. It's because it produces better code.
+The irony of getting interviewed about usage limits is that my entire workflow is designed to be maximally efficient with those limits. Specific prompts. Tight session scopes. [End-of-day todos written as agent instructions](/writing/stop-ending-your-day-with-fix-the-bug). Parallel agents in worktrees. None of this is because I'm trying to game the system. It's because it produces better code.
 
 The limits just made me figure that out faster.
