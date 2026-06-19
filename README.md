@@ -23,7 +23,6 @@ pnpm dev:www      # just the astro site (astro defaults to http://localhost:4321
 pnpm build
 pnpm test
 pnpm validate     # build + lint + typecheck + test
-pnpm github:audit
 ```
 
 ## Content model
