@@ -14,7 +14,6 @@ export {
   incrementThoughtViewCount,
   fetchThoughtStats,
   type ContentQueryOptions,
-  type QueryOptions,
 } from "./writing";
 
 export {

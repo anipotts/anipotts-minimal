@@ -11,15 +11,10 @@ import * as s from "../db/schema";
 
 export interface ContentQueryOptions {
   section?: ContentSection;
-  /** @deprecated Use section. */
-  subdomain?: ContentSection;
 }
 
-/** @deprecated Use ContentQueryOptions. */
-export type QueryOptions = ContentQueryOptions;
-
 function querySection(options?: ContentQueryOptions) {
-  return options?.section ?? options?.subdomain;
+  return options?.section;
 }
 
 /** Fetch all thoughts (admin view, includes drafts), ordered by newest first. */

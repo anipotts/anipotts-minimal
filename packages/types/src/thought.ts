@@ -47,10 +47,6 @@ export type ContentSection =
   | "lab"
   | "work"
   | "claude";
-/** @deprecated Use ContentSection */
-export type Section = ContentSection;
-/** @deprecated Use ContentSection */
-export type Subdomain = ContentSection;
 
 export interface Thought {
   id: string;
@@ -85,7 +81,7 @@ export interface Thought {
   typefully_linkedin_draft_id?: string;
 
   // Section scoping
-  section?: Section;
+  section?: ContentSection;
 }
 
 export interface ThoughtStats {
@@ -122,7 +118,7 @@ export interface Atom {
   updated_at: string;
 
   // Section scoping
-  section?: Section;
+  section?: ContentSection;
 }
 
 export interface AtomWithContent extends Atom {

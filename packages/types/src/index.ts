@@ -23,8 +23,6 @@ export type {
   Platform,
   AtomStatus,
   ContentSection,
-  Section,
-  Subdomain,
 } from "./thought";
 
 // Link types
