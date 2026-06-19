@@ -133,3 +133,5 @@ export interface ThoughtSummary {
   series_type?: SeriesType | null;
   tags?: string | string[] | null;
 }
+
+export type WritingSummary = ThoughtSummary;

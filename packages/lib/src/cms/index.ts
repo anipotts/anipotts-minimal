@@ -12,7 +12,7 @@ import type {
   ProjectCategory,
   SocialLink,
   SiteSettingsMap,
-  ThoughtSummary,
+  WritingSummary,
 } from "@anipotts/types";
 import { projectRowToProject } from "@anipotts/types";
 import { eq, desc, asc, and } from "drizzle-orm";
@@ -1105,8 +1105,7 @@ export async function fetchProjects(options?: {
 // Writing (D1 table: thoughts)
 // ---------------------------------------------------------------------------
 
-export type { ThoughtSummary } from "@anipotts/types";
-export type WritingSummary = ThoughtSummary;
+export type { ThoughtSummary, WritingSummary } from "@anipotts/types";
 
 export async function fetchWriting(options?: {
   published?: boolean;
@@ -1145,7 +1144,7 @@ export async function fetchWriting(options?: {
         created_at: row.created_at ?? "",
         views: row.views ?? undefined,
         id: row.id ?? undefined,
-        series_type: row.series_type as ThoughtSummary["series_type"],
+        series_type: row.series_type as WritingSummary["series_type"],
         tags: parseJsonArray(row.tags),
       }));
     } catch (err) {
@@ -1193,7 +1192,7 @@ export async function searchWriting(query: string): Promise<WritingSummary[]> {
         published_at: row.published_at as string | undefined,
         views: row.views as number | undefined,
         id: row.id as string | undefined,
-        series_type: row.series_type as ThoughtSummary["series_type"],
+        series_type: row.series_type as WritingSummary["series_type"],
         tags: parseJsonArray(row.tags),
       }));
     } catch (err) {

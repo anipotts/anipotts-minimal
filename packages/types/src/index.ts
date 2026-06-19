@@ -11,6 +11,7 @@ export type {
 export type {
   Thought,
   ThoughtSummary,
+  WritingSummary,
   ThoughtStats,
   Atom,
   AtomWithContent,
