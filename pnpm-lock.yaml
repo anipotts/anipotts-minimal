@@ -257,15 +257,6 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  packages/brand:
-    devDependencies:
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(jiti@2.7.0)(postcss@8.5.14)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.9.0)
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
   packages/config:
     devDependencies:
       '@tailwindcss/postcss':

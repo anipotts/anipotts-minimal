@@ -23,13 +23,13 @@ pnpm dev:www      # just the astro site (astro defaults to http://localhost:4321
 pnpm build
 pnpm test
 pnpm validate     # build + lint + typecheck + test
-pnpm github:audit
 ```
 
 ## Content model
 
 - Astro www collections: `apps/www/src/content/{projects,making,writing}` (schema in `apps/www/src/content.config.ts`).
 - Synced to Cloudflare D1 (`anipotts-db`) for full-text search.
+- Public brand logos live in `apps/www/public/images/brand` and should match `logoSrc` references in `apps/www/src/data/site.ts`.
 
 ## Route map (astro www)
 

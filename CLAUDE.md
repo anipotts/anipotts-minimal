@@ -30,7 +30,6 @@ packages/lib/          Shared D1 client (Drizzle ORM), env helper, query modules
                          analytics/, cms/, admin/, validation/, status/
 packages/styles/       Design tokens + global css (used by the astro www)
 packages/config/       Shared config. packages/types/ TS interfaces. packages/services-platform/ platform svc clients.
-packages/brand/        Legacy brand package. No current importer.
 content/thoughts/      Legacy next-era blog markdown. The astro www reads apps/www/src/content instead.
 scripts/claude/        Stats generation from ~/.claude session logs
 scripts/sync-yaml-to-d1.sh  Manual YAML sync from ~/Business/data/ to D1

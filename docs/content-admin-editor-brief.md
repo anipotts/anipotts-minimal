@@ -12,7 +12,7 @@ this is the content shape that should feed the next admin editor pass. it stays 
 | writing previews     | `apps/www/src/content/writing/*.md`                                       | title, slug, summary, tags, status, published date, body                                                         | five published posts, mostly claude code and ai workflow      |
 | newsletter block     | `apps/www/src/components/NewsletterSubscribe.astro`                       | static label, lede, email form, status messages                                                                  | copy now makes the promise specific without inventing cadence |
 | running notes        | `apps/www/src/content/running/**`                                         | weekly digests and experiments                                                                                   | useful as source material, not polished newsletter archive    |
-| legacy mirrors       | root `content/thoughts` and `content/work`                                | older content mirror and one github audit item                                                                   | do not treat as canonical without confirming sync direction   |
+| legacy mirrors       | root `content/thoughts`                                                   | older content mirror                                                                                             | do not treat as canonical without confirming sync direction   |
 
 ## highest-leverage cleanup batch
 
