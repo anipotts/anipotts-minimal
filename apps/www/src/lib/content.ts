@@ -35,6 +35,8 @@ export const writingSlug = (t: Writing): string => t.slug;
 export const projectSlug = (p: Project): string => p.slug;
 export const experimentSlug = (e: Experiment): string => e.data.slug ?? e.id;
 
+const HIDDEN_PUBLIC_PROJECTS = new Set(["habittracker-obh"]);
+
 function cmsLink(
   links: { label: string; url: string }[],
   labels: string[],
@@ -172,7 +174,10 @@ export async function visibleProjects(): Promise<Project[]> {
   const entries = await getCollection("projects", (p) => p.data.visible);
   const all = await Promise.all(entries.map(projectFromEntry));
   return all
-    .filter((project) => project.data.visible)
+    .filter(
+      (project) =>
+        project.data.visible && !HIDDEN_PUBLIC_PROJECTS.has(project.slug),
+    )
     .sort((a, b) => b.data.sort_order - a.data.sort_order);
 }
 

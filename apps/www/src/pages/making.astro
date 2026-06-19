@@ -1,27 +1,57 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
-import {
-  experimentSlug,
-  formatDate,
-  groupByYearAndQuarter,
-  publishedExperiments,
-  visibleProjects,
-  weeklyDigests,
-} from "../lib/content";
+import { visibleProjects, type Project } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const [projects, weeks, experiments] = await Promise.all([
-  visibleProjects(),
-  weeklyDigests(),
-  publishedExperiments(),
-]);
-const yearGroups = groupByYearAndQuarter(projects);
-const categories = ["all", "ai", "product", "quant", "music", "other"];
+const ORCHESTRATING_PROJECTS = new Set(["claude-code-tips", "imessage-mcp"]);
+const projects = (await visibleProjects()).filter(
+  (project) => !ORCHESTRATING_PROJECTS.has(project.slug),
+);
+
+type BucketId = "active" | "past" | "archive";
+const bucketFor = (project: Project): BucketId => {
+  if (project.data.status === "archived") return "archive";
+  const range = `${project.data.year} ${project.data.duration}`.toLowerCase();
+  if (
+    project.data.status === "wip" ||
+    range.includes("ongoing") ||
+    /2025-|2026-/.test(range)
+  ) {
+    return "active";
+  }
+  return "past";
+};
+
+const buckets: Array<{
+  id: BucketId;
+  label: string;
+  note: string;
+  projects: Project[];
+}> = [
+  {
+    id: "active",
+    label: "active",
+    note: "things still moving or maintained",
+    projects: projects.filter((project) => bucketFor(project) === "active"),
+  },
+  {
+    id: "past",
+    label: "past",
+    note: "finished work and older receipts",
+    projects: projects.filter((project) => bucketFor(project) === "past"),
+  },
+  {
+    id: "archive",
+    label: "archive",
+    note: "sunsetted projects kept for context",
+    projects: projects.filter((project) => bucketFor(project) === "archive"),
+  },
+];
 ---
 
 <Shell
@@ -33,8 +63,13 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
   <section data-rise>
     <h1 class="hero-title">making</h1>
     <p class="hero-summary">
-      finished work beside the stuff still moving. launches, utilities, weekly
-      traces, and odd pieces that are useful enough to keep around.
+      work i built or helped ship. product surfaces, data systems, quant tools,
+      and the older pieces that still explain how i think.
+    </p>
+    <p class="experience-note">
+      our bad habit stays as work experience: data engineering intern on an
+      atlantic records venture. the internal scouting dashboard is not listed as
+      a public project.
     </p>
   </section>
 
@@ -43,78 +78,23 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
       <h2 class="section-label">projects</h2>
       <span class="mono muted">{projects.length} visible</span>
     </span>
-    <div class="filters" role="group" aria-label="category filter" id="work-filter">
-      {categories.map((c) => (
-        <button class="chip" type="button" data-filter={c} aria-pressed={c === "all" ? "true" : "false"}>
-          {c}
-        </button>
-      ))}
-    </div>
 
-    <div class="groups" id="work-groups">
+    <div class="groups">
       {
-        yearGroups.map(({ year, quarters }) => (
-          <div class="year-group" data-year-group>
-            <h2 class="year">{year}</h2>
-            {quarters.map(({ quarter, projects: qProjects }) => (
-              <div class="quarter-group" data-quarter-group>
-                {quarter && <h3 class="quarter mono">{quarter}</h3>}
-                <div class="grid mobile-carousel">
-                  {qProjects.map((project) => (
-                    <ProjectCard project={project} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ))
-      }
-    </div>
-    <p class="empty mono" id="work-empty" hidden>nothing in this category yet.</p>
-  </section>
-
-  <section data-rise class="stack">
-    <span class="section-head">
-      <h2 class="section-label">weekly traces</h2>
-      <span class="mono muted">recent motion</span>
-    </span>
-    <div class="list">
-      {
-        weeks.map((w) => (
-          <article class="row-link entry" id={`week-${w.data.week}`}>
-            <span class="row-title">{w.data.week}</span>
-            <span class="meta mono">
-              <span>
-                {formatDate(w.data.window_start)} to{" "}
-                {formatDate(w.data.window_end)}
+        buckets
+          .filter((bucket) => bucket.projects.length > 0)
+          .map((bucket) => (
+            <section class="bucket" aria-labelledby={`bucket-${bucket.id}`}>
+              <span class="bucket-head">
+                <h3 id={`bucket-${bucket.id}`} class="bucket-title">{bucket.label}</h3>
+                <span class="mono muted">{bucket.note}</span>
               </span>
-              <span>{w.data.events} events</span>
-              <span>{w.data.agents} agents</span>
-            </span>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-
-  <section data-rise class="stack">
-    <span class="section-head">
-      <h2 class="section-label">experiments</h2>
-      <span class="mono muted">small public scraps</span>
-    </span>
-    <div class="list">
-      {
-        experiments.map((e) => (
-          <article class="row-link entry" id={`experiment-${experimentSlug(e)}`}>
-            <span class="row-title">{e.data.title}</span>
-            <span class="meta mono">
-              <span>{formatDate(e.data.date)}</span>
-              {e.data.tags.map((t) => (
-                <span>{t}</span>
-              ))}
-            </span>
-            {e.data.summary && <span class="dek">{e.data.summary}</span>}
-          </article>
+              <div class="grid mobile-carousel">
+                {bucket.projects.map((project) => (
+                  <ProjectCard project={project} />
+                ))}
+              </div>
+            </section>
         ))
       }
     </div>
@@ -137,17 +117,19 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
     gap: var(--s-6);
   }
 
+  .experience-note {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    line-height: var(--lh-copy);
+    margin-top: var(--s-3);
+    max-width: var(--measure);
+  }
+
   .section-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--s-3);
-  }
-
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
   }
 
   .groups {
@@ -156,21 +138,21 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
     gap: var(--s-7);
   }
 
-  .year-group {
+  .bucket {
     display: flex;
     flex-direction: column;
     gap: var(--s-5);
   }
 
-  .year {
-    font-size: var(--d-section);
+  .bucket-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
   }
 
-  .quarter {
-    color: var(--ink-muted);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    margin-bottom: var(--s-3);
+  .bucket-title {
+    font-size: var(--d-section);
   }
 
   .grid {
@@ -179,90 +161,12 @@ const categories = ["all", "ai", "product", "quant", "music", "other"];
     gap: var(--s-4);
   }
 
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-
-  .entry {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-  }
-
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-3);
-    font-size: 0.8rem;
-    color: var(--ink-muted);
-  }
-
-  .dek,
-  .empty {
-    color: var(--ink-muted);
-  }
-
-  .dek {
-    font-size: var(--p-small);
-    max-width: var(--measure);
-  }
-
   @media (max-width: 720px) {
-    .section-head {
+    .section-head,
+    .bucket-head {
       align-items: flex-start;
       flex-direction: column;
       gap: var(--s-1);
     }
   }
 </style>
-
-<script>
-  const filterWrap = document.getElementById("work-filter");
-  const chips = Array.from(
-    filterWrap?.querySelectorAll<HTMLButtonElement>("[data-filter]") ?? [],
-  );
-  const empty = document.getElementById("work-empty");
-
-  function apply(category: string) {
-    chips.forEach((c) =>
-      c.setAttribute("aria-pressed", String(c.dataset.filter === category)),
-    );
-    let visible = 0;
-    document
-      .querySelectorAll<HTMLElement>("[data-category]")
-      .forEach((card) => {
-        const show = category === "all" || card.dataset.category === category;
-        card.hidden = !show;
-        if (show) visible++;
-      });
-    document
-      .querySelectorAll<HTMLElement>("[data-quarter-group]")
-      .forEach((q) => {
-        q.hidden = !q.querySelector("[data-category]:not([hidden])");
-      });
-    document.querySelectorAll<HTMLElement>("[data-year-group]").forEach((y) => {
-      y.hidden = !y.querySelector("[data-category]:not([hidden])");
-    });
-    if (empty) empty.hidden = visible > 0;
-  }
-
-  chips.forEach((chip) =>
-    chip.addEventListener("click", () => {
-      const category = chip.dataset.filter ?? "all";
-      const url = new URL(location.href);
-      if (category === "all") url.searchParams.delete("category");
-      else url.searchParams.set("category", category);
-      history.pushState({}, "", url);
-      apply(category);
-    }),
-  );
-
-  const initial = new URLSearchParams(location.search).get("category") ?? "all";
-  if (initial !== "all") apply(initial);
-
-  window.addEventListener("popstate", () => {
-    apply(new URLSearchParams(location.search).get("category") ?? "all");
-  });
-</script>

@@ -107,6 +107,21 @@ const loop = [
   },
 ];
 
+const publicTools = [
+  {
+    title: "claude code tips",
+    href: "/projects/claude-code-tips",
+    detail:
+      "hooks, agents, plugin notes, and working patterns from actual agent sessions.",
+  },
+  {
+    title: "imessage mcp",
+    href: "/projects/imessage-mcp",
+    detail:
+      "local-first mcp for searching message history without turning private data into a cloud product.",
+  },
+];
+
 const r = stats.records;
 const records = [
   {
@@ -206,6 +221,23 @@ const fmtSessionTime = (iso: string) =>
             <h3>{item.title}</h3>
             <p>{item.detail}</p>
           </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="stack" id="public-tools">
+    <span class="split-head">
+      <h2 class="section-label">public tooling</h2>
+      <span class="mono muted">agent notes and local tools</span>
+    </span>
+    <div class="grid-2 mobile-carousel">
+      {
+        publicTools.map((tool) => (
+          <a href={tool.href} class="doc-card">
+            <span class="row-title">{tool.title}</span>
+            <span class="dek">{tool.detail}</span>
+          </a>
         ))
       }
     </div>

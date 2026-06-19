@@ -7,7 +7,9 @@ status: published
 published_at: 2026-04-13
 ---
 
-A reporter from Business Insider reached out a couple weeks ago. He was writing about how usage limits on AI tools are changing the way people work. Somebody pointed him to me because I've been pretty vocal about how I use Claude Code. The article went live today: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4).
+The original Business Insider piece is here: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4).
+
+A reporter from Business Insider reached out a couple weeks ago. He was writing about how usage limits on AI tools are changing the way people work. Somebody pointed him to me because I've been pretty vocal about how I use Claude Code.
 
 He nailed the broad strokes. I do plan my work around session limits. I do save the hardest tasks for when I'm far from the cap. And yes, Saturdays are for Claude Code. That quote is real. My friends think I'm joking when I say that. I'm not.
 
