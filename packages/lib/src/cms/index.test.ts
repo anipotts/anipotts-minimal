@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { setDB, type D1Database, type D1PreparedStatement } from "../db";
 import {
   cmsProjectPageKey,
   cmsWritingPageKey,
@@ -10,6 +11,7 @@ import {
   normalizeCmsWriting,
   normalizeHomepageContent,
   normalizeNewsletterContent,
+  searchThoughts,
   validateCmsProject,
   validateCmsWriting,
   validateHomepageContent,
@@ -90,6 +92,105 @@ describe("homepage cms validation", () => {
     expect(validateHomepageContent(content)).toEqual({
       ok: false,
       error: "About paragraph is too long",
+    });
+  });
+});
+
+describe("writing search", () => {
+  it("uses safe fts phrase matching against published writing rows", async () => {
+    let preparedSql = "";
+    let boundValues: unknown[] = [];
+
+    const statement: D1PreparedStatement = {
+      bind(...values: unknown[]) {
+        boundValues = values;
+        return statement;
+      },
+      async first() {
+        return null;
+      },
+      async run() {
+        return {
+          results: [],
+          success: true,
+          meta: {
+            duration: 0,
+            changes: 0,
+            last_row_id: 0,
+            rows_read: 0,
+            rows_written: 0,
+          },
+        };
+      },
+      async all<T>() {
+        return {
+          results: [
+            {
+              slug: "claude-code",
+              title: "claude code",
+              summary: "agent note",
+              created_at: "2026-06-01",
+              published_at: "2026-06-16",
+              views: 5,
+              id: "thought-1",
+              series_type: "note",
+              tags: '["codex"]',
+            },
+          ] as T[],
+          success: true,
+          meta: {
+            duration: 0,
+            changes: 0,
+            last_row_id: 0,
+            rows_read: 1,
+            rows_written: 0,
+          },
+        };
+      },
+      async raw<T>() {
+        return [] as T[];
+      },
+    };
+
+    const db: D1Database = {
+      prepare(query: string) {
+        preparedSql = query;
+        return statement;
+      },
+      async exec() {
+        return {
+          results: [],
+          success: true,
+          meta: {
+            duration: 0,
+            changes: 0,
+            last_row_id: 0,
+            rows_read: 0,
+            rows_written: 0,
+          },
+        };
+      },
+      async batch() {
+        return [];
+      },
+      async dump() {
+        return new ArrayBuffer(0);
+      },
+    };
+
+    setDB(db);
+
+    const results = await searchThoughts('claude "code"');
+
+    expect(preparedSql).toContain("t.published_at");
+    expect(preparedSql).toContain(
+      "AND (t.status = 'published' OR t.published = 1)",
+    );
+    expect(boundValues).toEqual(['"claude ""code"""']);
+    expect(results[0]).toMatchObject({
+      slug: "claude-code",
+      published_at: "2026-06-16",
+      tags: ["codex"],
     });
   });
 });

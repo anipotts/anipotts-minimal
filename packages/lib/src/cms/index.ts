@@ -1159,28 +1159,35 @@ export async function fetchThoughts(options?: {
 }
 
 export async function searchThoughts(query: string): Promise<ThoughtSummary[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
   const d1 = getDB();
   if (d1) {
     try {
+      // FTS5 phrase search keeps user input from being interpreted as MATCH syntax.
+      const phrase = `"${trimmed.replaceAll('"', '""')}"`;
+
       // FTS5 search: must use raw SQL (Drizzle doesn't support FTS5 MATCH)
       const { results } = await d1
         .prepare(
-          `SELECT t.slug, t.title, t.summary, t.created_at, t.views, t.id, t.series_type, t.tags,
+          `SELECT t.slug, t.title, t.summary, t.created_at, t.published_at, t.views, t.id, t.series_type, t.tags,
                   rank
            FROM thoughts_fts fts
            JOIN thoughts t ON t.rowid = fts.rowid
            WHERE thoughts_fts MATCH ?
-             AND t.published = 1
+             AND (t.status = 'published' OR t.published = 1)
            ORDER BY rank
            LIMIT 20`,
         )
-        .bind(query)
+        .bind(phrase)
         .all<Record<string, unknown>>();
       return (results ?? []).map((row) => ({
         slug: row.slug as string,
         title: row.title as string,
         summary: (row.summary as string) ?? "",
         created_at: (row.created_at as string) ?? "",
+        published_at: row.published_at as string | undefined,
         views: row.views as number | undefined,
         id: row.id as string | undefined,
         series_type: row.series_type as ThoughtSummary["series_type"],

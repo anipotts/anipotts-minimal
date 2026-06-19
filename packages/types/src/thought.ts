@@ -127,6 +127,7 @@ export interface ThoughtSummary {
   title: string;
   summary: string;
   created_at: string;
+  published_at?: string;
   views?: number;
   id?: string;
   series_type?: SeriesType | null;
