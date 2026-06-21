@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prepend_path() {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) PATH="$1:$PATH" ;;
+  esac
+}
+
+for bin_dir in \
+  "/opt/homebrew/bin" \
+  "/usr/local/bin" \
+  "$HOME/.nvm/versions/node/v20.11.1/bin" \
+  "$HOME/.nvm/versions/node/v20.18.0/bin" \
+  "$HOME/.nvm/versions/node/v22.22.3/bin"
+do
+  if [ -d "$bin_dir" ]; then
+    prepend_path "$bin_dir"
+  fi
+done
+export PATH
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${CODEX_WORKTREE_PATH:-$repo_root}"
+
+require_tool() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required tool: $1" >&2
+    echo "PATH=$PATH" >&2
+    exit 127
+  fi
+}
+
+pnpm_cmd() {
+  require_tool pnpm
+  pnpm "$@"
+}
+
+case "${1:-}" in
+  setup)
+    if command -v corepack >/dev/null 2>&1; then
+      corepack enable >/dev/null 2>&1 || true
+    fi
+    pnpm_cmd install --frozen-lockfile
+    ;;
+  www-dev)
+    require_tool pnpm
+    exec pnpm turbo dev --filter=@anipotts/www
+    ;;
+  admin-dev)
+    require_tool pnpm
+    exec pnpm turbo dev --filter=@anipotts/admin
+    ;;
+  check-www)
+    pnpm_cmd turbo build --filter=@anipotts/www...
+    pnpm_cmd turbo typecheck --filter=@anipotts/www...
+    ;;
+  check-all)
+    pnpm_cmd validate
+    ;;
+  pr-status)
+    require_tool gh
+    exec gh pr view --web
+    ;;
+  watch-pr)
+    require_tool gh
+    pr_url="$(gh pr view --json url -q .url 2>/dev/null || true)"
+    if [ -z "$pr_url" ]; then
+      echo "no pull request for current branch"
+      exit 1
+    fi
+    exec gh pr checks "$pr_url" --watch --fail-fast --interval 15
+    ;;
+  deploys)
+    require_tool gh
+    exec gh run list --workflow Deploy --limit 10
+    ;;
+  smoke-live)
+    for path in / /making /orchestrating /writing /writing/saturdays-are-for-claude-code /api/health; do
+      code="$(curl -s -o /dev/null -w '%{http_code}' "https://anipotts.com$path")"
+      echo "anipotts.com$path -> $code"
+    done
+
+    for path in /shipping /running; do
+      location="$(curl -sSI "https://anipotts.com$path" | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')"
+      echo "anipotts.com$path -> $location"
+    done
+    ;;
+  *)
+    echo "usage: $0 {setup|www-dev|admin-dev|check-www|check-all|pr-status|watch-pr|deploys|smoke-live}" >&2
+    exit 2
+    ;;
+esac

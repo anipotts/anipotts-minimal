@@ -1,0 +1,2 @@
+# Local development overrides needed by Codex-managed worktrees.
+.env.local

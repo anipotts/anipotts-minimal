@@ -46,7 +46,9 @@ playground*.html
 
 # Local agent app state
 .agents/
-.codex/
+.codex/*
+!.codex/environments/
+!.codex/environments/environment.toml
 HANDOFF.md
 
 # Agent/research docs (never commit)
