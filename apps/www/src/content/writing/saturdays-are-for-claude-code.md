@@ -25,7 +25,7 @@ Active tool rate holds steady at about 3.3 calls per minute for any session over
 
 Sessions under 30 minutes are the sweet spot. Past an hour, more than half hit context limits and need compaction. That's when you lose coherence. So the usage limit forcing you to stop isn't just about tokens. It's preventing the session quality degradation that happens naturally anyway.
 
-You can see all of this on [my Claude stats page](/claude). It's live, updated from my actual session logs.
+You can see all of this on [my orchestrating page](/orchestrating). It's live, updated from my actual session logs.
 
 ## Why the limit is a feature
 

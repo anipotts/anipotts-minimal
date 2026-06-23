@@ -30,10 +30,10 @@ const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHome ? intro.heading : homeContent.heading;
 const homeMakingSlugs = [
+  "quantercise",
   "quantercise-extension",
   "saeshify",
   "nyu-purity-test",
-  "habittracker-obh",
 ] as const;
 const homeMakingOrder = new Map<string, number>(
   homeMakingSlugs.map((slug, index) => [slug, index]),
