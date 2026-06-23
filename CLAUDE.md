@@ -76,7 +76,8 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
   checked, and inside the task. Do not let stale "no push" language block safe
   branch updates. Use `/Users/anipotts/Infra/docs/agent-native-project-policy.md`
   for the shared fleet policy.
-- Open same-repo PRs. The agent auto-merge workflow waits for required checks and dispatches Deploy with touched targets after the merge commit lands.
+- Open same-repo PRs as drafts unless Ani has explicitly approved the merge/live
+  path. Ready PRs can be auto-merged after checks, and that can dispatch Deploy.
 - Required PR gates are `Build, lint, typecheck, test` and `security`.
 - CI uses Turbo affected validation, so agents should keep changes scoped and let the package graph decide what to test.
 - Security review is expensive only for infra, admin, worker, package, dependency, and API/middleware changes. Static public-site copy/layout changes get the required `security` check without a Claude review run.
