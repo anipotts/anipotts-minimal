@@ -1,5 +1,6 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isServer } from "solid-js/web";
+import { getStateWs } from "~/lib/config";
 import { StateClient, type ConnectionState } from "~/lib/state-client";
 
 type Link = {
@@ -16,21 +17,16 @@ type LinkVaultEvent =
   | { type: "link.added"; link: Link }
   | { type: "link.removed"; id: string };
 
-const STATE_API = (import.meta.env.VITE_PUBLIC_STATE_API as string | undefined) ??
-  "https://anipotts-state.anipotts.workers.dev";
-
 export function LinkVaultPanel() {
   const [links, setLinks] = createSignal<Link[]>([]);
   const [conn, setConn] = createSignal<ConnectionState>("connecting");
-  const [submitting, setSubmitting] = createSignal(false);
-  const [draftUrl, setDraftUrl] = createSignal("");
 
   let client: StateClient<LinkVaultEvent> | null = null;
 
   onMount(() => {
     if (isServer) return;
     client = new StateClient<LinkVaultEvent>({
-      url: `${STATE_API.replace(/^http/, "ws")}/api/links/ws`,
+      url: getStateWs("/api/links/ws"),
       onState: setConn,
       onEvent: (event) => {
         if (event.type === "snapshot") setLinks(event.links);
@@ -46,49 +42,22 @@ export function LinkVaultPanel() {
 
   onCleanup(() => client?.close());
 
-  async function submit(e: SubmitEvent) {
-    e.preventDefault();
-    const url = draftUrl().trim();
-    if (!url) return;
-    setSubmitting(true);
-    try {
-      await fetch(`${STATE_API}/api/links`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, source: "admin" }),
-      });
-      setDraftUrl("");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   return (
-    <section>
-      <h2>
+    <section class="feed-panel">
+      <h2 class="panel-title">
         <span class="live-dot" data-state={conn()} />
-        LinkVault
+        linkvault
       </h2>
-
-      <form class="add" onSubmit={submit}>
-        <input
-          type="url"
-          required
-          placeholder="https://..."
-          value={draftUrl()}
-          onInput={(e) => setDraftUrl(e.currentTarget.value)}
-        />
-        <button type="submit" disabled={submitting()}>
-          save
-        </button>
-      </form>
+      <p class="panel-note">
+        read-only for now. writes move behind an authenticated server action in
+        the next pass.
+      </p>
 
       <Show
         when={links().length > 0}
         fallback={
           <p class="empty">
-            No links yet. Save one above, or text Rudy{" "}
-            <span class="muted">"save https://..."</span>.
+            No links yet. Publisher writes require STATE_PUBLISH_KEY.
           </p>
         }
       >

@@ -1,5 +1,6 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isServer } from "solid-js/web";
+import { getStateWs } from "~/lib/config";
 import { StateClient, type ConnectionState } from "~/lib/state-client";
 
 type Commit = {
@@ -14,10 +15,6 @@ type Commit = {
 type CodeStatsEvent =
   | { type: "snapshot"; commits: Commit[] }
   | { type: "commit.added"; commit: Commit };
-
-const STATE_API =
-  (import.meta.env.VITE_PUBLIC_STATE_API as string | undefined) ??
-  "https://anipotts-state.anipotts.workers.dev";
 
 function formatRelative(iso: string): string {
   const then = new Date(iso).getTime();
@@ -43,7 +40,7 @@ export function CommitFeed() {
   onMount(() => {
     if (isServer) return;
     client = new StateClient<CodeStatsEvent>({
-      url: `${STATE_API.replace(/^http/, "ws")}/api/commits/ws`,
+      url: getStateWs("/api/commits/ws"),
       onState: setConn,
       onEvent: (event) => {
         if (event.type === "snapshot") setCommits(event.commits);
@@ -60,10 +57,10 @@ export function CommitFeed() {
   onCleanup(() => client?.close());
 
   return (
-    <section>
-      <h2>
+    <section class="feed-panel">
+      <h2 class="panel-title">
         <span class="live-dot" data-state={conn()} />
-        CodeStats
+        codestats
       </h2>
 
       <Show
