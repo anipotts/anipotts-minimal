@@ -72,6 +72,10 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 ## Agent PR Flow
 
 - Work on `codex/*`, `claude/*`, or `worktree-*` branches.
+- Agents may commit and push scoped work branches when the diff is intentional,
+  checked, and inside the task. Do not let stale "no push" language block safe
+  branch updates. Use `/Users/anipotts/Infra/docs/agent-native-project-policy.md`
+  for the shared fleet policy.
 - Open same-repo PRs. The agent auto-merge workflow waits for required checks and dispatches Deploy with touched targets after the merge commit lands.
 - Required PR gates are `Build, lint, typecheck, test` and `security`.
 - CI uses Turbo affected validation, so agents should keep changes scoped and let the package graph decide what to test.
@@ -91,6 +95,9 @@ Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/en
 ## Rules
 
 - **NOTHING goes live without Ani's approval.** Always show summary before posting.
+- **Branch pushes are allowed for safe agent work.** Merges, deploys, DNS, env,
+  secrets, Wrangler account changes, and live content changes still need the
+  explicit approval and checks described above.
 - **Anti-corny guardrails are non-negotiable.** Run the checklist on every atom.
 - **If unsure about tone, err casual.** Authentic > perfect.
 - **80%+ of posts need proof artifacts.** Gists, repos, screenshots, demos.
