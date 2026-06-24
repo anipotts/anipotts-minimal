@@ -45,6 +45,36 @@
     "why": "jobs has ranked office-first targets, but deeper research and drafts need Ani's taste call."
   },
   {
+    "agent_next": "on or after 2026-07-05, capture the bounded analytics proof packet only, do not send/post/change platform state, and record proof.",
+    "ani_action": "reply `approve rayban 30 day analytics capture`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-07-06",
+    "id": "need-rayban-30-day-analytics-capture",
+    "owner": "chief/brand",
+    "primary_action": "reply `approve rayban 30 day analytics capture`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "approve",
+    "why": "Ray-Ban is delivered with 7-day analytics recorded, but the 30-day analytics capture window opens on 2026-07-05 and live platform capture needs exact authority."
+  },
+  {
+    "agent_next": "update the Brand/Business deal path based on the choice; do not send, mark paid, or read private payloads without separate exact authority.",
+    "ani_action": "reply `keep higgsfield paused`, `approve higgsfield send-proof recovery`, or `business owns higgsfield payment proof`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-28",
+    "id": "need-higgsfield-recovery-path",
+    "owner": "chief/brand",
+    "primary_action": "reply `keep higgsfield paused`, `approve higgsfield send-proof recovery`, or `business owns higgsfield payment proof`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "Higgsfield has local drafts but unresolved send proof and no payment/invoice proof in safe refs."
+  },
+  {
     "agent_next": "execute only the approved Phase 1 packet, validate references, commit, push, and record rollback.",
     "ani_action": "reply `approve infra layout phase 1` or name the part to revise",
     "bucket": "unblockable_now",
