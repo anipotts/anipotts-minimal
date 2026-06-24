@@ -1,0 +1,1297 @@
+{
+  "counts": {
+    "approvals": 1,
+    "blockers": 6,
+    "handoffs": 2,
+    "mutations": 7,
+    "operations": 7,
+    "proofs": 7,
+    "repo_states": 6
+  },
+  "model": "intent -> authority -> operation -> proof -> state",
+  "objects": {
+    "approvals": [
+      {
+        "allowed": [
+          "read-only design",
+          "sample data",
+          "schemas",
+          "local validation",
+          "validated Infra docs/schema/sample commit and push"
+        ],
+        "approval_id": "appr.admin.readonly-build-slices.2026-06-23",
+        "approved_at": "2026-06-23T23:40:00Z",
+        "approved_by": "Ani",
+        "authority_ref": "fleet/boss build slice 2 delegation",
+        "expires_at": null,
+        "forbidden": [
+          "launchd/root/auth/secrets/env/firewall/tailscale/service mutation",
+          "user-account cleanup",
+          "source/personal delete",
+          "deploy",
+          "DNS",
+          "payment",
+          "filing",
+          "outbound",
+          "Gmail/Calendar mutation",
+          "health rename execution"
+        ],
+        "mutation_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ],
+        "notes": "Sample rows are non-secret and not live execution authority.",
+        "object_type": "approval",
+        "proof_required": [
+          "schema JSON parses",
+          "sample JSONL parses",
+          "samples validate against schemas"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "delegation",
+            "path": "current Codex thread",
+            "ref": "fleet/boss build slice 2",
+            "summary": "Ani routed slice 2 to chief/infra with docs/schema/sample push allowed after validation."
+          }
+        ],
+        "source_thread_id": "019ed10b-518a-7d80-814b-cb52f7453646",
+        "status": "active",
+        "title": "Read-only admin control-plane build slices",
+        "updated_at": "2026-06-23T23:40:00Z"
+      }
+    ],
+    "blockers": [
+      {
+        "blocked_since": "2026-06-23T23:40:00Z",
+        "blocker_id": "block.site.consume-contract-fields",
+        "domain": "site",
+        "next_action": "Bind route cards to sample fields from coord/admin/README.md and samples/*.jsonl.",
+        "object_type": "blocker",
+        "owner": "chief/site",
+        "owner_thread": "chief/site",
+        "related_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "op.site.admin-shell.local-build"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "todo queue",
+            "summary": "chief/site and chief/infra need matching object names and sample ids."
+          }
+        ],
+        "stale_after": "2026-06-25T23:40:00Z",
+        "status": "waiting_on_agent",
+        "title": "chief/site needs stable field names for first admin UI slice",
+        "unblock_conditions": [
+          "UI can render mutation, approval, operation, proof, blocker, repo_state, and handoff cards from sample rows",
+          "No deploy or live worker mutation required"
+        ],
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T23:40:00Z",
+        "blocker_id": "block.admin.live-collectors-not-yet-approved",
+        "domain": "infra",
+        "next_action": "After the read-only UI feels right, request separate approval for low-latency collectors.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": ["mut.infra.admin-contract.schema-samples"],
+        "requires_ani": true,
+        "severity": "low",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "todo queue",
+            "summary": "Collectors come after read-only UI and before any write paths."
+          }
+        ],
+        "stale_after": "2026-07-01T23:40:00Z",
+        "status": "open",
+        "title": "Live collectors are intentionally out of scope for first pass",
+        "unblock_conditions": [
+          "UI field model is accepted",
+          "Collector paths are reviewed",
+          "No secret values or protected payloads enter admin feeds"
+        ],
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "blocked_since": "2026-06-22T09:24:10Z",
+        "blocker_id": "block.health.rename.execution-approval",
+        "domain": "health",
+        "next_action": "Review and approve or revise the prepared backup/hash and rollback packet before any path rename, restart, env-ref migration, or launchd label change.",
+        "object_type": "blocker",
+        "owner": "chief/health",
+        "owner_thread": "chief/health",
+        "related_ids": [
+          "mut.health.rename.execution-gate",
+          "op.health.rename.execution-waiting",
+          "proof.health.ingest-and-ready-packet",
+          "repo.health.vitals-live-tree.ap-mini"
+        ],
+        "requires_ani": true,
+        "severity": "high",
+        "source_refs": [
+          {
+            "kind": "needs-ani",
+            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
+            "ref": "blocker-health-rename-execution",
+            "summary": "Fresh ingest proof is sufficient; approval is now needed for execution packet."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared packet with commands only."
+          }
+        ],
+        "stale_after": "2026-06-26T03:55:32Z",
+        "status": "waiting_on_ani",
+        "title": "Health rename execution awaits packet approval",
+        "unblock_conditions": [
+          "Ani approves the prepared packet or supplies revisions",
+          "No endpoint, port, auth, env, secret, launchd, or GitHub repo rename changes are bundled into approval",
+          "Backup/hash commands remain local-only and value-safe",
+          "Post-rename proof remains required before launchd label rename"
+        ],
+        "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "blocked_since": "2026-06-24T04:05:00Z",
+        "blocker_id": "block.site.static-feed-consumption",
+        "domain": "site",
+        "next_action": "Replace ad hoc admin-solid mocks with a static copy or imported equivalent of coord/admin/static/admin-feed.sample.json.",
+        "object_type": "blocker",
+        "owner": "chief/site",
+        "owner_thread": "chief/site",
+        "related_ids": [
+          "mut.site.admin-static-feed.consume",
+          "op.site.admin-static-feed.consume",
+          "proof.admin.static-feed.bundle"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
+            "summary": "fleet/boss routed the static feed consumption task to chief/site."
+          }
+        ],
+        "stale_after": "2026-06-25T04:05:00Z",
+        "status": "waiting_on_agent",
+        "title": "Admin UI must consume the unified static feed",
+        "unblock_conditions": [
+          "All six admin routes render from the bundled feed",
+          "No runtime dependency on /Users/anipotts/Infra",
+          "No deploy or live collector"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T15:05:00Z",
+        "blocker_id": "block.jobs.gmail-empty-label-ui-cleanup",
+        "domain": "jobs",
+        "next_action": "Use a thread with in-app Browser access to remove empty old Gmail label objects after count proof; do not delete messages or filters.",
+        "object_type": "blocker",
+        "owner": "chief/jobs",
+        "owner_thread": "chief/jobs",
+        "related_ids": [
+          "mut.jobs.admin-feed-operating-layer.complete",
+          "proof.jobs.admin-feed.commit"
+        ],
+        "requires_ani": false,
+        "severity": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs message-label migration is complete; label-object cleanup is browser/UI-only."
+          }
+        ],
+        "stale_after": "2026-06-27T04:05:00Z",
+        "status": "open",
+        "title": "Empty Gmail label objects need Browser/UI cleanup",
+        "unblock_conditions": [
+          "Browser/UI runtime is available",
+          "Before counts still show old labels at 0 messages and 0 threads",
+          "After proof records no message delete, archive, send, or filter mutation"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T03:57:00Z",
+        "blocker_id": "block.brand.rayban-analytics-due",
+        "domain": "brand",
+        "next_action": "Prepare Ray-Ban 30-day analytics proof by 2026-07-05 without posting, sending, invoicing, or changing deal/payment status.",
+        "object_type": "blocker",
+        "owner": "chief/brand",
+        "owner_thread": "chief/brand",
+        "related_ids": [
+          "mut.brand.phase1-operating-skeleton.complete",
+          "proof.brand.phase1.commit",
+          "repo.brand.ap-mini.main"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand Phase 1 preserved Ray-Ban due date and deal-first priority."
+          }
+        ],
+        "stale_after": "2026-07-05T12:00:00Z",
+        "status": "open",
+        "title": "Ray-Ban 30-day analytics proof is the next Brand deal checkpoint",
+        "unblock_conditions": [
+          "Analytics proof is collected from approved source surfaces",
+          "Business remains payment truth source",
+          "No platform mutation or outbound message occurs without approval"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
+      }
+    ],
+    "handoffs": [
+      {
+        "absorbed_at": null,
+        "created_at": "2026-06-23T23:40:00Z",
+        "freshness": "current",
+        "handoff_id": "handoff.admin-control-plane-build-map",
+        "next_action": "chief/infra publishes contract and chief/site binds the UI shell to matching sample ids.",
+        "object_type": "handoff",
+        "owner": "fleet/boss",
+        "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "related_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ],
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "a4a09c5",
+            "summary": "Build map is tracked in Infra origin/main."
+          }
+        ],
+        "source_thread_id": "019ef754-39df-7ae3-a4bb-d15cc9e2a70b",
+        "status": "partially_absorbed",
+        "summary": "Defines admin as a read-only control plane for intent, authority, operation, proof, and state.",
+        "target_owner": "chief/site and chief/infra",
+        "title": "admin control plane build map",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "absorbed_at": "2026-06-24T02:43:15Z",
+        "created_at": "2026-06-24T02:43:15Z",
+        "freshness": "current",
+        "handoff_id": "handoff.rudy-account-deletion-closeout",
+        "next_action": "Display as verified destructive work with rollback limits and no remaining account-cleanup action unless new proof says otherwise.",
+        "object_type": "handoff",
+        "owner": "fleet/boss",
+        "path": "/Users/anipotts/Infra/handoffs/2026-06-23-rudy-kpanil-account-deletion-closeout.md",
+        "proof_ids": [],
+        "related_ids": ["block.admin.live-collectors-not-yet-approved"],
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "rudy-kpanil-account-deletion-closeout-2026-06-23",
+            "summary": "Representative completed destructive operation for admin mock data."
+          }
+        ],
+        "source_thread_id": "019ed10b-518a-7d80-814b-cb52f7453646",
+        "status": "absorbed",
+        "summary": "Example high-risk handoff where admin must show destructive cleanup only after approval, archive proof, process proof, and closeout proof exist.",
+        "target_owner": "chief/infra",
+        "title": "Rudy and kpanil account deletion closeout",
+        "updated_at": "2026-06-24T03:40:00Z"
+      }
+    ],
+    "mutations": [
+      {
+        "allowed_actions": [
+          "local app code edits",
+          "local verification",
+          "agent branch or scoped commit plan"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "domain": "site",
+        "forbidden_actions": [
+          "deploy",
+          "DNS change",
+          "env or secret mutation",
+          "live worker mutation"
+        ],
+        "intent": "Make admin.anipotts.com answer what is safe to do next using mocked control-plane data.",
+        "mutation_class": "read_only",
+        "mutation_id": "mut.site.admin-shell.readonly.slice1",
+        "next_safe_action": "Use coord/admin/samples as mocked read model and render read-only route skeletons.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-shell.local-build"],
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "proposed_by": "chief/site",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-23T23:40:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 1",
+            "summary": "chief/site owns the first read-only UI shell."
+          }
+        ],
+        "status": "approved",
+        "target_surface": "apps/admin-solid",
+        "title": "Build read-only admin control-plane shell",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "allowed_actions": [
+          "schema files",
+          "sample jsonl",
+          "validation script",
+          "private Infra commit and push after validation"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": [],
+        "domain": "infra",
+        "forbidden_actions": [
+          "launchd mutation",
+          "auth mutation",
+          "service mutation",
+          "deploy",
+          "user account cleanup"
+        ],
+        "intent": "Make authority, operation, proof, blocker, repo, and handoff state consumable by the admin UI.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.infra.admin-contract.schema-samples",
+        "next_safe_action": "Validate samples against schemas, commit tracked docs, and push Infra main.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.admin-contract.schema-samples"],
+        "proof_ids": ["proof.validator.admin-contract.samples"],
+        "proposed_by": "chief/infra",
+        "repo": "Infra",
+        "requested_at": "2026-06-23T23:40:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "authority",
+            "path": "/Users/anipotts/Infra/coord/authority.jsonl",
+            "ref": "approval-infra-major-vision-continuation-2026-06-22",
+            "summary": "Infra coordination-only docs and validation are approved."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 2",
+            "summary": "chief/infra owns the read-only data contract."
+          }
+        ],
+        "status": "running",
+        "target_surface": "coord/admin",
+        "title": "Create admin read-only data contract",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "allowed_actions": [
+          "read-only review of prepared packet",
+          "approval or revision of backup/hash and rollback plan",
+          "metadata-only freshness verification"
+        ],
+        "authority_state": "requested",
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "domain": "health",
+        "forbidden_actions": [
+          "path rename before approval",
+          "service restart before approval",
+          "endpoint or port change",
+          "auth/env/secret mutation",
+          "launchd label change",
+          "health data mutation",
+          "DuckDB row reads",
+          "pro-to-mini overwrite",
+          "GitHub repo rename"
+        ],
+        "intent": "Rename the mini live vitals service tree to health only after the prepared backup/hash and rollback packet is approved.",
+        "mutation_class": "service",
+        "mutation_id": "mut.health.rename.execution-gate",
+        "next_safe_action": "Review and approve or revise /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md before any execution.",
+        "object_type": "mutation",
+        "operation_ids": ["op.health.rename.execution-waiting"],
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "proposed_by": "chief/health",
+        "repo": "vitals",
+        "requested_at": "2026-06-22T09:24:10Z",
+        "required_approval_ids": ["appr.health.rename.execution.required"],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared backup/hash commands and rollback plan only; commands were not executed."
+          },
+          {
+            "kind": "needs-ani",
+            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
+            "ref": "blocker-health-rename-execution",
+            "summary": "Current blocker is execution approval, not phone ingest proof."
+          }
+        ],
+        "status": "blocked",
+        "target_surface": "/Users/anipotts/Code/projects/vitals -> /Users/anipotts/Code/projects/health",
+        "title": "Health vitals to health rename execution gate",
+        "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "allowed_actions": [
+          "static JSON copy",
+          "typed adapter",
+          "local route rendering",
+          "branch push after verification"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.site.static-feed-consumption"],
+        "domain": "site",
+        "forbidden_actions": [
+          "deploy",
+          "DNS change",
+          "env or secret mutation",
+          "live collector",
+          "admin write path",
+          "PR merge without Ani approval"
+        ],
+        "intent": "Make the read-only admin shell render the same bundled feed that Infra validates.",
+        "mutation_class": "read_only",
+        "mutation_id": "mut.site.admin-static-feed.consume",
+        "next_safe_action": "chief/site should render approvals, blockers, handoffs, mutations, operations, proofs, and repo_states from the static bundle.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-static-feed.consume"],
+        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "proposed_by": "fleet/boss",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-24T04:05:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
+            "summary": "Static feed consumption was routed after Infra 8fa3c32."
+          }
+        ],
+        "status": "running",
+        "target_surface": "apps/admin-solid",
+        "title": "Consume unified static admin feed in admin-solid",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "safe metadata ledgers",
+          "source registries",
+          "agent rules"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": [],
+        "domain": "business",
+        "forbidden_actions": [
+          "filings",
+          "payments",
+          "account connections",
+          "Gmail/Calendar/Drive mutation",
+          "Mercury/Wave/Fidelity/NJ/IRS portal mutation",
+          "outbound messages",
+          "secrets or env edits"
+        ],
+        "intent": "Make Business agent-native with a control center, safe data ledgers, and agent ops docs.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.business.secretary-operating-layer.complete",
+        "next_safe_action": "Use the committed Business control center as the source for future read-only admin exports.",
+        "object_type": "mutation",
+        "operation_ids": ["op.business.secretary-operating-layer.complete"],
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "proposed_by": "chief/business",
+        "repo": "Business",
+        "requested_at": "2026-06-24T03:52:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "business-secretary-operating-layer-complete-2026-06-23",
+            "summary": "Business first operating layer completed at fd00777."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "docs/00-control-center, docs/09-agent-ops, data",
+        "title": "Business secretary operating layer",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "top-level data YAML",
+          "source registries",
+          "approval gates"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "domain": "brand",
+        "forbidden_actions": [
+          "folder moves",
+          "private payload reads",
+          "platform mutation",
+          "Gmail/Calendar/Drive/Apps Script mutation",
+          "posting",
+          "scheduling",
+          "sending",
+          "invoicing",
+          "payment mutation",
+          "deal-status mutation",
+          "source delete"
+        ],
+        "intent": "Make Brand agent-native without displacing deal closeout work.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.brand.phase1-operating-skeleton.complete",
+        "next_safe_action": "Keep Ray-Ban analytics and Higgsfield proof gaps visible while using Brand data ledgers for future admin exports.",
+        "object_type": "mutation",
+        "operation_ids": ["op.brand.phase1-operating-skeleton.complete"],
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "proposed_by": "chief/brand",
+        "repo": "Brand",
+        "requested_at": "2026-06-24T03:52:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand Phase 1 completed at 0266970."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "README.md, docs/00-control-center, docs/09-agent-ops, data",
+        "title": "Brand phase 1 operating skeleton",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "sample admin-feed rows",
+          "branch push after validation"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "domain": "jobs",
+        "forbidden_actions": [
+          "Gmail mutation",
+          "Calendar mutation",
+          "Sheets mutation",
+          "Workspace Studio mutation",
+          "applications",
+          "message delete/archive/send",
+          "filter mutation",
+          "outbound action"
+        ],
+        "intent": "Expose jobs tracker, Gmail proof, application gates, and repo state as static admin-feed rows.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.jobs.admin-feed-operating-layer.complete",
+        "next_safe_action": "Use Jobs ops/admin-feed rows as a source for the next static feed import; keep empty Gmail label-object cleanup separate.",
+        "object_type": "mutation",
+        "operation_ids": ["op.jobs.admin-feed-operating-layer.complete"],
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "proposed_by": "chief/jobs",
+        "repo": "jobs",
+        "requested_at": "2026-06-24T03:58:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs admin-feed layer completed at 6b4768e."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "docs/00-control-center, docs/09-agent-ops, ops/admin-feed",
+        "title": "Jobs admin feed operating layer",
+        "updated_at": "2026-06-24T04:05:00Z"
+      }
+    ],
+    "operations": [
+      {
+        "agent": "codex chief/infra",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-23T23:40:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.infra.admin-contract.schema-samples"],
+        "next_safe_action": "Run coord/admin/validate_admin_contract.py and loop-runner validate before commit.",
+        "object_type": "operation",
+        "operation_id": "op.infra.admin-contract.schema-samples",
+        "phase": "schema-and-sample-authoring",
+        "proof_ids": ["proof.validator.admin-contract.samples"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "main",
+            "summary": "Private Infra repo may receive validated coordination docs/schema commits."
+          }
+        ],
+        "started_at": "2026-06-23T23:40:00Z",
+        "status": "running",
+        "stop_path": "stop by not committing, then revert working tree changes by exact file path if requested",
+        "thread_id": "current",
+        "title": "Write admin contract schemas and samples",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "agent": "chief/site",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "branch": "codex/admin-control-plane-readonly-slice",
+        "command_class": "ui_local_build",
+        "heartbeat_at": "2026-06-23T23:40:00Z",
+        "machine": "ap-pro or ap-mini",
+        "mutation_ids": ["mut.site.admin-shell.readonly.slice1"],
+        "next_safe_action": "Render route skeletons using coord/admin/samples JSONL as mocked data.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-shell.local-build",
+        "phase": "waiting-for-contract",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 1",
+            "summary": "Site owns the read-only admin UI shell."
+          }
+        ],
+        "started_at": "2026-06-23T23:40:00Z",
+        "status": "queued",
+        "stop_path": "stop before deploy, DNS, env, worker, or production mutation",
+        "thread_id": "chief/site",
+        "title": "Build mocked admin shell in apps/admin-solid",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "agent": "codex chief/health",
+        "allowed_by_approval_ids": [],
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "command_class": "read_only_validation",
+        "heartbeat_at": "2026-06-24T03:55:32Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.health.rename.execution-gate"],
+        "next_safe_action": "Wait for approval or revisions to /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md.",
+        "object_type": "operation",
+        "operation_id": "op.health.rename.execution-waiting",
+        "phase": "approval-gate",
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "repo": "vitals",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Execution commands are prepared but not run."
+          }
+        ],
+        "started_at": "2026-06-22T09:24:10Z",
+        "status": "waiting",
+        "stop_path": "Do not run rename-ready packet commands; leave /Users/anipotts/Code/projects/vitals, port 8080, env refs, endpoint shape, and launchd label unchanged.",
+        "thread_id": "019eebf1-bbd7-7f53-95d5-6dc05d48732c",
+        "title": "Health rename waiting on execution approval",
+        "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "agent": "chief/site",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.site.static-feed-consumption"],
+        "branch": "codex/admin-control-plane-shell-2026-06-23",
+        "command_class": "ui_local_build",
+        "heartbeat_at": "2026-06-24T04:05:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.site.admin-static-feed.consume"],
+        "next_safe_action": "Finish typed adapter and local route smoke against the static bundle.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-static-feed.consume",
+        "phase": "static-feed-adapter",
+        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "codex_thread",
+            "path": "codex-thread:019eebe2-e344-7213-810b-9469b8fe4d1e",
+            "ref": "site static feed prompt",
+            "summary": "chief/site is currently implementing static feed consumption."
+          }
+        ],
+        "started_at": "2026-06-24T04:05:00Z",
+        "status": "running",
+        "stop_path": "Stop before deploy, DNS, env, secrets, Cloudflare, production, live collector, admin write path, or PR merge.",
+        "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
+        "title": "Wire admin-solid to the static feed bundle",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/business",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T03:56:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.business.secretary-operating-layer.complete"],
+        "next_safe_action": "Keep exporting safe metadata from the Business control center; do not infer payment or filing truth without exact source proof.",
+        "object_type": "operation",
+        "operation_id": "op.business.secretary-operating-layer.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "repo": "Business",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Business",
+            "ref": "fd00777",
+            "summary": "Business main contains the first operating layer."
+          }
+        ],
+        "started_at": "2026-06-24T03:52:00Z",
+        "status": "succeeded",
+        "stop_path": "No external business systems were mutated; future changes stop at gates for filings, payments, accounts, portals, and outbound messages.",
+        "thread_id": "019eebe2-6147-70b0-b0fc-4a1a4ebaed2e",
+        "title": "Business operating layer committed",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/brand",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T03:57:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.brand.phase1-operating-skeleton.complete"],
+        "next_safe_action": "Keep Ray-Ban due date and Higgsfield proof state prominent in the Brand control center.",
+        "object_type": "operation",
+        "operation_id": "op.brand.phase1-operating-skeleton.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "repo": "Brand",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Brand",
+            "ref": "0266970",
+            "summary": "Brand main contains the first operating skeleton."
+          }
+        ],
+        "started_at": "2026-06-24T03:52:00Z",
+        "status": "succeeded",
+        "stop_path": "No platform, media, posting, scheduling, payment, deal-status, or source-delete mutation occurred.",
+        "thread_id": "019eebe2-c72e-73d1-a945-c1a446d3b155",
+        "title": "Brand phase 1 skeleton committed",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/jobs",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T04:01:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.jobs.admin-feed-operating-layer.complete"],
+        "next_safe_action": "Keep Jobs admin-feed rows as static source data until a safe read-only exporter exists.",
+        "object_type": "operation",
+        "operation_id": "op.jobs.admin-feed-operating-layer.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "6b4768e",
+            "summary": "Jobs branch contains the first admin-feed operating layer."
+          }
+        ],
+        "started_at": "2026-06-24T03:58:00Z",
+        "status": "succeeded",
+        "stop_path": "No Gmail, Calendar, Sheets, Workspace Studio, application, message archive/send/delete, filter, or outbound mutation occurred.",
+        "thread_id": "019eebe2-d537-76e2-bbfe-32a04ac63458",
+        "title": "Jobs admin feed layer committed",
+        "updated_at": "2026-06-24T04:05:00Z"
+      }
+    ],
+    "proofs": [
+      {
+        "collected_at": "2026-06-23T23:40:00Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.handoff.admin-build-map",
+        "proof_type": "handoff",
+        "redaction": "none",
+        "related_ids": ["handoff.admin-control-plane-build-map"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "a4a09c5",
+            "summary": "Build map was present at a4a09c5 or newer."
+          }
+        ],
+        "status": "valid",
+        "summary": "Handoff defines product thesis, core objects, site slice, infra contract slice, and non-goals.",
+        "title": "Admin control-plane build map exists",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "verifies": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ]
+      },
+      {
+        "collected_at": "2026-06-23T23:40:00Z",
+        "collected_by": "chief/infra",
+        "evidence_uri": "python3 coord/admin/validate_admin_contract.py",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.validator.admin-contract.samples",
+        "proof_type": "validator",
+        "redaction": "none",
+        "related_ids": ["op.infra.admin-contract.schema-samples"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "file",
+            "path": "/Users/anipotts/Infra/coord/admin/validate_admin_contract.py",
+            "summary": "Local stdlib validator for the contract."
+          }
+        ],
+        "status": "valid",
+        "summary": "Validation command parses schemas, parses JSONL samples, checks required fields, rejects extra fields, validates primitive types and enum values, and checks duplicate ids per file.",
+        "title": "Admin contract schemas and samples validate",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "verifies": ["mut.infra.admin-contract.schema-samples"]
+      },
+      {
+        "collected_at": "2026-06-22T09:24:10Z",
+        "collected_by": "chief/health",
+        "evidence_uri": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.health.ingest-and-ready-packet",
+        "proof_type": "handoff",
+        "redaction": "private_payload_omitted",
+        "related_ids": ["op.health.rename.execution-waiting"],
+        "repo": "vitals",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared gated rename packet."
+          },
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "health-phone-ingest-proof-sufficient-2026-06-22",
+            "summary": "Proof classified sufficient without printing rows or payload bodies."
+          }
+        ],
+        "status": "valid",
+        "summary": "Fresh Health Auto Export proof is metadata-only: raw HAE count 59, newest archive filename 2026-06-22T09-12-08-114Z.json, latest.json and DuckDB WAL refreshed at 2026-06-22T05:12:18-0400, unauthenticated /api/health returns 401, and the live Bun process is unchanged. Ready packet contains backup/hash and rollback commands only; commands were not executed.",
+        "title": "Fresh health ingest proof and ready packet exist",
+        "updated_at": "2026-06-24T03:55:32Z",
+        "verifies": [
+          "mut.health.rename.execution-gate",
+          "block.health.rename.execution-approval",
+          "repo.health.vitals-live-tree.ap-mini"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T04:04:00Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "python3 coord/admin/validate_admin_contract.py",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.admin.static-feed.bundle",
+        "proof_type": "validator",
+        "redaction": "none",
+        "related_ids": ["op.site.admin-static-feed.consume"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "8fa3c32",
+            "summary": "Infra commit created the deterministic bundled feed."
+          }
+        ],
+        "status": "valid",
+        "summary": "Static bundle was generated from tracked sample JSONL rows and validator confirms snapshot counts match source samples.",
+        "title": "Static admin feed bundle validates",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.site.admin-static-feed.consume",
+          "block.site.static-feed-consumption"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T03:56:00Z",
+        "collected_by": "chief/business",
+        "evidence_uri": "git commit fd00777",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.business.secretary-layer.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.business.secretary-operating-layer.complete"],
+        "repo": "Business",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "business-secretary-operating-layer-complete-2026-06-23",
+            "summary": "Business completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Business main contains docs/00-control-center, docs/09-agent-ops, safe data ledgers/source registries, and agent-rule pointers. Validation reported YAML parse, compliance-state summary, AGENTS/CLAUDE match, diff check, and no tracked private artifacts.",
+        "title": "Business operating layer commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.business.secretary-operating-layer.complete",
+          "repo.business.ap-mini.main"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T03:57:00Z",
+        "collected_by": "chief/brand",
+        "evidence_uri": "git commit 0266970",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.brand.phase1.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.brand.phase1-operating-skeleton.complete"],
+        "repo": "Brand",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Brand main contains README, docs/00-control-center, docs/09-agent-ops, data ledgers/source registries, and .gitignore changes while private exports remain ignored. Validation reported diff check, YAML parse, no staged private artifact formats, no folder moves, no private payload reads, and no external mutations.",
+        "title": "Brand phase 1 operating skeleton commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.brand.phase1-operating-skeleton.complete",
+          "repo.brand.ap-mini.main",
+          "block.brand.rayban-analytics-due"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T04:01:00Z",
+        "collected_by": "chief/jobs",
+        "evidence_uri": "git commit 6b4768e",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.jobs.admin-feed.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.jobs.admin-feed-operating-layer.complete"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Jobs branch contains docs/00-control-center, docs/09-agent-ops, ops/admin-feed README, and schema-compatible sample rows. Validation reported 12 Jobs feed rows against Infra schemas and upstream Infra samples with 0 failures and 13 sample rows.",
+        "title": "Jobs admin-feed layer commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.jobs.admin-feed-operating-layer.complete",
+          "repo.jobs.ap-mini.branch",
+          "block.jobs.gmail-empty-label-ui-cleanup"
+        ]
+      }
+    ],
+    "repo_states": [
+      {
+        "active_threads": ["chief/infra"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": [],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "a4a09c5-or-newer",
+        "last_verified_at": "2026-06-23T23:40:00Z",
+        "live_runtime_role": "coordination source and private remote backup",
+        "machine": "ap-mini",
+        "next_safe_action": "Commit and push validated coord/admin contract files only.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Infra",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "Infra",
+        "repo_state_id": "repo.infra.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git-status",
+            "path": "/Users/anipotts/Infra",
+            "summary": "Infra source moves by git; untracked local audits are not auto-staged."
+          }
+        ],
+        "untracked_count": 1,
+        "untracked_policy": "ignore unrelated local audit files unless explicitly routed",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/site"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "branch": "codex/admin-control-plane-readonly-slice",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "unknown-until-chief-site-starts",
+        "last_verified_at": "2026-06-23T23:40:00Z",
+        "live_runtime_role": "renderer for admin.anipotts.com, no deploy in slice 1",
+        "machine": "ap-pro or ap-mini",
+        "next_safe_action": "Build local mocked UI against coord/admin sample rows without deploy.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/anipotts-com",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "anipotts-com",
+        "repo_state_id": "repo.anipotts-com.admin-solid",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "existing site planning facts",
+            "summary": "apps/admin-solid is the correct target for admin.anipotts.com."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "chief/site should inspect before editing and avoid env or generated churn",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "unknown"
+      },
+      {
+        "active_threads": ["chief/health"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "canonical_role": "runtime",
+        "deploy_impact": "local_only",
+        "dirty_tracked": [],
+        "head_sha": "none",
+        "last_verified_at": "2026-06-22T09:24:10Z",
+        "live_runtime_role": "live health/vitals API tree on port 8080 with local-only health data; admin must show metadata only",
+        "machine": "ap-mini",
+        "next_safe_action": "Review the gated ready packet; do not rename, restart, edit env/secrets, change endpoint, or copy from pro.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/vitals",
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "repo": "vitals",
+        "repo_state_id": "repo.health.vitals-live-tree.ap-mini",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-21-health-rename-phone-ingest-gate.md",
+            "ref": "live tree and data classification",
+            "summary": "Mini vitals path is runtime-authoritative and not a Git checkout."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "classification",
+            "summary": "Fresh ingest proof is sufficient and execution packet is prepared."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "not applicable because this is a live non-git service tree; do not overwrite from pro",
+        "updated_at": "2026-06-24T03:55:32Z",
+        "upstream": "none",
+        "worktree_state": "unknown"
+      },
+      {
+        "active_threads": ["chief/business"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": [],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "fd00777",
+        "last_verified_at": "2026-06-24T03:56:00Z",
+        "live_runtime_role": "business operating repo and metadata source for compliance/revenue/evidence gates",
+        "machine": "ap-mini",
+        "next_safe_action": "Use the control center and safe ledgers as metadata-only inputs for admin; keep payments, filings, portals, and outbound actions gated.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Business",
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "repo": "Business",
+        "repo_state_id": "repo.business.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Business",
+            "ref": "fd00777",
+            "summary": "Business operating layer is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "do not stage private artifacts; source truth stays in tracked operating docs plus explicit evidence refs",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/brand"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "0266970",
+        "last_verified_at": "2026-06-24T03:57:00Z",
+        "live_runtime_role": "brand operating repo and metadata source for deal, content, and platform gates",
+        "machine": "ap-mini",
+        "next_safe_action": "Keep Ray-Ban analytics due date and Higgsfield proof status visible while preserving Business as payment truth source.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Brand",
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "repo": "Brand",
+        "repo_state_id": "repo.brand.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Brand",
+            "ref": "0266970",
+            "summary": "Brand Phase 1 operating skeleton is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "private exports and ops/crew/data remain ignored; do not stage media, PDFs, videos, envs, or private payloads",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/jobs"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "6b4768e",
+        "last_verified_at": "2026-06-24T04:01:00Z",
+        "live_runtime_role": "jobs tracker and proof repo; outbound/application/Gmail mutations remain gated",
+        "machine": "ap-mini",
+        "next_safe_action": "Use ops/admin-feed as static metadata source; keep Gmail label-object cleanup browser/UI-only and non-destructive.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Personal/jobs",
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "repo": "jobs",
+        "repo_state_id": "repo.jobs.ap-mini.branch",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "6b4768e",
+            "summary": "Jobs admin-feed branch is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "do not stage private Gmail, tracker, or application artifacts unless explicitly routed and redacted",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/codex/yc-2025-job-recs-refresh-2026-06-15",
+        "worktree_state": "clean"
+      }
+    ]
+  },
+  "question": "what is safe to do next?",
+  "snapshot_type": "admin-control-plane-static-sample",
+  "source": {
+    "generated_by": "coord/admin/build_static_snapshot.py",
+    "mode": "tracked-static-sample",
+    "path": "coord/admin/samples",
+    "repo": "Infra"
+  },
+  "version": 1
+}
