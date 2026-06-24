@@ -22,6 +22,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_bots: "ani-fleet-token-factory[bot]"
           prompt: |
             Review this pull request. Check for:
             1. Security issues (XSS, injection, auth bypass, leaked secrets)
