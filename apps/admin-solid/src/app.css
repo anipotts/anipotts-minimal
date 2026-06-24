@@ -387,14 +387,34 @@ dd,
   grid-template-columns: minmax(160px, 0.8fr) repeat(5, minmax(120px, 1fr));
 }
 
+.runtime-row {
+  grid-template-columns: minmax(180px, 0.9fr) repeat(7, minmax(112px, 1fr));
+}
+
 .handoff-row {
   align-items: start;
   grid-template-columns: minmax(220px, 1fr) 120px repeat(4, minmax(140px, 1fr));
 }
 
 .repo-row .proof-line,
+.runtime-row .proof-line,
 .handoff-row .proof-line {
   grid-column: 1 / -1;
+}
+
+.runtime-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.section-header.compact {
+  margin-bottom: 0;
+}
+
+.runtime-safety {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .fact-grid {
@@ -424,6 +444,7 @@ dd,
   .authority-row,
   .proof-row,
   .repo-row,
+  .runtime-row,
   .handoff-row {
     grid-template-columns: 1fr;
   }
@@ -439,7 +460,8 @@ dd,
   .actions-grid,
   .destructive-grid,
   .grid.two,
-  .fact-grid {
+  .fact-grid,
+  .runtime-safety {
     grid-template-columns: 1fr;
   }
 

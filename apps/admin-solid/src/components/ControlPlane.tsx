@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { For, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import type { JSX } from "solid-js";
 import type {
   AuthorityCard,
@@ -10,6 +10,8 @@ import type {
   ProofCard,
   RepoCard,
   RiskLevel,
+  RuntimeOverlayResponse,
+  RuntimeRepoOverlay,
   WorkCard,
 } from "~/data/control-plane";
 import { topStrip } from "~/data/control-plane";
@@ -269,6 +271,97 @@ export function RepoTable(props: { repos: RepoCard[] }) {
         )}
       </For>
     </div>
+  );
+}
+
+export function RuntimeRepoOverlayPanel() {
+  const [runtime, setRuntime] = createSignal<RuntimeOverlayResponse | null>(null);
+
+  onMount(async () => {
+    try {
+      const response = await fetch("/api/admin/runtime-feed");
+      setRuntime((await response.json()) as RuntimeOverlayResponse);
+    } catch (error) {
+      setRuntime({
+        available: false,
+        mode: "error",
+        generated_at: null,
+        machine: null,
+        source_path: "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json",
+        safety: null,
+        overlays: [],
+        error: error instanceof Error ? error.message : "runtime overlay fetch failed",
+      });
+    }
+  });
+
+  return (
+    <div class="runtime-panel">
+      <div class="section-header compact">
+        <div>
+          <p class="eyebrow">local-dev runtime</p>
+          <h2>repo overlays</h2>
+        </div>
+        <Show when={runtime()} fallback={<span class="muted">loading local runtime feed</span>}>
+          {(data) => (
+            <span class="muted">
+              {data().available ? `${data().overlays.length} overlays / ${data().machine ?? "unknown machine"}` : data().mode}
+            </span>
+          )}
+        </Show>
+      </div>
+
+      <Show when={runtime()} fallback={<p class="proof-line">runtime loader is local-dev only</p>}>
+        {(data) => (
+          <>
+            <Show
+              when={data().available}
+              fallback={
+                <p class="proof-line">
+                  runtime overlay unavailable: {data().error ?? data().mode}. source_path: {data().source_path}
+                </p>
+              }
+            >
+              <div class="table-card">
+                <For each={data().overlays}>
+                  {(overlay) => <RuntimeOverlayRow overlay={overlay} />}
+                </For>
+              </div>
+            </Show>
+
+            <div class="runtime-safety">
+              <Fact label="generated_at" value={data().generated_at ?? "not available"} />
+              <Fact label="source_path" value={data().source_path} />
+              <Fact label="safety_mode" value={data().safety?.mode ?? "not available"} />
+              <Fact label="secret_values" value={String(data().safety?.secret_values_included ?? false)} />
+              <Fact label="file_contents" value={String(data().safety?.file_contents_included ?? false)} />
+              <Fact label="health_payloads" value={String(data().safety?.health_payloads_included ?? false)} />
+            </div>
+          </>
+        )}
+      </Show>
+    </div>
+  );
+}
+
+function RuntimeOverlayRow(props: { overlay: RuntimeRepoOverlay }) {
+  return (
+    <article class="table-row runtime-row">
+      <div>
+        <h3>{props.overlay.repo}</h3>
+        <p class="muted">{props.overlay.repo_root_label}</p>
+      </div>
+      <Fact label="git" value={props.overlay.git_available ? "available" : "unavailable"} />
+      <Fact label="branch" value={props.overlay.branch ?? "not a git tree"} />
+      <Fact label="head_sha" value={props.overlay.head_sha ?? "none"} />
+      <Fact label="ahead/behind" value={`${props.overlay.ahead ?? "n/a"} / ${props.overlay.behind ?? "n/a"}`} />
+      <Fact label="dirty_tracked_count" value={String(props.overlay.dirty_tracked_count ?? "n/a")} />
+      <Fact label="untracked_count" value={String(props.overlay.untracked_count ?? "n/a")} />
+      <Fact label="deploy_impact" value={props.overlay.deploy_impact} />
+      <p class="proof-line">
+        {props.overlay.live_runtime_role}. {props.overlay.notes}
+      </p>
+    </article>
   );
 }
 

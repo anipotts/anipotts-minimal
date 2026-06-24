@@ -199,6 +199,42 @@ export type RepoCard = {
   proof_ids: string[];
 };
 
+export type RuntimeRepoOverlay = {
+  repo_state_id: string;
+  repo: string;
+  repo_root_label: string;
+  machine: string;
+  git_available: boolean;
+  branch: string | null;
+  head_sha: string | null;
+  upstream: string | null;
+  upstream_sha: string | null;
+  ahead: number | null;
+  behind: number | null;
+  dirty_tracked_count: number | null;
+  untracked_count: number | null;
+  deploy_impact: "none" | "local_only" | "preview" | "production" | "unknown";
+  live_runtime_role: string;
+  notes: string;
+};
+
+export type RuntimeOverlayResponse = {
+  available: boolean;
+  mode: "local_dev" | "disabled" | "missing" | "error";
+  generated_at: string | null;
+  machine: string | null;
+  source_path: string;
+  safety: {
+    dirty_filenames_included: boolean;
+    file_contents_included: boolean;
+    health_payloads_included: boolean;
+    mode: string;
+    secret_values_included: boolean;
+  } | null;
+  overlays: RuntimeRepoOverlay[];
+  error?: string;
+};
+
 export type HandoffCard = {
   title: string;
   path: string;
