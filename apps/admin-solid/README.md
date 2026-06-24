@@ -20,6 +20,7 @@ This app is read-only first. It renders the fleet/admin feed model:
 | route              | purpose                                               |
 | ------------------ | ----------------------------------------------------- |
 | `/`                | safe-next-action overview and feed coverage           |
+| `/content`         | read-only public-site content inventory               |
 | `/needs-ani`       | typed human syscall queue and future bridge contract  |
 | `/mutations`       | proposed, approved, running, verified, blocked states |
 | `/fleet`           | machine and agent operation placeholders              |
