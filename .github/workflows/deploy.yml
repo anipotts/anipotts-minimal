@@ -38,6 +38,12 @@ on:
         default: "false"
         type: choice
         options: ["false", "true"]
+      admin_solid:
+        description: "deploy admin-solid worker"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
       labs:
         description: "deploy labs.anipotts.com"
         required: true
@@ -74,6 +80,7 @@ jobs:
     outputs:
       www: ${{ steps.filter.outputs.www }}
       admin: ${{ steps.filter.outputs.admin }}
+      admin-solid: ${{ steps.filter.outputs.admin-solid }}
       labs: ${{ steps.filter.outputs.labs }}
       ingest: ${{ steps.filter.outputs.ingest }}
       newsletter: ${{ steps.filter.outputs.newsletter }}
@@ -99,6 +106,15 @@ jobs:
             admin:
               - *root
               - "apps/admin/**"
+              - "packages/config/**"
+              - "packages/lib/**"
+              - "packages/services-platform/**"
+              - "packages/styles/**"
+              - "packages/types/**"
+              - "services/**"
+            admin-solid:
+              - *root
+              - "apps/admin-solid/**"
               - "packages/config/**"
               - "packages/lib/**"
               - "packages/services-platform/**"
@@ -203,6 +219,41 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: apps/admin
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-admin-solid:
+    name: Deploy admin-solid
+    needs: [changes]
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.admin_solid == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs['admin-solid'] == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin-solid
+        run: pnpm turbo build --filter=@anipotts/admin-solid
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          workingDirectory: apps/admin-solid
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 

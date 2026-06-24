@@ -1,12 +1,12 @@
 {
   "counts": {
     "approvals": 1,
-    "blockers": 6,
-    "handoffs": 2,
-    "mutations": 7,
-    "operations": 7,
-    "proofs": 7,
-    "repo_states": 6
+    "blockers": 15,
+    "handoffs": 3,
+    "mutations": 15,
+    "operations": 12,
+    "proofs": 14,
+    "repo_states": 7
   },
   "model": "intent -> authority -> operation -> proof -> state",
   "objects": {
@@ -67,7 +67,7 @@
         "blocked_since": "2026-06-23T23:40:00Z",
         "blocker_id": "block.site.consume-contract-fields",
         "domain": "site",
-        "next_action": "Bind route cards to sample fields from coord/admin/README.md and samples/*.jsonl.",
+        "next_action": "No action remains for this first-slice field-alignment blocker; use newer site/admin rows for live follow-up.",
         "object_type": "blocker",
         "owner": "chief/site",
         "owner_thread": "chief/site",
@@ -76,23 +76,30 @@
           "op.site.admin-shell.local-build"
         ],
         "requires_ani": false,
-        "severity": "medium",
+        "severity": "info",
         "source_refs": [
           {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
-            "ref": "todo queue",
-            "summary": "chief/site and chief/infra need matching object names and sample ids."
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "site-admin-runtime-loader-complete-2026-06-24",
+            "summary": "chief/site completed the final local-dev runtime-loader slice for PR #75."
+          },
+          {
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "merged 2026-06-24T05:11:43Z",
+            "summary": "Ani merged the admin shell PR after the green checks."
           }
         ],
         "stale_after": "2026-06-25T23:40:00Z",
-        "status": "waiting_on_agent",
-        "title": "chief/site needs stable field names for first admin UI slice",
+        "status": "resolved",
+        "title": "Admin shell field alignment is complete",
         "unblock_conditions": [
-          "UI can render mutation, approval, operation, proof, blocker, repo_state, and handoff cards from sample rows",
-          "No deploy or live worker mutation required"
+          "admin-solid rendered the contract-backed static feed",
+          "runtime overlay slice completed in local dev",
+          "PR #75 later merged by Ani"
         ],
-        "updated_at": "2026-06-23T23:40:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "blocked_since": "2026-06-23T23:40:00Z",
@@ -127,48 +134,48 @@
         "blocked_since": "2026-06-22T09:24:10Z",
         "blocker_id": "block.health.rename.execution-approval",
         "domain": "health",
-        "next_action": "Review and approve or revise the prepared backup/hash and rollback packet before any path rename, restart, env-ref migration, or launchd label change.",
+        "next_action": "Ani runs one phone HAE push for post-rename ingest proof; only after proof can chief/health run the exact launchd relabel packet.",
         "object_type": "blocker",
         "owner": "chief/health",
         "owner_thread": "chief/health",
         "related_ids": [
-          "mut.health.rename.execution-gate",
-          "op.health.rename.execution-waiting",
-          "proof.health.ingest-and-ready-packet",
-          "repo.health.vitals-live-tree.ap-mini"
+          "mut.health.launchd-relabel.step-g",
+          "op.health.remaining-e-g",
+          "proof.health.rename.steps-a-d",
+          "repo.health.live-tree.ap-mini"
         ],
         "requires_ani": true,
         "severity": "high",
         "source_refs": [
           {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          },
+          {
             "kind": "needs-ani",
             "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
             "ref": "blocker-health-rename-execution",
-            "summary": "Fresh ingest proof is sufficient; approval is now needed for execution packet."
-          },
-          {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
-            "ref": "health-rename-ready-packet-2026-06-22",
-            "summary": "Prepared packet with commands only."
+            "summary": "Queue narrowed to post-rename phone ingest proof before launchd relabel."
           }
         ],
-        "stale_after": "2026-06-26T03:55:32Z",
+        "stale_after": "2026-06-26T08:02:00Z",
         "status": "waiting_on_ani",
-        "title": "Health rename execution awaits packet approval",
+        "title": "Health rename waits on post-rename phone ingest proof",
         "unblock_conditions": [
-          "Ani approves the prepared packet or supplies revisions",
-          "No endpoint, port, auth, env, secret, launchd, or GitHub repo rename changes are bundled into approval",
-          "Backup/hash commands remain local-only and value-safe",
-          "Post-rename proof remains required before launchd label rename"
+          "Phone HAE push lands after the vitals to health path move",
+          "Proof is metadata-only and no health payload rows are printed",
+          "Launchd relabel is limited to com.anipotts.vitals-api -> com.anipotts.health-api",
+          "No endpoint, env, secret, auth, or GitHub repo rename is bundled"
         ],
-        "updated_at": "2026-06-24T03:55:32Z"
+        "updated_at": "2026-06-24T08:02:00Z"
       },
       {
         "blocked_since": "2026-06-24T04:05:00Z",
         "blocker_id": "block.site.static-feed-consumption",
         "domain": "site",
-        "next_action": "Replace ad hoc admin-solid mocks with a static copy or imported equivalent of coord/admin/static/admin-feed.sample.json.",
+        "next_action": "No static-feed implementation action remains; next safe site step is authenticated browser verification of the protected production admin surface.",
         "object_type": "blocker",
         "owner": "chief/site",
         "owner_thread": "chief/site",
@@ -178,56 +185,68 @@
           "proof.admin.static-feed.bundle"
         ],
         "requires_ani": false,
-        "severity": "medium",
+        "severity": "info",
         "source_refs": [
           {
             "kind": "bus_ref",
             "path": "/Users/anipotts/Infra/coord/bus.jsonl",
-            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
-            "summary": "fleet/boss routed the static feed consumption task to chief/site."
+            "ref": "site-admin-runtime-loader-complete-2026-06-24",
+            "summary": "runtime-loader completion was absorbed by fleet/boss."
+          },
+          {
+            "kind": "github_run",
+            "path": "https://github.com/anipotts/anipotts.com/actions/runs/28076715983",
+            "ref": "Deploy success at a8633307",
+            "summary": "Deploy workflow succeeded after Ani merged PR #75."
           }
         ],
         "stale_after": "2026-06-25T04:05:00Z",
-        "status": "waiting_on_agent",
-        "title": "Admin UI must consume the unified static feed",
+        "status": "resolved",
+        "title": "Admin static feed consumption is complete",
         "unblock_conditions": [
-          "All six admin routes render from the bundled feed",
-          "No runtime dependency on /Users/anipotts/Infra",
-          "No deploy or live collector"
+          "static feed copied into admin-solid",
+          "local-dev runtime overlays rendered on /repos",
+          "PR #75 merged by Ani and Deploy workflow succeeded"
         ],
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "blocked_since": "2026-06-23T15:05:00Z",
         "blocker_id": "block.jobs.gmail-empty-label-ui-cleanup",
         "domain": "jobs",
-        "next_action": "Use a thread with in-app Browser access to remove empty old Gmail label objects after count proof; do not delete messages or filters.",
+        "next_action": "No Gmail cleanup action remains unless Ani requests independent live UI verification; the latest Chrome UI completion remains thread-reported and is now durably reconciled in the jobs repo.",
         "object_type": "blocker",
         "owner": "chief/jobs",
         "owner_thread": "chief/jobs",
         "related_ids": [
           "mut.jobs.admin-feed-operating-layer.complete",
-          "proof.jobs.admin-feed.commit"
+          "proof.jobs.gmail-ui-colors.durable-proof"
         ],
         "requires_ani": false,
-        "severity": "low",
+        "severity": "info",
         "source_refs": [
           {
-            "kind": "bus_ref",
-            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
-            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
-            "summary": "Jobs message-label migration is complete; label-object cleanup is browser/UI-only."
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "574ee9f",
+            "summary": "jobs commit 574ee9f records the missing 38fdc7a proof reconciliation and final thread-reported Gmail UI state."
+          },
+          {
+            "kind": "file",
+            "path": "/Users/anipotts/Personal/jobs/tools/inbound/gmail-label-color-proof-reconciliation-2026-06-24.md",
+            "ref": "proof reconciliation note",
+            "summary": "Durable note records that 38fdc7a was absent, the final UI state is thread-reported, and no live Gmail verification was independently rerun."
           }
         ],
         "stale_after": "2026-06-27T04:05:00Z",
-        "status": "open",
-        "title": "Empty Gmail label objects need Browser/UI cleanup",
+        "status": "resolved",
+        "title": "Gmail label UI proof reconciliation complete",
         "unblock_conditions": [
-          "Browser/UI runtime is available",
-          "Before counts still show old labels at 0 messages and 0 threads",
-          "After proof records no message delete, archive, send, or filter mutation"
+          "Durable missing-proof reconciliation landed in the jobs repo",
+          "Final label list and safety bounds were recorded",
+          "No Gmail message, filter, Calendar, Sheets, Workspace Studio, application, or outbound mutation occurred"
         ],
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:42:00Z"
       },
       {
         "blocked_since": "2026-06-23T03:57:00Z",
@@ -261,6 +280,283 @@
           "No platform mutation or outbound message occurs without approval"
         ],
         "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "blocked_since": "2026-06-21T00:00:00Z",
+        "blocker_id": "block.jobs.codesignal-nested-repo",
+        "domain": "jobs",
+        "next_action": "No action remains; keep the tar archive as the preserved practice copy.",
+        "object_type": "blocker",
+        "owner": "chief/jobs",
+        "owner_thread": "chief/jobs",
+        "related_ids": ["proof.jobs.codesignal.archive"],
+        "requires_ani": false,
+        "severity": "info",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-07-01T00:00:00Z",
+        "status": "resolved",
+        "title": "CodeSignal nested repo cleanup is closed",
+        "unblock_conditions": [
+          "Archive written",
+          "Nested clone trashed",
+          "Jobs de-nested"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-21T00:00:00Z",
+        "blocker_id": "block.infra.x-reader-initial-state",
+        "domain": "infra",
+        "next_action": "No initial-state action remains; future x-reader product/repo decisions are separate.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": [
+          "proof.x-reader.initial-commit",
+          "repo.x-reader.ap-mini.local"
+        ],
+        "requires_ani": false,
+        "severity": "info",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-07-01T00:00:00Z",
+        "status": "resolved",
+        "title": "x-reader initial repo state is resolved",
+        "unblock_conditions": [
+          "accounts.db and data/ gitignored",
+          "initial code-only commit exists",
+          "gitleaks clean",
+          "no remote created"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-21T00:00:00Z",
+        "blocker_id": "block.infra.cloudflare-token-convergence",
+        "domain": "infra",
+        "next_action": "No convergence decision remains; finish old-token revocation under the separate exact authority row.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": [
+          "proof.infra.cloudflare-token-convergence",
+          "mut.infra.cloudflare-old-token-revocation"
+        ],
+        "requires_ani": false,
+        "severity": "info",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-07-01T00:00:00Z",
+        "status": "resolved",
+        "title": "Cloudflare token divergence is converged",
+        "unblock_conditions": [
+          "Pro and mini current tokens match",
+          "D1 HTTP 200 verified on both machines",
+          "Old token files archived locally"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-24T07:56:00Z",
+        "blocker_id": "block.infra.cloudflare-old-token-revocation",
+        "domain": "infra",
+        "next_action": "Enumerate tokens and revoke only superseded old cf-anipotts-brand-d1-readwrite tokens; keep the current verified token alive.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": [
+          "mut.infra.cloudflare-old-token-revocation",
+          "proof.infra.cloudflare-token-convergence"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "authority",
+            "path": "/Users/anipotts/Infra/coord/authority.jsonl",
+            "ref": "approval-cloudflare-old-token-revocation-2026-06-24",
+            "summary": "Exact authority for revoking old superseded profile tokens."
+          }
+        ],
+        "stale_after": "2026-06-27T08:02:00Z",
+        "status": "open",
+        "title": "Old Cloudflare brand D1 tokens need revocation",
+        "unblock_conditions": [
+          "Active authority approval-cloudflare-old-token-revocation-2026-06-24 is followed",
+          "No token values are printed",
+          "D1 HTTP 200 still verifies after revocation"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-24T07:58:00Z",
+        "blocker_id": "block.infra.threads-yml-auto-generation",
+        "domain": "infra",
+        "next_action": "Build async non-blocking auto-generation from Codex session state so this registry no longer drifts from the IDE.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": ["mut.infra.threads-auto-generation"],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-06-28T08:02:00Z",
+        "status": "open",
+        "title": "threads.yml is still manually maintained",
+        "unblock_conditions": [
+          "Generator never stalls main work",
+          "Output is low-latency enough for boss/chiefs",
+          "Manual bootstrap snapshot status is retired"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-24T07:58:00Z",
+        "blocker_id": "block.infra.token-factory-static-ttl-zone",
+        "domain": "infra",
+        "next_action": "Fix anipotts-com-worker-deploy zone resource and eliminate silent 1h default TTL for profiles consumed from static files.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": ["mut.infra.token-factory-fixes"],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-06-28T08:02:00Z",
+        "status": "open",
+        "title": "Token factory needs zone resource and static TTL policy fixes",
+        "unblock_conditions": [
+          "Worker-deploy profile mints without the zone error",
+          "Static-file profiles have explicit long TTL or consumers mint on demand",
+          "No token values are printed"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-24T07:59:00Z",
+        "blocker_id": "block.site.admin-deploy-path-filter",
+        "domain": "site",
+        "next_action": "Add the admin-solid workflow path filter/job so future approved admin changes deploy without manual wrangler deploy.",
+        "object_type": "blocker",
+        "owner": "chief/site",
+        "owner_thread": "chief/site",
+        "related_ids": ["mut.site.admin-deploy-workflow-filter"],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-06-28T08:02:00Z",
+        "status": "open",
+        "title": "admin-solid deploy path filter is missing",
+        "unblock_conditions": [
+          "Workflow patch is reviewed and verified",
+          "No deploy is triggered unless repo policy/approval allows it",
+          "PR #75 manual deploy caveat is closed"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-24T07:58:00Z",
+        "blocker_id": "block.admin.blocked-by-ani-phone-channel",
+        "domain": "infra-site",
+        "next_action": "Render NEEDS-ANI in admin and design Codex-to-iMessage approval loop using the anipotts identity, with actual sending separately gated.",
+        "object_type": "blocker",
+        "owner": "chief/infra and chief/site",
+        "owner_thread": "chief/infra chief/site",
+        "related_ids": ["mut.admin.blocked-by-ani-phone-channel"],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "stale_after": "2026-06-30T08:02:00Z",
+        "status": "open",
+        "title": "Blocked-by-Ani queue needs phone-native channel",
+        "unblock_conditions": [
+          "Admin shows NEEDS-ANI queue read-only",
+          "Outbound iMessage bridge design is documented",
+          "No Messages send occurs before exact approval"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "blocked_since": "2026-06-21T00:00:00Z",
+        "blocker_id": "block.infra.elevenlabs-parent-bootstrap",
+        "domain": "infra",
+        "next_action": "Ani creates service account ani-fleet-token-factory and key elevenlabs-fleet-token-factory-parent, then runs the approved no-print store-parent command.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": ["mut.infra.elevenlabs-parent-bootstrap"],
+        "requires_ani": true,
+        "severity": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          },
+          {
+            "kind": "needs-ani",
+            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
+            "ref": "blocker-phone-agent-elevenlabs-parent",
+            "summary": "Human dashboard step remains open."
+          }
+        ],
+        "stale_after": "2026-06-28T08:02:00Z",
+        "status": "waiting_on_ani",
+        "title": "ElevenLabs parent key bootstrap waits on Ani",
+        "unblock_conditions": [
+          "Parent key stored through no-print flow",
+          "Child tokens minted",
+          "op-refs added without exposing values"
+        ],
+        "updated_at": "2026-06-24T08:02:00Z"
       }
     ],
     "handoffs": [
@@ -318,6 +614,36 @@
         "target_owner": "chief/infra",
         "title": "Rudy and kpanil account deletion closeout",
         "updated_at": "2026-06-24T03:40:00Z"
+      },
+      {
+        "absorbed_at": "2026-06-24T08:02:00Z",
+        "created_at": "2026-06-24T05:53:00Z",
+        "freshness": "current",
+        "handoff_id": "handoff.claude-fleet-sprint-closeout",
+        "next_action": "Chiefs execute the routed follow-ups; admin renders the remaining blockers and proof state.",
+        "object_type": "handoff",
+        "owner": "Claude Code",
+        "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+        "proof_ids": ["proof.claude.fleet-sprint.closeout"],
+        "related_ids": [
+          "block.infra.threads-yml-auto-generation",
+          "block.infra.token-factory-static-ttl-zone",
+          "block.admin.blocked-by-ani-phone-channel"
+        ],
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "source_thread_id": "external-claude-code-sprint-2026-06-24",
+        "status": "absorbed",
+        "summary": "Records verified sprint completions, remaining Ani gates, and phase-2 directives for admin control plane and fleet cleanup.",
+        "target_owner": "fleet/boss, chief/infra, chief/site, chief/health, chief/jobs",
+        "title": "Claude fleet sprint closeout",
+        "updated_at": "2026-06-24T08:02:00Z"
       }
     ],
     "mutations": [
@@ -328,7 +654,7 @@
           "agent branch or scoped commit plan"
         ],
         "authority_state": "approved",
-        "blocker_ids": ["block.site.consume-contract-fields"],
+        "blocker_ids": [],
         "domain": "site",
         "forbidden_actions": [
           "deploy",
@@ -339,10 +665,13 @@
         "intent": "Make admin.anipotts.com answer what is safe to do next using mocked control-plane data.",
         "mutation_class": "read_only",
         "mutation_id": "mut.site.admin-shell.readonly.slice1",
-        "next_safe_action": "Use coord/admin/samples as mocked read model and render read-only route skeletons.",
+        "next_safe_action": "Admin shell is merged to main and deployed behind Cloudflare Access; next safe action is authenticated browser verification, not another merge or deploy.",
         "object_type": "mutation",
         "operation_ids": ["op.site.admin-shell.local-build"],
-        "proof_ids": ["proof.handoff.admin-build-map"],
+        "proof_ids": [
+          "proof.handoff.admin-build-map",
+          "proof.site.admin-pr75.deploy-status"
+        ],
         "proposed_by": "chief/site",
         "repo": "anipotts-com",
         "requested_at": "2026-06-23T23:40:00Z",
@@ -352,16 +681,16 @@
         "risk_level": "low",
         "source_refs": [
           {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
-            "ref": "build slice 1",
-            "summary": "chief/site owns the first read-only UI shell."
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "merged 2026-06-24T05:11:43Z",
+            "summary": "Ani merged the admin shell PR at head 3adf783."
           }
         ],
-        "status": "approved",
+        "status": "verified",
         "target_surface": "apps/admin-solid",
         "title": "Build read-only admin control-plane shell",
-        "updated_at": "2026-06-23T23:40:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "allowed_actions": [
@@ -383,7 +712,7 @@
         "intent": "Make authority, operation, proof, blocker, repo, and handoff state consumable by the admin UI.",
         "mutation_class": "docs_schema",
         "mutation_id": "mut.infra.admin-contract.schema-samples",
-        "next_safe_action": "Validate samples against schemas, commit tracked docs, and push Infra main.",
+        "next_safe_action": "Use the validated contract as the static/runtime feed source; future live collectors and write paths still require separate approval.",
         "object_type": "mutation",
         "operation_ids": ["op.infra.admin-contract.schema-samples"],
         "proof_ids": ["proof.validator.admin-contract.samples"],
@@ -408,61 +737,10 @@
             "summary": "chief/infra owns the read-only data contract."
           }
         ],
-        "status": "running",
+        "status": "verified",
         "target_surface": "coord/admin",
         "title": "Create admin read-only data contract",
-        "updated_at": "2026-06-23T23:40:00Z"
-      },
-      {
-        "allowed_actions": [
-          "read-only review of prepared packet",
-          "approval or revision of backup/hash and rollback plan",
-          "metadata-only freshness verification"
-        ],
-        "authority_state": "requested",
-        "blocker_ids": ["block.health.rename.execution-approval"],
-        "domain": "health",
-        "forbidden_actions": [
-          "path rename before approval",
-          "service restart before approval",
-          "endpoint or port change",
-          "auth/env/secret mutation",
-          "launchd label change",
-          "health data mutation",
-          "DuckDB row reads",
-          "pro-to-mini overwrite",
-          "GitHub repo rename"
-        ],
-        "intent": "Rename the mini live vitals service tree to health only after the prepared backup/hash and rollback packet is approved.",
-        "mutation_class": "service",
-        "mutation_id": "mut.health.rename.execution-gate",
-        "next_safe_action": "Review and approve or revise /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md before any execution.",
-        "object_type": "mutation",
-        "operation_ids": ["op.health.rename.execution-waiting"],
-        "proof_ids": ["proof.health.ingest-and-ready-packet"],
-        "proposed_by": "chief/health",
-        "repo": "vitals",
-        "requested_at": "2026-06-22T09:24:10Z",
-        "required_approval_ids": ["appr.health.rename.execution.required"],
-        "risk_level": "high",
-        "source_refs": [
-          {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
-            "ref": "health-rename-ready-packet-2026-06-22",
-            "summary": "Prepared backup/hash commands and rollback plan only; commands were not executed."
-          },
-          {
-            "kind": "needs-ani",
-            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
-            "ref": "blocker-health-rename-execution",
-            "summary": "Current blocker is execution approval, not phone ingest proof."
-          }
-        ],
-        "status": "blocked",
-        "target_surface": "/Users/anipotts/Code/projects/vitals -> /Users/anipotts/Code/projects/health",
-        "title": "Health vitals to health rename execution gate",
-        "updated_at": "2026-06-24T03:55:32Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "allowed_actions": [
@@ -472,7 +750,7 @@
           "branch push after verification"
         ],
         "authority_state": "approved",
-        "blocker_ids": ["block.site.static-feed-consumption"],
+        "blocker_ids": [],
         "domain": "site",
         "forbidden_actions": [
           "deploy",
@@ -485,10 +763,13 @@
         "intent": "Make the read-only admin shell render the same bundled feed that Infra validates.",
         "mutation_class": "read_only",
         "mutation_id": "mut.site.admin-static-feed.consume",
-        "next_safe_action": "chief/site should render approvals, blockers, handoffs, mutations, operations, proofs, and repo_states from the static bundle.",
+        "next_safe_action": "Static feed and local-dev runtime overlay work is complete; authenticated browser verification is the next safe production check.",
         "object_type": "mutation",
         "operation_ids": ["op.site.admin-static-feed.consume"],
-        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "proof_ids": [
+          "proof.admin.static-feed.bundle",
+          "proof.site.admin-pr75.deploy-status"
+        ],
         "proposed_by": "fleet/boss",
         "repo": "anipotts-com",
         "requested_at": "2026-06-24T04:05:00Z",
@@ -498,16 +779,22 @@
         "risk_level": "low",
         "source_refs": [
           {
-            "kind": "bus_ref",
-            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
-            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
-            "summary": "Static feed consumption was routed after Infra 8fa3c32."
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "merged 2026-06-24T05:11:43Z",
+            "summary": "Admin static feed/runtime loader shipped through PR #75."
+          },
+          {
+            "kind": "github_run",
+            "path": "https://github.com/anipotts/anipotts.com/actions/runs/28076715983",
+            "ref": "Deploy success at a8633307",
+            "summary": "Deploy workflow succeeded after merge."
           }
         ],
-        "status": "running",
+        "status": "verified",
         "target_surface": "apps/admin-solid",
         "title": "Consume unified static admin feed in admin-solid",
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "allowed_actions": [
@@ -612,7 +899,7 @@
           "branch push after validation"
         ],
         "authority_state": "approved",
-        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "blocker_ids": [],
         "domain": "jobs",
         "forbidden_actions": [
           "Gmail mutation",
@@ -627,10 +914,13 @@
         "intent": "Expose jobs tracker, Gmail proof, application gates, and repo state as static admin-feed rows.",
         "mutation_class": "docs_schema",
         "mutation_id": "mut.jobs.admin-feed-operating-layer.complete",
-        "next_safe_action": "Use Jobs ops/admin-feed rows as a source for the next static feed import; keep empty Gmail label-object cleanup separate.",
+        "next_safe_action": "Jobs admin-feed rows and the Gmail UI proof reconciliation are durable; do not reopen Gmail unless Ani requests independent live UI verification.",
         "object_type": "mutation",
         "operation_ids": ["op.jobs.admin-feed-operating-layer.complete"],
-        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "proof_ids": [
+          "proof.jobs.admin-feed.commit",
+          "proof.jobs.gmail-ui-colors.durable-proof"
+        ],
         "proposed_by": "chief/jobs",
         "repo": "jobs",
         "requested_at": "2026-06-24T03:58:00Z",
@@ -644,12 +934,396 @@
             "path": "/Users/anipotts/Infra/coord/bus.jsonl",
             "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
             "summary": "Jobs admin-feed layer completed at 6b4768e."
+          },
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "574ee9f",
+            "summary": "Jobs branch contains the Gmail label-color proof reconciliation note."
           }
         ],
         "status": "verified",
         "target_surface": "docs/00-control-center, docs/09-agent-ops, ops/admin-feed",
         "title": "Jobs admin feed operating layer",
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:42:00Z"
+      },
+      {
+        "allowed_actions": [
+          "Ani merge of PR #75",
+          "GitHub Actions Deploy workflow",
+          "read-only verification of protected URL"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": [],
+        "domain": "site",
+        "forbidden_actions": [
+          "admin write path activation",
+          "live collector production activation",
+          "DNS change",
+          "env or secret mutation",
+          "Cloudflare Access policy mutation"
+        ],
+        "intent": "Promote the read-only admin shell to the protected production admin surface after Ani merged PR #75.",
+        "mutation_class": "deploy",
+        "mutation_id": "mut.site.admin-pr75.live-deploy",
+        "next_safe_action": "Verify admin.anipotts.com with an authenticated browser session; leave write paths, collectors, auth, DNS, and env unchanged unless separately approved.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-pr75.merge-deploy"],
+        "proof_ids": ["proof.site.admin-pr75.deploy-status"],
+        "proposed_by": "Ani via GitHub merge",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-24T05:11:43Z",
+        "required_approval_ids": [],
+        "risk_level": "medium",
+        "source_refs": [
+          {
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "merge commit a8633307",
+            "summary": "PR #75 merged by Ani at 2026-06-24T05:11:43Z."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "admin.anipotts.com",
+        "title": "Admin shell PR #75 merged and deployed",
+        "updated_at": "2026-06-24T06:24:00Z"
+      },
+      {
+        "allowed_actions": [
+          "backup and sha proof",
+          "path rename with compat symlink",
+          "non-secret ref migration",
+          "metadata-only service verification"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "domain": "health",
+        "forbidden_actions": [
+          "launchd relabel before post-rename ingest proof",
+          "endpoint change",
+          "env or secret mutation",
+          "health payload print",
+          "GitHub repo rename"
+        ],
+        "intent": "Move the mini live health service path from vitals to health while preserving compatibility and avoiding restart if service survives.",
+        "mutation_class": "service",
+        "mutation_id": "mut.health.rename.steps-a-d",
+        "next_safe_action": "Wait for Ani's post-rename phone HAE push before step G launchd relabel.",
+        "object_type": "mutation",
+        "operation_ids": ["op.health.rename.steps-a-d"],
+        "proof_ids": ["proof.health.rename.steps-a-d"],
+        "proposed_by": "Claude Code",
+        "repo": "health",
+        "requested_at": "2026-06-24T05:11:26Z",
+        "required_approval_ids": [
+          "approval-claude-fleet-sprint-completed-2026-06-24"
+        ],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "/Users/anipotts/Code/projects/health",
+        "title": "Health rename steps A-D",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "prepare exact launchd relabel packet",
+          "metadata-only post-rename proof check"
+        ],
+        "authority_state": "requested",
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "domain": "health",
+        "forbidden_actions": [
+          "launchd relabel before phone ingest proof",
+          "endpoint change",
+          "env or secret mutation",
+          "health data mutation",
+          "GitHub repo rename"
+        ],
+        "intent": "Rename launchd label from vitals-api to health-api after post-rename ingest proof.",
+        "mutation_class": "service",
+        "mutation_id": "mut.health.launchd-relabel.step-g",
+        "next_safe_action": "Ani runs one phone HAE push; chief/health then verifies proof and relabels only if packet conditions hold.",
+        "object_type": "mutation",
+        "operation_ids": ["op.health.remaining-e-g"],
+        "proof_ids": ["proof.health.rename.steps-a-d"],
+        "proposed_by": "chief/health",
+        "repo": "health",
+        "requested_at": "2026-06-24T08:00:00Z",
+        "required_approval_ids": [
+          "appr.health.post-rename-ingest-proof.required"
+        ],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "blocked",
+        "target_surface": "com.anipotts.vitals-api -> com.anipotts.health-api",
+        "title": "Health launchd relabel step G",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "set brand-d1-readwrite ttl_seconds to 7776000",
+          "reseed pro and mini local token files",
+          "verify D1 HTTP 200"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.infra.cloudflare-token-convergence"],
+        "domain": "infra",
+        "forbidden_actions": [
+          "print token values",
+          "delete old tokens during convergence",
+          "change DNS workers env or Access policies"
+        ],
+        "intent": "Converge pro and mini static Cloudflare brand D1 tokens on a 90 day child token.",
+        "mutation_class": "account",
+        "mutation_id": "mut.infra.cloudflare-token-convergence.option-a",
+        "next_safe_action": "Revoke only old superseded profile tokens under the separate exact revocation authority.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.cloudflare-token-convergence"],
+        "proof_ids": ["proof.infra.cloudflare-token-convergence"],
+        "proposed_by": "Claude Code",
+        "repo": "Infra",
+        "requested_at": "2026-06-24T05:55:00Z",
+        "required_approval_ids": [
+          "approval-claude-fleet-sprint-completed-2026-06-24"
+        ],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "secrets/personal/cloudflare/anipotts.token on pro and mini",
+        "title": "Cloudflare brand D1 token convergence option a",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "enumerate tokens with values omitted",
+          "delete only old superseded cf-anipotts-brand-d1-readwrite tokens",
+          "verify current token still works"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.infra.cloudflare-old-token-revocation"],
+        "domain": "infra",
+        "forbidden_actions": [
+          "delete current token",
+          "delete unrelated tokens",
+          "print secret values",
+          "change DNS workers routes env or Access"
+        ],
+        "intent": "Remove superseded brand-d1-readwrite tokens after static token convergence.",
+        "mutation_class": "account",
+        "mutation_id": "mut.infra.cloudflare-old-token-revocation",
+        "next_safe_action": "chief/infra performs no-print old-token revocation and writes proof.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.cloudflare-old-token-revocation"],
+        "proof_ids": ["proof.infra.cloudflare-token-convergence"],
+        "proposed_by": "fleet/boss",
+        "repo": "Infra",
+        "requested_at": "2026-06-24T07:56:00Z",
+        "required_approval_ids": [
+          "approval-cloudflare-old-token-revocation-2026-06-24"
+        ],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "authority",
+            "path": "/Users/anipotts/Infra/coord/authority.jsonl",
+            "ref": "approval-cloudflare-old-token-revocation-2026-06-24",
+            "summary": "Exact active authority for old-token revocation."
+          }
+        ],
+        "status": "approved",
+        "target_surface": "Cloudflare account token list",
+        "title": "Revoke old Cloudflare brand D1 tokens",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "read Codex session state",
+          "generate registry snapshot",
+          "run asynchronously without blocking main work",
+          "validate and commit coordination code/docs"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.infra.threads-yml-auto-generation"],
+        "domain": "infra",
+        "forbidden_actions": [
+          "mutate thread history destructively",
+          "stall main work",
+          "force archive live sessions",
+          "change secrets auth or launchd"
+        ],
+        "intent": "Stop reasoning from a stale manual bootstrap snapshot by deriving thread state from Codex session state asynchronously.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.infra.threads-auto-generation",
+        "next_safe_action": "chief/infra designs and implements the generator as a bounded non-blocking slice.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.threads-auto-generation"],
+        "proof_ids": [],
+        "proposed_by": "Ani via fleet/boss",
+        "repo": "Infra",
+        "requested_at": "2026-06-24T07:58:00Z",
+        "required_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "proposed",
+        "target_surface": "registries/threads.yml",
+        "title": "Auto-generate threads.yml",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "add zone resource to anipotts-com-worker-deploy profile",
+          "make static-file profiles explicit about TTL policy",
+          "add tests or dry-run proof"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.infra.token-factory-static-ttl-zone"],
+        "domain": "infra",
+        "forbidden_actions": [
+          "print token values",
+          "deploy workers",
+          "change DNS zones or Access",
+          "rotate current tokens unless separately scoped"
+        ],
+        "intent": "Repair worker deploy token minting and stop accidental one-hour static token expiry.",
+        "mutation_class": "git_push",
+        "mutation_id": "mut.infra.token-factory-fixes",
+        "next_safe_action": "chief/infra patches and validates factory/profile behavior without deploying.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.token-factory-fixes"],
+        "proof_ids": [],
+        "proposed_by": "Ani via fleet/boss",
+        "repo": "Infra",
+        "requested_at": "2026-06-24T07:58:00Z",
+        "required_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "risk_level": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "proposed",
+        "target_surface": "bin/cloudflare-token-factory and registries/cloudflare-token-profiles.json",
+        "title": "Token factory profile and TTL fixes",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "review workflow path filters",
+          "add admin-solid deploy coverage",
+          "validate workflow syntax"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.site.admin-deploy-path-filter"],
+        "domain": "site",
+        "forbidden_actions": [
+          "trigger deploy without approval",
+          "change DNS env secrets Cloudflare Access or branch protection",
+          "merge shared branches without approval"
+        ],
+        "intent": "Make future approved admin-solid changes deploy through the normal workflow instead of manual wrangler deploy.",
+        "mutation_class": "git_push",
+        "mutation_id": "mut.site.admin-deploy-workflow-filter",
+        "next_safe_action": "chief/site prepares a reviewed workflow patch and reports whether it will trigger deploy.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-deploy-workflow-filter"],
+        "proof_ids": ["proof.site.admin-pr75.deploy-status"],
+        "proposed_by": "Ani via fleet/boss",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-24T07:59:00Z",
+        "required_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "risk_level": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "proposed",
+        "target_surface": ".github/workflows/deploy.yml",
+        "title": "Admin deploy workflow path filter",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "allowed_actions": [
+          "render NEEDS-ANI read-only in admin",
+          "design outbound-imessage and inbound-imessage queues",
+          "route replies to NEEDS-ANI or ANSWERS"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.admin.blocked-by-ani-phone-channel"],
+        "domain": "infra-site",
+        "forbidden_actions": [
+          "send iMessages before exact approval",
+          "sign into Ani personal Apple ID",
+          "use Rudy identity",
+          "activate admin write paths or production collectors"
+        ],
+        "intent": "Make admin.anipotts.com and future iMessage bridge surface Ani decisions while agents continue working.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.admin.blocked-by-ani-phone-channel",
+        "next_safe_action": "chief/infra and chief/site design/read-only implementation first; live Messages send remains separately gated.",
+        "object_type": "mutation",
+        "operation_ids": ["op.admin.blocked-by-ani-phone-channel"],
+        "proof_ids": [],
+        "proposed_by": "Ani via fleet/boss",
+        "repo": "Infra and anipotts-com",
+        "requested_at": "2026-06-24T07:58:00Z",
+        "required_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "risk_level": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "proposed",
+        "target_surface": "NEEDS-ANI, ANSWERS, admin.anipotts.com, future iMessage bridge",
+        "title": "Blocked-by-Ani phone queue channel",
+        "updated_at": "2026-06-24T08:02:00Z"
       }
     ],
     "operations": [
@@ -661,13 +1335,13 @@
         "blocker_ids": [],
         "branch": "main",
         "command_class": "docs_schema_commit",
-        "heartbeat_at": "2026-06-23T23:40:00Z",
+        "heartbeat_at": "2026-06-24T04:26:12Z",
         "machine": "ap-mini",
         "mutation_ids": ["mut.infra.admin-contract.schema-samples"],
-        "next_safe_action": "Run coord/admin/validate_admin_contract.py and loop-runner validate before commit.",
+        "next_safe_action": "Keep using the contract and static/runtime builders; do not schedule production collectors without approval.",
         "object_type": "operation",
         "operation_id": "op.infra.admin-contract.schema-samples",
-        "phase": "schema-and-sample-authoring",
+        "phase": "verified-pushed",
         "proof_ids": ["proof.validator.admin-contract.samples"],
         "repo": "Infra",
         "source_refs": [
@@ -679,28 +1353,31 @@
           }
         ],
         "started_at": "2026-06-23T23:40:00Z",
-        "status": "running",
+        "status": "succeeded",
         "stop_path": "stop by not committing, then revert working tree changes by exact file path if requested",
         "thread_id": "current",
         "title": "Write admin contract schemas and samples",
-        "updated_at": "2026-06-23T23:40:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "agent": "chief/site",
         "allowed_by_approval_ids": [
           "appr.admin.readonly-build-slices.2026-06-23"
         ],
-        "blocker_ids": ["block.site.consume-contract-fields"],
-        "branch": "codex/admin-control-plane-readonly-slice",
+        "blocker_ids": [],
+        "branch": "codex/admin-control-plane-shell-2026-06-23",
         "command_class": "ui_local_build",
-        "heartbeat_at": "2026-06-23T23:40:00Z",
-        "machine": "ap-pro or ap-mini",
+        "heartbeat_at": "2026-06-24T04:37:36Z",
+        "machine": "ap-mini",
         "mutation_ids": ["mut.site.admin-shell.readonly.slice1"],
-        "next_safe_action": "Render route skeletons using coord/admin/samples JSONL as mocked data.",
+        "next_safe_action": "Admin shell is now in the merged/deployed PR #75 path; next check is authenticated production verification.",
         "object_type": "operation",
         "operation_id": "op.site.admin-shell.local-build",
-        "phase": "waiting-for-contract",
-        "proof_ids": ["proof.handoff.admin-build-map"],
+        "phase": "verified-pushed",
+        "proof_ids": [
+          "proof.handoff.admin-build-map",
+          "proof.site.admin-pr75.deploy-status"
+        ],
         "repo": "anipotts-com",
         "source_refs": [
           {
@@ -711,58 +1388,31 @@
           }
         ],
         "started_at": "2026-06-23T23:40:00Z",
-        "status": "queued",
+        "status": "succeeded",
         "stop_path": "stop before deploy, DNS, env, worker, or production mutation",
-        "thread_id": "chief/site",
+        "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
         "title": "Build mocked admin shell in apps/admin-solid",
-        "updated_at": "2026-06-23T23:40:00Z"
-      },
-      {
-        "agent": "codex chief/health",
-        "allowed_by_approval_ids": [],
-        "blocker_ids": ["block.health.rename.execution-approval"],
-        "branch": "not-a-git-checkout",
-        "command_class": "read_only_validation",
-        "heartbeat_at": "2026-06-24T03:55:32Z",
-        "machine": "ap-mini",
-        "mutation_ids": ["mut.health.rename.execution-gate"],
-        "next_safe_action": "Wait for approval or revisions to /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md.",
-        "object_type": "operation",
-        "operation_id": "op.health.rename.execution-waiting",
-        "phase": "approval-gate",
-        "proof_ids": ["proof.health.ingest-and-ready-packet"],
-        "repo": "vitals",
-        "source_refs": [
-          {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
-            "ref": "health-rename-ready-packet-2026-06-22",
-            "summary": "Execution commands are prepared but not run."
-          }
-        ],
-        "started_at": "2026-06-22T09:24:10Z",
-        "status": "waiting",
-        "stop_path": "Do not run rename-ready packet commands; leave /Users/anipotts/Code/projects/vitals, port 8080, env refs, endpoint shape, and launchd label unchanged.",
-        "thread_id": "019eebf1-bbd7-7f53-95d5-6dc05d48732c",
-        "title": "Health rename waiting on execution approval",
-        "updated_at": "2026-06-24T03:55:32Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "agent": "chief/site",
         "allowed_by_approval_ids": [
           "appr.admin.readonly-build-slices.2026-06-23"
         ],
-        "blocker_ids": ["block.site.static-feed-consumption"],
+        "blocker_ids": [],
         "branch": "codex/admin-control-plane-shell-2026-06-23",
         "command_class": "ui_local_build",
-        "heartbeat_at": "2026-06-24T04:05:00Z",
+        "heartbeat_at": "2026-06-24T04:37:36Z",
         "machine": "ap-mini",
         "mutation_ids": ["mut.site.admin-static-feed.consume"],
-        "next_safe_action": "Finish typed adapter and local route smoke against the static bundle.",
+        "next_safe_action": "Authenticated browser verification of protected admin.anipotts.com is the next safe production check.",
         "object_type": "operation",
         "operation_id": "op.site.admin-static-feed.consume",
-        "phase": "static-feed-adapter",
-        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "phase": "verified-pushed",
+        "proof_ids": [
+          "proof.admin.static-feed.bundle",
+          "proof.site.admin-pr75.deploy-status"
+        ],
         "repo": "anipotts-com",
         "source_refs": [
           {
@@ -773,11 +1423,11 @@
           }
         ],
         "started_at": "2026-06-24T04:05:00Z",
-        "status": "running",
+        "status": "succeeded",
         "stop_path": "Stop before deploy, DNS, env, secrets, Cloudflare, production, live collector, admin write path, or PR merge.",
         "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
         "title": "Wire admin-solid to the static feed bundle",
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:24:00Z"
       },
       {
         "agent": "chief/business",
@@ -848,17 +1498,20 @@
         "allowed_by_approval_ids": [
           "appr.admin.readonly-build-slices.2026-06-23"
         ],
-        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "blocker_ids": [],
         "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
         "command_class": "docs_schema_commit",
-        "heartbeat_at": "2026-06-24T04:01:00Z",
+        "heartbeat_at": "2026-06-24T06:42:00Z",
         "machine": "ap-mini",
         "mutation_ids": ["mut.jobs.admin-feed-operating-layer.complete"],
-        "next_safe_action": "Keep Jobs admin-feed rows as static source data until a safe read-only exporter exists.",
+        "next_safe_action": "No Jobs admin-feed action is pending from this monitor pass; leave Gmail closed unless Ani requests independent live UI verification.",
         "object_type": "operation",
         "operation_id": "op.jobs.admin-feed-operating-layer.complete",
         "phase": "verified-pushed",
-        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "proof_ids": [
+          "proof.jobs.admin-feed.commit",
+          "proof.jobs.gmail-ui-colors.durable-proof"
+        ],
         "repo": "jobs",
         "source_refs": [
           {
@@ -866,6 +1519,12 @@
             "path": "/Users/anipotts/Personal/jobs",
             "ref": "6b4768e",
             "summary": "Jobs branch contains the first admin-feed operating layer."
+          },
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "574ee9f",
+            "summary": "Jobs branch contains the Gmail label-color proof reconciliation note and is clean/aligned with origin."
           }
         ],
         "started_at": "2026-06-24T03:58:00Z",
@@ -873,7 +1532,215 @@
         "stop_path": "No Gmail, Calendar, Sheets, Workspace Studio, application, message archive/send/delete, filter, or outbound mutation occurred.",
         "thread_id": "019eebe2-d537-76e2-bbfe-32a04ac63458",
         "title": "Jobs admin feed layer committed",
-        "updated_at": "2026-06-24T04:05:00Z"
+        "updated_at": "2026-06-24T06:42:00Z"
+      },
+      {
+        "agent": "Ani plus GitHub Actions",
+        "allowed_by_approval_ids": [],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "deploy",
+        "heartbeat_at": "2026-06-24T05:11:54Z",
+        "machine": "github-actions",
+        "mutation_ids": ["mut.site.admin-pr75.live-deploy"],
+        "next_safe_action": "Use an authenticated browser session to verify the protected production admin surface.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-pr75.merge-deploy",
+        "phase": "merged-deployed",
+        "proof_ids": ["proof.site.admin-pr75.deploy-status"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "mergedAt 2026-06-24T05:11:43Z",
+            "summary": "PR #75 was merged by Ani."
+          },
+          {
+            "kind": "github_run",
+            "path": "https://github.com/anipotts/anipotts.com/actions/runs/28076715983",
+            "ref": "conclusion success",
+            "summary": "Deploy workflow completed successfully at 2026-06-24T05:11:54Z."
+          }
+        ],
+        "started_at": "2026-06-24T05:11:43Z",
+        "status": "succeeded",
+        "stop_path": "Do not enable admin write paths, production collectors, auth/DNS/env changes, or Cloudflare Access policy changes from this event.",
+        "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
+        "title": "Ani merged PR #75 and GitHub Actions deployed main",
+        "updated_at": "2026-06-24T06:24:00Z"
+      },
+      {
+        "agent": "Codex",
+        "allowed_by_approval_ids": [
+          "approval-infra-major-vision-continuation-2026-06-22"
+        ],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T08:02:00Z",
+        "machine": "ap-pro",
+        "mutation_ids": [],
+        "next_safe_action": "Push the coordination absorption after validation and route exact chief follow-ups.",
+        "object_type": "operation",
+        "operation_id": "op.fleet.claude-sprint-absorb",
+        "phase": "fleet/boss coordination",
+        "proof_ids": ["proof.claude.fleet-sprint.closeout"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "started_at": "2026-06-24T07:44:52Z",
+        "status": "succeeded",
+        "stop_path": "coord/authority.jsonl coord/NEEDS-ANI.md coord/bus.jsonl registries/threads.yml coord/admin/samples",
+        "thread_id": "019ed10b-518a-7d80-814b-cb52f7453646",
+        "title": "Absorb Claude fleet sprint closeout",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "agent": "chief/health",
+        "allowed_by_approval_ids": [],
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "command_class": "service_mutation",
+        "heartbeat_at": "2026-06-24T08:02:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.health.launchd-relabel.step-g"],
+        "next_safe_action": "Wait for Ani's phone HAE push before launchd relabel.",
+        "object_type": "operation",
+        "operation_id": "op.health.remaining-e-g",
+        "phase": "post-rename ingest then launchd relabel",
+        "proof_ids": ["proof.health.rename.steps-a-d"],
+        "repo": "health",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "started_at": "2026-06-24T08:00:00Z",
+        "status": "blocked",
+        "stop_path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md blocker-health-rename-execution",
+        "thread_id": "019eebf1-bbd7-7f53-95d5-6dc05d48732c",
+        "title": "Health remaining E/G gate",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "agent": "chief/infra",
+        "allowed_by_approval_ids": [
+          "approval-cloudflare-old-token-revocation-2026-06-24"
+        ],
+        "blocker_ids": ["block.infra.cloudflare-old-token-revocation"],
+        "branch": "main",
+        "command_class": "account_mutation",
+        "heartbeat_at": "2026-06-24T08:02:00Z",
+        "machine": "ap-mini or ap-pro",
+        "mutation_ids": ["mut.infra.cloudflare-old-token-revocation"],
+        "next_safe_action": "chief/infra enumerates and revokes old superseded tokens with values omitted.",
+        "object_type": "operation",
+        "operation_id": "op.infra.cloudflare-old-token-revocation",
+        "phase": "auth cleanup",
+        "proof_ids": ["proof.infra.cloudflare-token-convergence"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "started_at": "2026-06-24T08:00:00Z",
+        "status": "queued",
+        "stop_path": "authority approval-cloudflare-old-token-revocation-2026-06-24",
+        "thread_id": "019eebe2-f0ef-71d3-9f53-4b0c79a0ca42",
+        "title": "Cloudflare old-token revocation",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "agent": "chief/infra",
+        "allowed_by_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "blocker_ids": [
+          "block.infra.threads-yml-auto-generation",
+          "block.infra.token-factory-static-ttl-zone",
+          "block.admin.blocked-by-ani-phone-channel"
+        ],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T08:02:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": [
+          "mut.infra.threads-auto-generation",
+          "mut.infra.token-factory-fixes",
+          "mut.admin.blocked-by-ani-phone-channel"
+        ],
+        "next_safe_action": "chief/infra starts the smallest non-live slice and reports validation.",
+        "object_type": "operation",
+        "operation_id": "op.infra.phase2-directives",
+        "phase": "agent-native control plane",
+        "proof_ids": [],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "started_at": "2026-06-24T08:00:00Z",
+        "status": "queued",
+        "stop_path": "coord/admin and registries/threads.yml",
+        "thread_id": "019eebe2-f0ef-71d3-9f53-4b0c79a0ca42",
+        "title": "Infra phase-2 directives",
+        "updated_at": "2026-06-24T08:02:00Z"
+      },
+      {
+        "agent": "chief/site",
+        "allowed_by_approval_ids": [
+          "approval-admin-phase2-control-plane-work-2026-06-24"
+        ],
+        "blocker_ids": [
+          "block.site.admin-deploy-path-filter",
+          "block.admin.blocked-by-ani-phone-channel"
+        ],
+        "branch": "main or agent branch",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T08:02:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": [
+          "mut.site.admin-deploy-workflow-filter",
+          "mut.admin.blocked-by-ani-phone-channel"
+        ],
+        "next_safe_action": "chief/site prepares a non-live reviewed patch for workflow/admin queue rendering.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-followups",
+        "phase": "admin dashboard post-deploy polish",
+        "proof_ids": ["proof.site.admin-pr75.deploy-status"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "started_at": "2026-06-24T08:00:00Z",
+        "status": "queued",
+        "stop_path": "apps/admin-solid and .github/workflows/deploy.yml",
+        "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
+        "title": "Site admin follow-ups",
+        "updated_at": "2026-06-24T08:02:00Z"
       }
     ],
     "proofs": [
@@ -938,31 +1805,27 @@
         "proof_id": "proof.health.ingest-and-ready-packet",
         "proof_type": "handoff",
         "redaction": "private_payload_omitted",
-        "related_ids": ["op.health.rename.execution-waiting"],
-        "repo": "vitals",
+        "related_ids": ["op.health.remaining-e-g"],
+        "repo": "health",
         "source_refs": [
           {
             "kind": "handoff",
             "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
             "ref": "health-rename-ready-packet-2026-06-22",
-            "summary": "Prepared gated rename packet."
+            "summary": "Prepared gated rename packet that was later partly executed by Claude Code."
           },
           {
-            "kind": "bus_ref",
-            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
-            "ref": "health-phone-ingest-proof-sufficient-2026-06-22",
-            "summary": "Proof classified sufficient without printing rows or payload bodies."
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Steps A-D completed; remaining gate is post-rename phone ingest proof then launchd relabel."
           }
         ],
-        "status": "valid",
-        "summary": "Fresh Health Auto Export proof is metadata-only: raw HAE count 59, newest archive filename 2026-06-22T09-12-08-114Z.json, latest.json and DuckDB WAL refreshed at 2026-06-22T05:12:18-0400, unauthenticated /api/health returns 401, and the live Bun process is unchanged. Ready packet contains backup/hash and rollback commands only; commands were not executed.",
-        "title": "Fresh health ingest proof and ready packet exist",
-        "updated_at": "2026-06-24T03:55:32Z",
-        "verifies": [
-          "mut.health.rename.execution-gate",
-          "block.health.rename.execution-approval",
-          "repo.health.vitals-live-tree.ap-mini"
-        ]
+        "status": "stale",
+        "summary": "The 2026-06-22 fresh ingest proof and ready packet were valid pre-execution evidence. They are now superseded by the 2026-06-24 rename steps A-D proof; the active gate is one post-rename phone HAE push, then launchd relabel.",
+        "title": "Health ingest proof and ready packet superseded by steps A-D",
+        "updated_at": "2026-06-24T08:08:00Z",
+        "verifies": ["block.health.rename.execution-approval"]
       },
       {
         "collected_at": "2026-06-24T04:04:00Z",
@@ -1077,6 +1940,211 @@
           "repo.jobs.ap-mini.branch",
           "block.jobs.gmail-empty-label-ui-cleanup"
         ]
+      },
+      {
+        "collected_at": "2026-06-24T06:22:57Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "gh pr view 75; gh run list; curl -I -L https://admin.anipotts.com/",
+        "machine": "ap-pro",
+        "object_type": "proof",
+        "proof_id": "proof.site.admin-pr75.deploy-status",
+        "proof_type": "command_output",
+        "redaction": "metadata_only",
+        "related_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.site.admin-static-feed.consume"
+        ],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "github_pr",
+            "path": "https://github.com/anipotts/anipotts.com/pull/75",
+            "ref": "a8633307",
+            "summary": "PR #75 merged to main by Ani."
+          },
+          {
+            "kind": "github_run",
+            "path": "https://github.com/anipotts/anipotts.com/actions/runs/28076715983",
+            "ref": "success",
+            "summary": "Deploy workflow succeeded on the merge commit."
+          }
+        ],
+        "status": "valid",
+        "summary": "GitHub reports PR #75 merged by Ani at 2026-06-24T05:11:43Z with merge commit a8633307. The Deploy workflow on main succeeded. Unauthenticated curl to admin.anipotts.com redirects through Cloudflare Access and returns the protected Access page, so app-content rendering still needs authenticated browser verification.",
+        "title": "PR #75 merge and deploy status verified",
+        "updated_at": "2026-06-24T06:24:00Z",
+        "verifies": [
+          "mut.site.admin-pr75.live-deploy",
+          "op.site.admin-pr75.merge-deploy",
+          "repo.anipotts-com.admin-solid"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T06:42:00Z",
+        "collected_by": "chief/jobs",
+        "evidence_uri": "git commit 574ee9f",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.jobs.gmail-ui-colors.durable-proof",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.jobs.admin-feed-operating-layer.complete"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "574ee9f",
+            "summary": "Commit docs: reconcile gmail label color proof."
+          },
+          {
+            "kind": "file",
+            "path": "/Users/anipotts/Personal/jobs/tools/inbound/gmail-label-color-proof-reconciliation-2026-06-24.md",
+            "ref": "proof reconciliation note",
+            "summary": "Durable note records absent 38fdc7a, final thread-reported label list, and no external mutation during reconciliation."
+          }
+        ],
+        "status": "valid",
+        "summary": "chief/jobs reconciled the absent 38fdc7a claim into a durable jobs proof note. The final Gmail UI label state remains thread-reported, not independently reverified by fleet/boss; the note preserves safety bounds and confirms no Gmail, Calendar, Sheets, Workspace Studio, application, filter, message delete/archive/send, or outbound mutation happened during reconciliation.",
+        "title": "Gmail label-color completion proof reconciled",
+        "updated_at": "2026-06-24T06:42:00Z",
+        "verifies": [
+          "block.jobs.gmail-empty-label-ui-cleanup",
+          "mut.jobs.admin-feed-operating-layer.complete",
+          "repo.jobs.ap-mini.branch"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T08:02:00Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+        "machine": "ap-pro and ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.claude.fleet-sprint.closeout",
+        "proof_type": "handoff",
+        "redaction": "metadata_only",
+        "related_ids": ["op.fleet.claude-sprint-absorb"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "valid",
+        "summary": "Fleet/boss absorbed Claude's verified sprint closeout and routed remaining work without performing new live mutations.",
+        "title": "Claude sprint closeout absorbed",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "verifies": ["handoff.claude-fleet-sprint-closeout"]
+      },
+      {
+        "collected_at": "2026-06-24T05:53:00Z",
+        "collected_by": "Claude Code",
+        "evidence_uri": "~/Archive/codesignal-practice-2026-06-24.tar",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.jobs.codesignal.archive",
+        "proof_type": "checksum",
+        "redaction": "metadata_only",
+        "related_ids": ["mut.jobs.codesignal.archive-denest"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "valid",
+        "summary": "Archive contains 65 files including Ani's simulation.py edit; nested practice clone was trashed and jobs no longer carries the nested repo blocker.",
+        "title": "CodeSignal practice clone archived and jobs de-nested",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "verifies": ["block.jobs.codesignal-nested-repo"]
+      },
+      {
+        "collected_at": "2026-06-24T05:53:00Z",
+        "collected_by": "Claude Code",
+        "evidence_uri": "git commit da72be6 in /Users/anipotts/Code/projects/x/reader",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.x-reader.initial-commit",
+        "proof_type": "git_commit",
+        "redaction": "secret_value_omitted",
+        "related_ids": ["repo.x-reader.ap-mini.local"],
+        "repo": "x-reader",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "valid",
+        "summary": "accounts.db and data/ were gitignored before the code-only local commit; gitleaks was clean; no remote exists.",
+        "title": "x-reader initial code-only commit",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "verifies": ["block.infra.x-reader-initial-state"]
+      },
+      {
+        "collected_at": "2026-06-24T05:53:00Z",
+        "collected_by": "Claude Code",
+        "evidence_uri": "~/Archive/health/pre-health-rename-20260624T051126Z",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.health.rename.steps-a-d",
+        "proof_type": "handoff",
+        "redaction": "private_payload_omitted",
+        "related_ids": ["op.health.remaining-e-g"],
+        "repo": "health",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "valid",
+        "summary": "Backup exists, mini path moved vitals to health with compat symlink, live service survived without restart, and non-secret refs moved to anipotts/health while service label and env paths remain intentionally vitals-shaped.",
+        "title": "Health rename steps A-D verified",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "verifies": [
+          "mut.health.rename.steps-a-d",
+          "block.health.rename.execution-approval",
+          "repo.health.live-tree.ap-mini"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T05:55:00Z",
+        "collected_by": "Claude Code",
+        "evidence_uri": "/Users/anipotts/Infra/registries/cloudflare-token-profiles.json",
+        "machine": "ap-pro and ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.infra.cloudflare-token-convergence",
+        "proof_type": "command_output",
+        "redaction": "secret_value_omitted",
+        "related_ids": ["mut.infra.cloudflare-old-token-revocation"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "status": "valid",
+        "summary": "brand-d1-readwrite has ttl_seconds 7776000; pro and mini local tokens match hash prefix 2e1d02fe and both verify D1 HTTP 200. Old tokens remain for revocation.",
+        "title": "Cloudflare brand D1 token convergence verified",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "verifies": [
+          "mut.infra.cloudflare-token-convergence.option-a",
+          "block.infra.cloudflare-token-convergence"
+        ]
       }
     ],
     "repo_states": [
@@ -1116,73 +2184,40 @@
         "active_threads": ["chief/site"],
         "ahead": 0,
         "behind": 0,
-        "blocker_ids": ["block.site.consume-contract-fields"],
-        "branch": "codex/admin-control-plane-readonly-slice",
+        "blocker_ids": [],
+        "branch": "main",
         "canonical_role": "source",
-        "deploy_impact": "none",
+        "deploy_impact": "production",
         "dirty_tracked": [],
-        "head_sha": "unknown-until-chief-site-starts",
-        "last_verified_at": "2026-06-23T23:40:00Z",
-        "live_runtime_role": "renderer for admin.anipotts.com, no deploy in slice 1",
+        "head_sha": "a8633307",
+        "last_verified_at": "2026-06-24T06:22:57Z",
+        "live_runtime_role": "protected admin.anipotts.com renderer; Cloudflare Access protects unauthenticated requests",
         "machine": "ap-pro or ap-mini",
-        "next_safe_action": "Build local mocked UI against coord/admin sample rows without deploy.",
+        "next_safe_action": "Verify protected app content through an authenticated browser session; do not enable live collectors or write paths.",
         "object_type": "repo_state",
         "path": "/Users/anipotts/Code/projects/anipotts-com",
-        "proof_ids": ["proof.handoff.admin-build-map"],
+        "proof_ids": ["proof.site.admin-pr75.deploy-status"],
         "repo": "anipotts-com",
         "repo_state_id": "repo.anipotts-com.admin-solid",
         "source_refs": [
           {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
-            "ref": "existing site planning facts",
-            "summary": "apps/admin-solid is the correct target for admin.anipotts.com."
+            "kind": "git",
+            "path": "/Users/anipotts/Code/projects/anipotts-com",
+            "ref": "a8633307",
+            "summary": "main is aligned to the PR #75 merge commit."
+          },
+          {
+            "kind": "curl",
+            "path": "https://admin.anipotts.com/",
+            "ref": "Cloudflare Access 302 then 200",
+            "summary": "Unauthenticated requests reach the protected Access flow; app content still needs authenticated browser verification."
           }
         ],
         "untracked_count": 0,
         "untracked_policy": "chief/site should inspect before editing and avoid env or generated churn",
-        "updated_at": "2026-06-23T23:40:00Z",
+        "updated_at": "2026-06-24T06:24:00Z",
         "upstream": "origin/main",
-        "worktree_state": "unknown"
-      },
-      {
-        "active_threads": ["chief/health"],
-        "ahead": 0,
-        "behind": 0,
-        "blocker_ids": ["block.health.rename.execution-approval"],
-        "branch": "not-a-git-checkout",
-        "canonical_role": "runtime",
-        "deploy_impact": "local_only",
-        "dirty_tracked": [],
-        "head_sha": "none",
-        "last_verified_at": "2026-06-22T09:24:10Z",
-        "live_runtime_role": "live health/vitals API tree on port 8080 with local-only health data; admin must show metadata only",
-        "machine": "ap-mini",
-        "next_safe_action": "Review the gated ready packet; do not rename, restart, edit env/secrets, change endpoint, or copy from pro.",
-        "object_type": "repo_state",
-        "path": "/Users/anipotts/Code/projects/vitals",
-        "proof_ids": ["proof.health.ingest-and-ready-packet"],
-        "repo": "vitals",
-        "repo_state_id": "repo.health.vitals-live-tree.ap-mini",
-        "source_refs": [
-          {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-21-health-rename-phone-ingest-gate.md",
-            "ref": "live tree and data classification",
-            "summary": "Mini vitals path is runtime-authoritative and not a Git checkout."
-          },
-          {
-            "kind": "handoff",
-            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
-            "ref": "classification",
-            "summary": "Fresh ingest proof is sufficient and execution packet is prepared."
-          }
-        ],
-        "untracked_count": 0,
-        "untracked_policy": "not applicable because this is a live non-git service tree; do not overwrite from pro",
-        "updated_at": "2026-06-24T03:55:32Z",
-        "upstream": "none",
-        "worktree_state": "unknown"
+        "worktree_state": "clean"
       },
       {
         "active_threads": ["chief/business"],
@@ -1254,33 +2289,114 @@
         "active_threads": ["chief/jobs"],
         "ahead": 0,
         "behind": 0,
-        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "blocker_ids": [],
         "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
         "canonical_role": "source",
         "deploy_impact": "none",
         "dirty_tracked": [],
-        "head_sha": "6b4768e",
-        "last_verified_at": "2026-06-24T04:01:00Z",
+        "head_sha": "574ee9f",
+        "last_verified_at": "2026-06-24T06:42:00Z",
         "live_runtime_role": "jobs tracker and proof repo; outbound/application/Gmail mutations remain gated",
         "machine": "ap-mini",
-        "next_safe_action": "Use ops/admin-feed as static metadata source; keep Gmail label-object cleanup browser/UI-only and non-destructive.",
+        "next_safe_action": "No Jobs repo blocker remains from this pass; avoid Gmail mutation unless Ani explicitly requests a new independent live verification or cleanup lane.",
         "object_type": "repo_state",
         "path": "/Users/anipotts/Personal/jobs",
-        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "proof_ids": [
+          "proof.jobs.admin-feed.commit",
+          "proof.jobs.gmail-ui-colors.durable-proof"
+        ],
         "repo": "jobs",
         "repo_state_id": "repo.jobs.ap-mini.branch",
         "source_refs": [
           {
             "kind": "git",
             "path": "/Users/anipotts/Personal/jobs",
-            "ref": "6b4768e",
-            "summary": "Jobs admin-feed branch is pushed and aligned."
+            "ref": "574ee9f",
+            "summary": "Jobs branch is clean and aligned with origin at the Gmail label-color proof reconciliation commit."
+          },
+          {
+            "kind": "file",
+            "path": "/Users/anipotts/Personal/jobs/tools/inbound/gmail-label-color-proof-reconciliation-2026-06-24.md",
+            "ref": "proof reconciliation note",
+            "summary": "Durably records final thread-reported Gmail UI state and the absent 38fdc7a proof claim."
           }
         ],
         "untracked_count": 0,
         "untracked_policy": "do not stage private Gmail, tracker, or application artifacts unless explicitly routed and redacted",
-        "updated_at": "2026-06-24T04:05:00Z",
+        "updated_at": "2026-06-24T06:42:00Z",
         "upstream": "origin/codex/yc-2025-job-recs-refresh-2026-06-15",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/health"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "canonical_role": "runtime",
+        "deploy_impact": "local_only",
+        "dirty_tracked": [],
+        "head_sha": "none",
+        "last_verified_at": "2026-06-24T05:53:00Z",
+        "live_runtime_role": "live health API tree on port 8080 with local-only health data; admin must show metadata only",
+        "machine": "ap-mini",
+        "next_safe_action": "Ani runs one phone HAE push; chief/health verifies post-rename ingest proof before launchd relabel.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/health",
+        "proof_ids": ["proof.health.rename.steps-a-d"],
+        "repo": "health",
+        "repo_state_id": "repo.health.live-tree.ap-mini",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "superseded by steps A-D execution",
+            "summary": "Original packet now partly executed; remaining gate is post-rename ingest proof then launchd relabel."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "not applicable because this is a live non-git service tree; compat symlink /Users/anipotts/Code/projects/vitals remains for now",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "upstream": "none",
+        "worktree_state": "unknown"
+      },
+      {
+        "active_threads": ["chief/infra"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": [],
+        "branch": "main",
+        "canonical_role": "runtime",
+        "deploy_impact": "local_only",
+        "dirty_tracked": [],
+        "head_sha": "da72be6",
+        "last_verified_at": "2026-06-24T05:53:00Z",
+        "live_runtime_role": "canonical live x-reader tree parked for later review",
+        "machine": "ap-mini",
+        "next_safe_action": "Future x-reader source/product decision can be reviewed separately; no initial-state blocker remains.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/x/reader",
+        "proof_ids": ["proof.x-reader.initial-commit"],
+        "repo": "x-reader",
+        "repo_state_id": "repo.x-reader.ap-mini.local",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-24-claude-fleet-sprint-closeout.md",
+            "ref": "claude sprint closeout",
+            "summary": "Claude Code autonomous sprint closeout with verified completed work and phase-2 directives."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "runtime accounts.db and data/ are ignored; no remote exists",
+        "updated_at": "2026-06-24T08:02:00Z",
+        "upstream": "none",
         "worktree_state": "clean"
       }
     ]

@@ -50,6 +50,8 @@ type BlockerRow = {
   owner: string;
   domain: string;
   requires_ani: boolean;
+  blocked_since: string;
+  stale_after: string;
   next_action: string;
   related_ids: string[];
 };
@@ -246,6 +248,18 @@ export type HandoffCard = {
   proof_ids: string[];
 };
 
+export type NeedsAniItem = {
+  title: string;
+  status: ControlState;
+  risk_level: RiskLevel;
+  owner: string;
+  domain: string;
+  blocked_since: string;
+  stale_after: string;
+  next_safe_action: string;
+  related_ids: string[];
+};
+
 export type DestructiveGate = WorkCard &
   AuthorityCard &
   ProofCard & {
@@ -255,7 +269,7 @@ export type DestructiveGate = WorkCard &
 export const adminFeed = feedJson as AdminFeed;
 
 export const feedSource = {
-  infra_commit: "c26959c",
+  infra_commit: "32794b4",
   copied_from: "/Users/anipotts/Infra/coord/admin/static/admin-feed.sample.json",
   generated_by: adminFeed.source.generated_by,
   snapshot_type: adminFeed.snapshot_type,
@@ -284,6 +298,20 @@ export const coverageCards: WorkCard[] = [
   coverageCard("brand/business operating layers", hasDomain("brand") && hasDomain("business"), "proof.brand.phase1.commit, proof.business.secretary-layer.commit"),
   coverageCard("repo states", repoStateRows.length > 0, "repo.anipotts-com.admin-solid"),
 ];
+
+export const needsAniItems: NeedsAniItem[] = blockers
+  .filter((blocker) => blocker.requires_ani)
+  .map((blocker) => ({
+    title: blocker.title,
+    status: normalizeStatus(blocker.status),
+    risk_level: normalizeRisk(blocker.severity),
+    owner: blocker.owner,
+    domain: blocker.domain,
+    blocked_since: blocker.blocked_since,
+    stale_after: blocker.stale_after,
+    next_safe_action: blocker.next_action,
+    related_ids: blocker.related_ids,
+  }));
 
 export const authorityCards: AuthorityCard[] = [
   ...approvals.map(toApprovalAuthorityCard),

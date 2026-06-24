@@ -396,6 +396,11 @@ dd,
   grid-template-columns: minmax(220px, 1fr) 120px repeat(4, minmax(140px, 1fr));
 }
 
+.needs-ani-row {
+  align-items: start;
+  grid-template-columns: minmax(260px, 1.2fr) 120px 100px repeat(5, minmax(130px, 1fr));
+}
+
 .repo-row .proof-line,
 .runtime-row .proof-line,
 .handoff-row .proof-line {
@@ -415,6 +420,17 @@ dd,
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stop-list {
+  color: var(--muted);
+  display: grid;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  gap: 8px;
+  line-height: 1.45;
+  margin: 12px 0 0;
+  padding-left: 18px;
 }
 
 .fact-grid {
@@ -445,7 +461,8 @@ dd,
   .proof-row,
   .repo-row,
   .runtime-row,
-  .handoff-row {
+  .handoff-row,
+  .needs-ani-row {
     grid-template-columns: 1fr;
   }
 }

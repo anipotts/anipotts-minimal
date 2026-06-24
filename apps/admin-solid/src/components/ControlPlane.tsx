@@ -1,11 +1,13 @@
 import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
 import type { JSX } from "solid-js";
+import type { ApprovalBridgeDesign } from "~/data/approval-bridge";
 import type {
   AuthorityCard,
   ControlState,
   DestructiveGate,
   HandoffCard,
+  NeedsAniItem,
   OperationCard,
   ProofCard,
   RepoCard,
@@ -21,6 +23,7 @@ const navItems = [
   { href: "/mutations", label: "mutations" },
   { href: "/fleet", label: "fleet" },
   { href: "/repos", label: "repos" },
+  { href: "/needs-ani", label: "needs ani" },
   { href: "/handoffs", label: "handoffs" },
   { href: "/ops/destructive", label: "destructive ops" },
 ];
@@ -384,6 +387,70 @@ export function HandoffTable(props: { handoffs: HandoffCard[] }) {
           </article>
         )}
       </For>
+    </div>
+  );
+}
+
+export function NeedsAniQueue(props: { items: NeedsAniItem[] }) {
+  return (
+    <div class="table-card">
+      <For each={props.items}>
+        {(item) => (
+          <article class="table-row needs-ani-row">
+            <div>
+              <h3>{item.title}</h3>
+              <p class="muted">{item.next_safe_action}</p>
+            </div>
+            <StatusPill state={item.status} />
+            <RiskPill risk={item.risk_level} />
+            <Fact label="owner" value={item.owner} />
+            <Fact label="domain" value={item.domain} />
+            <Fact label="blocked_since" value={item.blocked_since} />
+            <Fact label="stale_after" value={item.stale_after} />
+            <Fact label="related_ids" value={item.related_ids.join(", ")} />
+          </article>
+        )}
+      </For>
+    </div>
+  );
+}
+
+export function ApprovalBridgePanel(props: { design: ApprovalBridgeDesign }) {
+  return (
+    <div class="grid two">
+      <article class="panel-card">
+        <div class="card-top">
+          <div>
+            <p class="eyebrow">{props.design.transport}</p>
+            <h3>{props.design.title}</h3>
+          </div>
+          <span class="status-pill" data-state="stale">
+            {props.design.status}
+          </span>
+        </div>
+        <div class="fact-grid">
+          <For each={props.design.inbound_contract}>
+            {(field) => <Fact label={field.field} value={`${field.source}: ${field.notes}`} />}
+          </For>
+        </div>
+      </article>
+
+      <article class="panel-card">
+        <div class="card-top">
+          <div>
+            <p class="eyebrow">interface constraints</p>
+            <h3>outbound contract and stops</h3>
+          </div>
+        </div>
+        <div class="fact-grid">
+          <For each={props.design.outbound_contract}>
+            {(field) => <Fact label={field.field} value={`${field.source}: ${field.notes}`} />}
+          </For>
+        </div>
+        <ul class="stop-list">
+          <For each={props.design.hard_stops}>{(stop) => <li>{stop}</li>}</For>
+        </ul>
+      </article>
     </div>
   );
 }
