@@ -1,4 +1,4 @@
-import type { RuntimeOverlayResponse, RuntimeRepoOverlay } from "~/data/control-plane";
+import type { RuntimeOverlayResponse, RuntimeRepoOverlay, SyscallNeedRow } from "~/data/control-plane";
 
 const RUNTIME_FEED_PATH = "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json";
 
@@ -6,6 +6,7 @@ type RuntimeFeedFile = {
   generated_at?: string;
   machine?: string;
   runtime?: {
+    needs_ani_queue?: SyscallNeedRow[];
     repo_state_overlays?: RuntimeRepoOverlay[];
     safety?: RuntimeOverlayResponse["safety"];
   };
@@ -29,6 +30,7 @@ export async function GET() {
       source_path: RUNTIME_FEED_PATH,
       safety: feed.runtime?.safety ?? null,
       overlays: feed.runtime?.repo_state_overlays ?? [],
+      needs_ani_queue: feed.runtime?.needs_ani_queue ?? [],
     } satisfies RuntimeOverlayResponse);
   } catch (error) {
     const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
@@ -49,5 +51,6 @@ function disabledResponse(): RuntimeOverlayResponse {
     source_path: RUNTIME_FEED_PATH,
     safety: null,
     overlays: [],
+    needs_ani_queue: [],
   };
 }

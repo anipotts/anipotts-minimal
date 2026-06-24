@@ -11,12 +11,12 @@ export default function NeedsAniRoute() {
   return (
     <ControlPlaneLayout
       title="needs ani"
-      deck="Blocked-by-Ani items from the admin feed, rendered read-only with exact next action, related proof ids, and future approval bridge interface notes."
+      deck="The human syscall queue. Each card is one typed return value Ani can provide so agents can continue and record proof."
     >
       <section>
         <SectionHeader
-          eyebrow="approval queue"
-          title="blocked by ani"
+          eyebrow="syscall queue"
+          title="needs ani"
           detail={`${needsAniItems.length} items`}
         />
         <NeedsAniQueue items={needsAniItems} />

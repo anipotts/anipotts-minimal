@@ -1,4 +1,5 @@
 import feedJson from "./static/admin-feed.sample.json";
+import syscallNeedsJson from "./static/needs-ani.syscalls.json";
 
 export type ControlState =
   | "safe"
@@ -22,6 +23,14 @@ export type ControlState =
   | "current";
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
+
+export type NeedBucket =
+  | "unblockable_now"
+  | "waiting_on_account_or_device"
+  | "review_delete_packets"
+  | "stale_or_closed";
+
+export type NeedType = "approve" | "choose" | "provide" | "perform" | "review-delete";
 
 type SourceRef = {
   kind: string;
@@ -234,6 +243,7 @@ export type RuntimeOverlayResponse = {
     secret_values_included: boolean;
   } | null;
   overlays: RuntimeRepoOverlay[];
+  needs_ani_queue: SyscallNeedRow[];
   error?: string;
 };
 
@@ -250,14 +260,34 @@ export type HandoffCard = {
 
 export type NeedsAniItem = {
   title: string;
+  id: string;
+  type: NeedType;
+  bucket: NeedBucket;
   status: ControlState;
   risk_level: RiskLevel;
   owner: string;
-  domain: string;
-  blocked_since: string;
-  stale_after: string;
+  why: string;
+  ani_action: string;
+  agent_next: string;
+  expires_stale: string;
+  proof: string;
   next_safe_action: string;
-  related_ids: string[];
+};
+
+export type SyscallNeedRow = {
+  id: string;
+  type: NeedType;
+  owner: string;
+  why: string;
+  ani_action: string;
+  agent_next: string;
+  expires_stale: string;
+  status: string;
+  proof: string;
+  bucket: NeedBucket;
+  primary_action: string;
+  requires_ani: boolean;
+  source: string;
 };
 
 export type DestructiveGate = WorkCard &
@@ -267,6 +297,7 @@ export type DestructiveGate = WorkCard &
   };
 
 export const adminFeed = feedJson as AdminFeed;
+export const syscallNeeds = syscallNeedsJson as SyscallNeedRow[];
 
 export const feedSource = {
   infra_commit: "32794b4",
@@ -299,19 +330,44 @@ export const coverageCards: WorkCard[] = [
   coverageCard("repo states", repoStateRows.length > 0, "repo.anipotts-com.admin-solid"),
 ];
 
-export const needsAniItems: NeedsAniItem[] = blockers
+const fallbackNeedsAniItems: NeedsAniItem[] = blockers
   .filter((blocker) => blocker.requires_ani)
   .map((blocker) => ({
     title: blocker.title,
+    id: blocker.blocker_id,
+    type: "approve",
+    bucket: "unblockable_now",
     status: normalizeStatus(blocker.status),
     risk_level: normalizeRisk(blocker.severity),
     owner: blocker.owner,
-    domain: blocker.domain,
-    blocked_since: blocker.blocked_since,
-    stale_after: blocker.stale_after,
+    why: blocker.domain,
+    ani_action: blocker.next_action,
+    agent_next: blocker.next_action,
+    expires_stale: blocker.stale_after,
+    proof: blocker.related_ids.join(", "),
     next_safe_action: blocker.next_action,
-    related_ids: blocker.related_ids,
   }));
+
+export const needsAniItems: NeedsAniItem[] =
+  syscallNeeds.length > 0
+    ? syscallNeeds
+        .filter((item) => item.requires_ani)
+        .map((item) => ({
+          title: item.id,
+          id: item.id,
+          type: item.type,
+          bucket: item.bucket,
+          status: normalizeStatus(item.status),
+          risk_level: item.type === "review-delete" ? "high" : "medium",
+          owner: item.owner,
+          why: item.why,
+          ani_action: item.ani_action,
+          agent_next: item.agent_next,
+          expires_stale: item.expires_stale,
+          proof: item.proof,
+          next_safe_action: item.primary_action,
+        }))
+    : fallbackNeedsAniItems;
 
 export const authorityCards: AuthorityCard[] = [
   ...approvals.map(toApprovalAuthorityCard),
