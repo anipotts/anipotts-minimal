@@ -17,11 +17,13 @@ import type {
   WorkCard,
 } from "~/data/control-plane";
 import type { ContentInventoryItem } from "~/data/content-inventory";
+import type { ContentPreviewItem } from "~/data/content-inventory";
 import { topStrip } from "~/data/control-plane";
 
 const navItems = [
   { href: "/", label: "overview" },
   { href: "/content", label: "content" },
+  { href: "/content/preview", label: "previews" },
   { href: "/mutations", label: "mutations" },
   { href: "/fleet", label: "fleet" },
   { href: "/repos", label: "repos" },
@@ -644,6 +646,78 @@ export function ContentWriteGate() {
   );
 }
 
+export function ContentPreviewQueue(props: { items: ContentPreviewItem[] }) {
+  return (
+    <div class="preview-grid">
+      <For each={props.items}>
+        {(item) => (
+          <article class="panel-card preview-card">
+            <div class="card-top">
+              <div>
+                <p class="eyebrow">{item.surface}</p>
+                <h3>{item.title}</h3>
+                <p class="muted">{item.next_safe_action}</p>
+              </div>
+              <div class="pill-row">
+                <span class="status-pill" data-state={stateKey(item.status)}>
+                  {item.status}
+                </span>
+                <RiskPill risk={item.risk_level} />
+              </div>
+            </div>
+
+            <div class="preview-diff">
+              <div>
+                <span>current</span>
+                <p>{item.current_value}</p>
+              </div>
+              <div>
+                <span>proposed preview</span>
+                <p>{item.proposed_value}</p>
+              </div>
+            </div>
+
+            <div class="fact-grid">
+              <Fact label="source_ref" value={item.source_ref} />
+              <Fact label="preview_route" value={item.preview_route} />
+              <Fact label="authority_state" value={item.authority_state} />
+              <Fact
+                label="required_approval_ids"
+                value={formatList(item.required_approval_ids)}
+              />
+              <Fact label="proof_ids" value={formatList(item.proof_ids)} />
+              <Fact
+                label="blocked_actions"
+                value={formatList(item.blocked_actions)}
+              />
+            </div>
+          </article>
+        )}
+      </For>
+    </div>
+  );
+}
+
+export function ContentPreviewGate() {
+  return (
+    <article class="panel-card gate-panel">
+      <div>
+        <p class="eyebrow">preview contract</p>
+        <h3>draft proposals have no live effect</h3>
+      </div>
+      <div class="fact-grid">
+        <Fact label="can_do" value="compare current and proposed copy" />
+        <Fact label="can_do_next" value="route proposal into NEEDS-ANI later" />
+        <Fact label="cannot_do" value="save, publish, send, sync, or deploy" />
+        <Fact
+          label="required_before_writes"
+          value="operation id, authority, proof, and stop path"
+        />
+      </div>
+    </article>
+  );
+}
+
 export function ApprovalBridgePanel(props: { design: ApprovalBridgeDesign }) {
   return (
     <div class="grid two">
@@ -754,6 +828,6 @@ function formatList(values: string[]): string {
   return values.length > 0 ? values.join(", ") : "none";
 }
 
-function stateKey(state: ControlState): string {
+function stateKey(state: ControlState | string): string {
   return state.replaceAll(" ", "-");
 }

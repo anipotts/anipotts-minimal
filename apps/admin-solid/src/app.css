@@ -475,7 +475,8 @@ dd,
 }
 
 .needs-grid,
-.content-grid {
+.content-grid,
+.preview-grid {
   display: grid;
   gap: 14px;
 }
@@ -523,6 +524,40 @@ dd,
 .gate-panel {
   display: grid;
   gap: 12px;
+}
+
+.preview-card {
+  display: grid;
+  gap: 12px;
+}
+
+.preview-diff {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.preview-diff div {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.preview-diff span {
+  color: var(--muted);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.preview-diff p {
+  color: var(--text);
+  font-size: 0.86rem;
+  line-height: 1.5;
 }
 
 .fact-grid {
@@ -584,7 +619,8 @@ dd,
   .destructive-grid,
   .grid.two,
   .fact-grid,
-  .runtime-safety {
+  .runtime-safety,
+  .preview-diff {
     grid-template-columns: 1fr;
   }
 
