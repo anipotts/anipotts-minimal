@@ -15,17 +15,17 @@
     "source": "coord/NEEDS-ANI.md"
   },
   {
-    "id": "need-elevenlabs-parent-service-account",
+    "id": "need-elevenlabs-direct-key-storage",
     "type": "perform",
     "owner": "chief/infra",
-    "why": "Codex retried the approved no-print setup, but ElevenLabs returned Service accounts are not enabled for this workspace.",
-    "ani_action": "enable ElevenLabs service accounts for the workspace, then reply `elevenlabs service accounts enabled`",
-    "agent_next": "create ani-fleet-token-factory, create key elevenlabs-fleet-token-factory-parent, store it with elevenlabs-token-factory, and verify without printing the key.",
+    "why": "ElevenLabs service accounts are sales/enterprise-only for this workspace, so the efficient creator-plan path is a regular dashboard API key stored value-silently.",
+    "ani_action": "sign in or unlock 1Password CLI for this shell, then reply `op ready for elevenlabs`",
+    "agent_next": "create a regular ElevenLabs dashboard API key for phone-agent-setup, pipe it into elevenlabs-token-factory store-direct phone-agent-setup --human-approved, and verify without printing the key.",
     "expires_stale": "2026-06-27",
     "status": "open",
-    "proof": "/Users/anipotts/Infra/coord/bus.jsonl#elevenlabs-service-account-workspace-capability-blocked-2026-06-24",
+    "proof": "/Users/anipotts/Infra/coord/bus.jsonl#elevenlabs-service-account-enterprise-only-2026-06-24",
     "bucket": "waiting_on_account_or_device",
-    "primary_action": "enable ElevenLabs service accounts for the workspace, then reply `elevenlabs service accounts enabled`",
+    "primary_action": "sign in or unlock 1Password CLI, then reply `op ready for elevenlabs`",
     "requires_ani": true,
     "source": "coord/NEEDS-ANI.md"
   },
