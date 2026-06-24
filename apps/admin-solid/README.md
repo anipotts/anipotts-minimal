@@ -1,40 +1,83 @@
 # @anipotts/admin-solid
 
-SolidStart admin (v2) for the personal cloud. Subscribes to Durable Objects in `@anipotts/state` over WebSockets so the dashboard updates in real time without polling.
+Current protected admin control-plane shell for `admin.anipotts.com`.
 
-This is **step 3** of the personal-cloud-architecture build (see `docs/personal-cloud-architecture.md`). Built alongside the existing `apps/admin` (Next.js) at `admin-v2.anipotts.com`. Tile-by-tile parity, then DNS swap to `admin.anipotts.com` and the Next admin retires.
+This app is read-only first. It renders the fleet/admin feed model:
 
-## Quick start
+`intent / authority / operation / proof / state`
+
+## current role
+
+- practical operator dashboard for Ani and agents
+- protected by Cloudflare Access at `admin.anipotts.com`
+- static feed copy from Infra for committed sample state
+- local-dev runtime loader for safe metadata overlays
+- no admin write path, content save path, deploy trigger, DNS control, secret
+  editor, or approval bridge execution path
+
+## routes
+
+| route              | purpose                                               |
+| ------------------ | ----------------------------------------------------- |
+| `/`                | safe-next-action overview and feed coverage           |
+| `/needs-ani`       | typed human syscall queue and future bridge contract  |
+| `/mutations`       | proposed, approved, running, verified, blocked states |
+| `/fleet`           | machine and agent operation placeholders              |
+| `/repos`           | static repo state plus local-dev runtime overlays     |
+| `/handoffs`        | handoff absorption and owner routing                  |
+| `/ops/destructive` | proof-backed destructive operation gates              |
+
+## data
+
+- static sample: `src/data/static/admin-feed.sample.json`
+- adapter: `src/data/control-plane.ts`
+- bridge design only: `src/data/approval-bridge.ts`
+- local runtime endpoint: `/api/admin/runtime-feed`
+- runtime source path:
+  `/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json`
+
+Runtime overlays are metadata-only. They must not include dirty filenames, file
+contents, secret values, health payload rows, private messages, message ids, or
+dollar amounts.
+
+## commands
 
 ```bash
-pnpm install
-# In one terminal:
-pnpm --filter @anipotts/state dev
-# In another:
 pnpm --filter @anipotts/admin-solid dev
-# Open http://localhost:3001
+pnpm --filter @anipotts/admin-solid typecheck
+pnpm --filter @anipotts/admin-solid build
 ```
 
-## Routes
+## deploy
 
-| Route | Component                                     |
-| ----- | --------------------------------------------- |
-| `/`   | `LinkVaultPanel` (live links list, save form) |
+Deploys go through the repo-level path-filtered GitHub Actions workflow. Do not
+run `wrangler deploy` manually unless Ani has approved that exact action.
 
-## Adding a panel
+The deploy target is `anipotts-admin-solid`; its custom domain route is
+`admin.anipotts.com`.
 
-1. Create `src/components/<Panel>.tsx` that opens a `StateClient` against `/<do>/ws` on the state worker.
-2. Drop it into a route under `src/routes/`.
-3. The panel gets live updates via the WebSocket; mutations go via REST POST to the same worker.
+## gates
 
-## Deploy
+Allowed without fresh authority after normal PR review and checks:
 
-```bash
-pnpm --filter @anipotts/admin-solid exec wrangler deploy
-```
+- read-only routes
+- feed adapters
+- static sample rendering
+- local-dev metadata overlays
+- layout and usability improvements
 
-After deploy, hostname is `https://anipotts-admin-solid.<account>.workers.dev`. To bind to `admin-v2.anipotts.com`, uncomment the `[[routes]]` block in `wrangler.toml` once the zone is in CF.
+Requires fresh authority:
 
-## Architecture
+- content writes
+- deploy triggers from the UI
+- approval bridge execution
+- Cloudflare Access changes
+- DNS changes
+- env or secret changes
+- production collector changes
+- account or payment actions
 
-The full vision: `docs/personal-cloud-architecture.md` in the same monorepo.
+## v2 direction
+
+The next admin direction is Astro-aligned and sidebar-first. See
+`docs/admin-v2-architecture.md`.
