@@ -1,0 +1,671 @@
+{
+  "counts": {
+    "approvals": 1,
+    "blockers": 3,
+    "handoffs": 2,
+    "mutations": 3,
+    "operations": 3,
+    "proofs": 3,
+    "repo_states": 3
+  },
+  "model": "intent -> authority -> operation -> proof -> state",
+  "objects": {
+    "approvals": [
+      {
+        "allowed": [
+          "read-only design",
+          "sample data",
+          "schemas",
+          "local validation",
+          "validated Infra docs/schema/sample commit and push"
+        ],
+        "approval_id": "appr.admin.readonly-build-slices.2026-06-23",
+        "approved_at": "2026-06-23T23:40:00Z",
+        "approved_by": "Ani",
+        "authority_ref": "fleet/boss build slice 2 delegation",
+        "expires_at": null,
+        "forbidden": [
+          "launchd/root/auth/secrets/env/firewall/tailscale/service mutation",
+          "user-account cleanup",
+          "source/personal delete",
+          "deploy",
+          "DNS",
+          "payment",
+          "filing",
+          "outbound",
+          "Gmail/Calendar mutation",
+          "health rename execution"
+        ],
+        "mutation_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ],
+        "notes": "Sample rows are non-secret and not live execution authority.",
+        "object_type": "approval",
+        "proof_required": [
+          "schema JSON parses",
+          "sample JSONL parses",
+          "samples validate against schemas"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "delegation",
+            "path": "current Codex thread",
+            "ref": "fleet/boss build slice 2",
+            "summary": "Ani routed slice 2 to chief/infra with docs/schema/sample push allowed after validation."
+          }
+        ],
+        "source_thread_id": "019ed10b-518a-7d80-814b-cb52f7453646",
+        "status": "active",
+        "title": "Read-only admin control-plane build slices",
+        "updated_at": "2026-06-23T23:40:00Z"
+      }
+    ],
+    "blockers": [
+      {
+        "blocked_since": "2026-06-23T23:40:00Z",
+        "blocker_id": "block.site.consume-contract-fields",
+        "domain": "site",
+        "next_action": "Bind route cards to sample fields from coord/admin/README.md and samples/*.jsonl.",
+        "object_type": "blocker",
+        "owner": "chief/site",
+        "owner_thread": "chief/site",
+        "related_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "op.site.admin-shell.local-build"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "todo queue",
+            "summary": "chief/site and chief/infra need matching object names and sample ids."
+          }
+        ],
+        "stale_after": "2026-06-25T23:40:00Z",
+        "status": "waiting_on_agent",
+        "title": "chief/site needs stable field names for first admin UI slice",
+        "unblock_conditions": [
+          "UI can render mutation, approval, operation, proof, blocker, repo_state, and handoff cards from sample rows",
+          "No deploy or live worker mutation required"
+        ],
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T23:40:00Z",
+        "blocker_id": "block.admin.live-collectors-not-yet-approved",
+        "domain": "infra",
+        "next_action": "After the read-only UI feels right, request separate approval for low-latency collectors.",
+        "object_type": "blocker",
+        "owner": "chief/infra",
+        "owner_thread": "chief/infra",
+        "related_ids": ["mut.infra.admin-contract.schema-samples"],
+        "requires_ani": true,
+        "severity": "low",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "todo queue",
+            "summary": "Collectors come after read-only UI and before any write paths."
+          }
+        ],
+        "stale_after": "2026-07-01T23:40:00Z",
+        "status": "open",
+        "title": "Live collectors are intentionally out of scope for first pass",
+        "unblock_conditions": [
+          "UI field model is accepted",
+          "Collector paths are reviewed",
+          "No secret values or protected payloads enter admin feeds"
+        ],
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "blocked_since": "2026-06-22T09:24:10Z",
+        "blocker_id": "block.health.rename.execution-approval",
+        "domain": "health",
+        "next_action": "Review and approve or revise the prepared backup/hash and rollback packet before any path rename, restart, env-ref migration, or launchd label change.",
+        "object_type": "blocker",
+        "owner": "chief/health",
+        "owner_thread": "chief/health",
+        "related_ids": [
+          "mut.health.rename.execution-gate",
+          "op.health.rename.execution-waiting",
+          "proof.health.ingest-and-ready-packet",
+          "repo.health.vitals-live-tree.ap-mini"
+        ],
+        "requires_ani": true,
+        "severity": "high",
+        "source_refs": [
+          {
+            "kind": "needs-ani",
+            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
+            "ref": "blocker-health-rename-execution",
+            "summary": "Fresh ingest proof is sufficient; approval is now needed for execution packet."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared packet with commands only."
+          }
+        ],
+        "stale_after": "2026-06-26T03:55:32Z",
+        "status": "waiting_on_ani",
+        "title": "Health rename execution awaits packet approval",
+        "unblock_conditions": [
+          "Ani approves the prepared packet or supplies revisions",
+          "No endpoint, port, auth, env, secret, launchd, or GitHub repo rename changes are bundled into approval",
+          "Backup/hash commands remain local-only and value-safe",
+          "Post-rename proof remains required before launchd label rename"
+        ],
+        "updated_at": "2026-06-24T03:55:32Z"
+      }
+    ],
+    "handoffs": [
+      {
+        "absorbed_at": null,
+        "created_at": "2026-06-23T23:40:00Z",
+        "freshness": "current",
+        "handoff_id": "handoff.admin-control-plane-build-map",
+        "next_action": "chief/infra publishes contract and chief/site binds the UI shell to matching sample ids.",
+        "object_type": "handoff",
+        "owner": "fleet/boss",
+        "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "related_ids": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ],
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "a4a09c5",
+            "summary": "Build map is tracked in Infra origin/main."
+          }
+        ],
+        "source_thread_id": "019ef754-39df-7ae3-a4bb-d15cc9e2a70b",
+        "status": "partially_absorbed",
+        "summary": "Defines admin as a read-only control plane for intent, authority, operation, proof, and state.",
+        "target_owner": "chief/site and chief/infra",
+        "title": "admin control plane build map",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "absorbed_at": "2026-06-24T02:43:15Z",
+        "created_at": "2026-06-24T02:43:15Z",
+        "freshness": "current",
+        "handoff_id": "handoff.rudy-account-deletion-closeout",
+        "next_action": "Display as verified destructive work with rollback limits and no remaining account-cleanup action unless new proof says otherwise.",
+        "object_type": "handoff",
+        "owner": "fleet/boss",
+        "path": "/Users/anipotts/Infra/handoffs/2026-06-23-rudy-kpanil-account-deletion-closeout.md",
+        "proof_ids": [],
+        "related_ids": ["block.admin.live-collectors-not-yet-approved"],
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "rudy-kpanil-account-deletion-closeout-2026-06-23",
+            "summary": "Representative completed destructive operation for admin mock data."
+          }
+        ],
+        "source_thread_id": "019ed10b-518a-7d80-814b-cb52f7453646",
+        "status": "absorbed",
+        "summary": "Example high-risk handoff where admin must show destructive cleanup only after approval, archive proof, process proof, and closeout proof exist.",
+        "target_owner": "chief/infra",
+        "title": "Rudy and kpanil account deletion closeout",
+        "updated_at": "2026-06-24T03:40:00Z"
+      }
+    ],
+    "mutations": [
+      {
+        "allowed_actions": [
+          "local app code edits",
+          "local verification",
+          "agent branch or scoped commit plan"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "domain": "site",
+        "forbidden_actions": [
+          "deploy",
+          "DNS change",
+          "env or secret mutation",
+          "live worker mutation"
+        ],
+        "intent": "Make admin.anipotts.com answer what is safe to do next using mocked control-plane data.",
+        "mutation_class": "read_only",
+        "mutation_id": "mut.site.admin-shell.readonly.slice1",
+        "next_safe_action": "Use coord/admin/samples as mocked read model and render read-only route skeletons.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-shell.local-build"],
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "proposed_by": "chief/site",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-23T23:40:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 1",
+            "summary": "chief/site owns the first read-only UI shell."
+          }
+        ],
+        "status": "approved",
+        "target_surface": "apps/admin-solid",
+        "title": "Build read-only admin control-plane shell",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "allowed_actions": [
+          "schema files",
+          "sample jsonl",
+          "validation script",
+          "private Infra commit and push after validation"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": [],
+        "domain": "infra",
+        "forbidden_actions": [
+          "launchd mutation",
+          "auth mutation",
+          "service mutation",
+          "deploy",
+          "user account cleanup"
+        ],
+        "intent": "Make authority, operation, proof, blocker, repo, and handoff state consumable by the admin UI.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.infra.admin-contract.schema-samples",
+        "next_safe_action": "Validate samples against schemas, commit tracked docs, and push Infra main.",
+        "object_type": "mutation",
+        "operation_ids": ["op.infra.admin-contract.schema-samples"],
+        "proof_ids": ["proof.validator.admin-contract.samples"],
+        "proposed_by": "chief/infra",
+        "repo": "Infra",
+        "requested_at": "2026-06-23T23:40:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "authority",
+            "path": "/Users/anipotts/Infra/coord/authority.jsonl",
+            "ref": "approval-infra-major-vision-continuation-2026-06-22",
+            "summary": "Infra coordination-only docs and validation are approved."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 2",
+            "summary": "chief/infra owns the read-only data contract."
+          }
+        ],
+        "status": "running",
+        "target_surface": "coord/admin",
+        "title": "Create admin read-only data contract",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "allowed_actions": [
+          "read-only review of prepared packet",
+          "approval or revision of backup/hash and rollback plan",
+          "metadata-only freshness verification"
+        ],
+        "authority_state": "requested",
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "domain": "health",
+        "forbidden_actions": [
+          "path rename before approval",
+          "service restart before approval",
+          "endpoint or port change",
+          "auth/env/secret mutation",
+          "launchd label change",
+          "health data mutation",
+          "DuckDB row reads",
+          "pro-to-mini overwrite",
+          "GitHub repo rename"
+        ],
+        "intent": "Rename the mini live vitals service tree to health only after the prepared backup/hash and rollback packet is approved.",
+        "mutation_class": "service",
+        "mutation_id": "mut.health.rename.execution-gate",
+        "next_safe_action": "Review and approve or revise /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md before any execution.",
+        "object_type": "mutation",
+        "operation_ids": ["op.health.rename.execution-waiting"],
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "proposed_by": "chief/health",
+        "repo": "vitals",
+        "requested_at": "2026-06-22T09:24:10Z",
+        "required_approval_ids": ["appr.health.rename.execution.required"],
+        "risk_level": "high",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared backup/hash commands and rollback plan only; commands were not executed."
+          },
+          {
+            "kind": "needs-ani",
+            "path": "/Users/anipotts/Infra/coord/NEEDS-ANI.md",
+            "ref": "blocker-health-rename-execution",
+            "summary": "Current blocker is execution approval, not phone ingest proof."
+          }
+        ],
+        "status": "blocked",
+        "target_surface": "/Users/anipotts/Code/projects/vitals -> /Users/anipotts/Code/projects/health",
+        "title": "Health vitals to health rename execution gate",
+        "updated_at": "2026-06-24T03:55:32Z"
+      }
+    ],
+    "operations": [
+      {
+        "agent": "codex chief/infra",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-23T23:40:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.infra.admin-contract.schema-samples"],
+        "next_safe_action": "Run coord/admin/validate_admin_contract.py and loop-runner validate before commit.",
+        "object_type": "operation",
+        "operation_id": "op.infra.admin-contract.schema-samples",
+        "phase": "schema-and-sample-authoring",
+        "proof_ids": ["proof.validator.admin-contract.samples"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "main",
+            "summary": "Private Infra repo may receive validated coordination docs/schema commits."
+          }
+        ],
+        "started_at": "2026-06-23T23:40:00Z",
+        "status": "running",
+        "stop_path": "stop by not committing, then revert working tree changes by exact file path if requested",
+        "thread_id": "current",
+        "title": "Write admin contract schemas and samples",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "agent": "chief/site",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "branch": "codex/admin-control-plane-readonly-slice",
+        "command_class": "ui_local_build",
+        "heartbeat_at": "2026-06-23T23:40:00Z",
+        "machine": "ap-pro or ap-mini",
+        "mutation_ids": ["mut.site.admin-shell.readonly.slice1"],
+        "next_safe_action": "Render route skeletons using coord/admin/samples JSONL as mocked data.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-shell.local-build",
+        "phase": "waiting-for-contract",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "build slice 1",
+            "summary": "Site owns the read-only admin UI shell."
+          }
+        ],
+        "started_at": "2026-06-23T23:40:00Z",
+        "status": "queued",
+        "stop_path": "stop before deploy, DNS, env, worker, or production mutation",
+        "thread_id": "chief/site",
+        "title": "Build mocked admin shell in apps/admin-solid",
+        "updated_at": "2026-06-23T23:40:00Z"
+      },
+      {
+        "agent": "codex chief/health",
+        "allowed_by_approval_ids": [],
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "command_class": "read_only_validation",
+        "heartbeat_at": "2026-06-24T03:55:32Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.health.rename.execution-gate"],
+        "next_safe_action": "Wait for approval or revisions to /Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md.",
+        "object_type": "operation",
+        "operation_id": "op.health.rename.execution-waiting",
+        "phase": "approval-gate",
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "repo": "vitals",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Execution commands are prepared but not run."
+          }
+        ],
+        "started_at": "2026-06-22T09:24:10Z",
+        "status": "waiting",
+        "stop_path": "Do not run rename-ready packet commands; leave /Users/anipotts/Code/projects/vitals, port 8080, env refs, endpoint shape, and launchd label unchanged.",
+        "thread_id": "019eebf1-bbd7-7f53-95d5-6dc05d48732c",
+        "title": "Health rename waiting on execution approval",
+        "updated_at": "2026-06-24T03:55:32Z"
+      }
+    ],
+    "proofs": [
+      {
+        "collected_at": "2026-06-23T23:40:00Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.handoff.admin-build-map",
+        "proof_type": "handoff",
+        "redaction": "none",
+        "related_ids": ["handoff.admin-control-plane-build-map"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "a4a09c5",
+            "summary": "Build map was present at a4a09c5 or newer."
+          }
+        ],
+        "status": "valid",
+        "summary": "Handoff defines product thesis, core objects, site slice, infra contract slice, and non-goals.",
+        "title": "Admin control-plane build map exists",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "verifies": [
+          "mut.site.admin-shell.readonly.slice1",
+          "mut.infra.admin-contract.schema-samples"
+        ]
+      },
+      {
+        "collected_at": "2026-06-23T23:40:00Z",
+        "collected_by": "chief/infra",
+        "evidence_uri": "python3 coord/admin/validate_admin_contract.py",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.validator.admin-contract.samples",
+        "proof_type": "validator",
+        "redaction": "none",
+        "related_ids": ["op.infra.admin-contract.schema-samples"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "file",
+            "path": "/Users/anipotts/Infra/coord/admin/validate_admin_contract.py",
+            "summary": "Local stdlib validator for the contract."
+          }
+        ],
+        "status": "valid",
+        "summary": "Validation command parses schemas, parses JSONL samples, checks required fields, rejects extra fields, validates primitive types and enum values, and checks duplicate ids per file.",
+        "title": "Admin contract schemas and samples validate",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "verifies": ["mut.infra.admin-contract.schema-samples"]
+      },
+      {
+        "collected_at": "2026-06-22T09:24:10Z",
+        "collected_by": "chief/health",
+        "evidence_uri": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.health.ingest-and-ready-packet",
+        "proof_type": "handoff",
+        "redaction": "private_payload_omitted",
+        "related_ids": ["op.health.rename.execution-waiting"],
+        "repo": "vitals",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "health-rename-ready-packet-2026-06-22",
+            "summary": "Prepared gated rename packet."
+          },
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "health-phone-ingest-proof-sufficient-2026-06-22",
+            "summary": "Proof classified sufficient without printing rows or payload bodies."
+          }
+        ],
+        "status": "valid",
+        "summary": "Fresh Health Auto Export proof is metadata-only: raw HAE count 59, newest archive filename 2026-06-22T09-12-08-114Z.json, latest.json and DuckDB WAL refreshed at 2026-06-22T05:12:18-0400, unauthenticated /api/health returns 401, and the live Bun process is unchanged. Ready packet contains backup/hash and rollback commands only; commands were not executed.",
+        "title": "Fresh health ingest proof and ready packet exist",
+        "updated_at": "2026-06-24T03:55:32Z",
+        "verifies": [
+          "mut.health.rename.execution-gate",
+          "block.health.rename.execution-approval",
+          "repo.health.vitals-live-tree.ap-mini"
+        ]
+      }
+    ],
+    "repo_states": [
+      {
+        "active_threads": ["chief/infra"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": [],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "a4a09c5-or-newer",
+        "last_verified_at": "2026-06-23T23:40:00Z",
+        "live_runtime_role": "coordination source and private remote backup",
+        "machine": "ap-mini",
+        "next_safe_action": "Commit and push validated coord/admin contract files only.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Infra",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "Infra",
+        "repo_state_id": "repo.infra.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git-status",
+            "path": "/Users/anipotts/Infra",
+            "summary": "Infra source moves by git; untracked local audits are not auto-staged."
+          }
+        ],
+        "untracked_count": 1,
+        "untracked_policy": "ignore unrelated local audit files unless explicitly routed",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/site"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.site.consume-contract-fields"],
+        "branch": "codex/admin-control-plane-readonly-slice",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "unknown-until-chief-site-starts",
+        "last_verified_at": "2026-06-23T23:40:00Z",
+        "live_runtime_role": "renderer for admin.anipotts.com, no deploy in slice 1",
+        "machine": "ap-pro or ap-mini",
+        "next_safe_action": "Build local mocked UI against coord/admin sample rows without deploy.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/anipotts-com",
+        "proof_ids": ["proof.handoff.admin-build-map"],
+        "repo": "anipotts-com",
+        "repo_state_id": "repo.anipotts-com.admin-solid",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-23-admin-control-plane-build-map.md",
+            "ref": "existing site planning facts",
+            "summary": "apps/admin-solid is the correct target for admin.anipotts.com."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "chief/site should inspect before editing and avoid env or generated churn",
+        "updated_at": "2026-06-23T23:40:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "unknown"
+      },
+      {
+        "active_threads": ["chief/health"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.health.rename.execution-approval"],
+        "branch": "not-a-git-checkout",
+        "canonical_role": "runtime",
+        "deploy_impact": "local_only",
+        "dirty_tracked": [],
+        "head_sha": "none",
+        "last_verified_at": "2026-06-22T09:24:10Z",
+        "live_runtime_role": "live health/vitals API tree on port 8080 with local-only health data; admin must show metadata only",
+        "machine": "ap-mini",
+        "next_safe_action": "Review the gated ready packet; do not rename, restart, edit env/secrets, change endpoint, or copy from pro.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Code/projects/vitals",
+        "proof_ids": ["proof.health.ingest-and-ready-packet"],
+        "repo": "vitals",
+        "repo_state_id": "repo.health.vitals-live-tree.ap-mini",
+        "source_refs": [
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-21-health-rename-phone-ingest-gate.md",
+            "ref": "live tree and data classification",
+            "summary": "Mini vitals path is runtime-authoritative and not a Git checkout."
+          },
+          {
+            "kind": "handoff",
+            "path": "/Users/anipotts/Infra/handoffs/2026-06-22-health-rename-ready-packet.md",
+            "ref": "classification",
+            "summary": "Fresh ingest proof is sufficient and execution packet is prepared."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "not applicable because this is a live non-git service tree; do not overwrite from pro",
+        "updated_at": "2026-06-24T03:55:32Z",
+        "upstream": "none",
+        "worktree_state": "unknown"
+      }
+    ]
+  },
+  "question": "what is safe to do next?",
+  "snapshot_type": "admin-control-plane-static-sample",
+  "source": {
+    "generated_by": "coord/admin/build_static_snapshot.py",
+    "mode": "tracked-static-sample",
+    "path": "coord/admin/samples",
+    "repo": "Infra"
+  },
+  "version": 1
+}

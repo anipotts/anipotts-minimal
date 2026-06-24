@@ -283,6 +283,7 @@ dt,
 
 .status-pill[data-state="running"],
 .status-pill[data-state="queued"],
+.status-pill[data-state="waiting"],
 .status-pill[data-state="partially_absorbed"] {
   background: rgba(53, 194, 209, 0.12);
   color: #9be8ef;
@@ -290,6 +291,7 @@ dt,
 
 .status-pill[data-state="blocked"],
 .status-pill[data-state="waiting_on_agent"],
+.status-pill[data-state="waiting_on_ani"],
 .status-pill[data-state="open"] {
   background: rgba(239, 68, 68, 0.12);
   color: #fca5a5;
