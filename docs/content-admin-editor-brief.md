@@ -2,6 +2,13 @@
 
 this is the content shape that should feed the next admin editor pass. it stays scoped to public-site content and does not prescribe the admin thread's implementation architecture.
 
+Admin v2 architecture lives in `docs/admin-v2-architecture.md`. This file is
+the public-site content inventory that the admin route should read first.
+
+The next implementation slice is a read-only `/content` admin route. It should
+show what can become editable without adding save behavior, outbound publishing,
+or any live write path.
+
 ## current inventory
 
 | surface              | source                                                                    | current shape                                                                                                    | notes                                                         |
@@ -24,6 +31,29 @@ this is the content shape that should feed the next admin editor pass. it stays 
 | p1       | add newsletter headline, deck, cta, and status messages | the subscribe module should be editable without code                     | admin editor                  |
 | p2       | decide canonical project source                         | markdown and `packages/lib/src/data/projects.ts` duplicate similar facts | admin editor plus site thread |
 | p2       | classify old posts before publishing to Buttondown      | current writing can seed the newsletter, but should not be auto-sent     | newsletter thread             |
+
+## first read-only admin slice
+
+The first admin implementation should not edit content. It should render a
+content inventory table that helps Ani and agents decide what can safely become
+editable later.
+
+Rows should include:
+
+| field                | source                       | purpose                                      |
+| -------------------- | ---------------------------- | -------------------------------------------- |
+| `surface`            | route or component           | homepage, projects, writing, newsletter      |
+| `source_ref`         | file path or record id       | points to current source truth               |
+| `current_value`      | rendered text or field value | what the public site currently uses          |
+| `editability`        | enum                         | `ready`, `needs_schema`, `needs_owner`       |
+| `risk_level`         | enum                         | public-site copy risk, not admin write risk  |
+| `next_safe_action`   | text                         | branch/PR cleanup or keep read-only          |
+| `required_authority` | array                        | empty for read-only, populated before writes |
+| `proof_ids`          | array                        | route, screenshot, content file, or record   |
+
+The route should group content by homepage, projects, writing, and newsletter.
+It should not include credentials, outbound publishing controls, social APIs, or
+hidden admin write endpoints.
 
 ## recommended admin schema
 

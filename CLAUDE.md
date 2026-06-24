@@ -1,8 +1,8 @@
 # anipotts-com agent guide
 
 This repo owns the public site and the protected admin UI. It should be easy
-for Codex and Claude Code to build, verify, merge, and deploy ordinary site and
-read-only admin improvements without reopening stale permission debates.
+for Codex and Claude Code to build, verify, merge, and deploy ordinary public
+site work while keeping admin control paths on stricter authority.
 
 `AGENTS.md` is a symlink to this file. Keep them equivalent.
 
@@ -34,8 +34,8 @@ clear permission boundary over bespoke workflow layers.
   prose files in this repo
 - Fleet state: `~/Infra/coord`, handoffs, registries, and admin feed files
 
-The target direction is that text content on `anipotts.com` is editable through
-`admin.anipotts.com`, so routine wording changes should move toward admin data
+The target direction is that text content on `anipotts.com` becomes editable
+through `admin.anipotts.com`, so routine wording changes move toward admin data
 or content records instead of recurring source deploys.
 
 ## commands
@@ -61,8 +61,8 @@ pnpm turbo build --filter=@anipotts/www...
 
 ## architecture
 
-- `apps/www`: Astro 5 static site on Cloudflare Workers.
-- `apps/admin-solid`: SolidStart admin control plane behind Cloudflare Access.
+- `apps/www`: Astro 5 site on Cloudflare Workers.
+- `apps/admin-solid`: current admin control plane behind Cloudflare Access.
 - `apps/admin`: older admin surface kept for compatibility while replacement
   work continues.
 - `apps/labs`: labs subdomain.
@@ -72,11 +72,46 @@ pnpm turbo build --filter=@anipotts/www...
   helpers.
 
 The admin control plane is read-only first. It may render `NEEDS-ANI`, repo
-state, fleet state, stale rule drift, live gates, and proof paths. Admin content
-editing is the next product direction, but publishing or mutating production
-state is a separate write path. Admin control buttons, outbound sends, account
-mutations, production collectors, and direct live controls require separate
-authority.
+state, fleet state, stale rule drift, live gates, proof paths, and future
+content-editor previews. Admin content editing is the next product direction,
+but publishing or mutating production state is a separate write path. Admin
+control buttons, outbound sends, account mutations, production collectors, and
+direct live controls require separate authority.
+
+## permission model
+
+Public site lane:
+
+- Agents may proactively create branches and PRs for safe content, copy, route,
+  layout, accessibility, and visual polish work.
+- Agents may run checks, commit, push, mark PRs ready, and merge when required
+  checks pass and the diff stays inside public site presentation or static
+  content.
+- Public site deploys from approved merges are normal when path-filtered CI
+  selects `apps/www`.
+- Do not use code edits as the permanent answer when the same wording should
+  become admin-editable content.
+
+Admin read-only lane:
+
+- Agents may proactively branch and PR read-only admin UI, schema display,
+  static feed rendering, local-dev runtime metadata, and proof views.
+- Agents may merge and deploy read-only admin UI only when the PR is approved,
+  checks pass, and the deploy target is limited to the intended admin worker.
+- The current live protected admin target is `apps/admin-solid` on
+  `admin.anipotts.com`.
+- Admin v2 should stay Astro-aligned and sidebar-first, with interactive islands
+  only where live state needs them.
+
+Admin control lane:
+
+- Any write path, content save, deploy trigger, approval bridge, external send,
+  account action, collector change, or live control button needs exact current
+  authority.
+- Authority must name the operation, allowed surface, forbidden actions, proof
+  requirement, and rollback or stop path.
+- Disabled UI for future controls is acceptable only when it cannot execute.
+- The default state for new admin capabilities is read-only proof rendering.
 
 ## agent lanes
 
@@ -112,6 +147,8 @@ Merge/deploy lane:
   diff is fully inside a safe lane.
 - Main pushes trigger the path-filtered Deploy workflow. That is expected for
   safe public site and read-only admin-solid work.
+- Docs-only changes should be merged normally when reviewed, but should not
+  deploy app targets.
 - Record the merge, deploy run, and verification URL in the PR or bus when the
   work is fleet-visible.
 
@@ -154,6 +191,10 @@ Content editing should have four states when implemented:
 - publish request: one typed NEEDS-ANI item when human taste or live write
   authority is required.
 - published: recorded with commit, admin proof, or content-store proof.
+
+See `docs/admin-v2-architecture.md` for the current admin v2 direction and
+`docs/content-admin-editor-brief.md` for the public-site content model that
+should eventually be editable through admin.
 
 ## environment
 
