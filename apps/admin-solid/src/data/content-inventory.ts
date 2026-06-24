@@ -16,6 +16,30 @@ export type ContentInventoryItem = {
   proof_ids: string[];
 };
 
+export type ContentPreviewStatus =
+  | "draft"
+  | "preview"
+  | "needs approval"
+  | "blocked";
+
+export type ContentPreviewItem = {
+  id: string;
+  inventory_id: string;
+  surface: ContentSurface;
+  title: string;
+  status: ContentPreviewStatus;
+  risk_level: RiskLevel;
+  source_ref: string;
+  current_value: string;
+  proposed_value: string;
+  preview_route: string;
+  authority_state: string;
+  required_approval_ids: string[];
+  proof_ids: string[];
+  blocked_actions: string[];
+  next_safe_action: string;
+};
+
 export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
   architecture_doc: "docs/admin-v2-architecture.md",
@@ -191,5 +215,94 @@ export const contentInventory: ContentInventoryItem[] = [
       "Keep as read-only planning until newsletter ownership and outbound-send authority are explicit.",
     required_authority: ["newsletter.publish.owner-decision"],
     proof_ids: ["content.newsletter.backfill.plan"],
+  },
+];
+
+export const contentPreviewItems: ContentPreviewItem[] = [
+  {
+    id: "preview.homepage.summary.tighten",
+    inventory_id: "homepage.summary",
+    surface: "homepage",
+    title: "tighten homepage summary",
+    status: "preview",
+    risk_level: "medium",
+    source_ref: "apps/www/src/data/site.ts:homeContent.summary",
+    current_value:
+      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
+    proposed_value:
+      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. now i write about coding agent workflows and the systems around them.",
+    preview_route: "/",
+    authority_state: "preview_only_no_write",
+    required_approval_ids: [],
+    proof_ids: [
+      "content.homepage.summary.source",
+      "admin.content.preview.local",
+    ],
+    blocked_actions: ["save content", "publish content", "deploy public site"],
+    next_safe_action:
+      "Review tone and layout in admin only; do not write this copy to a content store.",
+  },
+  {
+    id: "preview.projects.card-summary",
+    inventory_id: "projects.card_fields",
+    surface: "projects",
+    title: "normalize project card summary field",
+    status: "draft",
+    risk_level: "low",
+    source_ref: "apps/www/src/content/projects/*.md:subtitle",
+    current_value:
+      "Project cards currently use subtitle plus description, with `summary` reserved for future editor wording.",
+    proposed_value:
+      "Expose `summary` in admin while mapping it to existing markdown `subtitle` until the schema is renamed.",
+    preview_route: "/making",
+    authority_state: "model_only",
+    required_approval_ids: [],
+    proof_ids: ["content.projects.frontmatter.schema"],
+    blocked_actions: ["rename markdown schema", "rewrite project files"],
+    next_safe_action:
+      "Keep as a model decision until a migration PR can update the public site schema safely.",
+  },
+  {
+    id: "preview.writing.claude-link",
+    inventory_id: "writing.claude_stats_link",
+    surface: "writing",
+    title: "replace stale claude stats link",
+    status: "needs approval",
+    risk_level: "low",
+    source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    current_value:
+      "You can see all of this on [my Claude stats page](/claude).",
+    proposed_value:
+      "You can see the broader agent workflow on [my orchestrating page](/orchestrating).",
+    preview_route: "/writing/saturdays-are-for-claude-code",
+    authority_state: "public_site_safe_lane_if_refreshed",
+    required_approval_ids: ["pr.73.refresh-or-close"],
+    proof_ids: ["pr.73.public-cleanup.pending"],
+    blocked_actions: [
+      "merge stale PR #73 without refresh",
+      "deploy without checks",
+    ],
+    next_safe_action:
+      "Refresh or cherry-pick PR #73 if Ani wants the tiny public cleanup to ship.",
+  },
+  {
+    id: "preview.newsletter.copy-source",
+    inventory_id: "newsletter.subscribe_copy",
+    surface: "newsletter",
+    title: "choose newsletter copy source",
+    status: "blocked",
+    risk_level: "medium",
+    source_ref: "apps/www/src/components/NewsletterSubscribe.astro",
+    current_value:
+      "Newsletter copy defaults are component props, with CMS-normalized copy also used on the homepage.",
+    proposed_value:
+      "Move editable newsletter block copy into a typed content record before enabling admin edits.",
+    preview_route: "/newsletter",
+    authority_state: "needs_source_truth_decision",
+    required_approval_ids: ["content.newsletter-source.owner-decision"],
+    proof_ids: ["content.newsletter.component.defaults"],
+    blocked_actions: ["save newsletter copy", "sync Buttondown", "send email"],
+    next_safe_action:
+      "Keep read-only until the content store decision is recorded.",
   },
 ];
