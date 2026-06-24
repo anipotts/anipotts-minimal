@@ -219,7 +219,7 @@ export type DestructiveGate = WorkCard &
 export const adminFeed = feedJson as AdminFeed;
 
 export const feedSource = {
-  infra_commit: "8fa3c32",
+  infra_commit: "c26959c",
   copied_from: "/Users/anipotts/Infra/coord/admin/static/admin-feed.sample.json",
   generated_by: adminFeed.source.generated_by,
   snapshot_type: adminFeed.snapshot_type,
@@ -244,8 +244,8 @@ export const workCards: WorkCard[] = [
 export const coverageCards: WorkCard[] = [
   coverageCard("site/admin shell state", hasDomain("site"), "mut.site.admin-shell.readonly.slice1"),
   coverageCard("health rename blocker", hasDomain("health"), "block.health.rename.execution-approval"),
-  coverageCard("jobs feed state", hasDomain("jobs"), "missing.jobs.feed.static-sample"),
-  coverageCard("brand/business operating layers", hasDomain("brand") || hasDomain("business"), "missing.brand-business.static-sample"),
+  coverageCard("jobs feed state", hasDomain("jobs"), "proof.jobs.admin-feed.commit"),
+  coverageCard("brand/business operating layers", hasDomain("brand") && hasDomain("business"), "proof.brand.phase1.commit, proof.business.secretary-layer.commit"),
   coverageCard("repo states", repoStateRows.length > 0, "repo.anipotts-com.admin-solid"),
 ];
 
@@ -372,8 +372,8 @@ function coverageCard(title: string, present: boolean, proofId: string): WorkCar
     status: present ? "verified" : "stale",
     risk_level: present ? "low" : "medium",
     next_safe_action: present
-      ? "Render from the static feed bundle copied from Infra 8fa3c32."
-      : "No object for this layer exists in the 8fa3c32 static feed; add a repo exporter or sample row before live collector work.",
+      ? `Render from the static feed bundle copied from Infra ${feedSource.infra_commit}.`
+      : `No object for this layer exists in the ${feedSource.infra_commit} static feed; add a repo exporter or sample row before live collector work.`,
     intent: present ? "confirm static feed coverage" : "show missing static feed coverage without inventing state",
     authority_state: "static_sample_only",
     operation_summary: `${adminFeed.snapshot_type} / ${feedSource.infra_commit}`,
@@ -470,10 +470,11 @@ function matchesArea(area: string, action: string): boolean {
 }
 
 function hasDomain(domain: string): boolean {
+  const needle = domain.toLowerCase();
   return (
-    mutations.some((row) => row.domain === domain || row.repo === domain) ||
-    blockers.some((row) => row.domain === domain) ||
-    repoStateRows.some((row) => row.repo === domain || row.canonical_role === domain)
+    mutations.some((row) => row.domain.toLowerCase() === needle || row.repo.toLowerCase() === needle) ||
+    blockers.some((row) => row.domain.toLowerCase() === needle) ||
+    repoStateRows.some((row) => row.repo.toLowerCase() === needle || row.canonical_role.toLowerCase() === needle)
   );
 }
 

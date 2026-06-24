@@ -1,12 +1,12 @@
 {
   "counts": {
     "approvals": 1,
-    "blockers": 3,
+    "blockers": 6,
     "handoffs": 2,
-    "mutations": 3,
-    "operations": 3,
-    "proofs": 3,
-    "repo_states": 3
+    "mutations": 7,
+    "operations": 7,
+    "proofs": 7,
+    "repo_states": 6
   },
   "model": "intent -> authority -> operation -> proof -> state",
   "objects": {
@@ -163,6 +163,104 @@
           "Post-rename proof remains required before launchd label rename"
         ],
         "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "blocked_since": "2026-06-24T04:05:00Z",
+        "blocker_id": "block.site.static-feed-consumption",
+        "domain": "site",
+        "next_action": "Replace ad hoc admin-solid mocks with a static copy or imported equivalent of coord/admin/static/admin-feed.sample.json.",
+        "object_type": "blocker",
+        "owner": "chief/site",
+        "owner_thread": "chief/site",
+        "related_ids": [
+          "mut.site.admin-static-feed.consume",
+          "op.site.admin-static-feed.consume",
+          "proof.admin.static-feed.bundle"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
+            "summary": "fleet/boss routed the static feed consumption task to chief/site."
+          }
+        ],
+        "stale_after": "2026-06-25T04:05:00Z",
+        "status": "waiting_on_agent",
+        "title": "Admin UI must consume the unified static feed",
+        "unblock_conditions": [
+          "All six admin routes render from the bundled feed",
+          "No runtime dependency on /Users/anipotts/Infra",
+          "No deploy or live collector"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T15:05:00Z",
+        "blocker_id": "block.jobs.gmail-empty-label-ui-cleanup",
+        "domain": "jobs",
+        "next_action": "Use a thread with in-app Browser access to remove empty old Gmail label objects after count proof; do not delete messages or filters.",
+        "object_type": "blocker",
+        "owner": "chief/jobs",
+        "owner_thread": "chief/jobs",
+        "related_ids": [
+          "mut.jobs.admin-feed-operating-layer.complete",
+          "proof.jobs.admin-feed.commit"
+        ],
+        "requires_ani": false,
+        "severity": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs message-label migration is complete; label-object cleanup is browser/UI-only."
+          }
+        ],
+        "stale_after": "2026-06-27T04:05:00Z",
+        "status": "open",
+        "title": "Empty Gmail label objects need Browser/UI cleanup",
+        "unblock_conditions": [
+          "Browser/UI runtime is available",
+          "Before counts still show old labels at 0 messages and 0 threads",
+          "After proof records no message delete, archive, send, or filter mutation"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "blocked_since": "2026-06-23T03:57:00Z",
+        "blocker_id": "block.brand.rayban-analytics-due",
+        "domain": "brand",
+        "next_action": "Prepare Ray-Ban 30-day analytics proof by 2026-07-05 without posting, sending, invoicing, or changing deal/payment status.",
+        "object_type": "blocker",
+        "owner": "chief/brand",
+        "owner_thread": "chief/brand",
+        "related_ids": [
+          "mut.brand.phase1-operating-skeleton.complete",
+          "proof.brand.phase1.commit",
+          "repo.brand.ap-mini.main"
+        ],
+        "requires_ani": false,
+        "severity": "medium",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand Phase 1 preserved Ray-Ban due date and deal-first priority."
+          }
+        ],
+        "stale_after": "2026-07-05T12:00:00Z",
+        "status": "open",
+        "title": "Ray-Ban 30-day analytics proof is the next Brand deal checkpoint",
+        "unblock_conditions": [
+          "Analytics proof is collected from approved source surfaces",
+          "Business remains payment truth source",
+          "No platform mutation or outbound message occurs without approval"
+        ],
+        "updated_at": "2026-06-24T04:05:00Z"
       }
     ],
     "handoffs": [
@@ -365,6 +463,193 @@
         "target_surface": "/Users/anipotts/Code/projects/vitals -> /Users/anipotts/Code/projects/health",
         "title": "Health vitals to health rename execution gate",
         "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "allowed_actions": [
+          "static JSON copy",
+          "typed adapter",
+          "local route rendering",
+          "branch push after verification"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.site.static-feed-consumption"],
+        "domain": "site",
+        "forbidden_actions": [
+          "deploy",
+          "DNS change",
+          "env or secret mutation",
+          "live collector",
+          "admin write path",
+          "PR merge without Ani approval"
+        ],
+        "intent": "Make the read-only admin shell render the same bundled feed that Infra validates.",
+        "mutation_class": "read_only",
+        "mutation_id": "mut.site.admin-static-feed.consume",
+        "next_safe_action": "chief/site should render approvals, blockers, handoffs, mutations, operations, proofs, and repo_states from the static bundle.",
+        "object_type": "mutation",
+        "operation_ids": ["op.site.admin-static-feed.consume"],
+        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "proposed_by": "fleet/boss",
+        "repo": "anipotts-com",
+        "requested_at": "2026-06-24T04:05:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "site-admin-static-feed-consumption-dispatched-2026-06-23",
+            "summary": "Static feed consumption was routed after Infra 8fa3c32."
+          }
+        ],
+        "status": "running",
+        "target_surface": "apps/admin-solid",
+        "title": "Consume unified static admin feed in admin-solid",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "safe metadata ledgers",
+          "source registries",
+          "agent rules"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": [],
+        "domain": "business",
+        "forbidden_actions": [
+          "filings",
+          "payments",
+          "account connections",
+          "Gmail/Calendar/Drive mutation",
+          "Mercury/Wave/Fidelity/NJ/IRS portal mutation",
+          "outbound messages",
+          "secrets or env edits"
+        ],
+        "intent": "Make Business agent-native with a control center, safe data ledgers, and agent ops docs.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.business.secretary-operating-layer.complete",
+        "next_safe_action": "Use the committed Business control center as the source for future read-only admin exports.",
+        "object_type": "mutation",
+        "operation_ids": ["op.business.secretary-operating-layer.complete"],
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "proposed_by": "chief/business",
+        "repo": "Business",
+        "requested_at": "2026-06-24T03:52:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "business-secretary-operating-layer-complete-2026-06-23",
+            "summary": "Business first operating layer completed at fd00777."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "docs/00-control-center, docs/09-agent-ops, data",
+        "title": "Business secretary operating layer",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "top-level data YAML",
+          "source registries",
+          "approval gates"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "domain": "brand",
+        "forbidden_actions": [
+          "folder moves",
+          "private payload reads",
+          "platform mutation",
+          "Gmail/Calendar/Drive/Apps Script mutation",
+          "posting",
+          "scheduling",
+          "sending",
+          "invoicing",
+          "payment mutation",
+          "deal-status mutation",
+          "source delete"
+        ],
+        "intent": "Make Brand agent-native without displacing deal closeout work.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.brand.phase1-operating-skeleton.complete",
+        "next_safe_action": "Keep Ray-Ban analytics and Higgsfield proof gaps visible while using Brand data ledgers for future admin exports.",
+        "object_type": "mutation",
+        "operation_ids": ["op.brand.phase1-operating-skeleton.complete"],
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "proposed_by": "chief/brand",
+        "repo": "Brand",
+        "requested_at": "2026-06-24T03:52:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand Phase 1 completed at 0266970."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "README.md, docs/00-control-center, docs/09-agent-ops, data",
+        "title": "Brand phase 1 operating skeleton",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "allowed_actions": [
+          "tracked docs",
+          "sample admin-feed rows",
+          "branch push after validation"
+        ],
+        "authority_state": "approved",
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "domain": "jobs",
+        "forbidden_actions": [
+          "Gmail mutation",
+          "Calendar mutation",
+          "Sheets mutation",
+          "Workspace Studio mutation",
+          "applications",
+          "message delete/archive/send",
+          "filter mutation",
+          "outbound action"
+        ],
+        "intent": "Expose jobs tracker, Gmail proof, application gates, and repo state as static admin-feed rows.",
+        "mutation_class": "docs_schema",
+        "mutation_id": "mut.jobs.admin-feed-operating-layer.complete",
+        "next_safe_action": "Use Jobs ops/admin-feed rows as a source for the next static feed import; keep empty Gmail label-object cleanup separate.",
+        "object_type": "mutation",
+        "operation_ids": ["op.jobs.admin-feed-operating-layer.complete"],
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "proposed_by": "chief/jobs",
+        "repo": "jobs",
+        "requested_at": "2026-06-24T03:58:00Z",
+        "required_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "risk_level": "low",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs admin-feed layer completed at 6b4768e."
+          }
+        ],
+        "status": "verified",
+        "target_surface": "docs/00-control-center, docs/09-agent-ops, ops/admin-feed",
+        "title": "Jobs admin feed operating layer",
+        "updated_at": "2026-06-24T04:05:00Z"
       }
     ],
     "operations": [
@@ -461,6 +746,134 @@
         "thread_id": "019eebf1-bbd7-7f53-95d5-6dc05d48732c",
         "title": "Health rename waiting on execution approval",
         "updated_at": "2026-06-24T03:55:32Z"
+      },
+      {
+        "agent": "chief/site",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.site.static-feed-consumption"],
+        "branch": "codex/admin-control-plane-shell-2026-06-23",
+        "command_class": "ui_local_build",
+        "heartbeat_at": "2026-06-24T04:05:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.site.admin-static-feed.consume"],
+        "next_safe_action": "Finish typed adapter and local route smoke against the static bundle.",
+        "object_type": "operation",
+        "operation_id": "op.site.admin-static-feed.consume",
+        "phase": "static-feed-adapter",
+        "proof_ids": ["proof.admin.static-feed.bundle"],
+        "repo": "anipotts-com",
+        "source_refs": [
+          {
+            "kind": "codex_thread",
+            "path": "codex-thread:019eebe2-e344-7213-810b-9469b8fe4d1e",
+            "ref": "site static feed prompt",
+            "summary": "chief/site is currently implementing static feed consumption."
+          }
+        ],
+        "started_at": "2026-06-24T04:05:00Z",
+        "status": "running",
+        "stop_path": "Stop before deploy, DNS, env, secrets, Cloudflare, production, live collector, admin write path, or PR merge.",
+        "thread_id": "019eebe2-e344-7213-810b-9469b8fe4d1e",
+        "title": "Wire admin-solid to the static feed bundle",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/business",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": [],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T03:56:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.business.secretary-operating-layer.complete"],
+        "next_safe_action": "Keep exporting safe metadata from the Business control center; do not infer payment or filing truth without exact source proof.",
+        "object_type": "operation",
+        "operation_id": "op.business.secretary-operating-layer.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "repo": "Business",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Business",
+            "ref": "fd00777",
+            "summary": "Business main contains the first operating layer."
+          }
+        ],
+        "started_at": "2026-06-24T03:52:00Z",
+        "status": "succeeded",
+        "stop_path": "No external business systems were mutated; future changes stop at gates for filings, payments, accounts, portals, and outbound messages.",
+        "thread_id": "019eebe2-6147-70b0-b0fc-4a1a4ebaed2e",
+        "title": "Business operating layer committed",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/brand",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "branch": "main",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T03:57:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.brand.phase1-operating-skeleton.complete"],
+        "next_safe_action": "Keep Ray-Ban due date and Higgsfield proof state prominent in the Brand control center.",
+        "object_type": "operation",
+        "operation_id": "op.brand.phase1-operating-skeleton.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "repo": "Brand",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Brand",
+            "ref": "0266970",
+            "summary": "Brand main contains the first operating skeleton."
+          }
+        ],
+        "started_at": "2026-06-24T03:52:00Z",
+        "status": "succeeded",
+        "stop_path": "No platform, media, posting, scheduling, payment, deal-status, or source-delete mutation occurred.",
+        "thread_id": "019eebe2-c72e-73d1-a945-c1a446d3b155",
+        "title": "Brand phase 1 skeleton committed",
+        "updated_at": "2026-06-24T04:05:00Z"
+      },
+      {
+        "agent": "chief/jobs",
+        "allowed_by_approval_ids": [
+          "appr.admin.readonly-build-slices.2026-06-23"
+        ],
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
+        "command_class": "docs_schema_commit",
+        "heartbeat_at": "2026-06-24T04:01:00Z",
+        "machine": "ap-mini",
+        "mutation_ids": ["mut.jobs.admin-feed-operating-layer.complete"],
+        "next_safe_action": "Keep Jobs admin-feed rows as static source data until a safe read-only exporter exists.",
+        "object_type": "operation",
+        "operation_id": "op.jobs.admin-feed-operating-layer.complete",
+        "phase": "verified-pushed",
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "6b4768e",
+            "summary": "Jobs branch contains the first admin-feed operating layer."
+          }
+        ],
+        "started_at": "2026-06-24T03:58:00Z",
+        "status": "succeeded",
+        "stop_path": "No Gmail, Calendar, Sheets, Workspace Studio, application, message archive/send/delete, filter, or outbound mutation occurred.",
+        "thread_id": "019eebe2-d537-76e2-bbfe-32a04ac63458",
+        "title": "Jobs admin feed layer committed",
+        "updated_at": "2026-06-24T04:05:00Z"
       }
     ],
     "proofs": [
@@ -549,6 +962,120 @@
           "mut.health.rename.execution-gate",
           "block.health.rename.execution-approval",
           "repo.health.vitals-live-tree.ap-mini"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T04:04:00Z",
+        "collected_by": "fleet/boss",
+        "evidence_uri": "python3 coord/admin/validate_admin_contract.py",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.admin.static-feed.bundle",
+        "proof_type": "validator",
+        "redaction": "none",
+        "related_ids": ["op.site.admin-static-feed.consume"],
+        "repo": "Infra",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Infra",
+            "ref": "8fa3c32",
+            "summary": "Infra commit created the deterministic bundled feed."
+          }
+        ],
+        "status": "valid",
+        "summary": "Static bundle was generated from tracked sample JSONL rows and validator confirms snapshot counts match source samples.",
+        "title": "Static admin feed bundle validates",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.site.admin-static-feed.consume",
+          "block.site.static-feed-consumption"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T03:56:00Z",
+        "collected_by": "chief/business",
+        "evidence_uri": "git commit fd00777",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.business.secretary-layer.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.business.secretary-operating-layer.complete"],
+        "repo": "Business",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "business-secretary-operating-layer-complete-2026-06-23",
+            "summary": "Business completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Business main contains docs/00-control-center, docs/09-agent-ops, safe data ledgers/source registries, and agent-rule pointers. Validation reported YAML parse, compliance-state summary, AGENTS/CLAUDE match, diff check, and no tracked private artifacts.",
+        "title": "Business operating layer commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.business.secretary-operating-layer.complete",
+          "repo.business.ap-mini.main"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T03:57:00Z",
+        "collected_by": "chief/brand",
+        "evidence_uri": "git commit 0266970",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.brand.phase1.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.brand.phase1-operating-skeleton.complete"],
+        "repo": "Brand",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "brand-phase-1-operating-skeleton-complete-2026-06-23",
+            "summary": "Brand completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Brand main contains README, docs/00-control-center, docs/09-agent-ops, data ledgers/source registries, and .gitignore changes while private exports remain ignored. Validation reported diff check, YAML parse, no staged private artifact formats, no folder moves, no private payload reads, and no external mutations.",
+        "title": "Brand phase 1 operating skeleton commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.brand.phase1-operating-skeleton.complete",
+          "repo.brand.ap-mini.main",
+          "block.brand.rayban-analytics-due"
+        ]
+      },
+      {
+        "collected_at": "2026-06-24T04:01:00Z",
+        "collected_by": "chief/jobs",
+        "evidence_uri": "git commit 6b4768e",
+        "machine": "ap-mini",
+        "object_type": "proof",
+        "proof_id": "proof.jobs.admin-feed.commit",
+        "proof_type": "git_commit",
+        "redaction": "metadata_only",
+        "related_ids": ["op.jobs.admin-feed-operating-layer.complete"],
+        "repo": "jobs",
+        "source_refs": [
+          {
+            "kind": "bus_ref",
+            "path": "/Users/anipotts/Infra/coord/bus.jsonl",
+            "ref": "jobs-admin-feed-operating-layer-complete-2026-06-23",
+            "summary": "Jobs completion was absorbed by fleet/boss."
+          }
+        ],
+        "status": "valid",
+        "summary": "Jobs branch contains docs/00-control-center, docs/09-agent-ops, ops/admin-feed README, and schema-compatible sample rows. Validation reported 12 Jobs feed rows against Infra schemas and upstream Infra samples with 0 failures and 13 sample rows.",
+        "title": "Jobs admin-feed layer commit verified",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "verifies": [
+          "mut.jobs.admin-feed-operating-layer.complete",
+          "repo.jobs.ap-mini.branch",
+          "block.jobs.gmail-empty-label-ui-cleanup"
         ]
       }
     ],
@@ -656,6 +1183,105 @@
         "updated_at": "2026-06-24T03:55:32Z",
         "upstream": "none",
         "worktree_state": "unknown"
+      },
+      {
+        "active_threads": ["chief/business"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": [],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "fd00777",
+        "last_verified_at": "2026-06-24T03:56:00Z",
+        "live_runtime_role": "business operating repo and metadata source for compliance/revenue/evidence gates",
+        "machine": "ap-mini",
+        "next_safe_action": "Use the control center and safe ledgers as metadata-only inputs for admin; keep payments, filings, portals, and outbound actions gated.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Business",
+        "proof_ids": ["proof.business.secretary-layer.commit"],
+        "repo": "Business",
+        "repo_state_id": "repo.business.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Business",
+            "ref": "fd00777",
+            "summary": "Business operating layer is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "do not stage private artifacts; source truth stays in tracked operating docs plus explicit evidence refs",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/brand"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.brand.rayban-analytics-due"],
+        "branch": "main",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "0266970",
+        "last_verified_at": "2026-06-24T03:57:00Z",
+        "live_runtime_role": "brand operating repo and metadata source for deal, content, and platform gates",
+        "machine": "ap-mini",
+        "next_safe_action": "Keep Ray-Ban analytics due date and Higgsfield proof status visible while preserving Business as payment truth source.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Brand",
+        "proof_ids": ["proof.brand.phase1.commit"],
+        "repo": "Brand",
+        "repo_state_id": "repo.brand.ap-mini.main",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Brand",
+            "ref": "0266970",
+            "summary": "Brand Phase 1 operating skeleton is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "private exports and ops/crew/data remain ignored; do not stage media, PDFs, videos, envs, or private payloads",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/main",
+        "worktree_state": "clean"
+      },
+      {
+        "active_threads": ["chief/jobs"],
+        "ahead": 0,
+        "behind": 0,
+        "blocker_ids": ["block.jobs.gmail-empty-label-ui-cleanup"],
+        "branch": "codex/yc-2025-job-recs-refresh-2026-06-15",
+        "canonical_role": "source",
+        "deploy_impact": "none",
+        "dirty_tracked": [],
+        "head_sha": "6b4768e",
+        "last_verified_at": "2026-06-24T04:01:00Z",
+        "live_runtime_role": "jobs tracker and proof repo; outbound/application/Gmail mutations remain gated",
+        "machine": "ap-mini",
+        "next_safe_action": "Use ops/admin-feed as static metadata source; keep Gmail label-object cleanup browser/UI-only and non-destructive.",
+        "object_type": "repo_state",
+        "path": "/Users/anipotts/Personal/jobs",
+        "proof_ids": ["proof.jobs.admin-feed.commit"],
+        "repo": "jobs",
+        "repo_state_id": "repo.jobs.ap-mini.branch",
+        "source_refs": [
+          {
+            "kind": "git",
+            "path": "/Users/anipotts/Personal/jobs",
+            "ref": "6b4768e",
+            "summary": "Jobs admin-feed branch is pushed and aligned."
+          }
+        ],
+        "untracked_count": 0,
+        "untracked_policy": "do not stage private Gmail, tracker, or application artifacts unless explicitly routed and redacted",
+        "updated_at": "2026-06-24T04:05:00Z",
+        "upstream": "origin/codex/yc-2025-job-recs-refresh-2026-06-15",
+        "worktree_state": "clean"
       }
     ]
   },

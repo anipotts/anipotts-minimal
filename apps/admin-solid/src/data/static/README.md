@@ -3,7 +3,7 @@
 `admin-feed.sample.json` is a tracked static copy of the Infra admin feed bundle.
 
 - Source repo: `/Users/anipotts/Infra`
-- Source commit: `8fa3c32`
+- Source commit: `c26959c`
 - Source path: `coord/admin/static/admin-feed.sample.json`
 - Builder: `coord/admin/build_static_snapshot.py`
 
