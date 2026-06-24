@@ -133,5 +133,35 @@
     "status": "open",
     "type": "review-delete",
     "why": "`/Users/anipotts/.codex/worktrees/f98e/anipotts-com` is 1.5G and has source edits in `apps/www/src/data/site.ts`, `apps/www/src/pages/index.astro`, and `packages/lib/src/cms/defaults.ts`."
+  },
+  {
+    "agent_next": "execute only the chosen OBS config packet with archive/rollback proof; do not print config values.",
+    "ani_action": "reply `keep obs config`, `approve obs websocket config reset`, or `approve archive obs config`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-29",
+    "id": "need-obs-config-cleanup-choice",
+    "owner": "fleet/cleanup",
+    "primary_action": "reply `keep obs config`, `approve obs websocket config reset`, or `approve archive obs config`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "OBS local config is small but includes `obs-websocket/config.json` with password-capable keys; values were not printed."
+  },
+  {
+    "agent_next": "if approved, archive the skill out of active `.agents/skills` with rollback proof; do not delete old archive copies.",
+    "ani_action": "reply `keep postiz skill` or `approve archive postiz skill`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-29",
+    "id": "need-postiz-skill-cleanup-choice",
+    "owner": "fleet/cleanup",
+    "primary_action": "reply `keep postiz skill` or `approve archive postiz skill`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "an active local Postiz skill remains in `.agents/skills`, but Ani said Postiz is no longer used."
   }
 ]

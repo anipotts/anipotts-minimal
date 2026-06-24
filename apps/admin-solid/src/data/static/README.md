@@ -6,7 +6,7 @@
 - Source commit: `32794b4`
 - Source path: `coord/admin/static/admin-feed.sample.json`
 - Builder: `coord/admin/build_static_snapshot.py`
-- NEEDS-ANI syscall source commit: `a754fb2`
+- NEEDS-ANI syscall source commit: `b31ea50`
 - NEEDS-ANI syscall source path: `coord/NEEDS-ANI.md`
 - NEEDS-ANI parser: `coord/admin/build_runtime_snapshot.py`
 
