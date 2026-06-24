@@ -293,6 +293,7 @@ export function RuntimeRepoOverlayPanel() {
         source_path: "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json",
         safety: null,
         overlays: [],
+        needs_ani_queue: [],
         error: error instanceof Error ? error.message : "runtime overlay fetch failed",
       });
     }
@@ -391,25 +392,65 @@ export function HandoffTable(props: { handoffs: HandoffCard[] }) {
   );
 }
 
+const needGroups: Array<{ bucket: NeedsAniItem["bucket"]; title: string; detail: string }> = [
+  {
+    bucket: "unblockable_now",
+    title: "unblockable now",
+    detail: "answer these to let agents continue immediately",
+  },
+  {
+    bucket: "waiting_on_account_or_device",
+    title: "account or device",
+    detail: "requires an external app, account, device, or credential step",
+  },
+  {
+    bucket: "review_delete_packets",
+    title: "review-delete packets",
+    detail: "requires exact keep, archive, or delete approval after proof",
+  },
+  {
+    bucket: "stale_or_closed",
+    title: "stale",
+    detail: "needs pruning before it can be answered",
+  },
+];
+
 export function NeedsAniQueue(props: { items: NeedsAniItem[] }) {
   return (
-    <div class="table-card">
-      <For each={props.items}>
-        {(item) => (
-          <article class="table-row needs-ani-row">
-            <div>
-              <h3>{item.title}</h3>
-              <p class="muted">{item.next_safe_action}</p>
-            </div>
-            <StatusPill state={item.status} />
-            <RiskPill risk={item.risk_level} />
-            <Fact label="owner" value={item.owner} />
-            <Fact label="domain" value={item.domain} />
-            <Fact label="blocked_since" value={item.blocked_since} />
-            <Fact label="stale_after" value={item.stale_after} />
-            <Fact label="related_ids" value={item.related_ids.join(", ")} />
-          </article>
-        )}
+    <div class="needs-grid">
+      <For each={needGroups}>
+        {(group) => {
+          const items = props.items.filter((item) => item.bucket === group.bucket);
+          return (
+            <section class="table-card needs-group">
+              <div class="needs-group-head">
+                <div>
+                  <p class="eyebrow">{group.detail}</p>
+                  <h2>{group.title}</h2>
+                </div>
+                <span class="model-chip">{items.length} items</span>
+              </div>
+              <For each={items}>
+                {(item) => (
+                  <article class="table-row needs-ani-row">
+                    <div>
+                      <h3>{item.title}</h3>
+                      <p class="muted">{item.why}</p>
+                    </div>
+                    <StatusPill state={item.status} />
+                    <RiskPill risk={item.risk_level} />
+                    <Fact label="type" value={item.type} />
+                    <Fact label="owner" value={item.owner} />
+                    <Fact label="ani_action" value={item.ani_action} />
+                    <Fact label="agent_next" value={item.agent_next} />
+                    <Fact label="expires_stale" value={item.expires_stale} />
+                    <p class="proof-line">proof: {item.proof}</p>
+                  </article>
+                )}
+              </For>
+            </section>
+          );
+        }}
       </For>
     </div>
   );

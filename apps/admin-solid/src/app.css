@@ -398,13 +398,32 @@ dd,
 
 .needs-ani-row {
   align-items: start;
-  grid-template-columns: minmax(260px, 1.2fr) 120px 100px repeat(5, minmax(130px, 1fr));
+  grid-template-columns: minmax(280px, 1.2fr) 110px 96px minmax(90px, 0.4fr) minmax(120px, 0.55fr) minmax(260px, 1.1fr) minmax(320px, 1.4fr) minmax(120px, 0.45fr);
 }
 
 .repo-row .proof-line,
 .runtime-row .proof-line,
-.handoff-row .proof-line {
+.handoff-row .proof-line,
+.needs-ani-row .proof-line {
   grid-column: 1 / -1;
+}
+
+.needs-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.needs-group {
+  overflow: hidden;
+}
+
+.needs-group-head {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px;
 }
 
 .runtime-panel {

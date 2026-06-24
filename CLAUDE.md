@@ -1,107 +1,159 @@
-# CLAUDE.md
+# anipotts-com agent guide
 
-> **Content operations live in `~/Content/`.** This repo is the website renderer and admin UI.
-> Content commands (/atomize, /status, /draft) run from ~/Content, not here.
+This repo owns the public site and the protected admin UI. It should be easy
+for Codex and Claude Code to build, verify, merge, and deploy ordinary site and
+read-only admin improvements without reopening stale permission debates.
 
-## Commands
+`AGENTS.md` is a symlink to this file. Keep them equivalent.
+
+## source truth
+
+- Public site code: `apps/www`
+- Protected admin UI: `apps/admin-solid`
+- Legacy admin: `apps/admin`
+- Shared data and helpers: `packages/lib`, `packages/styles`, `packages/config`
+- Cloudflare Workers: `workers/*`
+- Content operations: `~/Content`, not this repo
+- Fleet state: `~/Infra/coord`, handoffs, registries, and admin feed files
+
+The target direction is that text content on `anipotts.com` is editable through
+`admin.anipotts.com`, so routine wording changes should move toward admin data
+or content records instead of recurring source deploys.
+
+## commands
 
 ```bash
-pnpm dev                                    # Start all apps
-pnpm turbo dev --filter=@anipotts/www      # Just www app
-pnpm build                                  # Production build
-pnpm lint                                   # ESLint
-pnpm typecheck                              # TypeScript check
-pnpm validate                               # Build + lint + typecheck + test
-pnpm update-claude-stats                    # Regenerate /claude stats from session logs
+pnpm dev
+pnpm turbo dev --filter=@anipotts/www
+pnpm turbo dev --filter=@anipotts/admin-solid
+pnpm build
+pnpm typecheck
+pnpm test
+pnpm validate
 ```
 
-## Architecture
+Use narrower package checks when the diff is scoped:
 
-```
-apps/www/              Public site (anipotts.com) -> Astro 5 static (@astrojs/cloudflare), Cloudflare Workers
-apps/admin/            Legacy admin (admin.anipotts.com) -> Next.js on CF Worker, CF Access. Being replaced by apps/admin-solid.
-apps/admin-solid/      New admin -> SolidStart (in progress, phase 2)
-apps/labs/             labs.anipotts.com -> Next.js on CF Worker
-workers/ingest/        YAML sync + hourly rollups -> CF Worker (API key auth)
-workers/state/         Personal-cloud state + CodeStats DO -> CF Worker (api.anipotts.com)
-workers/weekly-email/  Sunday 9am newsletter -> CF Worker (cron trigger)
-packages/lib/          Shared D1 client (Drizzle ORM), env helper, query modules:
-                         money/ (Mercury), code/ (GitHub, CF, npm), ops/, mini/ (REST + SSE),
-                         analytics/, cms/, admin/, validation/, status/
-packages/styles/       Design tokens + global css (used by the astro www)
-packages/config/       Shared config. packages/types/ TS interfaces. packages/services-platform/ platform svc clients.
-scripts/claude/        Stats generation from ~/.claude session logs
-scripts/sync-yaml-to-d1.sh  Manual YAML sync from ~/Business/data/ to D1
+```bash
+pnpm turbo typecheck --filter=@anipotts/admin-solid...
+pnpm turbo build --filter=@anipotts/admin-solid...
+pnpm turbo typecheck --filter=@anipotts/www...
+pnpm turbo build --filter=@anipotts/www...
 ```
 
-Admin sidebar: 5 spokes (Dashboard, Money, Content, Code, Ops). Live data via Mini API SSE at api.mini.anipotts.com.
+## architecture
 
-Content: the astro www renders canonical markdown collections under `apps/www/src/content` (projects, making, writing), schema in `apps/www/src/content.config.ts`. Do not recreate the old root `content/` mirror in this renderer repo. Content operations still live in `~/Content`; this repo owns the published site shape and admin UI.
+- `apps/www`: Astro 5 static site on Cloudflare Workers.
+- `apps/admin-solid`: SolidStart admin control plane behind Cloudflare Access.
+- `apps/admin`: older admin surface kept for compatibility while replacement
+  work continues.
+- `apps/labs`: labs subdomain.
+- `workers/ingest`, `workers/state`, `workers/weekly-email`: Cloudflare
+  worker services.
+- `packages/lib`: shared D1, admin feed, metrics, CMS, validation, and status
+  helpers.
 
-## Cloudflare D1
+The admin control plane is read-only first. It may render `NEEDS-ANI`, repo
+state, fleet state, stale rule drift, live gates, and proof paths. Admin write
+paths, production collectors, control buttons, outbound sends, and account
+mutations require separate authority.
 
-Database: `anipotts-db` (SQLite at edge via CF Workers)
-Tables: `thoughts`, `atoms`, `page_content`, `projects`, `social_links`, `site_settings`, `rate_limits`, `business_data`, `daily_rollups`, `email_queue`, `analytics_events`
-FTS5 virtual tables for full-text search on thoughts and projects.
+## agent lanes
 
-Static fallback data lives in `packages/lib/src/data/`. (The old `revalidate` guidance was Next.js-only; the astro www is statically built so it no longer applies.)
+Agents may inspect, edit, verify, commit, push branches, open PRs, and merge
+approved safe lanes when checks pass.
 
-## Environment Variables
+Safe lanes:
 
-Required in `.env.local` (for local dev):
+- public site presentation and layout without secrets, auth, DNS, payments, or
+  external writes.
+- `apps/admin-solid` read-only UI, route, copy, static feed, and local-dev
+  runtime display work.
+- docs and repo guide updates that reduce stale blockers and align with
+  `~/Infra/agents`.
+- tests, validation, build config, and deploy workflow path filters that do not
+  expand secrets or live permissions.
 
+Merge/deploy lane:
+
+- A same-repo PR may be merged by an agent after required checks pass when the
+  diff is fully inside a safe lane.
+- Main pushes trigger the path-filtered Deploy workflow. That is expected for
+  safe site and read-only admin UI work.
+- Record the merge, deploy run, and verification URL in the PR or bus when the
+  work is fleet-visible.
+
+Keep PRs draft while checks, review, or scope are still unsettled. Mark ready
+when the diff is reviewed and the deploy lane is clear.
+
+## hard gates
+
+These still require exact active authority in `~/Infra/coord/authority.jsonl`
+or an explicit current Ani instruction covering the exact action:
+
+- DNS, Cloudflare Access policy, auth, secrets, env, root, launchd, endpoint, or
+  production collector changes.
+- admin write paths, live control actions, iMessage sends, external account
+  mutations, applications, payments, filings, contracts, or outbound messages.
+- force-push, history rewrite, destructive cleanup, or source/personal deletes.
+- health-data mutation, `/Users/ojas` mutation, or printing secret values.
+
+Do not use stale local "no deploy" text to block a safe-lane admin or site UI
+deploy after checks. Do stop when the diff crosses a hard gate.
+
+## data and content
+
+The public site should read structured data and markdown collections. Do not
+recreate the old root `content/` mirror in this repo.
+
+Admin should become the operator surface for editable content and fleet state.
+Prefer small read-only slices:
+
+- render the queue or state first,
+- verify authenticated and unauthenticated behavior,
+- only then propose write paths with authority.
+
+## environment
+
+Local env files and Wrangler secrets stay out of git. Secret names may be
+documented, but values must never appear in commits, logs, screenshots, or bus
+rows.
+
+Use `getEnv(key)` from `@anipotts/lib/env` for worker/runtime secrets. Avoid
+raw `process.env` access unless the local framework path requires it.
+
+## verification
+
+Match checks to the touched package. For admin UI changes, run at least:
+
+```bash
+pnpm turbo typecheck --filter=@anipotts/admin-solid...
+pnpm turbo build --filter=@anipotts/admin-solid...
 ```
-ADMIN_PASSWORD, TYPEFULLY_API_KEY, BUTTONDOWN_API_KEY
+
+For public site UI changes, run at least:
+
+```bash
+pnpm turbo typecheck --filter=@anipotts/www...
+pnpm turbo build --filter=@anipotts/www...
 ```
 
-Wrangler secrets on admin Worker (accessed via `getEnv()` from `@anipotts/lib/env`):
-`ADMIN_PASSWORD`, `MERCURY_API_TOKEN`, `MERCURY_ACCOUNT_ID_CHECKING`, `MERCURY_ACCOUNT_ID_SAVINGS`, `GITHUB_TOKEN`, `CF_API_TOKEN`, `MINI_API_KEY`, `BUTTONDOWN_API_KEY`, `TYPEFULLY_API_KEY`, `RESEND_API_KEY`
+For shared packages, workflow, worker, or cross-app changes, run broader
+`pnpm validate` or the affected Turbo graph.
 
-`NEXT_PUBLIC_MINI_API_KEY` is baked at build time (set in CI/CD, not Wrangler secrets).
-`CF_ACCOUNT_ID` is set as `[vars]` in admin wrangler.toml (not a secret).
+When deploy occurs, verify:
 
-## Key Patterns
+- GitHub PR and merge commit,
+- Deploy workflow result,
+- protected admin route returns Cloudflare Access to unauthenticated requests,
+- authenticated browser render when a logged-in session is available.
 
-- www is Astro: routes are files under `apps/www/src/pages` (`/`, `/writing`, `/making`, `/projects`, `/orchestrating`). Content is markdown collections under `apps/www/src/content` (schema in `src/content.config.ts`).
-- Legacy route redirects are handled in `apps/www/src/middleware.ts`: `/shipping`, `/running`, and `/work` -> `/making`; `/connect`, `/links`, `/claude`, `/lab`, `/labs`, `/dev`, and `/updates` -> `/orchestrating`; `/metrics` -> `/orchestrating#status`; `/status` -> `/orchestrating#systems`; `/thoughts` -> `/writing`; `/docs` -> `/`.
-- PostHog is proxied via the astro endpoint `apps/www/src/pages/ingest/[...path].ts` (not Next.js rewrites).
-- Admin (legacy next): cookie auth via ADMIN_PASSWORD env var, CF Access on admin.anipotts.com.
-- `getEnv(key)` from `@anipotts/lib/env` for all Wrangler secrets (NOT `process.env`).
-- Health endpoints: `/api/health` on www and admin, `/health` on ingest and mini-api.
+## style
 
-## Agent PR Flow
+Public copy should sound like Ani. Keep it direct and specific. Avoid generic
+startup copy, fake vulnerability, engagement bait, guru tone, unsupported hype,
+recycled platitudes, rhetorical-question hooks, and exactly-three-item cadence.
 
-- Work on `codex/*`, `claude/*`, or `worktree-*` branches.
-- Agents may commit and push scoped work branches when the diff is intentional,
-  checked, and inside the task. Do not let stale "no push" language block safe
-  branch updates. Use `/Users/anipotts/Infra/docs/agent-native-project-policy.md`
-  for the shared fleet policy.
-- Open same-repo PRs as drafts unless Ani has explicitly approved the merge/live
-  path. Ready PRs can be auto-merged after checks, and that can dispatch Deploy.
-- Required PR gates are `Build, lint, typecheck, test` and `security`.
-- CI uses Turbo affected validation, so agents should keep changes scoped and let the package graph decide what to test.
-- Security review is expensive only for infra, admin, worker, package, dependency, and API/middleware changes. Static public-site copy/layout changes get the required `security` check without a Claude review run.
-- Main pushes auto-deploy through the path-filtered Deploy workflow. Agent merges also dispatch Deploy directly because `GITHUB_TOKEN` merges do not reliably create follow-on push workflow runs. Deploy jobs build and ship only targets touched by the merge instead of rebuilding the whole monorepo first.
+No em dashes in human-facing copy. Use commas, periods, or shorter sentences.
 
-## Anti-Corny Guardrails (NON-NEGOTIABLE)
-
-1. **No fake vulnerability.** Don't perform honesty. Just be honest.
-2. **No engagement farming.** No "comment X if you agree."
-3. **No guru energy.** Share what you found, don't preach.
-4. **No hype without receipts.** Every claim needs a proof artifact.
-5. **No recycled platitudes.** If it could go on a poster, delete it.
-6. **No em dashes.** Never use `—`, `–`, or `--`. Use periods, commas, or restructure.
-7. **No triplet lists.** Never list exactly 3 items in sequence. Use 2, 4+, or inline prose.
-
-## Rules
-
-- **NOTHING goes live without Ani's approval.** Always show summary before posting.
-- **Branch pushes are allowed for safe agent work.** Merges, deploys, DNS, env,
-  secrets, Wrangler account changes, and live content changes still need the
-  explicit approval and checks described above.
-- **Anti-corny guardrails are non-negotiable.** Run the checklist on every atom.
-- **If unsure about tone, err casual.** Authentic > perfect.
-- **80%+ of posts need proof artifacts.** Gists, repos, screenshots, demos.
-- **Content commands live in ~/Content/.** Don't recreate them here.
-- **Never use `git add .` or `git add -A`.** Always add specific files.
-- **Never commit personal files.** No \*\_REPORT.md, DESIGN_SPEC.md, .claude/ state, debug scripts.
+Never use `git add .` or `git add -A`. Stage exact files.
