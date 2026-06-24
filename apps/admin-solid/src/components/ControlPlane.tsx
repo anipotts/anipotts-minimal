@@ -16,10 +16,12 @@ import type {
   RuntimeRepoOverlay,
   WorkCard,
 } from "~/data/control-plane";
+import type { ContentInventoryItem } from "~/data/content-inventory";
 import { topStrip } from "~/data/control-plane";
 
 const navItems = [
   { href: "/", label: "overview" },
+  { href: "/content", label: "content" },
   { href: "/mutations", label: "mutations" },
   { href: "/fleet", label: "fleet" },
   { href: "/repos", label: "repos" },
@@ -34,30 +36,47 @@ export function ControlPlaneLayout(props: {
   children: JSX.Element;
 }) {
   return (
-    <main>
-      <header class="app-header">
-        <div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
           <p class="eyebrow">admin.anipotts.com</p>
-          <h1>{props.title}</h1>
-          <p class="lede">{props.deck}</p>
+          <strong>operator console</strong>
+          <span>read-only control plane</span>
         </div>
-        <div class="model-chip">intent / authority / operation / proof / state</div>
-      </header>
 
-      <nav class="nav-row" aria-label="admin control-plane sections">
-        <For each={navItems}>
-          {(item) => (
-            <A href={item.href} end={item.href === "/"}>
-              {item.label}
-            </A>
-          )}
-        </For>
-      </nav>
+        <nav class="side-nav" aria-label="admin control-plane sections">
+          <For each={navItems}>
+            {(item) => (
+              <A href={item.href} end={item.href === "/"}>
+                {item.label}
+              </A>
+            )}
+          </For>
+        </nav>
 
-      <TopStrip />
+        <div class="side-note">
+          <span class="model-chip">
+            intent / authority / operation / proof / state
+          </span>
+          <p class="muted">No write path is active from this shell.</p>
+        </div>
+      </aside>
 
-      <div class="page-stack">{props.children}</div>
-    </main>
+      <main>
+        <header class="app-header">
+          <div>
+            <p class="eyebrow">safe next action</p>
+            <h1>{props.title}</h1>
+            <p class="lede">{props.deck}</p>
+          </div>
+          <div class="model-chip">read-only first</div>
+        </header>
+
+        <TopStrip />
+
+        <div class="page-stack">{props.children}</div>
+      </main>
+    </div>
   );
 }
 
@@ -198,9 +217,18 @@ export function MutationTable(props: {
               <h3>{row.title}</h3>
               <p class="muted">authority_state: {row.authority_state}</p>
             </div>
-            <Fact label="required_approval_ids" value={row.required_approval_ids.join(", ")} />
-            <Fact label="allowed_actions" value={row.allowed_actions.join(", ")} />
-            <Fact label="forbidden_actions" value={row.forbidden_actions.join(", ")} />
+            <Fact
+              label="required_approval_ids"
+              value={row.required_approval_ids.join(", ")}
+            />
+            <Fact
+              label="allowed_actions"
+              value={row.allowed_actions.join(", ")}
+            />
+            <Fact
+              label="forbidden_actions"
+              value={row.forbidden_actions.join(", ")}
+            />
             <div class="pill-row align-end">
               <StatusPill state={row.status} />
               <RiskPill risk={row.risk_level} />
@@ -246,7 +274,9 @@ export function FleetGrid(props: { operations: OperationCard[] }) {
               <Fact label="heartbeat_at" value={operation.heartbeat_at} />
               <Fact label="stop_path" value={operation.stop_path} />
             </div>
-            <p class="proof-line">next_safe_action: {operation.next_safe_action}</p>
+            <p class="proof-line">
+              next_safe_action: {operation.next_safe_action}
+            </p>
           </article>
         )}
       </For>
@@ -265,8 +295,14 @@ export function RepoTable(props: { repos: RepoCard[] }) {
               <p class="muted">{repo.path}</p>
             </div>
             <Fact label="branch" value={repo.branch} />
-            <Fact label="dirty_tracked" value={formatList(repo.dirty_tracked)} />
-            <Fact label="untracked_count" value={String(repo.untracked_count)} />
+            <Fact
+              label="dirty_tracked"
+              value={formatList(repo.dirty_tracked)}
+            />
+            <Fact
+              label="untracked_count"
+              value={String(repo.untracked_count)}
+            />
             <Fact label="deploy_impact" value={repo.deploy_impact} />
             <Fact label="proof_ids" value={repo.proof_ids.join(", ")} />
             <p class="proof-line">next_safe_action: {repo.next_safe_action}</p>
@@ -278,7 +314,9 @@ export function RepoTable(props: { repos: RepoCard[] }) {
 }
 
 export function RuntimeRepoOverlayPanel() {
-  const [runtime, setRuntime] = createSignal<RuntimeOverlayResponse | null>(null);
+  const [runtime, setRuntime] = createSignal<RuntimeOverlayResponse | null>(
+    null,
+  );
 
   onMount(async () => {
     try {
@@ -290,11 +328,15 @@ export function RuntimeRepoOverlayPanel() {
         mode: "error",
         generated_at: null,
         machine: null,
-        source_path: "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json",
+        source_path:
+          "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json",
         safety: null,
         overlays: [],
         needs_ani_queue: [],
-        error: error instanceof Error ? error.message : "runtime overlay fetch failed",
+        error:
+          error instanceof Error
+            ? error.message
+            : "runtime overlay fetch failed",
       });
     }
   });
@@ -306,23 +348,32 @@ export function RuntimeRepoOverlayPanel() {
           <p class="eyebrow">local-dev runtime</p>
           <h2>repo overlays</h2>
         </div>
-        <Show when={runtime()} fallback={<span class="muted">loading local runtime feed</span>}>
+        <Show
+          when={runtime()}
+          fallback={<span class="muted">loading local runtime feed</span>}
+        >
           {(data) => (
             <span class="muted">
-              {data().available ? `${data().overlays.length} overlays / ${data().machine ?? "unknown machine"}` : data().mode}
+              {data().available
+                ? `${data().overlays.length} overlays / ${data().machine ?? "unknown machine"}`
+                : data().mode}
             </span>
           )}
         </Show>
       </div>
 
-      <Show when={runtime()} fallback={<p class="proof-line">runtime loader is local-dev only</p>}>
+      <Show
+        when={runtime()}
+        fallback={<p class="proof-line">runtime loader is local-dev only</p>}
+      >
         {(data) => (
           <>
             <Show
               when={data().available}
               fallback={
                 <p class="proof-line">
-                  runtime overlay unavailable: {data().error ?? data().mode}. source_path: {data().source_path}
+                  runtime overlay unavailable: {data().error ?? data().mode}.
+                  source_path: {data().source_path}
                 </p>
               }
             >
@@ -334,12 +385,27 @@ export function RuntimeRepoOverlayPanel() {
             </Show>
 
             <div class="runtime-safety">
-              <Fact label="generated_at" value={data().generated_at ?? "not available"} />
+              <Fact
+                label="generated_at"
+                value={data().generated_at ?? "not available"}
+              />
               <Fact label="source_path" value={data().source_path} />
-              <Fact label="safety_mode" value={data().safety?.mode ?? "not available"} />
-              <Fact label="secret_values" value={String(data().safety?.secret_values_included ?? false)} />
-              <Fact label="file_contents" value={String(data().safety?.file_contents_included ?? false)} />
-              <Fact label="health_payloads" value={String(data().safety?.health_payloads_included ?? false)} />
+              <Fact
+                label="safety_mode"
+                value={data().safety?.mode ?? "not available"}
+              />
+              <Fact
+                label="secret_values"
+                value={String(data().safety?.secret_values_included ?? false)}
+              />
+              <Fact
+                label="file_contents"
+                value={String(data().safety?.file_contents_included ?? false)}
+              />
+              <Fact
+                label="health_payloads"
+                value={String(data().safety?.health_payloads_included ?? false)}
+              />
             </div>
           </>
         )}
@@ -355,12 +421,24 @@ function RuntimeOverlayRow(props: { overlay: RuntimeRepoOverlay }) {
         <h3>{props.overlay.repo}</h3>
         <p class="muted">{props.overlay.repo_root_label}</p>
       </div>
-      <Fact label="git" value={props.overlay.git_available ? "available" : "unavailable"} />
+      <Fact
+        label="git"
+        value={props.overlay.git_available ? "available" : "unavailable"}
+      />
       <Fact label="branch" value={props.overlay.branch ?? "not a git tree"} />
       <Fact label="head_sha" value={props.overlay.head_sha ?? "none"} />
-      <Fact label="ahead/behind" value={`${props.overlay.ahead ?? "n/a"} / ${props.overlay.behind ?? "n/a"}`} />
-      <Fact label="dirty_tracked_count" value={String(props.overlay.dirty_tracked_count ?? "n/a")} />
-      <Fact label="untracked_count" value={String(props.overlay.untracked_count ?? "n/a")} />
+      <Fact
+        label="ahead/behind"
+        value={`${props.overlay.ahead ?? "n/a"} / ${props.overlay.behind ?? "n/a"}`}
+      />
+      <Fact
+        label="dirty_tracked_count"
+        value={String(props.overlay.dirty_tracked_count ?? "n/a")}
+      />
+      <Fact
+        label="untracked_count"
+        value={String(props.overlay.untracked_count ?? "n/a")}
+      />
       <Fact label="deploy_impact" value={props.overlay.deploy_impact} />
       <p class="proof-line">
         {props.overlay.live_runtime_role}. {props.overlay.notes}
@@ -381,10 +459,15 @@ export function HandoffTable(props: { handoffs: HandoffCard[] }) {
             </div>
             <StatusPill state={handoff.status} />
             <Fact label="freshness" value={handoff.freshness} />
-            <Fact label="absorbed_at" value={handoff.absorbed_at ?? "not absorbed"} />
+            <Fact
+              label="absorbed_at"
+              value={handoff.absorbed_at ?? "not absorbed"}
+            />
             <Fact label="target_owner" value={handoff.target_owner} />
             <Fact label="proof_ids" value={handoff.proof_ids.join(", ")} />
-            <p class="proof-line">next_safe_action: {handoff.next_safe_action}</p>
+            <p class="proof-line">
+              next_safe_action: {handoff.next_safe_action}
+            </p>
           </article>
         )}
       </For>
@@ -392,7 +475,11 @@ export function HandoffTable(props: { handoffs: HandoffCard[] }) {
   );
 }
 
-const needGroups: Array<{ bucket: NeedsAniItem["bucket"]; title: string; detail: string }> = [
+const needGroups: Array<{
+  bucket: NeedsAniItem["bucket"];
+  title: string;
+  detail: string;
+}> = [
   {
     bucket: "unblockable_now",
     title: "unblockable now",
@@ -420,7 +507,9 @@ export function NeedsAniQueue(props: { items: NeedsAniItem[] }) {
     <div class="needs-grid">
       <For each={needGroups}>
         {(group) => {
-          const items = props.items.filter((item) => item.bucket === group.bucket);
+          const items = props.items.filter(
+            (item) => item.bucket === group.bucket,
+          );
           return (
             <section class="table-card needs-group">
               <div class="needs-group-head">
@@ -456,6 +545,105 @@ export function NeedsAniQueue(props: { items: NeedsAniItem[] }) {
   );
 }
 
+const contentGroups: Array<{
+  surface: ContentInventoryItem["surface"];
+  title: string;
+  detail: string;
+}> = [
+  {
+    surface: "homepage",
+    title: "homepage",
+    detail: "hero copy, proof cards, mentions, and selected making cards",
+  },
+  {
+    surface: "projects",
+    title: "projects",
+    detail: "card fields, detail bodies, links, tags, and visibility",
+  },
+  {
+    surface: "writing",
+    title: "writing",
+    detail: "frontmatter, previews, status, artifacts, and body source",
+  },
+  {
+    surface: "newsletter",
+    title: "newsletter",
+    detail: "subscribe block copy and future content records",
+  },
+];
+
+export function ContentInventoryTable(props: { rows: ContentInventoryItem[] }) {
+  return (
+    <div class="content-grid">
+      <For each={contentGroups}>
+        {(group) => {
+          const rows = props.rows.filter(
+            (row) => row.surface === group.surface,
+          );
+          return (
+            <section class="table-card content-group">
+              <div class="needs-group-head">
+                <div>
+                  <p class="eyebrow">{group.detail}</p>
+                  <h2>{group.title}</h2>
+                </div>
+                <span class="model-chip">{rows.length} rows</span>
+              </div>
+              <For each={rows}>
+                {(row) => (
+                  <article class="table-row content-row">
+                    <div>
+                      <h3>{row.title}</h3>
+                      <p class="muted">{row.current_value}</p>
+                    </div>
+                    <Fact label="source_ref" value={row.source_ref} />
+                    <Fact label="editability" value={row.editability} />
+                    <RiskPill risk={row.risk_level} />
+                    <Fact
+                      label="required_authority"
+                      value={formatList(row.required_authority)}
+                    />
+                    <Fact label="proof_ids" value={formatList(row.proof_ids)} />
+                    <p class="proof-line">
+                      next_safe_action: {row.next_safe_action}
+                    </p>
+                  </article>
+                )}
+              </For>
+            </section>
+          );
+        }}
+      </For>
+    </div>
+  );
+}
+
+export function ContentWriteGate() {
+  return (
+    <article class="panel-card gate-panel">
+      <div>
+        <p class="eyebrow">write path status</p>
+        <h3>content editing is modeled, not active</h3>
+      </div>
+      <div class="fact-grid">
+        <Fact label="allowed_now" value="inspect current content source refs" />
+        <Fact
+          label="blocked_now"
+          value="save, publish, sync, and outbound posting"
+        />
+        <Fact
+          label="authority_needed"
+          value="content operation id plus proof and stop path"
+        />
+        <Fact
+          label="next_slice"
+          value="disabled proposal preview, still no writes"
+        />
+      </div>
+    </article>
+  );
+}
+
 export function ApprovalBridgePanel(props: { design: ApprovalBridgeDesign }) {
   return (
     <div class="grid two">
@@ -471,7 +659,12 @@ export function ApprovalBridgePanel(props: { design: ApprovalBridgeDesign }) {
         </div>
         <div class="fact-grid">
           <For each={props.design.inbound_contract}>
-            {(field) => <Fact label={field.field} value={`${field.source}: ${field.notes}`} />}
+            {(field) => (
+              <Fact
+                label={field.field}
+                value={`${field.source}: ${field.notes}`}
+              />
+            )}
           </For>
         </div>
       </article>
@@ -485,7 +678,12 @@ export function ApprovalBridgePanel(props: { design: ApprovalBridgeDesign }) {
         </div>
         <div class="fact-grid">
           <For each={props.design.outbound_contract}>
-            {(field) => <Fact label={field.field} value={`${field.source}: ${field.notes}`} />}
+            {(field) => (
+              <Fact
+                label={field.field}
+                value={`${field.source}: ${field.notes}`}
+              />
+            )}
           </For>
         </div>
         <ul class="stop-list">
@@ -520,9 +718,18 @@ export function DestructiveGrid(props: { gates: DestructiveGate[] }) {
               state={gate.status}
             />
             <div class="fact-grid">
-              <Fact label="required_approval_ids" value={gate.required_approval_ids.join(", ")} />
-              <Fact label="allowed_actions" value={gate.allowed_actions.join(", ")} />
-              <Fact label="forbidden_actions" value={gate.forbidden_actions.join(", ")} />
+              <Fact
+                label="required_approval_ids"
+                value={gate.required_approval_ids.join(", ")}
+              />
+              <Fact
+                label="allowed_actions"
+                value={gate.allowed_actions.join(", ")}
+              />
+              <Fact
+                label="forbidden_actions"
+                value={gate.forbidden_actions.join(", ")}
+              />
               <Fact label="evidence_uri" value={gate.evidence_uri} />
               <Fact label="redaction" value={gate.redaction} />
             </div>
