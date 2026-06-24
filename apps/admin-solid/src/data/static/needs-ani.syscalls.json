@@ -45,6 +45,36 @@
     "why": "jobs has ranked office-first targets, but deeper research and drafts need Ani's taste call."
   },
   {
+    "agent_next": "on or after 2026-07-05, capture the bounded analytics proof packet only, do not send/post/change platform state, and record proof.",
+    "ani_action": "reply `approve rayban 30 day analytics capture`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-07-06",
+    "id": "need-rayban-30-day-analytics-capture",
+    "owner": "chief/brand",
+    "primary_action": "reply `approve rayban 30 day analytics capture`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "approve",
+    "why": "Ray-Ban is delivered with 7-day analytics recorded, but the 30-day analytics capture window opens on 2026-07-05 and live platform capture needs exact authority."
+  },
+  {
+    "agent_next": "update the Brand/Business deal path based on the choice; do not send, mark paid, or read private payloads without separate exact authority.",
+    "ani_action": "reply `keep higgsfield paused`, `approve higgsfield send-proof recovery`, or `business owns higgsfield payment proof`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-28",
+    "id": "need-higgsfield-recovery-path",
+    "owner": "chief/brand",
+    "primary_action": "reply `keep higgsfield paused`, `approve higgsfield send-proof recovery`, or `business owns higgsfield payment proof`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "Higgsfield has local drafts but unresolved send proof and no payment/invoice proof in safe refs."
+  },
+  {
     "agent_next": "execute only the approved Phase 1 packet, validate references, commit, push, and record rollback.",
     "ani_action": "reply `approve infra layout phase 1` or name the part to revise",
     "bucket": "unblockable_now",
@@ -103,5 +133,35 @@
     "status": "open",
     "type": "review-delete",
     "why": "`/Users/anipotts/.codex/worktrees/f98e/anipotts-com` is 1.5G and has source edits in `apps/www/src/data/site.ts`, `apps/www/src/pages/index.astro`, and `packages/lib/src/cms/defaults.ts`."
+  },
+  {
+    "agent_next": "execute only the chosen OBS config packet with archive/rollback proof; do not print config values.",
+    "ani_action": "reply `keep obs config`, `approve obs websocket config reset`, or `approve archive obs config`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-29",
+    "id": "need-obs-config-cleanup-choice",
+    "owner": "fleet/cleanup",
+    "primary_action": "reply `keep obs config`, `approve obs websocket config reset`, or `approve archive obs config`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "OBS local config is small but includes `obs-websocket/config.json` with password-capable keys; values were not printed."
+  },
+  {
+    "agent_next": "if approved, archive the skill out of active `.agents/skills` with rollback proof; do not delete old archive copies.",
+    "ani_action": "reply `keep postiz skill` or `approve archive postiz skill`",
+    "bucket": "unblockable_now",
+    "expires_stale": "2026-06-29",
+    "id": "need-postiz-skill-cleanup-choice",
+    "owner": "fleet/cleanup",
+    "primary_action": "reply `keep postiz skill` or `approve archive postiz skill`",
+    "proof": "",
+    "requires_ani": true,
+    "source": "coord/NEEDS-ANI.md",
+    "status": "open",
+    "type": "choose",
+    "why": "an active local Postiz skill remains in `.agents/skills`, but Ani said Postiz is no longer used."
   }
 ]
