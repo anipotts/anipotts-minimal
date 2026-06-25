@@ -1,8 +1,8 @@
 # adr: admin auth boundary and content editing path
 
 Date: 2026-06-25
-Status: proposed
-Scope: design only
+Status: accepted for design
+Scope: design plus metadata-only audit
 
 ## decision
 
@@ -21,6 +21,17 @@ For content editing, keep admin read-only until the route model is stable. The
 next content architecture should use explicit content operations and a published
 content read model, not direct file writes from the browser. Draft, preview,
 approve, publish, and proof should be separate states.
+
+Ani approved these bounded next steps on 2026-06-25:
+
+- metadata-only Cloudflare Access admin app audit for `admin.anipotts.com`
+- staged Cloudflare Access login simplification planning for
+  `admin.anipotts.com`
+- admin content draft operation schema and inert write-path design
+
+Those approvals do not authorize live Access policy changes, DNS changes, env or
+secret changes, endpoint changes, deploys, admin write paths, content publish
+writes, or removal of Cloudflare Access.
 
 ## current boundary
 
@@ -293,6 +304,16 @@ Implementation order:
   Cloudflare Access.
 - Unauthenticated `curl` to `https://admin.anipotts.com/content` returned HTTP
   302 to Cloudflare Access.
+- Metadata-only Cloudflare Access API audit found one self-hosted Access app for
+  `admin.anipotts.com`, one allow policy using an email selector, one one-time
+  pin identity provider, a 24 hour session duration, and no app-level allowed
+  IdP restriction. Identifiers were redacted to suffixes only during inspection
+  and are not required for this public repo doc.
+
+See also:
+
+- `docs/admin-access-simplification-plan.md`
+- `docs/admin-content-draft-operations.md`
 
 ## references
 
@@ -307,27 +328,24 @@ Implementation order:
 
 ## next exact authority needed
 
-For an Access config audit:
+Completed design authority:
 
 `approve metadata-only Cloudflare Access admin app audit for admin.anipotts.com`
 
-Allowed by that authority should be limited to reading app name, hostname, IdP
-type, policy selectors, session duration, and allowed user/group metadata. It
-should forbid policy mutation, DNS changes, route changes, token printing, secret
-printing, and user addition/removal.
-
-For an Access simplification change:
-
 `approve staged Cloudflare Access login simplification for admin.anipotts.com`
-
-That authority must name the exact IdP, selector, session duration, rollback
-path, and proof route. It should still forbid removing Access unless separately
-approved.
-
-For content write work:
 
 `approve admin content draft operation schema and inert write-path design`
 
-That should allow schema and static/sample adapters only. Live writes, D1
-migration, public rendering from records, and publish actions each need separate
-authority.
+The first and third items are now represented in this ADR and companion docs.
+The second item is accepted as a staged plan only because it does not name the
+exact target IdP selector, session duration, policy shape, rollback operation,
+or proof route.
+
+For a live Access simplification change, the next authority must name the exact
+Access app, target IdP, selector, session duration, rollback path, and proof
+routes. It should still forbid removing Access unless separately approved.
+
+For content write work, the next authority must name the exact storage target,
+schema migration, API route, preview route, rollback behavior, and live render
+proof. Live writes, D1 migration, public rendering from records, and publish
+actions each need separate authority.

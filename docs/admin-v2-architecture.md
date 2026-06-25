@@ -187,6 +187,10 @@ Auth boundary note:
   identity experience first, and treat app-native auth as a future second layer
   behind Access until it has proof equal to or stronger than the current
   boundary.
+- See `docs/admin-access-simplification-plan.md` for the metadata-only Access
+  audit result and staged login simplification plan.
+- See `docs/admin-content-draft-operations.md` for the inert content draft
+  operation schema that should precede any save or publish path.
 
 ## smallest first implementation slice
 
