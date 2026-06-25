@@ -1,10 +1,10 @@
 {
-  "id": "newsletter-draft-agents-need-control-plane-not-vibes",
-  "slug": "agents-need-control-plane-not-vibes",
+  "id": "newsletter-draft-first-thing-agents-need-control-plane",
+  "slug": "first-thing-agents-need-control-plane",
   "status": "idea",
-  "title": "agents need a control plane, not vibes",
-  "subject": "agents need a control plane, not vibes",
-  "summary": "coding agents get useful when authority, proof, and human return queues are explicit.",
+  "title": "the first thing your agents need is a control plane",
+  "subject": "the first thing your agents need is a control plane",
+  "summary": "no matter what coding agent you use, it gets more useful when authority, proof, and human return queues are explicit.",
   "dek": "a practical note from building admin.anipotts.com as a read-only operator dashboard first, then a content review surface, then a guarded write path.",
   "audience": "builders running coding agents across real repos, live sites, and operational state",
   "source_refs": [
@@ -38,7 +38,7 @@
   ],
   "hook": {
     "kind": "opening",
-    "body": "agents can reason through code, but responsibility has nowhere durable to land unless the system gives them a control plane.",
+    "body": "no matter what coding agent you use, the first useful thing to build around it is a control plane: a place for authority, proof, and the few decisions that come back to you.",
     "source_refs": [
       "AGENTS.md",
       "docs/admin-v2-architecture.md"
@@ -48,11 +48,11 @@
     {
       "kind": "note",
       "heading": "safe lanes versus hard gates",
-      "body": "start with the contract. some work is safe to finish end to end: inspect, edit, verify, commit, push, and open a draft PR. other work is gated because it touches live systems, secrets, auth, DNS, publishing, outbound sends, or irreversible state. the point is not to slow agents down. the point is to make the next allowed move obvious.",
+      "body": "start with the contract. some work is safe to finish end to end: inspect, edit, verify, commit, push, and open a draft PR. other work is gated because it touches live systems, secrets, auth, DNS, publishing, outbound sends, or irreversible state. the contract makes the next allowed move obvious.",
       "source_refs": [
         "AGENTS.md"
       ],
-      "thread_beat": "the useful split is not easy tasks versus hard tasks. it is allowed operations versus gated operations."
+      "thread_beat": "the useful split is allowed operations versus gated operations."
     },
     {
       "kind": "receipt",
@@ -67,7 +67,7 @@
     {
       "kind": "note",
       "heading": "NEEDS-ANI as a human syscall queue",
-      "body": "the human return path should be small. NEEDS-ANI is not a todo list or a status page. it is where agents ask for the few decisions only Ani can make: approval, choice, secret setup, account-side action, identity, payment, or final taste.",
+      "body": "the human return path should be small. NEEDS-ANI has one job: agents ask for the few decisions only Ani can make, including approval, choice, secret setup, account-side action, identity, payment, or final taste.",
       "source_refs": [
         "AGENTS.md",
         "docs/admin-v2-architecture.md"
@@ -89,12 +89,12 @@
         "docs/content-admin-editor-brief.md",
         "apps/admin-solid/src/data/content-inventory.ts"
       ],
-      "thread_beat": "the control plane is not a bigger chat box. it is the map from intent to authority to operation to proof to state."
+      "thread_beat": "the control plane maps intent to authority to operation to proof to state."
     }
   ],
   "close": {
     "kind": "close",
-    "body": "the future is not one agent doing everything. it is a system where agents know what they are allowed to do next, what proof they owe, and when the right move is to return one clear decision to Ani.",
+    "body": "the future looks like a system where agents know what they are allowed to do next, what proof they owe, and when the right move is to return one clear decision to Ani.",
     "cta": "draft only. review for tone, claims, and source refs before any archive or send path."
   },
   "claims": [
@@ -106,7 +106,7 @@
       ]
     },
     {
-      "claim": "NEEDS-ANI is defined as a human syscall queue, not a todo list",
+      "claim": "NEEDS-ANI is defined as a narrow human syscall queue",
       "status": "source_backed",
       "source_refs": [
         "AGENTS.md"
@@ -129,7 +129,8 @@
     }
   ],
   "x_thread_beats": [
-    "agents can write code. the missing layer is where responsibility lands.",
+    "no matter what coding agent you use, the first useful thing to build around it is a control plane.",
+    "agents can write code. the system around them decides where responsibility lands.",
     "the useful contract is intent -> authority -> operation -> proof -> state.",
     "safe lanes let agents move without asking for permission every five minutes.",
     "hard gates keep live systems, secrets, sends, and irreversible actions behind explicit authority.",

@@ -149,7 +149,7 @@ these remain outside this lane:
 ## next safe action
 
 the first static draft fixture is
-`docs/newsletter-drafts/agents-need-control-plane-not-vibes.json`. keep it as
+`docs/newsletter-drafts/first-thing-agents-need-control-plane.json`. keep it as
 local draft content until chief/site or ani approves the next safe slice. this
 doc remains the contract: agents can draft against it, admin can preview against
 it, and all live actions stay gated.
