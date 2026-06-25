@@ -148,6 +148,8 @@ these remain outside this lane:
 
 ## next safe action
 
-add one or more static draft fixture files only after ani or chief/site chooses
-the first issue topic. until then, this doc is the contract: agents can draft
-against it, admin can preview against it, and all live actions stay gated.
+the first static draft fixture is
+`docs/newsletter-drafts/agents-need-control-plane-not-vibes.json`. keep it as
+local draft content until chief/site or ani approves the next safe slice. this
+doc remains the contract: agents can draft against it, admin can preview against
+it, and all live actions stay gated.
