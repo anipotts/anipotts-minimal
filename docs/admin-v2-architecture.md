@@ -193,6 +193,8 @@ Auth boundary note:
   operation schema that should precede any save or publish path.
 - See `docs/admin-next-step-packet-2026-06-25.md` for current PR status,
   read-only merge/deploy candidates, and exact approval language.
+- See `docs/admin-newsletter-scope-packet-2026-06-25.md` for the no-mutation
+  admin/content/newsletter operating scope before more PRs.
 
 ## smallest first implementation slice
 
