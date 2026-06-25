@@ -114,6 +114,10 @@ do not keep writing new buttondown drafts as the canonical flow. existing
 buttondown fields can stay for migration and historical lookup until the admin
 thread removes them intentionally.
 
+content structure for draft issues lives in
+`docs/newsletter-content-structure.md`. use that as the writer-facing contract
+before any d1 issue writes, admin save paths, archive publishing, or sends.
+
 ## migration from buttondown
 
 there are no current buttondown subscribers to migrate. skip subscriber import
