@@ -191,6 +191,8 @@ Auth boundary note:
   audit result and staged login simplification plan.
 - See `docs/admin-content-draft-operations.md` for the inert content draft
   operation schema that should precede any save or publish path.
+- See `docs/admin-next-step-packet-2026-06-25.md` for current PR status,
+  read-only merge/deploy candidates, and exact approval language.
 
 ## smallest first implementation slice
 
