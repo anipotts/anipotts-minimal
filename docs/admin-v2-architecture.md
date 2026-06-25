@@ -180,6 +180,14 @@ Admin control lane:
 - collector, DNS, Access, env, and secret changes require exact current
   authority
 
+Auth boundary note:
+
+- See `docs/admin-auth-content-adr.md` for the proposed design path. The current
+  recommendation is to keep Cloudflare Access as the edge gate, simplify the
+  identity experience first, and treat app-native auth as a future second layer
+  behind Access until it has proof equal to or stronger than the current
+  boundary.
+
 ## smallest first implementation slice
 
 First slice: add a read-only `/content` route to the current admin shell.
