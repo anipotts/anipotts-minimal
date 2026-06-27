@@ -243,7 +243,9 @@ th {
 .surface-grid,
 .review-board,
 .needs-grid,
-.preview-grid {
+.preview-grid,
+.proof-grid,
+.newsletter-grid {
   display: grid;
   gap: 14px;
   margin-top: 24px;
@@ -359,6 +361,39 @@ dd {
   margin: 0 0 12px;
 }
 
+.newsletter-detail {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.newsletter-detail > section {
+  padding: 16px;
+}
+
+.newsletter-detail > section + section {
+  border-left: 1px solid var(--border);
+}
+
+.newsletter-detail h3 {
+  margin: 0 0 12px;
+  letter-spacing: 0;
+}
+
+.newsletter-detail p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.compact-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
 .compact-row {
   display: grid;
   gap: 5px;
@@ -420,6 +455,7 @@ dd {
 
   .preview-grid,
   .lane-grid,
+  .newsletter-detail,
   .record-row dl,
   .need-row dl,
   .proposal-row dl,
@@ -428,6 +464,11 @@ dd {
   }
 
   .lane-grid > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .newsletter-detail > section + section {
     border-left: 0;
     border-top: 1px solid var(--border);
   }

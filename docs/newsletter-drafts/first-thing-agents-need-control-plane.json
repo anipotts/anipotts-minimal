@@ -21,57 +21,40 @@
       "use": "read-only content inventory and admin editing progression"
     },
     {
-      "ref": "apps/admin-solid/src/data/content-inventory.ts",
-      "use": "static content inventory and preview-only admin model"
+      "ref": "apps/admin/src/data/content.ts",
+      "use": "Astro admin static content inventory and preview-only model"
     },
     {
       "ref": "docs/newsletter-content-structure.md",
       "use": "newsletter draft issue contract and gated work list"
     }
   ],
-  "spine": [
-    "intent",
-    "authority",
-    "operation",
-    "proof",
-    "state"
-  ],
+  "spine": ["intent", "authority", "operation", "proof", "state"],
   "hook": {
     "kind": "opening",
     "body": "every coding agent i use eventually runs into the same boring problem: it can make a change, but it needs a system around it for responsibility.",
-    "source_refs": [
-      "AGENTS.md",
-      "docs/admin-v2-architecture.md"
-    ]
+    "source_refs": ["AGENTS.md", "docs/admin-v2-architecture.md"]
   },
   "sections": [
     {
       "kind": "note",
       "heading": "safe lanes versus hard gates",
       "body": "i want agents to move quickly when the blast radius is small. if the work is safe, the agent should inspect, edit, verify, commit, push, and open a PR without waiting on me. if the work touches dns, auth, secrets, env, production content, outbound sends, live endpoints, payments, or destructive cleanup, it needs explicit authority. the control plane makes that split obvious before anything gets touched.",
-      "source_refs": [
-        "AGENTS.md"
-      ],
+      "source_refs": ["AGENTS.md"],
       "thread_beat": "the useful split is simple: safe lanes can move, hard gates come back to me."
     },
     {
       "kind": "receipt",
       "label": "proof beats trust",
       "body": "if a decision only lives in chat, it barely exists. i want the useful state in commits, PRs, handoff docs, deploy runs, screenshots, and blocked-action lists. the next agent should be able to continue from the artifact instead of guessing what happened in the previous conversation.",
-      "source_refs": [
-        "AGENTS.md",
-        "docs/content-admin-editor-brief.md"
-      ],
+      "source_refs": ["AGENTS.md", "docs/content-admin-editor-brief.md"],
       "thread_beat": "proof is what lets the next agent continue without inheriting chat memory."
     },
     {
       "kind": "note",
       "heading": "NEEDS-ANI as a human syscall queue",
       "body": "the human queue should be tiny. i do not want a dashboard full of agent homework. i want the few calls only i can make: approve this, choose between these two options, do this account-side action, provide this secret, decide whether this public copy sounds like me.",
-      "source_refs": [
-        "AGENTS.md",
-        "docs/admin-v2-architecture.md"
-      ],
+      "source_refs": ["AGENTS.md", "docs/admin-v2-architecture.md"],
       "thread_beat": "a good human queue is small enough to answer from my phone."
     },
     {
@@ -87,7 +70,7 @@
       "source_refs": [
         "docs/admin-v2-architecture.md",
         "docs/content-admin-editor-brief.md",
-        "apps/admin-solid/src/data/content-inventory.ts"
+        "apps/admin/src/data/content.ts"
       ],
       "thread_beat": "the control plane maps what i meant to what was allowed to what changed."
     }
@@ -101,31 +84,22 @@
     {
       "claim": "agents in this repo can complete safe lanes end to end but must stop at true gates",
       "status": "source_backed",
-      "source_refs": [
-        "AGENTS.md"
-      ]
+      "source_refs": ["AGENTS.md"]
     },
     {
       "claim": "NEEDS-ANI is defined as a narrow human syscall queue",
       "status": "source_backed",
-      "source_refs": [
-        "AGENTS.md"
-      ]
+      "source_refs": ["AGENTS.md"]
     },
     {
       "claim": "admin content work should move from read-only inventory to previews before publish paths",
       "status": "source_backed",
-      "source_refs": [
-        "AGENTS.md",
-        "docs/content-admin-editor-brief.md"
-      ]
+      "source_refs": ["AGENTS.md", "docs/content-admin-editor-brief.md"]
     },
     {
       "claim": "admin.anipotts.com should become the practical web surface for editing public-site text, previewing changes, reviewing fleet state, and returning decisions",
       "status": "source_backed",
-      "source_refs": [
-        "AGENTS.md"
-      ]
+      "source_refs": ["AGENTS.md"]
     }
   ],
   "x_thread_beats": [

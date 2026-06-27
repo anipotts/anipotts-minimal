@@ -61,7 +61,9 @@ covered while passkey proof and Access removal are completed, then remove
 | `/content`         | content inventory                    |
 | `/content/review`  | content proposal queue               |
 | `/content/preview` | draft preview                        |
+| `/newsletter`      | newsletter issue draft preview       |
 | `/needs-ani`       | typed human decision queue           |
+| `/proof`           | deploy, auth, and route proof log    |
 | `/repos`           | repo and worktree state              |
 | `/handoffs`        | handoff freshness                    |
 | `/fleet`           | machine and agent state              |
