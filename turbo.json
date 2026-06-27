@@ -30,21 +30,14 @@
       "dependsOn": ["^build"],
       "inputs": [
         "src/**",
+        "public/**",
         "tsconfig.json",
         "package.json",
-        "next.config.ts",
-        "tailwind.config.mjs"
+        "astro.config.mjs",
+        "wrangler.toml"
       ],
-      "env": [
-        "NODE_ENV",
-        "ADMIN_PASSWORD",
-        "ADMIN_TOTP_SECRET",
-        "BUTTONDOWN_API_KEY",
-        "TYPEFULLY_API_KEY",
-        "TYPEFULLY_SOCIAL_SET_ID",
-        "QUANTERCISE_ADMIN_TOKEN",
-        "QUANTERCISE_BASE_URL"
-      ]
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV", "PUBLIC_STATE_API"]
     },
     "@anipotts/labs#build": {
       "dependsOn": ["^build"],

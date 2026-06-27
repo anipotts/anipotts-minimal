@@ -1,0 +1,12 @@
+---
+import AdminTable from "../../components/AdminTable.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { contentRows, needsRows } from "../../data/admin";
+---
+
+<AdminLayout
+  title="content review"
+  deck="Read-only proposal queue. Save and publish controls stay gated until write paths are audited."
+>
+  <AdminTable rows={[...contentRows, ...needsRows]} />
+</AdminLayout>

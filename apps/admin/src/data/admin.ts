@@ -1,0 +1,163 @@
+export type NavItem = {
+  href: string;
+  label: string;
+  status: "live-source" | "migrating" | "gated";
+};
+
+export type DashboardCard = {
+  title: string;
+  status: string;
+  risk: "low" | "medium" | "high";
+  next: string;
+};
+
+export type QueueRow = {
+  title: string;
+  owner: string;
+  status: string;
+  evidence: string;
+};
+
+export const navItems: NavItem[] = [
+  { href: "/", label: "overview", status: "migrating" },
+  { href: "/content", label: "content", status: "migrating" },
+  { href: "/content/review", label: "review", status: "migrating" },
+  { href: "/content/preview", label: "preview", status: "migrating" },
+  { href: "/needs-ani", label: "needs ani", status: "migrating" },
+  { href: "/repos", label: "repos", status: "migrating" },
+  { href: "/handoffs", label: "handoffs", status: "migrating" },
+  { href: "/fleet", label: "fleet", status: "migrating" },
+  { href: "/mutations", label: "mutations", status: "gated" },
+  { href: "/ops/destructive", label: "destructive ops", status: "gated" },
+];
+
+export const overviewCards: DashboardCard[] = [
+  {
+    title: "admin Astro migration",
+    status: "in progress",
+    risk: "medium",
+    next: "port admin-solid route behavior into this Astro target",
+  },
+  {
+    title: "passkey auth",
+    status: "edge protected",
+    risk: "high",
+    next: "register first biometric passkey before Access removal",
+  },
+  {
+    title: "content platform",
+    status: "read-only inventory",
+    risk: "medium",
+    next: "move editable fields into D1-backed draft records",
+  },
+  {
+    title: "legacy cleanup",
+    status: "started",
+    risk: "low",
+    next: "remove admin-solid after Astro parity and cutover",
+  },
+];
+
+export const contentRows: QueueRow[] = [
+  {
+    title: "homepage intro",
+    owner: "apps/www",
+    status: "structured source candidate",
+    evidence: "apps/www/src/data/site.ts",
+  },
+  {
+    title: "projects",
+    owner: "apps/www",
+    status: "content collection",
+    evidence: "apps/www/src/content/projects",
+  },
+  {
+    title: "writing",
+    owner: "apps/www",
+    status: "content collection",
+    evidence: "apps/www/src/content/writing",
+  },
+  {
+    title: "newsletter",
+    owner: "apps/www",
+    status: "D1 and queue backed",
+    evidence: "drizzle/migrations/0005_newsletter_system.sql",
+  },
+];
+
+export const needsRows: QueueRow[] = [
+  {
+    title: "passkey registration proof",
+    owner: "site/admin",
+    status: "needed before Access removal",
+    evidence: "D1 admin_passkey_credentials count must be greater than zero",
+  },
+  {
+    title: "Astro admin route parity",
+    owner: "site/admin",
+    status: "in progress",
+    evidence: "docs/platform-architecture.md",
+  },
+  {
+    title: "legacy worker review",
+    owner: "site/platform",
+    status: "pending classification",
+    evidence: "workers/*",
+  },
+];
+
+export const repoRows: QueueRow[] = [
+  {
+    title: "anipotts-com",
+    owner: "main",
+    status: "production-reflective",
+    evidence: "agent PRs merge after checks",
+  },
+  {
+    title: "apps/admin",
+    owner: "legacy-admin route",
+    status: "Astro target",
+    evidence: "this branch",
+  },
+  {
+    title: "apps/admin-solid",
+    owner: "admin.anipotts.com",
+    status: "live transitional source",
+    evidence: "deploy run 28301610377",
+  },
+];
+
+export const fleetRows: QueueRow[] = [
+  {
+    title: "ap-pro",
+    owner: "Codex / Claude",
+    status: "operator workstation",
+    evidence: "repo state and browser proof",
+  },
+  {
+    title: "ap-mini",
+    owner: "runtime host",
+    status: "state plane candidate",
+    evidence: "workers/state and Infra runtime feed",
+  },
+];
+
+export const mutationRows: QueueRow[] = [
+  {
+    title: "remove Cloudflare Access",
+    owner: "admin auth",
+    status: "blocked by proof",
+    evidence: "no active passkey credential yet",
+  },
+  {
+    title: "publish content edits",
+    owner: "content admin",
+    status: "future write path",
+    evidence: "must be logged, reversible, and proof-backed",
+  },
+];
+
+export function routeTitle(pathname: string): string {
+  const match = navItems.find((item) => item.href === pathname);
+  return match?.label ?? "admin";
+}

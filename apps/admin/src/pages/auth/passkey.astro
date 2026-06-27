@@ -1,0 +1,49 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout
+  title="passkey auth"
+  deck="Astro admin auth boundary. Registration UI is still being ported from admin-solid."
+>
+  <section class="grid">
+    <article class="panel">
+      <p>state</p>
+      <h2>app-native session required</h2>
+      <p>
+        Protected Astro admin routes check the D1-backed
+        <code>admin_passkey_session</code> cookie before rendering.
+      </p>
+    </article>
+    <article class="panel">
+      <p>next</p>
+      <h2>port WebAuthn actions</h2>
+      <p>
+        Move register, login, logout, revoke, and status handlers from
+        admin-solid into this Astro app.
+      </p>
+    </article>
+    <article class="panel">
+      <p>Access removal</p>
+      <h2>blocked by proof</h2>
+      <p>
+        Cloudflare Access stays on until passkey registration and login are
+        proven.
+      </p>
+    </article>
+    <article class="panel">
+      <p>rollback</p>
+      <h2>restore Access</h2>
+      <p>Rollback is the prior Cloudflare Access app or policy.</p>
+    </article>
+  </section>
+  <div class="actions">
+    <button class="button" disabled>register passkey</button>
+    <button class="button secondary" disabled>authenticate</button>
+    <button class="button secondary" disabled>logout</button>
+  </div>
+  <div class="notice">
+    These controls are inert in the first Astro shell. They mark the exact route
+    where the WebAuthn actions will land.
+  </div>
+</AdminLayout>
