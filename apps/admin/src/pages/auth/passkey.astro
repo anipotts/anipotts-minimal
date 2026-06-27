@@ -23,6 +23,11 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       <p id="passkey-next">loading</p>
     </article>
     <article class="panel">
+      <p>audit</p>
+      <h2 id="passkey-audit">0</h2>
+      <p>registration, login, denial, and logout proof rows</p>
+    </article>
+    <article class="panel">
       <p>rollback</p>
       <h2>restore Access</h2>
       <p>Rollback is the prior Cloudflare Access app or policy.</p>
@@ -70,11 +75,13 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     available: boolean;
     mode: "ready" | "missing_db";
     credential_count: number;
+    audit_count: number;
     has_session: boolean;
     can_register: boolean;
     access_identity_present: boolean;
     access_identity_hint: string | null;
     expected_origin: string;
+    expected_rp_id: string;
     current_origin: string;
     next_safe_action: string;
   };
@@ -82,6 +89,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
   const dbLabel = document.querySelector("#passkey-db");
   const originLabel = document.querySelector("#passkey-origin");
   const credentialsLabel = document.querySelector("#passkey-credentials");
+  const auditLabel = document.querySelector("#passkey-audit");
   const registerState = document.querySelector("#passkey-register-state");
   const sessionLabel = document.querySelector("#passkey-session");
   const nextLabel = document.querySelector("#passkey-next");
@@ -114,9 +122,10 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     setText(dbLabel, status.available ? "available" : "missing");
     setText(
       originLabel,
-      `expected ${status.expected_origin}; current ${status.current_origin}`,
+      `expected ${status.expected_origin}; rp ${status.expected_rp_id}; current ${status.current_origin}`,
     );
     setText(credentialsLabel, String(status.credential_count));
+    setText(auditLabel, String(status.audit_count));
     setText(
       registerState,
       status.can_register
