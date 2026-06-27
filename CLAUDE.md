@@ -25,6 +25,18 @@ to avoid unnecessary Claude API spend. The required `security` check is a local
 no-API placeholder; real safety comes from small scoped diffs, local checks,
 CodeRabbit/GitHub signals, focused human review when needed, and deploy proof.
 
+Primary workflows are intentionally limited to:
+
+- `ci.yml`
+- `security-review.yml`
+- `agent-automerge.yml`
+- `deploy.yml`
+- `smoke.yml`
+
+Do not add separate Dependabot automerge, external review, production
+promotion, or broad deploy workflows. Dependency updates should pass through
+the same PR checks and scoped deploy logic as other changes.
+
 ## current standing authority
 
 Ani approved these standing lanes on 2026-06-27.
