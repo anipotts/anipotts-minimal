@@ -3,7 +3,7 @@
 type D1PreparedStatement = {
   bind(...values: unknown[]): D1PreparedStatement;
   first<T = unknown>(): Promise<T | null>;
-  run(): Promise<unknown>;
+  run(): Promise<{ results?: unknown[]; success?: boolean; meta?: unknown }>;
   all<T = unknown>(): Promise<{ results?: T[] }>;
 };
 
