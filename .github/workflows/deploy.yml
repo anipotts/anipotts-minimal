@@ -159,6 +159,23 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Smoke www routes
+        run: |
+          set -euo pipefail
+          for path in / /projects /writing /newsletter; do
+            ok=false
+            for _ in $(seq 1 6); do
+              code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"
+              echo "https://anipotts.com${path} -> ${code}"
+              if [ "$code" = "200" ]; then
+                ok=true
+                break
+              fi
+              sleep 10
+            done
+            test "$ok" = "true"
+          done
+
   deploy-admin:
     name: Deploy admin
     needs: [changes, deploy-admin-solid]
@@ -197,6 +214,29 @@ jobs:
           workingDirectory: apps/admin
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Smoke admin unauthenticated block
+        run: |
+          set -euo pipefail
+          for path in /auth/passkey / /content /content/review /content/preview /needs-ani /repos /fleet; do
+            ok=false
+            for _ in $(seq 1 6); do
+              code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com${path}")"
+              echo "https://admin.anipotts.com${path} -> ${code}"
+              case "$path:$code" in
+                /auth/passkey:200|/auth/passkey:302|/auth/passkey:401|/auth/passkey:403)
+                  ok=true
+                  break
+                  ;;
+                *:302|*:401|*:403)
+                  ok=true
+                  break
+                  ;;
+              esac
+              sleep 10
+            done
+            test "$ok" = "true"
+          done
 
   deploy-admin-solid:
     name: Deploy admin-solid

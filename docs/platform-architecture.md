@@ -93,7 +93,7 @@ Primary workflows:
 | `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
 | `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets  |
 | `deploy.yml`          | deploy explicit targets only                             |
-| `smoke.yml`           | post-deploy route proof for public and admin targets     |
+| `smoke.yml`           | manual route proof for public and admin targets          |
 
 Rules:
 
@@ -101,6 +101,7 @@ Rules:
 - lockfile and root package changes never deploy every target by default.
 - public site changes deploy `www` only.
 - admin changes deploy only the affected admin target.
+- `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
 - D1 migrations run as reviewed migration steps before app deploy.
 - Anthropic and Claude Code API-backed GitHub workflows are disabled for this
   repo.

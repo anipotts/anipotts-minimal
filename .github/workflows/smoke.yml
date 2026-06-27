@@ -43,18 +43,13 @@ jobs:
         if: inputs.target == 'admin'
         run: |
           set -euo pipefail
-          login_code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com/auth/passkey")"
-          echo "https://admin.anipotts.com/auth/passkey -> ${login_code}"
-          case "$login_code" in
-            200|302|401|403) ;;
-            *) exit 1 ;;
-          esac
-          for path in / /content /content/review /needs-ani; do
+          for path in /auth/passkey / /content /content/review /content/preview /needs-ani /repos /fleet; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com${path}")"
             echo "https://admin.anipotts.com${path} -> ${code}"
-            case "$code" in
-              302|401|403) ;;
-              *) exit 1 ;;
+            case "$path:$code" in
+              /auth/passkey:200|/auth/passkey:302|/auth/passkey:401|/auth/passkey:403) ;;
+              *:302|*:401|*:403) ;;
+              *) exit 1;;
             esac
           done
           echo "commit_sha=${{ inputs.commit_sha }}"
