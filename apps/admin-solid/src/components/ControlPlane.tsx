@@ -25,6 +25,7 @@ const navItems = [
   { href: "/content", label: "content" },
   { href: "/content/preview", label: "previews" },
   { href: "/content/review", label: "review" },
+  { href: "/auth/passkey", label: "passkey auth" },
   { href: "/mutations", label: "mutations" },
   { href: "/fleet", label: "fleet" },
   { href: "/repos", label: "repos" },

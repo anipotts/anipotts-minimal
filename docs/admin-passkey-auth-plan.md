@@ -1,7 +1,7 @@
 # admin passkey auth plan
 
 Date: 2026-06-27
-Status: design only
+Status: implementation staged behind Cloudflare Access
 
 ## decision
 
@@ -102,20 +102,36 @@ Do not remove Access until all are true:
 - rollback restores Cloudflare Access without DNS ambiguity
 - Ani gives exact authority for the live Access removal
 
-## recommended next slice
+## staged implementation
 
-Do not start by editing Cloudflare Access.
+The first implementation slice keeps Cloudflare Access active and adds:
 
-Start with a design and schema PR:
+- `/auth/passkey`
+- `/api/admin/passkey/status`
+- `/api/admin/passkey/register-options`
+- `/api/admin/passkey/register-verify`
+- `/api/admin/passkey/login-options`
+- `/api/admin/passkey/login-verify`
+- `/api/admin/passkey/logout`
+- D1 binding `DB`
+- migration `drizzle/migrations/0006_admin_passkeys.sql`
 
-- choose storage target for credentials and sessions
-- define session cookie settings
-- define recovery flow
-- define first staging route
-- define local tests
-- define rollback
+The route can show missing DB state safely in local or undeployed contexts. Live
+enrollment requires the migration to be applied and the admin-solid app deployed
+with the D1 binding.
 
-Then implement passkey auth behind Access.
+## rollback plan
+
+Before removing Cloudflare Access:
+
+1. keep the existing Cloudflare Access app and policy config documented
+2. prove passkey auth on `/auth/passkey`, `/`, `/content`, `/content/review`,
+   and `/needs-ani`
+3. remove Access only in a single reviewed change
+4. if app-native auth blocks Ani or exposes an unexpected gap, restore the
+   previous Access app/policy for `admin.anipotts.com` and leave passkey auth as
+   an inner gate
+5. record unauthenticated and authenticated route proof after rollback
 
 ## exact authority needed
 

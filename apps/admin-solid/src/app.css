@@ -552,6 +552,34 @@ dd,
   gap: 12px;
 }
 
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.control-button {
+  background: var(--text);
+  border: 1px solid var(--text);
+  border-radius: 6px;
+  color: var(--bg);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  min-height: 38px;
+  padding: 9px 12px;
+}
+
+.control-button.secondary {
+  background: transparent;
+  color: var(--text);
+}
+
+.control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .preview-card {
   display: grid;
   gap: 12px;
