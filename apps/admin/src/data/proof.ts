@@ -50,7 +50,7 @@ export const proofEntries: ProofEntry[] = [
     status: "verified",
     title: "admin unauthenticated block holds",
     summary:
-      "Unauthenticated probes returned 302 for /auth/passkey, /, /content, /content/review, /content/preview, /needs-ani, /repos, and /fleet.",
+      "Unauthenticated probes returned 302 for /auth/passkey, /, /content, /content/review, /content/preview, /content/operations, /needs-ani, /repos, and /fleet.",
     evidence_uri: "https://admin.anipotts.com/auth/passkey",
     redaction: "protected_route",
     next_safe_action:
@@ -86,7 +86,7 @@ export const proofEntries: ProofEntry[] = [
     status: "pending",
     title: "admin write paths remain inert",
     summary:
-      "Content preview, review, mutation, and destructive-operation routes expose no save, publish, send, or live-control endpoint.",
+      "Content preview, review, operations, mutation, and destructive-operation routes expose no save, publish, send, or live-control endpoint.",
     evidence_uri: "apps/admin/src/pages",
     redaction: "metadata_only",
     next_safe_action:

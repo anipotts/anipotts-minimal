@@ -287,7 +287,7 @@ Required before writes:
 Implementation order:
 
 1. Continue read-only admin routes: `/content`, `/content/preview`,
-   `/content/review`.
+   `/content/review`, and `/content/operations`.
 2. Add a typed draft operation model with static samples only.
 3. Add a disabled write affordance that names the required authority.
 4. Design the content store schema and migration.
