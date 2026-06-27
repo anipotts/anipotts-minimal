@@ -103,13 +103,9 @@
     "zod": "^4.3.6"
   },
   "peerDependencies": {
-    "@opennextjs/cloudflare": "^1.19.10",
     "react": "^18 || ^19"
   },
   "peerDependenciesMeta": {
-    "@opennextjs/cloudflare": {
-      "optional": true
-    },
     "react": {
       "optional": true
     }

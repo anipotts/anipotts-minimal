@@ -10,9 +10,6 @@
       ],
       "ignoreDependencies": ["eslint"]
     },
-    "apps/admin": {
-      "entry": ["open-next.config.ts"]
-    },
     "apps/admin-solid": {
       "entry": [
         "app.config.ts",
@@ -26,7 +23,7 @@
       "ignoreDependencies": ["@iconify-json/ph"]
     },
     "packages/lib": {
-      "ignoreDependencies": ["@opennextjs/cloudflare", "react"]
+      "ignoreDependencies": ["react"]
     },
     "services": {
       "entry": ["*.ts"]

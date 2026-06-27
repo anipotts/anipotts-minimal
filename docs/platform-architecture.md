@@ -40,13 +40,13 @@ structured content/state model, and one predictable CI/CD path.
 
 ### packages
 
-| Path                         | Role today                                    | Classification              |
-| ---------------------------- | --------------------------------------------- | --------------------------- |
-| `packages/lib`               | shared CMS, admin, db, data, services helpers | keep, split later if useful |
-| `packages/styles`            | shared style tokens                           | keep                        |
-| `packages/types`             | shared generated types                        | keep                        |
-| `packages/services-platform` | service registry utilities                    | keep candidate              |
-| `packages/config`            | shared TypeScript config plus stale Next bits | remove Next exports later   |
+| Path                         | Role today                                      | Classification              |
+| ---------------------------- | ----------------------------------------------- | --------------------------- |
+| `packages/lib`               | shared CMS, admin, db, data, services helpers   | keep, split later if useful |
+| `packages/styles`            | shared style tokens                             | keep                        |
+| `packages/types`             | shared generated types                          | keep                        |
+| `packages/services-platform` | service registry utilities                      | keep candidate              |
+| `packages/config`            | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config  |
 
 ## route parity target
 
