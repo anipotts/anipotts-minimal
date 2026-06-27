@@ -10,8 +10,8 @@ structured content/state model, and one predictable CI/CD path.
 | Surface        | Target                                    | Status                   | Next action                                               |
 | -------------- | ----------------------------------------- | ------------------------ | --------------------------------------------------------- |
 | public site    | `apps/www`                                | keep                     | keep as Astro public app for `anipotts.com`               |
-| admin site     | `apps/admin`                              | Astro shell started      | port admin-solid behavior and then cut over               |
-| current admin  | `apps/admin-solid`                        | migrate then remove      | port routes into `apps/admin`, then archive or delete     |
+| admin site     | `apps/admin`                              | canonical cutover        | prove passkey registration and then remove Access         |
+| current admin  | `apps/admin-solid`                        | legacy rollback          | keep briefly on legacy route, then archive or delete      |
 | legacy admin   | old Next.js code in `apps/admin`          | replace in place         | keep only useful models while rebuilding Astro admin      |
 | labs           | `apps/labs`                               | archive/delete candidate | preserve useful content docs, then remove app target      |
 | workers        | `workers/*`                               | review individually      | keep only production-required workers                     |
@@ -22,12 +22,12 @@ structured content/state model, and one predictable CI/CD path.
 
 ### apps
 
-| Path               | Role today                                      | Classification           |
-| ------------------ | ----------------------------------------------- | ------------------------ |
-| `apps/www`         | public Astro site and newsletter endpoints      | keep                     |
-| `apps/admin-solid` | live protected admin dashboard, passkey staging | migrate                  |
-| `apps/admin`       | Astro admin shell on legacy route               | migrate to canonical     |
-| `apps/labs`        | legacy Next.js labs surface                     | archive/delete candidate |
+| Path               | Role today                                 | Classification           |
+| ------------------ | ------------------------------------------ | ------------------------ |
+| `apps/www`         | public Astro site and newsletter endpoints | keep                     |
+| `apps/admin`       | Astro admin app for `admin.anipotts.com`   | keep                     |
+| `apps/admin-solid` | transitional Solid admin rollback surface  | archive/remove next      |
+| `apps/labs`        | legacy Next.js labs surface                | archive/delete candidate |
 
 ### workers
 

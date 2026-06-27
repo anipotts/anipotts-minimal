@@ -168,10 +168,14 @@ jobs:
 
   deploy-admin:
     name: Deploy admin
-    needs: [changes]
+    needs: [changes, deploy-admin-solid]
     if: >
-      (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
-      (github.event_name == 'push' && needs.changes.outputs.admin == 'true')
+      always() &&
+      (needs['deploy-admin-solid'].result == 'success' || needs['deploy-admin-solid'].result == 'skipped') &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
+        (github.event_name == 'push' && needs.changes.outputs.admin == 'true')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

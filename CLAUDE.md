@@ -39,8 +39,8 @@ For admin UI, feed, content review, auth staging, and operator-dashboard work:
 - deploy only the affected admin target
 - record deploy run, skipped targets, and route proof
 
-`apps/admin-solid` is transitional. Move parity into `apps/admin`, prove it, then
-archive or remove `apps/admin-solid`.
+`apps/admin-solid` is legacy rollback. Keep it only until the Astro admin
+cutover and passkey proof are complete, then archive or remove it.
 
 Approved includes reviewed D1 migrations needed by the green PR, passkey auth
 rollout, and Cloudflare Access removal after passkey proof.
@@ -67,7 +67,7 @@ For `admin.anipotts.com`, use this order:
 
 1. merge the reviewed passkey PR
 2. apply its reviewed D1 migration to `anipotts-db`
-3. deploy `admin_solid=true` only
+3. deploy `admin=true` only
 4. prove passkey register, login, logout, session persistence, and blocked
    failure paths
 5. prove `/auth/passkey`, `/`, `/content`, `/content/review`, and `/needs-ani`
