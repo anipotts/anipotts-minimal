@@ -1,4 +1,4 @@
-name: Agent PR Auto-Merge
+name: Agent Auto-Merge
 
 on:
   pull_request_target:
@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: agent-pr-automerge-${{ github.event.pull_request.number }}
+  group: agent-automerge-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
