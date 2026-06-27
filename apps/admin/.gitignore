@@ -1,0 +1,8 @@
+# generated
+dist/
+.astro/
+.wrangler/
+
+# local
+node_modules/
+*.tsbuildinfo
