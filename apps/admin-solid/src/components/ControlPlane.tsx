@@ -24,6 +24,8 @@ const navItems = [
   { href: "/", label: "overview" },
   { href: "/content", label: "content" },
   { href: "/content/preview", label: "previews" },
+  { href: "/content/review", label: "review" },
+  { href: "/auth/passkey", label: "passkey auth" },
   { href: "/mutations", label: "mutations" },
   { href: "/fleet", label: "fleet" },
   { href: "/repos", label: "repos" },
@@ -617,6 +619,197 @@ export function ContentInventoryTable(props: { rows: ContentInventoryItem[] }) {
         }}
       </For>
     </div>
+  );
+}
+
+const contentReviewSurfaces: Array<{
+  surface: ContentInventoryItem["surface"];
+  title: string;
+  intent: string;
+}> = [
+  {
+    surface: "homepage",
+    title: "homepage",
+    intent: "above-fold copy, proof cards, and public credibility claims",
+  },
+  {
+    surface: "projects",
+    title: "projects",
+    intent: "project card fields, detail bodies, links, and source truth",
+  },
+  {
+    surface: "writing",
+    title: "writing",
+    intent: "frontmatter, summaries, body edits, and public article links",
+  },
+  {
+    surface: "newsletter",
+    title: "newsletter",
+    intent: "subscribe block copy, backfill planning, and send-path separation",
+  },
+];
+
+export function ContentReviewBoard(props: {
+  inventory: ContentInventoryItem[];
+  previews: ContentPreviewItem[];
+}) {
+  return (
+    <div class="review-board">
+      <For each={contentReviewSurfaces}>
+        {(surface) => {
+          const inventoryRows = props.inventory.filter(
+            (item) => item.surface === surface.surface,
+          );
+          const previewRows = props.previews.filter(
+            (item) => item.surface === surface.surface,
+          );
+          const readyRows = inventoryRows.filter(
+            (item) => item.editability === "ready",
+          );
+          const gatedRows = [
+            ...inventoryRows.filter((item) => item.required_authority.length),
+            ...previewRows.filter((item) => item.required_approval_ids.length),
+          ];
+
+          return (
+            <section class="table-card review-surface">
+              <div class="review-surface-head">
+                <div>
+                  <p class="eyebrow">{surface.intent}</p>
+                  <h2>{surface.title}</h2>
+                </div>
+                <div class="review-counts">
+                  <span>{inventoryRows.length} sources</span>
+                  <span>{previewRows.length} previews</span>
+                  <span>{gatedRows.length} gated</span>
+                </div>
+              </div>
+
+              <div class="review-lanes">
+                <div class="review-lane">
+                  <div class="review-lane-head">
+                    <h3>editable candidates</h3>
+                    <span class="muted">{readyRows.length} ready</span>
+                  </div>
+                  <For each={inventoryRows}>
+                    {(item) => (
+                      <article class="review-item">
+                        <div>
+                          <h4>{item.title}</h4>
+                          <p>{item.current_value}</p>
+                        </div>
+                        <div class="pill-row">
+                          <span
+                            class="status-pill"
+                            data-state={item.editability}
+                          >
+                            {item.editability}
+                          </span>
+                          <RiskPill risk={item.risk_level} />
+                        </div>
+                        <Fact label="source_ref" value={item.source_ref} />
+                        <Fact
+                          label="next_safe_action"
+                          value={item.next_safe_action}
+                        />
+                      </article>
+                    )}
+                  </For>
+                </div>
+
+                <div class="review-lane">
+                  <div class="review-lane-head">
+                    <h3>proposal queue</h3>
+                    <span class="muted">{previewRows.length} inert</span>
+                  </div>
+                  <Show
+                    when={previewRows.length > 0}
+                    fallback={
+                      <p class="review-empty">
+                        no proposal yet. keep this surface in inventory until a
+                        preview-only operation is modeled.
+                      </p>
+                    }
+                  >
+                    <For each={previewRows}>
+                      {(item) => (
+                        <article class="review-item proposal">
+                          <div>
+                            <h4>{item.title}</h4>
+                            <p>{item.next_safe_action}</p>
+                          </div>
+                          <div class="pill-row">
+                            <span
+                              class="status-pill"
+                              data-state={stateKey(item.status)}
+                            >
+                              {item.status}
+                            </span>
+                            <RiskPill risk={item.risk_level} />
+                          </div>
+                          <Fact
+                            label="authority_state"
+                            value={item.authority_state}
+                          />
+                          <Fact
+                            label="blocked_actions"
+                            value={formatList(item.blocked_actions)}
+                          />
+                        </article>
+                      )}
+                    </For>
+                  </Show>
+                </div>
+              </div>
+            </section>
+          );
+        }}
+      </For>
+    </div>
+  );
+}
+
+export function ContentReviewGate() {
+  return (
+    <article class="panel-card review-gate">
+      <div>
+        <p class="eyebrow">content editing path</p>
+        <h3>read, propose, review, then ask for authority</h3>
+      </div>
+      <div class="review-steps">
+        <div>
+          <span>01</span>
+          <strong>inventory</strong>
+          <p>map the current public-site source and rendered copy.</p>
+        </div>
+        <div>
+          <span>02</span>
+          <strong>preview</strong>
+          <p>compare current and proposed text without writing.</p>
+        </div>
+        <div>
+          <span>03</span>
+          <strong>syscall</strong>
+          <p>use NEEDS-ANI only when taste or live authority is required.</p>
+        </div>
+        <div>
+          <span>04</span>
+          <strong>write gate</strong>
+          <p>save and publish stay unavailable until explicitly authorized.</p>
+        </div>
+      </div>
+      <div class="pill-row">
+        <A class="text-link" href="/content">
+          inventory
+        </A>
+        <A class="text-link" href="/content/preview">
+          previews
+        </A>
+        <A class="text-link" href="/needs-ani">
+          needs ani
+        </A>
+      </div>
+    </article>
   );
 }
 

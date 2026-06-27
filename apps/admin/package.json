@@ -2,34 +2,23 @@
   "name": "@anipotts/admin",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --port 3001",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "dev": "astro dev --port 3001",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "astro check",
+    "typecheck": "astro check"
   },
   "dependencies": {
-    "@anipotts/lib": "workspace:*",
-    "@anipotts/styles": "workspace:^",
-    "@anipotts/types": "workspace:*",
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@phosphor-icons/react": "^2.1.10",
-    "next": "^16.2.6",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "@astrojs/cloudflare": "^12.6.0",
+    "@simplewebauthn/browser": "13.3.0",
+    "@simplewebauthn/server": "13.3.2",
+    "astro": "^5.16.0"
   },
   "devDependencies": {
-    "@anipotts/config": "workspace:*",
-    "@opennextjs/cloudflare": "^1.19.10",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "tailwindcss": "^4",
+    "@astrojs/check": "^0.9.4",
     "typescript": "^5"
   }
 }

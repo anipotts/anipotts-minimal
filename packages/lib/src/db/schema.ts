@@ -685,3 +685,97 @@ export const newsletterSuppressions = sqliteTable(
     ),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 25. admin passkey auth staging
+// ---------------------------------------------------------------------------
+
+export const adminPasskeyCredentials = sqliteTable(
+  "admin_passkey_credentials",
+  {
+    id: text("id").primaryKey(),
+    user_id: text("user_id").notNull(),
+    credential_id: text("credential_id").notNull().unique(),
+    public_key: text("public_key").notNull(),
+    counter: integer("counter").notNull().default(0),
+    transports: text("transports").notNull().default("[]"),
+    device_type: text("device_type"),
+    backed_up: integer("backed_up", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+    last_used_at: text("last_used_at"),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_passkey_credentials_user_active").on(
+      table.user_id,
+      table.revoked_at,
+    ),
+    index("idx_admin_passkey_credentials_credential").on(table.credential_id),
+  ],
+);
+
+export const adminPasskeyChallenges = sqliteTable(
+  "admin_passkey_challenges",
+  {
+    id: text("id").primaryKey(),
+    purpose: text("purpose").notNull(),
+    challenge: text("challenge").notNull().unique(),
+    credential_id: text("credential_id"),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    used_at: text("used_at"),
+  },
+  (table) => [
+    index("idx_admin_passkey_challenges_lookup").on(
+      table.purpose,
+      table.used_at,
+      table.expires_at,
+    ),
+    index("idx_admin_passkey_challenges_challenge").on(table.challenge),
+  ],
+);
+
+export const adminPasskeySessions = sqliteTable(
+  "admin_passkey_sessions",
+  {
+    id: text("id").primaryKey(),
+    token_hash: text("token_hash").notNull().unique(),
+    credential_id: text("credential_id").notNull(),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    last_seen_at: text("last_seen_at"),
+    revoked_at: text("revoked_at"),
+    updated_at: text("updated_at"),
+  },
+  (table) => [
+    index("idx_admin_passkey_sessions_lookup").on(
+      table.token_hash,
+      table.revoked_at,
+      table.expires_at,
+    ),
+    index("idx_admin_passkey_sessions_credential").on(
+      table.credential_id,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminPasskeyAudit = sqliteTable(
+  "admin_passkey_audit",
+  {
+    id: text("id").primaryKey(),
+    event_type: text("event_type").notNull(),
+    credential_id: text("credential_id"),
+    summary: text("summary").notNull(),
+    created_at: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_passkey_audit_type_created").on(
+      table.event_type,
+      table.created_at,
+    ),
+  ],
+);

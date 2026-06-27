@@ -1,164 +1,136 @@
 # anipotts-com agent guide
 
-`CLAUDE.md` is the canonical repo guide. `AGENTS.md` points here so Codex and
-Claude read the same project contract.
+`AGENTS.md` is a symlink to this file. Codex and Claude use the same project
+contract.
 
-This repo owns two live products:
+## ownership
 
-- `anipotts.com`, the public Astro site.
-- `admin.anipotts.com`, the protected operator dashboard.
+This repo owns:
 
-Agents should keep this repo moving. Branch, edit, verify, push, open PRs,
-merge, and deploy safe lanes without waiting for fleet/boss. Stop only at true
-gates.
+- `anipotts.com`: public Astro site in `apps/www`
+- `admin.anipotts.com`: target Astro admin app in `apps/admin`
+- legacy admin rollback worker in `apps/admin-solid`
+- legacy/reference surfaces in `apps/labs` and retained `workers/*`
+- shared code in `packages/*`
 
-## product direction
+Agents should move this repo forward. Do the work, verify it, commit it, push
+it, open or update the PR, merge when the lane allows it, and deploy only the
+approved target.
 
-The public site should become mostly stable code plus structured content. The
-admin site should become the practical web surface for editing public-site text,
-previewing changes, reviewing fleet state, and returning small decisions to
-agents.
+## automation posture
 
-The clean target:
+Do not add or restore GitHub workflows that call Anthropic, Claude Code, or
+other external LLM review APIs for this repo. Ani disabled those on 2026-06-27
+to avoid unnecessary Claude API spend. The required `security` check is a local
+no-API placeholder; real safety comes from small scoped diffs, local checks,
+CodeRabbit/GitHub signals, focused human review when needed, and deploy proof.
 
-- public text and project copy become editable through admin.
-- code deploys become less frequent because content changes move to records.
-- admin stays read-only first, then adds draft and preview flows.
-- publish, send, account, and live-control paths stay explicitly authorized.
+## current standing authority
 
-## source map
+Ani approved these standing lanes on 2026-06-27.
 
-- `apps/www`: Astro public site.
-- `apps/admin-solid`: current protected admin dashboard.
-- `apps/admin`: legacy admin surface, compatibility only.
-- `apps/labs`: labs subdomain.
-- `workers/*`: Cloudflare worker services.
-- `packages/lib`: shared env, data, admin feed, CMS, metrics, and validation.
-- `docs/admin-v2-architecture.md`: current admin v2 direction.
-- `docs/content-admin-editor-brief.md`: public-site editable-content inventory.
+### admin lane
 
-Fleet state lives in `~/Infra`, especially `coord/NEEDS-ANI.md`,
-`coord/ANSWERS.md`, `coord/authority.jsonl`, `coord/bus.jsonl`, handoffs,
-registries, and admin feed artifacts.
+For admin UI, feed, content review, auth staging, and operator-dashboard work:
 
-## commands
+- branch or update the current PR
+- mark ready once required checks are green
+- merge after green checks
+- deploy only the affected admin target
+- record deploy run, skipped targets, and route proof
+
+`apps/admin-solid` is legacy rollback. Keep it only until the Astro admin
+cutover and passkey proof are complete, then archive or remove it.
+
+Approved includes reviewed D1 migrations needed by the green PR, passkey auth
+rollout, and Cloudflare Access removal after passkey proof.
+
+### public-site lane
+
+For `apps/www` copy, layout, static content, accessibility, route, and
+presentation work:
+
+- branch or update the current PR
+- mark ready once required checks are green
+- merge after green checks
+- deploy `www=true` only
+- record deploy run and route proof
+
+### docs lane
+
+Docs-only changes may merge after green checks. They should not run app deploy
+targets.
+
+## passkey and Access sequence
+
+For `admin.anipotts.com`, use this order:
+
+1. merge the reviewed passkey PR
+2. apply its reviewed D1 migration to `anipotts-db`
+3. deploy `admin=true` only
+4. prove passkey register, login, logout, session persistence, and blocked
+   failure paths
+5. prove `/auth/passkey`, `/`, `/content`, `/content/review`, and `/needs-ani`
+6. remove Cloudflare Access only after proof passes
+7. verify app-native unauthenticated block and authenticated passkey access
+8. rollback by restoring the previous Access app or policy if proof fails
+
+Do not remove Access before app-native passkey proof exists.
+
+## hard stops
+
+These still need exact current authority for the exact action:
+
+- force-push, history rewrite, hook bypass, or destructive cleanup
+- printing secrets or private payloads
+- editing `.env*`, secret values, account credentials, payment, filing, or
+  legal/contract surfaces
+- source or personal deletes
+- health-data mutation or `/Users/ojas` mutation
+- legacy admin, worker, newsletter-send, ingest, approval-bridge, outbound
+  message, publish-write, live-control, root, launchd, endpoint, or production
+  collector changes outside an approved lane
+
+If work mixes a safe lane and a hard stop, split it. Ship the safe lane and
+leave the hard stop explicit.
+
+## verification
 
 Use the narrowest command that covers the diff.
 
 ```bash
-pnpm dev
-pnpm build
-pnpm typecheck
-pnpm test
+pnpm turbo typecheck --filter=@anipotts/www...
+pnpm turbo build --filter=@anipotts/www...
+pnpm turbo typecheck --filter=@anipotts/admin-solid...
+pnpm turbo build --filter=@anipotts/admin-solid...
 pnpm validate
-pnpm turbo typecheck --filter=@anipotts/www...
-pnpm turbo build --filter=@anipotts/www...
-pnpm turbo typecheck --filter=@anipotts/admin-solid...
-pnpm turbo build --filter=@anipotts/admin-solid...
 ```
 
-## safe lanes
+For deploys, record:
 
-Agents may complete safe lanes end to end: implement, verify, commit, push,
-open PR, mark ready, merge after required checks, and let the scoped deploy run.
+- PR number and merge SHA
+- deploy workflow run URL
+- which deploy target ran
+- skipped target proof
+- route proof
+- live impact
 
-Safe lanes include:
+## product direction
 
-- public-site presentation, layout, accessibility, routes, static data, and
-  performance work.
-- read-only `apps/admin-solid` dashboard work, including `/needs-ani`, `/repos`,
-  fleet state, proof views, and non-writing content inventory.
-- content schema, fixtures, adapters, previews, and migrations that do not write
-  production content.
-- docs, tests, package checks, and deploy workflow path filters that reduce
-  stale blockers without expanding live permissions.
+Public site code should become stable. More public text and project copy should
+move into structured content that admin can review, draft, preview, and later
+publish through an authorized write path.
 
-Safe public-site deploys are normal after green checks when the diff stays in
-`apps/www` or shared presentation code. Safe admin deploys are normal after
-green checks when the diff stays in read-only `apps/admin-solid` behavior.
-Docs-only changes should merge normally and should not deploy app targets.
+Admin should become one Astro app for content, fleet state, proof, repo status,
+handoffs, blockers, and future editing. Current Solid admin work is migration
+source, not the long-term home.
 
-## admin content lane
-
-Admin content editing should move in this order:
-
-1. read current public-site content into an admin route.
-2. render draft and preview states without writing production data.
-3. create a typed `NEEDS-ANI` syscall only when human taste or live authority is
-   required.
-4. publish only through an authorized write path with proof.
-
-The first implementation slice is a read-only `/content` route in the current
-admin app. It should group homepage, projects, writing, and newsletter content;
-show source refs and current values; mark editability and risk; and expose one
-next safe action per row. It must not add save APIs, hidden write endpoints,
-outbound publishing, social APIs, or credentials.
-
-## needs ani
-
-`NEEDS-ANI.md` is a human syscall queue. Use it only when work reaches a
-capability boundary that Ani must answer from his phone: authority, taste,
-identity, payment, secret setup, account-side action, source delete approval, or
-final choice.
-
-Each open item must have a fixed `type`, an owner, a short reason, one Ani
-action, one agent next step, and a stale date. Use these types only:
-
-- `approve`
-- `choose`
-- `provide`
-- `perform`
-- `review-delete`
-
-Do not use `NEEDS-ANI.md` as a todo list, status page, notes doc, or parking lot.
-Record normal status in commits, PRs, `bus.jsonl`, or handoffs.
-
-## hard gates
-
-These require exact current authority or an explicit current Ani instruction for
-the exact action:
-
-- DNS, Cloudflare Access, auth, secrets, env, root, launchd, endpoint, or
-  production collector changes.
-- admin write paths, content publish writes, live control buttons, deploy
-  trigger buttons, approval bridges, iMessage, external sends, applications,
-  payments, filings, contracts, or account mutations.
-- legacy `apps/admin`, worker services, ingest, newsletter, and any write path
-  outside the scoped public-site or read-only admin deploy lanes.
-- force-push, published history rewrite, destructive cleanup, source or personal
-  deletes, health-data mutation, `/Users/ojas` mutation, or printing secrets.
-
-Split mixed-scope work. Ship the safe lane and leave the gated lane as one typed
-syscall.
-
-## verification
-
-For public-site UI work:
-
-```bash
-pnpm turbo typecheck --filter=@anipotts/www...
-pnpm turbo build --filter=@anipotts/www...
-```
-
-For admin UI work:
-
-```bash
-pnpm turbo typecheck --filter=@anipotts/admin-solid...
-pnpm turbo build --filter=@anipotts/admin-solid...
-```
-
-For shared packages, workers, workflows, or cross-app changes, run the affected
-Turbo graph or `pnpm validate`.
-
-When a deploy runs, record the PR, merge commit, deploy workflow result,
-unauthenticated Cloudflare Access proof for protected admin routes, and
-authenticated render proof when a browser session is available.
+See `docs/platform-architecture.md` for the current inventory and cleanup map.
 
 ## style
 
 Public copy should sound like Ani: direct, specific, terse, and grounded in real
-work. Avoid generic startup copy, guru tone, engagement bait, fake vulnerability,
-unsupported hype, rhetorical-question hooks, and exactly-three-item cadence.
+work. Avoid generic startup copy, guru tone, unsupported hype, rhetorical
+questions, fake vulnerability, and exactly-three-item cadence.
 
-No em dashes in human-facing copy. Never use `git add .` or `git add -A`; stage
-exact files.
+No em dashes in human-facing copy. Never use `git add .` or `git add -A`.

@@ -1,0 +1,60 @@
+---
+import "../styles/admin.css";
+import { navItems, routeTitle } from "../data/admin";
+
+type Props = {
+  title?: string;
+  deck?: string;
+};
+
+const { title = routeTitle(Astro.url.pathname), deck = "" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101010" />
+    <title>{title} | anipotts admin</title>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="admin navigation">
+        <a class="brand" href="/">
+          <span class="brand-mark">a</span>
+          <span>
+            <strong>anipotts admin</strong>
+            <small>Astro canonical</small>
+          </span>
+        </a>
+        <nav>
+          {
+            navItems.map((item) => (
+              <a
+                class:list={[
+                  "nav-link",
+                  Astro.url.pathname === item.href && "active",
+                ]}
+                href={item.href}
+              >
+                <span>{item.label}</span>
+                <small>{item.status}</small>
+              </a>
+            ))
+          }
+        </nav>
+      </aside>
+      <main>
+        <header class="page-header">
+          <div>
+            <p>admin.anipotts.com</p>
+            <h1>{title}</h1>
+          </div>
+          {deck && <span>{deck}</span>}
+        </header>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

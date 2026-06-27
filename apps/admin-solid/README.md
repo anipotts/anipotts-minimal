@@ -22,6 +22,8 @@ This app is read-only first. It renders the fleet/admin feed model:
 | `/`                | safe-next-action overview and feed coverage           |
 | `/content`         | read-only public-site content inventory               |
 | `/content/preview` | draft content operation previews with no write path   |
+| `/content/review`  | grouped source-to-proposal editorial review queue     |
+| `/auth/passkey`    | app-native passkey staging behind Cloudflare Access   |
 | `/needs-ani`       | typed human syscall queue and future bridge contract  |
 | `/mutations`       | proposed, approved, running, verified, blocked states |
 | `/fleet`           | machine and agent operation placeholders              |
@@ -58,6 +60,17 @@ run `wrangler deploy` manually unless Ani has approved that exact action.
 The deploy target is `anipotts-admin-solid`; its custom domain route is
 `admin.anipotts.com`.
 
+## passkey auth staging
+
+`/auth/passkey` adds biometric passkey registration and login behind the
+existing Cloudflare Access gate. It is not an Access replacement until proof and
+rollback are complete.
+
+Storage uses D1 binding `DB` and migration
+`drizzle/migrations/0006_admin_passkeys.sql`. Applying the migration to live D1,
+deploying this route, enrolling devices, and removing Cloudflare Access are
+separate gates.
+
 ## gates
 
 Allowed without fresh authority after normal PR review and checks:
@@ -71,6 +84,7 @@ Allowed without fresh authority after normal PR review and checks:
 Requires fresh authority:
 
 - content writes
+- passkey migration or live enrollment rollout
 - deploy triggers from the UI
 - approval bridge execution
 - Cloudflare Access changes

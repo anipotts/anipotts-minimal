@@ -1,0 +1,144 @@
+name: Agent Auto-Merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  actions: write
+  checks: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: agent-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  automerge:
+    if: >
+      !github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (
+        startsWith(github.event.pull_request.head.ref, 'codex/') ||
+        startsWith(github.event.pull_request.head.ref, 'claude/') ||
+        startsWith(github.event.pull_request.head.ref, 'worktree-')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for required checks
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          count=0
+          for _ in $(seq 1 30); do
+            count="$(gh pr checks "$PR_URL" --required --json name --jq 'length' 2>/dev/null || echo 0)"
+            if [ "$count" -gt 0 ]; then
+              break
+            fi
+            sleep 10
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "required checks were not registered"
+            exit 1
+          fi
+          gh pr checks "$PR_URL" --required --watch --fail-fast --interval 15
+
+      - name: Compute deploy targets
+        id: targets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          files="$RUNNER_TEMP/pr-files.txt"
+          pr_number="${PR_URL##*/}"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" \
+            --paginate \
+            --jq '.[].filename' > "$files"
+
+          www=false
+          admin=false
+          admin_solid=false
+          labs=false
+          ingest=false
+          newsletter=false
+          weekly_email=false
+
+          while IFS= read -r file; do
+            case "$file" in
+              apps/www/*|packages/lib/*|packages/styles/*|packages/types/*)
+                www=true
+                ;;
+            esac
+            case "$file" in
+              apps/admin/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
+                admin=true
+                ;;
+            esac
+            case "$file" in
+              apps/admin-solid/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
+                admin_solid=true
+                ;;
+            esac
+            case "$file" in
+              apps/labs/*|packages/config/*)
+                labs=true
+                ;;
+            esac
+            case "$file" in
+              workers/ingest/*)
+                ingest=true
+                ;;
+            esac
+            case "$file" in
+              workers/newsletter/*)
+                newsletter=true
+                ;;
+            esac
+            case "$file" in
+              workers/weekly-email/*)
+                weekly_email=true
+                ;;
+            esac
+          done < "$files"
+
+          {
+            echo "www=$www"
+            echo "admin=$admin"
+            echo "admin_solid=$admin_solid"
+            echo "labs=$labs"
+            echo "ingest=$ingest"
+            echo "newsletter=$newsletter"
+            echo "weekly_email=$weekly_email"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --merge --delete-branch "$PR_URL"
+
+      - name: Dispatch deploy
+        if: >
+          steps.targets.outputs.www == 'true' ||
+          steps.targets.outputs.admin == 'true' ||
+          steps.targets.outputs.admin_solid == 'true' ||
+          steps.targets.outputs.labs == 'true' ||
+          steps.targets.outputs.ingest == 'true' ||
+          steps.targets.outputs.newsletter == 'true' ||
+          steps.targets.outputs.weekly_email == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh workflow run deploy.yml \
+            --repo "$GH_REPO" \
+            --ref main \
+            -f www=${{ steps.targets.outputs.www }} \
+            -f admin=${{ steps.targets.outputs.admin }} \
+            -f admin_solid=${{ steps.targets.outputs.admin_solid }} \
+            -f labs=${{ steps.targets.outputs.labs }} \
+            -f ingest=${{ steps.targets.outputs.ingest }} \
+            -f newsletter=${{ steps.targets.outputs.newsletter }} \
+            -f weekly_email=${{ steps.targets.outputs.weekly_email }}

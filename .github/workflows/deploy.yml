@@ -9,10 +9,11 @@
 #   TYPEFULLY_SOCIAL_SET_ID - Typefully social set ID
 #
 # Path-filtered deploys: each deploy-X job only runs when files relevant to
-# that target actually changed. Root dependency changes trigger every deployed
-# target because they can affect any build. Docs-only commits skip the workflow
-# entirely via paths-ignore. Workflow-only changes run detection but deploy
-# nothing. No untrusted input is interpolated into run: blocks anywhere here.
+# that target actually changed. Root dependency changes do not fan out to every
+# target; use workflow_dispatch for an explicit deploy when a root-only change
+# needs promotion. Docs-only commits skip the workflow entirely via
+# paths-ignore. Workflow-only changes run detection but deploy nothing. No
+# untrusted input is interpolated into run: blocks anywhere here.
 
 name: Deploy
 
@@ -92,19 +93,12 @@ jobs:
         id: filter
         with:
           filters: |
-            root: &root
-              - "package.json"
-              - "pnpm-lock.yaml"
-              - "pnpm-workspace.yaml"
-              - "turbo.json"
             www:
-              - *root
               - "apps/www/**"
               - "packages/lib/**"
               - "packages/styles/**"
               - "packages/types/**"
             admin:
-              - *root
               - "apps/admin/**"
               - "packages/config/**"
               - "packages/lib/**"
@@ -113,7 +107,6 @@ jobs:
               - "packages/types/**"
               - "services/**"
             admin-solid:
-              - *root
               - "apps/admin-solid/**"
               - "packages/config/**"
               - "packages/lib/**"
@@ -122,17 +115,13 @@ jobs:
               - "packages/types/**"
               - "services/**"
             labs:
-              - *root
               - "apps/labs/**"
               - "packages/config/**"
             ingest:
-              - *root
               - "workers/ingest/**"
             newsletter:
-              - *root
               - "workers/newsletter/**"
             weekly-email:
-              - *root
               - "workers/weekly-email/**"
 
   deploy-www:
@@ -179,10 +168,14 @@ jobs:
 
   deploy-admin:
     name: Deploy admin
-    needs: [changes]
+    needs: [changes, deploy-admin-solid]
     if: >
-      (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
-      (github.event_name == 'push' && needs.changes.outputs.admin == 'true')
+      always() &&
+      (needs['deploy-admin-solid'].result == 'success' || needs['deploy-admin-solid'].result == 'skipped') &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
+        (github.event_name == 'push' && needs.changes.outputs.admin == 'true')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -204,16 +197,6 @@ jobs:
 
       - name: Build admin
         run: pnpm turbo build --filter=@anipotts/admin
-        env:
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
-          TYPEFULLY_API_KEY: ${{ secrets.TYPEFULLY_API_KEY }}
-          TYPEFULLY_SOCIAL_SET_ID: ${{ secrets.TYPEFULLY_SOCIAL_SET_ID }}
-          NEXT_PUBLIC_MINI_API_KEY: ${{ secrets.MINI_API_KEY }}
-
-      - name: Build for Cloudflare
-        run: npx opennextjs-cloudflare build
-        working-directory: apps/admin
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

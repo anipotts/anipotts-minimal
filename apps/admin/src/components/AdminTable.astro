@@ -1,0 +1,34 @@
+---
+import type { QueueRow } from "../data/admin";
+
+type Props = {
+  rows: QueueRow[];
+};
+
+const { rows } = Astro.props;
+---
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>item</th>
+        <th>owner</th>
+        <th>status</th>
+        <th>evidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <td>{row.title}</td>
+            <td>{row.owner}</td>
+            <td>{row.status}</td>
+            <td>{row.evidence}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

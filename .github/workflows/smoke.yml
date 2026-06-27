@@ -1,0 +1,60 @@
+name: Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "target to smoke"
+        required: true
+        default: "www"
+        type: choice
+        options: ["www", "admin"]
+      commit_sha:
+        description: "commit sha expected to be deployed"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ inputs.target }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke ${{ inputs.target }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Smoke public site
+        if: inputs.target == 'www'
+        run: |
+          set -euo pipefail
+          for path in / /projects /writing /newsletter; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"
+            echo "https://anipotts.com${path} -> ${code}"
+            test "$code" = "200"
+          done
+          echo "commit_sha=${{ inputs.commit_sha }}"
+
+      - name: Smoke admin unauthenticated block
+        if: inputs.target == 'admin'
+        run: |
+          set -euo pipefail
+          login_code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com/auth/passkey")"
+          echo "https://admin.anipotts.com/auth/passkey -> ${login_code}"
+          case "$login_code" in
+            200|302|401|403) ;;
+            *) exit 1 ;;
+          esac
+          for path in / /content /content/review /needs-ani; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com${path}")"
+            echo "https://admin.anipotts.com${path} -> ${code}"
+            case "$code" in
+              302|401|403) ;;
+              *) exit 1 ;;
+            esac
+          done
+          echo "commit_sha=${{ inputs.commit_sha }}"
