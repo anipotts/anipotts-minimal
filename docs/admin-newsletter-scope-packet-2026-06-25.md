@@ -180,8 +180,8 @@ Eligible:
   safe shared read-model code
 - PR declares no write path, no auth change, no env/secrets, no DNS, no worker
   service outside admin-solid
-- required checks are green
-- Claude review and security review pass
+- required GitHub checks are green
+- no Claude/API security review workflow is required or allowed for this repo
 - deploy workflow path filter resolves to `admin_solid=true`
 - all unrelated deploy targets are skipped
 

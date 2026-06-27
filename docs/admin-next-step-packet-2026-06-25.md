@@ -17,14 +17,18 @@ Open admin PRs:
   - Head: `f95d219`
   - State: open draft
   - Merge state: clean
-  - Checks: CI, security, Claude review, CodeRabbit green
+  - Historical checks then: CI and GitHub review signals green
+  - Superseded gate note: Claude/API security review is now disabled and is not
+    required for this repo
   - Scope: read-only `apps/admin-solid` route and styling
 - PR #87: `Add admin auth and content editing ADR`
   - Branch: `codex/pro/admin-auth-content-adr-2026-06-25`
   - Head: `1274d84`
   - State: open draft
   - Merge state: clean
-  - Checks: CI, security, Claude review, CodeRabbit green
+  - Historical checks then: CI and GitHub review signals green
+  - Superseded gate note: Claude/API security review is now disabled and is not
+    required for this repo
   - Scope: docs-only auth/content ADR, Access audit packet, inert draft
     operation schema
 
