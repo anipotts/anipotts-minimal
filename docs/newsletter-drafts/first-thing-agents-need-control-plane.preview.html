@@ -298,22 +298,30 @@
           </figcaption>
         </figure>
         <p class="dek">
-          no matter what coding agent you use, it gets more useful when
-          authority, proof, and the human return path are explicit.
+          what i am learning from turning admin.anipotts.com into a read-only
+          operator dashboard first, then a content review surface, then a
+          guarded write path.
         </p>
       </header>
 
       <p>
-        the first useful thing to build around a coding agent is a control
-        plane: a place where the agent can tell what it is allowed to do, what
-        it must prove, and when it needs to come back to you.
+        every coding agent i use eventually runs into the same boring problem:
+        it can make a change, but it needs a system around it for
+        responsibility.
       </p>
 
       <p>
-        this is the lesson from building admin.anipotts.com. the product starts
-        as a read-only operator dashboard, then a content review surface, then a
-        guarded write path. the live controls come after the state model is
-        boring and obvious.
+        the control plane should make the important parts obvious: what i asked
+        it to do, who approved it, what it touched, what proof it left, and what
+        state changed after. if the answer only lives in the chat, the system is
+        too soft.
+      </p>
+
+      <p>
+        that is what i mean by a control plane. for anipotts.com, that has been
+        admin.anipotts.com: read-only first, content review second, guarded
+        writes later. the live buttons come after the state model is boring and
+        obvious.
       </p>
 
       <div class="note">
@@ -324,14 +332,14 @@
       <h2>safe lanes versus hard gates</h2>
 
       <p>
-        an agent should not have to ask permission for every small move. if the
-        lane is safe, it can inspect, edit, verify, commit, push, and open a
-        draft PR.
+        i want agents to move quickly when the blast radius is small. if the
+        lane is safe, the agent should inspect, edit, verify, commit, push, and
+        open a PR without waiting on me.
       </p>
 
       <p>
         other work needs a hard gate. dns, auth, secrets, env, production
-        content stores, outbound sends, live endpoints, payments, and destructive
+        content, outbound sends, live endpoints, payments, and destructive
         cleanup all need explicit authority. the point of the control plane is
         to make that split visible before the agent touches the thing.
       </p>
@@ -347,24 +355,24 @@
       <h2>proof beats trust</h2>
 
       <p>
-        a finished agent task should leave proof another agent can inspect. the
-        proof can be a commit, a PR, a command result, a deploy record, a
-        screenshot, or a blocked-action list. the important part is that it
-        survives the chat.
+        a finished agent task should leave proof another agent can inspect. that
+        can be a commit, a PR, a command result, a deploy record, a screenshot,
+        or a blocked-action list. the important part is that it survives the
+        chat.
       </p>
 
       <p>
-        chat memory is too soft for real work. once multiple agents are touching
-        the same repo, the durable object matters more than the explanation. if
-        the next agent cannot pick up from the artifact, the system is still
-        missing the control plane.
+        once multiple agents are touching the same repo, the durable object
+        matters more than the explanation. the next agent should continue from
+        the artifact instead of guessing what happened in the previous
+        conversation.
       </p>
 
       <h2>NEEDS-ANI is the human syscall queue</h2>
 
       <p>
-        the human return path should be small. NEEDS-ANI has one job: ask for
-        the decisions only Ani can make.
+        the human queue should be tiny. i do not want a dashboard full of agent
+        homework. i want the few calls only i can make.
       </p>
 
       <p>
@@ -376,24 +384,21 @@
       <h2>admin is the control plane</h2>
 
       <p>
-        admin.anipotts.com should make state legible before it makes state
-        mutable. content, fleet state, handoffs, approvals, and proof belong in
-        one surface because agents need to know what they are allowed to do
-        next.
+        this is why admin.anipotts.com starts read-only. i need one place where
+        content, fleet state, handoffs, approvals, and proof are legible.
       </p>
 
       <p>
         the order matters. read-only first. preview second. guarded writes after
-        the authority model is real. the system gets safer when the live button
-        is the last thing added.
+        the authority model is real. live controls come after the foundation.
       </p>
 
       <div class="callout">
         <h3>working close</h3>
         <p>
-          the future looks like a system where agents know what they can do
-          next, what proof they owe, and when the right move is to return one
-          clear decision to Ani.
+          the version of this i want is boring in the best way. agents know what
+          they can do next, what proof they owe, and when the right move is to
+          return one clear decision to me.
         </p>
       </div>
 
@@ -401,36 +406,38 @@
         <p class="label">x-thread compatible version</p>
         <ol>
           <li>
-            no matter what coding agent you use, the first useful thing to build
-            around it is a control plane.
+            every coding agent i use eventually runs into the same boring
+            problem: it needs a place to put responsibility.
           </li>
           <li>
-            agents can write code. the system around them decides where
-            responsibility lands.
+            that is what i mean by a control plane.
           </li>
           <li>
             the useful contract is
             <code>intent -> authority -> operation -> proof -> state</code>.
           </li>
           <li>
-            safe lanes let agents move without asking for permission every five
-            minutes.
+            safe lanes let agents move without asking me for permission every
+            five minutes.
           </li>
           <li>
-            hard gates keep live systems, secrets, sends, and irreversible
-            actions behind explicit authority.
+            hard gates keep dns, auth, secrets, sends, live endpoints, and
+            irreversible actions behind explicit authority.
           </li>
           <li>
             proof beats trust because the next agent has to continue from the
             artifact.
           </li>
           <li>
-            NEEDS-ANI is the human syscall queue: approval, choice,
-            account-side action, identity, payment, secret setup, final taste.
+            NEEDS-ANI is my human syscall queue: approval, choice, account-side
+            action, identity, payment, secret setup, final taste.
           </li>
           <li>
             admin.anipotts.com should make state legible before it makes state
             mutable.
+          </li>
+          <li>
+            the system i want is boring: agents know what they can do next.
           </li>
         </ol>
       </section>

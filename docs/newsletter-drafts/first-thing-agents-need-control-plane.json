@@ -4,8 +4,8 @@
   "status": "idea",
   "title": "the first thing your agents need is a control plane",
   "subject": "the first thing your agents need is a control plane",
-  "summary": "no matter what coding agent you use, it gets more useful when authority, proof, and human return queues are explicit.",
-  "dek": "a practical note from building admin.anipotts.com as a read-only operator dashboard first, then a content review surface, then a guarded write path.",
+  "summary": "every coding agent gets more useful when it knows what it is allowed to do, what proof it owes, and when it needs to come back to me.",
+  "dek": "what i am learning from turning admin.anipotts.com into a read-only operator dashboard first, then a content review surface, then a guarded write path.",
   "audience": "builders running coding agents across real repos, live sites, and operational state",
   "source_refs": [
     {
@@ -38,7 +38,7 @@
   ],
   "hook": {
     "kind": "opening",
-    "body": "no matter what coding agent you use, the first useful thing to build around it is a control plane: a place for authority, proof, and the few decisions that come back to you.",
+    "body": "every coding agent i use eventually runs into the same boring problem: it can make a change, but it needs a system around it for responsibility.",
     "source_refs": [
       "AGENTS.md",
       "docs/admin-v2-architecture.md"
@@ -48,31 +48,31 @@
     {
       "kind": "note",
       "heading": "safe lanes versus hard gates",
-      "body": "start with the contract. some work is safe to finish end to end: inspect, edit, verify, commit, push, and open a draft PR. other work is gated because it touches live systems, secrets, auth, DNS, publishing, outbound sends, or irreversible state. the contract makes the next allowed move obvious.",
+      "body": "i want agents to move quickly when the blast radius is small. if the work is safe, the agent should inspect, edit, verify, commit, push, and open a PR without waiting on me. if the work touches dns, auth, secrets, env, production content, outbound sends, live endpoints, payments, or destructive cleanup, it needs explicit authority. the control plane makes that split obvious before anything gets touched.",
       "source_refs": [
         "AGENTS.md"
       ],
-      "thread_beat": "the useful split is allowed operations versus gated operations."
+      "thread_beat": "the useful split is simple: safe lanes can move, hard gates come back to me."
     },
     {
       "kind": "receipt",
       "label": "proof beats trust",
-      "body": "a finished agent task should leave proof that another agent can inspect: changed files, exact checks, commits, PRs, deploy evidence when deploys are authorized, and explicit blockers when they are not. trust is too vague for a shared repo. proof is portable.",
+      "body": "if a decision only lives in chat, it barely exists. i want the useful state in commits, PRs, handoff docs, deploy runs, screenshots, and blocked-action lists. the next agent should be able to continue from the artifact instead of guessing what happened in the previous conversation.",
       "source_refs": [
         "AGENTS.md",
         "docs/content-admin-editor-brief.md"
       ],
-      "thread_beat": "proof lets the next agent continue the work without inheriting chat memory as a source of truth."
+      "thread_beat": "proof is what lets the next agent continue without inheriting chat memory."
     },
     {
       "kind": "note",
       "heading": "NEEDS-ANI as a human syscall queue",
-      "body": "the human return path should be small. NEEDS-ANI has one job: agents ask for the few decisions only Ani can make, including approval, choice, secret setup, account-side action, identity, payment, or final taste.",
+      "body": "the human queue should be tiny. i do not want a dashboard full of agent homework. i want the few calls only i can make: approve this, choose between these two options, do this account-side action, provide this secret, decide whether this public copy sounds like me.",
       "source_refs": [
         "AGENTS.md",
         "docs/admin-v2-architecture.md"
       ],
-      "thread_beat": "a good human queue is narrow enough to answer from a phone."
+      "thread_beat": "a good human queue is small enough to answer from my phone."
     },
     {
       "kind": "worklog",
@@ -80,21 +80,21 @@
       "items": [
         "read-only operator dashboard first",
         "content inventory and preview states next",
-        "guarded write paths only after authority exists",
-        "live gates visible before any live control exists"
+        "guarded writes only after the authority model is real",
+        "live gates visible before live controls exist"
       ],
-      "body": "admin.anipotts.com should make state legible before it makes state mutable. content, fleet state, handoffs, approvals, and proof belong in one surface because agents need to know what they are allowed to do next.",
+      "body": "this is why admin.anipotts.com starts read-only. i need one place where content, fleet state, handoffs, approvals, and proof are legible. only after that is boring do i want write buttons. live controls come after the foundation.",
       "source_refs": [
         "docs/admin-v2-architecture.md",
         "docs/content-admin-editor-brief.md",
         "apps/admin-solid/src/data/content-inventory.ts"
       ],
-      "thread_beat": "the control plane maps intent to authority to operation to proof to state."
+      "thread_beat": "the control plane maps what i meant to what was allowed to what changed."
     }
   ],
   "close": {
     "kind": "close",
-    "body": "the future looks like a system where agents know what they are allowed to do next, what proof they owe, and when the right move is to return one clear decision to Ani.",
+    "body": "the version of this i want is boring in the best way. agents know what they can do next, what proof they owe, and when the right move is to return one clear decision to me.",
     "cta": "draft only. review for tone, claims, and source refs before any archive or send path."
   },
   "claims": [
@@ -129,15 +129,15 @@
     }
   ],
   "x_thread_beats": [
-    "no matter what coding agent you use, the first useful thing to build around it is a control plane.",
-    "agents can write code. the system around them decides where responsibility lands.",
+    "every coding agent i use eventually runs into the same boring problem: it needs a place to put responsibility.",
+    "that is what i mean by a control plane.",
     "the useful contract is intent -> authority -> operation -> proof -> state.",
-    "safe lanes let agents move without asking for permission every five minutes.",
-    "hard gates keep live systems, secrets, sends, and irreversible actions behind explicit authority.",
-    "proof beats trust because another agent has to continue from the artifact, not the chat.",
-    "NEEDS-ANI is a human syscall queue: approval, choice, account action, identity, payment, final taste.",
+    "safe lanes let agents move without asking me for permission every five minutes.",
+    "hard gates keep dns, auth, secrets, sends, live endpoints, and irreversible actions behind explicit authority.",
+    "proof beats trust because the next agent has to continue from the artifact.",
+    "NEEDS-ANI is my human syscall queue: approval, choice, account action, identity, payment, secret setup, final taste.",
     "admin.anipotts.com should make state legible before it makes state mutable.",
-    "the future is a system where agents know what they are allowed to do next."
+    "the system i want is boring: agents know what they can do next."
   ],
   "links": [],
   "assets": [],
