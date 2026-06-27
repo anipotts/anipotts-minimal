@@ -11,6 +11,7 @@ const ROUTES = [
   "/content",
   "/content/review",
   "/content/preview",
+  "/content/operations",
   "/needs-ani",
   "/newsletter",
   "/proof",

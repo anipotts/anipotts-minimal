@@ -84,7 +84,8 @@ For `admin.anipotts.com`, use this order:
 3. deploy `admin=true` only
 4. prove passkey register, login, logout, session persistence, and blocked
    failure paths
-5. prove `/auth/passkey`, `/`, `/content`, `/content/review`, and `/needs-ani`
+5. prove `/auth/passkey`, `/`, `/content`, `/content/review`,
+   `/content/preview`, `/content/operations`, and `/needs-ani`
 6. remove Cloudflare Access only after proof passes
 7. verify app-native unauthenticated block and authenticated passkey access
 8. rollback by restoring the previous Access app or policy if proof fails

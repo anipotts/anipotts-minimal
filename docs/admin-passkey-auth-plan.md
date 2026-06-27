@@ -126,7 +126,7 @@ Before removing Cloudflare Access:
 
 1. keep the existing Cloudflare Access app and policy config documented
 2. prove passkey auth on `/auth/passkey`, `/`, `/content`, `/content/review`,
-   and `/needs-ani`
+   `/content/preview`, `/content/operations`, and `/needs-ani`
 3. remove Access only in a single reviewed change
 4. if app-native auth blocks Ani or exposes an unexpected gap, restore the
    previous Access app/policy for `admin.anipotts.com` and leave passkey auth as
