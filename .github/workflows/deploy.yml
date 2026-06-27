@@ -293,6 +293,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck weekly email worker
+        run: pnpm --filter anipotts-weekly-email typecheck
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
