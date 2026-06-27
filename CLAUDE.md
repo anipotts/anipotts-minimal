@@ -17,6 +17,14 @@ Agents should move this repo forward. Do the work, verify it, commit it, push
 it, open or update the PR, merge when the lane allows it, and deploy only the
 approved target.
 
+## automation posture
+
+Do not add or restore GitHub workflows that call Anthropic, Claude Code, or
+other external LLM review APIs for this repo. Ani disabled those on 2026-06-27
+to avoid unnecessary Claude API spend. The required `security` check is a local
+no-API placeholder; real safety comes from small scoped diffs, local checks,
+CodeRabbit/GitHub signals, focused human review when needed, and deploy proof.
+
 ## current standing authority
 
 Ani approved these standing lanes on 2026-06-27.

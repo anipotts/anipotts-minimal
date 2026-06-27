@@ -1,45 +1,19 @@
 name: Security Review
 
-# NOTE: This workflow uses anthropics/claude-code-security-review which handles
-# all analysis internally. No untrusted input is used in run: commands.
-
 on:
   pull_request:
 
 permissions:
-  pull-requests: write
   contents: read
 
 jobs:
   security:
     name: security
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-
-      - name: Decide security review scope
-        id: scope
+      - name: No external security reviewer
         run: |
-          changed="$RUNNER_TEMP/changed-files.txt"
-          git diff --name-only "origin/${{ github.base_ref }}"...HEAD | tee "$changed"
-          if grep -Eq '^(\.github/workflows/|apps/admin/|apps/admin-solid/|apps/labs/|apps/www/src/middleware\.ts|apps/www/src/pages/(api|ingest)/|apps/www/wrangler\.toml|workers/|packages/lib/|packages/services-platform/|drizzle/|scripts/|package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json|tsconfig\.json)' "$changed"; then
-            echo "run_review=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_review=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - uses: anthropics/claude-code-security-review@main
-        if: steps.scope.outputs.run_review == 'true'
-        with:
-          comment-pr: true
-          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
-          exclude-directories: node_modules,.next,dist
-          claude-model: claude-sonnet-4-6
-
-      - name: Skip expensive review for static-site-only changes
-        if: steps.scope.outputs.run_review != 'true'
-        run: echo "static public-site-only change; required security gate passes without claude review"
+          echo "Claude/Anthropic security review is disabled for this repository."
+          echo "This check intentionally performs no external API calls."
+          echo "Use local review, tests, and focused human review for sensitive changes."
