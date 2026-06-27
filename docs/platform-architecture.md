@@ -88,13 +88,12 @@ Required proof before removing Access:
 
 Primary workflows:
 
-| Workflow              | Role                                                      |
-| --------------------- | --------------------------------------------------------- |
-| `ci.yml`              | build, lint, typecheck, and test affected packages on PR  |
-| `security-review.yml` | local no-API placeholder for the required `security` gate |
-| `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets   |
-| `deploy.yml`          | deploy explicit targets only                              |
-| `smoke.yml`           | post-deploy route proof for public and admin targets      |
+| Workflow              | Role                                                     |
+| --------------------- | -------------------------------------------------------- |
+| `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
+| `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets  |
+| `deploy.yml`          | deploy explicit targets only                             |
+| `smoke.yml`           | post-deploy route proof for public and admin targets     |
 
 Rules:
 
