@@ -31,12 +31,12 @@ structured content/state model, and one predictable CI/CD path.
 
 ### workers
 
-| Path                   | Role today               | Classification |
-| ---------------------- | ------------------------ | -------------- |
-| `workers/ingest`       | ingest worker            | review         |
-| `workers/newsletter`   | newsletter queue worker  | review         |
-| `workers/state`        | future fleet state plane | keep candidate |
-| `workers/weekly-email` | weekly email worker      | review         |
+| Path                   | Role today                               | Classification                   |
+| ---------------------- | ---------------------------------------- | -------------------------------- |
+| `workers/ingest`       | ingest worker                            | review                           |
+| `workers/newsletter`   | newsletter queue worker                  | review                           |
+| `workers/state`        | `api.anipotts.com` state plane candidate | keep with explicit deploy target |
+| `workers/weekly-email` | weekly email worker                      | review                           |
 
 ### packages
 
