@@ -8,8 +8,9 @@ contract.
 This repo owns:
 
 - `anipotts.com`: public Astro site in `apps/www`
-- `admin.anipotts.com`: operator dashboard in `apps/admin-solid`
-- legacy/reference surfaces in `apps/admin`, `apps/labs`, and `workers/*`
+- `admin.anipotts.com`: target Astro admin app in `apps/admin`
+- transitional admin worker in `apps/admin-solid`
+- legacy/reference surfaces in `apps/labs` and retained `workers/*`
 - shared code in `packages/*`
 
 Agents should move this repo forward. Do the work, verify it, commit it, push
@@ -20,16 +21,18 @@ approved target.
 
 Ani approved these standing lanes on 2026-06-27.
 
-### admin-solid lane
+### admin lane
 
-For `apps/admin-solid` read-only UI, feed, content review, auth staging, and
-operator-dashboard work:
+For admin UI, feed, content review, auth staging, and operator-dashboard work:
 
 - branch or update the current PR
 - mark ready once required checks are green
 - merge after green checks
-- deploy `admin_solid=true` only
+- deploy only the affected admin target
 - record deploy run, skipped targets, and route proof
+
+`apps/admin-solid` is transitional. Move parity into `apps/admin`, prove it, then
+archive or remove `apps/admin-solid`.
 
 Approved includes reviewed D1 migrations needed by the green PR, passkey auth
 rollout, and Cloudflare Access removal after passkey proof.
@@ -110,8 +113,11 @@ Public site code should become stable. More public text and project copy should
 move into structured content that admin can review, draft, preview, and later
 publish through an authorized write path.
 
-Admin should become the practical operator dashboard for content, fleet state,
-proof, repo status, handoffs, blockers, and future editing.
+Admin should become one Astro app for content, fleet state, proof, repo status,
+handoffs, blockers, and future editing. Current Solid admin work is migration
+source, not the long-term home.
+
+See `docs/platform-architecture.md` for the current inventory and cleanup map.
 
 ## style
 
