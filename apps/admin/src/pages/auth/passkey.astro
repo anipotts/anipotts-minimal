@@ -4,32 +4,23 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 
 <AdminLayout
   title="passkey auth"
-  deck="Astro admin auth boundary. Registration UI is still being ported from admin-solid."
+  deck="Biometric passkey auth is staged here before Cloudflare Access is removed from the canonical admin route."
 >
   <section class="grid">
     <article class="panel">
-      <p>state</p>
-      <h2>app-native session required</h2>
-      <p>
-        Protected Astro admin routes check the D1-backed
-        <code>admin_passkey_session</code> cookie before rendering.
-      </p>
+      <p>database</p>
+      <h2 id="passkey-db">checking</h2>
+      <p id="passkey-origin">expected origin: admin.anipotts.com</p>
     </article>
     <article class="panel">
-      <p>next</p>
-      <h2>port WebAuthn actions</h2>
-      <p>
-        Move register, login, logout, revoke, and status handlers from
-        admin-solid into this Astro app.
-      </p>
+      <p>credentials</p>
+      <h2 id="passkey-credentials">0</h2>
+      <p id="passkey-register-state">registration requires Access identity</p>
     </article>
     <article class="panel">
-      <p>Access removal</p>
-      <h2>blocked by proof</h2>
-      <p>
-        Cloudflare Access stays on until passkey registration and login are
-        proven.
-      </p>
+      <p>session</p>
+      <h2 id="passkey-session">inactive</h2>
+      <p id="passkey-next">loading</p>
     </article>
     <article class="panel">
       <p>rollback</p>
@@ -37,13 +28,189 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       <p>Rollback is the prior Cloudflare Access app or policy.</p>
     </article>
   </section>
+
   <div class="actions">
-    <button class="button" disabled>register passkey</button>
-    <button class="button secondary" disabled>authenticate</button>
-    <button class="button secondary" disabled>logout</button>
+    <button class="button" id="register-passkey" type="button">
+      register passkey
+    </button>
+    <button class="button secondary" id="login-passkey" type="button">
+      authenticate
+    </button>
+    <button class="button secondary" id="logout-passkey" type="button">
+      logout
+    </button>
   </div>
-  <div class="notice">
-    These controls are inert in the first Astro shell. They mark the exact route
-    where the WebAuthn actions will land.
-  </div>
+
+  <p class="notice" id="passkey-message">
+    Cloudflare Access must remain on until registration, login, logout, session
+    persistence, revoked credential denial, and unauthenticated blocking are
+    proven.
+  </p>
 </AdminLayout>
+
+<script>
+  import {
+    startAuthentication,
+    startRegistration,
+  } from "@simplewebauthn/browser";
+  import type {
+    PublicKeyCredentialCreationOptionsJSON,
+    PublicKeyCredentialRequestOptionsJSON,
+  } from "@simplewebauthn/server";
+
+  type ApiResult = {
+    verified?: boolean;
+    ok?: boolean;
+    error?: string;
+    detail?: string;
+    next_safe_action?: string;
+  };
+
+  type PasskeyStatus = {
+    available: boolean;
+    mode: "ready" | "missing_db";
+    credential_count: number;
+    has_session: boolean;
+    can_register: boolean;
+    access_identity_present: boolean;
+    access_identity_hint: string | null;
+    expected_origin: string;
+    current_origin: string;
+    next_safe_action: string;
+  };
+
+  const dbLabel = document.querySelector("#passkey-db");
+  const originLabel = document.querySelector("#passkey-origin");
+  const credentialsLabel = document.querySelector("#passkey-credentials");
+  const registerState = document.querySelector("#passkey-register-state");
+  const sessionLabel = document.querySelector("#passkey-session");
+  const nextLabel = document.querySelector("#passkey-next");
+  const message = document.querySelector("#passkey-message");
+  const registerButton = document.querySelector<HTMLButtonElement>(
+    "#register-passkey",
+  );
+  const loginButton = document.querySelector<HTMLButtonElement>("#login-passkey");
+  const logoutButton =
+    document.querySelector<HTMLButtonElement>("#logout-passkey");
+
+  let status: PasskeyStatus | null = null;
+
+  registerButton?.addEventListener("click", () => void register());
+  loginButton?.addEventListener("click", () => void authenticate());
+  logoutButton?.addEventListener("click", () => void logout());
+
+  await refreshStatus();
+
+  async function refreshStatus() {
+    const response = await fetch("/api/admin/passkey/status", {
+      cache: "no-store",
+    });
+    status = (await response.json()) as PasskeyStatus;
+    renderStatus();
+  }
+
+  function renderStatus() {
+    if (!status) return;
+    setText(dbLabel, status.available ? "available" : "missing");
+    setText(
+      originLabel,
+      `expected ${status.expected_origin}; current ${status.current_origin}`,
+    );
+    setText(credentialsLabel, String(status.credential_count));
+    setText(
+      registerState,
+      status.can_register
+        ? "registration allowed"
+        : "registration locked until Access identity or active session",
+    );
+    setText(sessionLabel, status.has_session ? "active" : "inactive");
+    setText(nextLabel, status.next_safe_action);
+    if (registerButton) registerButton.disabled = !status.can_register;
+    if (loginButton) loginButton.disabled = !status.available;
+    if (logoutButton) logoutButton.disabled = !status.has_session;
+  }
+
+  async function register() {
+    await withBusy("starting passkey registration", async () => {
+      const options = await postJson<PublicKeyCredentialCreationOptionsJSON>(
+        "/api/admin/passkey/register-options",
+      );
+      const credential = await startRegistration({ optionsJSON: options });
+      const result = await postJson(
+        "/api/admin/passkey/register-verify",
+        credential,
+      );
+      setText(message, result.next_safe_action ?? "passkey registered");
+      await refreshStatus();
+    });
+  }
+
+  async function authenticate() {
+    await withBusy("starting passkey authentication", async () => {
+      const options = await postJson<PublicKeyCredentialRequestOptionsJSON>(
+        "/api/admin/passkey/login-options",
+      );
+      const assertion = await startAuthentication({ optionsJSON: options });
+      const result = await postJson(
+        "/api/admin/passkey/login-verify",
+        assertion,
+      );
+      setText(message, result.next_safe_action ?? "passkey session active");
+      await refreshStatus();
+    });
+  }
+
+  async function logout() {
+    await withBusy("clearing passkey session", async () => {
+      const result = await postJson("/api/admin/passkey/logout");
+      setText(message, result.next_safe_action ?? "session cleared");
+      await refreshStatus();
+    });
+  }
+
+  async function withBusy(label: string, action: () => Promise<void>) {
+    setBusy(true);
+    setText(message, label);
+    try {
+      await action();
+    } catch (error) {
+      setText(message, errorMessage(error));
+    } finally {
+      setBusy(false);
+      renderStatus();
+    }
+  }
+
+  async function postJson<TResponse = ApiResult>(
+    path: string,
+    body?: unknown,
+  ): Promise<TResponse> {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: body ? { "content-type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = (await response.json()) as TResponse;
+    const apiData = data as ApiResult;
+    if (!response.ok) {
+      throw new Error(
+        apiData.detail ?? apiData.error ?? `request failed: ${response.status}`,
+      );
+    }
+    return data;
+  }
+
+  function setBusy(busy: boolean) {
+    if (registerButton) registerButton.disabled = busy || !status?.can_register;
+    if (loginButton) loginButton.disabled = busy || !status?.available;
+    if (logoutButton) logoutButton.disabled = busy || !status?.has_session;
+  }
+
+  function setText(node: Element | null, value: string) {
+    if (node) node.textContent = value;
+  }
+
+  function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : "passkey request failed";
+  }
+</script>
