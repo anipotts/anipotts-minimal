@@ -100,13 +100,7 @@ jobs:
               - "packages/types/**"
             admin:
               - "apps/admin/**"
-              - "packages/config/**"
               - "packages/content/**"
-              - "packages/lib/**"
-              - "packages/services-platform/**"
-              - "packages/styles/**"
-              - "packages/types/**"
-              - "services/**"
             admin-solid:
               - "apps/admin-solid/**"
             ingest:
