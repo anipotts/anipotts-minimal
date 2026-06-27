@@ -7,16 +7,16 @@ structured content/state model, and one predictable CI/CD path.
 
 ## target state
 
-| Surface        | Target                                    | Status              | Next action                                               |
-| -------------- | ----------------------------------------- | ------------------- | --------------------------------------------------------- |
-| public site    | `apps/www`                                | keep                | keep as Astro public app for `anipotts.com`               |
-| admin site     | `apps/admin`                              | canonical cutover   | prove passkey registration and then remove Access         |
-| current admin  | `apps/admin-solid`                        | legacy rollback     | keep briefly, then archive or delete after passkey proof  |
-| legacy admin   | `docs/archive/admin-next-legacy.md`       | archived            | no Next admin app remains                                 |
-| labs           | `docs/archive/labs`                       | archived            | no app or deploy target remains                           |
-| workers        | `workers/*`                               | review individually | keep only production-required workers                     |
-| shared content | `packages/lib`, future `packages/content` | clarify             | move reusable content/schema logic into one owned package |
-| database       | `drizzle`, D1 `anipotts-db`               | keep                | use for content/admin state with reviewed migrations      |
+| Surface        | Target                              | Status              | Next action                                              |
+| -------------- | ----------------------------------- | ------------------- | -------------------------------------------------------- |
+| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`              |
+| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access        |
+| current admin  | `apps/admin-solid`                  | legacy rollback     | keep briefly, then archive or delete after passkey proof |
+| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                                |
+| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                          |
+| workers        | `workers/*`                         | review individually | keep only production-required workers                    |
+| shared content | `packages/content`, `packages/lib`  | started             | keep content/editor schema in `packages/content`         |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | use for content/admin state with reviewed migrations     |
 
 ## current inventory
 
@@ -40,13 +40,14 @@ structured content/state model, and one predictable CI/CD path.
 
 ### packages
 
-| Path                         | Role today                                      | Classification              |
-| ---------------------------- | ----------------------------------------------- | --------------------------- |
-| `packages/lib`               | shared CMS, admin, db, data, services helpers   | keep, split later if useful |
-| `packages/styles`            | shared style tokens                             | keep                        |
-| `packages/types`             | shared generated types                          | keep                        |
-| `packages/services-platform` | service registry utilities                      | keep candidate              |
-| `packages/config`            | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config  |
+| Path                         | Role today                                      | Classification                  |
+| ---------------------------- | ----------------------------------------------- | ------------------------------- |
+| `packages/lib`               | shared CMS, admin, db, data, services helpers   | keep, split later if useful     |
+| `packages/content`           | shared content inventory, previews, and drafts  | keep, expand toward D1 adapters |
+| `packages/styles`            | shared style tokens                             | keep                            |
+| `packages/types`             | shared generated types                          | keep                            |
+| `packages/services-platform` | service registry utilities                      | keep candidate                  |
+| `packages/config`            | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config      |
 
 ## route parity target
 
@@ -126,6 +127,6 @@ Rules:
 7. archive useful labs docs, then delete the labs app target if unused. done on
    2026-06-27.
 8. review workers and delete unneeded worker targets.
-9. split durable content schema into `packages/content` if `packages/lib`
-   remains too broad.
+9. expand `packages/content` from static content inventory into the durable
+   content schema and D1 adapter layer.
 10. reduce deploy workflow inputs to retained production targets.

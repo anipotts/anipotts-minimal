@@ -101,6 +101,7 @@ jobs:
             admin:
               - "apps/admin/**"
               - "packages/config/**"
+              - "packages/content/**"
               - "packages/lib/**"
               - "packages/services-platform/**"
               - "packages/styles/**"
