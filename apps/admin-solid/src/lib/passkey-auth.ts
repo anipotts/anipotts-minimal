@@ -168,6 +168,18 @@ export async function getPasskeyStatus(
   };
 }
 
+export async function hasActivePasskeySession(
+  event: HTTPEvent,
+): Promise<boolean> {
+  const db = dbFromEvent(event);
+  if (!db) return false;
+  try {
+    return Boolean(await getSession(event, db));
+  } catch {
+    return false;
+  }
+}
+
 export async function registrationOptions(event: HTTPEvent): Promise<Response> {
   const db = requiredDb(event);
   const status = await getPasskeyStatus(event);
@@ -384,7 +396,8 @@ function requiredDb(event: HTTPEvent): D1Database {
     throw json(
       {
         error: "db_binding_missing",
-        next_safe_action: "deploy with DB binding and apply migration before enrollment",
+        next_safe_action:
+          "deploy with DB binding and apply migration before enrollment",
       },
       { status: 503 },
     );
