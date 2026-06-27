@@ -1,7 +1,7 @@
 # admin content draft operations
 
-Date: 2026-06-25
-Status: approved for schema and inert design only
+Date: 2026-06-27
+Status: approved for additive schema and inert design only
 
 ## purpose
 
@@ -122,17 +122,19 @@ The first implementation should expose disabled controls only:
 No hidden API routes should exist for disabled controls. A disabled button is
 not enough if an endpoint can still be called directly.
 
-## future storage
+## storage
 
-The eventual content store can use tables shaped like:
+The content store now has an additive D1 schema proposal in
+`drizzle/migrations/0007_content_operations.sql`, mirrored in the canonical
+Drizzle schema at `packages/lib/src/db/schema.ts`.
 
 - `content_records`: published field overrides
 - `content_draft_operations`: draft and preview operations
 - `content_publish_events`: immutable publish proof
 
-Storage design remains gated. This doc does not authorize a D1 migration,
-binding change, Worker route, content write API, public-site runtime read from
-records, or publish action.
+This authorizes the additive schema only. It does not authorize a binding
+change, Worker route, content write API, public-site runtime read from records,
+browser save action, outbound send, or publish action.
 
 ## proof requirements before writes
 

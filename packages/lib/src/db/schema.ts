@@ -779,3 +779,115 @@ export const adminPasskeyAudit = sqliteTable(
     ),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 26. content editor operation staging
+// ---------------------------------------------------------------------------
+
+export const contentRecords = sqliteTable(
+  "content_records",
+  {
+    id: text("id").primaryKey(),
+    content_key: text("content_key").notNull().unique(),
+    surface: text("surface").notNull(),
+    route: text("route").notNull(),
+    field_path: text("field_path").notNull(),
+    value: text("value").notNull(),
+    value_format: text("value_format").notNull().default("text"),
+    status: text("status").notNull().default("draft"),
+    version: integer("version").notNull().default(1),
+    source_ref: text("source_ref").notNull(),
+    proof_ids: text("proof_ids").notNull().default("[]"),
+    metadata: text("metadata").notNull().default("{}"),
+    published_at: text("published_at"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+    updated_by: text("updated_by"),
+  },
+  (table) => [
+    index("idx_content_records_surface_route").on(table.surface, table.route),
+    index("idx_content_records_status").on(table.status, table.updated_at),
+  ],
+);
+
+export const contentDraftOperations = sqliteTable(
+  "content_draft_operations",
+  {
+    operation_id: text("operation_id").primaryKey(),
+    kind: text("kind").notNull().default("content_draft"),
+    surface: text("surface").notNull(),
+    route: text("route").notNull(),
+    source_ref: text("source_ref").notNull(),
+    field_path: text("field_path").notNull(),
+    current_value_ref: text("current_value_ref").notNull(),
+    proposed_value: text("proposed_value").notNull(),
+    status: text("status").notNull().default("draft"),
+    risk_level: text("risk_level").notNull().default("low"),
+    authority_state: text("authority_state").notNull(),
+    required_approval_ids: text("required_approval_ids")
+      .notNull()
+      .default("[]"),
+    allowed_actions: text("allowed_actions").notNull().default("[]"),
+    forbidden_actions: text("forbidden_actions").notNull().default("[]"),
+    preview_targets: text("preview_targets").notNull().default("[]"),
+    proof_ids: text("proof_ids").notNull().default("[]"),
+    evidence_uri: text("evidence_uri"),
+    redaction: text("redaction").notNull(),
+    created_by: text("created_by").notNull().default("agent"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+    expires_at: text("expires_at"),
+    rollback_ref: text("rollback_ref").notNull(),
+    reviewer_note: text("reviewer_note"),
+    metadata: text("metadata").notNull().default("{}"),
+  },
+  (table) => [
+    index("idx_content_draft_operations_status").on(
+      table.status,
+      table.updated_at,
+    ),
+    index("idx_content_draft_operations_surface_route").on(
+      table.surface,
+      table.route,
+    ),
+    index("idx_content_draft_operations_risk").on(
+      table.risk_level,
+      table.authority_state,
+    ),
+  ],
+);
+
+export const contentPublishEvents = sqliteTable(
+  "content_publish_events",
+  {
+    id: text("id").primaryKey(),
+    operation_id: text("operation_id").references(
+      () => contentDraftOperations.operation_id,
+    ),
+    content_record_id: text("content_record_id").references(
+      () => contentRecords.id,
+    ),
+    event_type: text("event_type").notNull(),
+    status: text("status").notNull(),
+    summary: text("summary").notNull(),
+    proof_ids: text("proof_ids").notNull().default("[]"),
+    rollback_ref: text("rollback_ref").notNull(),
+    created_by: text("created_by").notNull().default("agent"),
+    created_at: text("created_at").notNull(),
+    metadata: text("metadata").notNull().default("{}"),
+  },
+  (table) => [
+    index("idx_content_publish_events_operation").on(
+      table.operation_id,
+      table.created_at,
+    ),
+    index("idx_content_publish_events_record").on(
+      table.content_record_id,
+      table.created_at,
+    ),
+    index("idx_content_publish_events_type").on(
+      table.event_type,
+      table.created_at,
+    ),
+  ],
+);
