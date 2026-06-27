@@ -14,6 +14,12 @@ export type NewsletterSection = {
   thread_beat?: string;
 };
 
+export type NewsletterClose = {
+  kind: "close";
+  body: string;
+  cta: string;
+};
+
 export type NewsletterDraft = {
   id: string;
   slug: string;
@@ -25,8 +31,11 @@ export type NewsletterDraft = {
   audience: string;
   source_refs: { ref: string; use: string }[];
   spine: string[];
+  hook: NewsletterSection;
   sections: NewsletterSection[];
+  close: NewsletterClose;
   claims: NewsletterClaim[];
+  x_thread_beats: string[];
   blocked_actions: string[];
   preview_notes: string;
   source_fixture: string;
@@ -80,14 +89,14 @@ export const newsletterDrafts: NewsletterDraft[] = [
       },
     ],
     spine: ["intent", "authority", "operation", "proof", "state"],
+    hook: {
+      kind: "opening",
+      body: "every coding agent i use eventually runs into the same boring problem: it can make a change, but it needs a system around it for responsibility.",
+      source_refs: ["AGENTS.md", "docs/admin-v2-architecture.md"],
+      thread_beat:
+        "the useful split is simple: safe lanes can move, hard gates come back to me.",
+    },
     sections: [
-      {
-        kind: "opening",
-        body: "every coding agent i use eventually runs into the same boring problem: it can make a change, but it needs a system around it for responsibility.",
-        source_refs: ["AGENTS.md", "docs/admin-v2-architecture.md"],
-        thread_beat:
-          "the useful split is simple: safe lanes can move, hard gates come back to me.",
-      },
       {
         kind: "note",
         heading: "safe lanes versus hard gates",
@@ -131,6 +140,11 @@ export const newsletterDrafts: NewsletterDraft[] = [
           "the control plane maps what i meant to what was allowed to what changed.",
       },
     ],
+    close: {
+      kind: "close",
+      body: "the version of this i want is boring in the best way. agents know what they can do next, what proof they owe, and when the right move is to return one clear decision to me.",
+      cta: "draft only. review for tone, claims, and source refs before any archive or send path.",
+    },
     claims: [
       {
         claim:
@@ -155,6 +169,17 @@ export const newsletterDrafts: NewsletterDraft[] = [
         status: "source_backed",
         source_refs: ["AGENTS.md"],
       },
+    ],
+    x_thread_beats: [
+      "every coding agent i use eventually runs into the same boring problem: it needs a place to put responsibility.",
+      "that is what i mean by a control plane.",
+      "the useful contract is intent -> authority -> operation -> proof -> state.",
+      "safe lanes let agents move without asking me for permission every five minutes.",
+      "hard gates keep dns, auth, secrets, sends, live endpoints, and irreversible actions behind explicit authority.",
+      "proof beats trust because the next agent has to continue from the artifact.",
+      "NEEDS-ANI is my human syscall queue: approval, choice, account action, identity, payment, secret setup, final taste.",
+      "admin.anipotts.com should make state legible before it makes state mutable.",
+      "the system i want is boring: agents know what they can do next.",
     ],
     blocked_actions: [
       "write production d1 issue",
