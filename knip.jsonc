@@ -22,9 +22,6 @@
         "src/routes/**/*.tsx"
       ]
     },
-    "apps/labs": {
-      "entry": ["open-next.config.ts"]
-    },
     "apps/www": {
       "ignoreDependencies": ["@iconify-json/ph"]
     },

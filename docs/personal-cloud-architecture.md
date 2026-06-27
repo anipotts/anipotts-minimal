@@ -1,6 +1,6 @@
 # Personal Cloud Architecture
 
-Multi-month vision doc for the anipotts personal infrastructure. Companion to `docs/cloudflare-infrastructure.md` (deploy substrate) and `docs/per-project-vercel-migration.md` (project-by-project Vercel exit). This one is the _destination_ the migrations are walking toward.
+Multi-month vision doc for the anipotts personal infrastructure. Companion to `docs/archive/cloudflare-infrastructure-2026-05-13.md` (archived deploy substrate snapshot) and `docs/per-project-vercel-migration.md` (project-by-project Vercel exit). This one is the _destination_ the migrations are walking toward.
 
 Last updated: 2026-05-13.
 
@@ -62,7 +62,7 @@ Anyone in the input plane can mutate state. The state plane is the only thing bo
 | Email in/out           | **Email Workers** (in), **Email Workers `send_email` binding** (out, replaces Resend per PR #30)                         | Already planned; this fits the same model                                                                                                                                                                            |
 | iPhone integration     | **Apple Shortcuts** → Worker, **Web Push** from DO events                                                                | No new app needed; Shortcuts gives voice + share-sheet + automation                                                                                                                                                  |
 | Browser-side rendering | **Workers Browser Rendering**                                                                                            | OG image generation, screenshot-as-a-service, headless tasks                                                                                                                                                         |
-| Observability          | **Workers Logs** (free), **Logpush to R2** (cheap retention), **Sentry on Workers** (errors), **CF Web Analytics** (RUM) | Already planned in `cloudflare-infrastructure.md`                                                                                                                                                                    |
+| Observability          | **Workers Logs** (free), **Logpush to R2** (cheap retention), **Sentry on Workers** (errors), **CF Web Analytics** (RUM) | Already planned in `docs/archive/cloudflare-infrastructure-2026-05-13.md`                                                                                                                                            |
 
 ## Rudy's role (the keystone)
 
@@ -117,7 +117,7 @@ What stays on Mini:
 What gets removed/downgraded on Mini:
 
 - `~/Code/active/mini-api` http server on port 3456: stops being the user-facing API. The same code can stay running for a transition period, but new admin code never calls it. Eventually delete.
-- The `*.mini.anipotts.com` wildcard DNS record on Cloudflare: replaced by explicit `api.mini.anipotts.com` (only one in use) → Universal SSL covers it free → cancel ACM ($10/mo saving). See `cloudflare-infrastructure.md` for the ACM analysis.
+- The `*.mini.anipotts.com` wildcard DNS record on Cloudflare: replaced by explicit `api.mini.anipotts.com` (only one in use) → Universal SSL covers it free → cancel ACM ($10/mo saving). See `docs/archive/cloudflare-infrastructure-2026-05-13.md` for the ACM analysis.
 
 What Mini publisher daemons look like:
 
@@ -184,8 +184,8 @@ iMessage stays the conversational interface (Rudy). Shortcuts is the verb-only i
 | **`*.mini.anipotts.com` wildcard DNS**                                                         | **KILL**                     | Replace with explicit `api.mini.anipotts.com` record. Universal SSL covers it free. Cancels ACM ($10/mo).                                                                    |
 | **Cloudflare Tunnel `cloudflared-mini-api.plist`**                                             | **KEEP**                     | Exposes Mini for the rare ssh-via-domain case + transition-window backstop for old admin REST/SSE.                                                                           |
 | **Workers Cron Triggers**                                                                      | **NEW**                      | Replace any remaining "X polls Y" pattern with cron + DO mutation.                                                                                                           |
-| **Workers Logs** (`[observability] enabled = true` in every wrangler.toml)                     | **NEW (planned)**            | Per `cloudflare-infrastructure.md` adoption list.                                                                                                                            |
-| **CF Web Analytics**                                                                           | **NEW (planned)**            | Per `cloudflare-infrastructure.md`.                                                                                                                                          |
+| **Workers Logs** (`[observability] enabled = true` in every wrangler.toml)                     | **NEW (planned)**            | Per `docs/archive/cloudflare-infrastructure-2026-05-13.md` adoption list.                                                                                                    |
+| **CF Web Analytics**                                                                           | **NEW (planned)**            | Per `docs/archive/cloudflare-infrastructure-2026-05-13.md`.                                                                                                                  |
 
 ## Build order (small honest steps)
 
@@ -226,7 +226,7 @@ Auth: CF Access, same group as current admin.
 
 ## Cross-references
 
-- Deploy substrate + repo-level adoption + monitoring posture: `docs/cloudflare-infrastructure.md`
+- Deploy substrate + repo-level adoption + monitoring posture: `docs/archive/cloudflare-infrastructure-2026-05-13.md`
 - Per-project Vercel exit plan for 9 domain-bearing projects: `docs/per-project-vercel-migration.md`
 - Current state of all in-flight PRs (this repo): see open PRs #40, #41, #42 + cross-account `wigglesburg.com` PR #1 (first migration)
 
