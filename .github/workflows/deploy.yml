@@ -45,12 +45,6 @@ on:
         default: "false"
         type: choice
         options: ["false", "true"]
-      labs:
-        description: "deploy labs.anipotts.com"
-        required: true
-        default: "false"
-        type: choice
-        options: ["false", "true"]
       ingest:
         description: "deploy ingest worker"
         required: true
@@ -82,7 +76,6 @@ jobs:
       www: ${{ steps.filter.outputs.www }}
       admin: ${{ steps.filter.outputs.admin }}
       admin-solid: ${{ steps.filter.outputs.admin-solid }}
-      labs: ${{ steps.filter.outputs.labs }}
       ingest: ${{ steps.filter.outputs.ingest }}
       newsletter: ${{ steps.filter.outputs.newsletter }}
       weekly-email: ${{ steps.filter.outputs.weekly-email }}
@@ -114,9 +107,6 @@ jobs:
               - "packages/styles/**"
               - "packages/types/**"
               - "services/**"
-            labs:
-              - "apps/labs/**"
-              - "packages/config/**"
             ingest:
               - "workers/ingest/**"
             newsletter:
@@ -237,45 +227,6 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: apps/admin-solid
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  deploy-labs:
-    name: Deploy labs
-    needs: [changes]
-    if: >
-      (github.event_name == 'workflow_dispatch' && inputs.labs == 'true') ||
-      (github.event_name == 'push' && needs.changes.outputs.labs == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.5.2"
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build labs
-        run: pnpm turbo build --filter=@anipotts/labs
-
-      - name: Build for Cloudflare
-        run: npx opennextjs-cloudflare build
-        working-directory: apps/labs
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          workingDirectory: apps/labs
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 

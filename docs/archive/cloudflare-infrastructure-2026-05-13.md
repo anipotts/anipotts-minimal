@@ -1,5 +1,9 @@
 # Cloudflare Infrastructure Plan
 
+Archived 2026-06-27. This was a 2026-05-13 substrate plan and PR triage
+snapshot. It is historical reference only; current platform state lives in
+`docs/platform-architecture.md`.
+
 Living document for the anipotts.com monorepo's deploy substrate. The short version: production already runs entirely on Cloudflare. This doc captures what's there, what's vestigial, what to adopt next, and how to handle every open PR and issue under that lens.
 
 Last updated: 2026-05-13.

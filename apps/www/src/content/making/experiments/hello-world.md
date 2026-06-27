@@ -1,11 +1,11 @@
 ---
 title: hello, labs
 date: 2026-05-13
-summary: First experiment after porting the static site to Next 15 on Vercel.
+summary: Archived labs experiment from the old labs app.
 tags: [meta, infra]
 ---
 
-This page is the human side of [labs.anipotts.com](https://labs.anipotts.com). The bot side lives at [`anipotts/labs`](https://github.com/anipotts/labs) and gets pulled in at build time.
+This page is archived from the old labs app. The bot side lives at [`anipotts/labs`](https://github.com/anipotts/labs); the monorepo now keeps only the public Astro site and Astro admin app as first-class app surfaces.
 
 ## Why two repos
 

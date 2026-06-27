@@ -1,12 +1,13 @@
 # anipotts.com
 
-Monorepo for anipotts.com and its admin + labs surfaces.
+Monorepo for anipotts.com and its admin surface.
 
 ## Stack
 
-- Public site: Astro 5 (`apps/www`) on `@astrojs/cloudflare`, static output, served via Cloudflare Workers.
-- Legacy admin (`apps/admin`, Next.js) being replaced by `apps/admin-solid` (SolidStart).
-- `apps/labs` (Next.js), Cloudflare Workers under `workers/*`, shared `packages/*`.
+- Public site: Astro 5 (`apps/www`) on `@astrojs/cloudflare`, served via Cloudflare Workers.
+- Admin: Astro 5 (`apps/admin`) on `@astrojs/cloudflare`, served via Cloudflare Workers.
+- Legacy admin rollback: `apps/admin-solid` until passkey proof is complete.
+- Cloudflare Workers under `workers/*`, shared `packages/*`.
 - Git-first public content: canonical markdown collections under `apps/www/src/content`, synced to Cloudflare D1.
 
 ## Quick start
@@ -56,3 +57,4 @@ The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`). Only set en
 ## Archives
 
 Site version history and how to reach the pre-astro code: see [`archives/README.md`](archives/README.md).
+Labs app reference material is archived under [`docs/archive/labs`](docs/archive/labs).

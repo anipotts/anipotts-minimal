@@ -1,6 +1,9 @@
 # Per-Project Vercel → Cloudflare Migration Plan
 
-Companion to `docs/cloudflare-infrastructure.md`. That doc covers the anipotts.com monorepo and the broader account picture. This doc plans the actual project-by-project migrations for the 9 domains slated to move.
+Companion to `docs/archive/cloudflare-infrastructure-2026-05-13.md`. That
+archived doc covered the anipotts.com monorepo and the broader account picture
+at the time. This doc plans the actual project-by-project migrations for the 9
+domains slated to move.
 
 Last updated: 2026-05-13.
 
@@ -30,7 +33,7 @@ Migrate these 9 domain-bearing Vercel projects under the `anipotts` Vercel team 
 
 **Symphony (quantercise).** The Symphony daemon on `ap-mini` runs autonomous Linear-driven loops against `quantercise`. Per the infra map, it does fresh git clones into `~/symphony-workspaces/QUA-N/` per issue and pushes back. Modifying the deploy substrate without coordinating with Symphony will cause merge conflicts and blow up autonomous PRs in flight. **Pause Symphony before touching quantercise.** `ssh mini 'launchctl bootout gui/$(id -u)/com.symphony.quantercise'`. Restart after migration is verified.
 
-**GitHub App scoping.** Vercel GitHub App stays installed on each repo until migration is verified (so the rollback path stays open). Once a migration is verified, remove that repo from the app's selected list (one DELETE call per repo, see `docs/cloudflare-infrastructure.md`).
+**GitHub App scoping.** Vercel GitHub App stays installed on each repo until migration is verified (so the rollback path stays open). Once a migration is verified, remove that repo from the app's selected list (one DELETE call per repo, see `docs/archive/cloudflare-infrastructure-2026-05-13.md`).
 
 ## Per-project assessments
 

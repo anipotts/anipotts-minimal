@@ -10,7 +10,8 @@ This repo owns:
 - `anipotts.com`: public Astro site in `apps/www`
 - `admin.anipotts.com`: target Astro admin app in `apps/admin`
 - legacy admin rollback worker in `apps/admin-solid`
-- legacy/reference surfaces in `apps/labs` and retained `workers/*`
+- archived labs reference material in `docs/archive/labs` and retained
+  `workers/*`
 - shared code in `packages/*`
 
 Agents should move this repo forward. Do the work, verify it, commit it, push
@@ -36,6 +37,7 @@ Primary workflows are intentionally limited to:
 Do not add separate Dependabot automerge, external review, production
 promotion, or broad deploy workflows. Dependency updates should pass through
 the same PR checks and scoped deploy logic as other changes.
+`apps/labs` is archived and is not a deploy target.
 
 ## current standing authority
 

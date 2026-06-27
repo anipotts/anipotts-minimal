@@ -1,5 +1,9 @@
 # @anipotts/labs
 
+Archived 2026-06-27 when the monorepo was reduced toward one public Astro app
+and one Astro admin app. This document is historical reference only. The
+`apps/labs` app and deploy target no longer exist in this repo.
+
 Next.js 16 + Tailwind v4 app that serves [labs.anipotts.com](https://labs.anipotts.com). Replaces the hand-rolled static HTML site previously deployed to Cloudflare Pages, moving onto a Cloudflare Worker via OpenNext (`@opennextjs/cloudflare`) so it lives next to `apps/www` and `apps/admin` on the same deploy substrate.
 
 ## Routes
