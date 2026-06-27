@@ -72,7 +72,7 @@ jobs:
                 ;;
             esac
             case "$file" in
-              apps/admin/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
+              apps/admin/*|packages/config/*|packages/content/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
                 admin=true
                 ;;
             esac

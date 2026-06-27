@@ -21,7 +21,7 @@
       "use": "read-only content inventory and admin editing progression"
     },
     {
-      "ref": "apps/admin/src/data/content.ts",
+      "ref": "packages/content/src/admin/content.ts",
       "use": "Astro admin static content inventory and preview-only model"
     },
     {
@@ -70,7 +70,7 @@
       "source_refs": [
         "docs/admin-v2-architecture.md",
         "docs/content-admin-editor-brief.md",
-        "apps/admin/src/data/content.ts"
+        "packages/content/src/admin/content.ts"
       ],
       "thread_beat": "the control plane maps what i meant to what was allowed to what changed."
     }
