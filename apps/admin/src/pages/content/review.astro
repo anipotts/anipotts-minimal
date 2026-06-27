@@ -3,6 +3,9 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import {
   contentInventory,
   contentInventorySource,
+  contentOperationSchemaSource,
+  contentOperationTables,
+  contentOperationTemplates,
   contentPreviewItems,
 } from "../../data/content";
 
@@ -16,7 +19,53 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
   <section class="meta-strip" aria-label="content review source">
     <span>{contentInventory.length} sources</span>
     <span>{contentPreviewItems.length} previews</span>
+    <span>{contentOperationTables.length} d1 tables</span>
     <span>{contentInventorySource.architecture_doc}</span>
+  </section>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>operation schema</p>
+        <h2>draft model is ready for D1</h2>
+      </div>
+      <span>{contentOperationSchemaSource.mode}</span>
+    </div>
+    <div class="lane-grid">
+      <div>
+        <h3>tables</h3>
+        <div class="record-list">
+          {
+            contentOperationTables.map((table) => (
+              <article class="compact-row">
+                <strong>{table.table}</strong>
+                <span>{table.write_state}</span>
+                <small>{table.purpose}</small>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+      <div>
+        <h3>sample operation</h3>
+        <div class="record-list">
+          {
+            contentOperationTemplates.map((operation) => (
+              <article class="compact-row">
+                <strong>{operation.operation_id}</strong>
+                <span>
+                  {operation.status} / {operation.authority_state}
+                </span>
+                <small>
+                  allowed: {operation.allowed_actions.join(", ")}. blocked:{" "}
+                  {operation.forbidden_actions.join(", ")}.
+                </small>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
   </section>
 
   <div class="review-board">

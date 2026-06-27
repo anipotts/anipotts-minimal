@@ -15,8 +15,8 @@ structured content/state model, and one predictable CI/CD path.
 | legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                                |
 | labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                          |
 | workers        | `workers/*`                         | review individually | keep only production-required workers                    |
-| shared content | `packages/content`, `packages/lib`  | started             | keep content/editor schema in `packages/content`         |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | use for content/admin state with reviewed migrations     |
+| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables           |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | apply additive content operation schema, then prove it   |
 
 ## current inventory
 
@@ -128,5 +128,6 @@ Rules:
    2026-06-27.
 8. review workers and delete unneeded worker targets.
 9. expand `packages/content` from static content inventory into the durable
-   content schema and D1 adapter layer.
+   operation schema and D1 adapter layer. started with
+   `drizzle/migrations/0007_content_operations.sql`.
 10. reduce deploy workflow inputs to retained production targets.
