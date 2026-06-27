@@ -16,7 +16,7 @@ export const PASSKEY_SESSION_COOKIE = "admin_passkey_session";
 const SESSION_DAYS = 30;
 const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60;
 const CHALLENGE_MAX_AGE_MS = 10 * 60 * 1000;
-const RP_ID = "admin.anipotts.com";
+const PRODUCTION_RP_ID = "admin.anipotts.com";
 const RP_NAME = "anipotts admin";
 const EXPECTED_ORIGIN = "https://admin.anipotts.com";
 const LOCAL_ORIGIN = "http://localhost:3001";
@@ -89,11 +89,13 @@ export type PasskeyStatus = {
   available: boolean;
   mode: "ready" | "missing_db";
   credential_count: number;
+  audit_count: number;
   has_session: boolean;
   can_register: boolean;
   access_identity_present: boolean;
   access_identity_hint: string | null;
   expected_origin: string;
+  expected_rp_id: string;
   current_origin: string;
   next_safe_action: string;
 };
@@ -129,11 +131,13 @@ export async function getPasskeyStatus(
       available: false,
       mode: "missing_db",
       credential_count: 0,
+      audit_count: 0,
       has_session: false,
       can_register: false,
       access_identity_present: Boolean(accessIdentity),
       access_identity_hint: accessIdentity,
       expected_origin: EXPECTED_ORIGIN,
+      expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
       next_safe_action:
         "deploy with DB binding and apply migration before enrollment",
@@ -141,9 +145,11 @@ export async function getPasskeyStatus(
   }
 
   let credentialCount = 0;
+  let auditCount = 0;
   let session: SessionRow | null = null;
   try {
     credentialCount = await countActiveCredentials(db);
+    auditCount = await countAuditEvents(db);
     session = await getSession(context, db);
   } catch (error) {
     if (!isMissingPasskeyTable(error)) throw error;
@@ -151,11 +157,13 @@ export async function getPasskeyStatus(
       available: false,
       mode: "missing_db",
       credential_count: 0,
+      audit_count: 0,
       has_session: false,
       can_register: false,
       access_identity_present: Boolean(accessIdentity),
       access_identity_hint: accessIdentity,
       expected_origin: EXPECTED_ORIGIN,
+      expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
       next_safe_action:
         "apply drizzle/migrations/0006_admin_passkeys.sql before enrollment",
@@ -168,11 +176,13 @@ export async function getPasskeyStatus(
     available: true,
     mode: "ready",
     credential_count: credentialCount,
+    audit_count: auditCount,
     has_session: Boolean(session),
     can_register: canRegister,
     access_identity_present: Boolean(accessIdentity),
     access_identity_hint: accessIdentity,
     expected_origin: EXPECTED_ORIGIN,
+    expected_rp_id: expectedRpId(context),
     current_origin: context.url.origin,
     next_safe_action: session
       ? "passkey session active"
@@ -209,9 +219,10 @@ export async function registrationOptions(
   }
 
   const credentials = await listActiveCredentials(db);
+  const rpID = expectedRpId(context);
   const options = await generateRegistrationOptions({
     rpName: RP_NAME,
-    rpID: RP_ID,
+    rpID,
     userID: new TextEncoder().encode(USER_ID),
     userName: USER_NAME,
     userDisplayName: USER_DISPLAY_NAME,
@@ -242,7 +253,7 @@ export async function verifyRegistration(
     response: body,
     expectedChallenge: challenge.challenge,
     expectedOrigin: expectedOrigin(context),
-    expectedRPID: RP_ID,
+    expectedRPID: expectedRpId(context),
     requireUserVerification: true,
   });
 
@@ -273,6 +284,12 @@ export async function verifyRegistration(
       nowIso(),
     )
     .run();
+  await recordAudit(
+    db,
+    "passkey.credential.registered",
+    info.credential.id,
+    "registered platform passkey for admin",
+  );
 
   return json({
     verified: true,
@@ -296,7 +313,7 @@ export async function authenticationOptions(
   }
 
   const options = await generateAuthenticationOptions({
-    rpID: RP_ID,
+    rpID: expectedRpId(context),
     allowCredentials: credentials.map((credential) => ({
       id: credential.credential_id,
       transports: parseTransports(credential.transports),
@@ -316,6 +333,12 @@ export async function verifyAuthentication(
   const body = (await context.request.json()) as AuthenticationResponseJSON;
   const credential = await findCredential(db, body.id);
   if (!credential) {
+    await recordAudit(
+      db,
+      "passkey.authentication.denied",
+      null,
+      "denied authentication for missing or revoked credential",
+    );
     return json(
       { verified: false, error: "credential_not_found" },
       { status: 404 },
@@ -327,7 +350,7 @@ export async function verifyAuthentication(
     response: body,
     expectedChallenge: challenge.challenge,
     expectedOrigin: expectedOrigin(context),
-    expectedRPID: RP_ID,
+    expectedRPID: expectedRpId(context),
     credential: toWebAuthnCredential(credential),
     requireUserVerification: true,
   });
@@ -375,13 +398,19 @@ export async function verifyAuthentication(
       nowIso(),
     )
     .run();
+  await recordAudit(
+    db,
+    "passkey.session.created",
+    credential.credential_id,
+    "created app-native admin session",
+  );
 
   return json(
     {
       verified: true,
       next_safe_action: "passkey session active",
     },
-    { headers: { "set-cookie": sessionCookie(token) } },
+    { headers: { "set-cookie": sessionCookie(context, token) } },
   );
 }
 
@@ -389,6 +418,7 @@ export async function logout(context: PasskeyContext): Promise<Response> {
   const db = dbFromContext(context);
   const token = context.cookies.get(PASSKEY_SESSION_COOKIE)?.value;
   if (db && token) {
+    const session = await getSession(context, db);
     const tokenHash = await hashToken(token);
     await db
       .prepare(
@@ -398,11 +428,17 @@ export async function logout(context: PasskeyContext): Promise<Response> {
       )
       .bind(nowIso(), nowIso(), tokenHash)
       .run();
+    await recordAudit(
+      db,
+      "passkey.session.revoked",
+      session?.credential_id ?? null,
+      session ? "revoked app-native admin session" : "logout without session",
+    );
   }
 
   return json(
     { ok: true, next_safe_action: "passkey session cleared" },
-    { headers: { "set-cookie": expiredSessionCookie() } },
+    { headers: { "set-cookie": expiredSessionCookie(context) } },
   );
 }
 
@@ -444,6 +480,13 @@ async function countActiveCredentials(db: D1Database): Promise<number> {
        WHERE user_id = ? AND revoked_at IS NULL`,
     )
     .bind(USER_ID)
+    .first<{ count: number }>();
+  return Number(row?.count ?? 0);
+}
+
+async function countAuditEvents(db: D1Database): Promise<number> {
+  const row = await db
+    .prepare(`SELECT COUNT(*) AS count FROM admin_passkey_audit`)
     .first<{ count: number }>();
   return Number(row?.count ?? 0);
 }
@@ -560,6 +603,13 @@ function expectedOrigin(context: PasskeyContext): string {
   return EXPECTED_ORIGIN;
 }
 
+function expectedRpId(context: PasskeyContext): string {
+  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+    return context.url.hostname;
+  }
+  return PRODUCTION_RP_ID;
+}
+
 function accessIdentityHint(context: PasskeyContext): string | null {
   const email = context.request.headers.get(
     "cf-access-authenticated-user-email",
@@ -570,26 +620,48 @@ function accessIdentityHint(context: PasskeyContext): string | null {
   return `${name.slice(0, 2)}***@${domain}`;
 }
 
-function sessionCookie(token: string): string {
-  return [
+function sessionCookie(context: PasskeyContext, token: string): string {
+  const attributes = [
     `${PASSKEY_SESSION_COOKIE}=${token}`,
     "Path=/",
     `Max-Age=${SESSION_MAX_AGE_SECONDS}`,
     "HttpOnly",
-    "Secure",
     "SameSite=Lax",
-  ].join("; ");
+  ];
+  if (usesSecureCookie(context)) attributes.splice(4, 0, "Secure");
+  return attributes.join("; ");
 }
 
-function expiredSessionCookie(): string {
-  return [
+function expiredSessionCookie(context: PasskeyContext): string {
+  const attributes = [
     `${PASSKEY_SESSION_COOKIE}=`,
     "Path=/",
     "Max-Age=0",
     "HttpOnly",
-    "Secure",
     "SameSite=Lax",
-  ].join("; ");
+  ];
+  if (usesSecureCookie(context)) attributes.splice(4, 0, "Secure");
+  return attributes.join("; ");
+}
+
+function usesSecureCookie(context: PasskeyContext): boolean {
+  return !(context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV);
+}
+
+async function recordAudit(
+  db: D1Database,
+  eventType: string,
+  credentialId: string | null,
+  summary: string,
+): Promise<void> {
+  await db
+    .prepare(
+      `INSERT INTO admin_passkey_audit
+        (id, event_type, credential_id, summary, created_at)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+    .bind(randomId(), eventType, credentialId, summary, nowIso())
+    .run();
 }
 
 function randomId(): string {
