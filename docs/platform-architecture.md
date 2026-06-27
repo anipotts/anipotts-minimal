@@ -11,7 +11,7 @@ structured content/state model, and one predictable CI/CD path.
 | -------------- | ----------------------------------------- | ------------------- | --------------------------------------------------------- |
 | public site    | `apps/www`                                | keep                | keep as Astro public app for `anipotts.com`               |
 | admin site     | `apps/admin`                              | canonical cutover   | prove passkey registration and then remove Access         |
-| current admin  | `apps/admin-solid`                        | legacy rollback     | keep briefly on legacy route, then archive or delete      |
+| current admin  | `apps/admin-solid`                        | legacy rollback     | keep briefly, then archive or delete after passkey proof  |
 | legacy admin   | `docs/archive/admin-next-legacy.md`       | archived            | no Next admin app remains                                 |
 | labs           | `docs/archive/labs`                       | archived            | no app or deploy target remains                           |
 | workers        | `workers/*`                               | review individually | keep only production-required workers                     |
@@ -50,8 +50,9 @@ structured content/state model, and one predictable CI/CD path.
 
 ## route parity target
 
-The Astro admin replacement must cover these live admin-solid routes before
-`apps/admin-solid` is removed:
+The Astro admin replacement covers these live admin-solid routes. Keep them
+covered while passkey proof and Access removal are completed, then remove
+`apps/admin-solid`:
 
 | Route              | Purpose                              |
 | ------------------ | ------------------------------------ |
@@ -111,7 +112,7 @@ Rules:
 1. keep `main` production-reflective.
 2. finish passkey proof while Access is still available.
 3. remove Access after app-native proof and rollback proof.
-4. port admin-solid routes into Astro `apps/admin`.
+4. keep admin-solid route parity covered in Astro `apps/admin`.
 5. deploy `apps/admin` as the admin production target.
 6. remove or archive `apps/admin-solid`.
 7. archive useful labs docs, then delete the labs app target if unused. done on

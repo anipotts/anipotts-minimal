@@ -44,7 +44,7 @@ export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
   architecture_doc: "docs/admin-v2-architecture.md",
   mode: "read_only_static_inventory",
-  generated_from: "apps/www source files at main 31204f6",
+  generated_from: "current tracked apps/www source files",
 };
 
 export const contentInventory: ContentInventoryItem[] = [
@@ -176,16 +176,16 @@ export const contentInventory: ContentInventoryItem[] = [
   {
     id: "writing.claude_stats_link",
     surface: "writing",
-    title: "stale claude stats link",
+    title: "orchestrating stats link",
     source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
     current_value:
-      "Current main still links to /claude; draft PR #73 changes this to /orchestrating.",
+      "The writing post now links to /orchestrating instead of the legacy /claude path.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Refresh or close PR #73 depending on whether Ani wants that public cleanup deployed.",
+      "Keep this as the canonical route unless the public navigation changes again.",
     required_authority: [],
-    proof_ids: ["pr.73.public-cleanup.pending"],
+    proof_ids: ["content.writing.orchestrating-link.current"],
   },
   {
     id: "newsletter.subscribe_copy",
@@ -267,7 +267,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     inventory_id: "writing.claude_stats_link",
     surface: "writing",
     title: "replace stale claude stats link",
-    status: "needs approval",
+    status: "preview",
     risk_level: "low",
     source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
     current_value:
@@ -275,15 +275,12 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     proposed_value:
       "You can see the broader agent workflow on [my orchestrating page](/orchestrating).",
     preview_route: "/writing/saturdays-are-for-claude-code",
-    authority_state: "public_site_safe_lane_if_refreshed",
-    required_approval_ids: ["pr.73.refresh-or-close"],
-    proof_ids: ["pr.73.public-cleanup.pending"],
-    blocked_actions: [
-      "merge stale PR #73 without refresh",
-      "deploy without checks",
-    ],
+    authority_state: "public_site_safe_lane_absorbed",
+    required_approval_ids: [],
+    proof_ids: ["content.writing.orchestrating-link.current"],
+    blocked_actions: ["deploy without checks"],
     next_safe_action:
-      "Refresh or cherry-pick PR #73 if Ani wants the tiny public cleanup to ship.",
+      "Verify the public writing route and keep stale PR #73 closed.",
   },
   {
     id: "preview.newsletter.copy-source",
