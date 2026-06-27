@@ -59,22 +59,13 @@ jobs:
 
           www=false
           admin=false
+          admin_solid=false
           labs=false
           ingest=false
           newsletter=false
           weekly_email=false
 
           while IFS= read -r file; do
-            case "$file" in
-              package.json|pnpm-lock.yaml|pnpm-workspace.yaml|turbo.json)
-                www=true
-                admin=true
-                labs=true
-                ingest=true
-                newsletter=true
-                weekly_email=true
-                ;;
-            esac
             case "$file" in
               apps/www/*|packages/lib/*|packages/styles/*|packages/types/*)
                 www=true
@@ -83,6 +74,11 @@ jobs:
             case "$file" in
               apps/admin/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
                 admin=true
+                ;;
+            esac
+            case "$file" in
+              apps/admin-solid/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
+                admin_solid=true
                 ;;
             esac
             case "$file" in
@@ -110,6 +106,7 @@ jobs:
           {
             echo "www=$www"
             echo "admin=$admin"
+            echo "admin_solid=$admin_solid"
             echo "labs=$labs"
             echo "ingest=$ingest"
             echo "newsletter=$newsletter"
@@ -126,6 +123,7 @@ jobs:
         if: >
           steps.targets.outputs.www == 'true' ||
           steps.targets.outputs.admin == 'true' ||
+          steps.targets.outputs.admin_solid == 'true' ||
           steps.targets.outputs.labs == 'true' ||
           steps.targets.outputs.ingest == 'true' ||
           steps.targets.outputs.newsletter == 'true' ||
@@ -139,6 +137,7 @@ jobs:
             --ref main \
             -f www=${{ steps.targets.outputs.www }} \
             -f admin=${{ steps.targets.outputs.admin }} \
+            -f admin_solid=${{ steps.targets.outputs.admin_solid }} \
             -f labs=${{ steps.targets.outputs.labs }} \
             -f ingest=${{ steps.targets.outputs.ingest }} \
             -f newsletter=${{ steps.targets.outputs.newsletter }} \
