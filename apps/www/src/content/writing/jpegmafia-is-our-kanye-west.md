@@ -3,7 +3,7 @@ slug: jpegmafia-is-our-kanye-west
 title: jpegmafia is our kanye west
 summary: a short note on taste, consensus, feedback, and shipping with strong defaults.
 tags: [music, product, execution]
-status: published
+status: draft
 published_at: 2026-02-12
 ---
 
