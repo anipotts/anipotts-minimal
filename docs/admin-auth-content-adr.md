@@ -313,6 +313,7 @@ Implementation order:
 See also:
 
 - `docs/admin-access-simplification-plan.md`
+- `docs/admin-passkey-auth-plan.md`
 - `docs/admin-content-draft-operations.md`
 
 ## references
