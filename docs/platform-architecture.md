@@ -31,12 +31,12 @@ structured content/state model, and one predictable CI/CD path.
 
 ### workers
 
-| Path                   | Role today                               | Classification                   |
-| ---------------------- | ---------------------------------------- | -------------------------------- |
-| `workers/ingest`       | ingest worker                            | review                           |
-| `workers/newsletter`   | newsletter queue worker                  | review                           |
-| `workers/state`        | `api.anipotts.com` state plane candidate | keep with explicit deploy target |
-| `workers/weekly-email` | weekly email worker                      | review                           |
+| Path                   | Role today                                                   | Classification                        |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------- |
+| `workers/ingest`       | deployed cron/fetch worker for D1 ingest and event receivers | keep, review writers before expansion |
+| `workers/newsletter`   | deployed queue/fetch worker for newsletter sends             | keep, outbound-send gated             |
+| `workers/state`        | deployed `api.anipotts.com` durable-object state plane       | keep with explicit deploy target      |
+| `workers/weekly-email` | deployed scheduled email worker                              | keep, outbound-send gated             |
 
 ### packages
 
@@ -112,7 +112,10 @@ Rules:
 - docs-only changes deploy nothing.
 - lockfile and root package changes never deploy every target by default.
 - public site changes deploy `www` only.
-- admin changes deploy only the affected admin target.
+- admin changes and `packages/content` changes deploy only the Astro admin
+  target.
+- `packages/lib` and `packages/styles` changes deploy `www` only because
+  `apps/admin` does not depend on them.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
 - D1 migrations run as reviewed migration steps before app deploy.
 - Anthropic and Claude Code API-backed GitHub workflows are disabled for this
