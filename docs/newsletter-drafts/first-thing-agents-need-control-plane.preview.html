@@ -1,29 +1,361 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>the first thing your agents need is a control plane</title>
-<style>
-:root{color-scheme:light dark;--bg:#f7f5f0;--ink:#171717;--muted:#5f635f;--line:#d8d2c7;--panel:#fffdf7;--accent:#1b5c8a}@media(prefers-color-scheme:dark){:root{--bg:#141413;--ink:#f2efe8;--muted:#b8b1a7;--line:#39362f;--panel:#1d1c1a;--accent:#86b9df}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:920px;margin:0 auto;padding:48px 24px 80px}.eyebrow,.kicker{margin:0 0 8px;color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}h1{font-size:clamp(36px,6vw,68px);line-height:.98;margin:0 0 16px;letter-spacing:0}h2{font-size:24px;margin:0 0 12px;letter-spacing:0}.dek{font-size:20px;max-width:760px;color:var(--muted);margin:0 0 28px}.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:28px 0}.meta div,section,.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}.label{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}.hook{font-size:22px;line-height:1.35;margin:0}.spine{display:flex;gap:8px;flex-wrap:wrap}.spine span{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:transparent}.sections{display:grid;gap:16px;margin-top:24px}.beat{color:var(--accent);font-weight:650}table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.thread li{margin-bottom:8px}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}.close{font-size:20px}.blocked{color:var(--muted)}
-</style>
-</head>
-<body>
-<main>
-<p class="eyebrow">newsletter draft preview</p>
-<h1>the first thing your agents need is a control plane</h1>
-<p class="dek">a practical note from building admin.anipotts.com as a read-only operator dashboard first, then a content review surface, then a guarded write path.</p>
-<div class="meta"><div><span class="label">status</span>idea</div><div><span class="label">slug</span><code>first-thing-agents-need-control-plane</code></div><div><span class="label">subject</span>the first thing your agents need is a control plane</div></div>
-<section><p class="kicker">hook</p><p class="hook">no matter what coding agent you use, the first useful thing to build around it is a control plane: a place for authority, proof, and the few decisions that come back to you.</p></section>
-<div class="box"><span class="label">spine</span><div class="spine"><span>intent</span><span>authority</span><span>operation</span><span>proof</span><span>state</span></div></div>
-<div class="sections"><section><p class="kicker">note</p><h2>safe lanes versus hard gates</h2><p>start with the contract. some work is safe to finish end to end: inspect, edit, verify, commit, push, and open a draft PR. other work is gated because it touches live systems, secrets, auth, DNS, publishing, outbound sends, or irreversible state. the contract makes the next allowed move obvious.</p><p class="beat">the useful split is allowed operations versus gated operations.</p></section>
-<section><p class="kicker">receipt</p><h2>proof beats trust</h2><p>a finished agent task should leave proof that another agent can inspect: changed files, exact checks, commits, PRs, deploy evidence when deploys are authorized, and explicit blockers when they are not. trust is too vague for a shared repo. proof is portable.</p><p class="beat">proof lets the next agent continue the work without inheriting chat memory as a source of truth.</p></section>
-<section><p class="kicker">note</p><h2>NEEDS-ANI as a human syscall queue</h2><p>the human return path should be small. NEEDS-ANI has one job: agents ask for the few decisions only Ani can make, including approval, choice, secret setup, account-side action, identity, payment, or final taste.</p><p class="beat">a good human queue is narrow enough to answer from a phone.</p></section>
-<section><p class="kicker">worklog</p><h2>admin as the control plane</h2><p>admin.anipotts.com should make state legible before it makes state mutable. content, fleet state, handoffs, approvals, and proof belong in one surface because agents need to know what they are allowed to do next.</p><ul><li>read-only operator dashboard first</li><li>content inventory and preview states next</li><li>guarded write paths only after authority exists</li><li>live gates visible before any live control exists</li></ul><p class="beat">the control plane maps intent to authority to operation to proof to state.</p></section></div>
-<section><p class="kicker">close</p><p class="close">the future looks like a system where agents know what they are allowed to do next, what proof they owe, and when the right move is to return one clear decision to Ani.</p><p class="blocked">draft only. review for tone, claims, and source refs before any archive or send path.</p></section>
-<section><p class="kicker">x-thread beats</p><ol class="thread"><li>no matter what coding agent you use, the first useful thing to build around it is a control plane.</li><li>agents can write code. the system around them decides where responsibility lands.</li><li>the useful contract is intent -&gt; authority -&gt; operation -&gt; proof -&gt; state.</li><li>safe lanes let agents move without asking for permission every five minutes.</li><li>hard gates keep live systems, secrets, sends, and irreversible actions behind explicit authority.</li><li>proof beats trust because another agent has to continue from the artifact, not the chat.</li><li>NEEDS-ANI is a human syscall queue: approval, choice, account action, identity, payment, final taste.</li><li>admin.anipotts.com should make state legible before it makes state mutable.</li><li>the future is a system where agents know what they are allowed to do next.</li></ol></section>
-<section><p class="kicker">claims</p><table><thead><tr><th>claim</th><th>status</th><th>refs</th></tr></thead><tbody><tr><td>agents in this repo can complete safe lanes end to end but must stop at true gates</td><td>source_backed</td><td>AGENTS.md</td></tr><tr><td>NEEDS-ANI is defined as a narrow human syscall queue</td><td>source_backed</td><td>AGENTS.md</td></tr><tr><td>admin content work should move from read-only inventory to previews before publish paths</td><td>source_backed</td><td>AGENTS.md, docs/content-admin-editor-brief.md</td></tr><tr><td>admin.anipotts.com should become the practical web surface for editing public-site text, previewing changes, reviewing fleet state, and returning decisions</td><td>source_backed</td><td>AGENTS.md</td></tr></tbody></table></section>
-<section><p class="kicker">blocked actions</p><ul><li>write production d1 issue</li><li>publish archive page</li><li>send test email</li><li>broadcast to subscribers</li><li>change DNS</li><li>change auth or Cloudflare Access</li><li>modify env or secrets</li><li>change workers or endpoints</li><li>add admin write path</li><li>merge to main</li></ul></section>
-</main>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>the first thing your agents need is a control plane</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f5f0;
+        --ink: #171717;
+        --muted: #656159;
+        --line: #d8d2c7;
+        --panel: #fffdf7;
+        --accent: #245f86;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141413;
+          --ink: #f2efe8;
+          --muted: #b8b1a7;
+          --line: #39362f;
+          --panel: #1d1c1a;
+          --accent: #8fbee0;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          18px/1.62 ui-serif,
+          Georgia,
+          Cambria,
+          "Times New Roman",
+          serif;
+      }
+
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 56px 24px 88px;
+      }
+
+      header {
+        margin-bottom: 44px;
+      }
+
+      .eyebrow,
+      .label {
+        margin: 0 0 12px;
+        color: var(--accent);
+        font:
+          700 12px/1.2 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 720px;
+        margin: 0 0 18px;
+        font:
+          700 clamp(42px, 7vw, 72px) / 0.98 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        margin: 44px 0 12px;
+        font:
+          700 26px/1.15 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        font:
+          700 18px/1.25 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0 0 18px;
+      }
+
+      .dek {
+        max-width: 680px;
+        color: var(--muted);
+        font-size: 21px;
+        line-height: 1.45;
+      }
+
+      .note {
+        border-left: 3px solid var(--accent);
+        margin: 28px 0 36px;
+        padding: 2px 0 2px 18px;
+        color: var(--muted);
+        font:
+          16px/1.5 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .spine {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 20px 0 32px;
+      }
+
+      .spine span {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 11px;
+        color: var(--muted);
+        font:
+          13px/1 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .callout,
+      .appendix {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 20px;
+      }
+
+      .callout {
+        margin: 34px 0;
+      }
+
+      .callout p:last-child,
+      .appendix p:last-child {
+        margin-bottom: 0;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 20px;
+        padding-left: 22px;
+      }
+
+      li {
+        margin: 0 0 9px;
+      }
+
+      .appendix {
+        margin-top: 48px;
+        font:
+          15px/1.5 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .appendix .label {
+        margin-bottom: 16px;
+      }
+
+      code {
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        font-size: 0.92em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">draft newsletter issue</p>
+        <h1>the first thing your agents need is a control plane</h1>
+        <p class="dek">
+          no matter what coding agent you use, it gets more useful when
+          authority, proof, and the human return path are explicit.
+        </p>
+      </header>
+
+      <p>
+        the first useful thing to build around a coding agent is a control
+        plane: a place where the agent can tell what it is allowed to do, what
+        it must prove, and when it needs to come back to you.
+      </p>
+
+      <p>
+        this is the lesson from building admin.anipotts.com. the product starts
+        as a read-only operator dashboard, then a content review surface, then a
+        guarded write path. the live controls come after the state model is
+        boring and obvious.
+      </p>
+
+      <div class="note">
+        the spine is simple:
+        <code>intent -> authority -> operation -> proof -> state</code>.
+      </div>
+
+      <h2>safe lanes versus hard gates</h2>
+
+      <p>
+        an agent should not have to ask permission for every small move. if the
+        lane is safe, it can inspect, edit, verify, commit, push, and open a
+        draft PR.
+      </p>
+
+      <p>
+        other work needs a hard gate. dns, auth, secrets, env, production
+        content stores, outbound sends, live endpoints, payments, and destructive
+        cleanup all need explicit authority. the point of the control plane is
+        to make that split visible before the agent touches the thing.
+      </p>
+
+      <div class="spine">
+        <span>intent</span>
+        <span>authority</span>
+        <span>operation</span>
+        <span>proof</span>
+        <span>state</span>
+      </div>
+
+      <h2>proof beats trust</h2>
+
+      <p>
+        a finished agent task should leave proof another agent can inspect. the
+        proof can be a commit, a PR, a command result, a deploy record, a
+        screenshot, or a blocked-action list. the important part is that it
+        survives the chat.
+      </p>
+
+      <p>
+        chat memory is too soft for real work. once multiple agents are touching
+        the same repo, the durable object matters more than the explanation. if
+        the next agent cannot pick up from the artifact, the system is still
+        missing the control plane.
+      </p>
+
+      <h2>NEEDS-ANI is the human syscall queue</h2>
+
+      <p>
+        the human return path should be small. NEEDS-ANI has one job: ask for
+        the decisions only Ani can make.
+      </p>
+
+      <p>
+        that means approval, choice, account-side action, identity, payment,
+        secret setup, final taste, or a source-delete call. routine status
+        belongs in commits, PRs, handoffs, and proof records.
+      </p>
+
+      <h2>admin is the control plane</h2>
+
+      <p>
+        admin.anipotts.com should make state legible before it makes state
+        mutable. content, fleet state, handoffs, approvals, and proof belong in
+        one surface because agents need to know what they are allowed to do
+        next.
+      </p>
+
+      <p>
+        the order matters. read-only first. preview second. guarded writes after
+        the authority model is real. the system gets safer when the live button
+        is the last thing added.
+      </p>
+
+      <div class="callout">
+        <h3>working close</h3>
+        <p>
+          the future looks like a system where agents know what they can do
+          next, what proof they owe, and when the right move is to return one
+          clear decision to Ani.
+        </p>
+      </div>
+
+      <section class="appendix">
+        <p class="label">x-thread compatible version</p>
+        <ol>
+          <li>
+            no matter what coding agent you use, the first useful thing to build
+            around it is a control plane.
+          </li>
+          <li>
+            agents can write code. the system around them decides where
+            responsibility lands.
+          </li>
+          <li>
+            the useful contract is
+            <code>intent -> authority -> operation -> proof -> state</code>.
+          </li>
+          <li>
+            safe lanes let agents move without asking for permission every five
+            minutes.
+          </li>
+          <li>
+            hard gates keep live systems, secrets, sends, and irreversible
+            actions behind explicit authority.
+          </li>
+          <li>
+            proof beats trust because the next agent has to continue from the
+            artifact.
+          </li>
+          <li>
+            NEEDS-ANI is the human syscall queue: approval, choice,
+            account-side action, identity, payment, secret setup, final taste.
+          </li>
+          <li>
+            admin.anipotts.com should make state legible before it makes state
+            mutable.
+          </li>
+        </ol>
+      </section>
+
+      <section class="appendix">
+        <p class="label">blocked actions</p>
+        <ul>
+          <li>write production d1 issue</li>
+          <li>publish archive page</li>
+          <li>send test email or broadcast</li>
+          <li>change dns, auth, env, secrets, access, workers, or endpoints</li>
+          <li>add admin write path</li>
+          <li>merge to main</li>
+        </ul>
+      </section>
+    </main>
+  </body>
 </html>
