@@ -23,6 +23,7 @@ export const navItems: NavItem[] = [
   { href: "/content", label: "content", status: "live-source" },
   { href: "/content/review", label: "review", status: "live-source" },
   { href: "/content/preview", label: "preview", status: "live-source" },
+  { href: "/content/operations", label: "operations", status: "live-source" },
   { href: "/newsletter", label: "newsletter", status: "live-source" },
   { href: "/needs-ani", label: "needs ani", status: "live-source" },
   { href: "/proof", label: "proof", status: "live-source" },
