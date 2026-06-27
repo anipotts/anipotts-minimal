@@ -1,0 +1,12 @@
+---
+import AdminTable from "../../components/AdminTable.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { contentRows } from "../../data/admin";
+---
+
+<AdminLayout
+  title="content inventory"
+  deck="Current editable public-site surfaces and their source refs."
+>
+  <AdminTable rows={contentRows} />
+</AdminLayout>

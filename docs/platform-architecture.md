@@ -10,7 +10,7 @@ structured content/state model, and one predictable CI/CD path.
 | Surface        | Target                                    | Status                   | Next action                                               |
 | -------------- | ----------------------------------------- | ------------------------ | --------------------------------------------------------- |
 | public site    | `apps/www`                                | keep                     | keep as Astro public app for `anipotts.com`               |
-| admin site     | `apps/admin`                              | migrate to               | rebuild as Astro admin for `admin.anipotts.com`           |
+| admin site     | `apps/admin`                              | Astro shell started      | port admin-solid behavior and then cut over               |
 | current admin  | `apps/admin-solid`                        | migrate then remove      | port routes into `apps/admin`, then archive or delete     |
 | legacy admin   | old Next.js code in `apps/admin`          | replace in place         | keep only useful models while rebuilding Astro admin      |
 | labs           | `apps/labs`                               | archive/delete candidate | preserve useful content docs, then remove app target      |
@@ -26,7 +26,7 @@ structured content/state model, and one predictable CI/CD path.
 | ------------------ | ----------------------------------------------- | ------------------------ |
 | `apps/www`         | public Astro site and newsletter endpoints      | keep                     |
 | `apps/admin-solid` | live protected admin dashboard, passkey staging | migrate                  |
-| `apps/admin`       | large legacy Next.js admin app                  | replace in place         |
+| `apps/admin`       | Astro admin shell on legacy route               | migrate to canonical     |
 | `apps/labs`        | legacy Next.js labs surface                     | archive/delete candidate |
 
 ### workers

@@ -1,0 +1,12 @@
+---
+import AdminTable from "../components/AdminTable.astro";
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { needsRows } from "../data/admin";
+---
+
+<AdminLayout
+  title="needs ani"
+  deck="Typed human decision queue. This shell shows the queue shape before live feed wiring."
+>
+  <AdminTable rows={needsRows} />
+</AdminLayout>

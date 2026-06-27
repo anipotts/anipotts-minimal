@@ -1,0 +1,27 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { overviewCards } from "../data/admin";
+---
+
+<AdminLayout
+  title="operator overview"
+  deck="Read-only Astro admin shell. Live canonical admin remains admin-solid until parity and passkey proof are complete."
+>
+  <section class="grid" aria-label="operator overview cards">
+    {
+      overviewCards.map((card) => (
+        <article class="panel">
+          <p class={`risk-${card.risk}`}>{card.risk} risk</p>
+          <h2>{card.title}</h2>
+          <p>{card.status}</p>
+          <p>{card.next}</p>
+        </article>
+      ))
+    }
+  </section>
+  <div class="notice">
+    This app is the new Astro target for admin.anipotts.com. It is intentionally
+    protected by the app-native passkey session middleware and currently routed
+    through legacy-admin.anipotts.com while parity is built.
+  </div>
+</AdminLayout>
