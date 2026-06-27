@@ -2,7 +2,7 @@ name = "anipotts-admin-solid"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 account_id = "0f856093bdcd34a7da1bde5ee4385163"
-main = ".output/server/index.mjs"
+main = "worker-entry.mjs"
 workers_dev = true
 
 [assets]
