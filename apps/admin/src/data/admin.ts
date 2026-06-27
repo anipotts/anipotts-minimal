@@ -23,7 +23,9 @@ export const navItems: NavItem[] = [
   { href: "/content", label: "content", status: "live-source" },
   { href: "/content/review", label: "review", status: "live-source" },
   { href: "/content/preview", label: "preview", status: "live-source" },
+  { href: "/newsletter", label: "newsletter", status: "live-source" },
   { href: "/needs-ani", label: "needs ani", status: "live-source" },
+  { href: "/proof", label: "proof", status: "live-source" },
   { href: "/repos", label: "repos", status: "migrating" },
   { href: "/handoffs", label: "handoffs", status: "migrating" },
   { href: "/fleet", label: "fleet", status: "migrating" },
@@ -49,6 +51,18 @@ export const overviewCards: DashboardCard[] = [
     status: "read-only inventory",
     risk: "medium",
     next: "move editable fields into D1-backed draft records",
+  },
+  {
+    title: "proof log",
+    status: "static route proof",
+    risk: "low",
+    next: "move deploy and passkey proof into durable records",
+  },
+  {
+    title: "newsletter drafts",
+    status: "static preview model",
+    risk: "medium",
+    next: "review issue structure in admin before any D1 write or send path",
   },
   {
     title: "legacy cleanup",

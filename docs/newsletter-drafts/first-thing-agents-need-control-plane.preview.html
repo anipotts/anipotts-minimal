@@ -7,22 +7,46 @@
     <style>
       :root {
         color-scheme: light dark;
-        --bg: #f7f5f0;
-        --ink: #171717;
-        --muted: #656159;
-        --line: #d8d2c7;
-        --panel: #fffdf7;
-        --accent: #245f86;
+        --sans: "Instrument Sans Variable", "Instrument Sans", -apple-system,
+          BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+        --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+          "SF Mono", Menlo, monospace;
+        --bg: #fbfaf7;
+        --surface: #f3f1ec;
+        --ink: #1a1a1a;
+        --ink-muted: #6b6b6b;
+        --accent: #2563eb;
+        --accent-soft: rgba(37, 99, 235, 0.08);
+        --border: rgba(0, 0, 0, 0.08);
+        --p-h1: clamp(2rem, 4vw, 2.9rem);
+        --p-h2: clamp(1.5rem, 3vw, 2rem);
+        --p-h3: 1.25rem;
+        --p-hero: clamp(2.4rem, 6vw, 4rem);
+        --p-body: clamp(1rem, 0.5vw + 0.9rem, 1.0625rem);
+        --p-small: 0.875rem;
+        --p-mono: 0.85rem;
+        --s-1: 0.5rem;
+        --s-2: 0.75rem;
+        --s-3: 1rem;
+        --s-4: 1.5rem;
+        --s-5: 2rem;
+        --s-6: 3rem;
+        --s-7: 4rem;
+        --s-8: 6rem;
+        --measure: 65ch;
+        --lh-body: 1.65;
+        --lh-tight: 1.1;
       }
 
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg: #141413;
-          --ink: #f2efe8;
-          --muted: #b8b1a7;
-          --line: #39362f;
-          --panel: #1d1c1a;
-          --accent: #8fbee0;
+          --bg: #11111b;
+          --surface: #1e1e2e;
+          --ink: #cdd6f4;
+          --ink-muted: #7f849c;
+          --accent: #89b4fa;
+          --accent-soft: rgba(137, 180, 250, 0.12);
+          --border: rgba(205, 214, 244, 0.08);
         }
       }
 
@@ -34,273 +58,350 @@
         margin: 0;
         background: var(--bg);
         color: var(--ink);
-        font:
-          18px/1.62 ui-serif,
-          Georgia,
-          Cambria,
-          "Times New Roman",
-          serif;
+        font-family: var(--sans);
+        font-size: var(--p-body);
+        line-height: var(--lh-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
       }
 
-      main {
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 56px 24px 88px;
+      .frame {
+        max-width: 64rem;
+        margin-inline: auto;
+        padding-inline: clamp(1.25rem, 5vw, 2.5rem);
       }
 
-      header {
-        margin-bottom: 44px;
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: var(--s-5);
+        padding-block: var(--s-4);
+        margin-bottom: var(--s-3);
       }
 
-      .eyebrow,
-      .label {
-        margin: 0 0 12px;
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        margin-right: auto;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .dot {
         color: var(--accent);
-        font:
-          700 12px/1.2 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+      }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: var(--s-4);
+      }
+
+      .nav-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        color: var(--ink-muted);
+        font-size: var(--p-small);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover,
+      .nav-link[aria-current="page"] {
+        color: var(--accent);
+      }
+
+      .theme-dot {
+        width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-muted);
+        font-size: 1.15rem;
+      }
+
+      .theme-dot::before {
+        content: "";
+        width: 1em;
+        height: 1em;
+        border: 1.5px solid currentColor;
+        border-radius: 999px;
+        box-shadow: inset -0.42em 0 0 currentColor;
+      }
+
+      .page {
+        padding-block: var(--s-3) var(--s-7);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .article {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 64rem;
+        margin-inline: auto;
+        gap: var(--s-3);
+      }
+
+      .head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s-2);
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 44px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+        font-family: var(--mono);
+        font-size: var(--p-mono);
+      }
+
+      .back-link:hover {
+        color: var(--accent);
       }
 
       h1 {
-        max-width: 720px;
-        margin: 0 0 18px;
-        font:
-          700 clamp(42px, 7vw, 72px) / 0.98 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        letter-spacing: 0;
+        max-width: none;
+        margin: 0;
+        font-family: var(--sans);
+        font-size: var(--p-hero);
+        font-weight: 500;
+        line-height: var(--lh-tight);
+        letter-spacing: -0.02em;
+        text-wrap: pretty;
+        overflow-wrap: break-word;
       }
 
       h2 {
-        margin: 44px 0 12px;
-        font:
-          700 26px/1.15 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        letter-spacing: 0;
+        max-width: none;
+        margin: var(--s-4) 0 var(--s-1);
+        font-family: var(--sans);
+        font-size: var(--p-h2);
+        font-weight: 500;
+        line-height: var(--lh-tight);
+        letter-spacing: -0.01em;
       }
 
       h3 {
-        margin: 0 0 10px;
-        font:
-          700 18px/1.25 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        letter-spacing: 0;
+        margin: 0 0 var(--s-2);
+        font-family: var(--sans);
+        font-size: var(--p-h3);
+        font-weight: 500;
+        line-height: var(--lh-tight);
+        letter-spacing: -0.01em;
       }
 
       p {
-        margin: 0 0 18px;
+        width: 100%;
+        max-width: none;
+        margin: 0 0 var(--s-2);
+        overflow-wrap: break-word;
       }
 
       .dek {
-        max-width: 680px;
-        color: var(--muted);
-        font-size: 21px;
-        line-height: 1.45;
+        color: var(--ink-muted);
+        font-size: calc(var(--p-body) * 1.1);
+        line-height: var(--lh-body);
       }
 
       .thumbnail-slot {
-        margin: 26px 0 24px;
+        width: 100%;
+        margin: var(--s-2) 0 var(--s-3);
       }
 
       .thumbnail-frame {
         display: grid;
-        min-height: 320px;
-        aspect-ratio: 16 / 9;
+        width: 100%;
+        min-width: 0;
+        padding: 16px;
         place-items: center;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background:
-          linear-gradient(135deg, rgba(36, 95, 134, 0.12), transparent 42%),
-          var(--panel);
+        border: 1px solid color-mix(in srgb, var(--border) 72%, var(--accent) 28%);
+        border-radius: 1rem;
+        background: color-mix(in srgb, var(--surface) 82%, var(--bg) 18%);
+        box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.14);
       }
 
-      .thumbnail-inner {
-        width: min(82%, 560px);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--bg);
-        padding: 22px;
-      }
-
-      .thumbnail-bar {
-        display: flex;
-        gap: 6px;
-        margin-bottom: 18px;
-      }
-
-      .thumbnail-dot {
-        width: 9px;
-        height: 9px;
-        border-radius: 999px;
-        background: var(--line);
-      }
-
-      .thumbnail-title {
-        margin: 0 0 10px;
-        font:
-          700 24px/1.12 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-      }
-
-      .thumbnail-copy {
-        margin: 0;
-        color: var(--muted);
-        font:
-          15px/1.45 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-      }
-
-      .thumbnail-caption {
-        margin: 10px 0 0;
-        color: var(--muted);
-        font:
-          13px/1.4 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
+      .thumbnail-image {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        border-radius: 0.75rem;
       }
 
       .note {
+        max-width: none;
         border-left: 3px solid var(--accent);
-        margin: 28px 0 36px;
-        padding: 2px 0 2px 18px;
-        color: var(--muted);
-        font:
-          16px/1.5 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-      }
-
-      .spine {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin: 20px 0 32px;
-      }
-
-      .spine span {
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 7px 11px;
-        color: var(--muted);
-        font:
-          13px/1 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-      }
-
-      .callout,
-      .appendix {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
-        padding: 20px;
+        margin: 0 0 var(--s-2);
+        padding: 0 0 0 var(--s-4);
+        color: var(--ink-muted);
       }
 
       .callout {
-        margin: 34px 0;
+        max-width: none;
+        border-radius: 0.75rem;
+        background: var(--surface);
+        padding: var(--s-5);
       }
 
-      .callout p:last-child,
-      .appendix p:last-child {
+      .callout {
+        margin: var(--s-3) 0;
+      }
+
+      .callout p:last-child {
         margin-bottom: 0;
       }
 
       ul,
       ol {
-        margin: 0 0 20px;
-        padding-left: 22px;
+        max-width: none;
+        margin: 0 0 var(--s-2);
+        padding-left: 1.25rem;
       }
 
       li {
-        margin: 0 0 9px;
+        margin: 0 0 var(--s-2);
       }
 
-      .appendix {
-        margin-top: 48px;
-        font:
-          15px/1.5 ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
+      .site-footer {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: var(--s-5);
+        margin-top: var(--s-8);
+        padding-block: var(--s-6);
+        color: var(--ink-muted);
+        font-size: var(--p-small);
       }
 
-      .appendix .label {
-        margin-bottom: 16px;
+      .footer-brand {
+        display: block;
+      }
+
+      .footer-mark {
+        margin: 0;
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      .footer-links {
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--s-2) var(--s-4);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .footer-links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: var(--accent);
       }
 
       code {
-        font-family:
-          ui-monospace,
-          SFMono-Regular,
-          Menlo,
-          monospace;
+        font-family: var(--mono);
         font-size: 0.92em;
+      }
+
+      @media (max-width: 720px) {
+        .nav {
+          flex-wrap: wrap;
+          gap: var(--s-2);
+          padding-block: var(--s-3);
+          margin-bottom: var(--s-2);
+        }
+
+        .wordmark {
+          font-size: 1.25rem;
+        }
+
+        .nav-links {
+          order: 3;
+          width: 100%;
+          column-gap: var(--s-3);
+        }
+
+        .theme-dot {
+          margin-left: auto;
+        }
+
+        .page {
+          padding-block: var(--s-2) var(--s-6);
+        }
+
+        h1 {
+          font-size: clamp(1.85rem, 7.4vw, 2.45rem);
+        }
+
+        .footer-brand {
+          width: 100%;
+        }
+
+        .footer-links {
+          justify-content: flex-start;
+        }
+
+        .thumbnail-frame {
+          padding: 10px;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <p class="eyebrow">draft newsletter issue</p>
+    <header class="frame nav">
+      <a href="https://anipotts.com/" class="wordmark">ani potts<span class="dot">.</span></a>
+      <nav class="nav-links" aria-label="primary">
+        <a class="nav-link" aria-current="page" href="https://anipotts.com/writing">writing</a>
+        <a class="nav-link" href="https://anipotts.com/making">making</a>
+        <a class="nav-link" href="https://anipotts.com/orchestrating">orchestrating</a>
+      </nav>
+      <span class="theme-dot" aria-hidden="true"></span>
+    </header>
+    <main class="frame page">
+      <article class="article">
+      <header class="head">
+        <a class="back-link" href="https://anipotts.com/writing">back to all posts</a>
         <h1>the first thing your agents need is a control plane</h1>
         <figure class="thumbnail-slot">
-          <div class="thumbnail-frame" role="img" aria-label="thumbnail or video preview placeholder">
-            <div class="thumbnail-inner">
-              <div class="thumbnail-bar" aria-hidden="true">
-                <span class="thumbnail-dot"></span>
-                <span class="thumbnail-dot"></span>
-                <span class="thumbnail-dot"></span>
-              </div>
-              <p class="thumbnail-title">media preview slot</p>
-              <p class="thumbnail-copy">
-                image, video, screenshot, or article preview goes here.
-              </p>
-            </div>
+          <div class="thumbnail-frame">
+            <img
+              class="thumbnail-image"
+              src="/media-thumbnail"
+              alt="screenshot of a coding-agent workflow preview"
+            />
           </div>
-          <figcaption class="thumbnail-caption">
-            placeholder for the visual asset tied to this issue.
-          </figcaption>
         </figure>
         <p class="dek">
-          what i am learning from turning admin.anipotts.com into a read-only
-          operator dashboard first, then a content review surface, then a
-          guarded write path.
+          every coding agent gets more useful when it knows what it is allowed
+          to do, what proof it owes, and when it needs to come back to me.
         </p>
       </header>
 
@@ -308,13 +409,6 @@
         every coding agent i use eventually runs into the same boring problem:
         it can make a change, but it needs a system around it for
         responsibility.
-      </p>
-
-      <p>
-        the control plane should make the important parts obvious: what i asked
-        it to do, who approved it, what it touched, what proof it left, and what
-        state changed after. if the answer only lives in the chat, the system is
-        too soft.
       </p>
 
       <p>
@@ -343,14 +437,6 @@
         cleanup all need explicit authority. the point of the control plane is
         to make that split visible before the agent touches the thing.
       </p>
-
-      <div class="spine">
-        <span>intent</span>
-        <span>authority</span>
-        <span>operation</span>
-        <span>proof</span>
-        <span>state</span>
-      </div>
 
       <h2>proof beats trust</h2>
 
@@ -401,58 +487,17 @@
           return one clear decision to me.
         </p>
       </div>
-
-      <section class="appendix">
-        <p class="label">x-thread compatible version</p>
-        <ol>
-          <li>
-            every coding agent i use eventually runs into the same boring
-            problem: it needs a place to put responsibility.
-          </li>
-          <li>
-            that is what i mean by a control plane.
-          </li>
-          <li>
-            the useful contract is
-            <code>intent -> authority -> operation -> proof -> state</code>.
-          </li>
-          <li>
-            safe lanes let agents move without asking me for permission every
-            five minutes.
-          </li>
-          <li>
-            hard gates keep dns, auth, secrets, sends, live endpoints, and
-            irreversible actions behind explicit authority.
-          </li>
-          <li>
-            proof beats trust because the next agent has to continue from the
-            artifact.
-          </li>
-          <li>
-            NEEDS-ANI is my human syscall queue: approval, choice, account-side
-            action, identity, payment, secret setup, final taste.
-          </li>
-          <li>
-            admin.anipotts.com should make state legible before it makes state
-            mutable.
-          </li>
-          <li>
-            the system i want is boring: agents know what they can do next.
-          </li>
-        </ol>
-      </section>
-
-      <section class="appendix">
-        <p class="label">blocked actions</p>
-        <ul>
-          <li>write production d1 issue</li>
-          <li>publish archive page</li>
-          <li>send test email or broadcast</li>
-          <li>change dns, auth, env, secrets, access, workers, or endpoints</li>
-          <li>add admin write path</li>
-          <li>merge to main</li>
-        </ul>
-      </section>
+      </article>
     </main>
+    <footer class="frame site-footer">
+      <div class="footer-brand">
+        <p class="footer-mark">ani potts</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://anipotts.com/writing">writing</a></li>
+        <li><a href="https://anipotts.com/making">making</a></li>
+        <li><a href="https://anipotts.com/orchestrating">orchestrating</a></li>
+      </ul>
+    </footer>
   </body>
 </html>

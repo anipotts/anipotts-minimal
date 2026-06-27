@@ -1,0 +1,124 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
+---
+
+<AdminLayout
+  title="newsletter"
+  deck="Read-only issue drafts and source-backed preview structure. No D1 writes, archive publishing, sends, or worker controls."
+>
+  <section class="meta-strip" aria-label="newsletter source">
+    <span>{newsletterDrafts.length} draft</span>
+    <span>{newsletterDraftsSource.source_doc}</span>
+    <span>{newsletterDraftsSource.mode}</span>
+  </section>
+
+  <div class="newsletter-grid">
+    {
+      newsletterDrafts.map((draft) => (
+        <article class="table-card">
+          <div class="section-head">
+            <div>
+              <p>{draft.status}</p>
+              <h2>{draft.title}</h2>
+            </div>
+            <span>{draft.slug}</span>
+          </div>
+
+          <div class="newsletter-detail">
+            <section>
+              <h3>draft</h3>
+              <p>{draft.summary}</p>
+              <p>{draft.dek}</p>
+              <dl>
+                <div>
+                  <dt>subject</dt>
+                  <dd>{draft.subject}</dd>
+                </div>
+                <div>
+                  <dt>audience</dt>
+                  <dd>{draft.audience}</dd>
+                </div>
+                <div>
+                  <dt>spine</dt>
+                  <dd>{draft.spine.join(" -> ")}</dd>
+                </div>
+                <div>
+                  <dt>fixture</dt>
+                  <dd>{draft.source_fixture}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section>
+              <h3>source refs</h3>
+              <div class="record-list">
+                {draft.source_refs.map((source) => (
+                  <article class="compact-row">
+                    <strong>{source.ref}</strong>
+                    <small>{source.use}</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <div class="newsletter-detail">
+            <section>
+              <h3>sections</h3>
+              <div class="record-list">
+                {draft.sections.map((section) => (
+                  <article class="compact-row">
+                    <span>{section.kind}</span>
+                    <strong>{section.heading ?? section.label ?? "opening"}</strong>
+                    <small>{section.thread_beat ?? section.body}</small>
+                    {section.items && (
+                      <ul class="compact-list">
+                        {section.items.map((item) => (
+                          <li>{item}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h3>blocked live actions</h3>
+              <div class="record-list">
+                {draft.blocked_actions.map((action) => (
+                  <article class="compact-row">
+                    <strong>{action}</strong>
+                    <small>{newsletterDraftsSource.blocked}</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <div class="newsletter-detail">
+            <section>
+              <h3>claims</h3>
+              <div class="record-list">
+                {draft.claims.map((claim) => (
+                  <article class="compact-row">
+                    <span>{claim.status}</span>
+                    <strong>{claim.claim}</strong>
+                    <small>{claim.source_refs.join(", ")}</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h3>preview note</h3>
+              <p>{draft.preview_notes}</p>
+              <p>{draft.preview_fixture}</p>
+            </section>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</AdminLayout>
