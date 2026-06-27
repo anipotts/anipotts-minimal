@@ -30,7 +30,9 @@ pnpm --filter @anipotts/state test:cli http://localhost:8787
 pnpm --filter @anipotts/state exec wrangler deploy
 ```
 
-Once deployed, hostname is `https://anipotts-state.<account>.workers.dev`. To bind to `api.anipotts.com`, uncomment the `[[routes]]` block in `wrangler.toml` and re-deploy.
+Production is bound to `api.anipotts.com` by the `[[routes]]` block in
+`wrangler.toml`. Agent PRs that touch `workers/state/**` deploy through the
+explicit `state=true` deploy target.
 
 ## Adding a new DO
 

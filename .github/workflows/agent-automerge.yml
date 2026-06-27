@@ -62,6 +62,7 @@ jobs:
           admin_solid=false
           ingest=false
           newsletter=false
+          state=false
           weekly_email=false
 
           while IFS= read -r file; do
@@ -91,6 +92,11 @@ jobs:
                 ;;
             esac
             case "$file" in
+              workers/state/*)
+                state=true
+                ;;
+            esac
+            case "$file" in
               workers/weekly-email/*)
                 weekly_email=true
                 ;;
@@ -103,6 +109,7 @@ jobs:
             echo "admin_solid=$admin_solid"
             echo "ingest=$ingest"
             echo "newsletter=$newsletter"
+            echo "state=$state"
             echo "weekly_email=$weekly_email"
           } >> "$GITHUB_OUTPUT"
 
@@ -119,6 +126,7 @@ jobs:
           steps.targets.outputs.admin_solid == 'true' ||
           steps.targets.outputs.ingest == 'true' ||
           steps.targets.outputs.newsletter == 'true' ||
+          steps.targets.outputs.state == 'true' ||
           steps.targets.outputs.weekly_email == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,4 +140,5 @@ jobs:
             -f admin_solid=${{ steps.targets.outputs.admin_solid }} \
             -f ingest=${{ steps.targets.outputs.ingest }} \
             -f newsletter=${{ steps.targets.outputs.newsletter }} \
+            -f state=${{ steps.targets.outputs.state }} \
             -f weekly_email=${{ steps.targets.outputs.weekly_email }}

@@ -57,6 +57,12 @@ on:
         default: "false"
         type: choice
         options: ["false", "true"]
+      state:
+        description: "deploy state worker"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
       weekly_email:
         description: "deploy weekly email worker"
         required: true
@@ -78,6 +84,7 @@ jobs:
       admin-solid: ${{ steps.filter.outputs.admin-solid }}
       ingest: ${{ steps.filter.outputs.ingest }}
       newsletter: ${{ steps.filter.outputs.newsletter }}
+      state: ${{ steps.filter.outputs.state }}
       weekly-email: ${{ steps.filter.outputs.weekly-email }}
     steps:
       - uses: actions/checkout@v4
@@ -105,6 +112,8 @@ jobs:
               - "workers/ingest/**"
             newsletter:
               - "workers/newsletter/**"
+            state:
+              - "workers/state/**"
             weekly-email:
               - "workers/weekly-email/**"
 
@@ -288,6 +297,41 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: workers/weekly-email
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-state:
+    name: Deploy state worker
+    needs: [changes]
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.state == 'true') ||
+      (github.event_name == 'push' && needs.changes.outputs.state == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck state worker
+        run: pnpm --filter @anipotts/state typecheck
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          workingDirectory: workers/state
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
