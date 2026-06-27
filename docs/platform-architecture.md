@@ -87,6 +87,12 @@ Required proof before removing Access:
 | unauthenticated block     | protected admin routes redirect to app-native auth    |
 | rollback                  | previous Access app or policy can be restored         |
 
+Use `pnpm --silent proof:admin-passkey` before and after enrollment. It reads
+the remote `anipotts-db` passkey tables and probes protected admin routes
+without printing Cloudflare Access tokens. The proof is not complete until it
+shows at least one active credential, an app-native session, logout proof in
+audit rows, and app-native route blocking after Access removal.
+
 ## ci/cd target
 
 Primary workflows:
