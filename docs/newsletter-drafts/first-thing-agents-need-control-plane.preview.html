@@ -115,6 +115,78 @@
         line-height: 1.45;
       }
 
+      .thumbnail-slot {
+        margin: 26px 0 24px;
+      }
+
+      .thumbnail-frame {
+        display: grid;
+        min-height: 320px;
+        aspect-ratio: 16 / 9;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(36, 95, 134, 0.12), transparent 42%),
+          var(--panel);
+      }
+
+      .thumbnail-inner {
+        width: min(82%, 560px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        padding: 22px;
+      }
+
+      .thumbnail-bar {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+
+      .thumbnail-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--line);
+      }
+
+      .thumbnail-title {
+        margin: 0 0 10px;
+        font:
+          700 24px/1.12 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .thumbnail-copy {
+        margin: 0;
+        color: var(--muted);
+        font:
+          15px/1.45 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .thumbnail-caption {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font:
+          13px/1.4 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
       .note {
         border-left: 3px solid var(--accent);
         margin: 28px 0 36px;
@@ -207,6 +279,24 @@
       <header>
         <p class="eyebrow">draft newsletter issue</p>
         <h1>the first thing your agents need is a control plane</h1>
+        <figure class="thumbnail-slot">
+          <div class="thumbnail-frame" role="img" aria-label="thumbnail or video preview placeholder">
+            <div class="thumbnail-inner">
+              <div class="thumbnail-bar" aria-hidden="true">
+                <span class="thumbnail-dot"></span>
+                <span class="thumbnail-dot"></span>
+                <span class="thumbnail-dot"></span>
+              </div>
+              <p class="thumbnail-title">media preview slot</p>
+              <p class="thumbnail-copy">
+                image, video, screenshot, or article preview goes here.
+              </p>
+            </div>
+          </div>
+          <figcaption class="thumbnail-caption">
+            placeholder for the visual asset tied to this issue.
+          </figcaption>
+        </figure>
         <p class="dek">
           no matter what coding agent you use, it gets more useful when
           authority, proof, and the human return path are explicit.
