@@ -189,6 +189,8 @@ Auth boundary note:
   boundary.
 - See `docs/admin-access-simplification-plan.md` for the metadata-only Access
   audit result and staged login simplification plan.
+- See `docs/admin-passkey-auth-plan.md` for the design-only path to biometric
+  passkey auth and the criteria for removing Cloudflare Access later.
 - See `docs/admin-content-draft-operations.md` for the inert content draft
   operation schema that should precede any save or publish path.
 - See `docs/admin-next-step-packet-2026-06-25.md` for current PR status,

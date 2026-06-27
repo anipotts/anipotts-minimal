@@ -12,6 +12,11 @@ binding = "ASSETS"
 [observability]
 enabled = true
 
+[[d1_databases]]
+binding = "DB"
+database_name = "anipotts-db"
+database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
 # Build-time inlined as PUBLIC_*; runtime override available via wrangler vars
 [vars]
 PUBLIC_STATE_API = "https://api.anipotts.com"
