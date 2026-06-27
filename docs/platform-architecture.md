@@ -88,13 +88,13 @@ Required proof before removing Access:
 
 Primary workflows:
 
-| Workflow              | Role                                                     |
-| --------------------- | -------------------------------------------------------- |
-| `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
-| `security-review.yml` | PR security review for sensitive paths                   |
-| `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets  |
-| `deploy.yml`          | deploy explicit targets only                             |
-| `smoke.yml`           | post-deploy route proof for public and admin targets     |
+| Workflow              | Role                                                      |
+| --------------------- | --------------------------------------------------------- |
+| `ci.yml`              | build, lint, typecheck, and test affected packages on PR  |
+| `security-review.yml` | local no-API placeholder for the required `security` gate |
+| `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets   |
+| `deploy.yml`          | deploy explicit targets only                              |
+| `smoke.yml`           | post-deploy route proof for public and admin targets      |
 
 Rules:
 
@@ -103,6 +103,8 @@ Rules:
 - public site changes deploy `www` only.
 - admin changes deploy only the affected admin target.
 - D1 migrations run as reviewed migration steps before app deploy.
+- Anthropic and Claude Code API-backed GitHub workflows are disabled for this
+  repo.
 
 ## cleanup sequence
 
