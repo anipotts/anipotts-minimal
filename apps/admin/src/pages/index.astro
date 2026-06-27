@@ -5,7 +5,7 @@ import { overviewCards } from "../data/admin";
 
 <AdminLayout
   title="operator overview"
-  deck="Read-only Astro admin shell. Live canonical admin remains admin-solid until parity and passkey proof are complete."
+  deck="Canonical Astro admin shell. Cloudflare Access remains only until app-native passkey proof is complete."
 >
   <section class="grid" aria-label="operator overview cards">
     {
@@ -20,8 +20,8 @@ import { overviewCards } from "../data/admin";
     }
   </section>
   <div class="notice">
-    This app is the new Astro target for admin.anipotts.com. It is intentionally
-    protected by the app-native passkey session middleware and currently routed
-    through legacy-admin.anipotts.com while parity is built.
+    This app now owns admin.anipotts.com. It is intentionally protected by the
+    app-native passkey session middleware, with Cloudflare Access kept as the
+    outer guard until passkey proof is complete.
   </div>
 </AdminLayout>

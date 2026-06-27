@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
-  site: "https://legacy-admin.anipotts.com",
+  site: "https://admin.anipotts.com",
   output: "server",
   trailingSlash: "never",
   adapter: cloudflare({

@@ -33,10 +33,10 @@ export const navItems: NavItem[] = [
 
 export const overviewCards: DashboardCard[] = [
   {
-    title: "admin Astro migration",
-    status: "in progress",
-    risk: "medium",
-    next: "port admin-solid route behavior into this Astro target",
+    title: "admin Astro cutover",
+    status: "canonical route cut over",
+    risk: "low",
+    next: "prove passkey behavior, then remove the legacy Solid rollback",
   },
   {
     title: "passkey auth",
@@ -54,7 +54,7 @@ export const overviewCards: DashboardCard[] = [
     title: "legacy cleanup",
     status: "started",
     risk: "low",
-    next: "remove admin-solid after Astro parity and cutover",
+    next: "archive or remove admin-solid after passkey proof",
   },
 ];
 
@@ -115,15 +115,15 @@ export const repoRows: QueueRow[] = [
   },
   {
     title: "apps/admin",
-    owner: "legacy-admin route",
-    status: "Astro target",
-    evidence: "this branch",
+    owner: "admin.anipotts.com",
+    status: "canonical Astro app",
+    evidence: "deploy run 28302990801",
   },
   {
     title: "apps/admin-solid",
-    owner: "admin.anipotts.com",
-    status: "live transitional source",
-    evidence: "deploy run 28301610377",
+    owner: "legacy-admin-solid.anipotts.com",
+    status: "legacy rollback",
+    evidence: "deploy run 28302990801",
   },
 ];
 
