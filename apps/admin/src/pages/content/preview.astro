@@ -1,26 +1,54 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { contentInventorySource, contentPreviewItems } from "../../data/content";
 ---
 
 <AdminLayout
   title="content preview"
-  deck="Preview route placeholder for D1-backed drafts before public-site publish."
+  deck="Preview-only content operations. These compare current and proposed values without saving, publishing, deploying, or sending."
 >
-  <section class="grid">
-    <article class="panel">
-      <p>draft model</p>
-      <h2>not writing yet</h2>
-      <p>
-        Preview should read draft records, compare them to current public
-        content, and show route-level impact.
-      </p>
-    </article>
-    <article class="panel">
-      <p>publish model</p>
-      <h2>future gate</h2>
-      <p>
-        Publish stays explicit, logged, reversible, and proof-backed.
-      </p>
-    </article>
+  <section class="meta-strip" aria-label="preview queue source">
+    <span>{contentPreviewItems.length} proposals</span>
+    <span>{contentInventorySource.mode}</span>
+    <span>write path inactive</span>
   </section>
+
+  <div class="preview-grid">
+    {
+      contentPreviewItems.map((item) => (
+        <article class="proposal-row">
+          <p>{item.surface} / {item.status}</p>
+          <h2>{item.title}</h2>
+          <div class="diff-pair">
+            <div>
+              <span>current</span>
+              <p>{item.current_value}</p>
+            </div>
+            <div>
+              <span>proposed</span>
+              <p>{item.proposed_value}</p>
+            </div>
+          </div>
+          <dl>
+            <div>
+              <dt>route</dt>
+              <dd>{item.preview_route}</dd>
+            </div>
+            <div>
+              <dt>authority</dt>
+              <dd>{item.authority_state}</dd>
+            </div>
+            <div>
+              <dt>proof</dt>
+              <dd>{item.proof_ids.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>next</dt>
+              <dd>{item.next_safe_action}</dd>
+            </div>
+          </dl>
+        </article>
+      ))
+    }
+  </div>
 </AdminLayout>

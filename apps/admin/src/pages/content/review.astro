@@ -1,12 +1,97 @@
 ---
-import AdminTable from "../../components/AdminTable.astro";
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { contentRows, needsRows } from "../../data/admin";
+import {
+  contentInventory,
+  contentInventorySource,
+  contentPreviewItems,
+} from "../../data/content";
+
+const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
 ---
 
 <AdminLayout
   title="content review"
-  deck="Read-only proposal queue. Save and publish controls stay gated until write paths are audited."
+  deck="Read-only proposal queue. Save and publish controls stay absent until the write path is audited and approved."
 >
-  <AdminTable rows={[...contentRows, ...needsRows]} />
+  <section class="meta-strip" aria-label="content review source">
+    <span>{contentInventory.length} sources</span>
+    <span>{contentPreviewItems.length} previews</span>
+    <span>{contentInventorySource.architecture_doc}</span>
+  </section>
+
+  <div class="review-board">
+    {
+      surfaces.map((surface) => {
+        const sourceRows = contentInventory.filter(
+          (row) => row.surface === surface,
+        );
+        const previewRows = contentPreviewItems.filter(
+          (row) => row.surface === surface,
+        );
+
+        return (
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <p>{surface}</p>
+                <h2>{previewRows.length} previews</h2>
+              </div>
+              <span>{sourceRows.length} sources</span>
+            </div>
+
+            <div class="lane-grid">
+              <div>
+                <h3>current source</h3>
+                <div class="record-list">
+                  {sourceRows.map((row) => (
+                    <article class="compact-row">
+                      <strong>{row.title}</strong>
+                      <span>{row.source_ref}</span>
+                      <small>{row.next_safe_action}</small>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3>inert proposal</h3>
+                <div class="record-list">
+                  {previewRows.map((row) => (
+                    <article class="proposal-row">
+                      <p>{row.status}</p>
+                      <h3>{row.title}</h3>
+                      <div class="diff-pair">
+                        <div>
+                          <span>current</span>
+                          <p>{row.current_value}</p>
+                        </div>
+                        <div>
+                          <span>proposed</span>
+                          <p>{row.proposed_value}</p>
+                        </div>
+                      </div>
+                      <dl>
+                        <div>
+                          <dt>authority</dt>
+                          <dd>{row.authority_state}</dd>
+                        </div>
+                        <div>
+                          <dt>blocked</dt>
+                          <dd>{row.blocked_actions.join(", ")}</dd>
+                        </div>
+                        <div>
+                          <dt>next</dt>
+                          <dd>{row.next_safe_action}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
 </AdminLayout>

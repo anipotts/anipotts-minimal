@@ -20,10 +20,10 @@ export type QueueRow = {
 
 export const navItems: NavItem[] = [
   { href: "/", label: "overview", status: "migrating" },
-  { href: "/content", label: "content", status: "migrating" },
-  { href: "/content/review", label: "review", status: "migrating" },
-  { href: "/content/preview", label: "preview", status: "migrating" },
-  { href: "/needs-ani", label: "needs ani", status: "migrating" },
+  { href: "/content", label: "content", status: "live-source" },
+  { href: "/content/review", label: "review", status: "live-source" },
+  { href: "/content/preview", label: "preview", status: "live-source" },
+  { href: "/needs-ani", label: "needs ani", status: "live-source" },
   { href: "/repos", label: "repos", status: "migrating" },
   { href: "/handoffs", label: "handoffs", status: "migrating" },
   { href: "/fleet", label: "fleet", status: "migrating" },

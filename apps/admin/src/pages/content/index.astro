@@ -1,12 +1,65 @@
 ---
-import AdminTable from "../../components/AdminTable.astro";
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { contentRows } from "../../data/admin";
+import { contentInventory, contentInventorySource } from "../../data/content";
+
+const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
 ---
 
 <AdminLayout
   title="content inventory"
-  deck="Current editable public-site surfaces and their source refs."
+  deck="Current editable public-site surfaces and their source refs. This is read-only static inventory from the proven admin-solid model."
 >
-  <AdminTable rows={contentRows} />
+  <section class="meta-strip" aria-label="content inventory source">
+    <span>{contentInventory.length} rows</span>
+    <span>{contentInventorySource.mode}</span>
+    <span>{contentInventorySource.source_doc}</span>
+  </section>
+
+  <div class="surface-grid">
+    {
+      surfaces.map((surface) => {
+        const rows = contentInventory.filter((row) => row.surface === surface);
+
+        return (
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <p>{surface}</p>
+                <h2>{rows.length} fields</h2>
+              </div>
+              <span>{rows.filter((row) => row.editability === "ready").length} ready</span>
+            </div>
+            <div class="record-list">
+              {rows.map((row) => (
+                <article class="record-row">
+                  <div>
+                    <p>{row.title}</p>
+                    <h3>{row.current_value}</h3>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>source</dt>
+                      <dd>{row.source_ref}</dd>
+                    </div>
+                    <div>
+                      <dt>editability</dt>
+                      <dd>{row.editability}</dd>
+                    </div>
+                    <div>
+                      <dt>risk</dt>
+                      <dd>{row.risk_level}</dd>
+                    </div>
+                    <div>
+                      <dt>next</dt>
+                      <dd>{row.next_safe_action}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
 </AdminLayout>
