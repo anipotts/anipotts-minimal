@@ -43,7 +43,7 @@ jobs:
         if: inputs.target == 'admin'
         run: |
           set -euo pipefail
-          for path in /auth/passkey / /content /content/review /content/preview /newsletter /needs-ani /proof /repos /fleet; do
+          for path in /auth/passkey / /content /content/review /content/preview /content/operations /newsletter /needs-ani /proof /repos /fleet; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com${path}")"
             echo "https://admin.anipotts.com${path} -> ${code}"
             case "$path:$code" in

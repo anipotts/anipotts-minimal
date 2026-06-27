@@ -1,0 +1,209 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import {
+  contentOperationSchemaSource,
+  contentOperationTables,
+} from "../../data/content";
+
+type CountRow = {
+  table_name: string;
+  rows: number;
+};
+
+type OperationRow = {
+  operation_id: string;
+  kind: string;
+  surface: string;
+  route: string;
+  status: string;
+  risk_level: string;
+  authority_state: string;
+  updated_at: string;
+};
+
+type ReadState =
+  | { mode: "ready"; counts: CountRow[]; operations: OperationRow[] }
+  | { mode: "missing_db"; counts: CountRow[]; operations: OperationRow[] }
+  | {
+      mode: "read_failed";
+      counts: CountRow[];
+      operations: OperationRow[];
+      error: string;
+    };
+
+const fallbackCounts = contentOperationTables.map((table) => ({
+  table_name: table.table,
+  rows: 0,
+}));
+
+const db = Astro.locals.runtime?.env.DB;
+let readState: ReadState;
+
+if (!db) {
+  readState = { mode: "missing_db", counts: fallbackCounts, operations: [] };
+} else {
+  try {
+    const [records, operations, events, recent] = await Promise.all([
+      db.prepare("SELECT COUNT(*) AS count FROM content_records").first<{
+        count: number;
+      }>(),
+      db
+        .prepare("SELECT COUNT(*) AS count FROM content_draft_operations")
+        .first<{ count: number }>(),
+      db.prepare("SELECT COUNT(*) AS count FROM content_publish_events").first<{
+        count: number;
+      }>(),
+      db
+        .prepare(
+          `SELECT operation_id, kind, surface, route, status, risk_level, authority_state, updated_at
+           FROM content_draft_operations
+           ORDER BY updated_at DESC
+           LIMIT 20`,
+        )
+        .all<OperationRow>(),
+    ]);
+
+    readState = {
+      mode: "ready",
+      counts: [
+        { table_name: "content_records", rows: Number(records?.count ?? 0) },
+        {
+          table_name: "content_draft_operations",
+          rows: Number(operations?.count ?? 0),
+        },
+        {
+          table_name: "content_publish_events",
+          rows: Number(events?.count ?? 0),
+        },
+      ],
+      operations: recent.results ?? [],
+    };
+  } catch (error) {
+    readState = {
+      mode: "read_failed",
+      counts: fallbackCounts,
+      operations: [],
+      error: error instanceof Error ? error.message : "unknown read failure",
+    };
+  }
+}
+---
+
+<AdminLayout
+  title="content operations"
+  deck="Live read-only D1 view for draft operations. This route does not create, update, publish, send, or deploy."
+>
+  <section class="meta-strip" aria-label="content operation read source">
+    <span>{readState.mode}</span>
+    <span>{contentOperationSchemaSource.migration}</span>
+    <span>write path inactive</span>
+  </section>
+
+  <div class="surface-grid">
+    <section class="table-card">
+      <div class="section-head">
+        <div>
+          <p>d1 content store</p>
+          <h2>{readState.counts.reduce((sum, row) => sum + row.rows, 0)} rows</h2>
+        </div>
+        <span>{contentOperationSchemaSource.mode}</span>
+      </div>
+      <div class="record-list">
+        {
+          readState.counts.map((row) => (
+            <article class="record-row">
+              <div>
+                <p>{row.table_name}</p>
+                <h3>{row.rows} rows</h3>
+              </div>
+              <dl>
+                <div>
+                  <dt>state</dt>
+                  <dd>read only</dd>
+                </div>
+                <div>
+                  <dt>next</dt>
+                  <dd>
+                    keep schema visible before adding any reviewed write route
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="section-head">
+        <div>
+          <p>recent draft operations</p>
+          <h2>{readState.operations.length} visible</h2>
+        </div>
+        <span>no hidden api</span>
+      </div>
+      <div class="record-list">
+        {
+          readState.operations.length === 0 ? (
+            <article class="record-row">
+              <div>
+                <p>empty queue</p>
+                <h3>No D1 draft operations have been created yet.</h3>
+              </div>
+              <dl>
+                <div>
+                  <dt>meaning</dt>
+                  <dd>schema exists, but there is still no save endpoint</dd>
+                </div>
+                <div>
+                  <dt>next</dt>
+                  <dd>
+                    add a reviewed inert draft creator after passkey proof is
+                    complete
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ) : (
+            readState.operations.map((operation) => (
+              <article class="record-row">
+                <div>
+                  <p>
+                    {operation.surface} / {operation.status}
+                  </p>
+                  <h3>{operation.operation_id}</h3>
+                </div>
+                <dl>
+                  <div>
+                    <dt>route</dt>
+                    <dd>{operation.route}</dd>
+                  </div>
+                  <div>
+                    <dt>risk</dt>
+                    <dd>{operation.risk_level}</dd>
+                  </div>
+                  <div>
+                    <dt>authority</dt>
+                    <dd>{operation.authority_state}</dd>
+                  </div>
+                  <div>
+                    <dt>updated</dt>
+                    <dd>{operation.updated_at}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          )
+        }
+      </div>
+    </section>
+  </div>
+
+  {
+    readState.mode === "read_failed" && (
+      <section class="notice">
+        D1 read failed: {readState.error}. The page did not attempt a write.
+      </section>
+    )
+  }
+</AdminLayout>
