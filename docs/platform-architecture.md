@@ -26,7 +26,7 @@ structured content/state model, and one predictable CI/CD path.
 | ------------------ | ------------------------------------------ | ------------------------ |
 | `apps/www`         | public Astro site and newsletter endpoints | keep                     |
 | `apps/admin`       | Astro admin app for `admin.anipotts.com`   | keep                     |
-| `apps/admin-solid` | transitional Solid admin rollback surface  | archive/remove next      |
+| `apps/admin-solid` | legacy Solid admin rollback surface        | archive/remove next      |
 | `apps/labs`        | legacy Next.js labs surface                | archive/delete candidate |
 
 ### workers

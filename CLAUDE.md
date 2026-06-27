@@ -9,7 +9,7 @@ This repo owns:
 
 - `anipotts.com`: public Astro site in `apps/www`
 - `admin.anipotts.com`: target Astro admin app in `apps/admin`
-- transitional admin worker in `apps/admin-solid`
+- legacy admin rollback worker in `apps/admin-solid`
 - legacy/reference surfaces in `apps/labs` and retained `workers/*`
 - shared code in `packages/*`
 
