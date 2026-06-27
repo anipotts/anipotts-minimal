@@ -1,6 +1,6 @@
 /**
  * Minimal D1 type definitions for Cloudflare D1.
- * Replace with @cloudflare/workers-types when @opennextjs/cloudflare is installed (Session 3).
+ * Keep this lightweight so shared library code does not depend on a framework adapter.
  */
 
 export interface D1Result<T = unknown> {

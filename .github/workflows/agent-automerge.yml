@@ -76,7 +76,7 @@ jobs:
                 ;;
             esac
             case "$file" in
-              apps/admin-solid/*|packages/config/*|packages/lib/*|packages/services-platform/*|packages/styles/*|packages/types/*|services/*)
+              apps/admin-solid/*)
                 admin_solid=true
                 ;;
             esac

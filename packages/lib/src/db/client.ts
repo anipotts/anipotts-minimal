@@ -1,9 +1,9 @@
 /**
  * D1 database accessor.
  *
- * In production (CF Workers/Pages), the D1 binding comes from request context
- * via @opennextjs/cloudflare. In dev (next dev on Vercel), D1 is not available
- * and getDB() returns null when D1 unavailable.
+ * Cloudflare bindings are framework-local. Astro pages call setDB() from their
+ * request runtime before shared content helpers run. In local scripts and tests,
+ * callers may also inject a D1-compatible object with setDB().
  */
 
 import type { D1Database } from "./types";
@@ -21,20 +21,9 @@ export function setDB(db: D1Database): void {
  *
  * Resolution order:
  * 1. Manual override (setDB)
- * 2. CF Workers request context (getCloudflareContext)
- * 3. null (D1 unavailable)
+ * 2. null (D1 unavailable)
  */
 export function getDB(): D1Database | null {
   if (_override) return _override;
-
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getCloudflareContext } = require("@opennextjs/cloudflare");
-    const ctx = getCloudflareContext();
-    if (ctx?.env?.DB) return ctx.env.DB as D1Database;
-  } catch {
-    // Not in CF runtime (e.g. local dev)
-  }
-
   return null;
 }

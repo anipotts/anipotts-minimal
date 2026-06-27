@@ -101,12 +101,6 @@ jobs:
               - "services/**"
             admin-solid:
               - "apps/admin-solid/**"
-              - "packages/config/**"
-              - "packages/lib/**"
-              - "packages/services-platform/**"
-              - "packages/styles/**"
-              - "packages/types/**"
-              - "services/**"
             ingest:
               - "workers/ingest/**"
             newsletter:
