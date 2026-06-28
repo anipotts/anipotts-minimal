@@ -1,5 +1,11 @@
 # admin passkey auth plan
 
+Archived: 2026-06-27.
+
+This plan predates the canonical Astro admin passkey route and proof script.
+Current passkey sequencing lives in `docs/platform-architecture.md` and
+`CLAUDE.md`.
+
 Date: 2026-06-27
 Status: implementation staged behind Cloudflare Access
 

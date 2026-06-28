@@ -1,5 +1,11 @@
 # admin and newsletter scope packet: 2026-06-25
 
+Archived: 2026-06-27.
+
+The PR inventory in this packet is stale. Current source truth lives in
+`docs/platform-architecture.md`, `docs/admin-v2-architecture.md`, and
+`docs/newsletter-system.md`.
+
 Status: no-mutation scope packet
 
 ## operating direction

@@ -1,5 +1,11 @@
 # adr: admin auth boundary and content editing path
 
+Archived: 2026-06-27.
+
+This ADR was written before the Astro admin cutover. It is historical context
+only. Current source truth is `docs/platform-architecture.md` and
+`docs/admin-v2-architecture.md`.
+
 Date: 2026-06-25
 Status: accepted for design
 Scope: design plus metadata-only audit

@@ -30,7 +30,7 @@ or any live write path.
 | p1       | add writing preview controls                            | titles and summaries are the actual newsletter backfill queue            | admin editor                  |
 | p1       | add newsletter headline, deck, cta, and status messages | the subscribe module should be editable without code                     | admin editor                  |
 | p2       | decide canonical project source                         | markdown and `packages/lib/src/data/projects.ts` duplicate similar facts | admin editor plus site thread |
-| p2       | classify old posts before publishing to Buttondown      | current writing can seed the newsletter, but should not be auto-sent     | newsletter thread             |
+| p2       | classify old posts before publishing to the newsletter  | current writing can seed the newsletter, but should not be auto-sent     | newsletter thread             |
 
 ## first read-only admin slice
 
@@ -103,7 +103,7 @@ hidden admin write endpoints.
 | `cta_label`       | string |      yes | current label: `subscribe`                                                  |
 | `success_message` | string |      yes | current message: `subscribed. check your inbox.`                            |
 | `error_message`   | string |      yes | current message: `could not subscribe. try again in a minute.`              |
-| `buttondown_url`  |    url |       no | points to `news.anipotts.com` when the newsletter thread exposes it         |
+| `buttondown_url`  |    url |       no | legacy field name; current value points to `news.anipotts.com`              |
 
 ## newsletter backfill options
 

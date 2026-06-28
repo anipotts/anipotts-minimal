@@ -1,5 +1,10 @@
 # site open PR triage, 2026-06-24
 
+Archived: 2026-06-27.
+
+This triage packet is historical. The stale branches and PRs it discussed have
+been closed, absorbed, or deleted.
+
 ## PR #72, admin-solid fleet dashboard MVP
 
 PR: https://github.com/anipotts/anipotts.com/pull/72

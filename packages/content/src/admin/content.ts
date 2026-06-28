@@ -193,7 +193,7 @@ export const contentInventory: ContentInventoryItem[] = [
     title: "subscribe block copy",
     source_ref: "apps/www/src/components/NewsletterSubscribe.astro",
     current_value:
-      "Default lede, CTA label, success text, error text, and Buttondown link live in the component props.",
+      "Default lede, CTA label, success text, error text, and newsletter link live in the component props.",
     editability: "needs_schema",
     risk_level: "medium",
     next_safe_action:
@@ -280,7 +280,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     proof_ids: ["content.writing.orchestrating-link.current"],
     blocked_actions: ["deploy without checks"],
     next_safe_action:
-      "Verify the public writing route and keep stale PR #73 closed.",
+      "Keep the absorbed /orchestrating link as the canonical public-site route.",
   },
   {
     id: "preview.newsletter.copy-source",
@@ -298,7 +298,11 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     authority_state: "needs_source_truth_decision",
     required_approval_ids: ["content.newsletter-source.owner-decision"],
     proof_ids: ["content.newsletter.component.defaults"],
-    blocked_actions: ["save newsletter copy", "sync Buttondown", "send email"],
+    blocked_actions: [
+      "save newsletter copy",
+      "sync newsletter provider",
+      "send email",
+    ],
     next_safe_action:
       "Keep read-only until the content store decision is recorded.",
   },

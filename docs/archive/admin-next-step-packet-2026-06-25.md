@@ -1,5 +1,11 @@
 # admin next-step packet: 2026-06-25
 
+Archived: 2026-06-27.
+
+This packet described old admin-solid PRs that have since been merged,
+superseded, or closed. Current source truth lives in
+`docs/platform-architecture.md`.
+
 Status: no mutation packet
 
 ## current state
