@@ -12,51 +12,35 @@ export type ProofEntry = {
   next_safe_action: string;
 };
 
+type D1PreparedStatement = {
+  bind(...values: unknown[]): D1PreparedStatement;
+  first<T = unknown>(): Promise<T | null>;
+};
+
+export type ProofD1Database = {
+  prepare(query: string): D1PreparedStatement;
+};
+
 export const proofSource = {
-  mode: "read_only_static_proof_log",
+  mode: "read_only_static_plus_d1_metadata",
   generated_from:
-    "GitHub runs, route probes, PR state, and D1-safe passkey metadata",
+    "GitHub runs, route probes, PR state, and read-only D1 metadata",
   live_writes: "disabled",
 };
 
-export const proofEntries: ProofEntry[] = [
+const baseProofEntries: ProofEntry[] = [
   {
-    id: "proof.admin.pr131.deploy",
+    id: "proof.admin.agent-deploy-scope",
     kind: "deploy",
     status: "verified",
-    title: "PR #131 deployed admin only",
+    title: "agent admin deploys stay scoped",
     summary:
-      "Deploy run 28334470855 completed for admin. Www, admin-solid, ingest, newsletter, weekly-email, and state workers were skipped.",
+      "Recent admin content platform PRs deployed the Astro admin target only. Www, admin-solid, ingest, newsletter, weekly-email, and state workers were skipped.",
     evidence_uri:
-      "https://github.com/anipotts/anipotts.com/actions/runs/28334470855",
+      "https://github.com/anipotts/anipotts.com/actions/workflows/deploy.yml",
     redaction: "public_metadata",
     next_safe_action:
       "Keep deploy proof attached to admin route-level changes until proof rows move into D1.",
-  },
-  {
-    id: "proof.site.pr128.deploy",
-    kind: "deploy",
-    status: "verified",
-    title: "PR #128 deployed public site only",
-    summary:
-      "Deploy run 28334009441 completed for www after removing unused making content collections. Admin, admin-solid, ingest, newsletter, weekly-email, and state workers were skipped.",
-    evidence_uri:
-      "https://github.com/anipotts/anipotts.com/actions/runs/28334009441",
-    redaction: "public_metadata",
-    next_safe_action:
-      "Keep public cleanup deploys scoped to www until content records replace static source edits.",
-  },
-  {
-    id: "proof.repo.cleanup-prs",
-    kind: "repo",
-    status: "verified",
-    title: "cleanup PRs merged without branch residue",
-    summary:
-      "PRs #128, #129, #130, and #131 merged through agent automerge. Local main is aligned with origin/main and no open site PRs or agent branches remain.",
-    evidence_uri: "https://github.com/anipotts/anipotts.com/pulls",
-    redaction: "public_metadata",
-    next_safe_action:
-      "Continue branch-per-slice work and keep main production-reflective.",
   },
   {
     id: "proof.site.public-routes",
@@ -64,8 +48,8 @@ export const proofEntries: ProofEntry[] = [
     status: "verified",
     title: "public content routes answer",
     summary:
-      "Live probes returned 200 for /writing/saturdays-are-for-claude-code and /orchestrating. The legacy /claude path returned 301.",
-    evidence_uri: "https://anipotts.com/orchestrating",
+      "Live public route probes have returned 200 for the current Astro site routes, while admin remains separately protected.",
+    evidence_uri: "https://anipotts.com",
     redaction: "public_metadata",
     next_safe_action:
       "Keep public smoke coverage on the stable route set before expanding content from D1.",
@@ -76,23 +60,11 @@ export const proofEntries: ProofEntry[] = [
     status: "verified",
     title: "admin unauthenticated block holds",
     summary:
-      "Unauthenticated probes returned 302 for /auth/passkey, /repos, and /api/admin/runtime-feed after PR #131 deployed. Full proof script still reports Cloudflare Access as the outer boundary for protected admin routes.",
+      "Unauthenticated admin probes return 302 to Cloudflare Access while app-native passkey proof is incomplete.",
     evidence_uri: "https://admin.anipotts.com/auth/passkey",
     redaction: "protected_route",
     next_safe_action:
       "After passkey enrollment, prove app-native login and then remove Cloudflare Access.",
-  },
-  {
-    id: "proof.admin.passkey-enrollment",
-    kind: "gate",
-    status: "blocked",
-    title: "passkey enrollment proof missing",
-    summary:
-      "Passkey schema exists in D1, but proof on 2026-06-28 showed zero active credentials, zero active sessions, and zero audit events. Access removal remains blocked until registration, login, logout, persistence, and revoked-credential denial are proven.",
-    evidence_uri: "pnpm --silent proof:admin-passkey",
-    redaction: "metadata_only",
-    next_safe_action:
-      "Register the first passkey behind Cloudflare Access, then record D1 credential, session, and audit evidence.",
   },
   {
     id: "proof.admin.write-paths",
@@ -108,9 +80,149 @@ export const proofEntries: ProofEntry[] = [
   },
 ];
 
-export const proofCounts = {
-  total: proofEntries.length,
-  verified: proofEntries.filter((entry) => entry.status === "verified").length,
-  blocked: proofEntries.filter((entry) => entry.status === "blocked").length,
-  pending: proofEntries.filter((entry) => entry.status === "pending").length,
-};
+export async function readProofEntries(
+  db: ProofD1Database | null | undefined,
+): Promise<ProofEntry[]> {
+  return [
+    ...baseProofEntries,
+    await readContentOperationProof(db),
+    await readPasskeyProof(db),
+  ];
+}
+
+export function countProofEntries(entries: ProofEntry[]) {
+  return {
+    total: entries.length,
+    verified: entries.filter((entry) => entry.status === "verified").length,
+    blocked: entries.filter((entry) => entry.status === "blocked").length,
+    pending: entries.filter((entry) => entry.status === "pending").length,
+  };
+}
+
+async function readContentOperationProof(
+  db: ProofD1Database | null | undefined,
+): Promise<ProofEntry> {
+  if (!db) {
+    return {
+      id: "proof.content-operation.d1",
+      kind: "gate",
+      status: "pending",
+      title: "content operation D1 metadata unavailable",
+      summary:
+        "The admin runtime did not expose a D1 binding, so proof falls back to static metadata.",
+      evidence_uri: "D1 anipotts-db",
+      redaction: "metadata_only",
+      next_safe_action:
+        "Deploy admin with DB binding before relying on D1-backed proof.",
+    };
+  }
+
+  try {
+    const [records, drafts, events] = await Promise.all([
+      countRows(db, "content_records"),
+      countRows(db, "content_draft_operations"),
+      countRows(db, "content_publish_events"),
+    ]);
+    return {
+      id: "proof.content-operation.d1",
+      kind: "repo",
+      status:
+        drafts > 0 && records === 0 && events === 0 ? "verified" : "pending",
+      title: "content operations are D1-backed and inert",
+      summary: `content_records=${records}, content_draft_operations=${drafts}, content_publish_events=${events}. Draft operation rows can be reviewed without published records or publish events.`,
+      evidence_uri: "D1 anipotts-db content operation tables",
+      redaction: "metadata_only",
+      next_safe_action:
+        records === 0 && events === 0
+          ? "Keep rendering D1 draft operations read-only before adding an audited write route."
+          : "Review content records and publish events before enabling more content writes.",
+    };
+  } catch (error) {
+    return {
+      id: "proof.content-operation.d1",
+      kind: "gate",
+      status: "blocked",
+      title: "content operation D1 read failed",
+      summary:
+        error instanceof Error ? error.message : "unknown D1 read failure",
+      evidence_uri: "D1 anipotts-db content operation tables",
+      redaction: "metadata_only",
+      next_safe_action:
+        "Fix D1 schema or binding before relying on content operation proof.",
+    };
+  }
+}
+
+async function readPasskeyProof(
+  db: ProofD1Database | null | undefined,
+): Promise<ProofEntry> {
+  if (!db) {
+    return {
+      id: "proof.admin.passkey-enrollment",
+      kind: "gate",
+      status: "blocked",
+      title: "passkey proof unavailable",
+      summary:
+        "The admin runtime did not expose a D1 binding, so passkey credential and session counts cannot be checked.",
+      evidence_uri: "D1 anipotts-db admin passkey tables",
+      redaction: "metadata_only",
+      next_safe_action:
+        "Deploy admin with DB binding before passkey proof can complete.",
+    };
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const [credentials, sessions, auditEvents] = await Promise.all([
+      countRows(db, "admin_passkey_credentials", "WHERE revoked_at IS NULL"),
+      countRows(
+        db,
+        "admin_passkey_sessions",
+        "WHERE revoked_at IS NULL AND expires_at > ?",
+        [now],
+      ),
+      countRows(db, "admin_passkey_audit"),
+    ]);
+    const proven = credentials > 0 && sessions > 0 && auditEvents > 0;
+    return {
+      id: "proof.admin.passkey-enrollment",
+      kind: "gate",
+      status: proven ? "verified" : "blocked",
+      title: proven
+        ? "passkey credential and session exist"
+        : "passkey enrollment proof missing",
+      summary: `active_credentials=${credentials}, active_sessions=${sessions}, audit_events=${auditEvents}. Cloudflare Access removal waits for full register, login, logout, persistence, and revoked-credential denial proof.`,
+      evidence_uri: "D1 anipotts-db admin passkey tables",
+      redaction: "metadata_only",
+      next_safe_action: proven
+        ? "Run full route proof, logout proof, and revoked-credential denial before Access removal."
+        : "Register the first passkey behind Cloudflare Access, then record credential, session, and audit evidence.",
+    };
+  } catch (error) {
+    return {
+      id: "proof.admin.passkey-enrollment",
+      kind: "gate",
+      status: "blocked",
+      title: "passkey proof D1 read failed",
+      summary:
+        error instanceof Error ? error.message : "unknown D1 read failure",
+      evidence_uri: "D1 anipotts-db admin passkey tables",
+      redaction: "metadata_only",
+      next_safe_action:
+        "Fix passkey schema or binding before Access removal proof.",
+    };
+  }
+}
+
+async function countRows(
+  db: ProofD1Database,
+  table: string,
+  clause = "",
+  binds: unknown[] = [],
+): Promise<number> {
+  const row = await db
+    .prepare(`SELECT COUNT(*) AS count FROM ${table} ${clause}`)
+    .bind(...binds)
+    .first<{ count: number }>();
+  return Number(row?.count ?? 0);
+}
