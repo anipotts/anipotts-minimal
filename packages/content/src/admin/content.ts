@@ -40,13 +40,120 @@ export type ContentPreviewItem = {
   next_safe_action: string;
 };
 
+type D1Result<T = unknown> = {
+  results?: T[];
+  success?: boolean;
+};
+
+type D1PreparedStatement = {
+  first<T = unknown>(): Promise<T | null>;
+  all<T = unknown>(): Promise<D1Result<T>>;
+};
+
+export type ContentInventoryD1Database = {
+  prepare(query: string): D1PreparedStatement;
+};
+
+export type PageContentInventoryRow = {
+  id: string;
+  page_key: string;
+  version: number;
+  published: boolean;
+  field_count: number;
+  summary: string;
+  source_ref: string;
+  updated_at: string;
+  updated_by: string | null;
+};
+
+export type PageContentInventoryReadState =
+  | {
+      mode: "ready";
+      row_count: number;
+      published_count: number;
+      rows: PageContentInventoryRow[];
+    }
+  | {
+      mode: "missing_db";
+      row_count: number;
+      published_count: number;
+      rows: PageContentInventoryRow[];
+    }
+  | {
+      mode: "read_failed";
+      row_count: number;
+      published_count: number;
+      rows: PageContentInventoryRow[];
+      error: string;
+    };
+
+type PageContentD1Row = {
+  id: string;
+  page_key: string;
+  content: string;
+  version: number | null;
+  published: number | boolean | null;
+  updated_at: string | null;
+  updated_by: string | null;
+};
+
 export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
   architecture_doc: "docs/admin-v2-architecture.md",
-  mode: "read_only_static_inventory",
+  mode: "read_only_static_plus_d1_page_content",
   generated_from:
     "current tracked apps/www source files plus @anipotts/lib/cms page_content reader paths",
 };
+
+export async function readPageContentInventoryStore(
+  db: ContentInventoryD1Database | null | undefined,
+): Promise<PageContentInventoryReadState> {
+  if (!db) {
+    return {
+      mode: "missing_db",
+      row_count: 0,
+      published_count: 0,
+      rows: [],
+    };
+  }
+
+  try {
+    const [rowCount, publishedCount, rows] = await Promise.all([
+      countPageContentRows(db),
+      countPageContentRows(db, "WHERE published = 1"),
+      db
+        .prepare(
+          `SELECT
+             id,
+             page_key,
+             content,
+             version,
+             published,
+             updated_at,
+             updated_by
+           FROM page_content
+           ORDER BY page_key ASC, published DESC, version DESC
+           LIMIT 50`,
+        )
+        .all<PageContentD1Row>(),
+    ]);
+
+    return {
+      mode: "ready",
+      row_count: rowCount,
+      published_count: publishedCount,
+      rows: (rows.results ?? []).map(pageContentInventoryFromRow),
+    };
+  } catch (error) {
+    return {
+      mode: "read_failed",
+      row_count: 0,
+      published_count: 0,
+      rows: [],
+      error: error instanceof Error ? error.message : "unknown read failure",
+    };
+  }
+}
 
 export const contentInventory: ContentInventoryItem[] = [
   {
@@ -224,6 +331,95 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.newsletter.backfill.plan"],
   },
 ];
+
+function countPageContentRows(
+  db: ContentInventoryD1Database,
+  clause = "",
+): Promise<number> {
+  return db
+    .prepare(`SELECT COUNT(*) AS count FROM page_content ${clause}`)
+    .first<{ count: number }>()
+    .then((row) => Number(row?.count ?? 0));
+}
+
+function pageContentInventoryFromRow(
+  row: PageContentD1Row,
+): PageContentInventoryRow {
+  const content = parseJsonObject(row.content);
+  return {
+    id: row.id,
+    page_key: row.page_key,
+    version: Number(row.version ?? 1),
+    published: row.published === true || row.published === 1,
+    field_count: countLeafFields(content),
+    summary: summarizePageContent(row.page_key, content),
+    source_ref: `D1 page_content:${row.page_key}`,
+    updated_at: row.updated_at ?? "",
+    updated_by: row.updated_by,
+  };
+}
+
+function parseJsonObject(raw: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function countLeafFields(value: unknown): number {
+  if (Array.isArray(value)) {
+    return value.reduce((sum, item) => sum + countLeafFields(item), 0);
+  }
+  if (value && typeof value === "object") {
+    return Object.values(value).reduce(
+      (sum, item) => sum + countLeafFields(item),
+      0,
+    );
+  }
+  return value === undefined || value === null ? 0 : 1;
+}
+
+function summarizePageContent(
+  pageKey: string,
+  content: Record<string, unknown>,
+): string {
+  if (pageKey === "newsletter") {
+    return compactSummary([
+      ["headline", content.headline],
+      ["deck", content.deck],
+      ["cta", content.cta_label],
+    ]);
+  }
+
+  const sections = content.sections;
+  if (
+    pageKey === "home" &&
+    sections &&
+    typeof sections === "object" &&
+    !Array.isArray(sections)
+  ) {
+    const intro = (sections as Record<string, unknown>).intro;
+    if (intro && typeof intro === "object" && !Array.isArray(intro)) {
+      return compactSummary([
+        ["heading", (intro as Record<string, unknown>).heading],
+        ["subheading", (intro as Record<string, unknown>).subheading],
+      ]);
+    }
+  }
+
+  return Object.keys(content).slice(0, 6).join(", ") || "empty content object";
+}
+
+function compactSummary(fields: [string, unknown][]): string {
+  const parts = fields
+    .filter((field): field is [string, string] => typeof field[1] === "string")
+    .map(([label, value]) => `${label}: ${value}`);
+  return parts.join(" / ") || "no text fields";
+}
 
 export const contentPreviewItems: ContentPreviewItem[] = [
   {
