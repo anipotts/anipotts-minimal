@@ -67,31 +67,4 @@ const projects = defineCollection({
   }),
 });
 
-const weekly = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/making/weekly" }),
-  schema: z.object({
-    week: z.string().regex(/^\d{4}-W\d{2}$/),
-    window_start: z.coerce.date(),
-    window_end: z.coerce.date(),
-    events: z.number(),
-    events_total: z.number().optional(),
-    agents: z.number(),
-    highlights: z.array(z.string()).default([]),
-    generated_by: z.string().optional(),
-    generated_at: z.coerce.date().optional(),
-  }),
-});
-
-const experiments = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/making/experiments" }),
-  schema: z.object({
-    title: z.string(),
-    slug: z.string().optional(),
-    date: z.coerce.date(),
-    summary: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    status: status.default("published"),
-  }),
-});
-
-export const collections = { writing, projects, weekly, experiments };
+export const collections = { writing, projects };
