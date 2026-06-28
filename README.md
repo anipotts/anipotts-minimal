@@ -44,10 +44,10 @@ pnpm validate     # build + lint + typecheck + test
 ## Claude stats
 
 The `/orchestrating` page reads a generated snapshot at `apps/www/src/data/claude-stats.json`.
+This is a local snapshot generator only. It does not call Claude or Anthropic APIs, and this repo no longer carries launchd or auto-commit wrappers for it.
 
 ```bash
-pnpm update-claude-stats          # regenerate
-pnpm update-claude-stats:commit   # regenerate + commit
+pnpm update-claude-stats # regenerate local snapshot
 ```
 
 ## Environment
