@@ -31,6 +31,8 @@ Current strengths:
 - `NEEDS-ANI`, content inventory, content review, operations, newsletter,
   proof, repos, handoffs, fleet, mutations, and destructive ops have protected
   routes
+- `/repos` can render the local-dev Infra runtime repo overlay metadata through
+  `/api/admin/runtime-feed`
 - deploy workflow can target only admin
 - unauthenticated users are blocked by Cloudflare Access before app content
   renders
@@ -131,6 +133,10 @@ Never include secret values, dirty filenames, file contents, private messages,
 health payload rows, message ids, signed document bodies, or dollar amounts in
 admin feed payloads unless a future authority explicitly permits that exact
 field.
+
+The runtime feed remains local-dev only in `apps/admin`. Production returns a
+disabled metadata response until a reviewed collector and redaction contract are
+approved.
 
 ## content editing model
 
