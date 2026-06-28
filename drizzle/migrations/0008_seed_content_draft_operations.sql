@@ -1,0 +1,121 @@
+-- 0008_seed_content_draft_operations.sql
+-- Seed inert admin content draft operations.
+--
+-- This inserts reviewable operation rows only. It does not insert published
+-- content records, change public rendering, add save APIs, publish, send,
+-- deploy, or mutate external providers.
+--
+-- Rollback:
+--   DELETE FROM content_draft_operations
+--   WHERE operation_id IN (
+--     'content-draft-homepage-summary-2026-06-28',
+--     'content-draft-newsletter-copy-2026-06-28'
+--   );
+
+INSERT OR IGNORE INTO content_draft_operations (
+  operation_id,
+  kind,
+  surface,
+  route,
+  source_ref,
+  field_path,
+  current_value_ref,
+  proposed_value,
+  status,
+  risk_level,
+  authority_state,
+  required_approval_ids,
+  allowed_actions,
+  forbidden_actions,
+  preview_targets,
+  proof_ids,
+  evidence_uri,
+  redaction,
+  created_by,
+  created_at,
+  updated_at,
+  expires_at,
+  rollback_ref,
+  reviewer_note,
+  metadata
+) VALUES (
+  'content-draft-homepage-summary-2026-06-28',
+  'content_draft',
+  'public_site',
+  '/',
+  'D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary',
+  'homepage.summary',
+  'source_fallback',
+  'previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. now i write about coding agent workflows and the systems around them.',
+  'previewed',
+  'medium',
+  'preview_only_no_write',
+  '[]',
+  '["render_preview","request_review"]',
+  '["save","publish","deploy","send"]',
+  '["/content/preview","/"]',
+  '["content.homepage.summary.source","admin.content.preview.local"]',
+  'repo://apps/www/src/pages/index.astro',
+  'public_copy_only',
+  'agent',
+  '2026-06-28T00:00:00Z',
+  '2026-06-28T00:00:00Z',
+  '2026-07-28T00:00:00Z',
+  'source_fallback',
+  'Seeded as an inert review operation. No content record or publish event is created.',
+  '{"source":"drizzle/migrations/0008_seed_content_draft_operations.sql","write_path":"inactive"}'
+);
+
+INSERT OR IGNORE INTO content_draft_operations (
+  operation_id,
+  kind,
+  surface,
+  route,
+  source_ref,
+  field_path,
+  current_value_ref,
+  proposed_value,
+  status,
+  risk_level,
+  authority_state,
+  required_approval_ids,
+  allowed_actions,
+  forbidden_actions,
+  preview_targets,
+  proof_ids,
+  evidence_uri,
+  redaction,
+  created_by,
+  created_at,
+  updated_at,
+  expires_at,
+  rollback_ref,
+  reviewer_note,
+  metadata
+) VALUES (
+  'content-draft-newsletter-copy-2026-06-28',
+  'content_draft',
+  'newsletter',
+  '/newsletter',
+  'D1 page_content:newsletter, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT and component props',
+  'newsletter.subscribe_copy',
+  'source_fallback',
+  'Render headline, deck, CTA, success text, error text, footer text, and archive URL from a newsletter page_content record before any save route exists.',
+  'previewed',
+  'medium',
+  'source_truth_resolved_preview_only',
+  '[]',
+  '["render_preview","request_review"]',
+  '["save","publish","send","sync_provider"]',
+  '["/content/preview","/newsletter"]',
+  '["content.newsletter.page-content.source","content.newsletter.component.defaults"]',
+  'repo://apps/www/src/pages/newsletter.astro',
+  'public_copy_only',
+  'agent',
+  '2026-06-28T00:00:00Z',
+  '2026-06-28T00:00:00Z',
+  '2026-07-28T00:00:00Z',
+  'source_fallback',
+  'Seeded as an inert review operation. No content record, provider sync, send, or publish event is created.',
+  '{"source":"drizzle/migrations/0008_seed_content_draft_operations.sql","write_path":"inactive"}'
+);
