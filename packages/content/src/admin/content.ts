@@ -44,7 +44,8 @@ export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
   architecture_doc: "docs/admin-v2-architecture.md",
   mode: "read_only_static_inventory",
-  generated_from: "current tracked apps/www source files",
+  generated_from:
+    "current tracked apps/www source files plus @anipotts/lib/cms page_content reader paths",
 };
 
 export const contentInventory: ContentInventoryItem[] = [
@@ -52,12 +53,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.heading",
     surface: "homepage",
     title: "hero heading",
-    source_ref: "apps/www/src/data/site.ts:homeContent.heading",
+    source_ref:
+      "D1 page_content:home.sections.intro.heading, fallback apps/www/src/data/site.ts:homeContent.heading",
     current_value: "hi, i'm ani",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Expose as a future content field after the read-only inventory is proven.",
+      "Draft the homepage content record through an audited operation before adding a save path.",
     required_authority: [],
     proof_ids: ["content.homepage.heading.source"],
   },
@@ -65,13 +67,14 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.summary",
     surface: "homepage",
     title: "hero summary",
-    source_ref: "apps/www/src/data/site.ts:homeContent.summary",
+    source_ref:
+      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
     current_value:
-      "Structured AI, Our Bad Habit, Atlantic Records, and agent workflow copy are source-backed in site config.",
+      "Homepage intro copy uses the @anipotts/lib/cms reader path, with source defaults rendering until a published D1 record exists.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Model proposal preview before allowing edits because this is above-fold public copy.",
+      "Use the content operation model before allowing writes because this is above-fold public copy.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
   },
@@ -191,15 +194,19 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "newsletter.subscribe_copy",
     surface: "newsletter",
     title: "subscribe block copy",
-    source_ref: "apps/www/src/components/NewsletterSubscribe.astro",
+    source_ref:
+      "D1 page_content:newsletter, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT and component props",
     current_value:
-      "Default lede, CTA label, success text, error text, and newsletter link live in the component props.",
-    editability: "needs_schema",
+      "Headline, deck, CTA label, success text, error text, footer text, and archive URL use the @anipotts/lib/cms reader path, with fallback defaults rendering until a published D1 record exists.",
+    editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Choose D1 page_content or site config as the editable source before adding save behavior.",
-    required_authority: ["content.newsletter-source.owner-decision"],
-    proof_ids: ["content.newsletter.component.defaults"],
+      "Add an audited draft operation before any save route writes the newsletter content record.",
+    required_authority: [],
+    proof_ids: [
+      "content.newsletter.page-content.source",
+      "content.newsletter.component.defaults",
+    ],
   },
   {
     id: "newsletter.backfill",
@@ -226,9 +233,10 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "tighten homepage summary",
     status: "preview",
     risk_level: "medium",
-    source_ref: "apps/www/src/data/site.ts:homeContent.summary",
+    source_ref:
+      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
     current_value:
-      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
+      "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:
       "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. now i write about coding agent workflows and the systems around them.",
     preview_route: "/",
@@ -287,23 +295,26 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     inventory_id: "newsletter.subscribe_copy",
     surface: "newsletter",
     title: "choose newsletter copy source",
-    status: "blocked",
+    status: "preview",
     risk_level: "medium",
-    source_ref: "apps/www/src/components/NewsletterSubscribe.astro",
+    source_ref: "D1 page_content:newsletter",
     current_value:
-      "Newsletter copy defaults are component props, with CMS-normalized copy also used on the homepage.",
+      "Newsletter copy already has a `newsletter` content reader path, with source defaults as fallback.",
     proposed_value:
-      "Move editable newsletter block copy into a typed content record before enabling admin edits.",
+      "Render the newsletter content record in admin and require an audited content operation before writes.",
     preview_route: "/newsletter",
-    authority_state: "needs_source_truth_decision",
-    required_approval_ids: ["content.newsletter-source.owner-decision"],
-    proof_ids: ["content.newsletter.component.defaults"],
+    authority_state: "source_truth_resolved_preview_only",
+    required_approval_ids: [],
+    proof_ids: [
+      "content.newsletter.page-content.source",
+      "content.newsletter.component.defaults",
+    ],
     blocked_actions: [
       "save newsletter copy",
       "sync newsletter provider",
       "send email",
     ],
     next_safe_action:
-      "Keep read-only until the content store decision is recorded.",
+      "Keep read-only until a content operation write route is audited and logged.",
   },
 ];
