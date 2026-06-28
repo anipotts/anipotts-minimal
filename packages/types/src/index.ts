@@ -29,6 +29,9 @@ export type { TypefullyDraft, TypefullyQueueSummary } from "./typefully";
 export type {
   PageContent,
   HomepageProofCard,
+  HomepageRichSummarySegment,
+  HomepageRichSummarySentence,
+  HomepageRichSummarySimpleSegment,
   HomepageSection,
   HomepageContent,
   CmsEditorLink,

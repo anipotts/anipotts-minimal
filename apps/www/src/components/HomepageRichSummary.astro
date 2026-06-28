@@ -1,0 +1,147 @@
+---
+import InlineMention from "./InlineMention.astro";
+import { homeContent } from "../data/site";
+
+type RichSummarySimpleSegment =
+  | {
+      kind: "text";
+      text: string;
+    }
+  | {
+      kind: "mention";
+      key: string;
+      suffix?: string;
+    };
+
+type RichSummarySegment =
+  | RichSummarySimpleSegment
+  | {
+      kind: "cluster";
+      segments: RichSummarySegment[];
+    }
+  | {
+      kind: "parens";
+      segments: RichSummarySimpleSegment[];
+    };
+
+interface RichSummarySentence {
+  segments: RichSummarySegment[];
+}
+
+interface Props {
+  sentences: RichSummarySentence[];
+}
+
+const { sentences } = Astro.props;
+const mentionMap = homeContent.mentions;
+
+function mentionProps(key: string) {
+  return Object.prototype.hasOwnProperty.call(mentionMap, key)
+    ? mentionMap[key as keyof typeof mentionMap]
+    : null;
+}
+
+function isText(segment: RichSummarySegment): segment is {
+  kind: "text";
+  text: string;
+} {
+  return segment.kind === "text";
+}
+
+function isMention(segment: RichSummarySegment): segment is {
+  kind: "mention";
+  key: string;
+  suffix?: string;
+} {
+  return segment.kind === "mention";
+}
+---
+
+{
+  sentences.map((sentence: RichSummarySentence, index: number) => (
+    <>
+      <span class="hero-sentence">
+        {sentence.segments.map((segment: RichSummarySegment) => (
+          <>
+            {isText(segment) && segment.text}
+            {isMention(segment) &&
+              (() => {
+                const props = mentionProps(segment.key);
+                return props ? (
+                  <InlineMention {...props} suffix={segment.suffix} />
+                ) : (
+                  `${segment.key}${segment.suffix ?? ""}`
+                );
+              })()}
+            {segment.kind === "cluster" && (
+              <span class="mention-cluster">
+                {segment.segments.map((child: RichSummarySegment) => (
+                  <>
+                    {isText(child) && child.text}
+                    {isMention(child) &&
+                      (() => {
+                        const props = mentionProps(child.key);
+                        return props ? (
+                          <InlineMention {...props} suffix={child.suffix} />
+                        ) : (
+                          `${child.key}${child.suffix ?? ""}`
+                        );
+                      })()}
+                    {child.kind === "parens" && (
+                      <span class="brand-parens">
+                        <span>(</span>
+                        {child.segments.map(
+                          (parenChild: RichSummarySimpleSegment) => (
+                            <>
+                              {parenChild.kind === "text" && parenChild.text}
+                              {parenChild.kind === "mention" &&
+                                (() => {
+                                  const props = mentionProps(parenChild.key);
+                                  return props ? (
+                                    <InlineMention
+                                      {...props}
+                                      suffix={parenChild.suffix}
+                                    />
+                                  ) : (
+                                    `${parenChild.key}${parenChild.suffix ?? ""}`
+                                  );
+                                })()}
+                            </>
+                          ),
+                        )}
+                        <span>)</span>
+                      </span>
+                    )}
+                  </>
+                ))}
+              </span>
+            )}
+            {segment.kind === "parens" && (
+              <span class="brand-parens">
+                <span>(</span>
+                {segment.segments.map((child: RichSummarySimpleSegment) => (
+                  <>
+                    {child.kind === "text" && child.text}
+                    {child.kind === "mention" &&
+                      (() => {
+                        const props = mentionProps(child.key);
+                        return props ? (
+                          <InlineMention {...props} suffix={child.suffix} />
+                        ) : (
+                          `${child.key}${child.suffix ?? ""}`
+                        );
+                      })()}
+                  </>
+                ))}
+                <span>)</span>
+              </span>
+            )}
+          </>
+        ))}
+      </span>
+      {index < sentences.length - 1 && (
+        <span class="hero-break" aria-hidden="true" />
+      )}
+    </>
+  ))
+}

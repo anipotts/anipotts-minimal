@@ -34,6 +34,45 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       heading: "hi, i'm ani",
       subheading:
         "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
+      rich_summary: [
+        {
+          segments: [
+            {
+              kind: "text",
+              text: "previously worked on real-time agent i/o at ",
+            },
+            {
+              kind: "cluster",
+              segments: [
+                { kind: "mention", key: "structuredAi" },
+                {
+                  kind: "parens",
+                  segments: [{ kind: "mention", key: "yCombinatorF25" }],
+                },
+              ],
+            },
+            { kind: "text", text: " and " },
+            {
+              kind: "cluster",
+              segments: [
+                { kind: "mention", key: "badHabit", suffix: "," },
+                { kind: "text", text: "an " },
+                { kind: "mention", key: "atlanticRecords" },
+                { kind: "text", text: " venture." },
+              ],
+            },
+          ],
+        },
+        {
+          segments: [
+            {
+              kind: "text",
+              text: "every now and then i post about what i'm doing with claude code and codex, as featured on ",
+            },
+            { kind: "mention", key: "businessInsider", suffix: "." },
+          ],
+        },
+      ],
     },
     about: {
       visible: true,

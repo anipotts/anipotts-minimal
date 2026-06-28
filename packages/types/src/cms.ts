@@ -24,12 +24,39 @@ export interface HomepageSection {
   label: string;
   heading: string;
   subheading?: string;
+  rich_summary?: HomepageRichSummarySentence[];
   paragraphs?: string[];
   links?: { label: string; href: string }[];
   limit?: number;
   view_all?: string;
   project_slugs?: string[];
   writing_slugs?: string[];
+}
+
+export type HomepageRichSummarySimpleSegment =
+  | {
+      kind: "text";
+      text: string;
+    }
+  | {
+      kind: "mention";
+      key: string;
+      suffix?: string;
+    };
+
+export type HomepageRichSummarySegment =
+  | HomepageRichSummarySimpleSegment
+  | {
+      kind: "cluster";
+      segments: HomepageRichSummarySegment[];
+    }
+  | {
+      kind: "parens";
+      segments: HomepageRichSummarySimpleSegment[];
+    };
+
+export interface HomepageRichSummarySentence {
+  segments: HomepageRichSummarySegment[];
 }
 
 export interface HomepageProofCard {

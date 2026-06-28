@@ -160,6 +160,77 @@ describe("homepage cms validation", () => {
     expect(validateHomepageContent(content)).toEqual({ ok: true });
   });
 
+  it("normalizes D1-shaped homepage rich summary segments", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        intro: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
+          rich_summary: [
+            {
+              segments: [
+                { kind: "text", text: "worked at " },
+                { kind: "mention", key: "structuredAi" },
+                {
+                  kind: "cluster",
+                  segments: [
+                    { kind: "text", text: " with " },
+                    { kind: "mention", key: "yCombinatorF25" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    expect(content.sections.intro.rich_summary).toEqual([
+      {
+        segments: [
+          { kind: "text", text: "worked at " },
+          { kind: "mention", key: "structuredAi" },
+          {
+            kind: "cluster",
+            segments: [
+              { kind: "text", text: " with " },
+              { kind: "mention", key: "yCombinatorF25" },
+            ],
+          },
+        ],
+      },
+    ]);
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
+  it("drops malformed homepage rich summary mention keys", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        intro: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
+          rich_summary: [
+            {
+              segments: [
+                { kind: "text", text: "safe " },
+                { kind: "mention", key: "../unsafe" },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    expect(content.sections.intro.rich_summary).toEqual([
+      {
+        segments: [{ kind: "text", text: "safe " }],
+      },
+    ]);
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
   it("rejects duplicate homepage writing slugs", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,

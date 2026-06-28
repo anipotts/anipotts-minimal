@@ -183,13 +183,13 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
+      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback apps/www/src/pages/index.astro rich mention markup",
     current_value:
-      "Homepage intro summary keeps the source-backed rich inline mentions unless D1 explicitly provides a plain subheading field.",
+      "Homepage intro summary uses structured D1 text and mention keys when present, while brand logo and link metadata remain in the Astro mention map.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Use the content operation model before allowing writes because this is above-fold public copy.",
+      "Preview rich-summary segment edits before any save path touches above-fold public copy.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
   },
@@ -450,8 +450,11 @@ function sourceBackedFields(
 
   const gaps: string[] = [];
 
-  if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
-    gaps.unshift("sections.intro.subheading");
+  if (
+    !hasNestedField(content, ["sections", "intro", "rich_summary"]) &&
+    !hasNestedField(content, ["sections", "intro", "subheading"])
+  ) {
+    gaps.unshift("sections.intro.rich_summary");
   }
 
   if (!hasNestedField(content, ["proof_cards"])) {
@@ -538,7 +541,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     status: "preview",
     risk_level: "medium",
     source_ref:
-      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
+      "D1 page_content:home.sections.intro.rich_summary, fallback apps/www/src/pages/index.astro rich mention markup",
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:
