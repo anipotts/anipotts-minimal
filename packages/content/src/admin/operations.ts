@@ -45,6 +45,71 @@ export type ContentOperation = {
   reviewer_note?: string;
 };
 
+type D1Result<T = unknown> = {
+  results?: T[];
+  success?: boolean;
+};
+
+type D1PreparedStatement = {
+  bind(...values: unknown[]): D1PreparedStatement;
+  first<T = unknown>(): Promise<T | null>;
+  all<T = unknown>(): Promise<D1Result<T>>;
+};
+
+export type ContentOperationD1Database = {
+  prepare(query: string): D1PreparedStatement;
+};
+
+type ContentOperationRow = {
+  operation_id: string;
+  kind: string;
+  surface: string;
+  route: string;
+  source_ref: string;
+  field_path: string;
+  current_value_ref: string;
+  proposed_value: string;
+  status: string;
+  risk_level: string;
+  authority_state: string;
+  required_approval_ids: string;
+  allowed_actions: string;
+  forbidden_actions: string;
+  preview_targets: string;
+  proof_ids: string;
+  evidence_uri: string | null;
+  redaction: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  expires_at: string | null;
+  rollback_ref: string;
+  reviewer_note: string | null;
+};
+
+export type ContentOperationCountRow = {
+  table_name: ContentOperationTable["table"];
+  rows: number;
+};
+
+export type ContentOperationReadState =
+  | {
+      mode: "ready";
+      counts: ContentOperationCountRow[];
+      operations: ContentOperation[];
+    }
+  | {
+      mode: "missing_db";
+      counts: ContentOperationCountRow[];
+      operations: ContentOperation[];
+    }
+  | {
+      mode: "read_failed";
+      counts: ContentOperationCountRow[];
+      operations: ContentOperation[];
+      error: string;
+    };
+
 export type ContentOperationTable = {
   table:
     | "content_records"
@@ -86,6 +151,172 @@ export const contentOperationTables: ContentOperationTable[] = [
     blocked_actions: ["send", "schedule", "publish without proof"],
   },
 ];
+
+export function contentOperationFallbackCounts(): ContentOperationCountRow[] {
+  return contentOperationTables.map((table) => ({
+    table_name: table.table,
+    rows: 0,
+  }));
+}
+
+export async function readContentOperationStore(
+  db: ContentOperationD1Database | null | undefined,
+): Promise<ContentOperationReadState> {
+  const fallbackCounts = contentOperationFallbackCounts();
+  if (!db) {
+    return {
+      mode: "missing_db",
+      counts: fallbackCounts,
+      operations: [],
+    };
+  }
+
+  try {
+    const [records, operations, events, recent] = await Promise.all([
+      countRows(db, "content_records"),
+      countRows(db, "content_draft_operations"),
+      countRows(db, "content_publish_events"),
+      db
+        .prepare(
+          `SELECT
+             operation_id,
+             kind,
+             surface,
+             route,
+             source_ref,
+             field_path,
+             current_value_ref,
+             proposed_value,
+             status,
+             risk_level,
+             authority_state,
+             required_approval_ids,
+             allowed_actions,
+             forbidden_actions,
+             preview_targets,
+             proof_ids,
+             evidence_uri,
+             redaction,
+             created_by,
+             created_at,
+             updated_at,
+             expires_at,
+             rollback_ref,
+             reviewer_note
+           FROM content_draft_operations
+           ORDER BY updated_at DESC
+           LIMIT 20`,
+        )
+        .all<ContentOperationRow>(),
+    ]);
+
+    return {
+      mode: "ready",
+      counts: [
+        { table_name: "content_records", rows: records },
+        { table_name: "content_draft_operations", rows: operations },
+        { table_name: "content_publish_events", rows: events },
+      ],
+      operations: (recent.results ?? []).map(contentOperationFromRow),
+    };
+  } catch (error) {
+    return {
+      mode: "read_failed",
+      counts: fallbackCounts,
+      operations: [],
+      error: error instanceof Error ? error.message : "unknown read failure",
+    };
+  }
+}
+
+function countRows(
+  db: ContentOperationD1Database,
+  table: ContentOperationTable["table"],
+): Promise<number> {
+  return db
+    .prepare(`SELECT COUNT(*) AS count FROM ${table}`)
+    .first<{ count: number }>()
+    .then((row) => Number(row?.count ?? 0));
+}
+
+function contentOperationFromRow(row: ContentOperationRow): ContentOperation {
+  return {
+    operation_id: row.operation_id,
+    kind: parseKind(row.kind),
+    surface: parseSurface(row.surface),
+    route: row.route,
+    source_ref: row.source_ref,
+    field_path: row.field_path,
+    current_value_ref: row.current_value_ref,
+    proposed_value: row.proposed_value,
+    status: parseStatus(row.status),
+    risk_level: parseRisk(row.risk_level),
+    authority_state: row.authority_state,
+    required_approval_ids: parseStringArray(row.required_approval_ids),
+    allowed_actions: parseStringArray(row.allowed_actions),
+    forbidden_actions: parseStringArray(row.forbidden_actions),
+    preview_targets: parseStringArray(row.preview_targets),
+    proof_ids: parseStringArray(row.proof_ids),
+    evidence_uri: row.evidence_uri ?? undefined,
+    redaction: row.redaction,
+    created_by: parseCreatedBy(row.created_by),
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    expires_at: row.expires_at ?? undefined,
+    rollback_ref: row.rollback_ref,
+    reviewer_note: row.reviewer_note ?? undefined,
+  };
+}
+
+function parseStringArray(raw: string): string[] {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((value): value is string => typeof value === "string");
+  } catch {
+    return [];
+  }
+}
+
+function parseKind(value: string): ContentOperationKind {
+  return value === "content_record" ||
+    value === "content_draft" ||
+    value === "content_publish"
+    ? value
+    : "content_draft";
+}
+
+function parseSurface(value: string): ContentOperationSurface {
+  return value === "public_site" || value === "newsletter" || value === "admin"
+    ? value
+    : "public_site";
+}
+
+function parseStatus(value: string): ContentOperationStatus {
+  return value === "draft" ||
+    value === "previewed" ||
+    value === "needs_ani" ||
+    value === "blocked" ||
+    value === "approved" ||
+    value === "publishing" ||
+    value === "published" ||
+    value === "verified" ||
+    value === "reverted"
+    ? value
+    : "draft";
+}
+
+function parseRisk(value: string): RiskLevel {
+  return value === "low" || value === "medium" || value === "high"
+    ? value
+    : "medium";
+}
+
+function parseCreatedBy(value: string): ContentOperation["created_by"] {
+  return value === "agent" || value === "ani" || value === "system"
+    ? value
+    : "agent";
+}
 
 export const contentOperationTemplates: ContentOperation[] = [
   {

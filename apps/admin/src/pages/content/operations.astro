@@ -2,92 +2,11 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import {
   contentOperationSchemaSource,
-  contentOperationTables,
   contentOperationTemplates,
+  readContentOperationStore,
 } from "../../data/content";
 
-type CountRow = {
-  table_name: string;
-  rows: number;
-};
-
-type OperationRow = {
-  operation_id: string;
-  kind: string;
-  surface: string;
-  route: string;
-  status: string;
-  risk_level: string;
-  authority_state: string;
-  updated_at: string;
-};
-
-type ReadState =
-  | { mode: "ready"; counts: CountRow[]; operations: OperationRow[] }
-  | { mode: "missing_db"; counts: CountRow[]; operations: OperationRow[] }
-  | {
-      mode: "read_failed";
-      counts: CountRow[];
-      operations: OperationRow[];
-      error: string;
-    };
-
-const fallbackCounts = contentOperationTables.map((table) => ({
-  table_name: table.table,
-  rows: 0,
-}));
-
-const db = Astro.locals.runtime?.env.DB;
-let readState: ReadState;
-
-if (!db) {
-  readState = { mode: "missing_db", counts: fallbackCounts, operations: [] };
-} else {
-  try {
-    const [records, operations, events, recent] = await Promise.all([
-      db.prepare("SELECT COUNT(*) AS count FROM content_records").first<{
-        count: number;
-      }>(),
-      db
-        .prepare("SELECT COUNT(*) AS count FROM content_draft_operations")
-        .first<{ count: number }>(),
-      db.prepare("SELECT COUNT(*) AS count FROM content_publish_events").first<{
-        count: number;
-      }>(),
-      db
-        .prepare(
-          `SELECT operation_id, kind, surface, route, status, risk_level, authority_state, updated_at
-           FROM content_draft_operations
-           ORDER BY updated_at DESC
-           LIMIT 20`,
-        )
-        .all<OperationRow>(),
-    ]);
-
-    readState = {
-      mode: "ready",
-      counts: [
-        { table_name: "content_records", rows: Number(records?.count ?? 0) },
-        {
-          table_name: "content_draft_operations",
-          rows: Number(operations?.count ?? 0),
-        },
-        {
-          table_name: "content_publish_events",
-          rows: Number(events?.count ?? 0),
-        },
-      ],
-      operations: recent.results ?? [],
-    };
-  } catch (error) {
-    readState = {
-      mode: "read_failed",
-      counts: fallbackCounts,
-      operations: [],
-      error: error instanceof Error ? error.message : "unknown read failure",
-    };
-  }
-}
+const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
 ---
 
 <AdminLayout

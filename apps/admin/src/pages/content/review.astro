@@ -7,9 +7,25 @@ import {
   contentOperationTables,
   contentOperationTemplates,
   contentPreviewItems,
+  readContentOperationStore,
 } from "../../data/content";
 
 const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
+const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
+const d1Operations = readState.operations;
+
+function operationMatchesSurface(
+  operation: (typeof d1Operations)[number],
+  surface: (typeof surfaces)[number],
+) {
+  if (surface === "homepage")
+    return operation.field_path.startsWith("homepage.");
+  if (surface === "newsletter")
+    return operation.field_path.startsWith("newsletter.");
+  if (surface === "projects")
+    return operation.field_path.startsWith("projects.");
+  return operation.field_path.startsWith("writing.");
+}
 ---
 
 <AdminLayout
@@ -19,6 +35,8 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
   <section class="meta-strip" aria-label="content review source">
     <span>{contentInventory.length} sources</span>
     <span>{contentPreviewItems.length} previews</span>
+    <span>{d1Operations.length} d1 operations</span>
+    <span>{readState.mode}</span>
     <span>{contentOperationTables.length} d1 tables</span>
     <span>{contentInventorySource.architecture_doc}</span>
   </section>
@@ -47,10 +65,15 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
         </div>
       </div>
       <div>
-        <h3>sample operation</h3>
+        <h3>
+          {d1Operations.length > 0 ? "d1 review queue" : "sample operation"}
+        </h3>
         <div class="record-list">
           {
-            contentOperationTemplates.map((operation) => (
+            (d1Operations.length > 0
+              ? d1Operations
+              : contentOperationTemplates
+            ).map((operation) => (
               <article class="compact-row">
                 <strong>{operation.operation_id}</strong>
                 <span>
@@ -77,13 +100,20 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
         const previewRows = contentPreviewItems.filter(
           (row) => row.surface === surface,
         );
+        const operationRows = d1Operations.filter((operation) =>
+          operationMatchesSurface(operation, surface),
+        );
 
         return (
           <section class="table-card">
             <div class="section-head">
               <div>
                 <p>{surface}</p>
-                <h2>{previewRows.length} previews</h2>
+                <h2>
+                  {operationRows.length > 0
+                    ? `${operationRows.length} d1 operations`
+                    : `${previewRows.length} previews`}
+                </h2>
               </div>
               <span>{sourceRows.length} sources</span>
             </div>
@@ -103,38 +133,73 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
               </div>
 
               <div>
-                <h3>inert proposal</h3>
+                <h3>
+                  {operationRows.length > 0
+                    ? "d1 draft operation"
+                    : "static preview"}
+                </h3>
                 <div class="record-list">
-                  {previewRows.map((row) => (
-                    <article class="proposal-row">
-                      <p>{row.status}</p>
-                      <h3>{row.title}</h3>
-                      <div class="diff-pair">
-                        <div>
-                          <span>current</span>
-                          <p>{row.current_value}</p>
-                        </div>
-                        <div>
-                          <span>proposed</span>
-                          <p>{row.proposed_value}</p>
-                        </div>
-                      </div>
-                      <dl>
-                        <div>
-                          <dt>authority</dt>
-                          <dd>{row.authority_state}</dd>
-                        </div>
-                        <div>
-                          <dt>blocked</dt>
-                          <dd>{row.blocked_actions.join(", ")}</dd>
-                        </div>
-                        <div>
-                          <dt>next</dt>
-                          <dd>{row.next_safe_action}</dd>
-                        </div>
-                      </dl>
-                    </article>
-                  ))}
+                  {operationRows.length > 0
+                    ? operationRows.map((operation) => (
+                        <article class="proposal-row">
+                          <p>{operation.status}</p>
+                          <h3>{operation.operation_id}</h3>
+                          <div class="diff-pair">
+                            <div>
+                              <span>current</span>
+                              <p>{operation.current_value_ref}</p>
+                            </div>
+                            <div>
+                              <span>proposed</span>
+                              <p>{operation.proposed_value}</p>
+                            </div>
+                          </div>
+                          <dl>
+                            <div>
+                              <dt>authority</dt>
+                              <dd>{operation.authority_state}</dd>
+                            </div>
+                            <div>
+                              <dt>blocked</dt>
+                              <dd>{operation.forbidden_actions.join(", ")}</dd>
+                            </div>
+                            <div>
+                              <dt>rollback</dt>
+                              <dd>{operation.rollback_ref}</dd>
+                            </div>
+                          </dl>
+                        </article>
+                      ))
+                    : previewRows.map((row) => (
+                        <article class="proposal-row">
+                          <p>{row.status}</p>
+                          <h3>{row.title}</h3>
+                          <div class="diff-pair">
+                            <div>
+                              <span>current</span>
+                              <p>{row.current_value}</p>
+                            </div>
+                            <div>
+                              <span>proposed</span>
+                              <p>{row.proposed_value}</p>
+                            </div>
+                          </div>
+                          <dl>
+                            <div>
+                              <dt>authority</dt>
+                              <dd>{row.authority_state}</dd>
+                            </div>
+                            <div>
+                              <dt>blocked</dt>
+                              <dd>{row.blocked_actions.join(", ")}</dd>
+                            </div>
+                            <div>
+                              <dt>next</dt>
+                              <dd>{row.next_safe_action}</dd>
+                            </div>
+                          </dl>
+                        </article>
+                      ))}
                 </div>
               </div>
             </div>
@@ -143,4 +208,12 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
       })
     }
   </div>
+
+  {
+    readState.mode === "read_failed" && (
+      <section class="notice">
+        D1 read failed: {readState.error}. Static previews remained read-only.
+      </section>
+    )
+  }
 </AdminLayout>
