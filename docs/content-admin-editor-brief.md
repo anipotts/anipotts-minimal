@@ -11,26 +11,26 @@ or any live write path.
 
 ## current inventory
 
-| surface               | source                                                                    | current shape                                                                                                    | notes                                                         |
-| --------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| homepage hero         | `apps/www/src/data/site.ts`, rendered in `apps/www/src/pages/index.astro` | heading, summary, proof cards, press mention, inline links                                                       | now framed around startup engineering proof                   |
-| project cards         | `apps/www/src/content/projects/*.md`                                      | title, subtitle, description, year, category, role, duration, status, featured, visible, sort order, links, tags | source is already markdown-backed and editor-ready            |
-| project detail pages  | same project markdown body plus optional `technical` and `roadmap` arrays | overview, technical blocks, next steps                                                                           | only quantercise has meaningful body sections today           |
-| writing previews      | `apps/www/src/content/writing/*.md`                                       | title, slug, summary, tags, status, published date, body                                                         | five published posts, mostly claude code and ai workflow      |
-| newsletter block      | `apps/www/src/components/NewsletterSubscribe.astro`                       | static label, lede, email form, status messages                                                                  | copy now makes the promise specific without inventing cadence |
-| archived making notes | `docs/archive/labs/content/**`                                            | old weekly digests and experiments                                                                               | reference only, not an active public-site content source      |
+| surface               | source                                                                                                     | current shape                                                                                                    | notes                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| homepage hero         | D1 `page_content:home`, fallback `apps/www/src/data/site.ts`, rendered in `apps/www/src/pages/index.astro` | heading, summary, proof cards, press mention, inline links                                                       | reader path exists; source fallback renders until a published row exists |
+| project cards         | `apps/www/src/content/projects/*.md`                                                                       | title, subtitle, description, year, category, role, duration, status, featured, visible, sort order, links, tags | source is already markdown-backed and editor-ready                       |
+| project detail pages  | same project markdown body plus optional `technical` and `roadmap` arrays                                  | overview, technical blocks, next steps                                                                           | only quantercise has meaningful body sections today                      |
+| writing previews      | `apps/www/src/content/writing/*.md`                                                                        | title, slug, summary, tags, status, published date, body                                                         | five published posts, mostly claude code and ai workflow                 |
+| newsletter block      | D1 `page_content:newsletter`, fallback `@anipotts/lib/cms` defaults and `NewsletterSubscribe` props        | headline, deck, CTA label, success text, error text, footer, email form                                          | reader path exists; source fallback renders until a published row exists |
+| archived making notes | `docs/archive/labs/content/**`                                                                             | old weekly digests and experiments                                                                               | reference only, not an active public-site content source                 |
 
 ## highest-leverage cleanup batch
 
-| priority | cleanup                                                 | why it matters                                                           | owner fit                     |
-| -------- | ------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------- |
-| p0       | expose homepage proof cards in admin                    | above-fold credibility now depends on four concrete engineering receipts | admin editor                  |
-| p0       | expose project card fields in admin                     | shipping cards still carry the browsable proof trail                     | admin editor                  |
-| p0       | add `body` editing for project detail pages             | several projects have no narrative beyond a card                         | admin editor                  |
-| p1       | add writing preview controls                            | titles and summaries are the actual newsletter backfill queue            | admin editor                  |
-| p1       | add newsletter headline, deck, cta, and status messages | the subscribe module should be editable without code                     | admin editor                  |
-| p2       | decide canonical project source                         | markdown and `packages/lib/src/data/projects.ts` duplicate similar facts | admin editor plus site thread |
-| p2       | classify old posts before publishing to the newsletter  | current writing can seed the newsletter, but should not be auto-sent     | newsletter thread             |
+| priority | cleanup                                                 | why it matters                                                                           | owner fit                     |
+| -------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------- |
+| p0       | expose homepage proof cards in admin                    | above-fold credibility now depends on four concrete engineering receipts                 | admin editor                  |
+| p0       | expose project card fields in admin                     | shipping cards still carry the browsable proof trail                                     | admin editor                  |
+| p0       | add `body` editing for project detail pages             | several projects have no narrative beyond a card                                         | admin editor                  |
+| p1       | add writing preview controls                            | titles and summaries are the actual newsletter backfill queue                            | admin editor                  |
+| p1       | add newsletter headline, deck, cta, and status messages | these fields now have a D1 page-content source and need audited operations before writes | admin editor                  |
+| p2       | decide canonical project source                         | markdown and `packages/lib/src/data/projects.ts` duplicate similar facts                 | admin editor plus site thread |
+| p2       | classify old posts before publishing to the newsletter  | current writing can seed the newsletter, but should not be auto-sent                     | newsletter thread             |
 
 ## first read-only admin slice
 
@@ -105,6 +105,16 @@ hidden admin write endpoints.
 | `error_message`   | string |      yes | current message: `could not subscribe. try again in a minute.`              |
 | `buttondown_url`  |    url |       no | legacy field name; current value points to `news.anipotts.com`              |
 
+The canonical editable source is D1 `page_content` with `page_key =
+newsletter`, normalized by `@anipotts/lib/cms`. `NewsletterSubscribe.astro`
+remains a rendering component and fallback prop surface, not the long-term
+editable source.
+
+Current production D1 has no published `home` or `newsletter` rows as of this
+inventory refresh, so the public site still renders source defaults. The next
+safe step is a reviewed, audited draft operation that seeds rows without adding
+an untracked save path.
+
 ## newsletter backfill options
 
 do not invent fake archives. these are candidates from existing work and should be published only after ani or the newsletter thread confirms source artifacts.
@@ -135,8 +145,8 @@ do not invent fake archives. these are candidates from existing work and should 
 
 ## open questions
 
-| question                                                                                                     | why it matters                                                                     |
-| ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| should project `subtitle` be renamed to `summary` in the editor while staying mapped to markdown frontmatter | editor copy should match how ani thinks about cards                                |
-| should writing stay file-backed or move into D1 first                                                        | admin currently edits D1 thoughts, while www uses astro content collections        |
-| should newsletter copy live in `page_content` or static site config                                          | this decides whether non-article homepage copy can be edited with the same surface |
+| question                                                                                                      | why it matters                                                                    |
+| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| should project `subtitle` be renamed to `summary` in the editor while staying mapped to markdown frontmatter  | editor copy should match how ani thinks about cards                               |
+| should writing stay file-backed or move into D1 first                                                         | admin currently edits D1 thoughts, while www uses astro content collections       |
+| should the first newsletter copy write route require Ani approval every time or only when risk is medium/high | the source is D1 `page_content`; the remaining decision is write authority policy |
