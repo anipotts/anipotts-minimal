@@ -55,22 +55,23 @@ The Astro admin replacement covers these live admin-solid routes. Keep them
 covered while passkey proof and Access removal are completed, then remove
 `apps/admin-solid`:
 
-| Route                 | Purpose                              |
-| --------------------- | ------------------------------------ |
-| `/`                   | operator overview                    |
-| `/auth/passkey`       | app-native passkey auth              |
-| `/content`            | content inventory                    |
-| `/content/review`     | content proposal queue               |
-| `/content/preview`    | draft preview                        |
-| `/content/operations` | read-only D1 content operation state |
-| `/newsletter`         | newsletter issue draft preview       |
-| `/needs-ani`          | typed human decision queue           |
-| `/proof`              | deploy, auth, and route proof log    |
-| `/repos`              | repo and worktree state              |
-| `/handoffs`           | handoff freshness                    |
-| `/fleet`              | machine and agent state              |
-| `/mutations`          | mutation queue                       |
-| `/ops/destructive`    | gated destructive-operation register |
+| Route                                               | Purpose                              |
+| --------------------------------------------------- | ------------------------------------ |
+| `/`                                                 | operator overview                    |
+| `/auth/passkey`                                     | app-native passkey auth              |
+| `/content`                                          | content inventory                    |
+| `/content/review`                                   | content proposal queue               |
+| `/content/preview`                                  | draft preview                        |
+| `/content/operations`                               | read-only D1 content operation state |
+| `/newsletter`                                       | newsletter issue queue               |
+| `/newsletter/first-thing-agents-need-control-plane` | newsletter issue detail preview      |
+| `/needs-ani`                                        | typed human decision queue           |
+| `/proof`                                            | deploy, auth, and route proof log    |
+| `/repos`                                            | repo and worktree state              |
+| `/handoffs`                                         | handoff freshness                    |
+| `/fleet`                                            | machine and agent state              |
+| `/mutations`                                        | mutation queue                       |
+| `/ops/destructive`                                  | gated destructive-operation register |
 
 ## auth target
 
@@ -94,7 +95,9 @@ the remote `anipotts-db` passkey tables and probes protected admin routes
 without printing Cloudflare Access tokens. The proof is not complete until it
 shows at least one active credential, an app-native session, logout proof in
 audit rows, and app-native route blocking after Access removal. The route probe
-set must include the content inventory, review, preview, and operations routes.
+set must include content inventory, review, preview, operations, newsletter
+queue, newsletter detail preview, needs-ani, proof, repos, handoffs, fleet,
+mutations, and destructive-ops routes.
 
 ## ci/cd target
 

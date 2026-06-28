@@ -14,6 +14,7 @@ const ROUTES = [
   "/content/operations",
   "/needs-ani",
   "/newsletter",
+  "/newsletter/first-thing-agents-need-control-plane",
   "/proof",
   "/repos",
   "/handoffs",
