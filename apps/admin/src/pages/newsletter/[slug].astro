@@ -1,6 +1,9 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { newsletterDrafts, newsletterDraftsSource } from "../../data/newsletter";
+import {
+  newsletterDrafts,
+  newsletterDraftsSource,
+} from "../../data/newsletter";
 
 const { slug } = Astro.params;
 const draft = newsletterDrafts.find((item) => item.slug === slug);
@@ -25,14 +28,21 @@ if (!draft) {
         </section>
 
         <div class="newsletter-preview-layout">
-          <article class="newsletter-article-preview" aria-label="issue preview">
+          <article
+            class="newsletter-article-preview"
+            aria-label="issue preview"
+          >
             <a class="back-link" href="/newsletter">
               back to issue queue
             </a>
             <header class="newsletter-article-head">
               <p>draft newsletter issue</p>
               <h2>{draft.title}</h2>
-              <div class="newsletter-media-slot" role="img" aria-label="draft media preview placeholder">
+              <div
+                class="newsletter-media-slot"
+                role="img"
+                aria-label="draft media preview placeholder"
+              >
                 <div>
                   <span>media preview slot</span>
                   <strong>image, screenshot, or article preview</strong>
@@ -72,7 +82,10 @@ if (!draft) {
             </aside>
           </article>
 
-          <aside class="newsletter-proof-panel" aria-label="draft proof and gates">
+          <aside
+            class="newsletter-proof-panel"
+            aria-label="draft proof and gates"
+          >
             <section class="table-card">
               <div class="section-head">
                 <div>
@@ -122,7 +135,9 @@ if (!draft) {
                 {draft.blocked_actions.map((action) => (
                   <article class="compact-row">
                     <strong>{action}</strong>
-                    <small>requires separate authority before implementation</small>
+                    <small>
+                      requires separate authority before implementation
+                    </small>
                   </article>
                 ))}
               </div>

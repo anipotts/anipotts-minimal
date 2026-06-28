@@ -78,7 +78,9 @@ import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
                 {draft.sections.map((section) => (
                   <article class="compact-row">
                     <span>{section.kind}</span>
-                    <strong>{section.heading ?? section.label ?? "opening"}</strong>
+                    <strong>
+                      {section.heading ?? section.label ?? "opening"}
+                    </strong>
                     <small>{section.thread_beat ?? section.body}</small>
                     {section.items && (
                       <ul class="compact-list">

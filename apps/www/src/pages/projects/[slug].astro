@@ -48,21 +48,29 @@ const cmsParagraphs = project.body
       <span>duration: {d.duration}</span>
     </p>
     <p class="meta mono muted">
-      {d.tags.map((t) => (
-        <span>{t.toLowerCase()}</span>
-      ))}
+      {d.tags.map((t) => <span>{t.toLowerCase()}</span>)}
     </p>
     <span class="links mono">
       {
         d.link_live && (
-          <a href={d.link_live} class="accent-link ext" target="_blank" rel="noopener noreferrer">
+          <a
+            href={d.link_live}
+            class="accent-link ext"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             live site <Icon name="ph:arrow-bend-right-up" />
           </a>
         )
       }
       {
         d.link_repo && (
-          <a href={d.link_repo} class="quiet-link ext" target="_blank" rel="noopener noreferrer">
+          <a
+            href={d.link_repo}
+            class="quiet-link ext"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             source <Icon name="ph:arrow-bend-right-up" />
           </a>
         )

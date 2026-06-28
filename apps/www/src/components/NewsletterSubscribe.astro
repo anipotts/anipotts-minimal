@@ -50,7 +50,9 @@ const {
             aria-label="email address"
             required
           />
-          <button class="fill" type="submit">{ctaLabel}</button>
+          <button class="fill" type="submit">
+            {ctaLabel}
+          </button>
         </form>
         <p class="status mono" id="subscribe-status" aria-live="polite" />
       </>
@@ -186,40 +188,41 @@ const {
   }
 </style>
 
-{
-  mode === "form" && (
-    <script>
-      const form = document.getElementById("subscribe-form") as HTMLFormElement;
-      const status = document.getElementById("subscribe-status")!;
-      form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = (
-          form.elements.namedItem("email") as HTMLInputElement
-        ).value.trim();
-        if (!email) return;
-        status.textContent = "subscribing...";
-        status.classList.remove("ok");
-        try {
-          const website = (
-            form.elements.namedItem("website") as HTMLInputElement
-          ).value;
-          const res = await fetch("/api/newsletter/subscribe", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ email, website }),
-          });
-          if (!res.ok) throw new Error(String(res.status));
-          status.textContent =
-            form.dataset.successMessage ?? "subscribed. check your inbox.";
-          status.classList.add("ok");
-          form.reset();
-          (window as any).posthog?.capture("newsletter_subscribed");
-        } catch {
-          status.textContent =
-            form.dataset.errorMessage ??
-            "could not subscribe. try again in a minute.";
-        }
-      });
-    </script>
-  )
-}
+<script>
+  const form = document.getElementById("subscribe-form");
+  const status = document.getElementById("subscribe-status");
+
+  if (form instanceof HTMLFormElement && status) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const emailInput = form.elements.namedItem("email");
+      if (!(emailInput instanceof HTMLInputElement)) return;
+
+      const email = emailInput.value.trim();
+      if (!email) return;
+      status.textContent = "subscribing...";
+      status.classList.remove("ok");
+
+      try {
+        const websiteInput = form.elements.namedItem("website");
+        const website =
+          websiteInput instanceof HTMLInputElement ? websiteInput.value : "";
+        const res = await fetch("/api/newsletter/subscribe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email, website }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        status.textContent =
+          form.dataset.successMessage ?? "subscribed. check your inbox.";
+        status.classList.add("ok");
+        form.reset();
+        window.posthog?.capture?.("newsletter_subscribed");
+      } catch {
+        status.textContent =
+          form.dataset.errorMessage ??
+          "could not subscribe. try again in a minute.";
+      }
+    });
+  }
+</script>

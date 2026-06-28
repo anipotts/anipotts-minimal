@@ -105,7 +105,9 @@ if (!db) {
       <div class="section-head">
         <div>
           <p>d1 content store</p>
-          <h2>{readState.counts.reduce((sum, row) => sum + row.rows, 0)} rows</h2>
+          <h2>
+            {readState.counts.reduce((sum, row) => sum + row.rows, 0)} rows
+          </h2>
         </div>
         <span>{contentOperationSchemaSource.mode}</span>
       </div>

@@ -36,10 +36,7 @@ const markClass = [
 ]
   .filter(Boolean)
   .join(" ");
-const logoClass = [
-  "logo",
-  logoTone === "white" ? "logo-white" : "",
-]
+const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
   .filter(Boolean)
   .join(" ");
 ---
@@ -51,7 +48,33 @@ const logoClass = [
   rel={href ? "noopener noreferrer" : undefined}
   aria-label={label}
 >
-  {hasVisual && <span class={markClass} aria-hidden="true">{logoSrc && <img src={logoSrc} alt="" class={logoClass} loading="lazy" decoding="async" />}{icon && <Icon name={icon} />}{mark && <span class="mark">{mark}</span>}</span>}<span class="text">{label}{suffix}</span>{badgeSrc && <img src={badgeSrc} alt={badgeAlt ?? ""} class="logo badge" loading="lazy" decoding="async" />}
+  {
+    hasVisual && (
+      <span class={markClass} aria-hidden="true">
+        {logoSrc && (
+          <img
+            src={logoSrc}
+            alt=""
+            class={logoClass}
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+        {icon && <Icon name={icon} />}
+        {mark && <span class="mark">{mark}</span>}
+      </span>
+    )
+  }<span class="text">{label}{suffix}</span>{
+    badgeSrc && (
+      <img
+        src={badgeSrc}
+        alt={badgeAlt ?? ""}
+        class="logo badge"
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
 </Tag>
 
 <style>

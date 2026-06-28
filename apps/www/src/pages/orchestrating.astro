@@ -193,7 +193,9 @@ const fmtSessionTime = (iso: string) =>
     <aside class="hero-panel" aria-label="live session totals">
       <span class="mono panel-label">machine noise</span>
       <span class="panel-number">{fmt(stats.totals.toolCalls)}</span>
-      <span class="panel-copy">tool calls captured from local session logs.</span>
+      <span class="panel-copy"
+        >tool calls captured from local session logs.</span
+      >
     </aside>
   </section>
 
@@ -249,7 +251,11 @@ const fmtSessionTime = (iso: string) =>
       <span class="mono muted">tool calls + file mutations</span>
     </span>
     <div class="chart-card">
-      <div class="chart" role="img" aria-label="daily tool calls and file mutations, last 90 days">
+      <div
+        class="chart"
+        role="img"
+        aria-label="daily tool calls and file mutations, last 90 days"
+      >
         {
           stats.daily.map((d) => (
             <span
@@ -305,12 +311,22 @@ const fmtSessionTime = (iso: string) =>
   <section data-rise class="stack" id="hooks">
     <span class="split-head">
       <h2 class="section-label">safety rails</h2>
-      <a href={TIPS_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">tips repo</a>
+      <a
+        href={TIPS_REPO}
+        class="quiet-link mono"
+        target="_blank"
+        rel="noopener noreferrer">tips repo</a
+      >
     </span>
     <div class="grid-2 mobile-carousel">
       {
         hooks.map((hook) => (
-          <a href={hook.href} class="hook-card" target="_blank" rel="noopener noreferrer">
+          <a
+            href={hook.href}
+            class="hook-card"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span class="hook-head">
               <span class="mono hook-name">{hook.name}</span>
               <span class="pill">{hook.event}</span>
@@ -325,12 +341,22 @@ const fmtSessionTime = (iso: string) =>
   <section data-rise class="stack" id="playbooks">
     <span class="split-head">
       <h2 class="section-label">notes</h2>
-      <a href={MINE_REPO} class="quiet-link mono" target="_blank" rel="noopener noreferrer">mine repo</a>
+      <a
+        href={MINE_REPO}
+        class="quiet-link mono"
+        target="_blank"
+        rel="noopener noreferrer">mine repo</a
+      >
     </span>
     <div class="grid-2 mobile-carousel">
       {
         docs.map((doc) => (
-          <a href={doc.href} class="doc-card" target="_blank" rel="noopener noreferrer">
+          <a
+            href={doc.href}
+            class="doc-card"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span class="row-title">{doc.name}</span>
             <span class="dek">{doc.desc}</span>
           </a>

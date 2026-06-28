@@ -11,7 +11,11 @@ const slug = projectSlug(project);
 const { title, subtitle, year, status, category, tags } = project.data;
 ---
 
-<a href={`/projects/${slug}`} class="card project-card" data-category={category}>
+<a
+  href={`/projects/${slug}`}
+  class="card project-card"
+  data-category={category}
+>
   <span class="head">
     <span class="title">{title}</span>
     <Icon name="ph:arrow-bend-right-up" class="affordance" />

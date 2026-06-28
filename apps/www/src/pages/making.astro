@@ -81,7 +81,9 @@ const buckets: Array<{
           .map((bucket) => (
             <section class="bucket" aria-labelledby={`bucket-${bucket.id}`}>
               <span class="bucket-head">
-                <h3 id={`bucket-${bucket.id}`} class="bucket-title">{bucket.label}</h3>
+                <h3 id={`bucket-${bucket.id}`} class="bucket-title">
+                  {bucket.label}
+                </h3>
                 <span class="mono muted">{bucket.note}</span>
               </span>
               <div class="grid mobile-carousel">
@@ -90,7 +92,7 @@ const buckets: Array<{
                 ))}
               </div>
             </section>
-        ))
+          ))
       }
     </div>
   </section>

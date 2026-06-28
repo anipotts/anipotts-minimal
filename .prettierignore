@@ -2,6 +2,17 @@ dist/
 .next/
 node_modules/
 pnpm-lock.yaml
+.turbo/
+.claude/
+.codex/
+.agents/
+**/.astro/
+**/.output/
+**/.vinxi/
+
+# legacy rollback app stays untouched until Astro admin passkey proof lets us
+# remove or archive it.
+apps/admin-solid/
 
 # content collection bodies are data, not code. the markdown -> d1 sync
 # depends on byte fidelity, so no formatter ever touches them.

@@ -35,7 +35,9 @@ const groups = ["verified", "blocked", "pending"] as const;
               {rows.map((entry) => (
                 <article class="record-row">
                   <div>
-                    <p>{entry.kind} / {entry.redaction}</p>
+                    <p>
+                      {entry.kind} / {entry.redaction}
+                    </p>
                     <h3>{entry.title}</h3>
                   </div>
                   <dl>
@@ -66,7 +68,8 @@ const groups = ["verified", "blocked", "pending"] as const;
   </div>
 
   <div class="notice">
-    The final target is D1-backed proof records. This route is a static bridge so
-    admin can show what is already verified while write paths remain inactive.
+    The final target is D1-backed proof records. This route is a static bridge
+    so admin can show what is already verified while write paths remain
+    inactive.
   </div>
 </AdminLayout>

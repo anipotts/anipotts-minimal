@@ -42,8 +42,7 @@ const projects = (await visibleProjects())
   .filter((project) => homeMakingOrder.has(project.slug))
   .sort(
     (a, b) =>
-      (homeMakingOrder.get(a.slug) ?? 0) -
-      (homeMakingOrder.get(b.slug) ?? 0),
+      (homeMakingOrder.get(a.slug) ?? 0) - (homeMakingOrder.get(b.slug) ?? 0),
   )
   .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, writing.limit ?? 3);
@@ -52,51 +51,54 @@ const workHref = "/making";
 const ycMention = homeContent.mentions.yCombinatorF25;
 ---
 
-<Shell
-  title="ani potts"
-  description={homeContent.summary}
-  path="/"
->
+<Shell title="ani potts" description={homeContent.summary} path="/">
   <section data-rise>
     <h1 class="home-hero">
       {heading}<span class="spark">.</span>
     </h1>
     <p class="hero-summary hero-line">
-      {hasCmsHome ? (
-        intro.subheading ?? homeContent.summary
-      ) : (
-        <>
-          <span class="hero-sentence">
-            previously worked on real-time agent i/o at{" "}
-            <span class="mention-cluster"
-              ><InlineMention {...homeContent.mentions.structuredAi} />
-              <span class="brand-parens"
-                ><span>(</span><InlineMention {...ycMention} /><span
-                  >)</span
-                ></span
-              ></span
-            >{" "}
-            and{" "}
-            <span class="mention-cluster"
-              ><InlineMention {...homeContent.mentions.badHabit} suffix="," />
-              <span>an</span>
-              <InlineMention {...homeContent.mentions.atlanticRecords} />
-              <span>venture.</span></span
-            >
-          </span>
-          <span class="hero-break" aria-hidden="true"></span>
-          <span class="hero-sentence">
-            every now and then i post about what i'm doing with claude code and
-            codex, as featured on{" "}
-            <InlineMention
-              {...homeContent.mentions.businessInsider}
-              suffix="."
-            />
-          </span>
-        </>
-      )}
+      {
+        hasCmsHome ? (
+          (intro.subheading ?? homeContent.summary)
+        ) : (
+          <>
+            <span class="hero-sentence">
+              previously worked on real-time agent i/o at{" "}
+              <span class="mention-cluster">
+                <InlineMention {...homeContent.mentions.structuredAi} />
+                <span class="brand-parens">
+                  <>
+                    <span>(</span>
+                    <InlineMention {...ycMention} />
+                    <span>)</span>
+                  </>
+                </span>
+              </span>{" "}
+              and{" "}
+              <span class="mention-cluster">
+                <InlineMention {...homeContent.mentions.badHabit} suffix="," />
+                <span>an</span>
+                <InlineMention {...homeContent.mentions.atlanticRecords} />
+                <span>venture.</span>
+              </span>
+            </span>
+            <span class="hero-break" aria-hidden="true" />
+            <span class="hero-sentence">
+              every now and then i post about what i'm doing with claude code
+              and codex, as featured on{" "}
+              <InlineMention
+                {...homeContent.mentions.businessInsider}
+                suffix="."
+              />
+            </span>
+          </>
+        )
+      }
     </p>
-    <div class="proof-grid mobile-carousel" aria-label="selected engineering proof">
+    <div
+      class="proof-grid mobile-carousel"
+      aria-label="selected engineering proof"
+    >
       {
         homeContent.proof.map((item) => (
           <a href={item.href} class="proof-card">
@@ -109,29 +111,46 @@ const ycMention = homeContent.mentions.yCombinatorF25;
     </div>
   </section>
 
-  {work.visible && <section data-rise class="stack">
-    <span class="head-row">
-      <h2 class="section-label">{workLabel}</h2>
-      <a href={workHref} class="quiet-link mono view-all"
-        >{work.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
-      >
-    </span>
-    <div class="grid mobile-carousel">
-      {projects.map((project) => <ProjectCard project={project} />)}
-    </div>
-  </section>}
+  {
+    work.visible && (
+      <section data-rise class="stack">
+        <span class="head-row">
+          <h2 class="section-label">{workLabel}</h2>
+          <a href={workHref} class="quiet-link mono view-all">
+            {work.links?.[0]?.label ?? "view all"}
+            <Icon name="ph:arrow-bend-right-up" />
+          </a>
+        </span>
+        <div class="grid mobile-carousel">
+          {projects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
-  {writing.visible && <section data-rise class="stack">
-    <span class="head-row">
-      <h2 class="section-label">{writing.label}</h2>
-      <a href={writing.view_all ?? "/writing"} class="quiet-link mono view-all"
-        >{writing.links?.[0]?.label ?? "view all"}<Icon name="ph:arrow-bend-right-up" /></a
-      >
-    </span>
-    <div class="list">
-      {writingEntries.map((item) => <WritingRow item={item} />)}
-    </div>
-  </section>}
+  {
+    writing.visible && (
+      <section data-rise class="stack">
+        <span class="head-row">
+          <h2 class="section-label">{writing.label}</h2>
+          <a
+            href={writing.view_all ?? "/writing"}
+            class="quiet-link mono view-all"
+          >
+            {writing.links?.[0]?.label ?? "view all"}
+            <Icon name="ph:arrow-bend-right-up" />
+          </a>
+        </span>
+        <div class="list">
+          {writingEntries.map((item) => (
+            <WritingRow item={item} />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <section data-rise>
     <NewsletterSubscribe

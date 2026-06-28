@@ -16,7 +16,9 @@ import { needsAniBuckets, needsAniItems } from "../data/needs";
   <div class="needs-grid">
     {
       needsAniBuckets.map((group) => {
-        const rows = needsAniItems.filter((item) => item.bucket === group.bucket);
+        const rows = needsAniItems.filter(
+          (item) => item.bucket === group.bucket,
+        );
 
         return (
           <section class="table-card">
@@ -31,7 +33,9 @@ import { needsAniBuckets, needsAniItems } from "../data/needs";
               {rows.map((item) => (
                 <article class="need-row">
                   <div>
-                    <p>{item.owner} / {item.type}</p>
+                    <p>
+                      {item.owner} / {item.type}
+                    </p>
                     <h3>{item.id}</h3>
                     <span>{item.why}</span>
                   </div>
