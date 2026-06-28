@@ -7,7 +7,7 @@ admin cutover and still references SolidStart, `apps/admin-solid`, and PR #30 as
 future direction. Current source truth is `docs/platform-architecture.md` plus
 `docs/admin-v2-architecture.md` and `docs/newsletter-system.md`.
 
-Multi-month vision doc for the anipotts personal infrastructure. Companion to `docs/archive/cloudflare-infrastructure-2026-05-13.md` (archived deploy substrate snapshot) and `docs/per-project-vercel-migration.md` (project-by-project Vercel exit). This one is the _destination_ the migrations are walking toward.
+Multi-month vision doc for the anipotts personal infrastructure. Companion to `docs/archive/cloudflare-infrastructure-2026-05-13.md` (archived deploy substrate snapshot) and `docs/archive/per-project-vercel-migration-2026-05-13.md` (project-by-project Vercel exit). This one is the _destination_ the migrations are walking toward.
 
 Last updated: 2026-05-13.
 
@@ -217,7 +217,7 @@ Auth: CF Access, same group as current admin.
 
 ## What this is not
 
-- It is not a refactor of every existing repo. The 9-project Vercel migration (`docs/per-project-vercel-migration.md`) is unrelated to this; those are domain moves, not architectural moves.
+- It is not a refactor of every existing repo. The 9-project Vercel migration (`docs/archive/per-project-vercel-migration-2026-05-13.md`) is unrelated to this; those are domain moves, not architectural moves.
 - It is not a new product. It's personal infra. If it spawns a productized version later, that's downstream of using it for a year.
 - It is not "rip out everything tomorrow." It's strictly additive (new workers, new DO classes, new admin app) with one explicit kill (`*.mini.anipotts.com` wildcard) that's purely a billing/cleanup move.
 - It is not Workers Realtime (audio/video calls). Explicitly deferred per Ani's call (2026-05-13).
@@ -234,7 +234,7 @@ Auth: CF Access, same group as current admin.
 ## Cross-references
 
 - Deploy substrate + repo-level adoption + monitoring posture: `docs/archive/cloudflare-infrastructure-2026-05-13.md`
-- Per-project Vercel exit plan for 9 domain-bearing projects: `docs/per-project-vercel-migration.md`
+- Per-project Vercel exit plan for 9 domain-bearing projects: `docs/archive/per-project-vercel-migration-2026-05-13.md`
 - Current state of all in-flight PRs (this repo): see open PRs #40, #41, #42 + cross-account `wigglesburg.com` PR #1 (first migration)
 
 ## Update rule
