@@ -1,13 +1,24 @@
 import { defineMiddleware } from "astro:middleware";
 import { hasActivePasskeySession } from "./lib/passkey-auth";
 
-const PUBLIC_PATHS = [
+const PUBLIC_PATHS = new Set([
   "/auth/passkey",
   "/api/health",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
   "/apple-touch-icon.png",
-];
+]);
+
+const PUBLIC_PASSKEY_API_PATHS = new Set([
+  "/api/admin/passkey/login-options",
+  "/api/admin/passkey/login-verify",
+  "/api/admin/passkey/logout",
+  "/api/admin/passkey/register-options",
+  "/api/admin/passkey/register-verify",
+  "/api/admin/passkey/status",
+]);
+
+const PUBLIC_PREFIXES = ["/_astro/", "/assets/"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   if (isPublicPath(context.url.pathname)) return next();
@@ -23,9 +34,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 function isPublicPath(pathname: string): boolean {
   return (
-    PUBLIC_PATHS.includes(pathname) ||
-    pathname.startsWith("/api/admin/passkey/") ||
-    pathname.startsWith("/_astro/") ||
-    pathname.startsWith("/assets/")
+    PUBLIC_PATHS.has(pathname) ||
+    PUBLIC_PASSKEY_API_PATHS.has(pathname) ||
+    PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   );
 }
