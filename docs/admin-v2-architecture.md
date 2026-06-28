@@ -17,45 +17,48 @@ The current control-plane model remains the backbone:
 
 Live baseline:
 
-- app: `apps/admin-solid`
-- worker: `anipotts-admin-solid`
+- app: `apps/admin`
+- worker: `anipotts-admin`
 - host: `admin.anipotts.com`
-- protection: Cloudflare Access
-- deployed state: read-only admin feed shell
-- latest proven queue: `/needs-ani`
+- protection: Cloudflare Access plus staged app-native passkey middleware
+- deployed state: Astro admin operator and content shell
+- latest proven routes: `/newsletter` and
+  `/newsletter/first-thing-agents-need-control-plane`
 
 Current strengths:
 
-- dense operational pages already exist
-- `NEEDS-ANI` is rendered as typed human syscalls
-- static Infra feed and local-dev runtime overlays are wired
-- deploy workflow can target only admin-solid
-- unauthenticated users are blocked by Cloudflare Access
+- Astro admin is canonical for `admin.anipotts.com`
+- `NEEDS-ANI`, content inventory, content review, operations, newsletter,
+  proof, repos, handoffs, fleet, mutations, and destructive ops have protected
+  routes
+- deploy workflow can target only admin
+- unauthenticated users are blocked by Cloudflare Access before app content
+  renders
+- passkey tables and app middleware are deployed
 
 Current gaps:
 
-- app framework is separate from the Astro public site direction
-- route components and data adapters are still tightly coupled
-- content editing is modeled in docs but not represented in the live admin nav
-- no formal read model for public-site editable content
-- no disabled preview for future save or publish workflows
+- no active passkey credential exists yet
+- Cloudflare Access is still the outer boundary until passkey proof is complete
+- admin proof rows are still static source data, not durable D1 records
+- content operations are modeled and queryable, but publish writes remain inert
+- `apps/admin-solid` remains as a legacy rollback surface
 
 ## recommended v2 shape
 
-Build v2 as an Astro-aligned Cloudflare app with a sidebar-first operator shell.
-Use Astro for routing, layout, and server-rendered read views. Use Solid islands
-only where live state, filters, optimistic previews, or stream updates need
-client-side state.
+Continue with `apps/admin` as the canonical Astro admin app. Do not create a
+second admin app unless it removes more complexity than it adds.
 
-Recommended app options:
+Keep the sidebar-first operator shell. Use Astro for routing, layout, and
+server-rendered read views. Add islands only where live state, filters,
+optimistic previews, or stream updates need client-side state.
 
-- short term: keep improving `apps/admin-solid` while v2 is documented
-- medium term: create `apps/admin-v2` as an Astro app and port read-only routes
-- final target: move `admin.anipotts.com` to the Astro-aligned app after proof
+The next architecture milestone is proof, not another framework migration:
 
-Do not rewrite only for framework symmetry. Rewrite when the v2 shell can reduce
-deployment surface, make content editing easier, and share site-rendering
-patterns with `apps/www`.
+- enroll the first passkey while Access still protects the app
+- prove app-native login, logout, persistence, and denial paths
+- remove Access only after the proof script and browser proof both pass
+- then archive or remove `apps/admin-solid`
 
 ## information architecture
 
@@ -200,7 +203,8 @@ Auth boundary note:
 
 ## smallest first implementation slice
 
-First slice: add a read-only `/content` route to the current admin shell.
+First slice completed: add a read-only `/content` route to the current admin
+shell.
 
 Scope:
 
@@ -228,33 +232,26 @@ Why this slice:
 - it helps separate content data from source-code deploy habit
 - it can ship on the current app without waiting for Astro migration
 
-Second slice:
+Current next slice:
 
-- extract shared admin view-model types
-- add content operation preview objects
-- render disabled save/publish affordances with required authority labels
-- keep every button inert
+- complete passkey enrollment proof
+- rerun `pnpm --silent proof:admin-passkey`
+- remove Cloudflare Access only after proof passes
+- archive or remove `apps/admin-solid`
 
-Third slice:
+Follow-up content slice:
 
-- decide whether to keep `apps/admin-solid` or introduce `apps/admin-v2` Astro
-- port shell layout if Astro gives lower complexity
-- only then propose approved write APIs
+- move proof records into D1-backed read models
+- make content draft operations visible from D1
+- keep save, publish, send, and live controls inert until audit proof exists
 
 ## verification expectations
 
-For read-only admin slices:
+For admin slices:
 
 ```bash
-pnpm turbo typecheck --filter=@anipotts/admin-solid...
-pnpm turbo build --filter=@anipotts/admin-solid...
-```
-
-For future Astro v2 slices:
-
-```bash
-pnpm turbo typecheck --filter=<admin-v2-package>...
-pnpm turbo build --filter=<admin-v2-package>...
+pnpm turbo typecheck --filter=@anipotts/admin...
+pnpm turbo build --filter=@anipotts/admin...
 ```
 
 For deploy proof after approved merge:
