@@ -42,6 +42,8 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHeading ? intro.heading : homeContent.heading;
+const proofCards =
+  cmsHome.proof_cards.length > 0 ? cmsHome.proof_cards : homeContent.proof;
 const homeMakingSlugs = [
   "quantercise",
   "quantercise-extension",
@@ -117,7 +119,7 @@ function hasText(value: unknown): value is string {
       aria-label="selected engineering proof"
     >
       {
-        homeContent.proof.map((item) => (
+        proofCards.map((item) => (
           <a href={item.href} class="proof-card">
             <span class="proof-label mono">{item.label}</span>
             <span class="proof-title">{item.title}</span>

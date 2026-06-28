@@ -1,4 +1,8 @@
-import type { HomepageContent, HomepageSection } from "@anipotts/types";
+import type {
+  HomepageContent,
+  HomepageProofCard,
+  HomepageSection,
+} from "@anipotts/types";
 import {
   DEFAULT_HOMEPAGE_CONTENT,
   HOMEPAGE_FIELD_LIMITS,
@@ -90,6 +94,29 @@ function normalizeSection(
   return normalized;
 }
 
+function normalizeProofCards(
+  value: unknown,
+  fallback: HomepageProofCard[],
+): HomepageProofCard[] {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const cards = value
+    .filter((card): card is Record<string, unknown> => {
+      return Boolean(card) && typeof card === "object" && !Array.isArray(card);
+    })
+    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax)
+    .map((card) => ({
+      label: coerceString(card.label, "").trim(),
+      href: coerceString(card.href, "").trim(),
+      title: coerceString(card.title, "").trim(),
+      detail: coerceString(card.detail, "").trim(),
+    }));
+
+  return cards.length > 0 ? cards : fallback;
+}
+
 function isSafeHomepageLink(href: string): boolean {
   if (!href || /[\u0000-\u001f\u007f\s]/.test(href)) return false;
   if (href.startsWith("/")) return !href.startsWith("//");
@@ -147,6 +174,39 @@ function validateSectionLink(section: HomepageSection, label: string) {
   );
 }
 
+function validateProofCard(card: HomepageProofCard, index: number) {
+  const label = `Proof card ${index + 1}`;
+  return (
+    validateTextField(
+      card.label,
+      `${label} label`,
+      HOMEPAGE_FIELD_LIMITS.linkLabel,
+      true,
+    ) ??
+    validateTextField(
+      card.href,
+      `${label} link`,
+      HOMEPAGE_FIELD_LIMITS.linkHref,
+      true,
+    ) ??
+    (!isSafeHomepageLink(card.href)
+      ? `${label} link must start with / or https://`
+      : null) ??
+    validateTextField(
+      card.title,
+      `${label} title`,
+      HOMEPAGE_FIELD_LIMITS.proofTitle,
+      true,
+    ) ??
+    validateTextField(
+      card.detail,
+      `${label} detail`,
+      HOMEPAGE_FIELD_LIMITS.proofDetail,
+      true,
+    )
+  );
+}
+
 export function validateHomepageContent(content: HomepageContent): {
   ok: boolean;
   error?: string;
@@ -193,6 +253,15 @@ export function validateHomepageContent(content: HomepageContent): {
     validateSectionLink(latest_thoughts, "Writing");
   if (writingError) return { ok: false, error: writingError };
 
+  if (content.proof_cards.length === 0) {
+    return { ok: false, error: "Homepage proof cards are required" };
+  }
+
+  for (const [index, card] of content.proof_cards.entries()) {
+    const cardError = validateProofCard(card, index);
+    if (cardError) return { ok: false, error: cardError };
+  }
+
   return { ok: true };
 }
 
@@ -222,6 +291,10 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
       ),
     },
     section_order: HOME_SECTION_ORDER,
+    proof_cards: normalizeProofCards(
+      source.proof_cards,
+      DEFAULT_HOMEPAGE_CONTENT.proof_cards,
+    ),
   };
 }
 

@@ -170,4 +170,7 @@ Rules:
    `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
 10. move admin proof baseline rows into D1 `admin_proof_events`; seeded by
     `drizzle/migrations/0012_admin_proof_events.sql`.
-11. reduce deploy workflow inputs to retained production targets.
+11. move homepage proof cards into D1 `page_content`; seeded by
+    `drizzle/migrations/0013_seed_homepage_proof_cards.sql` with Astro source
+    fallback still retained.
+12. reduce deploy workflow inputs to retained production targets.

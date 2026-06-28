@@ -77,6 +77,49 @@ describe("homepage cms validation", () => {
     });
   });
 
+  it("normalizes D1-shaped proof cards", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      proof_cards: [
+        {
+          label: " demo ",
+          href: " /making ",
+          title: " proof ",
+          detail: " card detail ",
+        },
+      ],
+    });
+
+    expect(content.proof_cards).toEqual([
+      {
+        label: "demo",
+        href: "/making",
+        title: "proof",
+        detail: "card detail",
+      },
+    ]);
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
+  it("rejects unsafe proof card links", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      proof_cards: [
+        {
+          label: "demo",
+          href: "javascript:alert(1)",
+          title: "proof",
+          detail: "card detail",
+        },
+      ],
+    });
+
+    expect(validateHomepageContent(content)).toEqual({
+      ok: false,
+      error: "Proof card 1 link must start with / or https://",
+    });
+  });
+
   it("rejects excessive paragraph length", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,

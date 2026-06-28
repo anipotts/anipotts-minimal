@@ -33,6 +33,11 @@ SELECT
   published,
   json_extract(content, '$.sections.intro.heading') AS home_heading,
   coalesce(json_type(content, '$.sections.intro.subheading'), 'missing') AS home_subheading_type,
+  CASE
+    WHEN page_key = 'home'
+    THEN coalesce(json_array_length(json_extract(content, '$.proof_cards')), 0)
+    ELSE NULL
+  END AS home_proof_card_count,
   json_extract(content, '$.headline') AS newsletter_headline
 FROM page_content
 ORDER BY page_key ASC, version DESC;
@@ -84,9 +89,15 @@ const publicRouteFailures = publicRoutes.filter(
 const adminBoundary = summarizeBoundary(adminRoutes);
 const publishEvents = contentCounts.content_publish_events ?? 0;
 const contentRecords = contentCounts.content_records ?? 0;
+const homeProofCardCount = Number(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_proof_card_count ?? 0,
+);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
+  ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...(publishEvents === 0 ? [] : ["content_publish_events_should_be_empty"]),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
@@ -109,6 +120,11 @@ const proof = {
     published: Number(row.published) === 1,
     home_heading: row.home_heading ?? null,
     home_subheading_type: row.home_subheading_type ?? null,
+    home_proof_card_count:
+      row.home_proof_card_count === null ||
+      row.home_proof_card_count === undefined
+        ? null
+        : Number(row.home_proof_card_count),
     newsletter_headline: row.newsletter_headline ?? null,
   })),
   content_draft_operations: operationRows.map((row) => ({

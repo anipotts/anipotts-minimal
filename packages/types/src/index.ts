@@ -28,6 +28,7 @@ export type { TypefullyDraft, TypefullyQueueSummary } from "./typefully";
 // CMS types
 export type {
   PageContent,
+  HomepageProofCard,
   HomepageSection,
   HomepageContent,
   CmsEditorLink,
