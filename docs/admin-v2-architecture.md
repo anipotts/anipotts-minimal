@@ -197,6 +197,9 @@ Auth boundary note:
 - The current unblocker is first passkey enrollment, then proof for register,
   login, logout, session persistence, revoked credential denial, and
   unauthenticated app-native blocking after Access removal.
+- `pnpm --silent proof:admin-passkey` reports pre-removal blockers in
+  `access_removal_blockers`; `cloudflare_access_still_active: true` is expected
+  until the final Access removal step.
 - Historical auth and Access planning packets live under `docs/archive/`.
 - See `docs/admin-content-draft-operations.md` for the inert content draft
   operation schema that should precede any save or publish path.
