@@ -80,6 +80,13 @@ const baseProofEntries: ProofEntry[] = [
   },
 ];
 
+const requiredPasskeyAuditEvents = [
+  "passkey.credential.registered",
+  "passkey.session.created",
+  "passkey.session.revoked",
+  "passkey.authentication.denied",
+] as const;
+
 export async function readProofEntries(
   db: ProofD1Database | null | undefined,
 ): Promise<ProofEntry[]> {
@@ -173,7 +180,7 @@ async function readPasskeyProof(
 
   try {
     const now = new Date().toISOString();
-    const [credentials, sessions, auditEvents] = await Promise.all([
+    const [credentials, sessions, ...auditEventCounts] = await Promise.all([
       countRows(db, "admin_passkey_credentials", "WHERE revoked_at IS NULL"),
       countRows(
         db,
@@ -181,22 +188,33 @@ async function readPasskeyProof(
         "WHERE revoked_at IS NULL AND expires_at > ?",
         [now],
       ),
-      countRows(db, "admin_passkey_audit"),
+      ...requiredPasskeyAuditEvents.map((eventType) =>
+        countRows(db, "admin_passkey_audit", "WHERE event_type = ?", [
+          eventType,
+        ]),
+      ),
     ]);
-    const proven = credentials > 0 && sessions > 0 && auditEvents > 0;
+    const auditSummary = requiredPasskeyAuditEvents.map(
+      (eventType, index) => `${eventType}=${auditEventCounts[index] ?? 0}`,
+    );
+    const missingAuditEvents = requiredPasskeyAuditEvents.filter(
+      (_eventType, index) => (auditEventCounts[index] ?? 0) === 0,
+    );
+    const proven =
+      credentials > 0 && sessions > 0 && missingAuditEvents.length === 0;
     return {
       id: "proof.admin.passkey-enrollment",
       kind: "gate",
       status: proven ? "verified" : "blocked",
       title: proven
-        ? "passkey credential and session exist"
-        : "passkey enrollment proof missing",
-      summary: `active_credentials=${credentials}, active_sessions=${sessions}, audit_events=${auditEvents}. Cloudflare Access removal waits for full register, login, logout, persistence, and revoked-credential denial proof.`,
+        ? "passkey removal checklist is D1-backed"
+        : "passkey removal checklist is incomplete",
+      summary: `active_credentials=${credentials}, active_sessions=${sessions}, ${auditSummary.join(", ")}. Cloudflare Access removal waits for register, login, logout, persistence, and revoked-credential denial proof.`,
       evidence_uri: "D1 anipotts-db admin passkey tables",
       redaction: "metadata_only",
       next_safe_action: proven
-        ? "Run full route proof, logout proof, and revoked-credential denial before Access removal."
-        : "Register the first passkey behind Cloudflare Access, then record credential, session, and audit evidence.",
+        ? "Run route-boundary proof, then remove Cloudflare Access and prove app-native blocking."
+        : nextPasskeyProofAction(credentials, sessions, missingAuditEvents),
     };
   } catch (error) {
     return {
@@ -225,4 +243,24 @@ async function countRows(
     .bind(...binds)
     .first<{ count: number }>();
   return Number(row?.count ?? 0);
+}
+
+function nextPasskeyProofAction(
+  credentials: number,
+  sessions: number,
+  missingAuditEvents: readonly string[],
+): string {
+  if (credentials === 0) {
+    return "Register the first passkey behind Cloudflare Access.";
+  }
+  if (sessions === 0) {
+    return "Authenticate with the registered passkey and prove a durable session.";
+  }
+  if (missingAuditEvents.includes("passkey.session.revoked")) {
+    return "Logout once to record revocation, then authenticate again before Access removal.";
+  }
+  if (missingAuditEvents.includes("passkey.authentication.denied")) {
+    return "Record revoked-credential denial proof while Cloudflare Access remains active.";
+  }
+  return `Record missing audit proof: ${missingAuditEvents.join(", ")}.`;
 }
