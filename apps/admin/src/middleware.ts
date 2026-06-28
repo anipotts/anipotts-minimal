@@ -15,6 +15,7 @@ const PUBLIC_PASSKEY_API_PATHS = new Set([
   "/api/admin/passkey/logout",
   "/api/admin/passkey/register-options",
   "/api/admin/passkey/register-verify",
+  "/api/admin/passkey/revoke-current",
   "/api/admin/passkey/status",
 ]);
 

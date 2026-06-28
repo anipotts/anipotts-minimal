@@ -225,6 +225,11 @@ th {
   color: var(--text);
 }
 
+.button.danger {
+  border-color: #8f4b3f;
+  color: #f2b8ad;
+}
+
 .inert-button {
   color: var(--muted);
 }

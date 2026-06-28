@@ -44,6 +44,9 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     <button class="button secondary" id="logout-passkey" type="button">
       logout
     </button>
+    <button class="button secondary danger" id="revoke-passkey" type="button">
+      revoke current passkey
+    </button>
   </div>
 
   <p class="notice" id="passkey-message">
@@ -100,12 +103,15 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     document.querySelector<HTMLButtonElement>("#login-passkey");
   const logoutButton =
     document.querySelector<HTMLButtonElement>("#logout-passkey");
+  const revokeButton =
+    document.querySelector<HTMLButtonElement>("#revoke-passkey");
 
   let status: PasskeyStatus | null = null;
 
   registerButton?.addEventListener("click", () => void register());
   loginButton?.addEventListener("click", () => void authenticate());
   logoutButton?.addEventListener("click", () => void logout());
+  revokeButton?.addEventListener("click", () => void revokeCurrent());
 
   await refreshStatus();
 
@@ -137,6 +143,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     if (registerButton) registerButton.disabled = !status.can_register;
     if (loginButton) loginButton.disabled = !status.available;
     if (logoutButton) logoutButton.disabled = !status.has_session;
+    if (revokeButton) revokeButton.disabled = !status.has_session;
   }
 
   async function register() {
@@ -177,6 +184,19 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     });
   }
 
+  async function revokeCurrent() {
+    const confirmed = window.confirm(
+      "Revoke the current passkey for denial proof? Cloudflare Access must remain active so a replacement passkey can be registered.",
+    );
+    if (!confirmed) return;
+
+    await withBusy("revoking current passkey", async () => {
+      const result = await postJson("/api/admin/passkey/revoke-current");
+      setText(message, result.next_safe_action ?? "current passkey revoked");
+      await refreshStatus();
+    });
+  }
+
   async function withBusy(label: string, action: () => Promise<void>) {
     setBusy(true);
     setText(message, label);
@@ -213,6 +233,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     if (registerButton) registerButton.disabled = busy || !status?.can_register;
     if (loginButton) loginButton.disabled = busy || !status?.available;
     if (logoutButton) logoutButton.disabled = busy || !status?.has_session;
+    if (revokeButton) revokeButton.disabled = busy || !status?.has_session;
   }
 
   function setText(node: Element | null, value: string) {

@@ -28,6 +28,7 @@ const REQUIRED_AUDIT_EVENTS = [
   "passkey.credential.registered",
   "passkey.session.created",
   "passkey.session.revoked",
+  "passkey.credential.revoked",
   "passkey.authentication.denied",
 ];
 
@@ -221,6 +222,9 @@ function nextSafeAction({
   }
   if (missingAuditEvents.includes("passkey.session.revoked")) {
     return "logout once to record session revocation, then authenticate again before Access removal";
+  }
+  if (missingAuditEvents.includes("passkey.credential.revoked")) {
+    return "revoke the current passkey while Cloudflare Access remains active, then register a replacement";
   }
   if (missingAuditEvents.includes("passkey.authentication.denied")) {
     return "record revoked-credential denial proof while Cloudflare Access remains active";
