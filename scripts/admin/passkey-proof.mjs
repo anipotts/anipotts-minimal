@@ -83,11 +83,16 @@ const routeBoundary = summarizeBoundary(routes);
 const missingAuditEvents = REQUIRED_AUDIT_EVENTS.filter(
   (eventType) => !auditEvents[eventType],
 );
-const missingProof = missingProofItems({
+const accessRemovalBlockers = accessRemovalBlockerItems({
   schemaReady,
   credentialCount,
   sessionCount,
   missingAuditEvents,
+});
+const cloudflareAccessStillActive = routeBoundary === "cloudflare_access";
+const appNativeRouteBoundaryReady = routeBoundary === "app_native_passkey";
+const missingProof = missingProofItems({
+  accessRemovalBlockers,
   routeBoundary,
 });
 
@@ -109,11 +114,13 @@ const proof = {
       Number(auditEvents[eventType] ?? 0),
     ]),
   ),
+  access_removal_blockers: accessRemovalBlockers,
+  cloudflare_access_still_active: cloudflareAccessStillActive,
   missing_proof: missingProof,
   ready_for_access_removal:
-    missingProof.length === 1 &&
-    missingProof[0] === "cloudflare_access_still_active",
-  post_access_removal_verified: missingProof.length === 0,
+    accessRemovalBlockers.length === 0 && cloudflareAccessStillActive,
+  post_access_removal_verified:
+    accessRemovalBlockers.length === 0 && appNativeRouteBoundaryReady,
   routes,
   route_boundary: routeBoundary,
   next_safe_action: nextSafeAction({
@@ -242,21 +249,27 @@ function nextSafeAction({
 }
 
 function missingProofItems({
+  accessRemovalBlockers,
+  routeBoundary,
+}) {
+  const missing = [...accessRemovalBlockers];
+  if (routeBoundary === "cloudflare_access") return missing;
+  if (routeBoundary !== "app_native_passkey") {
+    missing.push("app_native_route_boundary");
+  }
+  return missing;
+}
+
+function accessRemovalBlockerItems({
   schemaReady,
   credentialCount,
   sessionCount,
   missingAuditEvents,
-  routeBoundary,
 }) {
   const missing = [];
   if (!schemaReady) missing.push("schema_ready");
   if (credentialCount === 0) missing.push("active_credential");
   if (sessionCount === 0) missing.push("active_session");
   missing.push(...missingAuditEvents);
-  if (routeBoundary === "cloudflare_access") {
-    missing.push("cloudflare_access_still_active");
-  } else if (routeBoundary !== "app_native_passkey") {
-    missing.push("app_native_route_boundary");
-  }
   return missing;
 }

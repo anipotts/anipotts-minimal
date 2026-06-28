@@ -96,10 +96,13 @@ the remote `anipotts-db` passkey tables and probes protected admin routes
 without printing Cloudflare Access tokens. Before Access removal, the script
 must show one active credential, one active session, and audit rows for
 registration, session creation, session revocation, credential revocation, and
-revoked-credential denial. After Access removal, the same script must show
-app-native route blocking. The route probe set must include content inventory,
-review, preview, operations, newsletter queue, newsletter detail preview,
-needs-ani, proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
+revoked-credential denial. It reports missing pre-removal evidence in
+`access_removal_blockers`; `cloudflare_access_still_active: true` is expected
+until the edge gate is removed, not a blocker by itself. After Access removal,
+the same script must show app-native route blocking. The route probe set must
+include content inventory, review, preview, operations, newsletter queue,
+newsletter detail preview, needs-ani, proof, repos, handoffs, fleet, mutations,
+and destructive-ops routes.
 
 First-passkey bootstrap in production requires a verified Cloudflare Access
 application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it
