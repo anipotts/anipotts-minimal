@@ -303,6 +303,15 @@ export async function authenticationOptions(
   const db = requiredDb(context);
   const credentials = await listActiveCredentials(db);
   if (credentials.length === 0) {
+    const revokedCredentials = await countRevokedCredentials(db);
+    if (revokedCredentials > 0) {
+      await recordAudit(
+        db,
+        "passkey.authentication.denied",
+        null,
+        "denied authentication because all registered passkeys are revoked",
+      );
+    }
     return json(
       {
         error: "no_credentials",
@@ -442,6 +451,63 @@ export async function logout(context: PasskeyContext): Promise<Response> {
   );
 }
 
+export async function revokeCurrentCredential(
+  context: PasskeyContext,
+): Promise<Response> {
+  const db = requiredDb(context);
+  const session = await getSession(context, db);
+  if (!session) {
+    return json(
+      {
+        error: "session_required",
+        next_safe_action:
+          "authenticate with a passkey before revoking the current credential",
+      },
+      { status: 403 },
+    );
+  }
+
+  await db
+    .prepare(
+      `UPDATE admin_passkey_credentials
+       SET revoked_at = ?, updated_at = ?
+       WHERE credential_id = ? AND revoked_at IS NULL`,
+    )
+    .bind(nowIso(), nowIso(), session.credential_id)
+    .run();
+
+  await db
+    .prepare(
+      `UPDATE admin_passkey_sessions
+       SET revoked_at = ?, updated_at = ?
+       WHERE credential_id = ? AND revoked_at IS NULL`,
+    )
+    .bind(nowIso(), nowIso(), session.credential_id)
+    .run();
+
+  await recordAudit(
+    db,
+    "passkey.credential.revoked",
+    session.credential_id,
+    "revoked current admin passkey for denial proof",
+  );
+  await recordAudit(
+    db,
+    "passkey.session.revoked",
+    session.credential_id,
+    "revoked app-native admin session during credential revocation",
+  );
+
+  return json(
+    {
+      ok: true,
+      next_safe_action:
+        "attempt authenticate to record denial, then register a replacement passkey while Cloudflare Access remains active",
+    },
+    { headers: { "set-cookie": expiredSessionCookie(context) } },
+  );
+}
+
 export function dbFromContext(context: PasskeyContext): D1Database | null {
   return context.locals.runtime?.env.DB ?? null;
 }
@@ -478,6 +544,17 @@ async function countActiveCredentials(db: D1Database): Promise<number> {
     .prepare(
       `SELECT COUNT(*) AS count FROM admin_passkey_credentials
        WHERE user_id = ? AND revoked_at IS NULL`,
+    )
+    .bind(USER_ID)
+    .first<{ count: number }>();
+  return Number(row?.count ?? 0);
+}
+
+async function countRevokedCredentials(db: D1Database): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) AS count FROM admin_passkey_credentials
+       WHERE user_id = ? AND revoked_at IS NOT NULL`,
     )
     .bind(USER_ID)
     .first<{ count: number }>();

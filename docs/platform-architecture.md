@@ -95,11 +95,11 @@ Use `pnpm --silent proof:admin-passkey` before and after enrollment. It reads
 the remote `anipotts-db` passkey tables and probes protected admin routes
 without printing Cloudflare Access tokens. Before Access removal, the script
 must show one active credential, one active session, and audit rows for
-registration, session creation, session revocation, and revoked-credential
-denial. After Access removal, the same script must show app-native route
-blocking. The route probe set must include content inventory, review, preview,
-operations, newsletter queue, newsletter detail preview, needs-ani, proof,
-repos, handoffs, fleet, mutations, and destructive-ops routes.
+registration, session creation, session revocation, credential revocation, and
+revoked-credential denial. After Access removal, the same script must show
+app-native route blocking. The route probe set must include content inventory,
+review, preview, operations, newsletter queue, newsletter detail preview,
+needs-ani, proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
 ## ci/cd target
 
