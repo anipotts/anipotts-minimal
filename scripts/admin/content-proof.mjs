@@ -43,6 +43,11 @@ SELECT
     THEN coalesce(json_array_length(json_extract(content, '$.sections.past_work.project_slugs')), 0)
     ELSE NULL
   END AS home_making_slug_count,
+  CASE
+    WHEN page_key = 'home'
+    THEN coalesce(json_array_length(json_extract(content, '$.sections.latest_thoughts.writing_slugs')), 0)
+    ELSE NULL
+  END AS home_writing_slug_count,
   json_extract(content, '$.headline') AS newsletter_headline
 FROM page_content
 ORDER BY page_key ASC, version DESC;
@@ -104,11 +109,17 @@ const homeMakingSlugCount = Number(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_making_slug_count ?? 0,
 );
+const homeWritingSlugCount = Number(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_writing_slug_count ?? 0,
+);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
   ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
+  ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...(publishEvents === 0 ? [] : ["content_publish_events_should_be_empty"]),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
@@ -141,6 +152,11 @@ const proof = {
       row.home_making_slug_count === undefined
         ? null
         : Number(row.home_making_slug_count),
+    home_writing_slug_count:
+      row.home_writing_slug_count === null ||
+      row.home_writing_slug_count === undefined
+        ? null
+        : Number(row.home_writing_slug_count),
     newsletter_headline: row.newsletter_headline ?? null,
   })),
   content_draft_operations: operationRows.map((row) => ({

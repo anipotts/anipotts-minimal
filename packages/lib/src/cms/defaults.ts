@@ -65,6 +65,11 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       limit: 3,
       links: [{ label: "view all", href: "/writing" }],
       view_all: "/writing",
+      writing_slugs: [
+        "saturdays-are-for-claude-code",
+        "i-built-a-monitor-for-my-claude-code-sessions",
+        "stop-ending-your-day-with-fix-the-bug",
+      ],
     },
   },
   section_order: HOME_SECTION_ORDER,

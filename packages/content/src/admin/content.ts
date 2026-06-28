@@ -224,6 +224,21 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.homepage.making.page-content"],
   },
   {
+    id: "homepage.writing_selection",
+    surface: "homepage",
+    title: "homepage writing selection",
+    source_ref:
+      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback apps/www/src/pages/index.astro:homeWritingSlugs",
+    current_value:
+      "D1 controls the writing label, limit, view-all link, and ordered homepage writing slugs when present.",
+    editability: "ready",
+    risk_level: "medium",
+    next_safe_action:
+      "Preview ordered writing selections from D1 before any save path edits the home content record.",
+    required_authority: [],
+    proof_ids: ["content.homepage.writing.page-content"],
+  },
+  {
     id: "projects.card_fields",
     surface: "projects",
     title: "project card fields",
@@ -433,7 +448,7 @@ function sourceBackedFields(
     return [];
   }
 
-  const gaps = ["sections.latest_thoughts.entries"];
+  const gaps: string[] = [];
 
   if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
     gaps.unshift("sections.intro.subheading");
@@ -445,6 +460,12 @@ function sourceBackedFields(
 
   if (!hasNestedField(content, ["sections", "past_work", "project_slugs"])) {
     gaps.push("sections.past_work.project_slugs");
+  }
+
+  if (
+    !hasNestedField(content, ["sections", "latest_thoughts", "writing_slugs"])
+  ) {
+    gaps.push("sections.latest_thoughts.writing_slugs");
   }
 
   return gaps;

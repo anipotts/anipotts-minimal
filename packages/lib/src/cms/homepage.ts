@@ -101,6 +101,16 @@ function normalizeSection(
     );
   }
 
+  if (
+    Array.isArray(source.writing_slugs) ||
+    fallback.writing_slugs !== undefined
+  ) {
+    normalized.writing_slugs = normalizeSlugList(
+      source.writing_slugs,
+      fallback.writing_slugs ?? [],
+    );
+  }
+
   return normalized;
 }
 
@@ -293,7 +303,10 @@ export function validateHomepageContent(content: HomepageContent): {
 
   const writingError =
     validateSectionLabel(latest_thoughts, "Writing label") ??
-    validateSectionLink(latest_thoughts, "Writing");
+    validateSectionLink(latest_thoughts, "Writing") ??
+    (latest_thoughts.visible
+      ? validateSlugList(latest_thoughts.writing_slugs ?? [], "Writing")
+      : null);
   if (writingError) return { ok: false, error: writingError };
 
   if (content.proof_cards.length === 0) {

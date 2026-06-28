@@ -50,12 +50,24 @@ const homeMakingSlugs = [
   "saeshify",
   "nyu-purity-test",
 ] as const;
+const homeWritingSlugs = [
+  "saturdays-are-for-claude-code",
+  "i-built-a-monitor-for-my-claude-code-sessions",
+  "stop-ending-your-day-with-fix-the-bug",
+] as const;
 const selectedMakingSlugs =
   work.project_slugs && work.project_slugs.length > 0
     ? work.project_slugs
     : [...homeMakingSlugs];
+const selectedWritingSlugs =
+  writing.writing_slugs && writing.writing_slugs.length > 0
+    ? writing.writing_slugs
+    : [...homeWritingSlugs];
 const homeMakingOrder = new Map<string, number>(
   selectedMakingSlugs.map((slug, index) => [slug, index]),
+);
+const homeWritingOrder = new Map<string, number>(
+  selectedWritingSlugs.map((slug, index) => [slug, index]),
 );
 const projects = (await visibleProjects())
   .filter((project) => homeMakingOrder.has(project.slug))
@@ -64,7 +76,13 @@ const projects = (await visibleProjects())
       (homeMakingOrder.get(a.slug) ?? 0) - (homeMakingOrder.get(b.slug) ?? 0),
   )
   .slice(0, work.limit ?? 4);
-const writingEntries = (await publishedWriting()).slice(0, writing.limit ?? 3);
+const writingEntries = (await publishedWriting())
+  .filter((item) => homeWritingOrder.has(item.slug))
+  .sort(
+    (a, b) =>
+      (homeWritingOrder.get(a.slug) ?? 0) - (homeWritingOrder.get(b.slug) ?? 0),
+  )
+  .slice(0, writing.limit ?? 3);
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
 const ycMention = homeContent.mentions.yCombinatorF25;

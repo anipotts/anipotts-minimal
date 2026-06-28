@@ -138,6 +138,46 @@ describe("homepage cms validation", () => {
     });
   });
 
+  it("normalizes D1-shaped homepage writing slugs", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        latest_thoughts: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.latest_thoughts,
+          writing_slugs: [
+            " saturdays-are-for-claude-code ",
+            " stop-ending-your-day-with-fix-the-bug ",
+          ],
+        },
+      },
+    });
+
+    expect(content.sections.latest_thoughts.writing_slugs).toEqual([
+      "saturdays-are-for-claude-code",
+      "stop-ending-your-day-with-fix-the-bug",
+    ]);
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
+  it("rejects duplicate homepage writing slugs", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        latest_thoughts: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.latest_thoughts,
+          writing_slugs: ["post-one", "post-one"],
+        },
+      },
+    });
+
+    expect(validateHomepageContent(content)).toEqual({
+      ok: false,
+      error: "Writing slugs must be unique",
+    });
+  });
+
   it("rejects unsafe proof card links", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,
