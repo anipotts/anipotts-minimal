@@ -1,6 +1,6 @@
 /**
- * Shared types for the state worker. Mirrored on the client so admin-solid
- * can deserialize WebSocket payloads with type safety.
+ * Shared types for the state worker. Mirrored on clients so admin and other
+ * frontends can deserialize WebSocket payloads with type safety.
  */
 
 export type Link = {

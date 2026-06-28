@@ -1,5 +1,10 @@
 # admin access simplification plan
 
+Archived: 2026-06-27.
+
+This plan predates the app-native passkey implementation in the canonical Astro
+admin. Current Access removal criteria live in `docs/platform-architecture.md`.
+
 Date: 2026-06-25
 Status: approved for metadata audit and staged design only
 
