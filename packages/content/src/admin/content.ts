@@ -195,9 +195,9 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "newsletter",
     title: "subscribe block copy",
     source_ref:
-      "D1 page_content:newsletter, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT and component props",
+      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT",
     current_value:
-      "Headline, deck, CTA label, success text, error text, footer text, and archive URL use the @anipotts/lib/cms reader path, with fallback defaults rendering until a published D1 record exists.",
+      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, and archive URL use the @anipotts/lib/cms reader path with D1 page_content as the live source.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -299,7 +299,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     risk_level: "medium",
     source_ref: "D1 page_content:newsletter",
     current_value:
-      "Newsletter copy already has a `newsletter` content reader path, with source defaults as fallback.",
+      "Newsletter copy has a published `newsletter` page_content seed and source defaults as fallback.",
     proposed_value:
       "Render the newsletter content record in admin and require an audited content operation before writes.",
     preview_route: "/newsletter",

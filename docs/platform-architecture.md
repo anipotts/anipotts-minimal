@@ -142,5 +142,7 @@ Rules:
 9. expand `packages/content` from static content inventory into the durable
    operation schema and D1 adapter layer. started with
    `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
-   `drizzle/migrations/0008_seed_content_draft_operations.sql`.
+   `drizzle/migrations/0008_seed_content_draft_operations.sql`; first published
+   newsletter page-content seed lives in
+   `drizzle/migrations/0009_seed_newsletter_page_content.sql`.
 10. reduce deploy workflow inputs to retained production targets.
