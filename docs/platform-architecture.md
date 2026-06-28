@@ -72,6 +72,7 @@ covered while passkey proof and Access removal are completed, then remove
 | `/fleet`                                            | machine and agent state              |
 | `/mutations`                                        | mutation queue                       |
 | `/ops/destructive`                                  | gated destructive-operation register |
+| `/api/admin/runtime-feed`                           | local-dev metadata overlay endpoint  |
 
 ## auth target
 
@@ -123,6 +124,8 @@ Rules:
 - D1 migrations run as reviewed migration steps before app deploy.
 - Anthropic and Claude Code API-backed GitHub workflows are disabled for this
   repo.
+- `/api/admin/runtime-feed` is disabled in production and reads only the local
+  Infra runtime metadata file during development.
 
 ## cleanup sequence
 

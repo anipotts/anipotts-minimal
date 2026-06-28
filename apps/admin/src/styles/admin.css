@@ -259,6 +259,37 @@ th {
   margin-top: 24px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+
+.section-header h2,
+.section-header p {
+  margin: 0;
+}
+
+.section-header p {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.section-header span,
+.muted {
+  color: var(--muted);
+}
+
+.runtime-panel {
+  margin-top: 28px;
+}
+
+.runtime-safety {
+  margin-top: 12px;
+}
+
 .preview-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -438,12 +469,7 @@ dd {
   background: #f8f5ee;
   color: #171717;
   padding: clamp(22px, 4vw, 52px);
-  font-family:
-    ui-serif,
-    Georgia,
-    Cambria,
-    "Times New Roman",
-    serif;
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
   line-height: 1.62;
 }
 
@@ -493,8 +519,7 @@ dd {
   place-items: center;
   border: 1px solid #d8d2c7;
   background:
-    linear-gradient(135deg, rgba(36, 95, 134, 0.12), transparent 42%),
-    #fffdf7;
+    linear-gradient(135deg, rgba(36, 95, 134, 0.12), transparent 42%), #fffdf7;
 }
 
 .newsletter-media-slot div {
