@@ -34,6 +34,9 @@ jobs:
       - name: Validate deploy target rules
         run: pnpm test:deploy-targets
 
+      - name: Validate formatting
+        run: pnpm format:check
+
       - name: Validate affected packages
         env:
           TURBO_SCM_BASE: origin/${{ github.base_ref }}
