@@ -15,6 +15,7 @@ export type ProofEntry = {
 type D1PreparedStatement = {
   bind(...values: unknown[]): D1PreparedStatement;
   first<T = unknown>(): Promise<T | null>;
+  all<T = unknown>(): Promise<{ results?: T[] }>;
 };
 
 export type ProofD1Database = {
@@ -22,9 +23,9 @@ export type ProofD1Database = {
 };
 
 export const proofSource = {
-  mode: "read_only_static_plus_d1_metadata",
+  mode: "read_only_d1_plus_runtime_metadata",
   generated_from:
-    "GitHub runs, route probes, PR state, and read-only D1 metadata",
+    "admin_proof_events, route probes, PR state, and read-only D1 metadata",
   live_writes: "disabled",
 };
 
@@ -88,11 +89,25 @@ const requiredPasskeyAuditEvents = [
   "passkey.authentication.denied",
 ] as const;
 
+type ProofEventRow = {
+  id: string;
+  kind: string;
+  status: string;
+  title: string;
+  summary: string;
+  evidence_uri: string;
+  redaction: string;
+  next_safe_action: string;
+};
+
 export async function readProofEntries(
   db: ProofD1Database | null | undefined,
 ): Promise<ProofEntry[]> {
+  const durableProofEntries = await readDurableProofEntries(db);
   return [
-    ...baseProofEntries,
+    ...(durableProofEntries.length > 0
+      ? durableProofEntries
+      : baseProofEntries),
     await readContentOperationProof(db),
     await readPasskeyProof(db),
   ];
@@ -161,6 +176,34 @@ async function readContentOperationProof(
       next_safe_action:
         "Fix D1 schema or binding before relying on content operation proof.",
     };
+  }
+}
+
+async function readDurableProofEntries(
+  db: ProofD1Database | null | undefined,
+): Promise<ProofEntry[]> {
+  if (!db) return [];
+
+  try {
+    const result = await db
+      .prepare(
+        `SELECT
+           id,
+           kind,
+           status,
+           title,
+           summary,
+           evidence_uri,
+           redaction,
+           next_safe_action
+         FROM admin_proof_events
+         ORDER BY updated_at DESC, id ASC
+         LIMIT 50`,
+      )
+      .all<ProofEventRow>();
+    return (result.results ?? []).map(proofEntryFromRow);
+  } catch {
+    return [];
   }
 }
 
@@ -249,6 +292,19 @@ async function countRows(
   return Number(row?.count ?? 0);
 }
 
+function proofEntryFromRow(row: ProofEventRow): ProofEntry {
+  return {
+    id: row.id,
+    kind: parseProofKind(row.kind),
+    status: parseProofStatus(row.status),
+    title: row.title,
+    summary: row.summary,
+    evidence_uri: row.evidence_uri,
+    redaction: parseRedaction(row.redaction),
+    next_safe_action: row.next_safe_action,
+  };
+}
+
 function nextPasskeyProofAction(
   credentials: number,
   sessions: number,
@@ -270,4 +326,35 @@ function nextPasskeyProofAction(
     return "Record revoked-credential denial proof while Cloudflare Access remains active.";
   }
   return `Record missing audit proof: ${missingAuditEvents.join(", ")}.`;
+}
+
+function parseProofKind(kind: string): ProofKind {
+  if (
+    kind === "deploy" ||
+    kind === "route" ||
+    kind === "auth" ||
+    kind === "repo" ||
+    kind === "gate"
+  ) {
+    return kind;
+  }
+  return "gate";
+}
+
+function parseProofStatus(status: string): ProofStatus {
+  if (status === "verified" || status === "blocked" || status === "pending") {
+    return status;
+  }
+  return "pending";
+}
+
+function parseRedaction(value: string): ProofEntry["redaction"] {
+  if (
+    value === "public_metadata" ||
+    value === "metadata_only" ||
+    value === "protected_route"
+  ) {
+    return value;
+  }
+  return "metadata_only";
 }

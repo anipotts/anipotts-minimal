@@ -114,6 +114,12 @@ remote D1 metadata and route status, then proves published `home` and
 `newsletter` page content, the four inert draft operations, empty content write
 tables, public route health, and protected admin route boundaries.
 
+The admin proof log reads durable rows from D1 table `admin_proof_events` when
+available, then appends live D1 metadata for content operations and passkey
+proof. The table is seeded by
+`drizzle/migrations/0012_admin_proof_events.sql`. There is still no admin proof
+write API.
+
 ## ci/cd target
 
 Primary workflows:
@@ -162,4 +168,6 @@ Rules:
    `drizzle/migrations/0010_seed_home_page_content.sql`. Source-backed project
    and writing review operations live in
    `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
-10. reduce deploy workflow inputs to retained production targets.
+10. move admin proof baseline rows into D1 `admin_proof_events`; seeded by
+    `drizzle/migrations/0012_admin_proof_events.sql`.
+11. reduce deploy workflow inputs to retained production targets.
