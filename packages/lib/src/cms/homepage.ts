@@ -91,7 +91,31 @@ function normalizeSection(
         : coerceString(source.view_all, fallback.view_all ?? "");
   }
 
+  if (
+    Array.isArray(source.project_slugs) ||
+    fallback.project_slugs !== undefined
+  ) {
+    normalized.project_slugs = normalizeSlugList(
+      source.project_slugs,
+      fallback.project_slugs ?? [],
+    );
+  }
+
   return normalized;
+}
+
+function normalizeSlugList(value: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const slugs = value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax);
+
+  return slugs.length > 0 ? slugs : fallback;
 }
 
 function normalizeProofCards(
@@ -174,6 +198,22 @@ function validateSectionLink(section: HomepageSection, label: string) {
   );
 }
 
+function validateSlugList(slugs: string[], label: string): string | null {
+  if (slugs.length === 0) return `${label} slugs are required`;
+  for (const slug of slugs) {
+    if (slug.length > HOMEPAGE_FIELD_LIMITS.slug) {
+      return `${label} slug is too long`;
+    }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+      return `${label} slug must be lowercase kebab-case`;
+    }
+  }
+  if (new Set(slugs).size !== slugs.length) {
+    return `${label} slugs must be unique`;
+  }
+  return null;
+}
+
 function validateProofCard(card: HomepageProofCard, index: number) {
   const label = `Proof card ${index + 1}`;
   return (
@@ -245,7 +285,10 @@ export function validateHomepageContent(content: HomepageContent): {
 
   const workError =
     validateSectionLabel(past_work, "Work label") ??
-    validateSectionLink(past_work, "Work");
+    validateSectionLink(past_work, "Work") ??
+    (past_work.visible
+      ? validateSlugList(past_work.project_slugs ?? [], "Work")
+      : null);
   if (workError) return { ok: false, error: workError };
 
   const writingError =

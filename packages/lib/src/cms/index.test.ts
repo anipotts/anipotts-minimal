@@ -101,6 +101,43 @@ describe("homepage cms validation", () => {
     expect(validateHomepageContent(content)).toEqual({ ok: true });
   });
 
+  it("normalizes D1-shaped homepage project slugs", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        past_work: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.past_work,
+          project_slugs: [" quantercise ", " saeshify "],
+        },
+      },
+    });
+
+    expect(content.sections.past_work.project_slugs).toEqual([
+      "quantercise",
+      "saeshify",
+    ]);
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
+  it("rejects malformed homepage project slugs", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        past_work: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.past_work,
+          project_slugs: ["Bad Slug"],
+        },
+      },
+    });
+
+    expect(validateHomepageContent(content)).toEqual({
+      ok: false,
+      error: "Work slug must be lowercase kebab-case",
+    });
+  });
+
   it("rejects unsafe proof card links", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,

@@ -19,6 +19,7 @@ export const HOMEPAGE_FIELD_LIMITS = {
   paragraph: 1200,
   linkLabel: 80,
   linkHref: 300,
+  slug: 120,
   proofTitle: 120,
   proofDetail: 360,
   limitMin: 1,
@@ -50,6 +51,12 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       limit: 4,
       links: [{ label: "view all", href: "/making" }],
       view_all: "/making",
+      project_slugs: [
+        "quantercise",
+        "quantercise-extension",
+        "saeshify",
+        "nyu-purity-test",
+      ],
     },
     latest_thoughts: {
       visible: true,

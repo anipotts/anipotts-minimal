@@ -28,6 +28,7 @@ export interface HomepageSection {
   links?: { label: string; href: string }[];
   limit?: number;
   view_all?: string;
+  project_slugs?: string[];
 }
 
 export interface HomepageProofCard {
