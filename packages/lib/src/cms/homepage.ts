@@ -1,6 +1,9 @@
 import type {
   HomepageContent,
   HomepageProofCard,
+  HomepageRichSummarySegment,
+  HomepageRichSummarySentence,
+  HomepageRichSummarySimpleSegment,
   HomepageSection,
 } from "@anipotts/types";
 import {
@@ -48,6 +51,16 @@ function normalizeSection(
       source.subheading === undefined
         ? fallback.subheading
         : coerceString(source.subheading, fallback.subheading ?? "").trim();
+  }
+
+  if (
+    Array.isArray(source.rich_summary) ||
+    fallback.rich_summary !== undefined
+  ) {
+    normalized.rich_summary = normalizeRichSummary(
+      source.rich_summary,
+      fallback.rich_summary ?? [],
+    );
   }
 
   if (Array.isArray(source.paragraphs)) {
@@ -126,6 +139,91 @@ function normalizeSlugList(value: unknown, fallback: string[]): string[] {
     .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax);
 
   return slugs.length > 0 ? slugs : fallback;
+}
+
+function normalizeRichSummary(
+  value: unknown,
+  fallback: HomepageRichSummarySentence[],
+): HomepageRichSummarySentence[] {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const sentences = value
+    .filter((item): item is Record<string, unknown> => {
+      return Boolean(item) && typeof item === "object" && !Array.isArray(item);
+    })
+    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax)
+    .map((sentence) => ({
+      segments: normalizeRichSummarySegments(sentence.segments, 0),
+    }))
+    .filter((sentence) => sentence.segments.length > 0);
+
+  return sentences.length > 0 ? sentences : fallback;
+}
+
+function normalizeRichSummarySegments(
+  value: unknown,
+  depth: number,
+): HomepageRichSummarySegment[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter((item): item is Record<string, unknown> => {
+      return Boolean(item) && typeof item === "object" && !Array.isArray(item);
+    })
+    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax)
+    .flatMap((segment) => normalizeRichSummarySegment(segment, depth));
+}
+
+function normalizeRichSummarySegment(
+  segment: Record<string, unknown>,
+  depth: number,
+): HomepageRichSummarySegment[] {
+  const kind = segment.kind;
+
+  if (kind === "text") {
+    const text = coerceString(segment.text, "");
+    return text.length > 0 ? [{ kind: "text", text }] : [];
+  }
+
+  if (kind === "mention") {
+    const key = coerceString(segment.key, "").trim();
+    if (!isSafeMentionKey(key)) return [];
+    const suffix = coerceString(segment.suffix, "").trim();
+    return [
+      suffix
+        ? { kind: "mention", key, suffix: suffix.slice(0, 12) }
+        : { kind: "mention", key },
+    ];
+  }
+
+  if (kind === "cluster" && depth < 2) {
+    const segments = normalizeRichSummarySegments(segment.segments, depth + 1);
+    return segments.length > 0 ? [{ kind: "cluster", segments }] : [];
+  }
+
+  if (kind === "parens") {
+    const segments = normalizeRichSummarySegments(
+      segment.segments,
+      depth + 1,
+    ).filter(isSimpleRichSummarySegment);
+    return segments.length > 0 ? [{ kind: "parens", segments }] : [];
+  }
+
+  return [];
+}
+
+function isSimpleRichSummarySegment(
+  segment: HomepageRichSummarySegment,
+): segment is HomepageRichSummarySimpleSegment {
+  return segment.kind === "text" || segment.kind === "mention";
+}
+
+function isSafeMentionKey(key: string): boolean {
+  return /^[A-Za-z][A-Za-z0-9]*$/.test(key);
 }
 
 function normalizeProofCards(
@@ -224,6 +322,80 @@ function validateSlugList(slugs: string[], label: string): string | null {
   return null;
 }
 
+function validateRichSummary(
+  sentences: HomepageRichSummarySentence[] | undefined,
+): string | null {
+  if (!sentences) return null;
+
+  let textLength = 0;
+  for (const [sentenceIndex, sentence] of sentences.entries()) {
+    if (sentence.segments.length === 0) {
+      return `Homepage summary sentence ${sentenceIndex + 1} needs segments`;
+    }
+
+    const error = validateRichSummarySegments(
+      sentence.segments,
+      `Homepage summary sentence ${sentenceIndex + 1}`,
+    );
+    if (error) return error;
+    textLength += richSummaryTextLength(sentence.segments);
+  }
+
+  if (textLength > HOMEPAGE_FIELD_LIMITS.subheading) {
+    return "Homepage summary is too long";
+  }
+
+  return null;
+}
+
+function validateRichSummarySegments(
+  segments: HomepageRichSummarySegment[],
+  label: string,
+): string | null {
+  for (const [index, segment] of segments.entries()) {
+    const segmentLabel = `${label} segment ${index + 1}`;
+
+    if (segment.kind === "text") {
+      if (segment.text.length > HOMEPAGE_FIELD_LIMITS.subheading) {
+        return `${segmentLabel} is too long`;
+      }
+      continue;
+    }
+
+    if (segment.kind === "mention") {
+      if (!isSafeMentionKey(segment.key)) {
+        return `${segmentLabel} mention key is invalid`;
+      }
+      if ((segment.suffix ?? "").length > 12) {
+        return `${segmentLabel} suffix is too long`;
+      }
+      continue;
+    }
+
+    if (segment.segments.length === 0) {
+      return `${segmentLabel} needs child segments`;
+    }
+
+    const nestedError = validateRichSummarySegments(
+      segment.segments,
+      segmentLabel,
+    );
+    if (nestedError) return nestedError;
+  }
+
+  return null;
+}
+
+function richSummaryTextLength(segments: HomepageRichSummarySegment[]): number {
+  return segments.reduce((sum, segment) => {
+    if (segment.kind === "text") return sum + segment.text.length;
+    if (segment.kind === "mention") {
+      return sum + segment.key.length + (segment.suffix?.length ?? 0);
+    }
+    return sum + richSummaryTextLength(segment.segments);
+  }, 0);
+}
+
 function validateProofCard(card: HomepageProofCard, index: number) {
   const label = `Proof card ${index + 1}`;
   return (
@@ -276,7 +448,8 @@ export function validateHomepageContent(content: HomepageContent): {
       "Homepage summary",
       HOMEPAGE_FIELD_LIMITS.subheading,
       false,
-    );
+    ) ??
+    validateRichSummary(intro.rich_summary);
   if (introError) return { ok: false, error: introError };
 
   const aboutError = validateSectionLabel(about, "About label");

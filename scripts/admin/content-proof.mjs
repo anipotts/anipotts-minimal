@@ -35,6 +35,11 @@ SELECT
   coalesce(json_type(content, '$.sections.intro.subheading'), 'missing') AS home_subheading_type,
   CASE
     WHEN page_key = 'home'
+    THEN coalesce(json_array_length(json_extract(content, '$.sections.intro.rich_summary')), 0)
+    ELSE NULL
+  END AS home_rich_summary_count,
+  CASE
+    WHEN page_key = 'home'
     THEN coalesce(json_array_length(json_extract(content, '$.proof_cards')), 0)
     ELSE NULL
   END AS home_proof_card_count,
@@ -104,6 +109,11 @@ const homeProofCardCount = Number(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_proof_card_count ?? 0,
 );
+const homeRichSummaryCount = Number(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_rich_summary_count ?? 0,
+);
 const homeMakingSlugCount = Number(
   pageRows.find(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
@@ -117,6 +127,7 @@ const homeWritingSlugCount = Number(
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
+  ...(homeRichSummaryCount === 2 ? [] : ["home_rich_summary"]),
   ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
@@ -142,6 +153,11 @@ const proof = {
     published: Number(row.published) === 1,
     home_heading: row.home_heading ?? null,
     home_subheading_type: row.home_subheading_type ?? null,
+    home_rich_summary_count:
+      row.home_rich_summary_count === null ||
+      row.home_rich_summary_count === undefined
+        ? null
+        : Number(row.home_rich_summary_count),
     home_proof_card_count:
       row.home_proof_card_count === null ||
       row.home_proof_card_count === undefined

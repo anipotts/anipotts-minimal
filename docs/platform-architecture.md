@@ -182,4 +182,7 @@ Rules:
 13. move homepage writing slugs into D1 `page_content`; seeded by
     `drizzle/migrations/0015_seed_homepage_writing_slugs.sql` with Astro source
     fallback still retained.
-14. reduce deploy workflow inputs to retained production targets.
+14. move homepage rich summary text and mention keys into D1 `page_content`;
+    seeded by `drizzle/migrations/0016_seed_homepage_rich_summary.sql` with
+    Astro brand visual metadata still retained.
+15. reduce deploy workflow inputs to retained production targets.
