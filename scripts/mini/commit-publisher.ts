@@ -15,15 +15,25 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import {
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  readdirSync,
+  statSync,
+} from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { homedir } from "node:os";
 
 const STATE_API = process.env.STATE_API ?? "https://api.anipotts.com";
 const PUBLISH_KEY = process.env.STATE_PUBLISH_KEY;
-const ROOTS = (process.env.COMMIT_ROOTS ?? join(homedir(), "Code/projects")).split(":");
+const ROOTS = (
+  process.env.COMMIT_ROOTS ?? join(homedir(), "Code/projects")
+).split(":");
 const CURSOR_FILE =
-  process.env.CURSOR_FILE ?? join(homedir(), ".anipotts/commit-publisher.cursor.json");
+  process.env.CURSOR_FILE ??
+  join(homedir(), ".anipotts/commit-publisher.cursor.json");
 const MAX_PER_REPO = Number(process.env.MAX_PER_REPO ?? "50");
 const AUTHOR_FILTER = process.env.AUTHOR_FILTER;
 
@@ -66,7 +76,12 @@ function findGitRepos(roots: string[], maxDepth = 4): string[] {
   return repos;
 }
 
-function walk(dir: string, depth: number, maxDepth: number, out: string[]): void {
+function walk(
+  dir: string,
+  depth: number,
+  maxDepth: number,
+  out: string[],
+): void {
   if (depth > maxDepth) return;
   let entries: string[];
   try {
@@ -97,7 +112,9 @@ function git(repo: string, args: string[]): string {
     maxBuffer: 16 * 1024 * 1024,
   });
   if (result.status !== 0) {
-    throw new Error(`git ${args.join(" ")} in ${repo} failed: ${result.stderr.trim()}`);
+    throw new Error(
+      `git ${args.join(" ")} in ${repo} failed: ${result.stderr.trim()}`,
+    );
   }
   return result.stdout;
 }
@@ -134,7 +151,9 @@ function readCommits(repo: string, sinceSha: string | undefined): Commit[] {
       author: (author ?? "").trim(),
       ts: ts.trim(),
       branch: branch || undefined,
-      parentCount: parents ? parents.trim().split(/\s+/).filter(Boolean).length : 0,
+      parentCount: parents
+        ? parents.trim().split(/\s+/).filter(Boolean).length
+        : 0,
     });
   }
   return commits.reverse();

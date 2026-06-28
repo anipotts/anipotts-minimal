@@ -70,7 +70,12 @@ const articleLd = {
       }
       {
         d.artifact_url && (
-          <a href={d.artifact_url} class="accent-link mono artifact" target="_blank" rel="noopener noreferrer">
+          <a
+            href={d.artifact_url}
+            class="accent-link mono artifact"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             proof artifact ({d.artifact_type ?? "link"})
             <Icon name="ph:arrow-bend-right-up" />
           </a>
@@ -79,7 +84,13 @@ const articleLd = {
     </header>
 
     <div data-rise class="article-body">
-      {Content ? <Content /> : cmsParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+      {
+        Content ? (
+          <Content />
+        ) : (
+          cmsParagraphs.map((paragraph) => <p>{paragraph}</p>)
+        )
+      }
     </div>
   </article>
 </Shell>

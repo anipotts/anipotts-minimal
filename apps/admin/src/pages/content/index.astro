@@ -27,7 +27,9 @@ const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
                 <p>{surface}</p>
                 <h2>{rows.length} fields</h2>
               </div>
-              <span>{rows.filter((row) => row.editability === "ready").length} ready</span>
+              <span>
+                {rows.filter((row) => row.editability === "ready").length} ready
+              </span>
             </div>
             <div class="record-list">
               {rows.map((row) => (

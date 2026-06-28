@@ -20,7 +20,8 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format": "prettier --write \"**/*.{astro,ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{astro,ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
     "proof:admin-passkey": "node scripts/admin/passkey-proof.mjs",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
@@ -32,10 +33,10 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "apps/www/**/*.{ts,tsx}": [
+    "apps/www/**/*.{astro,ts,tsx}": [
       "prettier --write"
     ],
-    "apps/admin/**/*.{ts,tsx}": [
+    "apps/admin/**/*.{astro,ts,tsx}": [
       "prettier --write"
     ],
     "workers/**/*.ts": [
@@ -66,6 +67,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.3.3",
     "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
     "turbo": "^2.9.14",
     "typescript": "^5.7.0",
     "wrangler": "^4.92.0"

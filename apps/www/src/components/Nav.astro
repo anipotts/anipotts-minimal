@@ -9,7 +9,12 @@ const current = Astro.url.pathname;
   <a href="/" class="wordmark" aria-label="home">
     ani potts<span class="dot">.</span>
   </a>
-  <nav id="primary-nav" class="primary-nav" aria-label="primary" data-open="false">
+  <nav
+    id="primary-nav"
+    class="primary-nav"
+    aria-label="primary"
+    data-open="false"
+  >
     <span class="nav-links">
       {
         navItems.map((item) => (

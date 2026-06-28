@@ -30,7 +30,10 @@ export type ContactPayload = z.infer<typeof contactSchema>;
 
 type ParseContactResult =
   | { success: true; data: ContactPayload }
-  | { success: false; error: { error: string; fields: Record<string, string> } };
+  | {
+      success: false;
+      error: { error: string; fields: Record<string, string> };
+    };
 
 export function parseContactPayload(input: unknown): ParseContactResult {
   const result = contactSchema.safeParse(input);

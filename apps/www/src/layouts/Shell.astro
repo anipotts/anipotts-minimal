@@ -55,17 +55,31 @@ const personLd = {
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf7" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11111b" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#fbfaf7"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#11111b"
+    />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={`${siteConfig.url}${siteConfig.ogImage}`} />
+    <meta
+      property="og:image"
+      content={`${siteConfig.url}${siteConfig.ogImage}`}
+    />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${siteConfig.url}${siteConfig.ogImage}`} />
+    <meta
+      name="twitter:image"
+      content={`${siteConfig.url}${siteConfig.ogImage}`}
+    />
     <script is:inline>
       (() => {
         const stored = localStorage.getItem("theme");
@@ -89,8 +103,20 @@ const personLd = {
         localStorage.setItem("font", font);
       })();
     </script>
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(personLd)} />
-    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(personLd)}
+    />
+    {
+      jsonLd && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(jsonLd)}
+        />
+      )
+    }
     {
       posthogKey && (
         <script

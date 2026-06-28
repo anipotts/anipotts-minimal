@@ -1,7 +1,10 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
-import { fetchPageContent, normalizeNewsletterContent } from "@anipotts/lib/cms";
+import {
+  fetchPageContent,
+  normalizeNewsletterContent,
+} from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 
@@ -40,12 +43,8 @@ const copy = normalizeNewsletterContent(page?.content);
 
   <section data-rise class="stack">
     <h2 class="section-label">archive</h2>
-    <p class="copy">
-      published notes live here as the archive fills in.
-    </p>
-    <a href={archiveUrl} class="quiet-link archive">
-      read the archive
-    </a>
+    <p class="copy">published notes live here as the archive fills in.</p>
+    <a href={archiveUrl} class="quiet-link archive"> read the archive </a>
   </section>
 </Shell>
 

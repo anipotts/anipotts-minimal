@@ -1,6 +1,9 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { contentInventorySource, contentPreviewItems } from "../../data/content";
+import {
+  contentInventorySource,
+  contentPreviewItems,
+} from "../../data/content";
 ---
 
 <AdminLayout
@@ -17,7 +20,9 @@ import { contentInventorySource, contentPreviewItems } from "../../data/content"
     {
       contentPreviewItems.map((item) => (
         <article class="proposal-row">
-          <p>{item.surface} / {item.status}</p>
+          <p>
+            {item.surface} / {item.status}
+          </p>
           <h2>{item.title}</h2>
           <div class="diff-pair">
             <div>
