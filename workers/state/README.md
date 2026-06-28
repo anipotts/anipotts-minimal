@@ -2,7 +2,10 @@
 
 State worker for the personal cloud. Hosts Durable Objects that hold one fact each (LinkVault, MoneyState, ContentPipeline, etc.) and exposes a Hono REST + WebSocket API at `api.anipotts.com`.
 
-This is **step 1** of the personal-cloud-architecture build (see `docs/personal-cloud-architecture.md`). The first DO is `LinkVault`. More DOs get added one class at a time as they're needed.
+This is the retained state-plane worker for `api.anipotts.com`. The current repo
+architecture lives in `docs/platform-architecture.md`. The older May 2026
+personal-cloud sketch is archived at
+`docs/archive/personal-cloud-architecture-2026-05-13.md`.
 
 ## Quick start
 
@@ -43,4 +46,7 @@ explicit `state=true` deploy target.
 
 ## Architecture
 
-The full vision lives at `docs/personal-cloud-architecture.md` in the same monorepo. TL;DR: this worker is the state plane. Inputs (Rudy, email, webhooks, admin) write here. Outputs (admin, iPhone, Rudy, agents) read here via WebSocket so nothing polls.
+The current source truth is `docs/platform-architecture.md`. This worker is the
+retained state plane for future operator state, fleet state, and WebSocket/DO
+work. Inputs and write paths still need explicit route-level authority before
+they become live controls.

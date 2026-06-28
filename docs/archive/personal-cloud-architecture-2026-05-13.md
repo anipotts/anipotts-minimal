@@ -1,5 +1,12 @@
 # Personal Cloud Architecture
 
+Archived: 2026-06-27.
+
+This is a historical May 2026 direction document. It predates the June Astro
+admin cutover and still references SolidStart, `apps/admin-solid`, and PR #30 as
+future direction. Current source truth is `docs/platform-architecture.md` plus
+`docs/admin-v2-architecture.md` and `docs/newsletter-system.md`.
+
 Multi-month vision doc for the anipotts personal infrastructure. Companion to `docs/archive/cloudflare-infrastructure-2026-05-13.md` (archived deploy substrate snapshot) and `docs/per-project-vercel-migration.md` (project-by-project Vercel exit). This one is the _destination_ the migrations are walking toward.
 
 Last updated: 2026-05-13.
