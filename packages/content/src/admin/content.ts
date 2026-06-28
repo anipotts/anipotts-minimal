@@ -60,10 +60,18 @@ export type PageContentInventoryRow = {
   version: number;
   published: boolean;
   field_count: number;
+  fields: PageContentInventoryField[];
+  source_backed_fields: string[];
   summary: string;
   source_ref: string;
   updated_at: string;
   updated_by: string | null;
+};
+
+export type PageContentInventoryField = {
+  path: string;
+  value: string;
+  kind: string;
 };
 
 export type PageContentInventoryReadState =
@@ -347,12 +355,15 @@ function pageContentInventoryFromRow(
   row: PageContentD1Row,
 ): PageContentInventoryRow {
   const content = parseJsonObject(row.content);
+  const fields = listLeafFields(content);
   return {
     id: row.id,
     page_key: row.page_key,
     version: Number(row.version ?? 1),
     published: row.published === true || row.published === 1,
-    field_count: countLeafFields(content),
+    field_count: fields.length,
+    fields,
+    source_backed_fields: sourceBackedFields(row.page_key, content),
     summary: summarizePageContent(row.page_key, content),
     source_ref: `D1 page_content:${row.page_key}`,
     updated_at: row.updated_at ?? "",
@@ -371,17 +382,86 @@ function parseJsonObject(raw: string): Record<string, unknown> {
   }
 }
 
-function countLeafFields(value: unknown): number {
+function listLeafFields(
+  value: unknown,
+  path = "",
+): PageContentInventoryField[] {
   if (Array.isArray(value)) {
-    return value.reduce((sum, item) => sum + countLeafFields(item), 0);
-  }
-  if (value && typeof value === "object") {
-    return Object.values(value).reduce(
-      (sum, item) => sum + countLeafFields(item),
-      0,
+    return value.flatMap((item, index) =>
+      listLeafFields(item, `${path}[${index}]`),
     );
   }
-  return value === undefined || value === null ? 0 : 1;
+
+  if (value && typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>).flatMap(
+      ([key, item]) => listLeafFields(item, path ? `${path}.${key}` : key),
+    );
+  }
+
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  return [
+    {
+      path: path || "value",
+      value: formatFieldValue(value),
+      kind: Array.isArray(value) ? "array" : typeof value,
+    },
+  ];
+}
+
+function formatFieldValue(value: unknown): string {
+  if (typeof value === "string") {
+    return value.length > 96 ? `${value.slice(0, 93)}...` : value;
+  }
+  if (typeof value === "boolean") {
+    return value ? "true" : "false";
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  return JSON.stringify(value) ?? String(value);
+}
+
+function sourceBackedFields(
+  pageKey: string,
+  content: Record<string, unknown>,
+): string[] {
+  if (pageKey !== "home") {
+    return [];
+  }
+
+  const gaps = [
+    "sections.past_work.project_slugs",
+    "sections.latest_thoughts.entries",
+  ];
+
+  if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
+    gaps.unshift("sections.intro.subheading");
+  }
+
+  return gaps;
+}
+
+function hasNestedField(
+  value: Record<string, unknown>,
+  path: string[],
+): boolean {
+  let current: unknown = value;
+
+  for (const key of path) {
+    if (!current || typeof current !== "object" || Array.isArray(current)) {
+      return false;
+    }
+    const record = current as Record<string, unknown>;
+    if (!(key in record)) {
+      return false;
+    }
+    current = record[key];
+  }
+
+  return current !== undefined && current !== null;
 }
 
 function summarizePageContent(

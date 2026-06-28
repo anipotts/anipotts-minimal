@@ -387,6 +387,58 @@ dd {
   font-size: 13px;
 }
 
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.field-chip {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: #141414;
+  padding: 10px;
+}
+
+.field-chip span,
+.field-gap span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.field-chip strong,
+.field-gap p {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.field-chip small {
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.muted-chip strong,
+.muted-chip small {
+  color: var(--muted);
+}
+
+.field-gap {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  border: 1px solid #4a3b28;
+  background: #181510;
+  padding: 10px;
+}
+
 .lane-grid {
   display: grid;
   grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.4fr);
