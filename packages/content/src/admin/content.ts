@@ -197,15 +197,16 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.proof_cards",
     surface: "homepage",
     title: "proof cards",
-    source_ref: "apps/www/src/data/site.ts:homeContent.proof",
+    source_ref:
+      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback apps/www/src/data/site.ts:homeContent.proof",
     current_value:
-      "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid.",
+      "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from D1 when present.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Expose card fields with source URL validation and preview-only proof before any save path.",
+      "Use the normalized D1 proof card schema for preview before any save path.",
     required_authority: [],
-    proof_ids: ["content.homepage.proof.source"],
+    proof_ids: ["content.homepage.proof.page-content"],
   },
   {
     id: "homepage.making_selection",
@@ -439,6 +440,10 @@ function sourceBackedFields(
 
   if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
     gaps.unshift("sections.intro.subheading");
+  }
+
+  if (!hasNestedField(content, ["proof_cards"])) {
+    gaps.push("proof_cards");
   }
 
   return gaps;

@@ -30,6 +30,13 @@ export interface HomepageSection {
   view_all?: string;
 }
 
+export interface HomepageProofCard {
+  label: string;
+  href: string;
+  title: string;
+  detail: string;
+}
+
 export interface HomepageContent {
   sections: {
     intro: HomepageSection;
@@ -38,6 +45,7 @@ export interface HomepageContent {
     latest_thoughts: HomepageSection;
   };
   section_order: ("intro" | "about" | "past_work" | "latest_thoughts")[];
+  proof_cards: HomepageProofCard[];
 }
 
 // ---------------------------------------------------------------------------

@@ -19,6 +19,8 @@ export const HOMEPAGE_FIELD_LIMITS = {
   paragraph: 1200,
   linkLabel: 80,
   linkHref: 300,
+  proofTitle: 120,
+  proofDetail: 360,
   limitMin: 1,
   limitMax: 12,
 } as const;
@@ -59,6 +61,36 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     },
   },
   section_order: HOME_SECTION_ORDER,
+  proof_cards: [
+    {
+      label: "structured ai",
+      href: "https://getstructured.ai/",
+      title: "drawing chat with page-level citations",
+      detail:
+        "architectural PDFs in, cited answers out. streamed claude/gemini and kept redis replay for live spectating and later debugging.",
+    },
+    {
+      label: "quantercise",
+      href: "https://quantercise.com",
+      title: "quant prep with real grading",
+      detail:
+        "next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.",
+    },
+    {
+      label: "paragon global investments",
+      href: "https://paragoninvestments.org",
+      title: "research portal for a quant fund",
+      detail:
+        "next.js and typescript on supabase. made fund research searchable and usable from mobile instead of buried in scattered docs.",
+    },
+    {
+      label: "public tooling",
+      href: "/projects/claude-code-tips",
+      title: "tools i actually use",
+      detail:
+        "claude-code-tips and imessage mcp are small public receipts from the same local-first workflow i run every day.",
+    },
+  ],
 };
 
 const CMS_LINK_LIMIT = 300;
