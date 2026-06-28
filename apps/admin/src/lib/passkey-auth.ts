@@ -4,6 +4,7 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 import type {
   AuthenticationResponseJSON,
   AuthenticatorTransportFuture,
@@ -23,6 +24,7 @@ const LOCAL_ORIGIN = "http://localhost:3001";
 const USER_ID = "ani";
 const USER_NAME = "ani@admin.anipotts.com";
 const USER_DISPLAY_NAME = "Ani";
+const ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
 
 type D1Result<T = unknown> = {
   results?: T[];
@@ -76,6 +78,11 @@ type SessionRow = {
   revoked_at: string | null;
 };
 
+type AccessIdentity = {
+  verified: boolean;
+  hint: string | null;
+};
+
 export type PasskeyContext = {
   request: Request;
   url: URL;
@@ -125,7 +132,7 @@ export async function getPasskeyStatus(
   context: PasskeyContext,
 ): Promise<PasskeyStatus> {
   const db = dbFromContext(context);
-  const accessIdentity = accessIdentityHint(context);
+  const accessIdentity = await resolveAccessIdentity(context);
   if (!db) {
     return {
       available: false,
@@ -134,8 +141,8 @@ export async function getPasskeyStatus(
       audit_count: 0,
       has_session: false,
       can_register: false,
-      access_identity_present: Boolean(accessIdentity),
-      access_identity_hint: accessIdentity,
+      access_identity_present: accessIdentity.verified,
+      access_identity_hint: accessIdentity.hint,
       expected_origin: EXPECTED_ORIGIN,
       expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
@@ -160,8 +167,8 @@ export async function getPasskeyStatus(
       audit_count: 0,
       has_session: false,
       can_register: false,
-      access_identity_present: Boolean(accessIdentity),
-      access_identity_hint: accessIdentity,
+      access_identity_present: accessIdentity.verified,
+      access_identity_hint: accessIdentity.hint,
       expected_origin: EXPECTED_ORIGIN,
       expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
@@ -170,7 +177,7 @@ export async function getPasskeyStatus(
     };
   }
   const canRegister =
-    Boolean(session) || (credentialCount === 0 && Boolean(accessIdentity));
+    Boolean(session) || (credentialCount === 0 && accessIdentity.verified);
 
   return {
     available: true,
@@ -179,14 +186,16 @@ export async function getPasskeyStatus(
     audit_count: auditCount,
     has_session: Boolean(session),
     can_register: canRegister,
-    access_identity_present: Boolean(accessIdentity),
-    access_identity_hint: accessIdentity,
+    access_identity_present: accessIdentity.verified,
+    access_identity_hint: accessIdentity.hint,
     expected_origin: EXPECTED_ORIGIN,
     expected_rp_id: expectedRpId(context),
     current_origin: context.url.origin,
-    next_safe_action: session
-      ? "passkey session active"
-      : "register the first passkey while Cloudflare Access identity is present",
+    next_safe_action: passkeyStatusNextAction(
+      Boolean(session),
+      credentialCount,
+      accessIdentity,
+    ),
   };
 }
 
@@ -687,11 +696,57 @@ function expectedRpId(context: PasskeyContext): string {
   return PRODUCTION_RP_ID;
 }
 
-function accessIdentityHint(context: PasskeyContext): string | null {
-  const email = context.request.headers.get(
-    "cf-access-authenticated-user-email",
-  );
-  if (!email) return import.meta.env.DEV ? "local-dev" : null;
+async function resolveAccessIdentity(
+  context: PasskeyContext,
+): Promise<AccessIdentity> {
+  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+    return { verified: true, hint: "local-dev" };
+  }
+
+  const teamDomain = context.locals.runtime?.env.ACCESS_TEAM_DOMAIN;
+  const audience = context.locals.runtime?.env.ACCESS_POLICY_AUD;
+  if (!teamDomain || !audience) {
+    return { verified: false, hint: null };
+  }
+
+  const token = context.request.headers.get(ACCESS_JWT_HEADER);
+  if (!token) {
+    return { verified: false, hint: null };
+  }
+
+  try {
+    const issuer = teamDomain.replace(/\/$/, "");
+    const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
+    const { payload } = await jwtVerify(token, jwks, {
+      issuer,
+      audience,
+    });
+    const email = typeof payload.email === "string" ? payload.email : null;
+    if (!email) {
+      return { verified: false, hint: null };
+    }
+    return { verified: true, hint: maskEmail(email) };
+  } catch {
+    return { verified: false, hint: null };
+  }
+}
+
+function passkeyStatusNextAction(
+  hasSession: boolean,
+  credentialCount: number,
+  accessIdentity: AccessIdentity,
+): string {
+  if (hasSession) return "passkey session active";
+  if (credentialCount === 0 && accessIdentity.verified) {
+    return "register the first passkey with verified Cloudflare Access identity";
+  }
+  if (credentialCount === 0) {
+    return "authenticate through Cloudflare Access before first passkey registration";
+  }
+  return "authenticate with the registered passkey";
+}
+
+function maskEmail(email: string): string {
   const [name, domain] = email.split("@");
   if (!name || !domain) return "access-user";
   return `${name.slice(0, 2)}***@${domain}`;

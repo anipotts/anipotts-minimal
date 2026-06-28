@@ -101,6 +101,14 @@ app-native route blocking. The route probe set must include content inventory,
 review, preview, operations, newsletter queue, newsletter detail preview,
 needs-ani, proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
+First-passkey bootstrap in production requires a verified Cloudflare Access
+application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it
+against `ACCESS_TEAM_DOMAIN` and `ACCESS_POLICY_AUD`, both non-secret
+configuration values in `apps/admin/wrangler.toml`, before allowing the first
+credential registration. After an active passkey session exists, additional
+credential operations use the app-native passkey session rather than Access
+identity headers.
+
 Use `pnpm --silent proof:admin-content` after content migrations. It reads only
 remote D1 metadata and route status, then proves published `home` and
 `newsletter` page content, the four inert draft operations, empty content write

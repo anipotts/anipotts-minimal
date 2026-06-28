@@ -14,6 +14,8 @@ type D1Database = {
 type Runtime = import("@astrojs/cloudflare").Runtime<{
   DB: D1Database;
   PUBLIC_STATE_API: string;
+  ACCESS_TEAM_DOMAIN: string;
+  ACCESS_POLICY_AUD: string;
 }>;
 
 declare namespace App {
