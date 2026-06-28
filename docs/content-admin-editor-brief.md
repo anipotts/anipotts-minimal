@@ -20,6 +20,10 @@ or any live write path.
 | newsletter block      | D1 `page_content:newsletter`, seeded by `drizzle/migrations/0009_seed_newsletter_page_content.sql`, fallback `@anipotts/lib/cms` defaults and `NewsletterSubscribe` props  | headline, deck, CTA label, success text, error text, footer, email form                                          | reader path exists; D1 seed matches current source defaults                                                               |
 | archived making notes | `docs/archive/labs/content/**`                                                                                                                                             | old weekly digests and experiments                                                                               | reference only, not an active public-site content source                                                                  |
 
+Admin `/content` now renders the D1 `page_content` rows and bundled read-only
+metadata from the project and writing markdown collections. It still does not
+add a save endpoint, publish endpoint, provider sync, or source file mutation.
+
 ## highest-leverage cleanup batch
 
 | priority | cleanup                                                 | why it matters                                                                           | owner fit                     |

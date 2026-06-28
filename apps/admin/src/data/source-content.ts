@@ -1,0 +1,221 @@
+type SourceSurface = "projects" | "writing";
+
+export type SourceContentField = {
+  path: string;
+  value: string;
+  kind: string;
+};
+
+export type SourceContentRecord = {
+  id: string;
+  surface: SourceSurface;
+  slug: string;
+  title: string;
+  route: string;
+  status: string;
+  source_ref: string;
+  summary: string;
+  body_words: number;
+  fields: SourceContentField[];
+  next_safe_action: string;
+};
+
+const projectModules = import.meta.glob<string>(
+  "../../../www/src/content/projects/*.md",
+  {
+    eager: true,
+    import: "default",
+    query: "?raw",
+  },
+);
+
+const writingModules = import.meta.glob<string>(
+  "../../../www/src/content/writing/*.md",
+  {
+    eager: true,
+    import: "default",
+    query: "?raw",
+  },
+);
+
+export const sourceContentRecords: SourceContentRecord[] = [
+  ...recordsFromModules("projects", projectModules),
+  ...recordsFromModules("writing", writingModules),
+];
+
+export const sourceContentSummary = {
+  projects: sourceContentRecords.filter(
+    (record) => record.surface === "projects",
+  ).length,
+  writing: sourceContentRecords.filter((record) => record.surface === "writing")
+    .length,
+  published_writing: sourceContentRecords.filter(
+    (record) => record.surface === "writing" && record.status === "published",
+  ).length,
+  visible_projects: sourceContentRecords.filter(
+    (record) => record.surface === "projects" && record.status !== "hidden",
+  ).length,
+};
+
+function recordsFromModules(
+  surface: SourceSurface,
+  modules: Record<string, string>,
+): SourceContentRecord[] {
+  return Object.entries(modules)
+    .map(([path, raw]) => recordFromRaw(surface, path, raw))
+    .sort(compareSourceRecords);
+}
+
+function recordFromRaw(
+  surface: SourceSurface,
+  path: string,
+  raw: string,
+): SourceContentRecord {
+  const file = fileSlug(path);
+  const source = splitMarkdown(raw);
+  const frontmatter = parseFrontmatter(source.frontmatter);
+  const slug = asString(frontmatter.slug) || file;
+  const title = asString(frontmatter.title) || slug;
+  const status = sourceStatus(surface, frontmatter);
+  const route =
+    surface === "projects" ? `/projects/${slug}` : `/writing/${slug}`;
+  const fields = Object.entries(frontmatter).map(([key, value]) => ({
+    path: key,
+    value: formatFieldValue(value),
+    kind: fieldKind(value),
+  }));
+
+  return {
+    id: `${surface}.${slug}`,
+    surface,
+    slug,
+    title,
+    route,
+    status,
+    source_ref: `apps/www/src/content/${surface}/${file}.md`,
+    summary:
+      asString(frontmatter.summary) ||
+      asString(frontmatter.subtitle) ||
+      asString(frontmatter.description) ||
+      "no summary field",
+    body_words: countWords(source.body),
+    fields,
+    next_safe_action:
+      surface === "projects"
+        ? "review project frontmatter and body before modeling a draft operation"
+        : "review title, summary, tags, and body before newsletter backfill",
+  };
+}
+
+function splitMarkdown(raw: string): { frontmatter: string; body: string } {
+  if (!raw.startsWith("---\n")) {
+    return { frontmatter: "", body: raw };
+  }
+
+  const end = raw.indexOf("\n---", 4);
+  if (end === -1) {
+    return { frontmatter: "", body: raw };
+  }
+
+  return {
+    frontmatter: raw.slice(4, end),
+    body: raw.slice(end + 4).trim(),
+  };
+}
+
+function parseFrontmatter(raw: string): Record<string, unknown> {
+  const fields: Record<string, unknown> = {};
+  const lines = raw.split("\n");
+  for (const line of lines) {
+    if (!line.trim() || line.startsWith(" ") || line.startsWith("-")) {
+      continue;
+    }
+
+    const match = line.match(/^([A-Za-z0-9_-]+):(?:\s*(.*))?$/);
+    if (!match) continue;
+
+    const [, key, rawValue = ""] = match;
+    fields[key] = parseScalar(rawValue);
+  }
+  return fields;
+}
+
+function parseScalar(raw: string): unknown {
+  const value = raw.trim();
+  if (!value) return "[structured list]";
+  if (value === "true") return true;
+  if (value === "false") return false;
+  if (/^-?\d+(?:\.\d+)?$/.test(value)) return Number(value);
+  if (value.startsWith("[") && value.endsWith("]")) {
+    return value
+      .slice(1, -1)
+      .split(",")
+      .map((part) => stripQuotes(part.trim()))
+      .filter(Boolean);
+  }
+  return stripQuotes(value);
+}
+
+function stripQuotes(value: string): string {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
+function fileSlug(path: string): string {
+  return path.split("/").pop()?.replace(/\.md$/, "") ?? path;
+}
+
+function sourceStatus(
+  surface: SourceSurface,
+  frontmatter: Record<string, unknown>,
+): string {
+  if (surface === "writing") return asString(frontmatter.status) || "draft";
+  if (frontmatter.visible === false) return "hidden";
+  return asString(frontmatter.status) || "unknown";
+}
+
+function asString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function countWords(body: string): number {
+  return body.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function formatFieldValue(value: unknown): string {
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return String(value);
+  if (typeof value === "string") {
+    return value.length > 96 ? `${value.slice(0, 93)}...` : value;
+  }
+  return JSON.stringify(value) ?? String(value);
+}
+
+function fieldKind(value: unknown): string {
+  if (Array.isArray(value)) return "array";
+  return typeof value;
+}
+
+function compareSourceRecords(
+  a: SourceContentRecord,
+  b: SourceContentRecord,
+): number {
+  if (a.surface !== b.surface) return a.surface.localeCompare(b.surface);
+  if (a.surface === "projects") {
+    const aOrder = numericField(a, "sort_order");
+    const bOrder = numericField(b, "sort_order");
+    return bOrder - aOrder || a.title.localeCompare(b.title);
+  }
+  return b.source_ref.localeCompare(a.source_ref);
+}
+
+function numericField(record: SourceContentRecord, path: string): number {
+  const field = record.fields.find((item) => item.path === path);
+  return Number(field?.value ?? 0);
+}

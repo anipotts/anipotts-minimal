@@ -5,6 +5,10 @@ import {
   contentInventorySource,
   readPageContentInventoryStore,
 } from "../../data/content";
+import {
+  sourceContentRecords,
+  sourceContentSummary,
+} from "../../data/source-content";
 
 const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
 const pageContentState = await readPageContentInventoryStore(
@@ -23,6 +27,8 @@ const pageContentState = await readPageContentInventoryStore(
     <span>{pageContentState.mode}</span>
     <span>{contentInventorySource.mode}</span>
     <span>{contentInventorySource.source_doc}</span>
+    <span>{sourceContentSummary.visible_projects} visible projects</span>
+    <span>{sourceContentSummary.published_writing} published writing</span>
   </section>
 
   <section class="table-card">
@@ -112,6 +118,69 @@ const pageContentState = await readPageContentInventoryStore(
             </article>
           ))
         )
+      }
+    </div>
+  </section>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>source content collections</p>
+        <h2>
+          {sourceContentSummary.projects} projects / {
+            sourceContentSummary.writing
+          }
+          writing
+        </h2>
+      </div>
+      <span>bundled read only</span>
+    </div>
+    <div class="record-list">
+      {
+        sourceContentRecords.map((record) => (
+          <article class="record-row">
+            <div>
+              <p>
+                {record.surface} / {record.status} / {record.body_words} words
+              </p>
+              <h3>{record.title}</h3>
+            </div>
+            <dl>
+              <div>
+                <dt>route</dt>
+                <dd>{record.route}</dd>
+              </div>
+              <div>
+                <dt>source</dt>
+                <dd>{record.source_ref}</dd>
+              </div>
+              <div>
+                <dt>summary</dt>
+                <dd>{record.summary}</dd>
+              </div>
+              <div>
+                <dt>next</dt>
+                <dd>{record.next_safe_action}</dd>
+              </div>
+            </dl>
+            <div class="field-grid" aria-label={`${record.slug} source fields`}>
+              {record.fields.slice(0, 14).map((field) => (
+                <div class="field-chip">
+                  <span>{field.path}</span>
+                  <strong>{field.value}</strong>
+                  <small>{field.kind}</small>
+                </div>
+              ))}
+              {record.fields.length > 14 && (
+                <div class="field-chip muted-chip">
+                  <span>more</span>
+                  <strong>{record.fields.length - 14} fields hidden</strong>
+                  <small>truncated</small>
+                </div>
+              )}
+            </div>
+          </article>
+        ))
       }
     </div>
   </section>
