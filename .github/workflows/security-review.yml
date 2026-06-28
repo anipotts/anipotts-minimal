@@ -1,0 +1,47 @@
+name: Security Review
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "apps/admin/src/middleware.ts"
+      - "apps/admin/src/lib/passkey-auth.ts"
+      - "apps/admin/src/pages/api/**"
+      - "apps/admin/src/pages/auth/**"
+      - "apps/admin-solid/src/lib/**"
+      - "apps/admin-solid/src/routes/api/**"
+      - "drizzle/migrations/**"
+      - "packages/lib/**"
+      - "scripts/**"
+      - "workers/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-review:
+    name: Security Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute changed files
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --prune origin "${{ github.base_ref }}"
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD > "$RUNNER_TEMP/security-files.txt"
+          cat "$RUNNER_TEMP/security-files.txt"
+
+      - name: Run static security review
+        run: node scripts/ci/security-review.mjs "$RUNNER_TEMP/security-files.txt"

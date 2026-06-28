@@ -22,14 +22,17 @@ approved target.
 
 Do not add or restore GitHub workflows that call Anthropic, Claude Code, or
 other external LLM review APIs for this repo. Ani disabled those on 2026-06-27
-to avoid unnecessary Claude API spend. There is no Claude security-review
-workflow and no required Claude API check. Real safety comes from small scoped
-diffs, local checks, CodeRabbit/GitHub signals, focused human review when
-needed, and deploy proof.
+to avoid unnecessary Claude API spend. `security-review.yml` is local static
+checking only: sensitive path detection, literal-secret scans, banned external
+LLM review hooks, and destructive migration guards. It must not call Claude,
+Anthropic, or any paid model API. Real safety comes from small scoped diffs,
+local checks, CodeRabbit/GitHub signals, focused human review when needed, and
+deploy proof.
 
 Primary workflows are intentionally limited to:
 
 - `ci.yml`
+- `security-review.yml`
 - `agent-automerge.yml`
 - `deploy.yml`
 - `smoke.yml`

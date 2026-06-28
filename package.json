@@ -27,6 +27,7 @@
     "proof:admin-content": "node scripts/admin/content-proof.mjs",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "test:deploy-targets": "node scripts/ci/compute-deploy-targets.test.mjs",
+    "test:security-review": "node scripts/ci/security-review.test.mjs",
     "test:unit": "turbo test",
     "test": "pnpm test:unit",
     "validate": "turbo build && turbo lint && turbo typecheck && turbo test",

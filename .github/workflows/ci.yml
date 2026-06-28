@@ -34,6 +34,9 @@ jobs:
       - name: Validate deploy target rules
         run: pnpm test:deploy-targets
 
+      - name: Validate security review rules
+        run: pnpm test:security-review
+
       - name: Validate formatting
         run: pnpm format:check
 
