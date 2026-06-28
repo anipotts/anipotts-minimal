@@ -7,9 +7,6 @@ import {
   normalizeCmsWriting,
 } from "@anipotts/lib/cms";
 
-export type Weekly = CollectionEntry<"weekly">;
-export type Experiment = CollectionEntry<"experiments">;
-
 type ProjectEntry = CollectionEntry<"projects">;
 type WritingEntry = CollectionEntry<"writing">;
 
@@ -33,7 +30,6 @@ export interface Writing {
 
 export const writingSlug = (t: Writing): string => t.slug;
 export const projectSlug = (p: Project): string => p.slug;
-export const experimentSlug = (e: Experiment): string => e.data.slug ?? e.id;
 
 const HIDDEN_PUBLIC_PROJECTS = new Set(["habittracker-obh"]);
 
@@ -179,19 +175,6 @@ export async function visibleProjects(): Promise<Project[]> {
         project.data.visible && !HIDDEN_PUBLIC_PROJECTS.has(project.slug),
     )
     .sort((a, b) => b.data.sort_order - a.data.sort_order);
-}
-
-export async function publishedExperiments(): Promise<Experiment[]> {
-  const all = await getCollection(
-    "experiments",
-    (e) => e.data.status === "published",
-  );
-  return all.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-}
-
-export async function weeklyDigests(): Promise<Weekly[]> {
-  const all = await getCollection("weekly");
-  return all.sort((a, b) => b.data.week.localeCompare(a.data.week));
 }
 
 export function readingTime(body: string): number {
