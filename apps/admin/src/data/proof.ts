@@ -126,7 +126,8 @@ async function readContentOperationProof(
   }
 
   try {
-    const [records, drafts, events] = await Promise.all([
+    const [publishedPages, records, drafts, events] = await Promise.all([
+      countRows(db, "page_content", "WHERE published = 1"),
       countRows(db, "content_records"),
       countRows(db, "content_draft_operations"),
       countRows(db, "content_publish_events"),
@@ -135,15 +136,17 @@ async function readContentOperationProof(
       id: "proof.content-operation.d1",
       kind: "repo",
       status:
-        drafts > 0 && records === 0 && events === 0 ? "verified" : "pending",
-      title: "content operations are D1-backed and inert",
-      summary: `content_records=${records}, content_draft_operations=${drafts}, content_publish_events=${events}. Draft operation rows can be reviewed without published records or publish events.`,
-      evidence_uri: "D1 anipotts-db content operation tables",
+        publishedPages > 0 && drafts > 0 && events === 0
+          ? "verified"
+          : "pending",
+      title: "content state is D1-backed and writes remain inert",
+      summary: `published_page_content=${publishedPages}, content_records=${records}, content_draft_operations=${drafts}, content_publish_events=${events}. Newsletter copy can render from page_content while draft operation rows remain review-only.`,
+      evidence_uri: "D1 anipotts-db page_content and content operation tables",
       redaction: "metadata_only",
       next_safe_action:
-        records === 0 && events === 0
-          ? "Keep rendering D1 draft operations read-only before adding an audited write route."
-          : "Review content records and publish events before enabling more content writes.",
+        events === 0
+          ? "Seed more public content into page_content before adding an audited write route."
+          : "Review publish events before enabling more content writes.",
     };
   } catch (error) {
     return {
@@ -153,7 +156,7 @@ async function readContentOperationProof(
       title: "content operation D1 read failed",
       summary:
         error instanceof Error ? error.message : "unknown D1 read failure",
-      evidence_uri: "D1 anipotts-db content operation tables",
+      evidence_uri: "D1 anipotts-db page_content and content operation tables",
       redaction: "metadata_only",
       next_safe_action:
         "Fix D1 schema or binding before relying on content operation proof.",
