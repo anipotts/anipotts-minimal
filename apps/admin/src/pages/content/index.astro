@@ -75,6 +75,10 @@ const pageContentState = await readPageContentInventoryStore(
                   <dd>{row.field_count}</dd>
                 </div>
                 <div>
+                  <dt>source-backed</dt>
+                  <dd>{row.source_backed_fields.length}</dd>
+                </div>
+                <div>
                   <dt>updated</dt>
                   <dd>{row.updated_at || "unknown"}</dd>
                 </div>
@@ -83,6 +87,28 @@ const pageContentState = await readPageContentInventoryStore(
                   <dd>no admin save or publish endpoint</dd>
                 </div>
               </dl>
+              <div class="field-grid" aria-label={`${row.page_key} d1 fields`}>
+                {row.fields.slice(0, 16).map((field) => (
+                  <div class="field-chip">
+                    <span>{field.path}</span>
+                    <strong>{field.value}</strong>
+                    <small>{field.kind}</small>
+                  </div>
+                ))}
+                {row.fields.length > 16 && (
+                  <div class="field-chip muted-chip">
+                    <span>more</span>
+                    <strong>{row.fields.length - 16} fields hidden</strong>
+                    <small>truncated</small>
+                  </div>
+                )}
+              </div>
+              {row.source_backed_fields.length > 0 && (
+                <div class="field-gap">
+                  <span>source-backed until schema exists</span>
+                  <p>{row.source_backed_fields.join(", ")}</p>
+                </div>
+              )}
             </article>
           ))
         )
