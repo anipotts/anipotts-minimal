@@ -67,6 +67,12 @@ jobs:
 
           while IFS= read -r file; do
             case "$file" in
+              *.md|docs/*|.github/ISSUE_TEMPLATE/*|LICENSE)
+                continue
+                ;;
+            esac
+
+            case "$file" in
               apps/www/*|packages/lib/*|packages/styles/*|packages/types/*)
                 www=true
                 ;;
