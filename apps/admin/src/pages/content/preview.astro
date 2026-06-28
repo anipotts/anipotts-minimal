@@ -3,7 +3,15 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import {
   contentInventorySource,
   contentPreviewItems,
+  readContentOperationStore,
 } from "../../data/content";
+
+const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
+const d1PreviewItems = readState.operations.filter((operation) =>
+  operation.preview_targets.includes("/content/preview"),
+);
+const previewSource =
+  d1PreviewItems.length > 0 ? "d1 draft operations" : "static previews";
 ---
 
 <AdminLayout
@@ -11,49 +19,110 @@ import {
   deck="Preview-only content operations. These compare current and proposed values without saving, publishing, deploying, or sending."
 >
   <section class="meta-strip" aria-label="preview queue source">
-    <span>{contentPreviewItems.length} proposals</span>
+    <span>
+      {
+        d1PreviewItems.length > 0
+          ? `${d1PreviewItems.length} d1 previews`
+          : `${contentPreviewItems.length} static previews`
+      }
+    </span>
+    <span>{readState.mode}</span>
+    <span>{previewSource}</span>
     <span>{contentInventorySource.mode}</span>
     <span>write path inactive</span>
   </section>
 
   <div class="preview-grid">
     {
-      contentPreviewItems.map((item) => (
-        <article class="proposal-row">
-          <p>
-            {item.surface} / {item.status}
-          </p>
-          <h2>{item.title}</h2>
-          <div class="diff-pair">
-            <div>
-              <span>current</span>
-              <p>{item.current_value}</p>
-            </div>
-            <div>
-              <span>proposed</span>
-              <p>{item.proposed_value}</p>
-            </div>
-          </div>
-          <dl>
-            <div>
-              <dt>route</dt>
-              <dd>{item.preview_route}</dd>
-            </div>
-            <div>
-              <dt>authority</dt>
-              <dd>{item.authority_state}</dd>
-            </div>
-            <div>
-              <dt>proof</dt>
-              <dd>{item.proof_ids.join(", ")}</dd>
-            </div>
-            <div>
-              <dt>next</dt>
-              <dd>{item.next_safe_action}</dd>
-            </div>
-          </dl>
-        </article>
-      ))
+      d1PreviewItems.length > 0
+        ? d1PreviewItems.map((item) => (
+            <article class="proposal-row">
+              <p>
+                {item.surface} / {item.status}
+              </p>
+              <h2>{item.operation_id}</h2>
+              <div class="diff-pair">
+                <div>
+                  <span>current</span>
+                  <p>{item.current_value_ref}</p>
+                </div>
+                <div>
+                  <span>proposed</span>
+                  <p>{item.proposed_value}</p>
+                </div>
+              </div>
+              <dl>
+                <div>
+                  <dt>route</dt>
+                  <dd>{item.route}</dd>
+                </div>
+                <div>
+                  <dt>field</dt>
+                  <dd>{item.field_path}</dd>
+                </div>
+                <div>
+                  <dt>authority</dt>
+                  <dd>{item.authority_state}</dd>
+                </div>
+                <div>
+                  <dt>blocked</dt>
+                  <dd>{item.forbidden_actions.join(", ")}</dd>
+                </div>
+                <div>
+                  <dt>proof</dt>
+                  <dd>{item.proof_ids.join(", ")}</dd>
+                </div>
+                <div>
+                  <dt>rollback</dt>
+                  <dd>{item.rollback_ref}</dd>
+                </div>
+              </dl>
+            </article>
+          ))
+        : contentPreviewItems.map((item) => (
+            <article class="proposal-row">
+              <p>
+                {item.surface} / {item.status}
+              </p>
+              <h2>{item.title}</h2>
+              <div class="diff-pair">
+                <div>
+                  <span>current</span>
+                  <p>{item.current_value}</p>
+                </div>
+                <div>
+                  <span>proposed</span>
+                  <p>{item.proposed_value}</p>
+                </div>
+              </div>
+              <dl>
+                <div>
+                  <dt>route</dt>
+                  <dd>{item.preview_route}</dd>
+                </div>
+                <div>
+                  <dt>authority</dt>
+                  <dd>{item.authority_state}</dd>
+                </div>
+                <div>
+                  <dt>proof</dt>
+                  <dd>{item.proof_ids.join(", ")}</dd>
+                </div>
+                <div>
+                  <dt>next</dt>
+                  <dd>{item.next_safe_action}</dd>
+                </div>
+              </dl>
+            </article>
+          ))
     }
   </div>
+
+  {
+    readState.mode === "read_failed" && (
+      <section class="notice">
+        D1 read failed: {readState.error}. Static previews remained read-only.
+      </section>
+    )
+  }
 </AdminLayout>
