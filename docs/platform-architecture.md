@@ -176,4 +176,7 @@ Rules:
 12. move homepage making project slugs into D1 `page_content`; seeded by
     `drizzle/migrations/0014_seed_homepage_making_slugs.sql` with Astro source
     fallback still retained.
-13. reduce deploy workflow inputs to retained production targets.
+13. move homepage writing slugs into D1 `page_content`; seeded by
+    `drizzle/migrations/0015_seed_homepage_writing_slugs.sql` with Astro source
+    fallback still retained.
+14. reduce deploy workflow inputs to retained production targets.

@@ -29,6 +29,7 @@ export interface HomepageSection {
   limit?: number;
   view_all?: string;
   project_slugs?: string[];
+  writing_slugs?: string[];
 }
 
 export interface HomepageProofCard {
