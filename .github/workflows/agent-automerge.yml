@@ -26,6 +26,8 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Wait for required checks
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,72 +54,14 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           files="$RUNNER_TEMP/pr-files.txt"
+          targets="$RUNNER_TEMP/deploy-targets.txt"
           pr_number="${PR_URL##*/}"
           gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" \
             --paginate \
             --jq '.[].filename' > "$files"
 
-          www=false
-          admin=false
-          admin_solid=false
-          ingest=false
-          newsletter=false
-          state=false
-          weekly_email=false
-
-          while IFS= read -r file; do
-            case "$file" in
-              *.md|docs/*|.github/ISSUE_TEMPLATE/*|LICENSE)
-                continue
-                ;;
-            esac
-
-            case "$file" in
-              apps/www/*|packages/lib/*|packages/styles/*|packages/types/*)
-                www=true
-                ;;
-            esac
-            case "$file" in
-              apps/admin/*|packages/content/*)
-                admin=true
-                ;;
-            esac
-            case "$file" in
-              apps/admin-solid/*)
-                admin_solid=true
-                ;;
-            esac
-            case "$file" in
-              workers/ingest/*)
-                ingest=true
-                ;;
-            esac
-            case "$file" in
-              workers/newsletter/*)
-                newsletter=true
-                ;;
-            esac
-            case "$file" in
-              workers/state/*)
-                state=true
-                ;;
-            esac
-            case "$file" in
-              workers/weekly-email/*)
-                weekly_email=true
-                ;;
-            esac
-          done < "$files"
-
-          {
-            echo "www=$www"
-            echo "admin=$admin"
-            echo "admin_solid=$admin_solid"
-            echo "ingest=$ingest"
-            echo "newsletter=$newsletter"
-            echo "state=$state"
-            echo "weekly_email=$weekly_email"
-          } >> "$GITHUB_OUTPUT"
+          node scripts/ci/compute-deploy-targets.mjs "$files" | tee "$targets"
+          cat "$targets" >> "$GITHUB_OUTPUT"
 
       - name: Merge PR
         env:
