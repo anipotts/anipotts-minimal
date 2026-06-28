@@ -101,6 +101,11 @@ app-native route blocking. The route probe set must include content inventory,
 review, preview, operations, newsletter queue, newsletter detail preview,
 needs-ani, proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
+Use `pnpm --silent proof:admin-content` after content migrations. It reads only
+remote D1 metadata and route status, then proves published `home` and
+`newsletter` page content, the four inert draft operations, empty content write
+tables, public route health, and protected admin route boundaries.
+
 ## ci/cd target
 
 Primary workflows:

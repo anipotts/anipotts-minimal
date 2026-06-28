@@ -24,6 +24,7 @@
     "format:check": "prettier --check \"**/*.{astro,ts,tsx,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
     "proof:admin-passkey": "node scripts/admin/passkey-proof.mjs",
+    "proof:admin-content": "node scripts/admin/content-proof.mjs",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "update-claude-stats:commit": "bash scripts/claude/refresh-claude-stats.sh",
     "test:deploy-targets": "node scripts/ci/compute-deploy-targets.test.mjs",
