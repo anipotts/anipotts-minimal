@@ -30,6 +30,14 @@ import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
               <h3>draft</h3>
               <p>{draft.summary}</p>
               <p>{draft.dek}</p>
+              <div class="actions">
+                <a class="button" href={`/newsletter/${draft.slug}`}>
+                  review preview
+                </a>
+                <span class="button secondary inert-button">
+                  save/send disabled
+                </span>
+              </div>
               <dl>
                 <div>
                   <dt>subject</dt>
