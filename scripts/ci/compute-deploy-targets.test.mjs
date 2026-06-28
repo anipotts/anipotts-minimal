@@ -51,6 +51,12 @@ expectTargets(
 );
 
 expectTargets(
+  "admin worker config deploys admin",
+  ["apps/admin/wrangler.toml"],
+  { admin: true },
+);
+
+expectTargets(
   "admin-solid source deploys only admin-solid",
   ["apps/admin-solid/src/routes/index.tsx"],
   {
