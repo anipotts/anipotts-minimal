@@ -144,5 +144,7 @@ Rules:
    `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
    `drizzle/migrations/0008_seed_content_draft_operations.sql`; first published
    newsletter page-content seed lives in
-   `drizzle/migrations/0009_seed_newsletter_page_content.sql`.
+   `drizzle/migrations/0009_seed_newsletter_page_content.sql`, and safe
+   homepage heading/section metadata seed lives in
+   `drizzle/migrations/0010_seed_home_page_content.sql`.
 10. reduce deploy workflow inputs to retained production targets.

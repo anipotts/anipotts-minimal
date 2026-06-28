@@ -22,13 +22,26 @@ const [homePage, newsletterPage] = await Promise.all([
   fetchPageContent("home"),
   fetchPageContent("newsletter"),
 ]);
+const rawHomeContent =
+  homePage?.content && typeof homePage.content === "object"
+    ? (homePage.content as {
+        sections?: {
+          intro?: {
+            heading?: unknown;
+            subheading?: unknown;
+          };
+        };
+      })
+    : null;
 const cmsHome = normalizeHomepageContent(homePage?.content);
 const newsletterCopy = normalizeNewsletterContent(newsletterPage?.content);
-const hasCmsHome = Boolean(homePage);
+const cmsIntroSource = rawHomeContent?.sections?.intro;
+const hasCmsHeading = hasText(cmsIntroSource?.heading);
+const hasCmsSubheading = hasText(cmsIntroSource?.subheading);
 const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
-const heading = hasCmsHome ? intro.heading : homeContent.heading;
+const heading = hasCmsHeading ? intro.heading : homeContent.heading;
 const homeMakingSlugs = [
   "quantercise",
   "quantercise-extension",
@@ -49,6 +62,10 @@ const writingEntries = (await publishedWriting()).slice(0, writing.limit ?? 3);
 const workLabel = "making";
 const workHref = "/making";
 const ycMention = homeContent.mentions.yCombinatorF25;
+
+function hasText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
 ---
 
 <Shell title="ani potts" description={homeContent.summary} path="/">
@@ -58,7 +75,7 @@ const ycMention = homeContent.mentions.yCombinatorF25;
     </h1>
     <p class="hero-summary hero-line">
       {
-        hasCmsHome ? (
+        hasCmsSubheading ? (
           (intro.subheading ?? homeContent.summary)
         ) : (
           <>

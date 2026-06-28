@@ -161,7 +161,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero heading",
     source_ref:
-      "D1 page_content:home.sections.intro.heading, fallback apps/www/src/data/site.ts:homeContent.heading",
+      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback apps/www/src/data/site.ts:homeContent.heading",
     current_value: "hi, i'm ani",
     editability: "ready",
     risk_level: "low",
@@ -177,7 +177,7 @@ export const contentInventory: ContentInventoryItem[] = [
     source_ref:
       "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
     current_value:
-      "Homepage intro copy uses the @anipotts/lib/cms reader path, with source defaults rendering until a published D1 record exists.",
+      "Homepage intro summary keeps the source-backed rich inline mentions unless D1 explicitly provides a plain subheading field.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -203,9 +203,10 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.making_selection",
     surface: "homepage",
     title: "homepage making selection",
-    source_ref: "apps/www/src/pages/index.astro:homeMakingSlugs",
+    source_ref:
+      "D1 page_content:home.sections.past_work plus apps/www/src/pages/index.astro:homeMakingSlugs",
     current_value:
-      "quantercise-extension, saeshify, nyu-purity-test, and habittracker-obh are selected in source order.",
+      "D1 controls the making label, limit, and view-all link; project slugs remain source-backed in the Astro page.",
     editability: "needs_schema",
     risk_level: "medium",
     next_safe_action:
