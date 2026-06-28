@@ -213,15 +213,15 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage making selection",
     source_ref:
-      "D1 page_content:home.sections.past_work plus apps/www/src/pages/index.astro:homeMakingSlugs",
+      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback apps/www/src/pages/index.astro:homeMakingSlugs",
     current_value:
-      "D1 controls the making label, limit, and view-all link; project slugs remain source-backed in the Astro page.",
-    editability: "needs_schema",
+      "D1 controls the making label, limit, view-all link, and ordered homepage project slugs when present.",
+    editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Keep source-backed until the editor has an ordered relation model for featured project cards.",
+      "Preview ordered project selections from D1 before any save path edits the home content record.",
     required_authority: [],
-    proof_ids: ["content.homepage.making.source"],
+    proof_ids: ["content.homepage.making.page-content"],
   },
   {
     id: "projects.card_fields",
@@ -433,10 +433,7 @@ function sourceBackedFields(
     return [];
   }
 
-  const gaps = [
-    "sections.past_work.project_slugs",
-    "sections.latest_thoughts.entries",
-  ];
+  const gaps = ["sections.latest_thoughts.entries"];
 
   if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
     gaps.unshift("sections.intro.subheading");
@@ -444,6 +441,10 @@ function sourceBackedFields(
 
   if (!hasNestedField(content, ["proof_cards"])) {
     gaps.push("proof_cards");
+  }
+
+  if (!hasNestedField(content, ["sections", "past_work", "project_slugs"])) {
+    gaps.push("sections.past_work.project_slugs");
   }
 
   return gaps;

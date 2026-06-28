@@ -50,8 +50,12 @@ const homeMakingSlugs = [
   "saeshify",
   "nyu-purity-test",
 ] as const;
+const selectedMakingSlugs =
+  work.project_slugs && work.project_slugs.length > 0
+    ? work.project_slugs
+    : [...homeMakingSlugs];
 const homeMakingOrder = new Map<string, number>(
-  homeMakingSlugs.map((slug, index) => [slug, index]),
+  selectedMakingSlugs.map((slug, index) => [slug, index]),
 );
 const projects = (await visibleProjects())
   .filter((project) => homeMakingOrder.has(project.slug))
@@ -61,8 +65,8 @@ const projects = (await visibleProjects())
   )
   .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting()).slice(0, writing.limit ?? 3);
-const workLabel = "making";
-const workHref = "/making";
+const workLabel = work.label || "making";
+const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
 const ycMention = homeContent.mentions.yCombinatorF25;
 
 function hasText(value: unknown): value is string {
