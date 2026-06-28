@@ -146,5 +146,7 @@ Rules:
    newsletter page-content seed lives in
    `drizzle/migrations/0009_seed_newsletter_page_content.sql`, and safe
    homepage heading/section metadata seed lives in
-   `drizzle/migrations/0010_seed_home_page_content.sql`.
+   `drizzle/migrations/0010_seed_home_page_content.sql`. Source-backed project
+   and writing review operations live in
+   `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
 10. reduce deploy workflow inputs to retained production targets.
