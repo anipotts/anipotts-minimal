@@ -62,6 +62,40 @@ jobs:
 
           node scripts/ci/compute-deploy-targets.mjs "$files" | tee "$targets"
           cat "$targets" >> "$GITHUB_OUTPUT"
+          node scripts/ci/security-review.mjs --required "$files" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for security review
+        if: steps.targets.outputs.security_review == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          for _ in $(seq 1 40); do
+            bucket="$(
+              gh pr checks "$PR_URL" \
+                --json name,bucket \
+                --jq '.[] | select(.name == "Security Review") | .bucket' \
+                2>/dev/null | head -n 1
+            )"
+            case "$bucket" in
+              pass)
+                exit 0
+                ;;
+              fail|cancel)
+                echo "Security Review did not pass"
+                exit 1
+                ;;
+              "")
+                echo "waiting for Security Review to register"
+                ;;
+              *)
+                echo "Security Review is ${bucket}"
+                ;;
+            esac
+            sleep 15
+          done
+          echo "Security Review did not finish in time"
+          exit 1
 
       - name: Merge PR
         env:

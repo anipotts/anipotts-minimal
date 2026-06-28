@@ -130,6 +130,7 @@ Primary workflows:
 | Workflow              | Role                                                     |
 | --------------------- | -------------------------------------------------------- |
 | `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
+| `security-review.yml` | local static checks for sensitive path changes on PR     |
 | `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets  |
 | `deploy.yml`          | deploy explicit targets only                             |
 | `smoke.yml`           | manual route proof for public and admin targets          |
@@ -145,8 +146,9 @@ Rules:
   `apps/admin` does not depend on them.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
 - D1 migrations run as reviewed migration steps before app deploy.
-- Anthropic and Claude Code API-backed GitHub workflows are disabled for this
-  repo.
+- `security-review.yml` does not call Anthropic, Claude Code, or any external
+  model API. It scans sensitive diffs for literal secrets, disabled LLM review
+  hooks, and destructive migration patterns.
 - `/api/admin/runtime-feed` is disabled in production and reads only the local
   Infra runtime metadata file during development.
 
