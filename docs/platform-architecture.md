@@ -16,7 +16,7 @@ structured content/state model, and one predictable CI/CD path.
 | labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                          |
 | workers        | `workers/*`                         | review individually | keep only production-required workers                    |
 | shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables           |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | apply additive content operation schema, then prove it   |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | seed inert content operations, then prove admin reads    |
 
 ## current inventory
 
@@ -140,5 +140,6 @@ Rules:
 8. review workers and delete unneeded worker targets.
 9. expand `packages/content` from static content inventory into the durable
    operation schema and D1 adapter layer. started with
-   `drizzle/migrations/0007_content_operations.sql`.
+   `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
+   `drizzle/migrations/0008_seed_content_draft_operations.sql`.
 10. reduce deploy workflow inputs to retained production targets.

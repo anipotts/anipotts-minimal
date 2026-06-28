@@ -57,7 +57,8 @@ export type ContentOperationTable = {
 
 export const contentOperationSchemaSource = {
   source_doc: "docs/admin-content-draft-operations.md",
-  migration: "drizzle/migrations/0007_content_operations.sql",
+  migration:
+    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql",
   schema: "packages/lib/src/db/schema.ts",
   mode: "d1_schema_no_write_endpoint",
 };
@@ -88,13 +89,14 @@ export const contentOperationTables: ContentOperationTable[] = [
 
 export const contentOperationTemplates: ContentOperation[] = [
   {
-    operation_id: "content-draft-homepage-summary-2026-06-27",
+    operation_id: "content-draft-homepage-summary-2026-06-28",
     kind: "content_draft",
     surface: "public_site",
     route: "/",
-    source_ref: "apps/www/src/data/site.ts:homeContent.summary",
+    source_ref:
+      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
     field_path: "homepage.summary",
-    current_value_ref: "source_default",
+    current_value_ref: "source_fallback",
     proposed_value:
       "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. now i write about coding agent workflows and the systems around them.",
     status: "previewed",
@@ -108,38 +110,42 @@ export const contentOperationTemplates: ContentOperation[] = [
       "content.homepage.summary.source",
       "admin.content.preview.local",
     ],
-    evidence_uri: "repo://apps/www/src/data/site.ts",
+    evidence_uri: "repo://apps/www/src/pages/index.astro",
     redaction: "public_copy_only",
     created_by: "agent",
-    created_at: "2026-06-27T00:00:00Z",
-    updated_at: "2026-06-27T00:00:00Z",
-    expires_at: "2026-07-27T00:00:00Z",
-    rollback_ref: "source_default",
+    created_at: "2026-06-28T00:00:00Z",
+    updated_at: "2026-06-28T00:00:00Z",
+    expires_at: "2026-07-28T00:00:00Z",
+    rollback_ref: "source_fallback",
   },
   {
-    operation_id: "content-draft-newsletter-block-source-2026-06-27",
+    operation_id: "content-draft-newsletter-copy-2026-06-28",
     kind: "content_draft",
     surface: "newsletter",
     route: "/newsletter",
-    source_ref: "apps/www/src/components/NewsletterSubscribe.astro",
+    source_ref:
+      "D1 page_content:newsletter, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT and component props",
     field_path: "newsletter.subscribe_copy",
-    current_value_ref: "component_default",
+    current_value_ref: "source_fallback",
     proposed_value:
-      "model newsletter headline, deck, CTA, success text, and error text as content records before enabling saves",
-    status: "blocked",
+      "Render headline, deck, CTA, success text, error text, footer text, and archive URL from a newsletter page_content record before any save route exists.",
+    status: "previewed",
     risk_level: "medium",
-    authority_state: "needs_source_truth_decision",
-    required_approval_ids: ["content.newsletter-source.owner-decision"],
+    authority_state: "source_truth_resolved_preview_only",
+    required_approval_ids: [],
     allowed_actions: ["render_preview", "request_review"],
     forbidden_actions: ["save", "publish", "send", "sync_provider"],
     preview_targets: ["/content/preview", "/newsletter"],
-    proof_ids: ["content.newsletter.component.defaults"],
-    evidence_uri: "repo://apps/www/src/components/NewsletterSubscribe.astro",
+    proof_ids: [
+      "content.newsletter.page-content.source",
+      "content.newsletter.component.defaults",
+    ],
+    evidence_uri: "repo://apps/www/src/pages/newsletter.astro",
     redaction: "public_copy_only",
     created_by: "agent",
-    created_at: "2026-06-27T00:00:00Z",
-    updated_at: "2026-06-27T00:00:00Z",
-    expires_at: "2026-07-27T00:00:00Z",
-    rollback_ref: "component_default",
+    created_at: "2026-06-28T00:00:00Z",
+    updated_at: "2026-06-28T00:00:00Z",
+    expires_at: "2026-07-28T00:00:00Z",
+    rollback_ref: "source_fallback",
   },
 ];

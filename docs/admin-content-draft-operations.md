@@ -132,9 +132,14 @@ Drizzle schema at `packages/lib/src/db/schema.ts`.
 - `content_draft_operations`: draft and preview operations
 - `content_publish_events`: immutable publish proof
 
-This authorizes the additive schema only. It does not authorize a binding
-change, Worker route, content write API, public-site runtime read from records,
-browser save action, outbound send, or publish action.
+`drizzle/migrations/0008_seed_content_draft_operations.sql` seeds the first two
+inert rows into `content_draft_operations`: homepage summary and newsletter
+copy. These rows exist so admin can review real D1 operation state instead of
+only static templates.
+
+The schema and seed rows do not authorize a binding change, Worker route,
+content write API, public-site runtime read from records, browser save action,
+outbound send, or publish action.
 
 ## proof requirements before writes
 
