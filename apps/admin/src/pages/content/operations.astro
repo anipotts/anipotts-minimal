@@ -3,6 +3,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import {
   contentOperationSchemaSource,
   contentOperationTables,
+  contentOperationTemplates,
 } from "../../data/content";
 
 type CountRow = {
@@ -198,6 +199,64 @@ if (!db) {
       </div>
     </section>
   </div>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>inert operation templates</p>
+        <h2>{contentOperationTemplates.length} proposals modeled</h2>
+      </div>
+      <span>preview only</span>
+    </div>
+    <div class="record-list">
+      {
+        contentOperationTemplates.map((operation) => (
+          <article class="record-row">
+            <div>
+              <p>
+                {operation.surface} / {operation.status}
+              </p>
+              <h3>{operation.operation_id}</h3>
+            </div>
+            <dl>
+              <div>
+                <dt>field</dt>
+                <dd>{operation.field_path}</dd>
+              </div>
+              <div>
+                <dt>route</dt>
+                <dd>{operation.route}</dd>
+              </div>
+              <div>
+                <dt>authority</dt>
+                <dd>{operation.authority_state}</dd>
+              </div>
+              <div>
+                <dt>risk</dt>
+                <dd>{operation.risk_level}</dd>
+              </div>
+              <div>
+                <dt>allowed</dt>
+                <dd>{operation.allowed_actions.join(", ")}</dd>
+              </div>
+              <div>
+                <dt>blocked</dt>
+                <dd>{operation.forbidden_actions.join(", ")}</dd>
+              </div>
+              <div>
+                <dt>proof</dt>
+                <dd>{operation.proof_ids.join(", ")}</dd>
+              </div>
+              <div>
+                <dt>rollback</dt>
+                <dd>{operation.rollback_ref}</dd>
+              </div>
+            </dl>
+          </article>
+        ))
+      }
+    </div>
+  </section>
 
   {
     readState.mode === "read_failed" && (
