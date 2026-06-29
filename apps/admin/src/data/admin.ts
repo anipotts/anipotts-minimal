@@ -1,7 +1,9 @@
 export type NavItem = {
   href: string;
   label: string;
-  status: "live-source" | "migrating" | "gated";
+  status: string;
+  group: "primary" | "content" | "advanced";
+  description: string;
 };
 
 export type DashboardCard = {
@@ -9,6 +11,8 @@ export type DashboardCard = {
   status: string;
   risk: "low" | "medium" | "high";
   next: string;
+  href: string;
+  action: string;
 };
 
 export type QueueRow = {
@@ -28,65 +32,162 @@ export type DeployRow = {
 };
 
 export const navItems: NavItem[] = [
-  { href: "/", label: "overview", status: "live-source" },
-  { href: "/content", label: "content", status: "live-source" },
-  { href: "/content/review", label: "review", status: "live-source" },
-  { href: "/content/drafts", label: "drafts", status: "live-source" },
-  { href: "/content/preview", label: "preview", status: "live-source" },
-  { href: "/content/operations", label: "operations", status: "live-source" },
-  { href: "/newsletter", label: "newsletter", status: "live-source" },
-  { href: "/needs-ani", label: "needs ani", status: "live-source" },
-  { href: "/proof", label: "proof", status: "live-source" },
-  { href: "/deploys", label: "deploys", status: "live-source" },
-  { href: "/repos", label: "repos", status: "migrating" },
-  { href: "/handoffs", label: "handoffs", status: "migrating" },
-  { href: "/fleet", label: "fleet", status: "migrating" },
-  { href: "/mutations", label: "mutations", status: "gated" },
-  { href: "/ops/destructive", label: "destructive ops", status: "gated" },
+  {
+    href: "/",
+    label: "overview",
+    status: "source",
+    group: "primary",
+    description: "what is safe to do next",
+  },
+  {
+    href: "/fleet",
+    label: "fleet",
+    status: "runtime",
+    group: "primary",
+    description: "machines, repo state, current work",
+  },
+  {
+    href: "/content",
+    label: "content",
+    status: "D1",
+    group: "primary",
+    description: "public-site content inventory",
+  },
+  {
+    href: "/content/drafts",
+    label: "writing editor",
+    status: "drafts",
+    group: "primary",
+    description: "draft operations and editable rows",
+  },
+  {
+    href: "/proof",
+    label: "proof/auth",
+    status: "passkeys",
+    group: "primary",
+    description: "auth, proof, and blocked checks",
+  },
+  {
+    href: "/deploys",
+    label: "deploys",
+    status: "scoped",
+    group: "primary",
+    description: "target map and deploy proof",
+  },
+  {
+    href: "/content/review",
+    label: "review queue",
+    status: "content",
+    group: "content",
+    description: "proposed copy and review state",
+  },
+  {
+    href: "/content/preview",
+    label: "preview",
+    status: "content",
+    group: "content",
+    description: "draft preview surfaces",
+  },
+  {
+    href: "/content/operations",
+    label: "operations",
+    status: "content",
+    group: "content",
+    description: "draft operation metadata",
+  },
+  {
+    href: "/newsletter",
+    label: "newsletter",
+    status: "retained",
+    group: "content",
+    description: "issue preview without sends",
+  },
+  {
+    href: "/needs-ani",
+    label: "needs ani",
+    status: "queue",
+    group: "content",
+    description: "typed approval and decision queue",
+  },
+  {
+    href: "/repos",
+    label: "repos",
+    status: "details",
+    group: "advanced",
+    description: "dirty state and branch drift",
+  },
+  {
+    href: "/handoffs",
+    label: "handoffs",
+    status: "details",
+    group: "advanced",
+    description: "handoff freshness and absorption",
+  },
+  {
+    href: "/mutations",
+    label: "mutations",
+    status: "gated",
+    group: "advanced",
+    description: "proposed, approved, running, verified",
+  },
+  {
+    href: "/ops/destructive",
+    label: "destructive ops",
+    status: "gated",
+    group: "advanced",
+    description: "delete, dns, auth, deploy, secrets",
+  },
 ];
 
 export const overviewCards: DashboardCard[] = [
   {
-    title: "admin Astro cutover",
-    status: "canonical route cut over",
-    risk: "low",
-    next: "prove passkey behavior, then remove the legacy Solid rollback",
-  },
-  {
-    title: "passkey auth",
-    status: "edge protected",
+    title: "passkey proof",
+    status: "two credentials registered, one active session",
     risk: "high",
-    next: "register first biometric passkey before Access removal",
+    next: "record revoked-credential and denied-auth proof before Access removal",
+    href: "/auth/passkey",
+    action: "open auth proof",
   },
   {
-    title: "content platform",
-    status: "D1-backed review state",
+    title: "writing editor",
+    status:
+      "draft operation editor is live; full publish flow moved to a worktree",
     risk: "medium",
-    next: "enroll passkey and save one draft operation before publish design",
+    next: "build D1 save, preview, publish, visibility, and revision history",
+    href: "/content/drafts",
+    action: "review editor",
   },
   {
-    title: "proof log",
-    status: "durable D1 proof",
+    title: "content inventory",
+    status: "D1 page_content rows are visible with source fallback",
     risk: "low",
-    next: "keep deploy target proof current after each admin or public deploy",
+    next: "keep public content readable while editor writes are proven separately",
+    href: "/content",
+    action: "open content",
   },
   {
-    title: "deploy scopes",
-    status: "read-only target map",
+    title: "fleet status",
+    status: "runtime and repo state are readable from the operator dashboard",
     risk: "low",
-    next: "use /deploys to confirm skipped targets after each scoped deploy",
+    next: "make machine drift, stale work, and current owner clearer",
+    href: "/fleet",
+    action: "open fleet",
   },
   {
-    title: "newsletter drafts",
-    status: "D1 page content plus static issue preview",
+    title: "deploy proof",
+    status: "admin and public deploy targets are separated",
+    risk: "low",
+    next: "after each merge, prove only the intended target ran",
+    href: "/deploys",
+    action: "check deploys",
+  },
+  {
+    title: "advanced ops",
+    status: "handoffs, mutations, and destructive ops are demoted",
     risk: "medium",
-    next: "review issue structure in admin before any D1 write or send path",
-  },
-  {
-    title: "legacy cleanup",
-    status: "blocked by passkey proof",
-    risk: "low",
-    next: "archive or remove admin-solid after passkey proof",
+    next: "keep visible for audit without making them the first screen",
+    href: "/mutations",
+    action: "open gates",
   },
 ];
 
@@ -249,6 +350,14 @@ export const mutationRows: QueueRow[] = [
 ];
 
 export function routeTitle(pathname: string): string {
-  const match = navItems.find((item) => item.href === pathname);
+  if (pathname.startsWith("/content/edit/")) return "writing editor";
+
+  const match =
+    navItems.find((item) => item.href === pathname) ??
+    [...navItems]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find(
+        (item) => item.href !== "/" && pathname.startsWith(`${item.href}/`),
+      );
   return match?.label ?? "admin";
 }
