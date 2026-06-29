@@ -89,6 +89,27 @@ function sanitizeAdminReturnPath(path: string | null): string {
     proven.
   </p>
 
+  <section
+    class="proof-command-board"
+    aria-labelledby="passkey-command-heading"
+  >
+    <div class="section-header">
+      <div>
+        <p>proof command</p>
+        <h2 id="passkey-command-heading">do not remove Access yet</h2>
+      </div>
+      <span>rerun after every browser step</span>
+    </div>
+    <div class="command-row">
+      <code>pnpm --silent proof:admin-passkey</code>
+      <p>
+        Access removal is allowed only when this reports an active credential,
+        an active session, required audit events, and
+        <code>ready_for_access_removal: true</code>.
+      </p>
+    </div>
+  </section>
+
   <section class="handoff-board" aria-labelledby="passkey-handoff-heading">
     <div class="section-header">
       <div>

@@ -296,6 +296,7 @@ th {
 }
 
 .handoff-board,
+.proof-command-board,
 .runbook-board,
 .proof-checklist {
   margin-top: 24px;
@@ -304,10 +305,35 @@ th {
 }
 
 .handoff-board .section-header,
+.proof-command-board .section-header,
 .runbook-board .section-header,
 .proof-checklist .section-header {
   padding: 16px;
   border-bottom: 1px solid var(--border);
+}
+
+.command-row {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.command-row code {
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--ink);
+  padding: 10px 12px;
+  width: fit-content;
+}
+
+.command-row p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 760px;
+}
+
+.command-row p code {
+  padding: 2px 5px;
 }
 
 .handoff-list,
