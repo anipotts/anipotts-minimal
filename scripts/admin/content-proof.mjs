@@ -43,6 +43,7 @@ const REQUIRED_OPERATIONS = [
 const ADMIN_ROUTES = [
   "/content",
   "/content/review",
+  "/content/drafts",
   "/content/preview",
   "/content/operations",
   "/proof",

@@ -10,6 +10,7 @@ const ROUTES = [
   "/",
   "/content",
   "/content/review",
+  "/content/drafts",
   "/content/preview",
   "/content/operations",
   "/needs-ani",
@@ -83,7 +84,7 @@ const routeBoundary = summarizeBoundary(routes);
 const missingAuditEvents = REQUIRED_AUDIT_EVENTS.filter(
   (eventType) => !auditEvents[eventType],
 );
-const accessRemovalBlockers = accessRemovalBlockerItems({
+const removalBlockers = accessRemovalBlockerItems({
   schemaReady,
   credentialCount,
   sessionCount,
@@ -92,7 +93,7 @@ const accessRemovalBlockers = accessRemovalBlockerItems({
 const cloudflareAccessStillActive = routeBoundary === "cloudflare_access";
 const appNativeRouteBoundaryReady = routeBoundary === "app_native_passkey";
 const missingProof = missingProofItems({
-  accessRemovalBlockers,
+  accessRemovalBlockers: removalBlockers,
   routeBoundary,
 });
 
@@ -114,13 +115,13 @@ const proof = {
       Number(auditEvents[eventType] ?? 0),
     ]),
   ),
-  access_removal_blockers: accessRemovalBlockers,
+  access_removal_blockers: removalBlockers,
   cloudflare_access_still_active: cloudflareAccessStillActive,
   missing_proof: missingProof,
   ready_for_access_removal:
-    accessRemovalBlockers.length === 0 && cloudflareAccessStillActive,
+    removalBlockers.length === 0 && cloudflareAccessStillActive,
   post_access_removal_verified:
-    accessRemovalBlockers.length === 0 && appNativeRouteBoundaryReady,
+    removalBlockers.length === 0 && appNativeRouteBoundaryReady,
   routes,
   route_boundary: routeBoundary,
   next_safe_action: nextSafeAction({
@@ -248,10 +249,7 @@ function nextSafeAction({
   return "inspect route boundary before changing Access";
 }
 
-function missingProofItems({
-  accessRemovalBlockers,
-  routeBoundary,
-}) {
+function missingProofItems({ accessRemovalBlockers, routeBoundary }) {
   const missing = [...accessRemovalBlockers];
   if (routeBoundary === "cloudflare_access") return missing;
   if (routeBoundary !== "app_native_passkey") {

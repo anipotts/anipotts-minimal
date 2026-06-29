@@ -1,0 +1,201 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import {
+  contentOperationTemplates,
+  readContentOperationStore,
+  readPageContentInventoryStore,
+} from "../../data/content";
+
+const operationState = await readContentOperationStore(
+  Astro.locals.runtime?.env.DB,
+);
+const pageContentState = await readPageContentInventoryStore(
+  Astro.locals.runtime?.env.DB,
+);
+const operations =
+  operationState.operations.length > 0
+    ? operationState.operations
+    : contentOperationTemplates;
+const writableRows = operationState.counts.filter(
+  (row) =>
+    row.table_name === "content_records" ||
+    row.table_name === "content_publish_events",
+);
+const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
+---
+
+<AdminLayout
+  title="content drafts"
+  deck="Field-level draft editor shape. Inputs are inert until save and publish paths are audited."
+>
+  <section class="meta-strip" aria-label="content draft editor state">
+    <span>{operations.length} draft operations</span>
+    <span>{pageContentState.published_count} published page rows</span>
+    <span>{operationState.mode}</span>
+    <span>{writeRowsEmpty ? "writes empty" : "writes present"}</span>
+    <span>controls disabled</span>
+  </section>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>editor gate</p>
+        <h2>{writeRowsEmpty ? "safe preview shape" : "review write rows"}</h2>
+      </div>
+      <span>no save route</span>
+    </div>
+    <div class="record-list">
+      <article class="record-row">
+        <div>
+          <p>write state</p>
+          <h3>
+            {
+              writeRowsEmpty
+                ? "content_records and content_publish_events are empty"
+                : "write tables contain rows and need review"
+            }
+          </h3>
+        </div>
+        <dl>
+          {
+            operationState.counts.map((row) => (
+              <div>
+                <dt>{row.table_name}</dt>
+                <dd>{row.rows} rows</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <div class="draft-editor-grid">
+    {
+      operations.map((operation) => (
+        <article class="draft-editor-card">
+          <div class="section-head">
+            <div>
+              <p>
+                {operation.surface} / {operation.status}
+              </p>
+              <h2>{operation.field_path}</h2>
+            </div>
+            <span>{operation.risk_level}</span>
+          </div>
+          <form class="draft-form" aria-label={`${operation.field_path} draft`}>
+            <label>
+              <span>operation</span>
+              <input value={operation.operation_id} disabled />
+            </label>
+            <label>
+              <span>route</span>
+              <input value={operation.route} disabled />
+            </label>
+            <label class="wide-field">
+              <span>source</span>
+              <textarea rows="2" disabled>
+                {operation.source_ref}
+              </textarea>
+            </label>
+            <label class="wide-field">
+              <span>current</span>
+              <textarea rows="3" disabled>
+                {operation.current_value_ref}
+              </textarea>
+            </label>
+            <label class="wide-field">
+              <span>draft preview</span>
+              <textarea rows="5" disabled>
+                {operation.proposed_value}
+              </textarea>
+            </label>
+            <div class="draft-control-row">
+              <button class="button secondary" type="button" disabled>
+                save draft
+              </button>
+              <button class="button secondary" type="button" disabled>
+                request review
+              </button>
+              <button class="button secondary danger" type="button" disabled>
+                publish
+              </button>
+            </div>
+          </form>
+          <dl class="draft-proof-grid">
+            <div>
+              <dt>authority</dt>
+              <dd>{operation.authority_state}</dd>
+            </div>
+            <div>
+              <dt>allowed</dt>
+              <dd>{operation.allowed_actions.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>blocked</dt>
+              <dd>{operation.forbidden_actions.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>proof</dt>
+              <dd>{operation.proof_ids.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>rollback</dt>
+              <dd>{operation.rollback_ref}</dd>
+            </div>
+          </dl>
+        </article>
+      ))
+    }
+  </div>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>page_content fields</p>
+        <h2>{pageContentState.row_count} records</h2>
+      </div>
+      <span>{pageContentState.mode}</span>
+    </div>
+    <div class="record-list">
+      {
+        pageContentState.rows.map((row) => (
+          <article class="record-row">
+            <div>
+              <p>
+                {row.page_key} / v{row.version}
+              </p>
+              <h3>{row.summary}</h3>
+            </div>
+            <div class="field-grid">
+              {row.fields.slice(0, 12).map((field) => (
+                <label class="field-chip field-input-chip">
+                  <span>{field.path}</span>
+                  <input value={field.value} disabled />
+                  <small>{field.kind}</small>
+                </label>
+              ))}
+              {row.fields.length > 12 && (
+                <div class="field-chip muted-chip">
+                  <span>more</span>
+                  <strong>{row.fields.length - 12} fields hidden</strong>
+                  <small>truncated</small>
+                </div>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    (operationState.mode === "read_failed" ||
+      pageContentState.mode === "read_failed") && (
+      <section class="notice">
+        D1 read failed. Static draft controls remained disabled and no write was
+        attempted.
+      </section>
+    )
+  }
+</AdminLayout>
