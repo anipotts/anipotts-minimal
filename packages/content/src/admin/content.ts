@@ -298,6 +298,21 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.projects.index.page-content"],
   },
   {
+    id: "projects.archive_index_copy",
+    surface: "projects",
+    title: "project archive index copy",
+    source_ref:
+      "D1 page_content:projects seeded by drizzle/migrations/0024_seed_projects_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_PROJECTS_INDEX_CONTENT",
+    current_value:
+      "The /projects title, meta description, hero title, hero summary, and /making hero link use structured page_content when present.",
+    editability: "ready",
+    risk_level: "low",
+    next_safe_action:
+      "Preview archive index copy changes before any save path edits the projects page content record.",
+    required_authority: [],
+    proof_ids: ["content.projects.archive-index.page-content"],
+  },
+  {
     id: "projects.detail_body",
     surface: "projects",
     title: "project detail body",
@@ -570,10 +585,11 @@ function summarizePageContent(
     ]);
   }
 
-  if (pageKey === "writing" || pageKey === "making") {
+  if (pageKey === "writing" || pageKey === "making" || pageKey === "projects") {
     return compactSummary([
       ["title", content.hero_title ?? content.title],
       ["summary", content.hero_summary],
+      ["link", content.hero_link_href],
       ["search", content.search_placeholder],
     ]);
   }

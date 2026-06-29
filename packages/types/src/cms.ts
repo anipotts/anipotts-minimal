@@ -155,6 +155,8 @@ export interface ListingPageContent {
   description: string;
   hero_title: string;
   hero_summary: string;
+  hero_link_label?: string;
+  hero_link_href?: string;
   search_placeholder?: string;
 }
 

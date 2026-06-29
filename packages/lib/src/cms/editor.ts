@@ -403,6 +403,14 @@ export function normalizeListingPageContent(
       source.hero_summary,
       fallback.hero_summary,
     ).trim(),
+    hero_link_label: coerceString(
+      source.hero_link_label,
+      fallback.hero_link_label ?? "",
+    ).trim(),
+    hero_link_href: coerceString(
+      source.hero_link_href,
+      fallback.hero_link_href ?? "",
+    ).trim(),
     search_placeholder: coerceString(
       source.search_placeholder,
       fallback.search_placeholder ?? "",
@@ -440,7 +448,31 @@ export function validateListingPageContent(content: ListingPageContent): {
       "Listing page search placeholder",
       CMS_TEXT_LIMITS.title,
       false,
-    );
+    ) ??
+    validateListingHeroLink(content);
 
   return error ? { ok: false, error } : { ok: true };
+}
+
+function validateListingHeroLink(content: ListingPageContent): string | null {
+  const hasLabel = Boolean(content.hero_link_label?.trim());
+  const hasHref = Boolean(content.hero_link_href?.trim());
+  if (!hasLabel && !hasHref) return null;
+  if (!hasLabel) return "Listing page hero link label is required";
+  if (!hasHref) return "Listing page hero link is required";
+  return (
+    validateCmsString(
+      content.hero_link_label ?? "",
+      "Listing page hero link label",
+      CMS_TEXT_LIMITS.linkLabel,
+    ) ??
+    validateCmsString(
+      content.hero_link_href ?? "",
+      "Listing page hero link",
+      CMS_TEXT_LIMITS.linkUrl,
+    ) ??
+    (!isSafeCmsUrl(content.hero_link_href ?? "")
+      ? "Listing page hero link must start with /, https://, or mailto:"
+      : null)
+  );
 }

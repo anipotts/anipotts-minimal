@@ -4,26 +4,47 @@ import { Icon } from "astro-icon/components";
 import { projectSlug, visibleProjects } from "../../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
+import {
+  DEFAULT_PROJECTS_INDEX_CONTENT,
+  fetchPageContent,
+  normalizeListingPageContent,
+  type ListingPageContent,
+} from "@anipotts/lib/cms";
 
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const projects = await visibleProjects();
+const [projects, projectsPage] = await Promise.all([
+  visibleProjects(),
+  fetchPageContent<ListingPageContent>("projects"),
+]);
+const copy = normalizeListingPageContent(
+  projectsPage?.content,
+  DEFAULT_PROJECTS_INDEX_CONTENT,
+);
 ---
 
 <Shell
-  title="projects"
-  description="every project with a page. flat list."
+  title={copy.title}
+  description={copy.description}
   path="/projects"
   mood="alert"
 >
   <section data-rise>
-    <h1 class="hero-title">archive</h1>
+    <h1 class="hero-title">{copy.hero_title}</h1>
     <p class="hero-summary">
-      every project with a page. the curated story is at <a
-        href="/making"
-        class="accent-link">/making</a
-      >.
+      {copy.hero_summary}
+      {
+        copy.hero_link_label && copy.hero_link_href && (
+          <>
+            {" "}
+            <a href={copy.hero_link_href} class="accent-link">
+              {copy.hero_link_label}
+            </a>
+            .
+          </>
+        )
+      }
     </p>
   </section>
 
