@@ -207,5 +207,8 @@ Rules:
 17. remove duplicate `homeContent` homepage fallback from `apps/www/src/data`;
     homepage fallback content now lives in `@anipotts/lib/cms`.
 18. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
-19. reduce deploy workflow inputs to retained production targets after rollback
+19. move homepage intro subheading into D1 `page_content`; seeded by
+    `drizzle/migrations/0019_seed_homepage_intro_subheading.sql` with source
+    fallback still retained.
+20. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
