@@ -56,6 +56,7 @@ const ROUTES = [
     nav: true,
   },
   { route: "/proof", file: "apps/admin/src/pages/proof.astro", nav: true },
+  { route: "/deploys", file: "apps/admin/src/pages/deploys.astro", nav: true },
   { route: "/repos", file: "apps/admin/src/pages/repos.astro", nav: true },
   {
     route: "/handoffs",

@@ -36,6 +36,7 @@ const ROUTES = [
   "/newsletter",
   "/newsletter/first-thing-agents-need-control-plane",
   "/proof",
+  "/deploys",
   "/repos",
   "/handoffs",
   "/fleet",

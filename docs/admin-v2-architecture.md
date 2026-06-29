@@ -27,7 +27,8 @@ Live baseline:
   `/api/admin/content/draft-operation`, `/content/preview`,
   `/content/operations`, `/newsletter`,
   `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, `/proof`,
-  `/repos`, `/handoffs`, `/fleet`, `/mutations`, and `/ops/destructive`
+  `/deploys`, `/repos`, `/handoffs`, `/fleet`, `/mutations`, and
+  `/ops/destructive`
 
 Current strengths:
 
@@ -38,6 +39,7 @@ Current strengths:
 - `/repos` can render the local-dev Infra runtime repo overlay metadata through
   `/api/admin/runtime-feed`
 - `admin_proof_events` provides durable proof rows in D1
+- `/deploys` shows the scoped deploy target map without dispatch controls
 - deploy workflow can target only admin
 - unauthenticated users are blocked by Cloudflare Access before app content
   renders

@@ -91,6 +91,7 @@ operation tables, or publish-event tables.
 | `/newsletter/first-thing-agents-need-control-plane` | newsletter issue detail preview      |
 | `/needs-ani`                                        | typed human decision queue           |
 | `/proof`                                            | deploy, auth, and route proof log    |
+| `/deploys`                                          | scoped deploy target map             |
 | `/repos`                                            | repo and worktree state              |
 | `/handoffs`                                         | handoff freshness                    |
 | `/fleet`                                            | machine and agent state              |
@@ -126,7 +127,7 @@ until the edge gate is removed, not a blocker by itself. After Access removal,
 the same script must show app-native route blocking. The route probe set must
 include content inventory, review, drafts, focused page editor, draft-save API,
 preview, operations, newsletter queue, newsletter detail preview, needs-ani,
-proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
+proof, deploys, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
 First-passkey bootstrap in production requires a verified Cloudflare Access
 application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it
@@ -308,5 +309,8 @@ Rules:
 36. add durable `admin_proof_events` coverage for the draft-save write path.
     `drizzle/migrations/0034_seed_content_draft_save_proof.sql` seeds the
     pending proof row, and successful draft saves update it with metadata only.
-37. reduce deploy workflow inputs to retained production targets after rollback
+37. add a read-only `/deploys` route so the admin sidebar exposes scoped
+    deploy targets, rollback-only admin-solid status, retained worker targets,
+    and skipped-target proof expectations.
+38. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

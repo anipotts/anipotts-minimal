@@ -22,6 +22,7 @@ const ALLOWED_API_ROUTES = [
 const FORBIDDEN_PAGE_SEGMENTS = new Set([
   "admin",
   "auth",
+  "deploys",
   "fleet",
   "handoffs",
   "mutations",
