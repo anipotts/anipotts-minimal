@@ -25,7 +25,16 @@ assert.deepEqual(
   "workers inventory drifted from retained production workers",
 );
 assert.equal(existsSync("apps/labs"), false, "apps/labs must stay archived");
-assert.equal(existsSync("services"), false, "services workspace must stay removed");
+assert.equal(
+  existsSync("services"),
+  false,
+  "services workspace must stay removed",
+);
+assert.equal(
+  existsSync("archives"),
+  false,
+  "root archives directory must stay consolidated under docs/archive",
+);
 
 const workspace = readFileSync("pnpm-workspace.yaml", "utf8");
 for (const glob of EXPECTED_WORKSPACE_GLOBS) {
