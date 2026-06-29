@@ -2,10 +2,15 @@ import type {
   CmsEditorLink,
   CmsProjectContent,
   CmsWritingContent,
+  ListingPageContent,
   NewsletterContent,
 } from "@anipotts/types";
 import { parseJsonArray } from "../db";
-import { CMS_TEXT_LIMITS, DEFAULT_NEWSLETTER_CONTENT } from "./defaults";
+import {
+  CMS_TEXT_LIMITS,
+  DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_WRITING_INDEX_CONTENT,
+} from "./defaults";
 
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === "string" ? value : fallback;
@@ -379,4 +384,63 @@ export function validateNewsletterContent(content: NewsletterContent): {
     return { ok: false, error: "Reply-to is invalid" };
   }
   return { ok: true };
+}
+
+export function normalizeListingPageContent(
+  content: unknown,
+  fallback: ListingPageContent = DEFAULT_WRITING_INDEX_CONTENT,
+): ListingPageContent {
+  const source =
+    content && typeof content === "object"
+      ? (content as Record<string, unknown>)
+      : {};
+
+  return {
+    title: coerceString(source.title, fallback.title).trim(),
+    description: coerceString(source.description, fallback.description).trim(),
+    hero_title: coerceString(source.hero_title, fallback.hero_title).trim(),
+    hero_summary: coerceString(
+      source.hero_summary,
+      fallback.hero_summary,
+    ).trim(),
+    search_placeholder: coerceString(
+      source.search_placeholder,
+      fallback.search_placeholder ?? "",
+    ).trim(),
+  };
+}
+
+export function validateListingPageContent(content: ListingPageContent): {
+  ok: boolean;
+  error?: string;
+} {
+  const error =
+    validateCmsString(
+      content.title,
+      "Listing page title",
+      CMS_TEXT_LIMITS.title,
+    ) ??
+    validateCmsString(
+      content.description,
+      "Listing page description",
+      CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      content.hero_title,
+      "Listing page hero title",
+      CMS_TEXT_LIMITS.title,
+    ) ??
+    validateCmsString(
+      content.hero_summary,
+      "Listing page hero summary",
+      CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      content.search_placeholder ?? "",
+      "Listing page search placeholder",
+      CMS_TEXT_LIMITS.title,
+      false,
+    );
+
+  return error ? { ok: false, error } : { ok: true };
 }

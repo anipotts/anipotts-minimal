@@ -150,6 +150,14 @@ export interface NewsletterContent {
   reply_to: string;
 }
 
+export interface ListingPageContent {
+  title: string;
+  description: string;
+  hero_title: string;
+  hero_summary: string;
+  search_placeholder?: string;
+}
+
 export interface CmsEditorSnapshot {
   homepage: HomepageContent;
   homepageMeta: CmsEditorMeta;

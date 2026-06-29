@@ -3,13 +3,16 @@ export {
   DEFAULT_CMS_WRITING,
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults";
 export {
   cmsProjectPageKey,
   cmsWritingPageKey,
+  normalizeListingPageContent,
   normalizeCmsProject,
   normalizeCmsWriting,
   normalizeNewsletterContent,
+  validateListingPageContent,
   validateCmsProject,
   validateCmsWriting,
   validateNewsletterContent,
@@ -36,6 +39,7 @@ export type {
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,
   HomepageRichSummarySimpleSegment,
+  ListingPageContent,
   ThoughtSummary,
   WritingSummary,
 } from "@anipotts/types";

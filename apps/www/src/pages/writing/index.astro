@@ -5,22 +5,31 @@ import { Icon } from "astro-icon/components";
 import { publishedWriting } from "../../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
+import {
+  fetchPageContent,
+  normalizeListingPageContent,
+  type ListingPageContent,
+} from "@anipotts/lib/cms";
 
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const writingEntries = await publishedWriting();
+const [writingEntries, writingPage] = await Promise.all([
+  publishedWriting(),
+  fetchPageContent<ListingPageContent>("writing"),
+]);
+const copy = normalizeListingPageContent(writingPage?.content);
 ---
 
 <Shell
-  title="writing"
-  description="things ani's written. claude code workflows, ai builds, the occasional music take."
+  title={copy.title}
+  description={copy.description}
   path="/writing"
   mood="drowsy"
 >
   <section data-rise>
-    <h1 class="hero-title">writing</h1>
-    <p class="hero-summary">stuff i've figured out and wanted to write down.</p>
+    <h1 class="hero-title">{copy.hero_title}</h1>
+    <p class="hero-summary">{copy.hero_summary}</p>
   </section>
 
   <section data-rise class="stack">
@@ -30,7 +39,7 @@ const writingEntries = await publishedWriting();
         id="writing-search"
         class="field search"
         type="search"
-        placeholder="search writing"
+        placeholder={copy.search_placeholder ?? "search writing"}
         autocomplete="off"
       />
     </label>

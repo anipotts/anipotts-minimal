@@ -7,14 +7,17 @@ import {
   DEFAULT_CMS_WRITING,
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_WRITING_INDEX_CONTENT,
   normalizeCmsProject,
   normalizeCmsWriting,
   normalizeHomepageContent,
+  normalizeListingPageContent,
   normalizeNewsletterContent,
   searchWriting,
   validateCmsProject,
   validateCmsWriting,
   validateHomepageContent,
+  validateListingPageContent,
   validateNewsletterContent,
   homepageSummaryText,
 } from "./index";
@@ -580,5 +583,19 @@ describe("owner editor cms validation", () => {
       ok: false,
       error: "Sender email is invalid",
     });
+  });
+
+  it("normalizes listing page content with fallback fields", () => {
+    const listing = normalizeListingPageContent({
+      ...DEFAULT_WRITING_INDEX_CONTENT,
+      hero_summary: 42,
+      search_placeholder: " find posts ",
+    });
+
+    expect(listing.hero_summary).toBe(
+      DEFAULT_WRITING_INDEX_CONTENT.hero_summary,
+    );
+    expect(listing.search_placeholder).toBe("find posts");
+    expect(validateListingPageContent(listing)).toEqual({ ok: true });
   });
 });
