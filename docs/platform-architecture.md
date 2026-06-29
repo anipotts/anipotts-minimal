@@ -8,6 +8,10 @@ structured content/state model, and one predictable CI/CD path.
 `pnpm test:workspace` enforces the active app, package, and worker inventory so
 archived surfaces do not re-enter the workspace quietly.
 
+`pnpm test:path-hygiene` keeps active repo files off retired local account paths.
+Historical references may remain under `docs/archive`, but live scripts and
+launchd templates must point at `/Users/anipotts`.
+
 ## target state
 
 | Surface        | Target                              | Status              | Next action                                           |

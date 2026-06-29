@@ -7,7 +7,7 @@ Scripts that run on `ap-mini` and POST events to the state worker
 
 ```bash
 # 1. Pull the repo on Mini (one time)
-ssh mini "cd ~/Code/projects && git clone https://github.com/anipotts/anipotts.com.git"
+ssh mini "cd ~/Code/projects && git clone https://github.com/anipotts/anipotts.com.git anipotts-com"
 
 # 2. Generate a publish key (any random string)
 KEY=$(openssl rand -hex 32)
@@ -17,7 +17,7 @@ ssh mini "mkdir -p ~/.anipotts && echo '$KEY' > ~/.anipotts/state-publish.key &&
 echo -n "$KEY" | wrangler secret put STATE_PUBLISH_KEY --config workers/state/wrangler.toml
 
 # 4. Symlink the plist into LaunchAgents on Mini
-ssh mini 'ln -sf ~/Code/projects/anipotts.com/scripts/mini/com.anipotts.publisher.commits.plist ~/Library/LaunchAgents/com.anipotts.publisher.commits.plist'
+ssh mini 'ln -sf ~/Code/projects/anipotts-com/scripts/mini/com.anipotts.publisher.commits.plist ~/Library/LaunchAgents/com.anipotts.publisher.commits.plist'
 
 # 5. Patch the launchd plist to source the key (one time)
 # launchd plists do not interpolate from files, so wrap the script in a

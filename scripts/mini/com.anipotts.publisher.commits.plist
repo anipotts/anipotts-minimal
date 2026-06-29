@@ -8,7 +8,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/opt/homebrew/bin/bun</string>
-        <string>/Users/rudy/Code/projects/anipotts.com/scripts/mini/commit-publisher.ts</string>
+        <string>/Users/anipotts/Code/projects/anipotts-com/scripts/mini/commit-publisher.ts</string>
     </array>
 
     <key>EnvironmentVariables</key>
@@ -18,7 +18,7 @@
         <key>STATE_API</key>
         <string>https://api.anipotts.com</string>
         <key>COMMIT_ROOTS</key>
-        <string>/Users/rudy/Code/projects</string>
+        <string>/Users/anipotts/Code/projects</string>
     </dict>
 
     <key>StartInterval</key>
@@ -28,9 +28,9 @@
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/rudy/Library/Logs/anipotts/commit-publisher.out.log</string>
+    <string>/Users/anipotts/Library/Logs/anipotts/commit-publisher.out.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/rudy/Library/Logs/anipotts/commit-publisher.err.log</string>
+    <string>/Users/anipotts/Library/Logs/anipotts/commit-publisher.err.log</string>
 </dict>
 </plist>
