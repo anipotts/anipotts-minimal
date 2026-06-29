@@ -99,6 +99,14 @@ const pageContentState = await readPageContentInventoryStore(
                   <dd>no admin save or publish endpoint</dd>
                 </div>
               </dl>
+              <div class="inline-actions">
+                <a
+                  class="button secondary"
+                  href={`/content/edit/${encodeURIComponent(row.page_key)}`}
+                >
+                  open editor
+                </a>
+              </div>
               <div class="field-grid" aria-label={`${row.page_key} d1 fields`}>
                 {row.fields.slice(0, 16).map((field) => (
                   <div class="field-chip">

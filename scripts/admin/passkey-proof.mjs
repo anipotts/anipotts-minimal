@@ -28,6 +28,7 @@ const ROUTES = [
   "/content",
   "/content/review",
   "/content/drafts",
+  "/content/edit/home",
   "/content/preview",
   "/content/operations",
   "/needs-ani",

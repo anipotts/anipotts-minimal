@@ -1,0 +1,166 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { readPageContentInventoryStore } from "../../../data/content";
+
+const pageKey = safeDecodePageKey(Astro.params.pageKey);
+const pageContentState = await readPageContentInventoryStore(
+  Astro.locals.runtime?.env.DB,
+);
+const pageRow = pageContentState.rows.find((row) => row.page_key === pageKey);
+
+if (!pageRow) {
+  Astro.response.status = 404;
+}
+
+function safeDecodePageKey(value: string | undefined): string {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function textareaRows(value: string): number {
+  const lineCount = value.split("\n").length;
+  const lengthRows = Math.ceil(value.length / 78);
+  return Math.min(14, Math.max(3, lineCount, lengthRows));
+}
+---
+
+<AdminLayout
+  title={pageRow ? `edit ${pageRow.page_key}` : "content row missing"}
+  deck="Focused page_content editor shape. Fields are disabled until the audited save path exists."
+>
+  <section class="meta-strip" aria-label="content edit state">
+    <span>{pageContentState.mode}</span>
+    <span>{pageRow ? `${pageRow.field_count} fields` : "0 fields"}</span>
+    <span>{pageRow?.published ? "published" : "draft or missing"}</span>
+    <span>save disabled</span>
+    <span>publish disabled</span>
+  </section>
+
+  {
+    pageRow ? (
+      <>
+        <section class="table-card operation-card">
+          <div class="section-head">
+            <div>
+              <p>page_content record</p>
+              <h2>{pageRow.summary}</h2>
+            </div>
+            <span>read only</span>
+          </div>
+          <div class="record-list">
+            <article class="record-row">
+              <div>
+                <p>
+                  {pageRow.page_key} / v{pageRow.version}
+                </p>
+                <h3>{pageRow.source_ref}</h3>
+              </div>
+              <dl>
+                <div>
+                  <dt>published</dt>
+                  <dd>{pageRow.published ? "true" : "false"}</dd>
+                </div>
+                <div>
+                  <dt>updated</dt>
+                  <dd>{pageRow.updated_at || "unknown"}</dd>
+                </div>
+                <div>
+                  <dt>updated by</dt>
+                  <dd>{pageRow.updated_by || "unknown"}</dd>
+                </div>
+                <div>
+                  <dt>write state</dt>
+                  <dd>no save route, no publish route, no content mutation</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+        </section>
+
+        <section class="editor-panel" aria-labelledby="editor-fields-heading">
+          <div class="section-head">
+            <div>
+              <p>draft editor model</p>
+              <h2 id="editor-fields-heading">field review</h2>
+            </div>
+            <span>disabled controls</span>
+          </div>
+          <form
+            class="page-editor-form"
+            aria-label={`${pageRow.page_key} fields`}
+          >
+            {pageRow.fields.map((field) => (
+              <label class="page-editor-field">
+                <span>{field.path}</span>
+                <textarea rows={textareaRows(field.raw_value)} disabled>
+                  {field.raw_value}
+                </textarea>
+                <small>
+                  {field.kind} / source {pageRow.source_ref}
+                </small>
+              </label>
+            ))}
+            <div class="draft-control-row page-editor-actions">
+              <button class="button secondary" type="button" disabled>
+                save draft
+              </button>
+              <button class="button secondary" type="button" disabled>
+                request review
+              </button>
+              <button class="button secondary" type="button" disabled>
+                preview public route
+              </button>
+              <button class="button secondary danger" type="button" disabled>
+                publish
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {pageRow.source_backed_fields.length > 0 && (
+          <section class="notice">
+            Source-backed gaps remain before this row can be treated as
+            complete:
+            {` ${pageRow.source_backed_fields.join(", ")}`}
+          </section>
+        )}
+
+        <nav class="inline-actions" aria-label="content editor navigation">
+          <a class="button secondary" href="/content">
+            back to inventory
+          </a>
+          <a class="button secondary" href="/content/drafts">
+            all draft controls
+          </a>
+          <a class="button secondary" href="/content/preview">
+            preview queue
+          </a>
+        </nav>
+      </>
+    ) : (
+      <section class="table-card operation-card">
+        <div class="section-head">
+          <div>
+            <p>missing page_content</p>
+            <h2>{pageKey || "unknown page key"}</h2>
+          </div>
+          <span>404</span>
+        </div>
+        <div class="record-list">
+          <article class="record-row">
+            <div>
+              <p>next safe action</p>
+              <h3>
+                Return to inventory and choose an existing D1 page_content row.
+              </h3>
+            </div>
+          </article>
+        </div>
+      </section>
+    )
+  }
+</AdminLayout>

@@ -76,6 +76,7 @@ export type PageContentInventoryRow = {
 export type PageContentInventoryField = {
   path: string;
   value: string;
+  raw_value: string;
   kind: string;
 };
 
@@ -540,6 +541,7 @@ function listLeafFields(
     {
       path: path || "value",
       value: formatFieldValue(value),
+      raw_value: formatRawFieldValue(value),
       kind: Array.isArray(value) ? "array" : typeof value,
     },
   ];
@@ -556,6 +558,19 @@ function formatFieldValue(value: unknown): string {
     return String(value);
   }
   return JSON.stringify(value) ?? String(value);
+}
+
+function formatRawFieldValue(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "boolean") {
+    return value ? "true" : "false";
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  return JSON.stringify(value, null, 2) ?? String(value);
 }
 
 function sourceBackedFields(
