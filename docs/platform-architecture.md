@@ -213,5 +213,8 @@ Rules:
     fallback still retained.
 20. refresh D1 admin proof event metadata now that the proof log is durable;
     updated by `drizzle/migrations/0020_refresh_admin_proof_events.sql`.
-21. reduce deploy workflow inputs to retained production targets after rollback
+21. move homepage about section into D1 `page_content`; seeded by
+    `drizzle/migrations/0021_seed_homepage_about_section.sql` with source
+    fallback still retained.
+22. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
