@@ -72,6 +72,10 @@ file classification for this parity set. New admin route files must be added to
 the protected route table or to an explicit public exception list before they
 can ship.
 
+The route table lives in `scripts/ci/admin-route-inventory.mjs`; route parity
+and passkey proof both consume that file so protected admin route coverage does
+not drift across scripts.
+
 `pnpm test:public-boundary` enforces the public app boundary for `apps/www`.
 The public app may render public CMS/D1 content, run newsletter subscribe
 endpoints, redirect `/admin/*` to `admin.anipotts.com`, and proxy PostHog
@@ -320,3 +324,6 @@ Rules:
 39. fail closed on new admin routes: `pnpm test:admin-routes` now requires every
     `apps/admin/src/pages` route file to be classified and every protected smoke
     route to appear in passkey proof before merge.
+40. make `scripts/ci/admin-route-inventory.mjs` the shared source for admin
+    route parity and passkey route proof to remove the duplicated proof route
+    list.
