@@ -18,6 +18,15 @@ export type QueueRow = {
   evidence: string;
 };
 
+export type DeployRow = {
+  target: string;
+  input: string;
+  scope: string;
+  status: "automatic safe lane" | "manual rollback" | "retained worker";
+  proof: string;
+  next: string;
+};
+
 export const navItems: NavItem[] = [
   { href: "/", label: "overview", status: "migrating" },
   { href: "/content", label: "content", status: "live-source" },
@@ -28,6 +37,7 @@ export const navItems: NavItem[] = [
   { href: "/newsletter", label: "newsletter", status: "live-source" },
   { href: "/needs-ani", label: "needs ani", status: "live-source" },
   { href: "/proof", label: "proof", status: "live-source" },
+  { href: "/deploys", label: "deploys", status: "live-source" },
   { href: "/repos", label: "repos", status: "migrating" },
   { href: "/handoffs", label: "handoffs", status: "migrating" },
   { href: "/fleet", label: "fleet", status: "migrating" },
@@ -56,9 +66,15 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "proof log",
-    status: "static route proof",
+    status: "durable D1 proof",
     risk: "low",
-    next: "move deploy and passkey proof into durable records",
+    next: "keep deploy target proof current after each admin or public deploy",
+  },
+  {
+    title: "deploy scopes",
+    status: "read-only target map",
+    risk: "low",
+    next: "use /deploys to confirm skipped targets after each scoped deploy",
   },
   {
     title: "newsletter drafts",
@@ -140,6 +156,65 @@ export const repoRows: QueueRow[] = [
     owner: "legacy-admin-solid.anipotts.com",
     status: "legacy rollback",
     evidence: "deploy run 28302990801",
+  },
+];
+
+export const deployRows: DeployRow[] = [
+  {
+    target: "public site",
+    input: "www=true",
+    scope: "apps/www and proven public consumers",
+    status: "automatic safe lane",
+    proof: "public routes return 200 after scoped deploy",
+    next: "keep public content/layout changes isolated from admin code",
+  },
+  {
+    target: "Astro admin",
+    input: "admin=true",
+    scope: "apps/admin and proven admin consumers",
+    status: "automatic safe lane",
+    proof: "admin routes return Cloudflare Access 302 until passkey removal",
+    next: "enroll passkey, then prove app-native blocking before Access removal",
+  },
+  {
+    target: "admin-solid rollback",
+    input: "admin_solid=true",
+    scope: "apps/admin-solid only",
+    status: "manual rollback",
+    proof: "Deploy admin-solid is skipped unless explicitly requested",
+    next: "archive or remove after passkey proof and Astro admin rollback window closes",
+  },
+  {
+    target: "state worker",
+    input: "state=true",
+    scope: "workers/state only",
+    status: "retained worker",
+    proof: "state deploy job is skipped unless the target is selected",
+    next: "keep write routes behind STATE_PUBLISH_KEY and route-level proof",
+  },
+  {
+    target: "ingest worker",
+    input: "ingest=true",
+    scope: "workers/ingest only",
+    status: "retained worker",
+    proof: "ingest deploy job is skipped unless the target is selected",
+    next: "do not expand receivers without source-specific proof",
+  },
+  {
+    target: "newsletter worker",
+    input: "newsletter=true",
+    scope: "workers/newsletter only",
+    status: "retained worker",
+    proof: "newsletter deploy job is skipped unless the target is selected",
+    next: "keep sends gated until newsletter publishing proof exists",
+  },
+  {
+    target: "weekly email worker",
+    input: "weekly_email=true",
+    scope: "workers/weekly-email only",
+    status: "retained worker",
+    proof: "weekly email deploy job is skipped unless the target is selected",
+    next: "fold or retire after newsletter/content system owns the summary path",
   },
 ];
 
