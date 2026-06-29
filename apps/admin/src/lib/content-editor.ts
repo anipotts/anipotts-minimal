@@ -2,6 +2,7 @@ import {
   normalizeCmsWriting,
   validateCmsWriting,
 } from "@anipotts/content/public";
+import { sourceContentRecords } from "../data/source-content";
 
 type D1Result<T = unknown> = {
   results?: T[];
@@ -18,6 +19,7 @@ type D1PreparedStatement = {
 
 export type ContentEditorD1Database = {
   prepare(query: string): D1PreparedStatement;
+  batch?(statements: D1PreparedStatement[]): Promise<D1Result[]>;
 };
 
 export type ContentVisibility = "private" | "draft" | "hidden" | "published";
@@ -75,6 +77,12 @@ export type ContentEditorPublishInput = {
   operation_id?: string;
 };
 
+export type ContentEditorActor = {
+  id: string;
+  display_name: string;
+  credential_id_hint?: string | null;
+};
+
 type PageContentRow = {
   id: string;
   page_key: string;
@@ -103,6 +111,12 @@ type DraftOperationRow = {
   rollback_ref: string;
   reviewer_note: string | null;
   metadata: string;
+  page_key?: string | null;
+  slug?: string | null;
+  title?: string | null;
+  visibility?: string | null;
+  updated_by?: string | null;
+  published_from_operation_id?: string | null;
 };
 
 type PublishEventRow = {
@@ -116,10 +130,20 @@ type PublishEventRow = {
   created_at: string;
 };
 
-const AUTHOR = "ani";
+const DEFAULT_AUTHOR = "ani";
 const MAX_BODY_LENGTH = 50_000;
 const MAX_SUMMARY_LENGTH = 600;
 const MAX_TITLE_LENGTH = 160;
+const RESERVED_WRITING_SLUGS = new Set([
+  "new",
+  "archive",
+  "api",
+  "feed",
+  "feed-xml",
+  "rss",
+  "sitemap",
+  "sitemap-xml",
+]);
 
 export async function readContentEditorState(
   db: ContentEditorD1Database | null | undefined,
@@ -184,8 +208,10 @@ export async function readDraftPreview(
 export async function saveEditorDraft(
   db: ContentEditorD1Database,
   input: ContentEditorSaveInput,
+  actor: ContentEditorActor = defaultActor(),
 ) {
-  const payload = buildPayload(input);
+  const payload = buildPayload(input, actor);
+  await validatePayloadForSave(db, payload, input);
   const now = payload.updated_at;
   const operationId = `content-editor-${slugForId(payload.page_key)}-${Date.now().toString(36)}`;
   const route = routeForPayload(payload);
@@ -199,6 +225,9 @@ export async function saveEditorDraft(
     summary: payload.summary,
     tags: payload.tags,
     editor: "owner_writing_editor",
+    author_id: actor.id,
+    author_display_name: actor.display_name,
+    credential_id_hint: actor.credential_id_hint ?? null,
   });
   const allowedActions = ["save_draft", "render_preview"];
   if (payload.visibility === "published") {
@@ -239,8 +268,14 @@ export async function saveEditorDraft(
         expires_at,
         rollback_ref,
         reviewer_note,
-        metadata
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        metadata,
+        page_key,
+        slug,
+        title,
+        visibility,
+        updated_by,
+        published_from_operation_id
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       operationId,
@@ -266,7 +301,7 @@ export async function saveEditorDraft(
       ]),
       `https://admin.anipotts.com/content/preview?operation_id=${operationId}`,
       "public_copy_only",
-      AUTHOR,
+      actor.id,
       now,
       now,
       null,
@@ -275,6 +310,12 @@ export async function saveEditorDraft(
         : `new_private_draft:${payload.page_key}`,
       "Saved from the passkey-protected owner editor. Public page_content is unchanged until explicit publish.",
       metadata,
+      payload.page_key,
+      payload.slug,
+      payload.title,
+      payload.visibility,
+      actor.id,
+      null,
     )
     .run();
 
@@ -286,12 +327,21 @@ export async function saveEditorDraft(
     page_key: payload.page_key,
     preview_href: `/content/preview?operation_id=${operationId}`,
     publishable: payload.visibility === "published",
+    public_route: route,
+    next_version: currentVersion + 1,
+    rollback_ref: current
+      ? `page_content:${payload.page_key}@v${currentVersion}`
+      : `new_private_draft:${payload.page_key}`,
+    visibility: payload.visibility,
+    title: payload.title,
+    slug: payload.slug,
   };
 }
 
 export async function publishEditorDraft(
   db: ContentEditorD1Database,
   input: ContentEditorPublishInput,
+  actor: ContentEditorActor = defaultActor(),
 ) {
   const operationId = cleanRequired(input.operation_id, 220, "operation_id");
   const draft = await db
@@ -310,6 +360,7 @@ export async function publishEditorDraft(
   if (payload.visibility !== "published") {
     throw statusError(409, "only_published_visibility_can_publish");
   }
+  await validatePayloadForPublish(db, payload);
 
   const now = new Date().toISOString();
   const previous = await latestPageContent(db, payload.page_key);
@@ -334,14 +385,27 @@ export async function publishEditorDraft(
       version: nextVersion,
       status: "published",
       timestamp: now,
-      author: AUTHOR,
+      author: actor.id,
       rollback_target: draft.rollback_ref,
     },
   ]);
 
-  const pageResult = await db
-    .prepare(
-      `INSERT INTO page_content (
+  const eventId = `content-publish-${slugForId(payload.page_key)}-${Date.now().toString(36)}`;
+  const rollbackRef = previous
+    ? `page_content:${payload.page_key}@v${previous.version ?? 0}`
+    : `new_private_draft:${payload.page_key}`;
+  const statements = [
+    db
+      .prepare(
+        `UPDATE page_content
+         SET published = 0
+         WHERE page_key = ?
+           AND published = 1`,
+      )
+      .bind(payload.page_key),
+    db
+      .prepare(
+        `INSERT INTO page_content (
         id,
         page_key,
         content,
@@ -352,25 +416,21 @@ export async function publishEditorDraft(
         created_at,
         version_history
        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      pageContentId,
-      payload.page_key,
-      JSON.stringify(payload.content),
-      nextVersion,
-      1,
-      now,
-      AUTHOR,
-      now,
-      history,
-    )
-    .run();
-  if (pageResult.success === false) throw statusError(500, "publish_failed");
-
-  const eventId = `content-publish-${slugForId(payload.page_key)}-${Date.now().toString(36)}`;
-  const eventResult = await db
-    .prepare(
-      `INSERT INTO content_publish_events (
+      )
+      .bind(
+        pageContentId,
+        payload.page_key,
+        JSON.stringify(payload.content),
+        nextVersion,
+        1,
+        now,
+        actor.id,
+        now,
+        history,
+      ),
+    db
+      .prepare(
+        `INSERT INTO content_publish_events (
         id,
         operation_id,
         content_record_id,
@@ -383,53 +443,61 @@ export async function publishEditorDraft(
         created_at,
         metadata
        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      eventId,
-      operationId,
-      null,
-      "publish_page_content",
-      "verified",
-      `Published ${payload.page_key} v${nextVersion} from draft ${operationId}.`,
-      JSON.stringify([
-        "admin.content.publish.passkey",
-        "admin.content.publish.page-content",
-      ]),
-      previous
-        ? `page_content:${payload.page_key}@v${previous.version ?? 0}`
-        : `new_private_draft:${payload.page_key}`,
-      AUTHOR,
-      now,
-      JSON.stringify({
-        page_key: payload.page_key,
-        route: routeForPayload(payload),
-        title: payload.title,
-        previous_version: previous?.version ?? null,
-        published_version: nextVersion,
-      }),
-    )
-    .run();
-  if (eventResult.success === false) {
-    throw statusError(500, "publish_event_failed");
-  }
-
-  await db
-    .prepare(
-      `UPDATE content_draft_operations
+      )
+      .bind(
+        eventId,
+        operationId,
+        null,
+        "publish_page_content",
+        "verified",
+        `Published ${payload.page_key} v${nextVersion} from draft ${operationId}.`,
+        JSON.stringify([
+          "admin.content.publish.passkey",
+          "admin.content.publish.page-content",
+        ]),
+        rollbackRef,
+        actor.id,
+        now,
+        JSON.stringify({
+          page_key: payload.page_key,
+          route: routeForPayload(payload),
+          title: payload.title,
+          previous_version: previous?.version ?? null,
+          published_version: nextVersion,
+          author_id: actor.id,
+          credential_id_hint: actor.credential_id_hint ?? null,
+        }),
+      ),
+    db
+      .prepare(
+        `UPDATE content_draft_operations
        SET status = ?,
            authority_state = ?,
            updated_at = ?,
-           reviewer_note = ?
+           reviewer_note = ?,
+           updated_by = ?,
+           published_from_operation_id = ?
        WHERE operation_id = ?`,
-    )
-    .bind(
-      "published",
-      "published_to_page_content_with_proof",
-      now,
-      `Published to page_content:${payload.page_key}@v${nextVersion}; event ${eventId}. No source file, deploy, send, or provider sync ran.`,
-      operationId,
-    )
-    .run();
+      )
+      .bind(
+        "published",
+        "published_to_page_content_with_proof",
+        now,
+        `Published to page_content:${payload.page_key}@v${nextVersion}; event ${eventId}. No source file, deploy, send, or provider sync ran.`,
+        actor.id,
+        operationId,
+        operationId,
+      ),
+  ];
+
+  if (db.batch) {
+    const results = await db.batch(statements);
+    if (results.some((result) => result.success === false)) {
+      throw statusError(500, "publish_batch_failed");
+    }
+  } else {
+    await runSequentialPublish(statements);
+  }
 
   return {
     ok: true,
@@ -440,7 +508,103 @@ export async function publishEditorDraft(
   };
 }
 
-function buildPayload(input: ContentEditorSaveInput): ContentEditorPayload {
+async function validatePayloadForSave(
+  db: ContentEditorD1Database,
+  payload: ContentEditorPayload,
+  input: ContentEditorSaveInput,
+) {
+  if (payload.kind !== "writing") return;
+
+  assertWritingSlugAllowed(payload.slug);
+  const requestedPageKey =
+    typeof input.page_key === "string" && input.page_key.trim()
+      ? normalizePageKey(input.page_key)
+      : "";
+  const isNewKey =
+    !requestedPageKey ||
+    requestedPageKey === "new" ||
+    requestedPageKey === "writing:new";
+
+  if (!isNewKey && requestedPageKey !== payload.page_key) {
+    throw statusError(409, "slug_change_requires_new_private_draft");
+  }
+
+  if (!isNewKey) return;
+
+  const sourceMatch = sourceContentRecords.find(
+    (record) => record.surface === "writing" && record.slug === payload.slug,
+  );
+  if (sourceMatch) throw statusError(409, "duplicate_source_slug");
+
+  const existing = await db
+    .prepare(
+      `SELECT page_key
+       FROM page_content
+       WHERE page_key = ?
+       LIMIT 1`,
+    )
+    .bind(payload.page_key)
+    .first<{ page_key: string }>();
+  if (existing) throw statusError(409, "duplicate_public_slug");
+}
+
+async function validatePayloadForPublish(
+  db: ContentEditorD1Database,
+  payload: ContentEditorPayload,
+) {
+  if (payload.kind !== "writing") return;
+  assertWritingSlugAllowed(payload.slug);
+  const expectedPageKey = `writing:${payload.slug}`;
+  if (payload.page_key !== expectedPageKey) {
+    throw statusError(409, "page_key_slug_mismatch");
+  }
+
+  const sourceMatch = sourceContentRecords.find(
+    (record) =>
+      record.surface === "writing" &&
+      record.slug === payload.slug &&
+      payload.page_key !== `writing:${record.slug}`,
+  );
+  if (sourceMatch) throw statusError(409, "duplicate_source_slug");
+
+  const conflicting = await db
+    .prepare(
+      `SELECT page_key
+       FROM page_content
+       WHERE json_extract(content, '$.slug') = ?
+         AND page_key <> ?
+       LIMIT 1`,
+    )
+    .bind(payload.slug, payload.page_key)
+    .first<{ page_key: string }>();
+  if (conflicting) throw statusError(409, "duplicate_public_slug");
+}
+
+function assertWritingSlugAllowed(slug: string) {
+  if (RESERVED_WRITING_SLUGS.has(slug)) {
+    throw statusError(409, "reserved_writing_slug");
+  }
+}
+
+async function runSequentialPublish(statements: D1PreparedStatement[]) {
+  for (const statement of statements) {
+    const result = await statement.run();
+    if (result.success === false) throw statusError(500, "publish_failed");
+  }
+}
+
+function defaultActor(): ContentEditorActor {
+  return {
+    id: DEFAULT_AUTHOR,
+    display_name: DEFAULT_AUTHOR,
+    credential_id_hint: null,
+  };
+}
+
+function buildPayload(
+  input: ContentEditorSaveInput,
+  actor: ContentEditorActor,
+): ContentEditorPayload {
   const kind = input.kind === "page" ? "page" : "writing";
   const title = cleanRequired(input.title, MAX_TITLE_LENGTH, "title");
   const slug = normalizeSlug(input.slug || title);
@@ -478,7 +642,7 @@ function buildPayload(input: ContentEditorSaveInput): ContentEditorPayload {
       body: writing.body,
       visibility,
       date: writing.date,
-      updated_by: AUTHOR,
+      updated_by: actor.id,
       updated_at: now,
       content: {
         ...writing,
@@ -500,7 +664,7 @@ function buildPayload(input: ContentEditorSaveInput): ContentEditorPayload {
     body,
     visibility,
     date,
-    updated_by: AUTHOR,
+    updated_by: actor.id,
     updated_at: now,
     content: {
       slug,
@@ -561,7 +725,7 @@ function payloadFromContent(
       cleanOptional(raw.date, 20) ||
       cleanOptional(raw.published_at, 20) ||
       isoDate(new Date()),
-    updated_by: row?.updated_by ?? AUTHOR,
+    updated_by: row?.updated_by ?? DEFAULT_AUTHOR,
     updated_at: row?.updated_at ?? new Date().toISOString(),
     content: raw,
   };
@@ -639,15 +803,23 @@ async function readDraftRows(
          updated_at,
          rollback_ref,
          reviewer_note,
-         metadata
+         metadata,
+         page_key,
+         slug,
+         title,
+         visibility,
+         updated_by,
+         published_from_operation_id
        FROM content_draft_operations
-       WHERE metadata LIKE ?
+       WHERE page_key = ?
+          OR metadata LIKE ?
           OR current_value_ref LIKE ?
           OR rollback_ref LIKE ?
        ORDER BY updated_at DESC
        LIMIT 30`,
     )
     .bind(
+      pageKey,
       `%"page_key":"${escapeLike(pageKey)}"%`,
       `%page_content:${escapeLike(pageKey)}%`,
       `%page_content:${escapeLike(pageKey)}%`,
@@ -687,9 +859,10 @@ function draftRevisionFromRow(row: DraftOperationRow): ContentRevision {
     id: row.operation_id,
     source: "draft",
     timestamp: row.updated_at,
-    author: row.created_by,
-    status: payload?.visibility ?? row.status,
-    summary: payload?.summary || row.reviewer_note || row.field_path,
+    author: row.updated_by || row.created_by,
+    status: payload?.visibility ?? row.visibility ?? row.status,
+    summary:
+      payload?.summary || row.title || row.reviewer_note || row.field_path,
     rollback_target: row.rollback_ref,
     view_href: `/content/preview?operation_id=${encodeURIComponent(row.operation_id)}`,
   };
@@ -743,7 +916,9 @@ function parseEditorPayload(value: string): ContentEditorPayload | null {
         ? parsed.date.trim()
         : isoDate(new Date()),
     updated_by:
-      typeof parsed.updated_by === "string" ? parsed.updated_by : AUTHOR,
+      typeof parsed.updated_by === "string"
+        ? parsed.updated_by
+        : DEFAULT_AUTHOR,
     updated_at:
       typeof parsed.updated_at === "string"
         ? parsed.updated_at

@@ -411,6 +411,11 @@ th {
   color: var(--danger-text);
 }
 
+.button.ghost {
+  background: transparent;
+  color: var(--muted);
+}
+
 .inert-button {
   color: var(--muted);
 }
@@ -1031,15 +1036,69 @@ dd {
   line-height: 1.55;
 }
 
-.preview-document pre {
-  margin: 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  border: 1px solid var(--border);
-  background: #111;
+.article-body {
+  display: grid;
+  gap: 12px;
   color: var(--text);
-  padding: 14px;
-  line-height: 1.55;
+  line-height: 1.62;
+}
+
+.article-body :where(h2, h3, p, ul) {
+  margin: 0;
+}
+
+.article-body :where(h2, h3) {
+  color: var(--text);
+}
+
+.article-body ul {
+  padding-left: 20px;
+}
+
+.publish-dialog {
+  width: min(560px, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--text);
+  padding: 0;
+}
+
+.publish-dialog::backdrop {
+  background: rgb(0 0 0 / 0.48);
+}
+
+.publish-dialog-inner {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.publish-dialog-inner h2,
+.publish-dialog-inner p {
+  margin: 0;
+}
+
+.publish-dialog-inner dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.publish-dialog-inner dl div {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.publish-dialog-inner dt {
+  color: var(--muted);
+}
+
+.publish-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .draft-proof-grid {

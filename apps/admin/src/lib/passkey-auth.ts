@@ -126,6 +126,12 @@ export type PasskeyStatus = {
   next_safe_action: string;
 };
 
+export type PasskeyActor = {
+  id: string;
+  display_name: string;
+  credential_id_hint: string | null;
+};
+
 export function json(data: unknown, init?: ResponseInit): Response {
   return Response.json(data, {
     ...init,
@@ -263,6 +269,36 @@ export async function hasActivePasskeySession(
   } catch {
     return false;
   }
+}
+
+export async function getPasskeyActor(
+  context: PasskeyContext,
+): Promise<PasskeyActor> {
+  const db = dbFromContext(context);
+  if (!db) {
+    return {
+      id: USER_ID,
+      display_name: USER_DISPLAY_NAME,
+      credential_id_hint: null,
+    };
+  }
+
+  const session = await getSession(context, db);
+  if (!session) {
+    throw json(
+      {
+        error: "passkey_session_required",
+        next_safe_action: "authenticate before saving or publishing content",
+      },
+      { status: 403 },
+    );
+  }
+
+  return {
+    id: USER_ID,
+    display_name: USER_DISPLAY_NAME,
+    credential_id_hint: credentialHint(session.credential_id),
+  };
 }
 
 export async function registrationOptions(
@@ -758,6 +794,10 @@ function toWebAuthnCredential(row: CredentialRow): WebAuthnCredential {
     counter: row.counter,
     transports: parseTransports(row.transports),
   };
+}
+
+function credentialHint(credentialId: string): string {
+  return credentialId.slice(-8);
 }
 
 function parseTransports(raw: string): AuthenticatorTransportFuture[] {
