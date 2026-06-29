@@ -8,7 +8,6 @@ import {
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 
-const archiveUrl = "/archive";
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
@@ -42,9 +41,11 @@ const copy = normalizeNewsletterContent(page?.content);
   </section>
 
   <section data-rise class="stack">
-    <h2 class="section-label">archive</h2>
-    <p class="copy">published notes live here as the archive fills in.</p>
-    <a href={archiveUrl} class="quiet-link archive"> read the archive </a>
+    <h2 class="section-label">{copy.archive_label}</h2>
+    <p class="copy">{copy.archive_copy}</p>
+    <a href={copy.archive_url} class="quiet-link archive">
+      {copy.archive_link_label}
+    </a>
   </section>
 </Shell>
 

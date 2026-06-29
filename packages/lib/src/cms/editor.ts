@@ -305,6 +305,22 @@ export function normalizeNewsletterContent(
       source.buttondown_url,
       DEFAULT_NEWSLETTER_CONTENT.buttondown_url,
     ).trim(),
+    archive_label: coerceString(
+      source.archive_label,
+      DEFAULT_NEWSLETTER_CONTENT.archive_label,
+    ).trim(),
+    archive_copy: coerceString(
+      source.archive_copy,
+      DEFAULT_NEWSLETTER_CONTENT.archive_copy,
+    ).trim(),
+    archive_link_label: coerceString(
+      source.archive_link_label,
+      DEFAULT_NEWSLETTER_CONTENT.archive_link_label,
+    ).trim(),
+    archive_url: coerceString(
+      source.archive_url,
+      DEFAULT_NEWSLETTER_CONTENT.archive_url,
+    ).trim(),
     sender_name: coerceString(
       source.sender_name,
       DEFAULT_NEWSLETTER_CONTENT.sender_name,
@@ -363,6 +379,26 @@ export function validateNewsletterContent(content: NewsletterContent): {
       false,
     ) ??
     validateCmsString(
+      content.archive_label,
+      "Newsletter archive label",
+      CMS_TEXT_LIMITS.linkLabel,
+    ) ??
+    validateCmsString(
+      content.archive_copy,
+      "Newsletter archive copy",
+      CMS_TEXT_LIMITS.newsletterDeck,
+    ) ??
+    validateCmsString(
+      content.archive_link_label,
+      "Newsletter archive link label",
+      CMS_TEXT_LIMITS.linkLabel,
+    ) ??
+    validateCmsString(
+      content.archive_url,
+      "Newsletter archive URL",
+      CMS_TEXT_LIMITS.linkUrl,
+    ) ??
+    validateCmsString(
       content.sender_name,
       "Sender name",
       CMS_TEXT_LIMITS.sender,
@@ -376,6 +412,9 @@ export function validateNewsletterContent(content: NewsletterContent): {
   if (error) return { ok: false, error };
   if (content.buttondown_url && !isSafeCmsUrl(content.buttondown_url)) {
     return { ok: false, error: "Newsletter URL is invalid" };
+  }
+  if (!isSafeCmsUrl(content.archive_url)) {
+    return { ok: false, error: "Newsletter archive URL is invalid" };
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.sender_email)) {
     return { ok: false, error: "Sender email is invalid" };
