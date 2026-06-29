@@ -76,6 +76,7 @@ const ADMIN_ROUTES = [
   "/content",
   "/content/review",
   "/content/drafts",
+  "/content/edit/home",
   "/content/preview",
   "/content/operations",
   "/proof",

@@ -414,7 +414,8 @@ th {
 
 .table-card,
 .proposal-row,
-.draft-editor-card {
+.draft-editor-card,
+.editor-panel {
   border: 1px solid var(--border);
   background: var(--panel);
 }
@@ -685,6 +686,58 @@ dd {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.editor-panel {
+  margin-top: 24px;
+}
+
+.page-editor-form {
+  display: grid;
+  gap: 0;
+}
+
+.page-editor-field {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-editor-field span,
+.page-editor-field small {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.page-editor-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: #111;
+  color: var(--text);
+  padding: 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.page-editor-field textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.76;
+}
+
+.page-editor-actions {
+  padding: 16px;
 }
 
 .draft-proof-grid {

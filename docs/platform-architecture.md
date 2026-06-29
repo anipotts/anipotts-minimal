@@ -83,6 +83,7 @@ operation tables, or publish-event tables.
 | `/content`                                          | content inventory                    |
 | `/content/review`                                   | content proposal queue               |
 | `/content/drafts`                                   | inert draft editor surface           |
+| `/content/edit/:pageKey`                            | focused inert page_content editor    |
 | `/content/preview`                                  | draft preview                        |
 | `/content/operations`                               | read-only D1 content operation state |
 | `/newsletter`                                       | newsletter issue queue               |
@@ -122,9 +123,9 @@ revoked-credential denial. It reports missing pre-removal evidence in
 `access_removal_blockers`; `cloudflare_access_still_active: true` is expected
 until the edge gate is removed, not a blocker by itself. After Access removal,
 the same script must show app-native route blocking. The route probe set must
-include content inventory, review, drafts, preview, operations, newsletter
-queue, newsletter detail preview, needs-ani, proof, repos, handoffs, fleet,
-mutations, and destructive-ops routes.
+include content inventory, review, drafts, focused page editor, preview,
+operations, newsletter queue, newsletter detail preview, needs-ani, proof,
+repos, handoffs, fleet, mutations, and destructive-ops routes.
 
 First-passkey bootstrap in production requires a verified Cloudflare Access
 application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it

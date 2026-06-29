@@ -26,6 +26,11 @@ const ROUTES = [
     nav: true,
   },
   {
+    route: "/content/edit/home",
+    file: "apps/admin/src/pages/content/edit/[pageKey].astro",
+    nav: false,
+  },
+  {
     route: "/content/preview",
     file: "apps/admin/src/pages/content/preview.astro",
     nav: true,
@@ -80,6 +85,10 @@ const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeySource = readFileSync(
   "apps/admin/src/pages/auth/passkey.astro",
+  "utf8",
+);
+const contentEditorSource = readFileSync(
+  "apps/admin/src/pages/content/edit/[pageKey].astro",
   "utf8",
 );
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
@@ -162,6 +171,18 @@ for (const marker of [
   assert.ok(
     passkeySource.includes(marker),
     `/auth/passkey missing proof runbook marker ${marker}`,
+  );
+}
+
+for (const marker of [
+  "readPageContentInventoryStore",
+  "save disabled",
+  "publish disabled",
+  "no save route, no publish route, no content mutation",
+]) {
+  assert.ok(
+    contentEditorSource.includes(marker),
+    `/content/edit/:pageKey missing inert editor marker ${marker}`,
   );
 }
 

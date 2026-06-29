@@ -167,6 +167,14 @@ const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
               </p>
               <h3>{row.summary}</h3>
             </div>
+            <div class="inline-actions">
+              <a
+                class="button secondary"
+                href={`/content/edit/${encodeURIComponent(row.page_key)}`}
+              >
+                open editor
+              </a>
+            </div>
             <div class="field-grid">
               {row.fields.slice(0, 12).map((field) => (
                 <label class="field-chip field-input-chip">
