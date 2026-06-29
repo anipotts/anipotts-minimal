@@ -224,6 +224,19 @@ assert.ok(passkeyProofScript.includes("expectedPasskeyTables"));
 assert.equal(passkeyProofScript.includes("const REQUIRED_AUDIT_EVENTS"), false);
 assert.equal(passkeyProofScript.includes("function nextSafeAction"), false);
 
+const passkeyAuthSource = readFileSync(
+  "apps/admin/src/lib/passkey-auth.ts",
+  "utf8",
+);
+assert.ok(
+  passkeyAuthSource.includes("ON CONFLICT(credential_id) DO UPDATE SET"),
+  "passkey registration must support re-registering a revoked platform credential",
+);
+assert.ok(
+  passkeyAuthSource.includes("revoked_at = NULL"),
+  "passkey replacement registration must reactivate a previously revoked credential",
+);
+
 const disabledRuntime = disabledRuntimeOverlayResponse();
 assert.equal(disabledRuntime.mode, "disabled");
 assert.equal(disabledRuntime.available, false);
