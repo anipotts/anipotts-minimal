@@ -123,7 +123,7 @@ export type ContentOperationTable = {
 export const contentOperationSchemaSource = {
   source_doc: "docs/admin-content-draft-operations.md",
   migration:
-    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql",
+    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql",
   schema: "packages/lib/src/db/schema.ts",
   mode: "d1_schema_no_write_endpoint",
 };
@@ -608,10 +608,10 @@ export const contentOperationTemplates: ContentOperation[] = [
     route: "/orchestrating",
     source_ref:
       "D1 page_content:orchestrating, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
-    field_path: "orchestrating.hero_copy",
+    field_path: "orchestrating.hero_sections_loop_tools",
     current_value_ref: "published_page_content:orchestrating",
     proposed_value:
-      "Review future edits to the /orchestrating hero and live-session panel copy through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /orchestrating hero, section labels, loop cards, and public-tool cards through preview-only operations before any save path edits page_content.",
     status: "previewed",
     risk_level: "medium",
     authority_state: "page_content_preview_only_no_write",
@@ -636,5 +636,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
     rollback_ref: "published_page_content:orchestrating",
+    reviewer_note:
+      "Expanded from hero-only copy to a fuller page_content contract. Still inert preview metadata only.",
   },
 ];

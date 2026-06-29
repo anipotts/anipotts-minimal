@@ -453,11 +453,11 @@ export const contentInventory: ContentInventoryItem[] = [
   {
     id: "orchestrating.hero_copy",
     surface: "orchestrating",
-    title: "orchestrating hero copy",
+    title: "orchestrating page copy",
     source_ref:
-      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
+      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql and expanded by drizzle/migrations/0030_expand_orchestrating_page_content.sql, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
     current_value:
-      "The /orchestrating title, meta description, section label, hero title, hero summary, and live-session panel copy use structured page_content when present.",
+      "The /orchestrating title, meta description, section labels, hero, live-session panel, loop cards, and public-tool cards use structured page_content when present.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -632,6 +632,8 @@ function summarizePageContent(
       ["label", content.section_label],
       ["summary", content.hero_summary],
       ["panel", content.panel_copy],
+      ["loop", summarizeArray(content.loop_cards)],
+      ["tools", summarizeArray(content.public_tools)],
       ["link", content.hero_link_href],
       ["search", content.search_placeholder],
     ]);
@@ -661,6 +663,11 @@ function compactSummary(fields: [string, unknown][]): string {
     .filter((field): field is [string, string] => typeof field[1] === "string")
     .map(([label, value]) => `${label}: ${value}`);
   return parts.join(" / ") || "no text fields";
+}
+
+function summarizeArray(value: unknown): string | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return `${value.length} items`;
 }
 
 export const contentPreviewItems: ContentPreviewItem[] = [

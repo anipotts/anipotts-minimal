@@ -173,6 +173,35 @@ export interface OrchestratingPageContent {
   hero_summary: string;
   panel_label: string;
   panel_copy: string;
+  sections: OrchestratingSectionLabels;
+  loop_cards: OrchestratingLoopCard[];
+  public_tools: OrchestratingLinkCard[];
+}
+
+export interface OrchestratingSectionLabels {
+  systems: string;
+  loop: string;
+  public_tools: string;
+  public_tools_note: string;
+  status: string;
+  status_note: string;
+  records: string;
+  plugin: string;
+  hooks: string;
+  playbooks: string;
+  sessions: string;
+}
+
+export interface OrchestratingLoopCard {
+  label: string;
+  title: string;
+  detail: string;
+}
+
+export interface OrchestratingLinkCard {
+  title: string;
+  href: string;
+  detail: string;
 }
 
 export interface CmsEditorSnapshot {

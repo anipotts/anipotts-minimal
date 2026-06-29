@@ -37,8 +37,11 @@ export type {
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,
   HomepageRichSummarySimpleSegment,
+  OrchestratingLinkCard,
+  OrchestratingLoopCard,
   ListingPageContent,
   OrchestratingPageContent,
+  OrchestratingSectionLabels,
   ThoughtSummary,
   WritingSummary,
 } from "@anipotts/types";
