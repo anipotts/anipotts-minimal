@@ -169,6 +169,9 @@ Rules:
 - `packages/lib` and `packages/styles` changes deploy `www` only because
   `apps/admin` does not depend on them.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
+  `pnpm test:public-routes` keeps deploy smoke, manual smoke, and content proof
+  aligned on the public route set: `/`, `/newsletter`, `/newsletter/archive`,
+  `/making`, `/orchestrating`, `/projects`, and `/writing`.
 - D1 migrations run as reviewed migration steps before app deploy.
 - `security-review.yml` does not call Anthropic, Claude Code, or any external
   model API. It scans sensitive diffs for literal secrets, disabled LLM review

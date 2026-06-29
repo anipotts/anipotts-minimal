@@ -221,10 +221,9 @@ function calculateFastestCommitCadence(repos) {
   for (const repo of repos) {
     let output;
     try {
-      output = execSync(
-        `git -C "${repo}" log ${sinceArg} --pretty=%ct`,
-        { stdio: ["ignore", "pipe", "ignore"] },
-      )
+      output = execSync(`git -C "${repo}" log ${sinceArg} --pretty=%ct`, {
+        stdio: ["ignore", "pipe", "ignore"],
+      })
         .toString()
         .trim();
     } catch (error) {
@@ -261,8 +260,7 @@ function calculateFastestCommitCadence(repos) {
 const MAX_SESSION_MINUTES = 360;
 
 const mineDbPath =
-  process.env.MINE_DB_PATH ||
-  path.join(os.homedir(), ".claude", "mine.db");
+  process.env.MINE_DB_PATH || path.join(os.homedir(), ".claude", "mine.db");
 
 /** Query mine.db for authoritative headline stats (sessions, hours, streak). */
 function queryMineDb() {
@@ -280,9 +278,13 @@ function queryMineDb() {
         WHERE is_subagent = 0
       "`,
       { stdio: ["ignore", "pipe", "ignore"] },
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
 
-    const [sessions, hoursWall, hoursActive, toolCalls] = raw.split("|").map(Number);
+    const [sessions, hoursWall, hoursActive, toolCalls] = raw
+      .split("|")
+      .map(Number);
 
     // Subagent stats
     const subRaw = execSync(
@@ -291,7 +293,9 @@ function queryMineDb() {
         FROM sessions WHERE is_subagent = 1
       "`,
       { stdio: ["ignore", "pipe", "ignore"] },
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
     const [subSessions, subToolCalls] = subRaw.split("|").map(Number);
 
     // Streak (consecutive days with activity ending today or yesterday)
@@ -309,7 +313,9 @@ function queryMineDb() {
         SELECT COUNT(*) FROM streak WHERE days_ago = rn - 1 OR (rn = 1 AND days_ago <= 1)
       "`,
       { stdio: ["ignore", "pipe", "ignore"] },
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
     const streakDays = Number(streakRaw) || 0;
 
     // Project count
@@ -318,7 +324,9 @@ function queryMineDb() {
         SELECT COUNT(DISTINCT project_name) FROM sessions WHERE is_subagent = 0
       "`,
       { stdio: ["ignore", "pipe", "ignore"] },
-    ).toString().trim();
+    )
+      .toString()
+      .trim();
     const projectCount = Number(projectsRaw) || 0;
 
     return {
@@ -331,7 +339,10 @@ function queryMineDb() {
       subagents: { sessions: subSessions, toolCalls: subToolCalls },
     };
   } catch (error) {
-    console.warn("Could not query mine.db, falling back to JSONL scan:", error.message);
+    console.warn(
+      "Could not query mine.db, falling back to JSONL scan:",
+      error.message,
+    );
     return null;
   }
 }
@@ -396,7 +407,10 @@ async function main() {
     for (const f of session.filesMutated) allFiles.add(f);
 
     // Accumulate hours (capped per session to exclude stale/overnight)
-    const cappedMinutes = Math.min(session.durationMinutes, MAX_SESSION_MINUTES);
+    const cappedMinutes = Math.min(
+      session.durationMinutes,
+      MAX_SESSION_MINUTES,
+    );
     totalHoursUsed += cappedMinutes / 60;
 
     const dailyEntry = dailyMap.get(dayKey) || { toolCalls: 0, files: 0 };
@@ -487,9 +501,10 @@ async function main() {
       project: session.project,
       start: session.startTime.toISOString(),
       end: session.endTime.toISOString(),
-      durationMinutes: Math.round(
-        Math.min(session.durationMinutes, MAX_SESSION_MINUTES) * 10,
-      ) / 10,
+      durationMinutes:
+        Math.round(
+          Math.min(session.durationMinutes, MAX_SESSION_MINUTES) * 10,
+        ) / 10,
       toolCalls: session.toolCalls,
       filesMutated: session.filesMutated.size,
     })),
