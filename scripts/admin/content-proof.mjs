@@ -77,6 +77,7 @@ const ADMIN_ROUTES = [
   "/content/review",
   "/content/drafts",
   "/content/edit/home",
+  "/api/admin/content/draft-operation",
   "/content/preview",
   "/content/operations",
   "/proof",
@@ -496,6 +497,7 @@ const proof = {
   admin_routes: adminRoutes,
   public_routes: publicRoutes,
   route_boundary: adminBoundary,
+  publish_writes_inert: contentRecords === 0 && publishEvents === 0,
   writes_inert: contentRecords === 0 && publishEvents === 0,
   ready_for_write_path_design:
     missingProof.length === 0 &&
@@ -503,7 +505,7 @@ const proof = {
   missing_proof: missingProof,
   next_safe_action:
     missingProof.length === 0
-      ? "keep content writes disabled until passkey proof and audited save route design are complete"
+      ? "save draft operations behind passkey only; keep publish and public content writes blocked"
       : `resolve missing content proof: ${missingProof.join(", ")}`,
 };
 

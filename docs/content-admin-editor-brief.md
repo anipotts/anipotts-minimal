@@ -27,23 +27,25 @@ or any live write path.
 
 Admin `/content` now renders the D1 `page_content` rows and bundled read-only
 metadata from the project and writing markdown collections. It still does not
-add a save endpoint, publish endpoint, provider sync, or source file mutation.
+add a publish endpoint, provider sync, public content mutation, or source file
+mutation.
 The source collection rows include markdown body state, section count, and a
 short body preview so project detail and writing body edits can be reviewed
 before any editor write path exists.
 The source-content parser and summary builder live in
 `packages/content/src/admin/source-content.ts`; `apps/admin` only owns the raw
 markdown import boundary.
-Admin `/content/drafts` renders the first inert draft-editor shape with disabled
-controls backed by `page_content` and `content_draft_operations`. It is an
-editor surface model only, not a write path.
+Admin `/content/edit/:pageKey` renders the focused editor and may save
+passkey-protected draft operation rows only. Admin `/content/drafts` renders the
+draft queue and page-content field map. Publish, provider sync, public route
+mutation, and source file mutation remain blocked.
 The D1 review queue includes inert homepage, newsletter, project, and writing
 operations seeded by `drizzle/migrations/0008_seed_content_draft_operations.sql`
 and `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
 Listing-page review operations for making, projects, writing,
 newsletter archive, and orchestrating are seeded by
 `drizzle/migrations/0028_seed_listing_content_review_operations.sql`. These
-rows are preview-only and explicitly keep save, publish, deploy, source rewrite,
+rows are preview-oriented and explicitly keep publish, deploy, source rewrite,
 provider sync, send, and schedule actions blocked.
 
 ## highest-leverage cleanup batch

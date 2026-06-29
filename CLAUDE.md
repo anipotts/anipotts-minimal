@@ -90,7 +90,8 @@ For `admin.anipotts.com`, use this order:
 4. prove passkey register, login, logout, session persistence, and blocked
    failure paths
 5. prove `/auth/passkey`, `/`, `/content`, `/content/review`,
-   `/content/drafts`, `/content/edit/home`, `/content/preview`,
+   `/content/drafts`, `/content/edit/home`,
+   `/api/admin/content/draft-operation`, `/content/preview`,
    `/content/operations`, `/newsletter`,
    `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, and
    `/proof`

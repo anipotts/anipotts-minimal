@@ -26,23 +26,25 @@ const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
 
 <AdminLayout
   title="content drafts"
-  deck="Field-level draft editor shape. Inputs are inert until save and publish paths are audited."
+  deck="Field-level draft review. Focused editor saves draft operation rows only; publish and public content writes stay blocked."
 >
   <section class="meta-strip" aria-label="content draft editor state">
     <span>{operations.length} draft operations</span>
     <span>{pageContentState.published_count} published page rows</span>
     <span>{operationState.mode}</span>
-    <span>{writeRowsEmpty ? "writes empty" : "writes present"}</span>
-    <span>controls disabled</span>
+    <span
+      >{writeRowsEmpty ? "public writes empty" : "review public writes"}</span
+    >
+    <span>publish disabled</span>
   </section>
 
   <section class="table-card operation-card">
     <div class="section-head">
       <div>
         <p>editor gate</p>
-        <h2>{writeRowsEmpty ? "safe preview shape" : "review write rows"}</h2>
+        <h2>{writeRowsEmpty ? "draft-save only" : "review write rows"}</h2>
       </div>
-      <span>no save route</span>
+      <span>no publish route</span>
     </div>
     <div class="record-list">
       <article class="record-row">

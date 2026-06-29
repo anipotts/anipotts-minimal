@@ -79,11 +79,11 @@ const baseProofEntries: ProofEntry[] = [
     status: "verified",
     title: "admin write paths remain inert",
     summary:
-      "Content preview, review, operations, mutation, and destructive-operation routes expose no save, publish, send, or live-control endpoint.",
+      "Content preview, review, operations, mutation, and destructive-operation routes expose no publish, send, public-content write, or live-control endpoint. Draft saves are limited to content_draft_operations.",
     evidence_uri: "apps/admin/src/pages",
     redaction: "metadata_only",
     next_safe_action:
-      "Keep content save, publish, send, and live-control endpoints absent until a reviewed write path is approved.",
+      "Keep publish, send, public-content writes, and live-control endpoints absent until reviewed write paths are approved.",
   },
 ];
 
@@ -157,12 +157,12 @@ async function readContentOperationProof(
       id: "proof.content-operation.d1",
       kind: "repo",
       status: isReady ? "verified" : "pending",
-      title: "content state is D1-backed and writes remain inert",
-      summary: `published_page_content=${publishedPages}/${REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS}, content_records=${records}, content_draft_operations=${drafts}/${REQUIRED_CONTENT_DRAFT_OPERATIONS}, content_publish_events=${events}. Public route copy can render from page_content while draft operation rows remain review-only.`,
+      title: "content state is D1-backed and publish writes remain blocked",
+      summary: `published_page_content=${publishedPages}/${REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS}, content_records=${records}, content_draft_operations=${drafts}/${REQUIRED_CONTENT_DRAFT_OPERATIONS}, content_publish_events=${events}. Public route copy can render from page_content while draft operation rows remain the only content write surface.`,
       evidence_uri: "D1 anipotts-db page_content and content operation tables",
       redaction: "metadata_only",
       next_safe_action: isReady
-        ? "Keep write routes absent until passkey proof and the audited save path are ready."
+        ? "Use passkey-protected draft operations for review; keep publish and public content writes blocked."
         : contentOperationNextAction(publishedPages, records, drafts, events),
     };
   } catch (error) {
@@ -197,9 +197,9 @@ function contentOperationNextAction(
     return "Seed the remaining public route copy into published page_content rows.";
   }
   if (drafts < REQUIRED_CONTENT_DRAFT_OPERATIONS) {
-    return "Seed inert draft operations for every D1-backed public copy surface.";
+    return "Seed draft operations for every D1-backed public copy surface.";
   }
-  return "Keep content writes disabled until the audited save path is ready.";
+  return "Keep publish and public content writes disabled until the audited publish path is ready.";
 }
 
 async function readDurableProofEntries(

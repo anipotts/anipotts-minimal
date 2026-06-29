@@ -1,14 +1,15 @@
 # admin content draft operations
 
 Date: 2026-06-27
-Status: approved for additive schema and inert design only
+Status: draft operation save path staged; publish remains blocked
 
 ## purpose
 
 Admin content editing should not write directly from a browser form into public
 site source, deployed content, or outbound channels. The first write-path shape
-is an inert operation model that can be rendered, previewed, reviewed, and
-proved before any storage or publish mutation exists.
+stores passkey-protected draft operations only. These operations can be
+rendered, previewed, reviewed, and proved before any `page_content`, public
+runtime, outbound, or publish mutation exists.
 
 The target flow is:
 
@@ -32,8 +33,8 @@ Each draft operation should be represented as a plain data object:
   "risk_level": "low",
   "authority_state": "not_required_for_draft",
   "required_approval_ids": [],
-  "allowed_actions": ["render_preview", "request_review"],
-  "forbidden_actions": ["save", "publish", "deploy", "send"],
+  "allowed_actions": ["save_draft", "render_preview", "request_review"],
+  "forbidden_actions": ["publish", "deploy", "send", "write_page_content"],
   "preview_targets": ["/content/preview", "/"],
   "proof_ids": [],
   "evidence_uri": "repo://apps/www/src/data/site.ts",
@@ -91,9 +92,10 @@ Future gated states:
 - `verified`
 - `reverted`
 
-The current admin app may render all states, but it must not create live writes.
-Only `draft`, `previewed`, `needs_ani`, and `blocked` should appear in static or
-local-dev sample data until write authority exists.
+The current admin app may render all states, but the only live write it may
+create is a `content_draft_operations` row from the passkey-protected focused
+editor. Only `draft`, `previewed`, `needs_ani`, and `blocked` should appear
+until publish authority exists.
 
 ## authority mapping
 
@@ -109,18 +111,20 @@ Publishing requires exact authority when any operation:
 - sends, posts, files, pays, applies, deletes, or mutates an account
 - touches auth, DNS, env, secrets, endpoints, collectors, root, or launchd
 
-## inert write-path design
+## draft-only write-path design
 
-The first implementation should expose disabled controls only:
+The first implementation exposes one live control and keeps irreversible
+controls disabled:
 
 - `preview` may render local/sample proposed values
 - `request review` may show the needed authority text
-- `save` remains disabled
+- `save draft` may write a `content_draft_operations` row after passkey login
 - `publish` remains disabled
 - `deploy` remains absent unless separately approved
 
-No hidden API routes should exist for disabled controls. A disabled button is
-not enough if an endpoint can still be called directly.
+No hidden API routes should exist for disabled controls. The draft-save API is
+explicitly same-origin, passkey-middleware protected, and limited to draft
+operation rows.
 
 ## storage
 
@@ -137,13 +141,13 @@ inert rows into `content_draft_operations`: homepage summary and newsletter
 copy. These rows exist so admin can review real D1 operation state instead of
 only static templates.
 
-The schema and seed rows do not authorize a binding change, Worker route,
-content write API, public-site runtime read from records, browser save action,
-outbound send, or publish action.
+The schema and seed rows do not authorize public-site runtime reads from draft
+records, browser writes to `page_content`, outbound sends, deploys, or publish
+actions.
 
-## proof requirements before writes
+## proof requirements before publish writes
 
-Before implementing any real write path, require:
+Before implementing any publish or public-content write path, require:
 
 - storage target and binding approved
 - migration reviewed and reversible
@@ -153,4 +157,4 @@ Before implementing any real write path, require:
 - preview route proven
 - publish rollback defined
 - audit event schema approved
-- exact authority recorded for the live write action
+- exact authority recorded for the live publish action

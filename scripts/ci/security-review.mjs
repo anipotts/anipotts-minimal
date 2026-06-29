@@ -150,7 +150,7 @@ function scanForSecrets(file, content) {
 }
 
 function isPublicMetadataAssignment(line) {
-  return /^(?:authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*:/.test(
+  return /^(?:authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*(?::|=)/.test(
     line.trim(),
   );
 }

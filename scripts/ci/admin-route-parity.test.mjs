@@ -79,6 +79,11 @@ const ROUTES = [
     nav: false,
     smoke: false,
   },
+  {
+    route: "/api/admin/content/draft-operation",
+    file: "apps/admin/src/pages/api/admin/content/draft-operation.ts",
+    nav: false,
+  },
 ];
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
@@ -176,13 +181,13 @@ for (const marker of [
 
 for (const marker of [
   "readPageContentInventoryStore",
-  "save disabled",
   "publish disabled",
-  "no save route, no publish route, no content mutation",
+  "/api/admin/content/draft-operation",
+  "draft operation only",
 ]) {
   assert.ok(
     contentEditorSource.includes(marker),
-    `/content/edit/:pageKey missing inert editor marker ${marker}`,
+    `/content/edit/:pageKey missing draft editor marker ${marker}`,
   );
 }
 
