@@ -325,7 +325,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/",
     source_ref:
-      "D1 page_content:home.sections.intro.subheading, fallback apps/www/src/data/site.ts:homeContent.summary",
+      "D1 page_content:home.sections.intro.rich_summary and @anipotts/lib/cms homepageSummaryText fallback",
     field_path: "homepage.summary",
     current_value_ref: "source_fallback",
     proposed_value:

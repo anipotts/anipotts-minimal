@@ -169,7 +169,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero heading",
     source_ref:
-      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback apps/www/src/data/site.ts:homeContent.heading",
+      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
     current_value: "hi, i'm ani",
     editability: "ready",
     risk_level: "low",
@@ -213,7 +213,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "proof cards",
     source_ref:
-      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback apps/www/src/data/site.ts:homeContent.proof",
+      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from D1 when present.",
     editability: "ready",
@@ -228,7 +228,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage making selection",
     source_ref:
-      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback apps/www/src/pages/index.astro:homeMakingSlugs",
+      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "D1 controls the making label, limit, view-all link, and ordered homepage project slugs when present.",
     editability: "ready",
@@ -243,7 +243,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage writing selection",
     source_ref:
-      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback apps/www/src/pages/index.astro:homeWritingSlugs",
+      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "D1 controls the writing label, limit, view-all link, and ordered homepage writing slugs when present.",
     editability: "ready",
