@@ -57,7 +57,9 @@ For admin UI, feed, content review, auth staging, and operator-dashboard work:
 - record deploy run, skipped targets, and route proof
 
 `apps/admin-solid` is legacy rollback. Keep it only until the Astro admin
-cutover and passkey proof are complete, then archive or remove it.
+cutover and passkey proof are complete, then archive or remove it. It is not a
+normal auto-deploy target; use the explicit manual `admin_solid=true` deploy
+input only for rollback.
 
 Approved includes reviewed D1 migrations needed by the green PR, passkey auth
 rollout, and Cloudflare Access removal after passkey proof.

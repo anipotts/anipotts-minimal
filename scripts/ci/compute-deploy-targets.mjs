@@ -43,9 +43,9 @@ export function computeDeployTargets(files) {
       targets.admin = true;
     }
 
-    if (file.startsWith("apps/admin-solid/")) {
-      targets.admin_solid = true;
-    }
+    // apps/admin-solid is retained as a temporary rollback surface only.
+    // It should not auto-deploy from agent PRs or path-filtered main pushes.
+    // Use the explicit deploy workflow input if rollback deployment is needed.
 
     if (file.startsWith("workers/ingest/")) {
       targets.ingest = true;

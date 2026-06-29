@@ -57,11 +57,9 @@ expectTargets(
 );
 
 expectTargets(
-  "admin-solid source deploys only admin-solid",
+  "admin-solid source does not auto-deploy rollback worker",
   ["apps/admin-solid/src/routes/index.tsx"],
-  {
-    admin_solid: true,
-  },
+  {},
 );
 
 expectTargets(
