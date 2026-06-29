@@ -402,9 +402,9 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "newsletter",
     title: "subscribe block copy",
     source_ref:
-      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT",
+      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql and updated by drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT",
     current_value:
-      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, and archive URL use the @anipotts/lib/cms reader path with D1 page_content as the live source.",
+      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, archive label, archive copy, and archive URL use the @anipotts/lib/cms reader path with D1 page_content as the live source.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:

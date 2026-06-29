@@ -588,6 +588,22 @@ describe("owner editor cms validation", () => {
     });
   });
 
+  it("validates newsletter archive cta slots", () => {
+    const newsletter = normalizeNewsletterContent({
+      ...DEFAULT_NEWSLETTER_CONTENT,
+      archive_label: " archive ",
+      archive_copy: " published notes ",
+      archive_link_label: " read ",
+      archive_url: "javascript:alert(1)",
+    });
+
+    expect(newsletter.archive_label).toBe("archive");
+    expect(validateNewsletterContent(newsletter)).toEqual({
+      ok: false,
+      error: "Newsletter archive URL is invalid",
+    });
+  });
+
   it("normalizes listing page content with fallback fields", () => {
     const listing = normalizeListingPageContent({
       ...DEFAULT_WRITING_INDEX_CONTENT,

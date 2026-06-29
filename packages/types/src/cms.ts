@@ -145,6 +145,10 @@ export interface NewsletterContent {
   error_message: string;
   footer_text: string;
   buttondown_url: string;
+  archive_label: string;
+  archive_copy: string;
+  archive_link_label: string;
+  archive_url: string;
   sender_name: string;
   sender_email: string;
   reply_to: string;

@@ -228,5 +228,9 @@ Rules:
 25. move `/newsletter/archive` route copy into D1 `page_content`; seeded by
     `drizzle/migrations/0025_seed_newsletter_archive_page_content.sql` with
     source fallback still retained.
-26. reduce deploy workflow inputs to retained production targets after rollback
+26. move the `/newsletter` archive CTA label, copy, and link into D1
+    `page_content`; seeded by
+    `drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql` with
+    source fallback still retained.
+27. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

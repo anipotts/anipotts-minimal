@@ -100,6 +100,10 @@ SELECT
   coalesce(json_type(content, '$.error_message'), 'missing') AS newsletter_error_message_type,
   coalesce(json_type(content, '$.footer_text'), 'missing') AS newsletter_footer_text_type,
   json_extract(content, '$.buttondown_url') AS newsletter_buttondown_url,
+  coalesce(json_type(content, '$.archive_label'), 'missing') AS newsletter_archive_label_type,
+  coalesce(json_type(content, '$.archive_copy'), 'missing') AS newsletter_archive_copy_type,
+  coalesce(json_type(content, '$.archive_link_label'), 'missing') AS newsletter_archive_link_label_type,
+  json_extract(content, '$.archive_url') AS newsletter_archive_url,
   json_extract(content, '$.hero_title') AS listing_hero_title,
   coalesce(json_type(content, '$.description'), 'missing') AS listing_description_type,
   coalesce(json_type(content, '$.hero_summary'), 'missing') AS listing_hero_summary_type,
@@ -421,6 +425,16 @@ function newsletterProofFieldTypes(row) {
     buttondown_url:
       typeof row?.newsletter_buttondown_url === "string" &&
       row.newsletter_buttondown_url.startsWith("https://")
+        ? "text"
+        : "missing",
+    archive_label: String(row?.newsletter_archive_label_type ?? "missing"),
+    archive_copy: String(row?.newsletter_archive_copy_type ?? "missing"),
+    archive_link_label: String(
+      row?.newsletter_archive_link_label_type ?? "missing",
+    ),
+    archive_url:
+      typeof row?.newsletter_archive_url === "string" &&
+      isSafeProofHref(row.newsletter_archive_url)
         ? "text"
         : "missing",
   };
