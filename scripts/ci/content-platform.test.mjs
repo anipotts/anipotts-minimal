@@ -5,6 +5,8 @@ import { execFileSync } from "node:child_process";
 import {
   countProofEntries,
   contentInventorySource,
+  needsAniBuckets,
+  needsAniItemsFromJson,
   proofSource,
   recordsFromSourceModules,
   readProofEntries,
@@ -39,6 +41,37 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_provider",
   "sync_external",
 ]);
+
+const needsFixture = needsAniItemsFromJson([
+  {
+    agent_next: "continue after approval",
+    ani_action: "approve test action",
+    bucket: "unblockable_now",
+    expires_stale: "2026-07-01",
+    id: "need-test-action",
+    owner: "chief/site",
+    primary_action: "approve test action",
+    proof: "",
+    requires_ani: true,
+    source: "coord/NEEDS-ANI.md",
+    status: "open",
+    type: "approve",
+    why: "valid row should render",
+  },
+  {
+    id: "invalid-row",
+    type: "send",
+    bucket: "unblockable_now",
+  },
+]);
+
+assert.deepEqual(
+  needsAniBuckets.map((group) => group.bucket),
+  ["unblockable_now", "waiting_on_account_or_device", "review_delete_packets"],
+  "needs-ani buckets must stay stable for the admin route",
+);
+assert.equal(needsFixture.length, 1);
+assert.equal(needsFixture[0]?.id, "need-test-action");
 
 const sourceRecords = [
   ...recordsFromSourceModules("projects", {
