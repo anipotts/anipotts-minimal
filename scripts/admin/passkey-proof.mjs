@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { ADMIN_PROTECTED_SMOKE_ROUTES } from "../ci/admin-route-inventory.mjs";
 
 const REPO_ROOT = new URL("../../", import.meta.url);
 execFileSync("pnpm", ["--filter", "@anipotts/content", "build"], {
@@ -22,27 +23,7 @@ const {
 const ADMIN_ORIGIN =
   process.env.ADMIN_ORIGIN?.replace(/\/$/, "") ?? "https://admin.anipotts.com";
 const D1_DATABASE = process.env.ADMIN_D1_DATABASE ?? "anipotts-db";
-const ROUTES = [
-  "/auth/passkey",
-  "/",
-  "/content",
-  "/content/review",
-  "/content/drafts",
-  "/content/edit/home",
-  "/api/admin/content/draft-operation",
-  "/content/preview",
-  "/content/operations",
-  "/needs-ani",
-  "/newsletter",
-  "/newsletter/first-thing-agents-need-control-plane",
-  "/proof",
-  "/deploys",
-  "/repos",
-  "/handoffs",
-  "/fleet",
-  "/mutations",
-  "/ops/destructive",
-];
+const ROUTES = ADMIN_PROTECTED_SMOKE_ROUTES;
 
 const checkedAt = new Date().toISOString();
 

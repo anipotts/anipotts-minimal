@@ -3,101 +3,11 @@
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-
-const ROUTES = [
-  { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
-  {
-    route: "/auth/passkey",
-    file: "apps/admin/src/pages/auth/passkey.astro",
-    nav: false,
-  },
-  {
-    route: "/content",
-    file: "apps/admin/src/pages/content/index.astro",
-    nav: true,
-  },
-  {
-    route: "/content/review",
-    file: "apps/admin/src/pages/content/review.astro",
-    nav: true,
-  },
-  {
-    route: "/content/drafts",
-    file: "apps/admin/src/pages/content/drafts.astro",
-    nav: true,
-  },
-  {
-    route: "/content/edit/home",
-    file: "apps/admin/src/pages/content/edit/[pageKey].astro",
-    nav: false,
-  },
-  {
-    route: "/content/preview",
-    file: "apps/admin/src/pages/content/preview.astro",
-    nav: true,
-  },
-  {
-    route: "/content/operations",
-    file: "apps/admin/src/pages/content/operations.astro",
-    nav: true,
-  },
-  {
-    route: "/newsletter",
-    file: "apps/admin/src/pages/newsletter.astro",
-    nav: true,
-  },
-  {
-    route: "/newsletter/first-thing-agents-need-control-plane",
-    file: "apps/admin/src/pages/newsletter/[slug].astro",
-    nav: false,
-  },
-  {
-    route: "/needs-ani",
-    file: "apps/admin/src/pages/needs-ani.astro",
-    nav: true,
-  },
-  { route: "/proof", file: "apps/admin/src/pages/proof.astro", nav: true },
-  { route: "/deploys", file: "apps/admin/src/pages/deploys.astro", nav: true },
-  { route: "/repos", file: "apps/admin/src/pages/repos.astro", nav: true },
-  {
-    route: "/handoffs",
-    file: "apps/admin/src/pages/handoffs.astro",
-    nav: true,
-  },
-  { route: "/fleet", file: "apps/admin/src/pages/fleet.astro", nav: true },
-  {
-    route: "/mutations",
-    file: "apps/admin/src/pages/mutations.astro",
-    nav: true,
-  },
-  {
-    route: "/ops/destructive",
-    file: "apps/admin/src/pages/ops/destructive.astro",
-    nav: true,
-  },
-  {
-    route: "/api/admin/runtime-feed",
-    file: "apps/admin/src/pages/api/admin/runtime-feed.ts",
-    nav: false,
-    smoke: false,
-  },
-  {
-    route: "/api/admin/content/draft-operation",
-    file: "apps/admin/src/pages/api/admin/content/draft-operation.ts",
-    nav: false,
-  },
-];
-
-const PUBLIC_UNSMOKED_ROUTE_FILES = [
-  "apps/admin/src/pages/api/health.ts",
-  "apps/admin/src/pages/api/admin/passkey/login-options.ts",
-  "apps/admin/src/pages/api/admin/passkey/login-verify.ts",
-  "apps/admin/src/pages/api/admin/passkey/logout.ts",
-  "apps/admin/src/pages/api/admin/passkey/register-options.ts",
-  "apps/admin/src/pages/api/admin/passkey/register-verify.ts",
-  "apps/admin/src/pages/api/admin/passkey/revoke-current.ts",
-  "apps/admin/src/pages/api/admin/passkey/status.ts",
-];
+import {
+  ADMIN_PROTECTED_SMOKE_ROUTES,
+  ADMIN_ROUTES,
+  PUBLIC_UNSMOKED_ROUTE_FILES,
+} from "./admin-route-inventory.mjs";
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
@@ -117,9 +27,6 @@ const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
 const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
-const passkeyProofRoutes = new Set(
-  extractStringList(passkeyProofSource, "ROUTES"),
-);
 const publicPaths = extractStringList(middlewareSource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
   middlewareSource,
@@ -146,7 +53,7 @@ assert.deepEqual(publicPasskeyApiPaths, [
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 
 const classifiedFiles = new Set([
-  ...ROUTES.map((route) => route.file),
+  ...ADMIN_ROUTES.map((route) => route.file),
   ...PUBLIC_UNSMOKED_ROUTE_FILES,
 ]);
 
@@ -161,7 +68,16 @@ for (const file of PUBLIC_UNSMOKED_ROUTE_FILES) {
   assert.ok(existsSync(file), `public admin exception missing ${file}`);
 }
 
-for (const route of ROUTES) {
+assert.ok(
+  passkeyProofSource.includes("ADMIN_PROTECTED_SMOKE_ROUTES"),
+  "passkey proof must import shared protected smoke routes",
+);
+assert.ok(
+  passkeyProofSource.includes("const ROUTES = ADMIN_PROTECTED_SMOKE_ROUTES;"),
+  "passkey proof must use the shared protected smoke route list",
+);
+
+for (const route of ADMIN_ROUTES) {
   assert.ok(existsSync(route.file), `${route.route} missing ${route.file}`);
 
   if (route.route !== "/auth/passkey") {
@@ -199,8 +115,8 @@ for (const route of ROUTES) {
       `${route.route} missing from smoke.yml admin route proof`,
     );
     assert.ok(
-      passkeyProofRoutes.has(route.route),
-      `${route.route} missing from passkey proof route set`,
+      ADMIN_PROTECTED_SMOKE_ROUTES.includes(route.route),
+      `${route.route} missing from shared passkey proof route set`,
     );
   }
 }
