@@ -80,51 +80,6 @@ const updated = new Date(stats.generatedAt).toLocaleString("en-US", {
   minute: "2-digit",
 });
 
-const heroStats = [
-  { label: "sessions", value: fmt(stats.totals.sessions) },
-  { label: "tool calls", value: fmt(stats.totals.toolCalls) },
-  { label: "files touched", value: fmt(stats.totals.filesMutated) },
-  { label: "hours used", value: fmt(stats.totals.hoursUsed) },
-  { label: "streak", value: `${stats.totals.streakDays}d` },
-];
-
-const r = stats.records;
-const records = [
-  {
-    label: "fastest commit cadence",
-    value: `${fmt(r.fastestCommitCadence.commitsPerHour)} commits/hour`,
-    detail: r.fastestCommitCadence.repo
-      ? `${r.fastestCommitCadence.repo} ${r.fastestCommitCadence.windowStart?.slice(0, 10) ?? ""}`
-      : "no git data",
-  },
-  {
-    label: "most files changed",
-    value: `${fmt(r.mostFilesChanged.files)} files`,
-    detail: r.mostFilesChanged.project
-      ? `${r.mostFilesChanged.project} ${r.mostFilesChanged.startedAt?.slice(0, 10) ?? ""}`
-      : "no session data",
-  },
-  {
-    label: "longest session",
-    value: `${Math.round(r.longestSession.durationMinutes)} min`,
-    detail: r.longestSession.project
-      ? `${r.longestSession.project} ${r.longestSession.startedAt?.slice(0, 10) ?? ""}`
-      : "no session data",
-  },
-  {
-    label: "most tool calls",
-    value: `${fmt(r.mostToolCalls.toolCalls)} calls`,
-    detail: r.mostToolCalls.project
-      ? `${r.mostToolCalls.project} ${r.mostToolCalls.startedAt?.slice(0, 10) ?? ""}`
-      : "no session data",
-  },
-];
-
-const maxDaily = Math.max(
-  1,
-  ...stats.daily.map((d) => d.toolCalls + d.filesMutated),
-);
-
 const fmtSessionTime = (iso: string) =>
   new Date(iso).toLocaleString("en-US", {
     timeZone: stats.timezone,
@@ -133,6 +88,71 @@ const fmtSessionTime = (iso: string) =>
     hour: "2-digit",
     minute: "2-digit",
   });
+
+const maxDaily = Math.max(
+  1,
+  ...stats.daily.map((d) => d.toolCalls + d.filesMutated),
+);
+
+const loopOutputs = ["trace", "surface", "guard", "control"];
+const loopCards = copy.loop_cards.map((item, index) => ({
+  ...item,
+  number: String(index + 1).padStart(2, "0"),
+  output: loopOutputs[index] ?? "note",
+}));
+
+const telemetryRows = [
+  { label: "sessions", value: fmt(stats.totals.sessions) },
+  { label: "tool calls", value: fmt(stats.totals.toolCalls) },
+  { label: "files touched", value: fmt(stats.totals.filesMutated) },
+  { label: "hours used", value: fmt(stats.totals.hoursUsed) },
+  { label: "streak", value: `${stats.totals.streakDays}d` },
+];
+
+const proofRows = [
+  {
+    label: "fastest commit cadence",
+    value: `${fmt(stats.records.fastestCommitCadence.commitsPerHour)} / hr`,
+    detail: stats.records.fastestCommitCadence.repo
+      ? `${stats.records.fastestCommitCadence.repo} ${stats.records.fastestCommitCadence.windowStart?.slice(0, 10) ?? ""}`
+      : "no git data",
+  },
+  {
+    label: "most files changed",
+    value: `${fmt(stats.records.mostFilesChanged.files)} files`,
+    detail: stats.records.mostFilesChanged.project
+      ? `${stats.records.mostFilesChanged.project} ${stats.records.mostFilesChanged.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+  {
+    label: "longest session",
+    value: `${Math.round(stats.records.longestSession.durationMinutes)} min`,
+    detail: stats.records.longestSession.project
+      ? `${stats.records.longestSession.project} ${stats.records.longestSession.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+  {
+    label: "most tool calls",
+    value: `${fmt(stats.records.mostToolCalls.toolCalls)} calls`,
+    detail: stats.records.mostToolCalls.project
+      ? `${stats.records.mostToolCalls.project} ${stats.records.mostToolCalls.startedAt?.slice(0, 10) ?? ""}`
+      : "no session data",
+  },
+];
+
+const toolRows = [
+  ...copy.public_tools.map((tool) => ({ ...tool, external: false })),
+  {
+    title: minePlugin.name,
+    href: minePlugin.href,
+    detail: minePlugin.tagline,
+    external: true,
+  },
+];
+
+const featuredHooks = hooks.slice(0, 4);
+const featuredDocs = docs.slice(0, 4);
+const recentSessions = stats.sessions.slice(0, 8);
 ---
 
 <Shell
@@ -143,124 +163,100 @@ const fmtSessionTime = (iso: string) =>
 >
   <section data-rise id="operating-room" class="hero-shell">
     <div class="hero-copy">
-      <span class="section-label">{copy.section_label}</span>
       <h1 class="hero-title">{copy.hero_title}</h1>
       <p class="hero-summary">{copy.hero_summary}</p>
-      <p class="mono muted updated">
+      <div class="status-strip mono" aria-label="current coding status">
         <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
-        {stats.live.isCodingNow ? "coding now" : "idle"}
-        <span>last updated {updated} ({stats.timezone})</span>
-      </p>
+        <span>{stats.live.isCodingNow ? "coding now" : "idle"}</span>
+        <span>last updated {updated}</span>
+        <span>{stats.timezone}</span>
+      </div>
     </div>
-    <aside class="hero-panel" aria-label="live session totals">
-      <span class="mono panel-label">{copy.panel_label}</span>
+
+    <aside class="telemetry-panel" aria-label="live session totals">
+      <div class="panel-head">
+        <span class="mono panel-label">{copy.panel_label}</span>
+        <span class="mono muted">read only</span>
+      </div>
       <span class="panel-number">{fmt(stats.totals.toolCalls)}</span>
-      <span class="panel-copy">{copy.panel_copy}</span>
+      <p>{copy.panel_copy}</p>
+      <div class="panel-ledger">
+        {
+          telemetryRows.map((row) => (
+            <span class="panel-row">
+              <span class="mono muted">{row.label}</span>
+              <span class="mono">{row.value}</span>
+            </span>
+          ))
+        }
+      </div>
     </aside>
   </section>
 
-  <section data-rise class="stack" id="systems">
-    <h2 class="section-label">{copy.sections.systems}</h2>
-    <div class="stat-grid mobile-carousel">
-      {
-        heroStats.map((s) => (
-          <div class="stat">
-            <span class="stat-value">{s.value}</span>
-            <span class="stat-label mono">{s.label}</span>
-          </div>
-        ))
-      }
+  <section data-rise class="loop-section" id="loop">
+    <div class="section-head">
+      <h2 class="section-label">{copy.sections.loop}</h2>
+      <p class="section-deck">
+        the useful version works as a loop: capture the signal, make the
+        smallest move, record proof, and hand off context.
+      </p>
     </div>
-  </section>
-
-  <section data-rise class="stack" id="loop">
-    <h2 class="section-label">{copy.sections.loop}</h2>
-    <div class="loop-grid mobile-carousel">
+    <div class="loop-rail">
       {
-        copy.loop_cards.map((item) => (
-          <article class="loop-card">
-            <span class="mono loop-label">{item.label}</span>
-            <h3>{item.title}</h3>
-            <p>{item.detail}</p>
+        loopCards.map((item) => (
+          <article class="loop-row">
+            <span class="loop-number mono">{item.number}</span>
+            <span class="loop-dot" aria-hidden="true" />
+            <div class="loop-main">
+              <span class="mono loop-label">{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </div>
+            <span class="mono loop-output">{item.output}</span>
           </article>
         ))
       }
     </div>
   </section>
 
-  <section data-rise class="stack" id="public-tools">
-    <span class="split-head">
-      <h2 class="section-label">{copy.sections.public_tools}</h2>
-      <span class="mono muted">{copy.sections.public_tools_note}</span>
-    </span>
-    <div class="grid-2 mobile-carousel">
-      {
-        copy.public_tools.map((tool) => (
-          <a href={tool.href} class="doc-card">
-            <span class="row-title">{tool.title}</span>
-            <span class="dek">{tool.detail}</span>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <section data-rise class="stack" id="status">
-    <span class="split-head">
+  <section data-rise class="proof-section" id="status">
+    <div class="section-head">
       <h2 class="section-label">{copy.sections.status}</h2>
-      <span class="mono muted">{copy.sections.status_note}</span>
-    </span>
-    <div class="chart-card">
-      <div
-        class="chart"
-        role="img"
-        aria-label="daily tool calls and file mutations, last 90 days"
-      >
-        {
-          stats.daily.map((d) => (
-            <span
-              class="bar"
-              style={`height:${Math.max(2, Math.round(((d.toolCalls + d.filesMutated) / maxDaily) * 100))}%`}
-              title={`${d.date}: ${d.toolCalls} tool calls, ${d.filesMutated} files`}
-            />
-          ))
-        }
-      </div>
+      <p class="section-deck">{copy.sections.status_note}</p>
     </div>
-  </section>
 
-  <section data-rise class="stack" id="edges">
-    <h2 class="section-label">{copy.sections.records}</h2>
-    <div class="grid-2 mobile-carousel">
-      {
-        records.map((rec) => (
-          <div class="record-card">
-            <span class="stat-label mono">{rec.label}</span>
-            <span class="record-value">{rec.value}</span>
-            <span class="mono muted detail">{rec.detail}</span>
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  <section data-rise class="stack" id="plugin">
-    <h2 class="section-label">{copy.sections.plugin}</h2>
-    <div class="mine-card">
-      <div class="mine-copy">
-        <span class="row-title">{minePlugin.name}</span>
-        <p class="dek">{minePlugin.tagline}</p>
-        <span class="install mono">
-          <code id="install-cmd">{minePlugin.install}</code>
-          <button id="copy-install" class="chip" type="button">copy</button>
-        </span>
+    <div class="proof-grid">
+      <div class="chart-panel">
+        <div class="panel-head">
+          <span class="mono panel-label">last 90 days</span>
+          <span class="mono muted">calls + files</span>
+        </div>
+        <div
+          class="chart"
+          role="img"
+          aria-label="daily tool calls and file mutations, last 90 days"
+        >
+          {
+            stats.daily.map((d) => (
+              <span
+                class="bar"
+                style={`height:${Math.max(2, Math.round(((d.toolCalls + d.filesMutated) / maxDaily) * 100))}%`}
+                title={`${d.date}: ${d.toolCalls} tool calls, ${d.filesMutated} files`}
+              />
+            ))
+          }
+        </div>
       </div>
-      <div class="features mobile-carousel">
+
+      <div class="proof-ledger" aria-label={copy.sections.records}>
         {
-          minePlugin.features.map((f) => (
-            <span class="feature">
-              <span class="mono feature-name">{f.name}</span>
-              <span class="mono muted feature-desc">{f.desc}</span>
+          proofRows.map((row) => (
+            <span class="proof-row">
+              <span>
+                <span class="mono muted">{row.label}</span>
+                <span class="mono proof-detail">{row.detail}</span>
+              </span>
+              <strong>{row.value}</strong>
             </span>
           ))
         }
@@ -268,8 +264,61 @@ const fmtSessionTime = (iso: string) =>
     </div>
   </section>
 
-  <section data-rise class="stack" id="hooks">
-    <span class="split-head">
+  <section data-rise class="tool-section" id="public-tools">
+    <div class="section-head">
+      <h2 class="section-label">{copy.sections.public_tools}</h2>
+      <p class="section-deck">{copy.sections.public_tools_note}</p>
+    </div>
+
+    <div class="tool-ledger">
+      {
+        toolRows.map((tool) => (
+          <a
+            href={tool.href}
+            class="tool-row"
+            target={tool.external ? "_blank" : undefined}
+            rel={tool.external ? "noopener noreferrer" : undefined}
+          >
+            <span class="tool-title">{tool.title}</span>
+            <span class="tool-detail">{tool.detail}</span>
+            <span class="mono tool-action">
+              {tool.external ? "repo" : "open"}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section data-rise class="console-section" id="plugin">
+    <div class="section-head">
+      <h2 class="section-label">{copy.sections.plugin}</h2>
+      <p class="section-deck">
+        local logs only matter when they can be searched, compared, and folded
+        back into habits.
+      </p>
+    </div>
+
+    <div class="console-panel">
+      <div class="install-row">
+        <span class="mono">{minePlugin.install}</span>
+        <button id="copy-install" class="chip" type="button">copy</button>
+      </div>
+      <div class="feature-grid mobile-carousel">
+        {
+          minePlugin.features.map((feature) => (
+            <span class="feature">
+              <span class="mono feature-name">{feature.name}</span>
+              <span class="mono muted">{feature.desc}</span>
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section data-rise class="split-section" id="hooks">
+    <div class="section-head">
       <h2 class="section-label">{copy.sections.hooks}</h2>
       <a
         href={TIPS_REPO}
@@ -277,29 +326,29 @@ const fmtSessionTime = (iso: string) =>
         target="_blank"
         rel="noopener noreferrer">tips repo</a
       >
-    </span>
-    <div class="grid-2 mobile-carousel">
+    </div>
+    <div class="split-ledger">
       {
-        hooks.map((hook) => (
+        featuredHooks.map((hook) => (
           <a
             href={hook.href}
-            class="hook-card"
+            class="small-row"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span class="hook-head">
-              <span class="mono hook-name">{hook.name}</span>
-              <span class="pill">{hook.event}</span>
+            <span>
+              <span class="mono row-kicker">{hook.event}</span>
+              <span class="row-title">{hook.name}</span>
             </span>
-            <span class="mono muted detail">{hook.desc}</span>
+            <span class="row-detail">{hook.desc}</span>
           </a>
         ))
       }
     </div>
   </section>
 
-  <section data-rise class="stack" id="playbooks">
-    <span class="split-head">
+  <section data-rise class="split-section" id="playbooks">
+    <div class="section-head">
       <h2 class="section-label">{copy.sections.playbooks}</h2>
       <a
         href={MINE_REPO}
@@ -307,26 +356,29 @@ const fmtSessionTime = (iso: string) =>
         target="_blank"
         rel="noopener noreferrer">mine repo</a
       >
-    </span>
-    <div class="grid-2 mobile-carousel">
+    </div>
+    <div class="split-ledger">
       {
-        docs.map((doc) => (
+        featuredDocs.map((doc) => (
           <a
             href={doc.href}
-            class="doc-card"
+            class="small-row"
             target="_blank"
             rel="noopener noreferrer"
           >
             <span class="row-title">{doc.name}</span>
-            <span class="dek">{doc.desc}</span>
+            <span class="row-detail">{doc.desc}</span>
           </a>
         ))
       }
     </div>
   </section>
 
-  <section data-rise class="stack" id="sessions">
-    <h2 class="section-label">{copy.sections.sessions}</h2>
+  <section data-rise class="trace-section" id="sessions">
+    <div class="section-head">
+      <h2 class="section-label">{copy.sections.sessions}</h2>
+      <p class="section-deck">recent rows from local session logs.</p>
+    </div>
     <div class="table-wrap">
       <table class="stat-table">
         <thead>
@@ -340,13 +392,13 @@ const fmtSessionTime = (iso: string) =>
         </thead>
         <tbody>
           {
-            stats.sessions.map((s) => (
+            recentSessions.map((session) => (
               <tr>
-                <td>{s.project}</td>
-                <td>{fmtSessionTime(s.start)}</td>
-                <td class="num">{s.durationMinutes.toFixed(1)}</td>
-                <td class="num">{fmt(s.toolCalls)}</td>
-                <td class="num">{fmt(s.filesMutated)}</td>
+                <td>{session.project}</td>
+                <td>{fmtSessionTime(session.start)}</td>
+                <td class="num">{session.durationMinutes.toFixed(1)}</td>
+                <td class="num">{fmt(session.toolCalls)}</td>
+                <td class="num">{fmt(session.filesMutated)}</td>
               </tr>
             ))
           }
@@ -357,53 +409,84 @@ const fmtSessionTime = (iso: string) =>
 </Shell>
 
 <style>
-  .stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
+  :global(main.frame) {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   .hero-shell {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.42fr);
-    align-items: end;
-    gap: var(--s-6);
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.46fr);
+    align-items: start;
+    gap: var(--s-7);
+    padding-bottom: var(--s-2);
   }
 
-  .hero-copy {
+  .hero-shell,
+  .loop-section,
+  .proof-section,
+  .tool-section,
+  .console-section,
+  .split-section,
+  .trace-section {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-copy,
+  .section-head,
+  .console-section,
+  .trace-section {
     display: flex;
     flex-direction: column;
     gap: var(--s-4);
   }
 
   .hero-title {
-    margin: 0;
+    margin-top: clamp(1rem, 4vw, 3rem);
+    max-width: 11ch;
+    text-wrap: balance;
   }
 
   .hero-summary {
-    max-width: 48rem;
+    max-width: 43rem;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    line-height: 1.45;
   }
 
-  .updated {
+  .status-strip {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--s-3);
-    font-size: 0.8rem;
-    margin: 0;
+    width: fit-content;
+    max-width: 100%;
+    border-top: 1px solid var(--border);
+    padding-top: var(--s-3);
+    color: var(--ink-muted);
+  }
+
+  .status-strip span:nth-child(2) {
+    color: var(--ink);
+  }
+
+  .pulse,
+  .idle-dot,
+  .loop-dot {
+    display: inline-block;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .pulse,
   .idle-dot {
-    width: 0.5em;
-    height: 0.5em;
-    border-radius: 50%;
-    background: var(--ink-muted);
-    display: inline-block;
+    width: 0.55em;
+    height: 0.55em;
   }
 
-  .pulse {
-    background: var(--accent);
+  .idle-dot {
+    background: var(--ink-muted);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -418,325 +501,446 @@ const fmtSessionTime = (iso: string) =>
     }
   }
 
-  .hero-panel {
+  .telemetry-panel,
+  .chart-panel,
+  .proof-ledger,
+  .console-panel,
+  .tool-ledger,
+  .split-ledger,
+  .table-wrap {
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+  }
+
+  .telemetry-panel {
     padding: var(--s-4);
-    background:
-      linear-gradient(180deg, var(--accent-soft), transparent 72%),
-      var(--surface);
+    overflow: hidden;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
   }
 
   .panel-label {
-    color: var(--ink-muted);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
+    color: var(--ink);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
   .panel-number {
     display: block;
     color: var(--accent);
-    font-size: clamp(2.6rem, 7vw, 4.8rem);
-    line-height: 0.92;
-    margin-block: var(--s-3);
+    font-size: clamp(3rem, 6vw, 4.35rem);
     font-variant-numeric: tabular-nums;
+    line-height: 0.9;
+    margin-block: var(--s-5) var(--s-3);
   }
 
-  .panel-copy {
-    display: block;
+  .telemetry-panel p {
+    margin: 0 0 var(--s-4);
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+  }
+
+  .panel-ledger,
+  .proof-ledger,
+  .tool-ledger,
+  .split-ledger {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-row,
+  .proof-row,
+  .tool-row,
+  .small-row {
+    display: grid;
+    align-items: baseline;
+    gap: var(--s-3);
+    border-top: 1px solid var(--border);
+  }
+
+  .hero-shell > *,
+  .proof-grid > *,
+  .split-section > *,
+  .loop-main > *,
+  .panel-row > *,
+  .proof-row > *,
+  .tool-row > *,
+  .small-row > * {
+    min-width: 0;
+  }
+
+  .panel-row {
+    grid-template-columns: 1fr auto;
+    padding-block: var(--s-2);
+  }
+
+  .loop-section,
+  .proof-section,
+  .tool-section,
+  .split-section {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .section-head {
+    max-width: 42rem;
+  }
+
+  .section-deck {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .loop-rail {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+  }
+
+  .loop-rail::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(4.35rem + 5px);
+    width: 1px;
+    background: var(--border);
+  }
+
+  .loop-row {
+    display: grid;
+    grid-template-columns: 3.1rem 2.5rem minmax(0, 1fr) minmax(5rem, auto);
+    gap: var(--s-3);
+    align-items: start;
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .loop-number {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+  }
+
+  .loop-dot {
+    position: relative;
+    z-index: 1;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: 0.55rem;
+  }
+
+  .loop-main {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.28fr) minmax(12rem, 0.42fr) minmax(
+        0,
+        1fr
+      );
+    gap: var(--s-4);
+    align-items: baseline;
+  }
+
+  .loop-label,
+  .row-kicker {
+    color: var(--accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .loop-main h3 {
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+  }
+
+  .loop-main p {
+    margin: 0;
     color: var(--ink-muted);
     font-size: var(--p-small);
     line-height: 1.45;
   }
 
-  .split-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+  .loop-output {
+    color: var(--ink-muted);
+    text-align: right;
+  }
+
+  .proof-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.9fr);
     gap: var(--s-4);
   }
 
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--s-3);
-  }
-
-  .stat,
-  .record-card,
-  .loop-card,
-  .hook-card,
-  .doc-card {
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
+  .chart-panel {
     padding: var(--s-4);
-    background: var(--surface);
-  }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-    min-height: 8rem;
-    justify-content: end;
-  }
-
-  .stat-value {
-    font-family: var(--sans);
-    font-size: var(--d-section);
-    line-height: 1;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .stat-label {
-    font-size: 0.78rem;
-    color: var(--ink-muted);
-    letter-spacing: 0.08em;
-  }
-
-  .loop-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s-3);
-  }
-
-  .loop-card {
-    display: flex;
-    min-height: 16rem;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--s-4);
-  }
-
-  .loop-card h3 {
-    font-size: clamp(1.25rem, 2vw, 1.65rem);
-  }
-
-  .loop-card p {
-    margin: 0;
-    color: var(--ink-muted);
-    font-size: var(--p-small);
-    line-height: 1.5;
-  }
-
-  .loop-label {
-    color: var(--accent);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .chart-card {
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: var(--s-4);
-    background: var(--surface);
-    overflow: hidden;
   }
 
   .chart {
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    height: clamp(9rem, 24vw, 14rem);
+    height: clamp(10rem, 24vw, 15rem);
+    margin-top: var(--s-4);
     overflow: hidden;
   }
 
   .bar {
     flex: 1;
-    background: var(--accent);
-    opacity: 0.68;
-    border-radius: 2px 2px 0 0;
     min-width: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--accent);
+    opacity: 0.7;
   }
 
   .bar:hover {
     opacity: 1;
   }
 
-  .grid-2 {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
-    gap: var(--s-3);
+  .proof-ledger {
+    overflow: hidden;
   }
 
-  .record-value {
-    font-family: var(--sans);
-    font-size: var(--p-h2);
+  .proof-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--s-3) var(--s-4);
+  }
+
+  .proof-row:first-child,
+  .tool-row:first-child,
+  .small-row:first-child {
+    border-top: 0;
+  }
+
+  .proof-row > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .proof-row strong {
     color: var(--accent);
-    display: block;
-    margin-block: var(--s-2);
+    font-size: var(--p-h3);
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
   }
 
-  .detail {
-    font-size: 0.8rem;
+  .proof-detail,
+  .row-detail,
+  .tool-detail {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
   }
 
-  .mine-card {
-    display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-    gap: var(--s-4);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: var(--s-4);
+  .tool-ledger {
+    overflow: hidden;
+  }
+
+  .tool-row {
+    grid-template-columns: minmax(8rem, 0.26fr) minmax(0, 1fr) auto;
+    padding: var(--s-3) var(--s-4);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      background 160ms ease,
+      color 160ms ease;
+  }
+
+  .tool-row:hover,
+  .small-row:hover {
     background: var(--surface);
   }
 
-  .mine-copy {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
+  .tool-row:hover .tool-title,
+  .tool-row:hover .tool-action,
+  .small-row:hover .row-title {
+    color: var(--accent);
   }
 
+  .tool-title,
   .row-title {
-    font-family: var(--sans);
-    font-size: var(--p-h3);
     font-weight: 500;
-    transition: color 0.2s;
   }
 
-  .dek {
+  .tool-action {
     color: var(--ink-muted);
-    font-size: var(--p-small);
-    display: block;
-    max-width: var(--measure);
   }
 
-  .mine .dek,
-  .mine-copy .dek {
-    margin: 0;
+  .console-panel {
+    padding: var(--s-4);
   }
 
-  .install {
+  .install-row {
     display: flex;
     align-items: center;
-    gap: var(--s-2);
-    flex-wrap: wrap;
-    font-size: 0.85rem;
+    justify-content: space-between;
+    gap: var(--s-3);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--s-4);
   }
 
-  .install code {
-    background: var(--bg);
-    border-radius: 0.3rem;
-    padding: 0.3em 0.6em;
+  .install-row > span {
+    overflow-wrap: anywhere;
   }
 
-  .features {
+  .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--s-2);
+    margin-top: var(--s-4);
   }
 
   .feature {
     display: flex;
-    min-height: 7rem;
+    min-height: 6.5rem;
     flex-direction: column;
     justify-content: space-between;
     gap: var(--s-2);
     border: 1px solid var(--border);
-    border-radius: 0.6rem;
+    border-radius: 0.45rem;
     padding: var(--s-3);
     background: var(--bg);
   }
 
   .feature-name {
-    font-size: 0.85rem;
     color: var(--accent);
+    font-size: 0.84rem;
   }
 
-  .feature-desc {
-    font-size: 0.8rem;
+  .split-section {
+    grid-template-columns: minmax(10rem, 0.32fr) minmax(0, 1fr);
+    align-items: start;
   }
 
-  .hook-card,
-  .doc-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
+  .split-section .section-head {
+    position: sticky;
+    top: var(--s-4);
+  }
+
+  .small-row {
+    grid-template-columns: minmax(10rem, 0.4fr) minmax(0, 1fr);
+    padding: var(--s-3) var(--s-4);
     color: inherit;
     text-decoration: none;
     transition:
-      border-color 160ms ease,
-      transform 160ms ease;
+      background 160ms ease,
+      color 160ms ease;
   }
 
-  .hook-card:hover,
-  .doc-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-
-  .hook-card:hover .hook-name,
-  .doc-card:hover .row-title {
-    color: var(--accent);
-  }
-
-  .hook-head {
+  .small-row > span:first-child {
     display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    flex-wrap: wrap;
-  }
-
-  .hook-name {
-    color: var(--ink);
-    font-size: 0.9rem;
-    transition: color 0.2s;
+    flex-direction: column;
+    gap: 0.2rem;
   }
 
   .table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
   }
 
-  @media (max-width: 900px) {
+  .stat-table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--surface) 64%, transparent);
+  }
+
+  @media (max-width: 960px) {
     .hero-shell,
-    .mine-card {
+    .proof-grid,
+    .split-section {
       grid-template-columns: 1fr;
     }
 
-    .stat-grid,
-    .loop-grid {
+    .split-section .section-head {
+      position: static;
+    }
+
+    .loop-main {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+    }
+
+    .feature-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 720px) {
     .hero-shell {
-      gap: var(--s-4);
+      gap: var(--s-5);
     }
 
-    .hero-panel {
+    .telemetry-panel,
+    .chart-panel,
+    .console-panel {
       padding: var(--s-3);
     }
 
-    .stat,
-    .record-card,
-    .loop-card,
-    .hook-card,
-    .doc-card {
-      min-height: 11rem;
+    .hero-title {
+      max-width: 9.5ch;
+      font-size: clamp(2.25rem, 11vw, 2.8rem);
     }
 
-    .features.mobile-carousel {
-      grid-auto-columns: minmax(13rem, 70vw);
-      margin-inline: calc(-1 * var(--s-3));
+    .status-strip {
+      width: 100%;
     }
 
-    .split-head {
+    .panel-number {
+      font-size: clamp(3rem, 17vw, 4.2rem);
+    }
+
+    .loop-rail::before {
+      left: calc(3.4rem + 5px);
+    }
+
+    .loop-row {
+      grid-template-columns: 2.4rem 1.8rem minmax(0, 1fr);
+      gap: var(--s-2);
+    }
+
+    .loop-output {
+      grid-column: 3;
+      text-align: left;
+    }
+
+    .tool-row,
+    .small-row,
+    .proof-row {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+      align-items: start;
+    }
+
+    .proof-row strong {
+      text-align: left;
+    }
+
+    .install-row {
       align-items: flex-start;
       flex-direction: column;
-      gap: var(--s-1);
+    }
+
+    .feature-grid {
+      grid-auto-columns: minmax(13rem, 72vw);
+      margin-inline: calc(-1 * var(--s-3));
     }
   }
 </style>
 
 <script>
   const btn = document.getElementById("copy-install");
-  const cmd = document.getElementById("install-cmd");
+  const cmd = document.querySelector(".install-row .mono");
   btn?.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(cmd?.textContent?.trim() ?? "");
