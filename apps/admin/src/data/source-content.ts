@@ -16,6 +16,9 @@ export type SourceContentRecord = {
   source_ref: string;
   summary: string;
   body_words: number;
+  body_state: string;
+  body_section_count: number;
+  body_preview: string;
   fields: SourceContentField[];
   next_safe_action: string;
 };
@@ -99,10 +102,13 @@ function recordFromRaw(
       asString(frontmatter.description) ||
       "no summary field",
     body_words: countWords(source.body),
+    body_state: bodyState(surface, source.body),
+    body_section_count: countMarkdownSections(source.body),
+    body_preview: markdownPreview(source.body),
     fields,
     next_safe_action:
       surface === "projects"
-        ? "review project frontmatter and body before modeling a draft operation"
+        ? "review project frontmatter, detail body, and structured sections before modeling a draft operation"
         : "review title, summary, tags, and body before newsletter backfill",
   };
 }
@@ -185,6 +191,31 @@ function asString(value: unknown): string {
 
 function countWords(body: string): number {
   return body.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function countMarkdownSections(body: string): number {
+  return body.split("\n").filter((line) => /^#{2,6}\s+\S/.test(line.trim()))
+    .length;
+}
+
+function bodyState(surface: SourceSurface, body: string): string {
+  const words = countWords(body);
+  if (words === 0 && surface === "projects") return "frontmatter only";
+  if (words === 0) return "empty body";
+  if (words < 80) return "short body";
+  return "body ready for preview";
+}
+
+function markdownPreview(body: string): string {
+  const normalized = body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(" ");
+  if (!normalized) return "no markdown body yet";
+  return normalized.length > 220
+    ? `${normalized.slice(0, 217).trimEnd()}...`
+    : normalized;
 }
 
 function formatFieldValue(value: unknown): string {
