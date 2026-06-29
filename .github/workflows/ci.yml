@@ -37,6 +37,9 @@ jobs:
       - name: Validate admin route parity
         run: pnpm test:admin-routes
 
+      - name: Validate workflow inventory
+        run: pnpm test:workflows
+
       - name: Validate security review rules
         run: pnpm test:security-review
 

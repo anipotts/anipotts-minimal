@@ -137,6 +137,9 @@ Primary workflows:
 | `deploy.yml`          | deploy explicit targets only                             |
 | `smoke.yml`           | manual route proof for public and admin targets          |
 
+`pnpm test:workflows` enforces this exact workflow inventory and rejects
+disabled external Claude or Anthropic review hooks.
+
 Rules:
 
 - docs-only changes deploy nothing.
