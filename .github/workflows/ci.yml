@@ -34,6 +34,9 @@ jobs:
       - name: Validate deploy target rules
         run: pnpm test:deploy-targets
 
+      - name: Validate admin route parity
+        run: pnpm test:admin-routes
+
       - name: Validate security review rules
         run: pnpm test:security-review
 

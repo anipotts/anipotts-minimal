@@ -55,6 +55,9 @@ The Astro admin replacement covers these live admin-solid routes. Keep them
 covered while passkey proof and Access removal are completed, then remove
 `apps/admin-solid`:
 
+`pnpm test:admin-routes` enforces the route files, admin navigation, deploy
+smoke list, and manual smoke list for this parity set.
+
 | Route                                               | Purpose                              |
 | --------------------------------------------------- | ------------------------------------ |
 | `/`                                                 | operator overview                    |
