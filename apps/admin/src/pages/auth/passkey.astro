@@ -55,6 +55,17 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     proven.
   </p>
 
+  <section class="runbook-board" aria-labelledby="passkey-runbook-heading">
+    <div class="section-header">
+      <div>
+        <p>production sequence</p>
+        <h2 id="passkey-runbook-heading">Access removal runbook</h2>
+      </div>
+      <span id="passkey-runbook-summary">loading</span>
+    </div>
+    <ol id="passkey-runbook" class="runbook-list" aria-live="polite"></ol>
+  </section>
+
   <section class="proof-checklist" aria-labelledby="passkey-proof-heading">
     <div class="section-header">
       <div>
@@ -112,6 +123,12 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     next_safe_action: string;
   };
 
+  type PasskeyRunbookStep = {
+    label: string;
+    detail: string;
+    complete: boolean;
+  };
+
   const dbLabel = document.querySelector("#passkey-db");
   const originLabel = document.querySelector("#passkey-origin");
   const credentialsLabel = document.querySelector("#passkey-credentials");
@@ -120,6 +137,8 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
   const sessionLabel = document.querySelector("#passkey-session");
   const nextLabel = document.querySelector("#passkey-next");
   const message = document.querySelector("#passkey-message");
+  const runbookSummary = document.querySelector("#passkey-runbook-summary");
+  const runbookList = document.querySelector("#passkey-runbook");
   const proofSummary = document.querySelector("#passkey-proof-summary");
   const proofList = document.querySelector("#passkey-proof-list");
   const registerButton =
@@ -175,6 +194,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     if (loginButton) loginButton.disabled = !status.available;
     if (logoutButton) logoutButton.disabled = !status.has_session;
     if (revokeButton) revokeButton.disabled = !status.has_session;
+    renderRunbook();
     renderProofList();
   }
 
@@ -285,6 +305,104 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
         return row;
       }),
     );
+  }
+
+  function renderRunbook() {
+    if (!status || !runbookList) return;
+    const steps = buildRunbookSteps(status);
+    const firstOpenStep = steps.find((step) => !step.complete);
+    setText(
+      runbookSummary,
+      firstOpenStep ? `next: ${firstOpenStep.label}` : "ready to remove Access",
+    );
+    runbookList.replaceChildren(
+      ...steps.map((step, index) => {
+        const row = document.createElement("li");
+        row.className = `runbook-step ${step.complete ? "complete" : "open"}`;
+        row.innerHTML = `
+          <span class="step-index"></span>
+          <span>
+            <strong></strong>
+            <small></small>
+          </span>
+        `;
+        setText(row.querySelector(".step-index"), String(index + 1));
+        setText(row.querySelector("strong"), step.label);
+        setText(row.querySelector("small"), step.detail);
+        return row;
+      }),
+    );
+  }
+
+  function buildRunbookSteps(
+    currentStatus: PasskeyStatus,
+  ): PasskeyRunbookStep[] {
+    const events = currentStatus.audit_events;
+    const registered = events["passkey.credential.registered"] > 0;
+    const sessionCreated = events["passkey.session.created"] > 0;
+    const sessionRevoked = events["passkey.session.revoked"] > 0;
+    const credentialRevoked = events["passkey.credential.revoked"] > 0;
+    const denied = events["passkey.authentication.denied"] > 0;
+    const activeCredential = currentStatus.credential_count > 0;
+    const activeSession = currentStatus.has_session;
+
+    return [
+      {
+        label: "enter through Cloudflare Access",
+        detail: currentStatus.access_identity_present
+          ? `Access identity verified as ${currentStatus.access_identity_hint ?? "admin user"}.`
+          : "sign in through Access once so first registration is allowed.",
+        complete:
+          currentStatus.access_identity_present ||
+          activeCredential ||
+          activeSession,
+      },
+      {
+        label: "register platform passkey",
+        detail: activeCredential
+          ? "active credential exists in D1."
+          : "use register passkey and finish the biometric prompt.",
+        complete: activeCredential && registered,
+      },
+      {
+        label: "create app-native session",
+        detail: activeSession
+          ? "active session exists in D1."
+          : "use authenticate after registration.",
+        complete: activeSession && sessionCreated,
+      },
+      {
+        label: "prove persistence",
+        detail: activeSession
+          ? "reload a protected admin route and confirm it still renders."
+          : "authenticate first so protected routes can prove session reuse.",
+        complete: activeSession,
+      },
+      {
+        label: "prove logout and recovery",
+        detail:
+          sessionRevoked && activeSession
+            ? "logout proof exists and a replacement session is active."
+            : "logout once, then authenticate again before continuing.",
+        complete: sessionRevoked && activeSession,
+      },
+      {
+        label: "prove revoked credential denial",
+        detail:
+          credentialRevoked && denied && activeCredential && activeSession
+            ? "revoked credential denial exists and replacement access is live."
+            : "revoke current passkey, attempt authenticate, then register and authenticate a replacement.",
+        complete:
+          credentialRevoked && denied && activeCredential && activeSession,
+      },
+      {
+        label: "remove Cloudflare Access",
+        detail: currentStatus.ready_for_access_removal
+          ? "rerun proof, remove Access, then verify app-native blocking."
+          : currentStatus.next_safe_action,
+        complete: currentStatus.ready_for_access_removal,
+      },
+    ];
   }
 
   function setBusy(busy: boolean) {

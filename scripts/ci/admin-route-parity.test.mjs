@@ -72,6 +72,10 @@ const ROUTES = [
 ];
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
+const passkeySource = readFileSync(
+  "apps/admin/src/pages/auth/passkey.astro",
+  "utf8",
+);
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
@@ -97,6 +101,18 @@ for (const route of ROUTES) {
       `${route.route} missing from smoke.yml admin route proof`,
     );
   }
+}
+
+for (const marker of [
+  "Access removal runbook",
+  "passkey-runbook",
+  "buildRunbookSteps",
+  "ready_for_access_removal",
+]) {
+  assert.ok(
+    passkeySource.includes(marker),
+    `/auth/passkey missing proof runbook marker ${marker}`,
+  );
 }
 
 function extractShellForRoutes(source) {
