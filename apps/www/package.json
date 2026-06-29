@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@cloudflare/workers-types": "^4.20250523.0",
+    "@cloudflare/workers-types": "^4.20260629.1",
     "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@iconify-json/ph": "^1.2.2",
     "typescript": "^5.8.3"
