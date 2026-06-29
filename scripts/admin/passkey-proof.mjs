@@ -2,6 +2,23 @@
 
 import { execFileSync } from "node:child_process";
 
+const REPO_ROOT = new URL("../../", import.meta.url);
+execFileSync("pnpm", ["--filter", "@anipotts/content", "build"], {
+  cwd: REPO_ROOT,
+  stdio: "ignore",
+});
+const {
+  expectedPasskeyTables,
+  manualPasskeyEnrollmentSequence,
+  missingRequiredPasskeyAuditEvents,
+  nextPasskeyProofAction,
+  passkeyAccessRemovalBlockers,
+  passkeyMissingProofItems,
+  REQUIRED_PASSKEY_AUDIT_EVENTS,
+} = await import(
+  new URL("../../packages/content/dist/admin/index.js", import.meta.url).href
+);
+
 const ADMIN_ORIGIN =
   process.env.ADMIN_ORIGIN?.replace(/\/$/, "") ?? "https://admin.anipotts.com";
 const D1_DATABASE = process.env.ADMIN_D1_DATABASE ?? "anipotts-db";
@@ -25,22 +42,6 @@ const ROUTES = [
 ];
 
 const checkedAt = new Date().toISOString();
-const REQUIRED_AUDIT_EVENTS = [
-  "passkey.credential.registered",
-  "passkey.session.created",
-  "passkey.session.revoked",
-  "passkey.credential.revoked",
-  "passkey.authentication.denied",
-];
-const MANUAL_ENROLLMENT_SEQUENCE = [
-  "open /auth/passkey through Cloudflare Access",
-  "click register passkey and finish the platform biometric prompt",
-  "click authenticate to create an app-native admin session",
-  "reload a protected route to prove session persistence",
-  "logout once, then authenticate again",
-  "revoke the current passkey while Cloudflare Access remains active",
-  "authenticate once while revoked to record denial, then register and authenticate a replacement passkey",
-];
 
 const tableSql = `
 SELECT name
@@ -69,13 +70,6 @@ GROUP BY event_type
 ORDER BY event_type;
 `;
 
-const expectedTables = [
-  "admin_passkey_audit",
-  "admin_passkey_challenges",
-  "admin_passkey_credentials",
-  "admin_passkey_sessions",
-];
-
 const tables = runD1(tableSql).map((row) => String(row.name));
 const counts = Object.fromEntries(
   runD1(countSql).map((row) => [String(row.table_name), Number(row.count)]),
@@ -85,23 +79,23 @@ const auditEvents = Object.fromEntries(
 );
 const routes = await Promise.all(ROUTES.map(probeRoute));
 
-const schemaReady = expectedTables.every((table) => tables.includes(table));
+const schemaReady = expectedPasskeyTables.every((table) =>
+  tables.includes(table),
+);
 const credentialCount = counts.credentials ?? 0;
 const sessionCount = counts.sessions ?? 0;
 const auditCount = counts.audit ?? 0;
 const routeBoundary = summarizeBoundary(routes);
-const missingAuditEvents = REQUIRED_AUDIT_EVENTS.filter(
-  (eventType) => !auditEvents[eventType],
-);
-const removalBlockers = accessRemovalBlockerItems({
+const missingAuditEvents = missingRequiredPasskeyAuditEvents(auditEvents);
+const removalBlockers = passkeyAccessRemovalBlockers({
   schemaReady,
   credentialCount,
   sessionCount,
-  missingAuditEvents,
+  auditEvents,
 });
 const cloudflareAccessStillActive = routeBoundary === "cloudflare_access";
 const appNativeRouteBoundaryReady = routeBoundary === "app_native_passkey";
-const missingProof = missingProofItems({
+const missingProof = passkeyMissingProofItems({
   accessRemovalBlockers: removalBlockers,
   routeBoundary,
 });
@@ -119,7 +113,7 @@ const proof = {
   },
   audit_events: auditEvents,
   required_audit_events: Object.fromEntries(
-    REQUIRED_AUDIT_EVENTS.map((eventType) => [
+    REQUIRED_PASSKEY_AUDIT_EVENTS.map((eventType) => [
       eventType,
       Number(auditEvents[eventType] ?? 0),
     ]),
@@ -134,11 +128,11 @@ const proof = {
   manual_enrollment: {
     url: `${ADMIN_ORIGIN}/auth/passkey`,
     requires_browser_passkey_prompt: removalBlockers.length > 0,
-    sequence: MANUAL_ENROLLMENT_SEQUENCE,
+    sequence: manualPasskeyEnrollmentSequence,
   },
   routes,
   route_boundary: routeBoundary,
-  next_safe_action: nextSafeAction({
+  next_safe_action: nextPasskeyProofAction({
     schemaReady,
     credentialCount,
     sessionCount,
@@ -164,7 +158,7 @@ function runD1(command) {
       command,
     ],
     {
-      cwd: new URL("../../", import.meta.url),
+      cwd: REPO_ROOT,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -224,64 +218,4 @@ function summarizeBoundary(routes) {
   if (boundaries.has("cloudflare_access")) return "cloudflare_access";
   if (boundaries.has("app_native_passkey")) return "app_native_passkey";
   return "unknown";
-}
-
-function nextSafeAction({
-  schemaReady,
-  credentialCount,
-  sessionCount,
-  missingAuditEvents,
-  routeBoundary,
-}) {
-  if (!schemaReady) {
-    return "apply drizzle/migrations/0006_admin_passkeys.sql before enrollment";
-  }
-  if (credentialCount === 0) {
-    return "open /auth/passkey behind Cloudflare Access and register the first platform passkey";
-  }
-  if (sessionCount === 0) {
-    return "authenticate with the registered passkey and prove a durable app-native session";
-  }
-  if (missingAuditEvents.includes("passkey.session.revoked")) {
-    return "logout once to record session revocation, then authenticate again before Access removal";
-  }
-  if (missingAuditEvents.includes("passkey.credential.revoked")) {
-    return "revoke the current passkey while Cloudflare Access remains active, then register a replacement";
-  }
-  if (missingAuditEvents.includes("passkey.authentication.denied")) {
-    return "record revoked-credential denial proof while Cloudflare Access remains active";
-  }
-  if (missingAuditEvents.length > 0) {
-    return `record missing passkey audit proof: ${missingAuditEvents.join(", ")}`;
-  }
-  if (routeBoundary === "cloudflare_access") {
-    return "passkey proof is staged; remove Cloudflare Access and rerun this proof";
-  }
-  if (routeBoundary === "app_native_passkey") {
-    return "record app-native unauthenticated block and authenticated route render proof";
-  }
-  return "inspect route boundary before changing Access";
-}
-
-function missingProofItems({ accessRemovalBlockers, routeBoundary }) {
-  const missing = [...accessRemovalBlockers];
-  if (routeBoundary === "cloudflare_access") return missing;
-  if (routeBoundary !== "app_native_passkey") {
-    missing.push("app_native_route_boundary");
-  }
-  return missing;
-}
-
-function accessRemovalBlockerItems({
-  schemaReady,
-  credentialCount,
-  sessionCount,
-  missingAuditEvents,
-}) {
-  const missing = [];
-  if (!schemaReady) missing.push("schema_ready");
-  if (credentialCount === 0) missing.push("active_credential");
-  if (sessionCount === 0) missing.push("active_session");
-  missing.push(...missingAuditEvents);
-  return missing;
 }

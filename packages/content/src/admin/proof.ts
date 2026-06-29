@@ -1,3 +1,9 @@
+import {
+  missingRequiredPasskeyAuditEvents,
+  nextPasskeyProofAction,
+  REQUIRED_PASSKEY_AUDIT_EVENTS,
+} from "./passkey.js";
+
 export type ProofStatus = "verified" | "blocked" | "pending";
 export type ProofKind = "deploy" | "route" | "auth" | "repo" | "gate";
 
@@ -81,13 +87,6 @@ const baseProofEntries: ProofEntry[] = [
   },
 ];
 
-const requiredPasskeyAuditEvents = [
-  "passkey.credential.registered",
-  "passkey.session.created",
-  "passkey.session.revoked",
-  "passkey.credential.revoked",
-  "passkey.authentication.denied",
-] as const;
 const REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS = 7;
 const REQUIRED_CONTENT_DRAFT_OPERATIONS = 9;
 
@@ -259,18 +258,22 @@ async function readPasskeyProof(
         "WHERE revoked_at IS NULL AND expires_at > ?",
         [now],
       ),
-      ...requiredPasskeyAuditEvents.map((eventType) =>
+      ...REQUIRED_PASSKEY_AUDIT_EVENTS.map((eventType) =>
         countRows(db, "admin_passkey_audit", "WHERE event_type = ?", [
           eventType,
         ]),
       ),
     ]);
-    const auditSummary = requiredPasskeyAuditEvents.map(
-      (eventType, index) => `${eventType}=${auditEventCounts[index] ?? 0}`,
+    const auditEvents = Object.fromEntries(
+      REQUIRED_PASSKEY_AUDIT_EVENTS.map((eventType, index) => [
+        eventType,
+        auditEventCounts[index] ?? 0,
+      ]),
     );
-    const missingAuditEvents = requiredPasskeyAuditEvents.filter(
-      (_eventType, index) => (auditEventCounts[index] ?? 0) === 0,
+    const auditSummary = REQUIRED_PASSKEY_AUDIT_EVENTS.map(
+      (eventType) => `${eventType}=${auditEvents[eventType] ?? 0}`,
     );
+    const missingAuditEvents = missingRequiredPasskeyAuditEvents(auditEvents);
     const proven =
       credentials > 0 && sessions > 0 && missingAuditEvents.length === 0;
     return {
@@ -285,7 +288,11 @@ async function readPasskeyProof(
       redaction: "metadata_only",
       next_safe_action: proven
         ? "Run route-boundary proof, then remove Cloudflare Access and prove app-native blocking."
-        : nextPasskeyProofAction(credentials, sessions, missingAuditEvents),
+        : nextPasskeyProofAction({
+            credentialCount: credentials,
+            sessionCount: sessions,
+            missingAuditEvents,
+          }),
     };
   } catch (error) {
     return {
@@ -327,29 +334,6 @@ function proofEntryFromRow(row: ProofEventRow): ProofEntry {
     redaction: parseRedaction(row.redaction),
     next_safe_action: row.next_safe_action,
   };
-}
-
-function nextPasskeyProofAction(
-  credentials: number,
-  sessions: number,
-  missingAuditEvents: readonly string[],
-): string {
-  if (credentials === 0) {
-    return "Register the first passkey behind Cloudflare Access.";
-  }
-  if (sessions === 0) {
-    return "Authenticate with the registered passkey and prove a durable session.";
-  }
-  if (missingAuditEvents.includes("passkey.session.revoked")) {
-    return "Logout once to record revocation, then authenticate again before Access removal.";
-  }
-  if (missingAuditEvents.includes("passkey.credential.revoked")) {
-    return "Revoke the current passkey while Cloudflare Access remains active, then register a replacement.";
-  }
-  if (missingAuditEvents.includes("passkey.authentication.denied")) {
-    return "Record revoked-credential denial proof while Cloudflare Access remains active.";
-  }
-  return `Record missing audit proof: ${missingAuditEvents.join(", ")}.`;
 }
 
 function parseProofKind(kind: string): ProofKind {
