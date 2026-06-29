@@ -119,8 +119,9 @@ identity headers.
 
 Use `pnpm --silent proof:admin-content` after content migrations. It reads only
 remote D1 metadata and route status, then proves published `home` and
-`newsletter` page content, the four inert draft operations, empty content write
-tables, public route health, and protected admin route boundaries.
+`newsletter` page content, the newsletter subscribe copy fields, the four inert
+draft operations, empty content write tables, public route health, and protected
+admin route boundaries.
 
 The admin proof log reads durable rows from D1 table `admin_proof_events` when
 available, then appends live D1 metadata for content operations and passkey
