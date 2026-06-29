@@ -222,6 +222,15 @@ export const DEFAULT_WRITING_INDEX_CONTENT: ListingPageContent = {
   search_placeholder: "search writing",
 };
 
+export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
+  title: "making",
+  description:
+    "projects, experiments, weekly traces, and small utilities from ani potts.",
+  hero_title: "making",
+  hero_summary:
+    "work i built or helped ship. product surfaces, data systems, quant tools, and the older pieces that still explain how i think.",
+};
+
 export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   {
     slug: "quantercise",

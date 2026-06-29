@@ -283,6 +283,21 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.projects.frontmatter.schema"],
   },
   {
+    id: "projects.index_copy",
+    surface: "projects",
+    title: "making index copy",
+    source_ref:
+      "D1 page_content:making seeded by drizzle/migrations/0023_seed_making_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_MAKING_INDEX_CONTENT",
+    current_value:
+      "The /making title, meta description, hero title, and hero summary use structured page_content when present.",
+    editability: "ready",
+    risk_level: "low",
+    next_safe_action:
+      "Preview index copy changes before any save path edits the making page content record.",
+    required_authority: [],
+    proof_ids: ["content.projects.index.page-content"],
+  },
+  {
     id: "projects.detail_body",
     surface: "projects",
     title: "project detail body",
@@ -555,7 +570,7 @@ function summarizePageContent(
     ]);
   }
 
-  if (pageKey === "writing") {
+  if (pageKey === "writing" || pageKey === "making") {
     return compactSummary([
       ["title", content.hero_title ?? content.title],
       ["summary", content.hero_summary],

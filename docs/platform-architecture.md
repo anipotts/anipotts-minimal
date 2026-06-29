@@ -219,5 +219,8 @@ Rules:
 22. move `/writing` index route copy into D1 `page_content`; seeded by
     `drizzle/migrations/0022_seed_writing_index_page_content.sql` with source
     fallback still retained.
-23. reduce deploy workflow inputs to retained production targets after rollback
+23. move `/making` index route copy into D1 `page_content`; seeded by
+    `drizzle/migrations/0023_seed_making_index_page_content.sql` with source
+    fallback still retained.
+24. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

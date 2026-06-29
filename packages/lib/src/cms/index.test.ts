@@ -6,6 +6,7 @@ import {
   DEFAULT_CMS_PROJECTS,
   DEFAULT_CMS_WRITING,
   DEFAULT_HOMEPAGE_CONTENT,
+  DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
   normalizeCmsProject,
@@ -597,5 +598,24 @@ describe("owner editor cms validation", () => {
     );
     expect(listing.search_placeholder).toBe("find posts");
     expect(validateListingPageContent(listing)).toEqual({ ok: true });
+  });
+
+  it("normalizes listing page content with a route-specific fallback", () => {
+    const listing = normalizeListingPageContent(
+      {
+        title: " projects ",
+        hero_title: "",
+        hero_summary: null,
+      },
+      DEFAULT_MAKING_INDEX_CONTENT,
+    );
+
+    expect(listing.title).toBe("projects");
+    expect(listing.description).toBe(DEFAULT_MAKING_INDEX_CONTENT.description);
+    expect(listing.search_placeholder).toBe("");
+    expect(validateListingPageContent(listing)).toEqual({
+      ok: false,
+      error: "Listing page hero title is required",
+    });
   });
 });
