@@ -56,5 +56,5 @@ The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`). Only set en
 
 ## Archives
 
-Site version history and how to reach the pre-astro code: see [`archives/README.md`](archives/README.md).
-Labs app reference material is archived under [`docs/archive/labs`](docs/archive/labs).
+Site version history and old platform notes live under [`docs/archive`](docs/archive).
+Pre-Astro recovery refs are indexed in [`docs/archive/version-history.md`](docs/archive/version-history.md).
