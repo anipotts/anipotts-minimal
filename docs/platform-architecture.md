@@ -41,6 +41,11 @@ archived surfaces do not re-enter the workspace quietly.
 | `workers/state`        | deployed `api.anipotts.com` durable-object state plane       | keep with explicit deploy target      |
 | `workers/weekly-email` | deployed scheduled email worker                              | keep, outbound-send gated             |
 
+Detailed worker evidence and deletion criteria live in
+`docs/worker-inventory.md`. The 2026-06-29 review found no worker safe to delete
+yet: all four retained workers have current config, route or trigger evidence,
+deploy target coverage, and live version history.
+
 ### packages
 
 | Path               | Role today                                      | Classification                  |
@@ -177,7 +182,10 @@ Rules:
 8. remove the inactive `services/` and `packages/services-platform` planning
    scaffold; keep the D1 `service_registry` table and `packages/lib` read
    queries.
-9. review workers and delete unneeded worker targets.
+9. review workers and delete unneeded worker targets. first pass completed on
+   2026-06-29 in `docs/worker-inventory.md`; no worker is safe to delete yet
+   because all four retained workers still have route or trigger evidence,
+   deployment history, and production responsibility.
 10. expand `packages/content` from static content inventory into the durable
     operation schema and D1 adapter layer. started with
     `drizzle/migrations/0007_content_operations.sql` and inert seed rows in

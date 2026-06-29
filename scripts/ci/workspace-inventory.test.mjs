@@ -68,6 +68,14 @@ assert.equal(
   "services workspace glob must stay removed",
 );
 
+const workerInventory = readFileSync("docs/worker-inventory.md", "utf8");
+for (const worker of EXPECTED_WORKERS) {
+  assert.ok(
+    workerInventory.includes(`workers/${worker}`),
+    `docs/worker-inventory.md must classify workers/${worker}`,
+  );
+}
+
 function packageDirs(root) {
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
