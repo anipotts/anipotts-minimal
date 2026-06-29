@@ -37,6 +37,7 @@ export type {
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,
   HomepageRichSummarySimpleSegment,
+  ListingBucketContent,
   OrchestratingLinkCard,
   OrchestratingLoopCard,
   ListingPageContent,

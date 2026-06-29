@@ -35,7 +35,7 @@ const REQUIRED_UNPUBLISHED_PAGE_KEYS = [
   "writing:jpegmafia-is-our-kanye-west",
 ];
 const LISTING_PAGE_PROOF = {
-  making: { heroLink: false, search: false },
+  making: { heroLink: false, search: false, buckets: true },
   newsletter_archive: { heroLink: false, search: false, sectionLabel: true },
   orchestrating: {
     heroLink: false,
@@ -251,6 +251,12 @@ SELECT
   coalesce(json_type(content, '$.search_placeholder'), 'missing') AS listing_search_placeholder_type,
   coalesce(json_type(content, '$.hero_link_label'), 'missing') AS listing_hero_link_label_type,
   json_extract(content, '$.hero_link_href') AS listing_hero_link_href,
+  coalesce(json_type(content, '$.buckets'), 'missing') AS listing_buckets_type,
+  CASE
+    WHEN page_key = 'making'
+    THEN coalesce(json_array_length(json_extract(content, '$.buckets')), 0)
+    ELSE NULL
+  END AS listing_bucket_count,
   json_extract(content, '$.slug') AS detail_slug,
   coalesce(json_type(content, '$.title'), 'missing') AS detail_title_type,
   coalesce(json_type(content, '$.body'), 'missing') AS detail_body_type,
@@ -382,7 +388,7 @@ const missingListingFields = Object.entries(LISTING_PAGE_PROOF).flatMap(
         String(pageRow.page_key) === pageKey && Number(pageRow.published) === 1,
     );
     return Object.entries(listingProofFieldTypes(row, options))
-      .filter(([, type]) => type !== "text")
+      .filter(([, type]) => type !== "text" && type !== "array")
       .map(([field]) => `${pageKey}_${field}`);
   },
 );
@@ -674,6 +680,14 @@ function listingProofFieldTypes(row, options) {
   if (options.panel) {
     fields.panel_label = String(row?.listing_panel_label_type ?? "missing");
     fields.panel_copy = String(row?.listing_panel_copy_type ?? "missing");
+  }
+
+  if (options.buckets) {
+    fields.buckets =
+      String(row?.listing_buckets_type ?? "missing") === "array" &&
+      Number(row?.listing_bucket_count ?? 0) >= 3
+        ? "array"
+        : "missing";
   }
 
   if (options.heroLink) {

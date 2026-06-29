@@ -40,6 +40,11 @@ const bucketFor = (project: Project): BucketId => {
   }
   return "past";
 };
+const bucketCopy = new Map(
+  (copy.buckets ?? []).map((bucket) => [bucket.id, bucket]),
+);
+const bucketLabel = (id: BucketId) => bucketCopy.get(id)?.label ?? id;
+const bucketNote = (id: BucketId) => bucketCopy.get(id)?.note ?? "";
 
 const buckets: Array<{
   id: BucketId;
@@ -49,20 +54,20 @@ const buckets: Array<{
 }> = [
   {
     id: "active",
-    label: "active",
-    note: "things still moving or maintained",
+    label: bucketLabel("active"),
+    note: bucketNote("active"),
     projects: projects.filter((project) => bucketFor(project) === "active"),
   },
   {
     id: "past",
-    label: "past",
-    note: "finished work and older receipts",
+    label: bucketLabel("past"),
+    note: bucketNote("past"),
     projects: projects.filter((project) => bucketFor(project) === "past"),
   },
   {
     id: "archive",
-    label: "archive",
-    note: "sunsetted projects kept for context",
+    label: bucketLabel("archive"),
+    note: bucketNote("archive"),
     projects: projects.filter((project) => bucketFor(project) === "archive"),
   },
 ];

@@ -2,6 +2,7 @@ import type {
   CmsEditorLink,
   CmsProjectContent,
   CmsWritingContent,
+  ListingBucketContent,
   ListingPageContent,
   NewsletterContent,
   OrchestratingPageContent,
@@ -73,6 +74,26 @@ function normalizeTags(value: unknown): string[] {
       .slice(0, 12);
   }
   return [];
+}
+
+function normalizeListingBuckets(
+  value: unknown,
+  fallback: ListingBucketContent[] = [],
+): ListingBucketContent[] {
+  const source = Array.isArray(value) ? value : fallback;
+  const buckets = source
+    .filter((item): item is Record<string, unknown> =>
+      Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    )
+    .map((item) => ({
+      id: normalizeSlug(item.id, "bucket"),
+      label: coerceString(item.label, "").trim(),
+      note: coerceString(item.note, "").trim(),
+    }))
+    .filter((bucket) => bucket.id && bucket.label && bucket.note)
+    .slice(0, 12);
+
+  return buckets.length > 0 ? buckets : fallback;
 }
 
 function normalizeLinks(value: unknown): CmsEditorLink[] {
@@ -468,6 +489,7 @@ export function normalizeListingPageContent(
       source.search_placeholder,
       fallback.search_placeholder ?? "",
     ).trim(),
+    buckets: normalizeListingBuckets(source.buckets, fallback.buckets ?? []),
   };
 }
 
@@ -508,9 +530,38 @@ export function validateListingPageContent(content: ListingPageContent): {
       CMS_TEXT_LIMITS.title,
       false,
     ) ??
+    validateListingBuckets(content.buckets ?? []) ??
     validateListingHeroLink(content);
 
   return error ? { ok: false, error } : { ok: true };
+}
+
+function validateListingBuckets(
+  buckets: ListingBucketContent[],
+): string | null {
+  for (const bucket of buckets) {
+    const error =
+      validateCmsString(
+        bucket.id,
+        "Listing page bucket id",
+        CMS_TEXT_LIMITS.slug,
+      ) ??
+      validateCmsString(
+        bucket.label,
+        "Listing page bucket label",
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        bucket.note,
+        "Listing page bucket note",
+        CMS_TEXT_LIMITS.summary,
+      ) ??
+      (!/^[a-z][a-z0-9-]*$/.test(bucket.id)
+        ? "Listing page bucket id must be lowercase kebab-case"
+        : null);
+    if (error) return error;
+  }
+  return null;
 }
 
 function validateListingHeroLink(content: ListingPageContent): string | null {

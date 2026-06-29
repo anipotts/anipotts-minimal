@@ -40,6 +40,7 @@ export type {
   CmsEditorSnapshot,
   CmsProjectContent,
   CmsWritingContent,
+  ListingBucketContent,
   ListingPageContent,
   NewsletterContent,
   OrchestratingLinkCard,

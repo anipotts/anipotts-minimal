@@ -234,6 +234,23 @@ export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
   hero_title: "making",
   hero_summary:
     "work i built or helped ship. product surfaces, data systems, quant tools, and the older pieces that still explain how i think.",
+  buckets: [
+    {
+      id: "active",
+      label: "active",
+      note: "things still moving or maintained",
+    },
+    {
+      id: "past",
+      label: "past",
+      note: "finished work and older receipts",
+    },
+    {
+      id: "archive",
+      label: "archive",
+      note: "sunsetted projects kept for context",
+    },
+  ],
 };
 
 export const DEFAULT_PROJECTS_INDEX_CONTENT: ListingPageContent = {
