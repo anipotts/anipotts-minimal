@@ -23,7 +23,7 @@ pnpm dev:www      # just the astro site (astro defaults to http://localhost:4321
 ```bash
 pnpm build
 pnpm test
-pnpm validate     # build + lint + typecheck + test
+pnpm validate     # local PR gate: invariants + format + build/lint/typecheck/test
 ```
 
 ## Content model
