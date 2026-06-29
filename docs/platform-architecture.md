@@ -40,14 +40,13 @@ structured content/state model, and one predictable CI/CD path.
 
 ### packages
 
-| Path                         | Role today                                      | Classification                  |
-| ---------------------------- | ----------------------------------------------- | ------------------------------- |
-| `packages/lib`               | shared CMS, admin, db, data, services helpers   | keep, split later if useful     |
-| `packages/content`           | shared content inventory, previews, and drafts  | keep, expand toward D1 adapters |
-| `packages/styles`            | shared style tokens                             | keep                            |
-| `packages/types`             | shared generated types                          | keep                            |
-| `packages/services-platform` | service registry utilities                      | keep candidate                  |
-| `packages/config`            | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config      |
+| Path               | Role today                                      | Classification                  |
+| ------------------ | ----------------------------------------------- | ------------------------------- |
+| `packages/lib`     | shared CMS, admin, db, data, services helpers   | keep, split later if useful     |
+| `packages/content` | shared content inventory, previews, and drafts  | keep, expand toward D1 adapters |
+| `packages/styles`  | shared style tokens                             | keep                            |
+| `packages/types`   | shared generated types                          | keep                            |
+| `packages/config`  | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config      |
 
 ## route parity target
 
@@ -167,31 +166,34 @@ Rules:
 6. remove or archive `apps/admin-solid`.
 7. archive useful labs docs, then delete the labs app target if unused. done on
    2026-06-27.
-8. review workers and delete unneeded worker targets.
-9. expand `packages/content` from static content inventory into the durable
-   operation schema and D1 adapter layer. started with
-   `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
-   `drizzle/migrations/0008_seed_content_draft_operations.sql`; first published
-   newsletter page-content seed lives in
-   `drizzle/migrations/0009_seed_newsletter_page_content.sql`, and safe
-   homepage heading/section metadata seed lives in
-   `drizzle/migrations/0010_seed_home_page_content.sql`. Source-backed project
-   and writing review operations live in
-   `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
-10. move admin proof baseline rows into D1 `admin_proof_events`; seeded by
+8. remove the inactive `services/` and `packages/services-platform` planning
+   scaffold; keep the D1 `service_registry` table and `packages/lib` read
+   queries.
+9. review workers and delete unneeded worker targets.
+10. expand `packages/content` from static content inventory into the durable
+    operation schema and D1 adapter layer. started with
+    `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
+    `drizzle/migrations/0008_seed_content_draft_operations.sql`; first published
+    newsletter page-content seed lives in
+    `drizzle/migrations/0009_seed_newsletter_page_content.sql`, and safe
+    homepage heading/section metadata seed lives in
+    `drizzle/migrations/0010_seed_home_page_content.sql`. Source-backed project
+    and writing review operations live in
+    `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
+11. move admin proof baseline rows into D1 `admin_proof_events`; seeded by
     `drizzle/migrations/0012_admin_proof_events.sql`.
-11. move homepage proof cards into D1 `page_content`; seeded by
+12. move homepage proof cards into D1 `page_content`; seeded by
     `drizzle/migrations/0013_seed_homepage_proof_cards.sql` with Astro source
     fallback still retained.
-12. move homepage making project slugs into D1 `page_content`; seeded by
+13. move homepage making project slugs into D1 `page_content`; seeded by
     `drizzle/migrations/0014_seed_homepage_making_slugs.sql` with Astro source
     fallback still retained.
-13. move homepage writing slugs into D1 `page_content`; seeded by
+14. move homepage writing slugs into D1 `page_content`; seeded by
     `drizzle/migrations/0015_seed_homepage_writing_slugs.sql` with Astro source
     fallback still retained.
-14. move homepage rich summary text and mention keys into D1 `page_content`;
+15. move homepage rich summary text and mention keys into D1 `page_content`;
     seeded by `drizzle/migrations/0016_seed_homepage_rich_summary.sql` with
     Astro brand visual metadata still retained.
-15. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
-16. reduce deploy workflow inputs to retained production targets after rollback
+16. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
+17. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
