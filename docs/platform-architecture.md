@@ -67,7 +67,10 @@ covered while passkey proof and Access removal are completed, then remove
 `apps/admin-solid`:
 
 `pnpm test:admin-routes` enforces the route files, admin navigation, deploy
-smoke list, and manual smoke list for this parity set.
+smoke list, manual smoke list, passkey proof route set, and full admin page/API
+file classification for this parity set. New admin route files must be added to
+the protected route table or to an explicit public exception list before they
+can ship.
 
 `pnpm test:public-boundary` enforces the public app boundary for `apps/www`.
 The public app may render public CMS/D1 content, run newsletter subscribe
@@ -314,3 +317,6 @@ Rules:
     and skipped-target proof expectations.
 38. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
+39. fail closed on new admin routes: `pnpm test:admin-routes` now requires every
+    `apps/admin/src/pages` route file to be classified and every protected smoke
+    route to appear in passkey proof before merge.
