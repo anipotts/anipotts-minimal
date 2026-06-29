@@ -204,6 +204,8 @@ Rules:
     `page_content`; seeded by
     `drizzle/migrations/0017_seed_homepage_mentions.sql` with Astro source
     fallback still retained.
-17. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
-18. reduce deploy workflow inputs to retained production targets after rollback
+17. remove duplicate `homeContent` homepage fallback from `apps/www/src/data`;
+    homepage fallback content now lives in `@anipotts/lib/cms`.
+18. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
+19. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

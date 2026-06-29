@@ -24,7 +24,7 @@ Each draft operation should be represented as a plain data object:
   "kind": "content_draft",
   "surface": "public_site",
   "route": "/",
-  "source_ref": "apps/www/src/data/site.ts#homepage.summary",
+  "source_ref": "D1 page_content:home.sections.intro.rich_summary and @anipotts/lib/cms homepageSummaryText fallback",
   "field_path": "homepage.summary",
   "current_value_ref": "source_default",
   "proposed_value": "new copy goes here",

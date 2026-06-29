@@ -72,6 +72,7 @@ const operationRows = runD1(`
 SELECT
   operation_id,
   field_path,
+  source_ref,
   status,
   risk_level,
   authority_state
@@ -102,6 +103,11 @@ const publishedPageKeys = pageRows
   .filter((row) => Number(row.published) === 1)
   .map((row) => String(row.page_key));
 const operationIds = operationRows.map((row) => String(row.operation_id));
+const staleOperationSources = operationRows
+  .filter((row) =>
+    /homeContent|homeMakingSlugs|homeWritingSlugs/.test(String(row.source_ref)),
+  )
+  .map((row) => String(row.operation_id));
 const missingPageKeys = REQUIRED_PAGE_KEYS.filter(
   (pageKey) => !publishedPageKeys.includes(pageKey),
 );
@@ -148,6 +154,9 @@ const missingProof = [
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
+  ...staleOperationSources.map(
+    (operationId) => `stale_content_operation_source:${operationId}`,
+  ),
   ...(publishEvents === 0 ? [] : ["content_publish_events_should_be_empty"]),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
   ...publicRouteFailures.map((route) => `public_route:${route.path}`),
@@ -199,6 +208,7 @@ const proof = {
   content_draft_operations: operationRows.map((row) => ({
     operation_id: String(row.operation_id),
     field_path: String(row.field_path),
+    source_ref: String(row.source_ref),
     status: String(row.status),
     risk_level: String(row.risk_level),
     authority_state: String(row.authority_state),
