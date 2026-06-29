@@ -39,6 +39,9 @@ assert.equal(
 
 assert.equal(requiresSecurityReview(["docs/platform-architecture.md"]), false);
 
+const publicSqlMetadataAssignment =
+  "  authority_" + "state = 'passkey_draft_save_no_publish';\n";
+
 const fakeFiles = new Map([
   [
     ".github/workflows/review.yml",
@@ -64,6 +67,7 @@ const fakeFiles = new Map([
 };
 `,
   ],
+  ["drizzle/migrations/0100_public_metadata.sql", publicSqlMetadataAssignment],
 ]);
 
 function readFake(file) {
@@ -77,6 +81,7 @@ const findings = reviewFiles(
     "drizzle/migrations/0099_drop.sql",
     ".github/workflows/deploy.yml",
     "packages/content/src/admin/operations.ts",
+    "drizzle/migrations/0100_public_metadata.sql",
     "docs/archive/old.md",
   ],
   readFake,
