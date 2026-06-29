@@ -403,6 +403,10 @@ export function normalizeListingPageContent(
       source.hero_summary,
       fallback.hero_summary,
     ).trim(),
+    section_label: coerceString(
+      source.section_label,
+      fallback.section_label ?? "",
+    ).trim(),
     hero_link_label: coerceString(
       source.hero_link_label,
       fallback.hero_link_label ?? "",
@@ -442,6 +446,12 @@ export function validateListingPageContent(content: ListingPageContent): {
       content.hero_summary,
       "Listing page hero summary",
       CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      content.section_label ?? "",
+      "Listing page section label",
+      CMS_TEXT_LIMITS.title,
+      false,
     ) ??
     validateCmsString(
       content.search_placeholder ?? "",

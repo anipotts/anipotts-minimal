@@ -7,6 +7,7 @@ import {
   DEFAULT_CMS_WRITING,
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_MAKING_INDEX_CONTENT,
+  DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
   DEFAULT_PROJECTS_INDEX_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
@@ -634,5 +635,18 @@ describe("owner editor cms validation", () => {
       ok: false,
       error: "Listing page hero link must start with /, https://, or mailto:",
     });
+  });
+
+  it("validates newsletter archive listing content", () => {
+    const listing = normalizeListingPageContent(
+      {
+        ...DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
+        section_label: " archive ",
+      },
+      DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
+    );
+
+    expect(listing.section_label).toBe("archive");
+    expect(validateListingPageContent(listing)).toEqual({ ok: true });
   });
 });

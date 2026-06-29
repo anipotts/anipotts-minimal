@@ -225,5 +225,8 @@ Rules:
 24. move `/projects` archive index route copy into D1 `page_content`; seeded by
     `drizzle/migrations/0024_seed_projects_index_page_content.sql` with source
     fallback still retained.
-25. reduce deploy workflow inputs to retained production targets after rollback
+25. move `/newsletter/archive` route copy into D1 `page_content`; seeded by
+    `drizzle/migrations/0025_seed_newsletter_archive_page_content.sql` with
+    source fallback still retained.
+26. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
