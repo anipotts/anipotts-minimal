@@ -389,8 +389,16 @@ th {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.draft-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
 .table-card,
-.proposal-row {
+.proposal-row,
+.draft-editor-card {
   border: 1px solid var(--border);
   background: var(--panel);
 }
@@ -590,6 +598,76 @@ dd {
   padding: 16px;
 }
 
+.draft-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.draft-form label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.draft-form label span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.draft-form input,
+.draft-form textarea,
+.field-input-chip input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: #111;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.draft-form input,
+.field-input-chip input {
+  min-height: 38px;
+  padding: 8px 10px;
+}
+
+.draft-form textarea {
+  resize: vertical;
+  padding: 10px;
+}
+
+.draft-form input:disabled,
+.draft-form textarea:disabled,
+.field-input-chip input:disabled,
+.draft-control-row .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.wide-field,
+.draft-control-row {
+  grid-column: 1 / -1;
+}
+
+.draft-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.draft-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0 16px 16px;
+}
+
 .diff-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -787,12 +865,15 @@ dd {
   }
 
   .preview-grid,
+  .draft-editor-grid,
   .lane-grid,
   .newsletter-detail,
   .newsletter-preview-layout,
   .record-row dl,
   .need-row dl,
   .proposal-row dl,
+  .draft-form,
+  .draft-proof-grid,
   .diff-pair {
     grid-template-columns: 1fr;
   }

@@ -22,6 +22,7 @@ export const navItems: NavItem[] = [
   { href: "/", label: "overview", status: "migrating" },
   { href: "/content", label: "content", status: "live-source" },
   { href: "/content/review", label: "review", status: "live-source" },
+  { href: "/content/drafts", label: "drafts", status: "live-source" },
   { href: "/content/preview", label: "preview", status: "live-source" },
   { href: "/content/operations", label: "operations", status: "live-source" },
   { href: "/newsletter", label: "newsletter", status: "live-source" },
@@ -49,9 +50,9 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "content platform",
-    status: "read-only inventory",
+    status: "inert draft editor",
     risk: "medium",
-    next: "move editable fields into D1-backed draft records",
+    next: "prove draft review shape before enabling audited save routes",
   },
   {
     title: "proof log",

@@ -28,6 +28,9 @@ or any live write path.
 Admin `/content` now renders the D1 `page_content` rows and bundled read-only
 metadata from the project and writing markdown collections. It still does not
 add a save endpoint, publish endpoint, provider sync, or source file mutation.
+Admin `/content/drafts` renders the first inert draft-editor shape with disabled
+controls backed by `page_content` and `content_draft_operations`. It is an
+editor surface model only, not a write path.
 The D1 review queue includes inert homepage, newsletter, project, and writing
 operations seeded by `drizzle/migrations/0008_seed_content_draft_operations.sql`
 and `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
