@@ -25,6 +25,13 @@ const USER_ID = "ani";
 const USER_NAME = "ani@admin.anipotts.com";
 const USER_DISPLAY_NAME = "Ani";
 const ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
+const REQUIRED_PASSKEY_AUDIT_EVENTS = [
+  "passkey.credential.registered",
+  "passkey.session.created",
+  "passkey.session.revoked",
+  "passkey.credential.revoked",
+  "passkey.authentication.denied",
+] as const;
 
 type D1Result<T = unknown> = {
   results?: T[];
@@ -83,6 +90,21 @@ type AccessIdentity = {
   hint: string | null;
 };
 
+type RequiredPasskeyAuditEvent = (typeof REQUIRED_PASSKEY_AUDIT_EVENTS)[number];
+
+type PasskeyAuditEventRow = {
+  event_type: string;
+  count: number;
+};
+
+export type PasskeyProofItem = {
+  id: string;
+  label: string;
+  count: number;
+  complete: boolean;
+  next_safe_action: string;
+};
+
 export type PasskeyContext = {
   request: Request;
   url: URL;
@@ -104,6 +126,10 @@ export type PasskeyStatus = {
   expected_origin: string;
   expected_rp_id: string;
   current_origin: string;
+  audit_events: Record<RequiredPasskeyAuditEvent, number>;
+  proof_items: PasskeyProofItem[];
+  access_removal_blockers: string[];
+  ready_for_access_removal: boolean;
   next_safe_action: string;
 };
 
@@ -134,6 +160,8 @@ export async function getPasskeyStatus(
   const db = dbFromContext(context);
   const accessIdentity = await resolveAccessIdentity(context);
   if (!db) {
+    const auditEvents = emptyAuditEvents();
+    const blockers = accessRemovalBlockerItems(0, false, auditEvents);
     return {
       available: false,
       mode: "missing_db",
@@ -146,6 +174,10 @@ export async function getPasskeyStatus(
       expected_origin: EXPECTED_ORIGIN,
       expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
+      audit_events: auditEvents,
+      proof_items: buildPasskeyProofItems(0, false, auditEvents),
+      access_removal_blockers: blockers,
+      ready_for_access_removal: false,
       next_safe_action:
         "deploy with DB binding and apply migration before enrollment",
     };
@@ -153,13 +185,17 @@ export async function getPasskeyStatus(
 
   let credentialCount = 0;
   let auditCount = 0;
+  let auditEvents = emptyAuditEvents();
   let session: SessionRow | null = null;
   try {
     credentialCount = await countActiveCredentials(db);
     auditCount = await countAuditEvents(db);
+    auditEvents = await readRequiredAuditEvents(db);
     session = await getSession(context, db);
   } catch (error) {
     if (!isMissingPasskeyTable(error)) throw error;
+    const missingAuditEvents = emptyAuditEvents();
+    const blockers = accessRemovalBlockerItems(0, false, missingAuditEvents);
     return {
       available: false,
       mode: "missing_db",
@@ -172,12 +208,21 @@ export async function getPasskeyStatus(
       expected_origin: EXPECTED_ORIGIN,
       expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
+      audit_events: missingAuditEvents,
+      proof_items: buildPasskeyProofItems(0, false, missingAuditEvents),
+      access_removal_blockers: blockers,
+      ready_for_access_removal: false,
       next_safe_action:
         "apply drizzle/migrations/0006_admin_passkeys.sql before enrollment",
     };
   }
   const canRegister =
     Boolean(session) || (credentialCount === 0 && accessIdentity.verified);
+  const blockers = accessRemovalBlockerItems(
+    credentialCount,
+    Boolean(session),
+    auditEvents,
+  );
 
   return {
     available: true,
@@ -191,6 +236,14 @@ export async function getPasskeyStatus(
     expected_origin: EXPECTED_ORIGIN,
     expected_rp_id: expectedRpId(context),
     current_origin: context.url.origin,
+    audit_events: auditEvents,
+    proof_items: buildPasskeyProofItems(
+      credentialCount,
+      Boolean(session),
+      auditEvents,
+    ),
+    access_removal_blockers: blockers,
+    ready_for_access_removal: blockers.length === 0,
     next_safe_action: passkeyStatusNextAction(
       Boolean(session),
       credentialCount,
@@ -577,6 +630,30 @@ async function countAuditEvents(db: D1Database): Promise<number> {
   return Number(row?.count ?? 0);
 }
 
+async function readRequiredAuditEvents(
+  db: D1Database,
+): Promise<Record<RequiredPasskeyAuditEvent, number>> {
+  const eventCounts = emptyAuditEvents();
+  const placeholders = REQUIRED_PASSKEY_AUDIT_EVENTS.map(() => "?").join(", ");
+  const result = await db
+    .prepare(
+      `SELECT event_type, COUNT(*) AS count
+       FROM admin_passkey_audit
+       WHERE event_type IN (${placeholders})
+       GROUP BY event_type`,
+    )
+    .bind(...REQUIRED_PASSKEY_AUDIT_EVENTS)
+    .all<PasskeyAuditEventRow>();
+
+  for (const row of result.results ?? []) {
+    if (isRequiredAuditEvent(row.event_type)) {
+      eventCounts[row.event_type] = Number(row.count ?? 0);
+    }
+  }
+
+  return eventCounts;
+}
+
 async function findCredential(
   db: D1Database,
   credentialId: string,
@@ -709,15 +786,15 @@ async function resolveAccessIdentity(
     return { verified: false, hint: null };
   }
 
-  const token = context.request.headers.get(ACCESS_JWT_HEADER);
-  if (!token) {
+  const cfJwt = context.request.headers.get(ACCESS_JWT_HEADER);
+  if (!cfJwt) {
     return { verified: false, hint: null };
   }
 
   try {
     const issuer = teamDomain.replace(/\/$/, "");
     const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
-    const { payload } = await jwtVerify(token, jwks, {
+    const { payload } = await jwtVerify(cfJwt, jwks, {
       issuer,
       audience,
     });
@@ -744,6 +821,94 @@ function passkeyStatusNextAction(
     return "authenticate through Cloudflare Access before first passkey registration";
   }
   return "authenticate with the registered passkey";
+}
+
+function emptyAuditEvents(): Record<RequiredPasskeyAuditEvent, number> {
+  return Object.fromEntries(
+    REQUIRED_PASSKEY_AUDIT_EVENTS.map((eventType) => [eventType, 0]),
+  ) as Record<RequiredPasskeyAuditEvent, number>;
+}
+
+function buildPasskeyProofItems(
+  credentialCount: number,
+  hasSession: boolean,
+  auditEvents: Record<RequiredPasskeyAuditEvent, number>,
+): PasskeyProofItem[] {
+  return [
+    {
+      id: "active_credential",
+      label: "active credential",
+      count: credentialCount,
+      complete: credentialCount > 0,
+      next_safe_action: "register the first platform passkey",
+    },
+    {
+      id: "active_session",
+      label: "active session",
+      count: hasSession ? 1 : 0,
+      complete: hasSession,
+      next_safe_action: "authenticate with the registered passkey",
+    },
+    {
+      id: "passkey.credential.registered",
+      label: "registration audit",
+      count: auditEvents["passkey.credential.registered"],
+      complete: auditEvents["passkey.credential.registered"] > 0,
+      next_safe_action: "register the first platform passkey",
+    },
+    {
+      id: "passkey.session.created",
+      label: "login audit",
+      count: auditEvents["passkey.session.created"],
+      complete: auditEvents["passkey.session.created"] > 0,
+      next_safe_action: "authenticate with the registered passkey",
+    },
+    {
+      id: "passkey.session.revoked",
+      label: "logout audit",
+      count: auditEvents["passkey.session.revoked"],
+      complete: auditEvents["passkey.session.revoked"] > 0,
+      next_safe_action: "logout once, then authenticate again",
+    },
+    {
+      id: "passkey.credential.revoked",
+      label: "credential revoke audit",
+      count: auditEvents["passkey.credential.revoked"],
+      complete: auditEvents["passkey.credential.revoked"] > 0,
+      next_safe_action:
+        "revoke the current passkey while Cloudflare Access remains active",
+    },
+    {
+      id: "passkey.authentication.denied",
+      label: "revoked credential denial audit",
+      count: auditEvents["passkey.authentication.denied"],
+      complete: auditEvents["passkey.authentication.denied"] > 0,
+      next_safe_action:
+        "attempt authenticate after revocation, then register a replacement",
+    },
+  ];
+}
+
+function accessRemovalBlockerItems(
+  credentialCount: number,
+  hasSession: boolean,
+  auditEvents: Record<RequiredPasskeyAuditEvent, number>,
+): string[] {
+  const blockers: string[] = [];
+  if (credentialCount === 0) blockers.push("active_credential");
+  if (!hasSession) blockers.push("active_session");
+  for (const eventType of REQUIRED_PASSKEY_AUDIT_EVENTS) {
+    if (auditEvents[eventType] === 0) blockers.push(eventType);
+  }
+  return blockers;
+}
+
+function isRequiredAuditEvent(
+  eventType: string,
+): eventType is RequiredPasskeyAuditEvent {
+  return REQUIRED_PASSKEY_AUDIT_EVENTS.includes(
+    eventType as RequiredPasskeyAuditEvent,
+  );
 }
 
 function maskEmail(email: string): string {

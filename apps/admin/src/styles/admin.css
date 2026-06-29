@@ -295,6 +295,64 @@ th {
   margin-top: 12px;
 }
 
+.proof-checklist {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.proof-checklist .section-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.proof-list {
+  display: grid;
+}
+
+.proof-item {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 58px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.proof-item:last-child {
+  border-bottom: 0;
+}
+
+.proof-item strong,
+.proof-item small {
+  display: block;
+}
+
+.proof-item small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.proof-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--risk);
+}
+
+.proof-item.complete .proof-dot {
+  background: var(--accent);
+}
+
+.proof-item code {
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--muted);
+  min-width: 34px;
+  padding: 6px 8px;
+  text-align: center;
+}
+
 .preview-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
