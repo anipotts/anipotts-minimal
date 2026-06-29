@@ -33,9 +33,9 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm --filter @anipotts/types build && tsc",
     "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pnpm --filter @anipotts/types build && tsc --noEmit"
   },
   "dependencies": {
     "@anipotts/types": "workspace:*"
