@@ -416,6 +416,21 @@ export const contentInventory: ContentInventoryItem[] = [
     ],
   },
   {
+    id: "newsletter.archive_copy",
+    surface: "newsletter",
+    title: "newsletter archive copy",
+    source_ref:
+      "D1 page_content:newsletter_archive seeded by drizzle/migrations/0025_seed_newsletter_archive_page_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
+    current_value:
+      "The /newsletter/archive title, meta description, section label, and hero summary use structured page_content when present.",
+    editability: "ready",
+    risk_level: "low",
+    next_safe_action:
+      "Preview archive copy changes before any save path edits the newsletter archive page content record.",
+    required_authority: [],
+    proof_ids: ["content.newsletter.archive.page-content"],
+  },
+  {
     id: "newsletter.backfill",
     surface: "newsletter",
     title: "newsletter backfill candidates",
@@ -585,9 +600,15 @@ function summarizePageContent(
     ]);
   }
 
-  if (pageKey === "writing" || pageKey === "making" || pageKey === "projects") {
+  if (
+    pageKey === "writing" ||
+    pageKey === "making" ||
+    pageKey === "projects" ||
+    pageKey === "newsletter_archive"
+  ) {
     return compactSummary([
       ["title", content.hero_title ?? content.title],
+      ["label", content.section_label],
       ["summary", content.hero_summary],
       ["link", content.hero_link_href],
       ["search", content.search_placeholder],

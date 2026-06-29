@@ -240,6 +240,15 @@ export const DEFAULT_PROJECTS_INDEX_CONTENT: ListingPageContent = {
   hero_link_href: "/making",
 };
 
+export const DEFAULT_NEWSLETTER_ARCHIVE_CONTENT: ListingPageContent = {
+  title: "newsletter archive",
+  description: "published issues from ani's first-party newsletter.",
+  hero_title: "newsletter archive",
+  hero_summary:
+    "published issues will appear here after the first-party send path is verified.",
+  section_label: "archive",
+};
+
 export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   {
     slug: "quantercise",

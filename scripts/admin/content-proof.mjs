@@ -12,11 +12,13 @@ const REQUIRED_PAGE_KEYS = [
   "home",
   "making",
   "newsletter",
+  "newsletter_archive",
   "projects",
   "writing",
 ];
 const LISTING_PAGE_PROOF = {
   making: { heroLink: false, search: false },
+  newsletter_archive: { heroLink: false, search: false, sectionLabel: true },
   projects: { heroLink: true, search: false },
   writing: { heroLink: false, search: true },
 };
@@ -33,7 +35,14 @@ const ADMIN_ROUTES = [
   "/content/operations",
   "/proof",
 ];
-const PUBLIC_ROUTES = ["/", "/newsletter", "/making", "/projects", "/writing"];
+const PUBLIC_ROUTES = [
+  "/",
+  "/newsletter",
+  "/newsletter/archive",
+  "/making",
+  "/projects",
+  "/writing",
+];
 
 const checkedAt = new Date().toISOString();
 
@@ -94,6 +103,7 @@ SELECT
   json_extract(content, '$.hero_title') AS listing_hero_title,
   coalesce(json_type(content, '$.description'), 'missing') AS listing_description_type,
   coalesce(json_type(content, '$.hero_summary'), 'missing') AS listing_hero_summary_type,
+  coalesce(json_type(content, '$.section_label'), 'missing') AS listing_section_label_type,
   coalesce(json_type(content, '$.search_placeholder'), 'missing') AS listing_search_placeholder_type,
   coalesce(json_type(content, '$.hero_link_label'), 'missing') AS listing_hero_link_label_type,
   json_extract(content, '$.hero_link_href') AS listing_hero_link_href
@@ -431,6 +441,10 @@ function listingProofFieldTypes(row, options) {
     fields.search_placeholder = String(
       row?.listing_search_placeholder_type ?? "missing",
     );
+  }
+
+  if (options.sectionLabel) {
+    fields.section_label = String(row?.listing_section_label_type ?? "missing");
   }
 
   if (options.heroLink) {
