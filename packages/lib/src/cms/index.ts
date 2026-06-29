@@ -30,4 +30,11 @@ export {
 export { fetchCmsEditorSnapshot } from "./snapshot";
 export { fetchWriting, searchWriting } from "./writing";
 
-export type { ThoughtSummary, WritingSummary } from "@anipotts/types";
+export type {
+  HomepageMention,
+  HomepageRichSummarySegment,
+  HomepageRichSummarySentence,
+  HomepageRichSummarySimpleSegment,
+  ThoughtSummary,
+  WritingSummary,
+} from "@anipotts/types";

@@ -231,6 +231,71 @@ describe("homepage cms validation", () => {
     expect(validateHomepageContent(content)).toEqual({ ok: true });
   });
 
+  it("normalizes D1-shaped homepage mentions", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      mentions: {
+        ...DEFAULT_HOMEPAGE_CONTENT.mentions,
+        structuredAi: {
+          label: " structured ai ",
+          href: " https://getstructured.ai/ ",
+          logoSrc: " /images/brand/structured-ai-favicon.png ",
+          logoAlt: " structured ai ",
+          logoTone: "white",
+        },
+      },
+    });
+
+    expect(content.mentions.structuredAi).toEqual({
+      label: "structured ai",
+      href: "https://getstructured.ai/",
+      logoSrc: "/images/brand/structured-ai-favicon.png",
+      logoAlt: "structured ai",
+      logoTone: "white",
+    });
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
+  });
+
+  it("rejects homepage mention logos outside local images", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      mentions: {
+        ...DEFAULT_HOMEPAGE_CONTENT.mentions,
+        structuredAi: {
+          ...DEFAULT_HOMEPAGE_CONTENT.mentions.structuredAi,
+          logoSrc: "https://example.com/logo.png",
+        },
+      },
+    });
+
+    expect(validateHomepageContent(content)).toEqual({
+      ok: false,
+      error: "Homepage mention structuredAi logo must stay under /images/",
+    });
+  });
+
+  it("requires rich summary mention keys to exist in mention metadata", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        intro: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
+          rich_summary: [
+            {
+              segments: [{ kind: "mention", key: "newMention" }],
+            },
+          ],
+        },
+      },
+    });
+
+    expect(validateHomepageContent(content)).toEqual({
+      ok: false,
+      error: "Homepage mention newMention is required",
+    });
+  });
+
   it("rejects duplicate homepage writing slugs", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,
