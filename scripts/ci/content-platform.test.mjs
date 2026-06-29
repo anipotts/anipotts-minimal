@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { contentInventorySource } from "../../packages/content/dist/admin/index.js";
 import {
   contentOperationTables,
   contentOperationTemplates,
 } from "../../packages/content/dist/admin/operations.js";
+import { contentInventorySource as rootContentInventorySource } from "../../packages/content/dist/index.js";
 
 const EXPECTED_OPERATION_IDS = [
   "content-draft-homepage-summary-2026-06-28",
@@ -29,6 +32,27 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_provider",
   "sync_external",
 ]);
+
+assert.equal(
+  contentInventorySource.mode,
+  "read_only_static_plus_d1_page_content",
+);
+assert.equal(
+  rootContentInventorySource.mode,
+  "read_only_static_plus_d1_page_content",
+);
+assert.equal(
+  execFileSync(
+    process.execPath,
+    [
+      "-e",
+      "import('@anipotts/content/admin').then((mod) => process.stdout.write(mod.contentInventorySource.mode))",
+    ],
+    { cwd: "apps/admin", encoding: "utf8" },
+  ),
+  "read_only_static_plus_d1_page_content",
+  "apps/admin must be able to import @anipotts/content/admin from the built package export",
+);
 
 assert.deepEqual(
   contentOperationTemplates.map((operation) => operation.operation_id).sort(),
