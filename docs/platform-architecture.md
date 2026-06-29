@@ -327,3 +327,6 @@ Rules:
 40. make `scripts/ci/admin-route-inventory.mjs` the shared source for admin
     route parity and passkey route proof to remove the duplicated proof route
     list.
+41. move `/making` project bucket labels and notes into D1 `page_content`;
+    covered by `drizzle/migrations/0035_seed_making_bucket_copy.sql` with
+    source fallback still retained in `@anipotts/content/public`.

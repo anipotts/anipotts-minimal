@@ -717,11 +717,11 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/making",
     source_ref:
-      "D1 page_content:making, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
-    field_path: "projects.making_index_copy",
+      "D1 page_content:making.buckets and page copy, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
+    field_path: "projects.making_index_copy_and_buckets",
     current_value_ref: "published_page_content:making",
     proposed_value:
-      "Review future edits to the /making title, meta description, hero title, and hero summary through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /making title, meta description, hero title, hero summary, and project bucket labels/notes through preview-only operations before any save path edits page_content.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",

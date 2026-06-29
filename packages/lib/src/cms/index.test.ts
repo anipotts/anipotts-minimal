@@ -634,10 +634,54 @@ describe("owner editor cms validation", () => {
     expect(listing.title).toBe("projects");
     expect(listing.description).toBe(DEFAULT_MAKING_INDEX_CONTENT.description);
     expect(listing.search_placeholder).toBe("");
+    expect(listing.buckets).toEqual(DEFAULT_MAKING_INDEX_CONTENT.buckets);
     expect(validateListingPageContent(listing)).toEqual({
       ok: false,
       error: "Listing page hero title is required",
     });
+  });
+
+  it("normalizes listing page bucket copy", () => {
+    const listing = normalizeListingPageContent(
+      {
+        ...DEFAULT_MAKING_INDEX_CONTENT,
+        buckets: [
+          {
+            id: " Active Work ",
+            label: " active ",
+            note: " maintained ",
+          },
+          {
+            id: "../bad",
+            label: "",
+            note: "dropped",
+          },
+        ],
+      },
+      DEFAULT_MAKING_INDEX_CONTENT,
+    );
+
+    expect(listing.buckets).toEqual([
+      {
+        id: "active-work",
+        label: "active",
+        note: "maintained",
+      },
+    ]);
+    expect(validateListingPageContent(listing)).toEqual({ ok: true });
+  });
+
+  it("falls back when listing page bucket copy is malformed", () => {
+    const listing = normalizeListingPageContent(
+      {
+        ...DEFAULT_MAKING_INDEX_CONTENT,
+        buckets: [{ id: "", label: "", note: "" }],
+      },
+      DEFAULT_MAKING_INDEX_CONTENT,
+    );
+
+    expect(listing.buckets).toEqual(DEFAULT_MAKING_INDEX_CONTENT.buckets);
+    expect(validateListingPageContent(listing)).toEqual({ ok: true });
   });
 
   it("validates listing page hero links", () => {

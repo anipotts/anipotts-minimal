@@ -154,6 +154,12 @@ export interface NewsletterContent {
   reply_to: string;
 }
 
+export interface ListingBucketContent {
+  id: string;
+  label: string;
+  note: string;
+}
+
 export interface ListingPageContent {
   title: string;
   description: string;
@@ -163,6 +169,7 @@ export interface ListingPageContent {
   hero_link_label?: string;
   hero_link_href?: string;
   search_placeholder?: string;
+  buckets?: ListingBucketContent[];
 }
 
 export interface OrchestratingPageContent {
