@@ -14,8 +14,10 @@ const REQUIRED_PAGE_KEYS = [
   "newsletter",
   "newsletter_archive",
   "orchestrating",
+  "project:quantercise",
   "projects",
   "writing",
+  "writing:saturdays-are-for-claude-code",
 ];
 const LISTING_PAGE_PROOF = {
   making: { heroLink: false, search: false },
@@ -33,7 +35,9 @@ const REQUIRED_OPERATIONS = [
   "content-draft-homepage-summary-2026-06-28",
   "content-draft-newsletter-copy-2026-06-28",
   "content-draft-project-card-fields-2026-06-28",
+  "content-draft-project-quantercise-detail-2026-06-29",
   "content-draft-writing-newsletter-backfill-2026-06-28",
+  "content-draft-writing-saturdays-detail-2026-06-29",
   "content-draft-making-index-copy-2026-06-29",
   "content-draft-projects-index-copy-2026-06-29",
   "content-draft-writing-index-copy-2026-06-29",
@@ -55,8 +59,20 @@ const PUBLIC_ROUTES = [
   "/making",
   "/orchestrating",
   "/projects",
+  "/projects/quantercise",
   "/writing",
+  "/writing/saturdays-are-for-claude-code",
 ];
+const DETAIL_PAGE_PROOF = {
+  "project:quantercise": {
+    route: "/projects/quantercise",
+    slug: "quantercise",
+  },
+  "writing:saturdays-are-for-claude-code": {
+    route: "/writing/saturdays-are-for-claude-code",
+    slug: "saturdays-are-for-claude-code",
+  },
+};
 
 const checkedAt = new Date().toISOString();
 
@@ -126,7 +142,11 @@ SELECT
   coalesce(json_type(content, '$.panel_copy'), 'missing') AS listing_panel_copy_type,
   coalesce(json_type(content, '$.search_placeholder'), 'missing') AS listing_search_placeholder_type,
   coalesce(json_type(content, '$.hero_link_label'), 'missing') AS listing_hero_link_label_type,
-  json_extract(content, '$.hero_link_href') AS listing_hero_link_href
+  json_extract(content, '$.hero_link_href') AS listing_hero_link_href,
+  json_extract(content, '$.slug') AS detail_slug,
+  coalesce(json_type(content, '$.title'), 'missing') AS detail_title_type,
+  coalesce(json_type(content, '$.body'), 'missing') AS detail_body_type,
+  coalesce(json_type(content, '$.visible'), 'missing') AS detail_visible_type
 FROM page_content
 ORDER BY page_key ASC, version DESC;
 `);
@@ -241,6 +261,20 @@ const missingListingFields = Object.entries(LISTING_PAGE_PROOF).flatMap(
       .map(([field]) => `${pageKey}_${field}`);
   },
 );
+const missingDetailFields = Object.entries(DETAIL_PAGE_PROOF).flatMap(
+  ([pageKey, options]) => {
+    const row = pageRows.find(
+      (pageRow) =>
+        String(pageRow.page_key) === pageKey && Number(pageRow.published) === 1,
+    );
+    return Object.entries(detailProofFieldTypes(row, options))
+      .filter(
+        ([, type]) =>
+          type !== "text" && type !== "integer" && type !== "boolean",
+      )
+      .map(([field]) => `${pageKey}_${field}`);
+  },
+);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -255,6 +289,7 @@ const missingProof = [
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
   ...missingNewsletterFields,
   ...missingListingFields,
+  ...missingDetailFields,
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...staleOperationSources.map(
     (operationId) => `stale_content_operation_source:${operationId}`,
@@ -323,6 +358,14 @@ const proof = {
     listing_field_types:
       String(row.page_key) in LISTING_PAGE_PROOF
         ? listingProofFieldTypes(row, LISTING_PAGE_PROOF[String(row.page_key)])
+        : null,
+    detail_slug:
+      String(row.page_key) in DETAIL_PAGE_PROOF
+        ? (row.detail_slug ?? null)
+        : null,
+    detail_field_types:
+      String(row.page_key) in DETAIL_PAGE_PROOF
+        ? detailProofFieldTypes(row, DETAIL_PAGE_PROOF[String(row.page_key)])
         : null,
   })),
   content_draft_operations: operationRows.map((row) => ({
@@ -494,6 +537,29 @@ function listingProofFieldTypes(row, options) {
   }
 
   return fields;
+}
+
+function detailProofFieldTypes(row, options) {
+  if (!row) {
+    return {
+      slug: "missing",
+      title: "missing",
+      body: "missing",
+      visible: "missing",
+    };
+  }
+
+  return {
+    slug: row.detail_slug === options.slug ? "text" : "missing",
+    title: row.detail_title_type,
+    body: row.detail_body_type,
+    visible:
+      row.detail_visible_type === "true" ||
+      row.detail_visible_type === "false" ||
+      row.detail_visible_type === "integer"
+        ? "boolean"
+        : "missing",
+  };
 }
 
 function isSafeProofHref(href) {

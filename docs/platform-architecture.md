@@ -283,5 +283,11 @@ Rules:
     section labels, loop cards, and public-tool cards. Covered by
     `drizzle/migrations/0030_expand_orchestrating_page_content.sql`; route
     fallback remains in `@anipotts/content/public`.
-33. reduce deploy workflow inputs to retained production targets after rollback
+33. seed the first individual project and writing detail records into
+    `page_content` while preserving source fallbacks. Covered by
+    `drizzle/migrations/0031_seed_detail_page_content.sql` for
+    `/projects/quantercise` and `/writing/saturdays-are-for-claude-code`.
+    This proves the detail-record path without adding save APIs, publish
+    writes, sends, source rewrites, or external mutations.
+34. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

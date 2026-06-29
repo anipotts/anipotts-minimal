@@ -123,7 +123,7 @@ export type ContentOperationTable = {
 export const contentOperationSchemaSource = {
   source_doc: "docs/admin-content-draft-operations.md",
   migration:
-    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql",
+    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql",
   schema: "packages/lib/src/db/schema.ts",
   mode: "d1_schema_no_write_endpoint",
 };
@@ -422,6 +422,49 @@ export const contentOperationTemplates: ContentOperation[] = [
       "Seeded as an inert review operation. No source files or public routes are changed.",
   },
   {
+    operation_id: "content-draft-project-quantercise-detail-2026-06-29",
+    kind: "content_draft",
+    surface: "public_site",
+    route: "/projects/quantercise",
+    source_ref:
+      "D1 page_content:project:quantercise seeded by drizzle/migrations/0031_seed_detail_page_content.sql, fallback apps/www/src/content/projects/quantercise.md",
+    field_path: "projects.quantercise.detail",
+    current_value_ref: "published_page_content:project:quantercise",
+    proposed_value:
+      "Review future edits to the Quantercise title, summary, body, links, tags, and visibility through preview-only operations before any save path edits page_content.",
+    status: "previewed",
+    risk_level: "medium",
+    authority_state: "detail_page_content_preview_only_no_write",
+    required_approval_ids: [],
+    allowed_actions: ["render_preview", "request_review"],
+    forbidden_actions: [
+      "save",
+      "publish",
+      "deploy",
+      "rewrite_markdown",
+      "sync_external",
+    ],
+    preview_targets: [
+      "/content/review",
+      "/content/preview",
+      "/projects/quantercise",
+    ],
+    proof_ids: [
+      "content.projects.quantercise.page-content",
+      "admin.content.preview.d1",
+    ],
+    evidence_uri: "repo://apps/www/src/content/projects/quantercise.md",
+    redaction: "public_copy_only",
+    created_by: "agent",
+    created_at: "2026-06-29T07:30:00Z",
+    updated_at: "2026-06-29T07:30:00Z",
+    expires_at: "2026-07-29T07:30:00Z",
+    rollback_ref:
+      "source_markdown:apps/www/src/content/projects/quantercise.md",
+    reviewer_note:
+      "First project detail row seeded as inert preview metadata. No source rewrite, save route, or publish event is created.",
+  },
+  {
     operation_id: "content-draft-writing-newsletter-backfill-2026-06-28",
     kind: "content_draft",
     surface: "newsletter",
@@ -458,6 +501,52 @@ export const contentOperationTemplates: ContentOperation[] = [
     rollback_ref: "source_markdown_collection",
     reviewer_note:
       "Seeded as an inert review operation. No newsletter provider action, send, schedule, or source mutation is created.",
+  },
+  {
+    operation_id: "content-draft-writing-saturdays-detail-2026-06-29",
+    kind: "content_draft",
+    surface: "public_site",
+    route: "/writing/saturdays-are-for-claude-code",
+    source_ref:
+      "D1 page_content:writing:saturdays-are-for-claude-code seeded by drizzle/migrations/0031_seed_detail_page_content.sql, fallback apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    field_path: "writing.saturdays_are_for_claude_code.detail",
+    current_value_ref:
+      "published_page_content:writing:saturdays-are-for-claude-code",
+    proposed_value:
+      "Review future edits to the Saturdays are for Claude Code title, summary, body, source link, tags, and publish visibility through preview-only operations before any save path edits page_content.",
+    status: "previewed",
+    risk_level: "medium",
+    authority_state: "detail_page_content_preview_only_no_write",
+    required_approval_ids: [],
+    allowed_actions: ["render_preview", "request_review"],
+    forbidden_actions: [
+      "save",
+      "publish",
+      "send",
+      "schedule",
+      "rewrite_markdown",
+      "sync_provider",
+    ],
+    preview_targets: [
+      "/content/review",
+      "/content/preview",
+      "/writing/saturdays-are-for-claude-code",
+    ],
+    proof_ids: [
+      "content.writing.saturdays.page-content",
+      "admin.content.preview.d1",
+    ],
+    evidence_uri:
+      "repo://apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    redaction: "public_copy_only",
+    created_by: "agent",
+    created_at: "2026-06-29T07:30:00Z",
+    updated_at: "2026-06-29T07:30:00Z",
+    expires_at: "2026-07-29T07:30:00Z",
+    rollback_ref:
+      "source_markdown:apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    reviewer_note:
+      "First writing detail row seeded as inert preview metadata. No source rewrite, send, save route, or publish event is created.",
   },
   {
     operation_id: "content-draft-making-index-copy-2026-06-29",
