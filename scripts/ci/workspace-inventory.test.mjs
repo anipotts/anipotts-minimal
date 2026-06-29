@@ -8,6 +8,36 @@ const EXPECTED_APPS = ["admin", "admin-solid", "www"];
 const EXPECTED_PACKAGES = ["config", "content", "lib", "styles", "types"];
 const EXPECTED_WORKERS = ["ingest", "newsletter", "state", "weekly-email"];
 const EXPECTED_WORKSPACE_GLOBS = ['"apps/*"', '"packages/*"', '"workers/*"'];
+const FORBIDDEN_PATHS = [
+  ["apps/labs", "apps/labs must stay archived"],
+  ["services", "services workspace must stay removed"],
+  [
+    "archives",
+    "root archives directory must stay consolidated under docs/archive",
+  ],
+  ["apps/admin/next.config.ts", "apps/admin must stay Astro-native"],
+  ["apps/admin/next.config.mjs", "apps/admin must stay Astro-native"],
+  ["apps/admin/next.config.js", "apps/admin must stay Astro-native"],
+  ["apps/admin/open-next.config.ts", "apps/admin must stay Astro-native"],
+  ["apps/admin/open-next.config.mjs", "apps/admin must stay Astro-native"],
+  ["apps/admin/open-next.config.js", "apps/admin must stay Astro-native"],
+  ["apps/admin/vercel.json", "apps/admin must stay Cloudflare Worker native"],
+  ["apps/www/next.config.ts", "apps/www must stay Astro-native"],
+  ["apps/www/next.config.mjs", "apps/www must stay Astro-native"],
+  ["apps/www/next.config.js", "apps/www must stay Astro-native"],
+  ["apps/www/open-next.config.ts", "apps/www must stay Astro-native"],
+  ["apps/www/open-next.config.mjs", "apps/www must stay Astro-native"],
+  ["apps/www/open-next.config.js", "apps/www must stay Astro-native"],
+  ["apps/www/vercel.json", "apps/www must stay Cloudflare Worker native"],
+  [
+    "packages/services-platform/package.json",
+    "services-platform package must stay removed from the workspace",
+  ],
+  [
+    "packages/brand/package.json",
+    "brand package must stay removed from the workspace",
+  ],
+];
 
 assert.deepEqual(
   packageDirs("apps"),
@@ -24,17 +54,9 @@ assert.deepEqual(
   EXPECTED_WORKERS,
   "workers inventory drifted from retained production workers",
 );
-assert.equal(existsSync("apps/labs"), false, "apps/labs must stay archived");
-assert.equal(
-  existsSync("services"),
-  false,
-  "services workspace must stay removed",
-);
-assert.equal(
-  existsSync("archives"),
-  false,
-  "root archives directory must stay consolidated under docs/archive",
-);
+for (const [path, message] of FORBIDDEN_PATHS) {
+  assert.equal(existsSync(path), false, message);
+}
 
 const workspace = readFileSync("pnpm-workspace.yaml", "utf8");
 for (const glob of EXPECTED_WORKSPACE_GLOBS) {
