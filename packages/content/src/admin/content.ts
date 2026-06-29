@@ -1,6 +1,11 @@
 export type RiskLevel = "low" | "medium" | "high";
 
-export type ContentSurface = "homepage" | "projects" | "writing" | "newsletter";
+export type ContentSurface =
+  | "homepage"
+  | "projects"
+  | "writing"
+  | "newsletter"
+  | "orchestrating";
 export type ContentEditability = "ready" | "needs_schema" | "needs_owner";
 
 export type ContentInventoryItem = {
@@ -445,6 +450,21 @@ export const contentInventory: ContentInventoryItem[] = [
     required_authority: ["newsletter.publish.owner-decision"],
     proof_ids: ["content.newsletter.backfill.plan"],
   },
+  {
+    id: "orchestrating.hero_copy",
+    surface: "orchestrating",
+    title: "orchestrating hero copy",
+    source_ref:
+      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql, fallback @anipotts/lib/cms DEFAULT_ORCHESTRATING_CONTENT",
+    current_value:
+      "The /orchestrating title, meta description, section label, hero title, hero summary, and live-session panel copy use structured page_content when present.",
+    editability: "ready",
+    risk_level: "medium",
+    next_safe_action:
+      "Preview orchestrating hero changes before any save path edits the page content record because this page describes live operator machinery.",
+    required_authority: [],
+    proof_ids: ["content.orchestrating.hero.page-content"],
+  },
 ];
 
 function countPageContentRows(
@@ -604,12 +624,14 @@ function summarizePageContent(
     pageKey === "writing" ||
     pageKey === "making" ||
     pageKey === "projects" ||
-    pageKey === "newsletter_archive"
+    pageKey === "newsletter_archive" ||
+    pageKey === "orchestrating"
   ) {
     return compactSummary([
       ["title", content.hero_title ?? content.title],
       ["label", content.section_label],
       ["summary", content.hero_summary],
+      ["panel", content.panel_copy],
       ["link", content.hero_link_href],
       ["search", content.search_placeholder],
     ]);

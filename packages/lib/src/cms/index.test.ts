@@ -9,6 +9,7 @@ import {
   DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_ORCHESTRATING_CONTENT,
   DEFAULT_PROJECTS_INDEX_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
   normalizeCmsProject,
@@ -16,12 +17,14 @@ import {
   normalizeHomepageContent,
   normalizeListingPageContent,
   normalizeNewsletterContent,
+  normalizeOrchestratingPageContent,
   searchWriting,
   validateCmsProject,
   validateCmsWriting,
   validateHomepageContent,
   validateListingPageContent,
   validateNewsletterContent,
+  validateOrchestratingPageContent,
   homepageSummaryText,
 } from "./index";
 
@@ -664,5 +667,29 @@ describe("owner editor cms validation", () => {
 
     expect(listing.section_label).toBe("archive");
     expect(validateListingPageContent(listing)).toEqual({ ok: true });
+  });
+
+  it("validates orchestrating page content", () => {
+    const content = normalizeOrchestratingPageContent({
+      ...DEFAULT_ORCHESTRATING_CONTENT,
+      section_label: " orchestrating ",
+      panel_copy: " live local stats ",
+    });
+
+    expect(content.section_label).toBe("orchestrating");
+    expect(content.panel_copy).toBe("live local stats");
+    expect(validateOrchestratingPageContent(content)).toEqual({ ok: true });
+  });
+
+  it("rejects empty orchestrating panel copy", () => {
+    const content = normalizeOrchestratingPageContent({
+      ...DEFAULT_ORCHESTRATING_CONTENT,
+      panel_copy: "",
+    });
+
+    expect(validateOrchestratingPageContent(content)).toEqual({
+      ok: false,
+      error: "Orchestrating panel copy is required",
+    });
   });
 });

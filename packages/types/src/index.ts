@@ -42,6 +42,7 @@ export type {
   CmsWritingContent,
   ListingPageContent,
   NewsletterContent,
+  OrchestratingPageContent,
   FooterContent,
   ProjectRow,
   SocialLinkRow,
