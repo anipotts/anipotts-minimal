@@ -14,10 +14,25 @@ const REQUIRED_PAGE_KEYS = [
   "newsletter",
   "newsletter_archive",
   "orchestrating",
+  "project:chainedchat",
+  "project:claude-code-tips",
+  "project:imessage-mcp",
+  "project:nyu-purity-test",
+  "project:options-pricing-sensitivity",
+  "project:pgi-research-platform",
   "project:quantercise",
+  "project:quantercise-extension",
+  "project:saeshify",
   "projects",
   "writing",
+  "writing:i-built-a-monitor-for-my-claude-code-sessions",
   "writing:saturdays-are-for-claude-code",
+  "writing:search-will-be-dead-by-2030",
+  "writing:stop-ending-your-day-with-fix-the-bug",
+];
+const REQUIRED_UNPUBLISHED_PAGE_KEYS = [
+  "project:habittracker-obh",
+  "writing:jpegmafia-is-our-kanye-west",
 ];
 const LISTING_PAGE_PROOF = {
   making: { heroLink: false, search: false },
@@ -33,16 +48,29 @@ const LISTING_PAGE_PROOF = {
 };
 const REQUIRED_OPERATIONS = [
   "content-draft-homepage-summary-2026-06-28",
+  "content-draft-making-index-copy-2026-06-29",
+  "content-draft-newsletter-archive-copy-2026-06-29",
   "content-draft-newsletter-copy-2026-06-28",
+  "content-draft-orchestrating-hero-copy-2026-06-29",
   "content-draft-project-card-fields-2026-06-28",
+  "content-draft-project-chainedchat-detail-2026-06-29",
+  "content-draft-project-claude-code-tips-detail-2026-06-29",
+  "content-draft-project-habittracker-obh-detail-2026-06-29",
+  "content-draft-project-imessage-mcp-detail-2026-06-29",
+  "content-draft-project-nyu-purity-test-detail-2026-06-29",
+  "content-draft-project-options-pricing-sensitivity-detail-2026-06-29",
+  "content-draft-project-pgi-research-platform-detail-2026-06-29",
   "content-draft-project-quantercise-detail-2026-06-29",
+  "content-draft-project-quantercise-extension-detail-2026-06-29",
+  "content-draft-project-saeshify-detail-2026-06-29",
+  "content-draft-projects-index-copy-2026-06-29",
+  "content-draft-writing-i-built-a-monitor-for-my-claude-code-sessions-detail-2026-06-29",
+  "content-draft-writing-index-copy-2026-06-29",
+  "content-draft-writing-jpegmafia-is-our-kanye-west-detail-2026-06-29",
   "content-draft-writing-newsletter-backfill-2026-06-28",
   "content-draft-writing-saturdays-detail-2026-06-29",
-  "content-draft-making-index-copy-2026-06-29",
-  "content-draft-projects-index-copy-2026-06-29",
-  "content-draft-writing-index-copy-2026-06-29",
-  "content-draft-newsletter-archive-copy-2026-06-29",
-  "content-draft-orchestrating-hero-copy-2026-06-29",
+  "content-draft-writing-search-will-be-dead-by-2030-detail-2026-06-29",
+  "content-draft-writing-stop-ending-your-day-with-fix-the-bug-detail-2026-06-29",
 ];
 const ADMIN_ROUTES = [
   "/content",
@@ -59,18 +87,96 @@ const PUBLIC_ROUTES = [
   "/making",
   "/orchestrating",
   "/projects",
+  "/projects/chainedchat",
+  "/projects/claude-code-tips",
+  "/projects/imessage-mcp",
+  "/projects/nyu-purity-test",
+  "/projects/options-pricing-sensitivity",
+  "/projects/pgi-research-platform",
   "/projects/quantercise",
+  "/projects/quantercise-extension",
+  "/projects/saeshify",
   "/writing",
+  "/writing/i-built-a-monitor-for-my-claude-code-sessions",
   "/writing/saturdays-are-for-claude-code",
+  "/writing/search-will-be-dead-by-2030",
+  "/writing/stop-ending-your-day-with-fix-the-bug",
 ];
 const DETAIL_PAGE_PROOF = {
+  "project:chainedchat": {
+    route: "/projects/chainedchat",
+    slug: "chainedchat",
+    published: true,
+  },
+  "project:claude-code-tips": {
+    route: "/projects/claude-code-tips",
+    slug: "claude-code-tips",
+    published: true,
+  },
+  "project:habittracker-obh": {
+    route: "/projects/habittracker-obh",
+    slug: "habittracker-obh",
+    published: false,
+  },
+  "project:imessage-mcp": {
+    route: "/projects/imessage-mcp",
+    slug: "imessage-mcp",
+    published: true,
+  },
+  "project:nyu-purity-test": {
+    route: "/projects/nyu-purity-test",
+    slug: "nyu-purity-test",
+    published: true,
+  },
+  "project:options-pricing-sensitivity": {
+    route: "/projects/options-pricing-sensitivity",
+    slug: "options-pricing-sensitivity",
+    published: true,
+  },
+  "project:pgi-research-platform": {
+    route: "/projects/pgi-research-platform",
+    slug: "pgi-research-platform",
+    published: true,
+  },
   "project:quantercise": {
     route: "/projects/quantercise",
     slug: "quantercise",
+    published: true,
+  },
+  "project:quantercise-extension": {
+    route: "/projects/quantercise-extension",
+    slug: "quantercise-extension",
+    published: true,
+  },
+  "project:saeshify": {
+    route: "/projects/saeshify",
+    slug: "saeshify",
+    published: true,
+  },
+  "writing:i-built-a-monitor-for-my-claude-code-sessions": {
+    route: "/writing/i-built-a-monitor-for-my-claude-code-sessions",
+    slug: "i-built-a-monitor-for-my-claude-code-sessions",
+    published: true,
+  },
+  "writing:jpegmafia-is-our-kanye-west": {
+    route: "/writing/jpegmafia-is-our-kanye-west",
+    slug: "jpegmafia-is-our-kanye-west",
+    published: false,
   },
   "writing:saturdays-are-for-claude-code": {
     route: "/writing/saturdays-are-for-claude-code",
     slug: "saturdays-are-for-claude-code",
+    published: true,
+  },
+  "writing:search-will-be-dead-by-2030": {
+    route: "/writing/search-will-be-dead-by-2030",
+    slug: "search-will-be-dead-by-2030",
+    published: true,
+  },
+  "writing:stop-ending-your-day-with-fix-the-bug": {
+    route: "/writing/stop-ending-your-day-with-fix-the-bug",
+    slug: "stop-ending-your-day-with-fix-the-bug",
+    published: true,
   },
 };
 
@@ -185,6 +291,9 @@ const [adminRoutes, publicRoutes] = await Promise.all([
 const publishedPageKeys = pageRows
   .filter((row) => Number(row.published) === 1)
   .map((row) => String(row.page_key));
+const unpublishedPageKeys = pageRows
+  .filter((row) => Number(row.published) === 0)
+  .map((row) => String(row.page_key));
 const operationIds = operationRows.map((row) => String(row.operation_id));
 const staleOperationSources = operationRows
   .filter((row) =>
@@ -193,6 +302,9 @@ const staleOperationSources = operationRows
   .map((row) => String(row.operation_id));
 const missingPageKeys = REQUIRED_PAGE_KEYS.filter(
   (pageKey) => !publishedPageKeys.includes(pageKey),
+);
+const missingUnpublishedPageKeys = REQUIRED_UNPUBLISHED_PAGE_KEYS.filter(
+  (pageKey) => !unpublishedPageKeys.includes(pageKey),
 );
 const missingOperations = REQUIRED_OPERATIONS.filter(
   (operationId) => !operationIds.includes(operationId),
@@ -265,7 +377,8 @@ const missingDetailFields = Object.entries(DETAIL_PAGE_PROOF).flatMap(
   ([pageKey, options]) => {
     const row = pageRows.find(
       (pageRow) =>
-        String(pageRow.page_key) === pageKey && Number(pageRow.published) === 1,
+        String(pageRow.page_key) === pageKey &&
+        Number(pageRow.published) === (options.published ? 1 : 0),
     );
     return Object.entries(detailProofFieldTypes(row, options))
       .filter(
@@ -278,6 +391,9 @@ const missingDetailFields = Object.entries(DETAIL_PAGE_PROOF).flatMap(
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
+  ...missingUnpublishedPageKeys.map(
+    (pageKey) => `unpublished_page_content:${pageKey}`,
+  ),
   ...(homeSubheadingType === "text" ? [] : ["home_intro_subheading"]),
   ...(homeRichSummaryCount === 2 ? [] : ["home_rich_summary"]),
   ...(homeAboutParagraphCount === 2 && homeAboutLabelType === "text"

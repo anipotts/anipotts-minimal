@@ -322,17 +322,17 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "projects",
     title: "project detail body",
     source_ref:
-      "D1 page_content:project:quantercise seeded by drizzle/migrations/0031_seed_detail_page_content.sql for the first detail row, fallback apps/www/src/content/projects/*.md body",
+      "D1 page_content:project:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback apps/www/src/content/projects/*.md body",
     current_value:
-      "Quantercise now has a structured detail page_content row. Other project bodies plus optional technical and roadmap arrays still fall back to Astro markdown.",
+      "Every tracked project detail record now has a structured page_content row. Visible rows publish to public routes; hidden rows remain available for admin review only.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Extend detail page_content rows one project at a time before adding any save path, because detail pages carry public claims.",
+      "Review detail page_content rows in admin before replacing markdown fallback or adding any save path, because detail pages carry public claims.",
     required_authority: [],
     proof_ids: [
       "content.projects.body.schema",
-      "content.projects.quantercise.page-content",
+      "content.projects.detail.page-content",
     ],
   },
   {
@@ -383,17 +383,17 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "writing",
     title: "writing body",
     source_ref:
-      "D1 page_content:writing:saturdays-are-for-claude-code seeded by drizzle/migrations/0031_seed_detail_page_content.sql for the first detail row, fallback apps/www/src/content/writing/*.md body",
+      "D1 page_content:writing:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback apps/www/src/content/writing/*.md body",
     current_value:
-      "Saturdays are for Claude Code now has a structured detail page_content row. Other published article bodies still fall back to Astro markdown.",
+      "Every tracked writing detail record now has a structured page_content row. Published rows render on public routes; the draft row remains unpublished for admin review only.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Extend detail page_content rows one writing item at a time; publishing and outbound syndication stay separate.",
+      "Review writing detail page_content rows in admin before replacing markdown fallback or adding any save/send path.",
     required_authority: [],
     proof_ids: [
       "content.writing.body.source",
-      "content.writing.saturdays.page-content",
+      "content.writing.detail.page-content",
     ],
   },
   {
