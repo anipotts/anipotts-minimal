@@ -24,7 +24,6 @@ const ROUTES = [
     route: "/content/drafts",
     file: "apps/admin/src/pages/content/drafts.astro",
     nav: true,
-    smoke: false,
   },
   {
     route: "/content/preview",
