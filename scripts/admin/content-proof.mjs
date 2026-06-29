@@ -145,9 +145,15 @@ const homeMentionCount = Number(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_mention_count ?? 0,
 );
+const homeSubheadingType = String(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_subheading_type ?? "missing",
+);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
+  ...(homeSubheadingType === "text" ? [] : ["home_intro_subheading"]),
   ...(homeRichSummaryCount === 2 ? [] : ["home_rich_summary"]),
   ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
