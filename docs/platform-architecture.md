@@ -168,6 +168,9 @@ Rules:
   workflow-dispatch only for rollback while passkey proof is incomplete.
 - `packages/lib` and `packages/styles` changes deploy `www` only because
   `apps/admin` does not depend on them.
+- `agent-automerge.yml` and `deploy.yml` both use
+  `scripts/ci/compute-deploy-targets.mjs`; target rules should not be duplicated
+  in workflow-local path filters.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
   `pnpm test:public-routes` keeps deploy smoke, manual smoke, and content proof
   aligned on the public route set: `/`, `/newsletter`, `/newsletter/archive`,
