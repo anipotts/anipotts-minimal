@@ -2,7 +2,11 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { contentInventorySource } from "../../packages/content/dist/admin/index.js";
+import {
+  contentInventorySource,
+  recordsFromSourceModules,
+  summarizeSourceContentRecords,
+} from "../../packages/content/dist/admin/index.js";
 import {
   contentOperationTables,
   contentOperationTemplates,
@@ -32,6 +36,70 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_provider",
   "sync_external",
 ]);
+
+const sourceRecords = [
+  ...recordsFromSourceModules("projects", {
+    "/repo/apps/www/src/content/projects/hidden-lab.md": `---
+title: Hidden Lab
+summary: Internal project page
+visible: false
+sort_order: 2
+---
+`,
+  }),
+  ...recordsFromSourceModules("writing", {
+    "/repo/apps/www/src/content/writing/control-plane.md": `---
+title: Control Plane
+summary: Agents need authority, proof, and state.
+status: published
+tags: [agents, admin]
+---
+## opening
+
+The admin app should render source-backed writing as a preview before any publish or send path exists.
+`,
+  }),
+];
+
+assert.deepEqual(
+  summarizeSourceContentRecords(sourceRecords),
+  {
+    projects: 1,
+    writing: 1,
+    published_writing: 1,
+    visible_projects: 0,
+  },
+  "source content parser must preserve admin summary counts",
+);
+
+const hiddenProject = sourceRecords.find(
+  (record) => record.id === "projects.hidden-lab",
+);
+assert.ok(hiddenProject, "hidden project source record must be parsed");
+assert.equal(hiddenProject.status, "hidden");
+assert.equal(
+  hiddenProject.source_ref,
+  "apps/www/src/content/projects/hidden-lab.md",
+);
+assert.equal(hiddenProject.body_state, "frontmatter only");
+assert.equal(hiddenProject.body_preview, "no markdown body yet");
+
+const writingRecord = sourceRecords.find(
+  (record) => record.id === "writing.control-plane",
+);
+assert.ok(writingRecord, "writing source record must be parsed");
+assert.equal(writingRecord.status, "published");
+assert.equal(writingRecord.body_section_count, 1);
+assert.ok(
+  writingRecord.fields.some(
+    (field) => field.path === "tags" && field.value === "agents, admin",
+  ),
+  "source content parser must preserve list frontmatter fields",
+);
+assert.ok(
+  writingRecord.body_preview.includes("admin app should render source-backed"),
+  "source content parser must expose a markdown body preview",
+);
 
 assert.equal(
   contentInventorySource.mode,
