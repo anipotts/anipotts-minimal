@@ -16,6 +16,7 @@ const SENSITIVE_PREFIXES = [
   "apps/admin-solid/src/lib/",
   "apps/admin-solid/src/routes/api/",
   "drizzle/migrations/",
+  "packages/content/",
   "packages/lib/",
   "scripts/",
   "workers/",
@@ -129,6 +130,12 @@ function scanForSecrets(file, content) {
   for (const [lineIndex, line] of content.split(/\r?\n/).entries()) {
     if (line.includes("${{ secrets.")) continue;
     for (const { id, pattern } of SECRET_PATTERNS) {
+      if (
+        id === "inline-secret-assignment" &&
+        isPublicMetadataAssignment(line)
+      ) {
+        continue;
+      }
       if (pattern.test(line)) {
         findings.push({
           file,
@@ -140,6 +147,12 @@ function scanForSecrets(file, content) {
     }
   }
   return findings;
+}
+
+function isPublicMetadataAssignment(line) {
+  return /^(?:authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*:/.test(
+    line.trim(),
+  );
 }
 
 function scanForBannedLlmReview(file, content) {

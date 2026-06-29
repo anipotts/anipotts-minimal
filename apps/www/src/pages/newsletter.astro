@@ -1,10 +1,8 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
-import {
-  fetchPageContent,
-  normalizeNewsletterContent,
-} from "@anipotts/lib/cms";
+import { normalizeNewsletterContent } from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 

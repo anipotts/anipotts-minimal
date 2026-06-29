@@ -113,6 +113,9 @@ importers:
 
   apps/www:
     dependencies:
+      '@anipotts/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@anipotts/lib':
         specifier: workspace:*
         version: link:../../packages/lib
@@ -176,6 +179,10 @@ importers:
         version: 5.9.3
 
   packages/content:
+    dependencies:
+      '@anipotts/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       typescript:
         specifier: ^5
@@ -183,6 +190,9 @@ importers:
 
   packages/lib:
     dependencies:
+      '@anipotts/content':
+        specifier: workspace:*
+        version: link:../content
       '@anipotts/types':
         specifier: workspace:*
         version: link:../types

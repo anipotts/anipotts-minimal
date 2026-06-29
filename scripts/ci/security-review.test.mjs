@@ -16,6 +16,7 @@ expectSensitive("apps/admin/src/middleware.ts", true);
 expectSensitive("apps/admin/src/pages/api/admin/passkey/status.ts", true);
 expectSensitive("apps/admin/src/pages/auth/passkey.astro", true);
 expectSensitive("workers/state/src/index.ts", true);
+expectSensitive("packages/content/src/public/defaults.ts", true);
 expectSensitive("packages/lib/src/cms/homepage.ts", true);
 expectSensitive("drizzle/migrations/0016_seed_homepage_rich_summary.sql", true);
 expectSensitive("scripts/ci/security-review.mjs", true);
@@ -51,6 +52,14 @@ const fakeFiles = new Map([
     ".github/workflows/deploy.yml",
     "env:\n  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n",
   ],
+  [
+    "packages/content/src/admin/operations.ts",
+    `const operation = {
+  authority_state: "source_truth_resolved_preview_only",
+  current_value_ref: "published_page_content:newsletter_archive",
+};
+`,
+  ],
 ]);
 
 function readFake(file) {
@@ -63,6 +72,7 @@ const findings = reviewFiles(
     "scripts/example.ts",
     "drizzle/migrations/0099_drop.sql",
     ".github/workflows/deploy.yml",
+    "packages/content/src/admin/operations.ts",
     "docs/archive/old.md",
   ],
   readFake,

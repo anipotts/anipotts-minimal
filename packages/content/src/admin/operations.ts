@@ -325,7 +325,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary and @anipotts/lib/cms homepageSummaryText fallback",
+      "D1 page_content:home.sections.intro.rich_summary and @anipotts/content/public homepageSummaryText fallback",
     field_path: "homepage.summary",
     current_value_ref: "source_fallback",
     proposed_value:
@@ -355,7 +355,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "newsletter",
     route: "/newsletter",
     source_ref:
-      "D1 page_content:newsletter, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT and component props",
+      "D1 page_content:newsletter, fallback @anipotts/content/public DEFAULT_NEWSLETTER_CONTENT and component props",
     field_path: "newsletter.subscribe_copy",
     current_value_ref: "source_fallback",
     proposed_value:
@@ -465,7 +465,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/making",
     source_ref:
-      "D1 page_content:making, fallback @anipotts/lib/cms DEFAULT_MAKING_INDEX_CONTENT",
+      "D1 page_content:making, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
     field_path: "projects.making_index_copy",
     current_value_ref: "published_page_content:making",
     proposed_value:
@@ -501,7 +501,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/projects",
     source_ref:
-      "D1 page_content:projects, fallback @anipotts/lib/cms DEFAULT_PROJECTS_INDEX_CONTENT",
+      "D1 page_content:projects, fallback @anipotts/content/public DEFAULT_PROJECTS_INDEX_CONTENT",
     field_path: "projects.archive_index_copy",
     current_value_ref: "published_page_content:projects",
     proposed_value:
@@ -537,7 +537,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/writing",
     source_ref:
-      "D1 page_content:writing, fallback @anipotts/lib/cms DEFAULT_WRITING_INDEX_CONTENT",
+      "D1 page_content:writing, fallback @anipotts/content/public DEFAULT_WRITING_INDEX_CONTENT",
     field_path: "writing.index_copy",
     current_value_ref: "published_page_content:writing",
     proposed_value:
@@ -573,7 +573,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "newsletter",
     route: "/newsletter/archive",
     source_ref:
-      "D1 page_content:newsletter_archive, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
+      "D1 page_content:newsletter_archive, fallback @anipotts/content/public DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
     field_path: "newsletter.archive_copy",
     current_value_ref: "published_page_content:newsletter_archive",
     proposed_value:
@@ -607,7 +607,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/orchestrating",
     source_ref:
-      "D1 page_content:orchestrating, fallback @anipotts/lib/cms DEFAULT_ORCHESTRATING_CONTENT",
+      "D1 page_content:orchestrating, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
     field_path: "orchestrating.hero_copy",
     current_value_ref: "published_page_content:orchestrating",
     proposed_value:

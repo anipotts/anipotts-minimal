@@ -52,13 +52,13 @@ deploy target coverage, and live version history.
 
 ### packages
 
-| Path               | Role today                                                     | Classification                  |
-| ------------------ | -------------------------------------------------------------- | ------------------------------- |
-| `packages/lib`     | shared CMS, admin, db, data, services helpers                  | keep, split later if useful     |
-| `packages/content` | shared content inventory, previews, source parsers, and drafts | keep, expand toward D1 adapters |
-| `packages/styles`  | shared style tokens                                            | keep                            |
-| `packages/types`   | shared generated types                                         | keep                            |
-| `packages/config`  | shared TypeScript, Tailwind, and PostCSS config                | keep minimal shared config      |
+| Path               | Role today                                                               | Classification                  |
+| ------------------ | ------------------------------------------------------------------------ | ------------------------------- |
+| `packages/lib`     | D1-backed CMS readers, db, data, services helpers                        | keep as runtime adapter layer   |
+| `packages/content` | public content contracts, admin inventory, previews, parsers, and drafts | keep, expand toward D1 adapters |
+| `packages/styles`  | shared style tokens                                                      | keep                            |
+| `packages/types`   | shared generated types                                                   | keep                            |
+| `packages/config`  | shared TypeScript, Tailwind, and PostCSS config                          | keep minimal shared config      |
 
 ## route parity target
 
@@ -166,8 +166,10 @@ Rules:
 - docs-only changes deploy nothing.
 - lockfile and root package changes never deploy every target by default.
 - public site changes deploy `www` only.
-- admin changes and `packages/content` changes deploy only the Astro admin
-  target.
+- admin changes deploy only the Astro admin target.
+- `packages/content/src/admin` changes deploy admin only.
+- `packages/content/src/public`, package export, or package manifest changes
+  deploy both `www` and admin consumers.
 - `apps/admin-solid` changes do not auto-deploy. Its deploy job remains
   workflow-dispatch only for rollback while passkey proof is incomplete.
 - `packages/lib` and `packages/styles` changes deploy `www` only because
@@ -232,7 +234,7 @@ Rules:
     `drizzle/migrations/0017_seed_homepage_mentions.sql` with Astro source
     fallback still retained.
 17. remove duplicate `homeContent` homepage fallback from `apps/www/src/data`;
-    homepage fallback content now lives in `@anipotts/lib/cms`.
+    homepage fallback content now lives in `@anipotts/content/public`.
 18. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
 19. move homepage intro subheading into D1 `page_content`; seeded by
     `drizzle/migrations/0019_seed_homepage_intro_subheading.sql` with source
@@ -270,5 +272,12 @@ Rules:
     controls backed by page_content and content_draft_operations.
 30. move project and writing source-content parsing into `packages/content` so
     the admin app only owns the Vite raw-markdown import boundary.
-31. reduce deploy workflow inputs to retained production targets after rollback
+31. move public page content defaults, pure normalizers, validators, content key
+    helpers, and homepage summary helpers into `@anipotts/content/public`.
+    Keep `@anipotts/lib/cms` as the D1-backed reader facade and compatibility
+    export. Public route consumers should import pure content shape contracts
+    from `@anipotts/content/public`; D1 readers stay in `@anipotts/lib/cms`.
+    Metadata-only source-ref refresh is covered by
+    `drizzle/migrations/0029_update_public_content_contract_source_refs.sql`.
+32. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

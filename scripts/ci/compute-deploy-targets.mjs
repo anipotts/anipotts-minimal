@@ -30,6 +30,9 @@ export function computeDeployTargets(files) {
     if (
       file.startsWith("apps/www/") ||
       file.startsWith("packages/lib/") ||
+      file.startsWith("packages/content/src/public/") ||
+      file === "packages/content/package.json" ||
+      file === "packages/content/src/index.ts" ||
       file.startsWith("packages/styles/") ||
       file.startsWith("packages/types/")
     ) {
