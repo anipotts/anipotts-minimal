@@ -199,7 +199,11 @@ Rules:
     fallback still retained.
 15. move homepage rich summary text and mention keys into D1 `page_content`;
     seeded by `drizzle/migrations/0016_seed_homepage_rich_summary.sql` with
-    Astro brand visual metadata still retained.
-16. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
-17. reduce deploy workflow inputs to retained production targets after rollback
+    Astro source fallback still retained.
+16. move homepage mention label, link, and local logo metadata into D1
+    `page_content`; seeded by
+    `drizzle/migrations/0017_seed_homepage_mentions.sql` with Astro source
+    fallback still retained.
+17. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
+18. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

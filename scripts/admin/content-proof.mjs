@@ -53,6 +53,16 @@ SELECT
     THEN coalesce(json_array_length(json_extract(content, '$.sections.latest_thoughts.writing_slugs')), 0)
     ELSE NULL
   END AS home_writing_slug_count,
+  CASE
+    WHEN page_key = 'home'
+    THEN coalesce((SELECT COUNT(*) FROM json_each(page_content.content, '$.mentions')), 0)
+    ELSE NULL
+  END AS home_mention_count,
+  CASE
+    WHEN page_key = 'home'
+    THEN json_extract(content, '$.mentions.structuredAi.logoSrc')
+    ELSE NULL
+  END AS home_structured_ai_logo,
   json_extract(content, '$.headline') AS newsletter_headline
 FROM page_content
 ORDER BY page_key ASC, version DESC;
@@ -124,6 +134,11 @@ const homeWritingSlugCount = Number(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_writing_slug_count ?? 0,
 );
+const homeMentionCount = Number(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_mention_count ?? 0,
+);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -131,6 +146,7 @@ const missingProof = [
   ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
+  ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...(publishEvents === 0 ? [] : ["content_publish_events_should_be_empty"]),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
@@ -173,6 +189,11 @@ const proof = {
       row.home_writing_slug_count === undefined
         ? null
         : Number(row.home_writing_slug_count),
+    home_mention_count:
+      row.home_mention_count === null || row.home_mention_count === undefined
+        ? null
+        : Number(row.home_mention_count),
+    home_structured_ai_logo: row.home_structured_ai_logo ?? null,
     newsletter_headline: row.newsletter_headline ?? null,
   })),
   content_draft_operations: operationRows.map((row) => ({

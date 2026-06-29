@@ -1,5 +1,6 @@
 import type {
   HomepageContent,
+  HomepageMention,
   HomepageProofCard,
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,
@@ -249,6 +250,93 @@ function normalizeProofCards(
   return cards.length > 0 ? cards : fallback;
 }
 
+function normalizeMentions(
+  value: unknown,
+  fallback: Record<string, HomepageMention>,
+): Record<string, HomepageMention> {
+  const source =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const keys = new Set([
+    ...Object.keys(fallback),
+    ...Object.keys(source).filter(isSafeMentionKey),
+  ]);
+  const mentions: Record<string, HomepageMention> = {};
+
+  for (const key of keys) {
+    const normalized = normalizeMention(source[key], fallback[key]);
+    if (normalized) {
+      mentions[key] = normalized;
+    }
+  }
+
+  return Object.keys(mentions).length > 0 ? mentions : fallback;
+}
+
+function normalizeMention(
+  value: unknown,
+  fallback: HomepageMention | undefined,
+): HomepageMention | null {
+  const source =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const label = coerceString(source.label, fallback?.label ?? "").trim();
+
+  if (!label) return null;
+
+  const mention: HomepageMention = {
+    label,
+  };
+
+  copyOptionalString(mention, source, fallback, "href");
+  copyOptionalString(mention, source, fallback, "icon");
+  copyOptionalString(mention, source, fallback, "mark");
+  copyOptionalString(mention, source, fallback, "logoSrc");
+  copyOptionalString(mention, source, fallback, "logoAlt");
+  copyOptionalString(mention, source, fallback, "badgeSrc");
+  copyOptionalString(mention, source, fallback, "badgeAlt");
+  mention.logoTone = normalizeMentionOption(
+    source.logoTone,
+    fallback?.logoTone,
+    ["native", "white"],
+  );
+  mention.logoShape = normalizeMentionOption(
+    source.logoShape,
+    fallback?.logoShape,
+    ["square", "wide", "mark", "large"],
+  );
+
+  return mention;
+}
+
+function copyOptionalString<K extends keyof HomepageMention>(
+  target: HomepageMention,
+  source: Record<string, unknown>,
+  fallback: HomepageMention | undefined,
+  key: K,
+) {
+  const sourceKey = String(key);
+  const value =
+    source[sourceKey] === undefined
+      ? fallback?.[key]
+      : coerceString(source[sourceKey], "").trim();
+  if (typeof value === "string" && value.length > 0) {
+    target[key] = value as HomepageMention[K];
+  }
+}
+
+function normalizeMentionOption<T extends string>(
+  value: unknown,
+  fallback: T | undefined,
+  allowed: readonly T[],
+): T | undefined {
+  return typeof value === "string" && allowed.includes(value as T)
+    ? (value as T)
+    : fallback;
+}
+
 function isSafeHomepageLink(href: string): boolean {
   if (!href || /[\u0000-\u001f\u007f\s]/.test(href)) return false;
   if (href.startsWith("/")) return !href.startsWith("//");
@@ -260,6 +348,11 @@ function isSafeHomepageLink(href: string): boolean {
   } catch {
     return false;
   }
+}
+
+function isSafeHomepageAssetPath(path: string): boolean {
+  if (!path || /[\u0000-\u001f\u007f\s]/.test(path)) return false;
+  return path.startsWith("/images/") && !path.includes("..");
 }
 
 function validateTextField(
@@ -396,6 +489,84 @@ function richSummaryTextLength(segments: HomepageRichSummarySegment[]): number {
   }, 0);
 }
 
+function collectRichSummaryMentionKeys(
+  sentences: HomepageRichSummarySentence[] | undefined,
+): string[] {
+  if (!sentences) return [];
+  const keys = new Set<string>();
+  for (const sentence of sentences) {
+    collectMentionKeysFromSegments(sentence.segments, keys);
+  }
+  return [...keys];
+}
+
+function collectMentionKeysFromSegments(
+  segments: HomepageRichSummarySegment[],
+  keys: Set<string>,
+) {
+  for (const segment of segments) {
+    if (segment.kind === "mention") {
+      keys.add(segment.key);
+      continue;
+    }
+    if (segment.kind === "cluster" || segment.kind === "parens") {
+      collectMentionKeysFromSegments(segment.segments, keys);
+    }
+  }
+}
+
+function validateMentions(
+  mentions: Record<string, HomepageMention>,
+  requiredKeys: string[],
+): string | null {
+  for (const key of requiredKeys) {
+    if (!mentions[key]) return `Homepage mention ${key} is required`;
+  }
+
+  for (const [key, mention] of Object.entries(mentions)) {
+    if (!isSafeMentionKey(key)) return `Homepage mention key ${key} is invalid`;
+    const label = `Homepage mention ${key}`;
+    const textError =
+      validateTextField(
+        mention.label,
+        `${label} label`,
+        HOMEPAGE_FIELD_LIMITS.mentionLabel,
+        true,
+      ) ??
+      validateOptionalMentionText(label, "logoAlt", mention.logoAlt) ??
+      validateOptionalMentionText(label, "badgeAlt", mention.badgeAlt) ??
+      validateOptionalMentionText(label, "mark", mention.mark);
+    if (textError) return textError;
+
+    if (mention.href && !isSafeHomepageLink(mention.href)) {
+      return `${label} link must start with / or https://`;
+    }
+    if (mention.logoSrc && !isSafeHomepageAssetPath(mention.logoSrc)) {
+      return `${label} logo must stay under /images/`;
+    }
+    if (mention.badgeSrc && !isSafeHomepageAssetPath(mention.badgeSrc)) {
+      return `${label} badge must stay under /images/`;
+    }
+  }
+
+  return null;
+}
+
+function validateOptionalMentionText(
+  label: string,
+  field: string,
+  value: string | undefined,
+): string | null {
+  return value === undefined
+    ? null
+    : validateTextField(
+        value,
+        `${label} ${field}`,
+        HOMEPAGE_FIELD_LIMITS.mentionAsset,
+        false,
+      );
+}
+
 function validateProofCard(card: HomepageProofCard, index: number) {
   const label = `Proof card ${index + 1}`;
   return (
@@ -451,6 +622,12 @@ export function validateHomepageContent(content: HomepageContent): {
     ) ??
     validateRichSummary(intro.rich_summary);
   if (introError) return { ok: false, error: introError };
+
+  const mentionError = validateMentions(
+    content.mentions,
+    collectRichSummaryMentionKeys(intro.rich_summary),
+  );
+  if (mentionError) return { ok: false, error: mentionError };
 
   const aboutError = validateSectionLabel(about, "About label");
   if (aboutError) return { ok: false, error: aboutError };
@@ -523,6 +700,10 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
     proof_cards: normalizeProofCards(
       source.proof_cards,
       DEFAULT_HOMEPAGE_CONTENT.proof_cards,
+    ),
+    mentions: normalizeMentions(
+      source.mentions,
+      DEFAULT_HOMEPAGE_CONTENT.mentions,
     ),
   };
 }

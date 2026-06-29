@@ -183,15 +183,30 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback apps/www/src/pages/index.astro rich mention markup",
+      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
     current_value:
-      "Homepage intro summary uses structured D1 text and mention keys when present, while brand logo and link metadata remain in the Astro mention map.",
+      "Homepage intro summary uses structured D1 text and mention keys when present.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
       "Preview rich-summary segment edits before any save path touches above-fold public copy.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
+  },
+  {
+    id: "homepage.mentions",
+    surface: "homepage",
+    title: "homepage mention metadata",
+    source_ref:
+      "D1 page_content:home.mentions seeded by drizzle/migrations/0017_seed_homepage_mentions.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+    current_value:
+      "Structured AI, YC F25, Our Bad Habit, Atlantic Records, and Business Insider labels, links, and local logo paths are now structured homepage content.",
+    editability: "ready",
+    risk_level: "medium",
+    next_safe_action:
+      "Preview mention label, link, and local logo-path edits before any save path touches above-fold public copy.",
+    required_authority: [],
+    proof_ids: ["content.homepage.mentions.page-content"],
   },
   {
     id: "homepage.proof_cards",
@@ -541,7 +556,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     status: "preview",
     risk_level: "medium",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary, fallback apps/www/src/pages/index.astro rich mention markup",
+      "D1 page_content:home.sections.intro.rich_summary and home.mentions",
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:

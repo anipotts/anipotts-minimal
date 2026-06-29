@@ -47,6 +47,10 @@ const writing = cmsHome.sections.latest_thoughts;
 const heading = hasCmsHeading ? intro.heading : homeContent.heading;
 const proofCards =
   cmsHome.proof_cards.length > 0 ? cmsHome.proof_cards : homeContent.proof;
+const mentionMap =
+  Object.keys(cmsHome.mentions).length > 0
+    ? cmsHome.mentions
+    : homeContent.mentions;
 const homeMakingSlugs = [
   "quantercise",
   "quantercise-extension",
@@ -88,7 +92,7 @@ const writingEntries = (await publishedWriting())
   .slice(0, writing.limit ?? 3);
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
-const ycMention = homeContent.mentions.yCombinatorF25;
+const ycMention = mentionMap.yCombinatorF25;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -107,7 +111,10 @@ function hasNonEmptyArray(value: unknown): value is unknown[] {
     <p class="hero-summary hero-line">
       {
         hasCmsRichSummary && intro.rich_summary ? (
-          <HomepageRichSummary sentences={intro.rich_summary} />
+          <HomepageRichSummary
+            sentences={intro.rich_summary}
+            mentions={mentionMap}
+          />
         ) : hasCmsSubheading ? (
           (intro.subheading ?? homeContent.summary)
         ) : (
@@ -115,7 +122,7 @@ function hasNonEmptyArray(value: unknown): value is unknown[] {
             <span class="hero-sentence">
               previously worked on real-time agent i/o at{" "}
               <span class="mention-cluster">
-                <InlineMention {...homeContent.mentions.structuredAi} />
+                <InlineMention {...mentionMap.structuredAi} />
                 <span class="brand-parens">
                   <>
                     <span>(</span>
@@ -126,9 +133,9 @@ function hasNonEmptyArray(value: unknown): value is unknown[] {
               </span>{" "}
               and{" "}
               <span class="mention-cluster">
-                <InlineMention {...homeContent.mentions.badHabit} suffix="," />
+                <InlineMention {...mentionMap.badHabit} suffix="," />
                 <span>an</span>
-                <InlineMention {...homeContent.mentions.atlanticRecords} />
+                <InlineMention {...mentionMap.atlanticRecords} />
                 <span>venture.</span>
               </span>
             </span>
@@ -136,10 +143,7 @@ function hasNonEmptyArray(value: unknown): value is unknown[] {
             <span class="hero-sentence">
               every now and then i post about what i'm doing with claude code
               and codex, as featured on{" "}
-              <InlineMention
-                {...homeContent.mentions.businessInsider}
-                suffix="."
-              />
+              <InlineMention {...mentionMap.businessInsider} suffix="." />
             </span>
           </>
         )

@@ -66,6 +66,19 @@ export interface HomepageProofCard {
   detail: string;
 }
 
+export interface HomepageMention {
+  label: string;
+  href?: string;
+  icon?: string;
+  mark?: string;
+  logoSrc?: string;
+  logoAlt?: string;
+  logoTone?: "native" | "white";
+  logoShape?: "square" | "wide" | "mark" | "large";
+  badgeSrc?: string;
+  badgeAlt?: string;
+}
+
 export interface HomepageContent {
   sections: {
     intro: HomepageSection;
@@ -75,6 +88,7 @@ export interface HomepageContent {
   };
   section_order: ("intro" | "about" | "past_work" | "latest_thoughts")[];
   proof_cards: HomepageProofCard[];
+  mentions: Record<string, HomepageMention>;
 }
 
 // ---------------------------------------------------------------------------

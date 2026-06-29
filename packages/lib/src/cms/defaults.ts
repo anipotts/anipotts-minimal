@@ -19,6 +19,9 @@ export const HOMEPAGE_FIELD_LIMITS = {
   paragraph: 1200,
   linkLabel: 80,
   linkHref: 300,
+  mentionKey: 80,
+  mentionLabel: 120,
+  mentionAsset: 220,
   slug: 120,
   proofTitle: 120,
   proofDetail: 360,
@@ -112,6 +115,39 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     },
   },
   section_order: HOME_SECTION_ORDER,
+  mentions: {
+    structuredAi: {
+      label: "structured ai",
+      href: "https://getstructured.ai/",
+      logoSrc: "/images/brand/structured-ai-favicon.png",
+      logoAlt: "structured ai",
+      logoTone: "white",
+    },
+    yCombinatorF25: {
+      label: "F25",
+      logoSrc: "/images/brand/ycombinator-favicon.ico",
+      logoAlt: "y combinator",
+    },
+    badHabit: {
+      label: "our bad habit",
+      href: "https://ourbadhabit.com/",
+      logoSrc: "/images/brand/bad-habit-favicon.png",
+      logoAlt: "our bad habit",
+    },
+    atlanticRecords: {
+      label: "atlantic records",
+      href: "https://www.atlanticrecords.com/",
+      logoSrc: "/images/brand/atlantic-records-logo-cropped.png",
+      logoAlt: "atlantic records",
+      logoShape: "wide",
+    },
+    businessInsider: {
+      label: "business insider",
+      href: "/writing/saturdays-are-for-claude-code",
+      logoSrc: "/images/brand/business-insider-favicon.svg",
+      logoAlt: "business insider",
+    },
+  },
   proof_cards: [
     {
       label: "structured ai",
