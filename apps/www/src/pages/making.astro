@@ -4,12 +4,26 @@ import ProjectCard from "../components/ProjectCard.astro";
 import { visibleProjects, type Project } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
+import {
+  DEFAULT_MAKING_INDEX_CONTENT,
+  fetchPageContent,
+  normalizeListingPageContent,
+  type ListingPageContent,
+} from "@anipotts/lib/cms";
 
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
 const ORCHESTRATING_PROJECTS = new Set(["claude-code-tips", "imessage-mcp"]);
-const projects = (await visibleProjects()).filter(
+const [allProjects, makingPage] = await Promise.all([
+  visibleProjects(),
+  fetchPageContent<ListingPageContent>("making"),
+]);
+const copy = normalizeListingPageContent(
+  makingPage?.content,
+  DEFAULT_MAKING_INDEX_CONTENT,
+);
+const projects = allProjects.filter(
   (project) => !ORCHESTRATING_PROJECTS.has(project.slug),
 );
 
@@ -55,17 +69,14 @@ const buckets: Array<{
 ---
 
 <Shell
-  title="making"
-  description="projects, experiments, weekly traces, and small utilities from ani potts."
+  title={copy.title}
+  description={copy.description}
   path="/making"
   mood="alert"
 >
   <section data-rise>
-    <h1 class="hero-title">making</h1>
-    <p class="hero-summary">
-      work i built or helped ship. product surfaces, data systems, quant tools,
-      and the older pieces that still explain how i think.
-    </p>
+    <h1 class="hero-title">{copy.hero_title}</h1>
+    <p class="hero-summary">{copy.hero_summary}</p>
   </section>
 
   <section data-rise class="catalog">

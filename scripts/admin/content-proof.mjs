@@ -8,7 +8,7 @@ const WWW_ORIGIN =
   process.env.WWW_ORIGIN?.replace(/\/$/, "") ?? "https://anipotts.com";
 const D1_DATABASE = process.env.ADMIN_D1_DATABASE ?? "anipotts-db";
 
-const REQUIRED_PAGE_KEYS = ["home", "newsletter", "writing"];
+const REQUIRED_PAGE_KEYS = ["home", "making", "newsletter", "writing"];
 const REQUIRED_OPERATIONS = [
   "content-draft-homepage-summary-2026-06-28",
   "content-draft-newsletter-copy-2026-06-28",
@@ -83,7 +83,10 @@ SELECT
   json_extract(content, '$.hero_title') AS writing_hero_title,
   coalesce(json_type(content, '$.description'), 'missing') AS writing_description_type,
   coalesce(json_type(content, '$.hero_summary'), 'missing') AS writing_hero_summary_type,
-  coalesce(json_type(content, '$.search_placeholder'), 'missing') AS writing_search_placeholder_type
+  coalesce(json_type(content, '$.search_placeholder'), 'missing') AS writing_search_placeholder_type,
+  json_extract(content, '$.hero_title') AS making_hero_title,
+  coalesce(json_type(content, '$.description'), 'missing') AS making_description_type,
+  coalesce(json_type(content, '$.hero_summary'), 'missing') AS making_hero_summary_type
 FROM page_content
 ORDER BY page_key ASC, version DESC;
 `);
@@ -194,6 +197,13 @@ const writingFieldTypes = writingProofFieldTypes(writingRow);
 const missingWritingFields = Object.entries(writingFieldTypes)
   .filter(([, type]) => type !== "text")
   .map(([field]) => `writing_${field}`);
+const makingRow = pageRows.find(
+  (row) => String(row.page_key) === "making" && Number(row.published) === 1,
+);
+const makingFieldTypes = makingProofFieldTypes(makingRow);
+const missingMakingFields = Object.entries(makingFieldTypes)
+  .filter(([, type]) => type !== "text")
+  .map(([field]) => `making_${field}`);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -206,6 +216,7 @@ const missingProof = [
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
+  ...missingMakingFields,
   ...missingNewsletterFields,
   ...missingWritingFields,
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
@@ -272,6 +283,9 @@ const proof = {
     writing_hero_title: row.writing_hero_title ?? null,
     writing_field_types:
       String(row.page_key) === "writing" ? writingProofFieldTypes(row) : null,
+    making_hero_title: row.making_hero_title ?? null,
+    making_field_types:
+      String(row.page_key) === "making" ? makingProofFieldTypes(row) : null,
   })),
   content_draft_operations: operationRows.map((row) => ({
     operation_id: String(row.operation_id),
@@ -406,5 +420,17 @@ function writingProofFieldTypes(row) {
     search_placeholder: String(
       row?.writing_search_placeholder_type ?? "missing",
     ),
+  };
+}
+
+function makingProofFieldTypes(row) {
+  return {
+    hero_title:
+      typeof row?.making_hero_title === "string" &&
+      row.making_hero_title.trim().length > 0
+        ? "text"
+        : "missing",
+    description: String(row?.making_description_type ?? "missing"),
+    hero_summary: String(row?.making_hero_summary_type ?? "missing"),
   };
 }
