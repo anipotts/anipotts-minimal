@@ -173,10 +173,9 @@ function extractShellForRoutes(source) {
 
 function extractStringList(source, name) {
   const match =
-    source.match(new RegExp(`const ${name} = new Set\\(\\[([\\s\\S]*?)\\]\\);`)) ??
-    source.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
+    source.match(
+      new RegExp(`const ${name} = new Set\\(\\[([\\s\\S]*?)\\]\\);`),
+    ) ?? source.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
   assert.ok(match, `missing middleware list ${name}`);
-  return [...match[1].matchAll(/"([^"]+)"/g)]
-    .map((item) => item[1])
-    .sort();
+  return [...match[1].matchAll(/"([^"]+)"/g)].map((item) => item[1]).sort();
 }

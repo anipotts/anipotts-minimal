@@ -32,10 +32,7 @@ assert.equal(
   true,
 );
 
-assert.equal(
-  requiresSecurityReview(["docs/platform-architecture.md"]),
-  false,
-);
+assert.equal(requiresSecurityReview(["docs/platform-architecture.md"]), false);
 
 const fakeFiles = new Map([
   [
@@ -71,17 +68,11 @@ const findings = reviewFiles(
   readFake,
 );
 
-assert.deepEqual(
-  findings.map((finding) => finding.rule).sort(),
-  [
-    "anthropic-api-key",
-    "drop-table",
-    "inline-secret-assignment",
-    "openai-or-similar-key",
-  ],
-);
+assert.deepEqual(findings.map((finding) => finding.rule).sort(), [
+  "anthropic-api-key",
+  "drop-table",
+  "inline-secret-assignment",
+  "openai-or-similar-key",
+]);
 
-assert.deepEqual(
-  reviewFiles([".github/workflows/deploy.yml"], readFake),
-  [],
-);
+assert.deepEqual(reviewFiles([".github/workflows/deploy.yml"], readFake), []);

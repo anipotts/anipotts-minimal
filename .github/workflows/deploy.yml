@@ -154,7 +154,7 @@ jobs:
       - name: Smoke www routes
         run: |
           set -euo pipefail
-          for path in / /projects /writing /newsletter; do
+          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /writing; do
             ok=false
             for _ in $(seq 1 6); do
               code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"

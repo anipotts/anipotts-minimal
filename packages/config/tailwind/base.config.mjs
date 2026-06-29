@@ -17,7 +17,7 @@ export default {
         },
         signal: {
           green: "#4ade80", // green-400
-          red: "#ef4444",   // red-500
+          red: "#ef4444", // red-500
         },
         border: {
           DEFAULT: "var(--border)",
@@ -49,17 +49,15 @@ export default {
         heading: ["var(--font-display)", "var(--font-mono)", "monospace"],
       },
       animation: {
-        'signal-pulse': 'signal-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        "signal-pulse": "signal-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
-        'signal-pulse': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.4' },
-        }
-      }
+        "signal-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.4" },
+        },
+      },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [require("@tailwindcss/typography")],
 };

@@ -20,8 +20,8 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{astro,ts,tsx,md,json}\"",
-    "format:check": "prettier --check \"**/*.{astro,ts,tsx,md,json}\"",
+    "format": "prettier --write \"**/*.{astro,ts,tsx,mjs,md,json}\"",
+    "format:check": "prettier --check \"**/*.{astro,ts,tsx,mjs,md,json}\"",
     "dev:www": "turbo dev --filter=@anipotts/www",
     "proof:admin-passkey": "node scripts/admin/passkey-proof.mjs",
     "proof:admin-content": "node scripts/admin/content-proof.mjs",
@@ -30,6 +30,7 @@
     "test:admin-routes": "node scripts/ci/admin-route-parity.test.mjs",
     "test:content-platform": "pnpm --filter @anipotts/content build && node scripts/ci/content-platform.test.mjs",
     "test:public-boundary": "node scripts/ci/public-app-boundary.test.mjs",
+    "test:public-routes": "node scripts/ci/public-route-parity.test.mjs",
     "test:workspace": "node scripts/ci/workspace-inventory.test.mjs",
     "test:workflows": "node scripts/ci/workflow-inventory.test.mjs",
     "test:security-review": "node scripts/ci/security-review.test.mjs",
@@ -49,6 +50,12 @@
       "prettier --write"
     ],
     "packages/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "scripts/**/*.mjs": [
+      "prettier --write"
+    ],
+    "packages/**/*.mjs": [
       "prettier --write"
     ],
     "*.{json,md,yml}": [

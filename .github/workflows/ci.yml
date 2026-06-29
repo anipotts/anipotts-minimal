@@ -43,6 +43,9 @@ jobs:
       - name: Validate public app boundary
         run: pnpm test:public-boundary
 
+      - name: Validate public route smoke parity
+        run: pnpm test:public-routes
+
       - name: Validate content platform invariants
         run: pnpm test:content-platform
 
