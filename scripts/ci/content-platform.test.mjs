@@ -5,11 +5,15 @@ import { execFileSync } from "node:child_process";
 import {
   countProofEntries,
   contentInventorySource,
+  disabledRuntimeOverlayResponse,
   needsAniBuckets,
   needsAniItemsFromJson,
   proofSource,
   recordsFromSourceModules,
   readProofEntries,
+  RUNTIME_FEED_PATH,
+  runtimeOverlayErrorResponse,
+  runtimeOverlayResponseFromFeed,
   summarizeSourceContentRecords,
 } from "../../packages/content/dist/admin/index.js";
 import {
@@ -72,6 +76,102 @@ assert.deepEqual(
 );
 assert.equal(needsFixture.length, 1);
 assert.equal(needsFixture[0]?.id, "need-test-action");
+
+const disabledRuntime = disabledRuntimeOverlayResponse();
+assert.equal(disabledRuntime.mode, "disabled");
+assert.equal(disabledRuntime.available, false);
+assert.equal(disabledRuntime.source_path, RUNTIME_FEED_PATH);
+assert.deepEqual(disabledRuntime.overlays, []);
+assert.deepEqual(disabledRuntime.needs_ani_queue, []);
+
+const runtimeOverlay = runtimeOverlayResponseFromFeed({
+  generated_at: "2026-06-29T12:00:00Z",
+  machine: "ap-mini.local",
+  runtime: {
+    needs_ani_queue: [
+      needsFixture[0],
+      {
+        id: "invalid-runtime-need",
+        type: "send",
+        bucket: "unblockable_now",
+      },
+    ],
+    repo_state_overlays: [
+      {
+        ahead: 0,
+        behind: 1,
+        branch: "main",
+        deploy_impact: "none",
+        dirty_tracked_count: 0,
+        git_available: true,
+        head_sha: "abc1234",
+        live_runtime_role: "public site source",
+        machine: "ap-mini.local",
+        notes: "metadata only",
+        repo: "anipotts-com",
+        repo_root_label: "~/Code/projects/anipotts-com",
+        repo_state_id: "runtime.repo.site.local",
+        untracked_count: 2,
+        upstream: "origin/main",
+        upstream_sha: "abc1234",
+      },
+      {
+        ahead: null,
+        behind: null,
+        branch: null,
+        deploy_impact: "future-unknown",
+        dirty_tracked_count: null,
+        git_available: false,
+        head_sha: null,
+        live_runtime_role: "runtime data tree",
+        machine: "ap-mini.local",
+        notes: "non-git runtime tree",
+        repo: "vitals",
+        repo_root_label: "~/Code/projects/vitals",
+        repo_state_id: "runtime.repo.vitals.local",
+        untracked_count: null,
+        upstream: null,
+        upstream_sha: null,
+      },
+      {
+        repo_state_id: "invalid-overlay",
+        repo: "missing required fields",
+      },
+    ],
+    safety: {
+      dirty_filenames_included: false,
+      file_contents_included: false,
+      health_payloads_included: false,
+      mode: "read_only_metadata",
+      secret_values_included: false,
+    },
+  },
+});
+
+assert.equal(runtimeOverlay.mode, "local_dev");
+assert.equal(runtimeOverlay.available, true);
+assert.equal(runtimeOverlay.generated_at, "2026-06-29T12:00:00Z");
+assert.equal(runtimeOverlay.machine, "ap-mini.local");
+assert.equal(runtimeOverlay.safety?.mode, "read_only_metadata");
+assert.equal(runtimeOverlay.safety?.secret_values_included, false);
+assert.equal(runtimeOverlay.safety?.file_contents_included, false);
+assert.equal(runtimeOverlay.overlays.length, 2);
+assert.equal(runtimeOverlay.overlays[0]?.repo, "anipotts-com");
+assert.equal(runtimeOverlay.overlays[0]?.behind, 1);
+assert.equal(runtimeOverlay.overlays[1]?.deploy_impact, "unknown");
+assert.equal(runtimeOverlay.needs_ani_queue.length, 1);
+assert.equal(runtimeOverlay.needs_ani_queue[0]?.id, "need-test-action");
+
+const missingRuntime = runtimeOverlayErrorResponse(
+  Object.assign(new Error("missing feed"), { code: "ENOENT" }),
+);
+assert.equal(missingRuntime.mode, "missing");
+assert.equal(missingRuntime.available, false);
+assert.equal(missingRuntime.error, "missing feed");
+
+const failedRuntime = runtimeOverlayErrorResponse(new Error("bad json"));
+assert.equal(failedRuntime.mode, "error");
+assert.equal(failedRuntime.error, "bad json");
 
 const sourceRecords = [
   ...recordsFromSourceModules("projects", {
