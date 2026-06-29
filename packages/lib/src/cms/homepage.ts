@@ -54,9 +54,12 @@ function normalizeSection(
         : coerceString(source.subheading, fallback.subheading ?? "").trim();
   }
 
+  const hasSourceSubheading =
+    typeof source.subheading === "string" &&
+    source.subheading.trim().length > 0;
   if (
     Array.isArray(source.rich_summary) ||
-    fallback.rich_summary !== undefined
+    (fallback.rich_summary !== undefined && !hasSourceSubheading)
   ) {
     normalized.rich_summary = normalizeRichSummary(
       source.rich_summary,
@@ -489,6 +492,29 @@ function richSummaryTextLength(segments: HomepageRichSummarySegment[]): number {
   }, 0);
 }
 
+function richSummaryPlainText(
+  segments: HomepageRichSummarySegment[],
+  mentions: Record<string, HomepageMention>,
+): string {
+  return segments
+    .map((segment) => richSummarySegmentPlainText(segment, mentions))
+    .join("");
+}
+
+function richSummarySegmentPlainText(
+  segment: HomepageRichSummarySegment,
+  mentions: Record<string, HomepageMention>,
+): string {
+  if (segment.kind === "text") return segment.text;
+  if (segment.kind === "mention") {
+    return `${mentions[segment.key]?.label ?? segment.key}${segment.suffix ?? ""}`;
+  }
+  if (segment.kind === "parens") {
+    return ` (${richSummaryPlainText(segment.segments, mentions)})`;
+  }
+  return richSummaryPlainText(segment.segments, mentions);
+}
+
 function collectRichSummaryMentionKeys(
   sentences: HomepageRichSummarySentence[] | undefined,
 ): string[] {
@@ -706,6 +732,27 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
       DEFAULT_HOMEPAGE_CONTENT.mentions,
     ),
   };
+}
+
+export function homepageSummaryText(content: HomepageContent): string {
+  const intro = content.sections.intro;
+  const subheading = intro.subheading?.trim();
+  if (subheading) return subheading;
+
+  const richSummary = intro.rich_summary ?? [];
+  const plainText = richSummary
+    .map((sentence) =>
+      richSummaryPlainText(sentence.segments, content.mentions),
+    )
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return (
+    plainText ||
+    DEFAULT_HOMEPAGE_CONTENT.sections.intro.subheading ||
+    DEFAULT_HOMEPAGE_CONTENT.sections.intro.heading
+  );
 }
 
 export async function fetchHomepageContent(): Promise<HomepageContent> {

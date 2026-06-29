@@ -16,6 +16,7 @@ export {
 } from "./editor";
 export {
   fetchHomepageContent,
+  homepageSummaryText,
   normalizeHomepageContent,
   validateHomepageContent,
 } from "./homepage";

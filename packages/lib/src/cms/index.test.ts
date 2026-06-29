@@ -16,6 +16,7 @@ import {
   validateCmsWriting,
   validateHomepageContent,
   validateNewsletterContent,
+  homepageSummaryText,
 } from "./index";
 
 describe("homepage cms validation", () => {
@@ -349,6 +350,33 @@ describe("homepage cms validation", () => {
       ok: false,
       error: "About paragraph is too long",
     });
+  });
+
+  it("derives plain homepage summary text from rich summary mentions", () => {
+    const content = normalizeHomepageContent(DEFAULT_HOMEPAGE_CONTENT);
+
+    expect(homepageSummaryText(content)).toBe(
+      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
+    );
+  });
+
+  it("keeps D1 subheading-only intro copy plain", () => {
+    const content = normalizeHomepageContent({
+      ...DEFAULT_HOMEPAGE_CONTENT,
+      sections: {
+        ...DEFAULT_HOMEPAGE_CONTENT.sections,
+        intro: {
+          visible: true,
+          label: "index",
+          heading: "hi, i'm ani",
+          subheading: "plain d1 summary",
+        },
+      },
+    });
+
+    expect(content.sections.intro.rich_summary).toBeUndefined();
+    expect(homepageSummaryText(content)).toBe("plain d1 summary");
+    expect(validateHomepageContent(content)).toEqual({ ok: true });
   });
 });
 
