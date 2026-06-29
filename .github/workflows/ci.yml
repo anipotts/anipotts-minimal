@@ -40,6 +40,9 @@ jobs:
       - name: Validate admin route parity
         run: pnpm test:admin-routes
 
+      - name: Validate public app boundary
+        run: pnpm test:public-boundary
+
       - name: Validate content platform invariants
         run: pnpm test:content-platform
 

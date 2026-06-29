@@ -65,6 +65,13 @@ covered while passkey proof and Access removal are completed, then remove
 `pnpm test:admin-routes` enforces the route files, admin navigation, deploy
 smoke list, and manual smoke list for this parity set.
 
+`pnpm test:public-boundary` enforces the public app boundary for `apps/www`.
+The public app may render public CMS/D1 content, run newsletter subscribe
+endpoints, redirect `/admin/*` to `admin.anipotts.com`, and proxy PostHog
+analytics through `/ingest/*`. It must not add admin routes, admin API routes,
+passkey logic, Cloudflare Access identity handling, proof tables, content draft
+operation tables, or publish-event tables.
+
 | Route                                               | Purpose                              |
 | --------------------------------------------------- | ------------------------------------ |
 | `/`                                                 | operator overview                    |
