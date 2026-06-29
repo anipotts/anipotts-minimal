@@ -8,7 +8,7 @@ const WWW_ORIGIN =
   process.env.WWW_ORIGIN?.replace(/\/$/, "") ?? "https://anipotts.com";
 const D1_DATABASE = process.env.ADMIN_D1_DATABASE ?? "anipotts-db";
 
-const REQUIRED_PAGE_KEYS = ["home", "newsletter"];
+const REQUIRED_PAGE_KEYS = ["home", "newsletter", "writing"];
 const REQUIRED_OPERATIONS = [
   "content-draft-homepage-summary-2026-06-28",
   "content-draft-newsletter-copy-2026-06-28",
@@ -79,7 +79,11 @@ SELECT
   coalesce(json_type(content, '$.success_message'), 'missing') AS newsletter_success_message_type,
   coalesce(json_type(content, '$.error_message'), 'missing') AS newsletter_error_message_type,
   coalesce(json_type(content, '$.footer_text'), 'missing') AS newsletter_footer_text_type,
-  json_extract(content, '$.buttondown_url') AS newsletter_buttondown_url
+  json_extract(content, '$.buttondown_url') AS newsletter_buttondown_url,
+  json_extract(content, '$.hero_title') AS writing_hero_title,
+  coalesce(json_type(content, '$.description'), 'missing') AS writing_description_type,
+  coalesce(json_type(content, '$.hero_summary'), 'missing') AS writing_hero_summary_type,
+  coalesce(json_type(content, '$.search_placeholder'), 'missing') AS writing_search_placeholder_type
 FROM page_content
 ORDER BY page_key ASC, version DESC;
 `);
@@ -183,6 +187,13 @@ const newsletterFieldTypes = newsletterProofFieldTypes(newsletterRow);
 const missingNewsletterFields = Object.entries(newsletterFieldTypes)
   .filter(([, type]) => type !== "text")
   .map(([field]) => `newsletter_${field}`);
+const writingRow = pageRows.find(
+  (row) => String(row.page_key) === "writing" && Number(row.published) === 1,
+);
+const writingFieldTypes = writingProofFieldTypes(writingRow);
+const missingWritingFields = Object.entries(writingFieldTypes)
+  .filter(([, type]) => type !== "text")
+  .map(([field]) => `writing_${field}`);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -196,6 +207,7 @@ const missingProof = [
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
   ...missingNewsletterFields,
+  ...missingWritingFields,
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...staleOperationSources.map(
     (operationId) => `stale_content_operation_source:${operationId}`,
@@ -257,6 +269,9 @@ const proof = {
       String(row.page_key) === "newsletter"
         ? newsletterProofFieldTypes(row)
         : null,
+    writing_hero_title: row.writing_hero_title ?? null,
+    writing_field_types:
+      String(row.page_key) === "writing" ? writingProofFieldTypes(row) : null,
   })),
   content_draft_operations: operationRows.map((row) => ({
     operation_id: String(row.operation_id),
@@ -376,5 +391,20 @@ function newsletterProofFieldTypes(row) {
       row.newsletter_buttondown_url.startsWith("https://")
         ? "text"
         : "missing",
+  };
+}
+
+function writingProofFieldTypes(row) {
+  return {
+    hero_title:
+      typeof row?.writing_hero_title === "string" &&
+      row.writing_hero_title.trim().length > 0
+        ? "text"
+        : "missing",
+    description: String(row?.writing_description_type ?? "missing"),
+    hero_summary: String(row?.writing_hero_summary_type ?? "missing"),
+    search_placeholder: String(
+      row?.writing_search_placeholder_type ?? "missing",
+    ),
   };
 }

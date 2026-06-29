@@ -325,6 +325,21 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.writing.frontmatter.schema"],
   },
   {
+    id: "writing.index_copy",
+    surface: "writing",
+    title: "writing index copy",
+    source_ref:
+      "D1 page_content:writing seeded by drizzle/migrations/0022_seed_writing_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_WRITING_INDEX_CONTENT",
+    current_value:
+      "The /writing title, meta description, hero summary, and search placeholder use structured page_content when present.",
+    editability: "ready",
+    risk_level: "low",
+    next_safe_action:
+      "Preview index copy changes before any save path edits the writing page content record.",
+    required_authority: [],
+    proof_ids: ["content.writing.index.page-content"],
+  },
+  {
     id: "writing.body",
     surface: "writing",
     title: "writing body",
@@ -537,6 +552,14 @@ function summarizePageContent(
       ["headline", content.headline],
       ["deck", content.deck],
       ["cta", content.cta_label],
+    ]);
+  }
+
+  if (pageKey === "writing") {
+    return compactSummary([
+      ["title", content.hero_title ?? content.title],
+      ["summary", content.hero_summary],
+      ["search", content.search_placeholder],
     ]);
   }
 

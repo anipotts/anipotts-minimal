@@ -2,6 +2,7 @@ import type {
   CmsProjectContent,
   CmsWritingContent,
   HomepageContent,
+  ListingPageContent,
   NewsletterContent,
 } from "@anipotts/types";
 
@@ -210,6 +211,15 @@ export const DEFAULT_NEWSLETTER_CONTENT: NewsletterContent = {
   sender_name: "Ani Potts",
   sender_email: "news@anipotts.com",
   reply_to: "contact@anipotts.com",
+};
+
+export const DEFAULT_WRITING_INDEX_CONTENT: ListingPageContent = {
+  title: "writing",
+  description:
+    "things ani's written. claude code workflows, ai builds, the occasional music take.",
+  hero_title: "writing",
+  hero_summary: "stuff i've figured out and wanted to write down.",
+  search_placeholder: "search writing",
 };
 
 export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
