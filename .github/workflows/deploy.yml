@@ -79,35 +79,31 @@ jobs:
     name: Detect changed paths
     runs-on: ubuntu-latest
     outputs:
-      www: ${{ steps.filter.outputs.www }}
-      admin: ${{ steps.filter.outputs.admin }}
-      ingest: ${{ steps.filter.outputs.ingest }}
-      newsletter: ${{ steps.filter.outputs.newsletter }}
-      state: ${{ steps.filter.outputs.state }}
-      weekly-email: ${{ steps.filter.outputs.weekly-email }}
+      www: ${{ steps.targets.outputs.www || 'false' }}
+      admin: ${{ steps.targets.outputs.admin || 'false' }}
+      ingest: ${{ steps.targets.outputs.ingest || 'false' }}
+      newsletter: ${{ steps.targets.outputs.newsletter || 'false' }}
+      state: ${{ steps.targets.outputs.state || 'false' }}
+      weekly-email: ${{ steps.targets.outputs.weekly_email || 'false' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        if: github.event_name == 'push'
-        id: filter
         with:
-          filters: |
-            www:
-              - "apps/www/**"
-              - "packages/lib/**"
-              - "packages/styles/**"
-              - "packages/types/**"
-            admin:
-              - "apps/admin/**"
-              - "packages/content/**"
-            ingest:
-              - "workers/ingest/**"
-            newsletter:
-              - "workers/newsletter/**"
-            state:
-              - "workers/state/**"
-            weekly-email:
-              - "workers/weekly-email/**"
+          fetch-depth: 0
+
+      - name: Compute deploy targets
+        if: github.event_name == 'push'
+        id: targets
+        run: |
+          set -euo pipefail
+          files="$RUNNER_TEMP/deploy-changed-files.txt"
+
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" > "$files"
+          else
+            git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > "$files"
+          fi
+
+          node scripts/ci/compute-deploy-targets.mjs "$files" | tee "$GITHUB_OUTPUT"
 
   deploy-www:
     name: Deploy www

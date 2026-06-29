@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { computeDeployTargets } from "./compute-deploy-targets.mjs";
 
 const empty = {
@@ -30,6 +31,12 @@ expectTargets(
     ".github/ISSUE_TEMPLATE/bug.md",
     "LICENSE",
   ],
+  {},
+);
+
+expectTargets(
+  "worker docs plus workflow-only changes do not deploy",
+  ["workers/state/README.md", ".github/workflows/deploy.yml"],
   {},
 );
 
@@ -71,6 +78,14 @@ expectTargets(
 );
 
 expectTargets(
+  "worker readme with worker source deploys exact worker",
+  ["workers/state/README.md", "workers/state/src/index.ts"],
+  {
+    state: true,
+  },
+);
+
+expectTargets(
   "shared runtime packages deploy www only",
   ["packages/lib/src/cms/index.ts", "packages/styles/src/tokens.css"],
   { www: true },
@@ -86,4 +101,17 @@ expectTargets(
   "mixed app and worker changes preserve exact targets",
   ["apps/admin/src/pages/proof.astro", "workers/newsletter/src/index.ts"],
   { admin: true, newsletter: true },
+);
+
+const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
+
+assert.ok(
+  deployWorkflow.includes("node scripts/ci/compute-deploy-targets.mjs"),
+  "deploy.yml must use the shared deploy target calculator",
+);
+
+assert.equal(
+  deployWorkflow.includes("dorny/paths-filter"),
+  false,
+  "deploy.yml must not duplicate target rules through paths-filter",
 );
