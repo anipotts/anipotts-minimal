@@ -10,7 +10,13 @@ import {
   sourceContentSummary,
 } from "../../data/source-content";
 
-const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
+const surfaces = [
+  "homepage",
+  "projects",
+  "writing",
+  "newsletter",
+  "orchestrating",
+] as const;
 const pageContentState = await readPageContentInventoryStore(
   Astro.locals.runtime?.env.DB,
 );

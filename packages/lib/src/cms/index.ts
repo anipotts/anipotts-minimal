@@ -5,6 +5,7 @@ export {
   DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
+  DEFAULT_ORCHESTRATING_CONTENT,
   DEFAULT_PROJECTS_INDEX_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults";
@@ -15,10 +16,12 @@ export {
   normalizeCmsProject,
   normalizeCmsWriting,
   normalizeNewsletterContent,
+  normalizeOrchestratingPageContent,
   validateListingPageContent,
   validateCmsProject,
   validateCmsWriting,
   validateNewsletterContent,
+  validateOrchestratingPageContent,
 } from "./editor";
 export {
   fetchHomepageContent,
@@ -43,6 +46,7 @@ export type {
   HomepageRichSummarySentence,
   HomepageRichSummarySimpleSegment,
   ListingPageContent,
+  OrchestratingPageContent,
   ThoughtSummary,
   WritingSummary,
 } from "@anipotts/types";

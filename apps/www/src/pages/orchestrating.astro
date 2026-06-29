@@ -2,12 +2,20 @@
 import Shell from "../layouts/Shell.astro";
 import { docs, hooks, minePlugin, MINE_REPO, TIPS_REPO } from "../data/claude";
 import statsJson from "../data/claude-stats.json";
+import {
+  fetchPageContent,
+  normalizeOrchestratingPageContent,
+  type OrchestratingPageContent,
+} from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 
 export const prerender = false;
 
 setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+const orchestratingPage =
+  await fetchPageContent<OrchestratingPageContent>("orchestrating");
+const copy = normalizeOrchestratingPageContent(orchestratingPage?.content);
 
 interface SessionRow {
   id: string;
@@ -170,20 +178,16 @@ const fmtSessionTime = (iso: string) =>
 ---
 
 <Shell
-  title="orchestrating"
-  description="personal systems, labs, experiments, and local automation around ani's work."
+  title={copy.title}
+  description={copy.description}
   path="/orchestrating"
   mood="alert"
 >
   <section data-rise id="operating-room" class="hero-shell">
     <div class="hero-copy">
-      <span class="section-label">orchestrating</span>
-      <h1 class="hero-title">weird operating room</h1>
-      <p class="hero-summary">
-        where the private machinery goes when it is useful to see: local logs,
-        small checks, cron traces, admin surfaces, and experiments that do not
-        need a whole product around them.
-      </p>
+      <span class="section-label">{copy.section_label}</span>
+      <h1 class="hero-title">{copy.hero_title}</h1>
+      <p class="hero-summary">{copy.hero_summary}</p>
       <p class="mono muted updated">
         <span class={stats.live.isCodingNow ? "pulse" : "idle-dot"}></span>
         {stats.live.isCodingNow ? "coding now" : "idle"}
@@ -191,11 +195,9 @@ const fmtSessionTime = (iso: string) =>
       </p>
     </div>
     <aside class="hero-panel" aria-label="live session totals">
-      <span class="mono panel-label">machine noise</span>
+      <span class="mono panel-label">{copy.panel_label}</span>
       <span class="panel-number">{fmt(stats.totals.toolCalls)}</span>
-      <span class="panel-copy"
-        >tool calls captured from local session logs.</span
-      >
+      <span class="panel-copy">{copy.panel_copy}</span>
     </aside>
   </section>
 

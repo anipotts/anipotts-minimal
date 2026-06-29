@@ -4,6 +4,7 @@ import type {
   HomepageContent,
   ListingPageContent,
   NewsletterContent,
+  OrchestratingPageContent,
 } from "@anipotts/types";
 
 export const HOME_SECTION_ORDER: HomepageContent["section_order"] = [
@@ -251,6 +252,18 @@ export const DEFAULT_NEWSLETTER_ARCHIVE_CONTENT: ListingPageContent = {
   hero_summary:
     "published issues will appear here after the first-party send path is verified.",
   section_label: "archive",
+};
+
+export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
+  title: "orchestrating",
+  description:
+    "personal systems, labs, experiments, and local automation around ani's work.",
+  section_label: "orchestrating",
+  hero_title: "weird operating room",
+  hero_summary:
+    "where the private machinery goes when it is useful to see: local logs, small checks, cron traces, admin surfaces, and experiments that do not need a whole product around them.",
+  panel_label: "machine noise",
+  panel_copy: "tool calls captured from local session logs.",
 };
 
 export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [

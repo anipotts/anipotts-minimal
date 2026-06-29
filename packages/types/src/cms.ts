@@ -165,6 +165,16 @@ export interface ListingPageContent {
   search_placeholder?: string;
 }
 
+export interface OrchestratingPageContent {
+  title: string;
+  description: string;
+  section_label: string;
+  hero_title: string;
+  hero_summary: string;
+  panel_label: string;
+  panel_copy: string;
+}
+
 export interface CmsEditorSnapshot {
   homepage: HomepageContent;
   homepageMeta: CmsEditorMeta;

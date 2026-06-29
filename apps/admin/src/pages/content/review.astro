@@ -10,7 +10,13 @@ import {
   readContentOperationStore,
 } from "../../data/content";
 
-const surfaces = ["homepage", "projects", "writing", "newsletter"] as const;
+const surfaces = [
+  "homepage",
+  "projects",
+  "writing",
+  "newsletter",
+  "orchestrating",
+] as const;
 const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
 const d1Operations = readState.operations;
 
@@ -24,6 +30,8 @@ function operationMatchesSurface(
     return operation.field_path.startsWith("newsletter.");
   if (surface === "projects")
     return operation.field_path.startsWith("projects.");
+  if (surface === "orchestrating")
+    return operation.field_path.startsWith("orchestrating.");
   return operation.field_path.startsWith("writing.");
 }
 ---

@@ -4,11 +4,13 @@ import type {
   CmsWritingContent,
   ListingPageContent,
   NewsletterContent,
+  OrchestratingPageContent,
 } from "@anipotts/types";
 import { parseJsonArray } from "../db";
 import {
   CMS_TEXT_LIMITS,
   DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_ORCHESTRATING_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults";
 
@@ -524,4 +526,87 @@ function validateListingHeroLink(content: ListingPageContent): string | null {
       ? "Listing page hero link must start with /, https://, or mailto:"
       : null)
   );
+}
+
+export function normalizeOrchestratingPageContent(
+  content: unknown,
+): OrchestratingPageContent {
+  const source =
+    content && typeof content === "object"
+      ? (content as Record<string, unknown>)
+      : {};
+
+  return {
+    title: coerceString(
+      source.title,
+      DEFAULT_ORCHESTRATING_CONTENT.title,
+    ).trim(),
+    description: coerceString(
+      source.description,
+      DEFAULT_ORCHESTRATING_CONTENT.description,
+    ).trim(),
+    section_label: coerceString(
+      source.section_label,
+      DEFAULT_ORCHESTRATING_CONTENT.section_label,
+    ).trim(),
+    hero_title: coerceString(
+      source.hero_title,
+      DEFAULT_ORCHESTRATING_CONTENT.hero_title,
+    ).trim(),
+    hero_summary: coerceString(
+      source.hero_summary,
+      DEFAULT_ORCHESTRATING_CONTENT.hero_summary,
+    ).trim(),
+    panel_label: coerceString(
+      source.panel_label,
+      DEFAULT_ORCHESTRATING_CONTENT.panel_label,
+    ).trim(),
+    panel_copy: coerceString(
+      source.panel_copy,
+      DEFAULT_ORCHESTRATING_CONTENT.panel_copy,
+    ).trim(),
+  };
+}
+
+export function validateOrchestratingPageContent(
+  content: OrchestratingPageContent,
+): { ok: boolean; error?: string } {
+  const error =
+    validateCmsString(
+      content.title,
+      "Orchestrating page title",
+      CMS_TEXT_LIMITS.title,
+    ) ??
+    validateCmsString(
+      content.description,
+      "Orchestrating page description",
+      CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      content.section_label,
+      "Orchestrating section label",
+      CMS_TEXT_LIMITS.linkLabel,
+    ) ??
+    validateCmsString(
+      content.hero_title,
+      "Orchestrating hero title",
+      CMS_TEXT_LIMITS.title,
+    ) ??
+    validateCmsString(
+      content.hero_summary,
+      "Orchestrating hero summary",
+      CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      content.panel_label,
+      "Orchestrating panel label",
+      CMS_TEXT_LIMITS.linkLabel,
+    ) ??
+    validateCmsString(
+      content.panel_copy,
+      "Orchestrating panel copy",
+      CMS_TEXT_LIMITS.summary,
+    );
+
+  return error ? { ok: false, error } : { ok: true };
 }
