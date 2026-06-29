@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const ROUTES = [
   { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
@@ -87,8 +88,23 @@ const ROUTES = [
   },
 ];
 
+const PUBLIC_UNSMOKED_ROUTE_FILES = [
+  "apps/admin/src/pages/api/health.ts",
+  "apps/admin/src/pages/api/admin/passkey/login-options.ts",
+  "apps/admin/src/pages/api/admin/passkey/login-verify.ts",
+  "apps/admin/src/pages/api/admin/passkey/logout.ts",
+  "apps/admin/src/pages/api/admin/passkey/register-options.ts",
+  "apps/admin/src/pages/api/admin/passkey/register-verify.ts",
+  "apps/admin/src/pages/api/admin/passkey/revoke-current.ts",
+  "apps/admin/src/pages/api/admin/passkey/status.ts",
+];
+
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
+const passkeyProofSource = readFileSync(
+  "scripts/admin/passkey-proof.mjs",
+  "utf8",
+);
 const passkeySource = readFileSync(
   "apps/admin/src/pages/auth/passkey.astro",
   "utf8",
@@ -101,6 +117,9 @@ const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
 const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
+const passkeyProofRoutes = new Set(
+  extractStringList(passkeyProofSource, "ROUTES"),
+);
 const publicPaths = extractStringList(middlewareSource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
   middlewareSource,
@@ -125,6 +144,22 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/status",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
+
+const classifiedFiles = new Set([
+  ...ROUTES.map((route) => route.file),
+  ...PUBLIC_UNSMOKED_ROUTE_FILES,
+]);
+
+for (const file of listAdminPageFiles()) {
+  assert.ok(
+    classifiedFiles.has(file),
+    `${file} must be classified in admin-route-parity before it can ship`,
+  );
+}
+
+for (const file of PUBLIC_UNSMOKED_ROUTE_FILES) {
+  assert.ok(existsSync(file), `public admin exception missing ${file}`);
+}
 
 for (const route of ROUTES) {
   assert.ok(existsSync(route.file), `${route.route} missing ${route.file}`);
@@ -162,6 +197,10 @@ for (const route of ROUTES) {
     assert.ok(
       manualSmokeRoutes.has(route.route),
       `${route.route} missing from smoke.yml admin route proof`,
+    );
+    assert.ok(
+      passkeyProofRoutes.has(route.route),
+      `${route.route} missing from passkey proof route set`,
     );
   }
 }
@@ -207,4 +246,14 @@ function extractStringList(source, name) {
     ) ?? source.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
   assert.ok(match, `missing middleware list ${name}`);
   return [...match[1].matchAll(/"([^"]+)"/g)].map((item) => item[1]).sort();
+}
+
+function listAdminPageFiles(dir = "apps/admin/src/pages") {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) return listAdminPageFiles(path);
+    if (!entry.isFile()) return [];
+    if (!/\.(astro|ts)$/.test(entry.name)) return [];
+    return [path];
+  });
 }
