@@ -88,6 +88,8 @@ const requiredPasskeyAuditEvents = [
   "passkey.credential.revoked",
   "passkey.authentication.denied",
 ] as const;
+const REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS = 7;
+const REQUIRED_CONTENT_DRAFT_OPERATIONS = 9;
 
 type ProofEventRow = {
   id: string;
@@ -147,21 +149,22 @@ async function readContentOperationProof(
       countRows(db, "content_draft_operations"),
       countRows(db, "content_publish_events"),
     ]);
+    const isReady =
+      publishedPages >= REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS &&
+      drafts >= REQUIRED_CONTENT_DRAFT_OPERATIONS &&
+      records === 0 &&
+      events === 0;
     return {
       id: "proof.content-operation.d1",
       kind: "repo",
-      status:
-        publishedPages > 0 && drafts > 0 && events === 0
-          ? "verified"
-          : "pending",
+      status: isReady ? "verified" : "pending",
       title: "content state is D1-backed and writes remain inert",
-      summary: `published_page_content=${publishedPages}, content_records=${records}, content_draft_operations=${drafts}, content_publish_events=${events}. Newsletter copy can render from page_content while draft operation rows remain review-only.`,
+      summary: `published_page_content=${publishedPages}/${REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS}, content_records=${records}, content_draft_operations=${drafts}/${REQUIRED_CONTENT_DRAFT_OPERATIONS}, content_publish_events=${events}. Public route copy can render from page_content while draft operation rows remain review-only.`,
       evidence_uri: "D1 anipotts-db page_content and content operation tables",
       redaction: "metadata_only",
-      next_safe_action:
-        events === 0
-          ? "Seed more public content into page_content before adding an audited write route."
-          : "Review publish events before enabling more content writes.",
+      next_safe_action: isReady
+        ? "Keep write routes absent until passkey proof and the audited save path are ready."
+        : contentOperationNextAction(publishedPages, records, drafts, events),
     };
   } catch (error) {
     return {
@@ -177,6 +180,27 @@ async function readContentOperationProof(
         "Fix D1 schema or binding before relying on content operation proof.",
     };
   }
+}
+
+function contentOperationNextAction(
+  publishedPages: number,
+  records: number,
+  drafts: number,
+  events: number,
+): string {
+  if (records > 0) {
+    return "Review content_records before enabling any public runtime read from draft records.";
+  }
+  if (events > 0) {
+    return "Review publish events before enabling more content writes.";
+  }
+  if (publishedPages < REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS) {
+    return "Seed the remaining public route copy into published page_content rows.";
+  }
+  if (drafts < REQUIRED_CONTENT_DRAFT_OPERATIONS) {
+    return "Seed inert draft operations for every D1-backed public copy surface.";
+  }
+  return "Keep content writes disabled until the audited save path is ready.";
 }
 
 async function readDurableProofEntries(
