@@ -22,8 +22,10 @@ Live baseline:
 - host: `admin.anipotts.com`
 - protection: Cloudflare Access plus staged app-native passkey middleware
 - deployed state: Astro admin operator and content shell
-- latest proven routes: `/newsletter` and
-  `/newsletter/first-thing-agents-need-control-plane`
+- latest protected route set: `/`, `/content`, `/content/review`,
+  `/content/preview`, `/content/operations`, `/newsletter`,
+  `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, `/proof`,
+  `/repos`, `/handoffs`, `/fleet`, `/mutations`, and `/ops/destructive`
 
 Current strengths:
 
@@ -174,10 +176,12 @@ Public site lane:
 
 Admin read-only lane:
 
-- agents may branch and PR read-only dashboards, routes, schema display, and
-  feed adapters
-- deploy requires approval when the live admin target changes
-- authenticated and unauthenticated proof should be captured when available
+- agents may branch, edit, verify, push, PR, mark ready, merge after green
+  checks, and deploy only the affected admin target
+- route, feed, dashboard, schema display, content-review, and auth-staging UI
+  work is in this lane when it stays read-only or proof-only
+- authenticated proof should be captured when available, and unauthenticated
+  boundary proof must be recorded after deploy
 - route output must respect redaction rules
 
 Admin control lane:
@@ -186,8 +190,9 @@ Admin control lane:
 - approval bridge execution requires exact current authority
 - deploy buttons require exact current authority
 - content-save APIs require exact current authority
-- collector, DNS, Access, env, and secret changes require exact current
-  authority
+- collector, DNS, Access removal, env, secret, root, launchd, endpoint,
+  outbound, payment, filing, contract, and live-control changes require exact
+  current authority and proof
 
 Auth boundary note:
 
@@ -216,7 +221,8 @@ Scope:
 - no framework rewrite
 - no writes
 - no D1 mutation
-- no deploy unless separately approved after PR
+- scoped admin deploy is allowed when the diff stays in the standing read-only
+  admin lane and checks are green
 - no new secret or Access changes
 
 Deliverables:
