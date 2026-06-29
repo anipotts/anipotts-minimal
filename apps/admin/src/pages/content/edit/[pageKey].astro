@@ -74,7 +74,7 @@ function textareaRows(value: string): number {
                 </div>
                 <div>
                   <dt>write state</dt>
-                  <dd>no save route, no publish route, no content mutation</dd>
+                  <dd>draft operation save only; no publish route</dd>
                 </div>
               </dl>
             </article>
@@ -84,30 +84,48 @@ function textareaRows(value: string): number {
         <section class="editor-panel" aria-labelledby="editor-fields-heading">
           <div class="section-head">
             <div>
-              <p>draft editor model</p>
+              <p>draft operation editor</p>
               <h2 id="editor-fields-heading">field review</h2>
             </div>
-            <span>disabled controls</span>
+            <span>publish disabled</span>
           </div>
           <form
             class="page-editor-form"
             aria-label={`${pageRow.page_key} fields`}
           >
             {pageRow.fields.map((field) => (
-              <label class="page-editor-field">
-                <span>{field.path}</span>
-                <textarea rows={textareaRows(field.raw_value)} disabled>
-                  {field.raw_value}
-                </textarea>
+              <article
+                class="page-editor-field"
+                data-draft-field
+                data-page-key={pageRow.page_key}
+                data-field-path={field.path}
+                data-source-ref={pageRow.source_ref}
+              >
+                <label>
+                  <span>{field.path}</span>
+                  <textarea
+                    name="proposed_value"
+                    rows={textareaRows(field.raw_value)}
+                  >
+                    {field.raw_value}
+                  </textarea>
+                </label>
                 <small>
                   {field.kind} / source {pageRow.source_ref}
                 </small>
-              </label>
+                <div class="draft-control-row">
+                  <button
+                    class="button secondary"
+                    type="button"
+                    data-draft-save
+                  >
+                    save draft
+                  </button>
+                  <span data-draft-save-status>draft operation only</span>
+                </div>
+              </article>
             ))}
             <div class="draft-control-row page-editor-actions">
-              <button class="button secondary" type="button" disabled>
-                save draft
-              </button>
               <button class="button secondary" type="button" disabled>
                 request review
               </button>
@@ -164,3 +182,63 @@ function textareaRows(value: string): number {
     )
   }
 </AdminLayout>
+
+<script>
+  type DraftSaveResponse = {
+    ok?: boolean;
+    operation_id?: string;
+    next_safe_action?: string;
+    error?: string;
+  };
+
+  const draftFields =
+    document.querySelectorAll<HTMLElement>("[data-draft-field]");
+
+  for (const field of draftFields) {
+    const button = field.querySelector<HTMLButtonElement>("[data-draft-save]");
+    button?.addEventListener("click", () => void saveDraft(field, button));
+  }
+
+  async function saveDraft(field: HTMLElement, button: HTMLButtonElement) {
+    const textarea = field.querySelector<HTMLTextAreaElement>(
+      "textarea[name='proposed_value']",
+    );
+    const status = field.querySelector<HTMLElement>("[data-draft-save-status]");
+
+    if (!textarea) return;
+
+    button.disabled = true;
+    setText(status, "saving draft operation");
+
+    try {
+      const response = await fetch("/api/admin/content/draft-operation", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          page_key: field.dataset.pageKey,
+          field_path: field.dataset.fieldPath,
+          source_ref: field.dataset.sourceRef,
+          proposed_value: textarea.value,
+        }),
+      });
+      const data = (await response.json()) as DraftSaveResponse;
+      if (!response.ok || !data.ok) {
+        throw new Error(
+          data.next_safe_action ?? data.error ?? "draft save failed",
+        );
+      }
+      setText(status, `saved ${data.operation_id}`);
+    } catch (error) {
+      setText(
+        status,
+        error instanceof Error ? error.message : "draft save failed",
+      );
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function setText(node: Element | null, value: string) {
+    if (node) node.textContent = value;
+  }
+</script>

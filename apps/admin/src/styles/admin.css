@@ -736,6 +736,15 @@ dd {
   opacity: 0.76;
 }
 
+[data-draft-save-status] {
+  align-self: center;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  text-transform: none;
+}
+
 .page-editor-actions {
   padding: 16px;
 }

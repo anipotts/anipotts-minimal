@@ -45,7 +45,7 @@ Current gaps:
 - no active passkey credential exists yet
 - Cloudflare Access is still the outer boundary until passkey proof is complete
 - admin proof rows are still static source data, not durable D1 records
-- content operations are modeled and queryable, but publish writes remain inert
+- content draft-operation saves are staged, but publish writes remain inert
 - `apps/admin-solid` remains as a legacy rollback surface
 
 ## recommended v2 shape
@@ -253,8 +253,8 @@ Current next slice:
 Follow-up content slice:
 
 - move proof records into D1-backed read models
-- make content draft operations visible from D1
-- keep save, publish, send, and live controls inert until audit proof exists
+- make content draft-operation saves visible from D1
+- keep publish, send, and live controls inert until audit proof exists
 
 ## verification expectations
 

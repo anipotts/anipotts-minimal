@@ -500,7 +500,7 @@ assert.ok(
 assert.deepEqual(
   contentOperationTemplates.map((operation) => operation.operation_id).sort(),
   EXPECTED_OPERATION_IDS.toSorted(),
-  "static content operation fallback must match seeded D1 inert operations",
+  "static content operation fallback must match seeded D1 draft operations",
 );
 
 for (const operation of contentOperationTemplates) {
@@ -509,7 +509,7 @@ for (const operation of contentOperationTemplates) {
   assert.equal(operation.redaction, "public_copy_only", operation.operation_id);
   assert.ok(
     operation.preview_targets.includes("/content/preview"),
-    `${operation.operation_id} must render through the inert preview lane`,
+    `${operation.operation_id} must render through the preview lane`,
   );
   assert.ok(
     operation.forbidden_actions.includes("save"),
@@ -534,8 +534,8 @@ assert.deepEqual(
   contentOperationTables.map((table) => [table.table, table.write_state]),
   [
     ["content_records", "schema_only"],
-    ["content_draft_operations", "inert_preview"],
+    ["content_draft_operations", "draft_save_only"],
     ["content_publish_events", "future_publish"],
   ],
-  "content operation tables must preserve read-only write posture",
+  "content operation tables must preserve draft-only write posture",
 );

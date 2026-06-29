@@ -116,16 +116,16 @@ export type ContentOperationTable = {
     | "content_draft_operations"
     | "content_publish_events";
   purpose: string;
-  write_state: "schema_only" | "inert_preview" | "future_publish";
+  write_state: "schema_only" | "draft_save_only" | "future_publish";
   blocked_actions: string[];
 };
 
 export const contentOperationSchemaSource = {
   source_doc: "docs/admin-content-draft-operations.md",
   migration:
-    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql + drizzle/migrations/0032_seed_remaining_detail_page_content.sql",
+    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql + drizzle/migrations/0032_seed_remaining_detail_page_content.sql + drizzle/migrations/0033_refresh_draft_operation_save_metadata.sql",
   schema: "packages/lib/src/db/schema.ts",
-  mode: "d1_schema_no_write_endpoint",
+  mode: "d1_schema_with_passkey_draft_operation_save",
 };
 
 export const contentOperationTables: ContentOperationTable[] = [
@@ -140,8 +140,8 @@ export const contentOperationTables: ContentOperationTable[] = [
     table: "content_draft_operations",
     purpose:
       "draft and preview operations with authority, proof, rollback, and blocked action metadata",
-    write_state: "inert_preview",
-    blocked_actions: ["hidden api write", "direct source edit", "auto deploy"],
+    write_state: "draft_save_only",
+    blocked_actions: ["direct source edit", "auto deploy", "publish"],
   },
   {
     table: "content_publish_events",
@@ -476,7 +476,7 @@ function detailOperationFromSeed(seed: DetailOperationSeed): ContentOperation {
     updated_at: REMAINING_DETAIL_OPERATION_CREATED_AT,
     expires_at: "2026-07-29T07:45:00Z",
     rollback_ref: `source_markdown:${seed.sourceFile}`,
-    reviewer_note: `${seed.published ? "Published" : "Unpublished"} detail row seeded as inert preview metadata. No save route, source rewrite, external sync, send, schedule, or publish event is created.`,
+    reviewer_note: `${seed.published ? "Published" : "Unpublished"} detail row seeded as preview metadata. No page_content write, source rewrite, external sync, send, schedule, or publish event is created.`,
   };
 }
 
@@ -521,7 +521,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     field_path: "newsletter.subscribe_copy",
     current_value_ref: "source_fallback",
     proposed_value:
-      "Render headline, deck, CTA, success text, error text, footer text, and archive URL from a newsletter page_content record before any save route exists.",
+      "Render headline, deck, CTA, success text, error text, footer text, and archive URL from a newsletter page_content record before any page_content write or publish path exists.",
     status: "previewed",
     risk_level: "medium",
     authority_state: "source_truth_resolved_preview_only",
@@ -624,7 +624,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     rollback_ref:
       "source_markdown:apps/www/src/content/projects/quantercise.md",
     reviewer_note:
-      "First project detail row seeded as inert preview metadata. No source rewrite, save route, or publish event is created.",
+      "First project detail row seeded as preview metadata. No source rewrite, page_content write, or publish event is created.",
   },
   {
     operation_id: "content-draft-writing-newsletter-backfill-2026-06-28",
@@ -708,7 +708,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     rollback_ref:
       "source_markdown:apps/www/src/content/writing/saturdays-are-for-claude-code.md",
     reviewer_note:
-      "First writing detail row seeded as inert preview metadata. No source rewrite, send, save route, or publish event is created.",
+      "First writing detail row seeded as preview metadata. No source rewrite, send, page_content write, or publish event is created.",
   },
   ...remainingDetailContentOperationTemplates,
   {

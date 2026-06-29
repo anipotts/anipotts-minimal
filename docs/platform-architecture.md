@@ -23,7 +23,7 @@ launchd templates must point at `/Users/anipotts`.
 | labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                       |
 | workers        | `workers/*`                         | review individually | keep only production-required workers                 |
 | shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables        |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | seed inert content operations, then prove admin reads |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated       |
 
 ## current inventory
 
@@ -82,8 +82,9 @@ operation tables, or publish-event tables.
 | `/auth/passkey`                                     | app-native passkey auth              |
 | `/content`                                          | content inventory                    |
 | `/content/review`                                   | content proposal queue               |
-| `/content/drafts`                                   | inert draft editor surface           |
-| `/content/edit/:pageKey`                            | focused inert page_content editor    |
+| `/content/drafts`                                   | draft operation queue                |
+| `/content/edit/:pageKey`                            | focused draft page_content editor    |
+| `/api/admin/content/draft-operation`                | passkey-protected draft save API     |
 | `/content/preview`                                  | draft preview                        |
 | `/content/operations`                               | read-only D1 content operation state |
 | `/newsletter`                                       | newsletter issue queue               |
@@ -123,9 +124,9 @@ revoked-credential denial. It reports missing pre-removal evidence in
 `access_removal_blockers`; `cloudflare_access_still_active: true` is expected
 until the edge gate is removed, not a blocker by itself. After Access removal,
 the same script must show app-native route blocking. The route probe set must
-include content inventory, review, drafts, focused page editor, preview,
-operations, newsletter queue, newsletter detail preview, needs-ani, proof,
-repos, handoffs, fleet, mutations, and destructive-ops routes.
+include content inventory, review, drafts, focused page editor, draft-save API,
+preview, operations, newsletter queue, newsletter detail preview, needs-ani,
+proof, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
 First-passkey bootstrap in production requires a verified Cloudflare Access
 application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it
@@ -137,8 +138,8 @@ identity headers.
 
 Use `pnpm --silent proof:admin-content` after content migrations. It reads only
 remote D1 metadata and route status, then proves published `home` and
-`newsletter` page content, the newsletter subscribe copy fields, the four inert
-draft operations, empty content write tables, public route health, and protected
+`newsletter` page content, the newsletter subscribe copy fields, draft
+operations, empty public publish tables, public route health, and protected
 admin route boundaries.
 
 The admin proof log reads durable rows from D1 table `admin_proof_events` when
@@ -266,12 +267,12 @@ Rules:
     `page_content`; seeded by
     `drizzle/migrations/0027_seed_orchestrating_page_content.sql` with source
     fallback still retained.
-28. seed inert D1 review operations for D1-backed listing/page copy on
+28. seed D1 review operations for D1-backed listing/page copy on
     `/making`, `/projects`, `/writing`, `/newsletter/archive`, and
     `/orchestrating`; seeded by
     `drizzle/migrations/0028_seed_listing_content_review_operations.sql`.
-29. add a first-class inert `/content/drafts` admin route with disabled editor
-    controls backed by page_content and content_draft_operations.
+29. add a first-class `/content/drafts` admin route backed by page_content and
+    content_draft_operations.
 30. move project and writing source-content parsing into `packages/content` so
     the admin app only owns the Vite raw-markdown import boundary.
 31. move public page content defaults, pure normalizers, validators, content key
@@ -296,6 +297,11 @@ Rules:
     `drizzle/migrations/0032_seed_remaining_detail_page_content.sql` for all
     visible project and published writing detail routes, plus unpublished
     review-only rows for hidden project and draft writing content. This keeps
-    write paths inert while making detail content reviewable from D1.
-35. reduce deploy workflow inputs to retained production targets after rollback
+    publish writes blocked while making detail content reviewable from D1.
+35. add a passkey-protected `/api/admin/content/draft-operation` route for
+    saving draft operation rows from `/content/edit/:pageKey`; this still does
+    not write page_content, publish events, source files, sends, or deploys.
+    Existing D1 draft operation metadata is refreshed by
+    `drizzle/migrations/0033_refresh_draft_operation_save_metadata.sql`.
+36. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

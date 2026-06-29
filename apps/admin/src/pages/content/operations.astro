@@ -11,12 +11,12 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
 
 <AdminLayout
   title="content operations"
-  deck="Live read-only D1 view for draft operations. This route does not create, update, publish, send, or deploy."
+  deck="Live D1 view for draft operations. Draft saves are passkey-protected; publishing, sending, deploying, and public content writes remain blocked."
 >
   <section class="meta-strip" aria-label="content operation read source">
     <span>{readState.mode}</span>
     <span>{contentOperationSchemaSource.migration}</span>
-    <span>write path inactive</span>
+    <span>draft save only</span>
   </section>
 
   <div class="surface-grid">
@@ -41,12 +41,18 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
               <dl>
                 <div>
                   <dt>state</dt>
-                  <dd>read only</dd>
+                  <dd>
+                    {row.table_name === "content_draft_operations"
+                      ? "draft save allowed after passkey"
+                      : "read only"}
+                  </dd>
                 </div>
                 <div>
                   <dt>next</dt>
                   <dd>
-                    keep schema visible before adding any reviewed write route
+                    {row.table_name === "content_draft_operations"
+                      ? "review saved draft proposals before any publish path"
+                      : "keep public writes blocked"}
                   </dd>
                 </div>
               </dl>
@@ -62,7 +68,7 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
           <p>recent draft operations</p>
           <h2>{readState.operations.length} visible</h2>
         </div>
-        <span>no hidden api</span>
+        <span>passkey-gated api</span>
       </div>
       <div class="record-list">
         {
@@ -75,13 +81,16 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
               <dl>
                 <div>
                   <dt>meaning</dt>
-                  <dd>schema exists, but there is still no save endpoint</dd>
+                  <dd>
+                    schema exists; the focused editor can save draft operation
+                    rows after passkey login
+                  </dd>
                 </div>
                 <div>
                   <dt>next</dt>
                   <dd>
-                    add a reviewed inert draft creator after passkey proof is
-                    complete
+                    enroll passkey, save a draft proposal, then verify it in
+                    this queue
                   </dd>
                 </div>
               </dl>

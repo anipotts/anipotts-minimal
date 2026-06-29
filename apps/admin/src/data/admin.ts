@@ -50,9 +50,9 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "content platform",
-    status: "inert draft editor",
+    status: "draft save staged",
     risk: "medium",
-    next: "prove draft review shape before enabling audited save routes",
+    next: "enroll passkey and prove draft operation saves before publish design",
   },
   {
     title: "proof log",

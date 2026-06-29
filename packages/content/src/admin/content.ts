@@ -422,7 +422,7 @@ export const contentInventory: ContentInventoryItem[] = [
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Add an audited draft operation before any save route writes the newsletter content record.",
+      "Review draft operations before any page_content write or newsletter publish path exists.",
     required_authority: [],
     proof_ids: [
       "content.newsletter.page-content.source",

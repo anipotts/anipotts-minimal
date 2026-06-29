@@ -13,6 +13,10 @@ function expectSensitive(file, expected) {
 
 expectSensitive(".github/workflows/deploy.yml", true);
 expectSensitive("apps/admin/src/middleware.ts", true);
+expectSensitive(
+  "apps/admin/src/pages/api/admin/content/draft-operation.ts",
+  true,
+);
 expectSensitive("apps/admin/src/pages/api/admin/passkey/status.ts", true);
 expectSensitive("apps/admin/src/pages/auth/passkey.astro", true);
 expectSensitive("workers/state/src/index.ts", true);
