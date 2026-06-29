@@ -28,6 +28,7 @@
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "test:deploy-targets": "node scripts/ci/compute-deploy-targets.test.mjs",
     "test:admin-routes": "node scripts/ci/admin-route-parity.test.mjs",
+    "test:content-platform": "pnpm --filter @anipotts/content build && node scripts/ci/content-platform.test.mjs",
     "test:workspace": "node scripts/ci/workspace-inventory.test.mjs",
     "test:workflows": "node scripts/ci/workflow-inventory.test.mjs",
     "test:security-review": "node scripts/ci/security-review.test.mjs",

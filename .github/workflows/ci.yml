@@ -40,6 +40,9 @@ jobs:
       - name: Validate admin route parity
         run: pnpm test:admin-routes
 
+      - name: Validate content platform invariants
+        run: pnpm test:content-platform
+
       - name: Validate workflow inventory
         run: pnpm test:workflows
 
