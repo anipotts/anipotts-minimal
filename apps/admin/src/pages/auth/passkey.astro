@@ -54,6 +54,17 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     persistence, revoked credential denial, and unauthenticated blocking are
     proven.
   </p>
+
+  <section class="proof-checklist" aria-labelledby="passkey-proof-heading">
+    <div class="section-header">
+      <div>
+        <p>access removal proof</p>
+        <h2 id="passkey-proof-heading">passkey checklist</h2>
+      </div>
+      <span id="passkey-proof-summary">loading</span>
+    </div>
+    <div id="passkey-proof-list" class="proof-list" aria-live="polite"></div>
+  </section>
 </AdminLayout>
 
 <script>
@@ -86,6 +97,18 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     expected_origin: string;
     expected_rp_id: string;
     current_origin: string;
+    audit_events: Record<string, number>;
+    proof_items: PasskeyProofItem[];
+    access_removal_blockers: string[];
+    ready_for_access_removal: boolean;
+    next_safe_action: string;
+  };
+
+  type PasskeyProofItem = {
+    id: string;
+    label: string;
+    count: number;
+    complete: boolean;
     next_safe_action: string;
   };
 
@@ -97,6 +120,8 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
   const sessionLabel = document.querySelector("#passkey-session");
   const nextLabel = document.querySelector("#passkey-next");
   const message = document.querySelector("#passkey-message");
+  const proofSummary = document.querySelector("#passkey-proof-summary");
+  const proofList = document.querySelector("#passkey-proof-list");
   const registerButton =
     document.querySelector<HTMLButtonElement>("#register-passkey");
   const loginButton =
@@ -133,6 +158,12 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     setText(credentialsLabel, String(status.credential_count));
     setText(auditLabel, String(status.audit_count));
     setText(
+      proofSummary,
+      status.ready_for_access_removal
+        ? "ready for Access removal"
+        : `${status.access_removal_blockers.length} blockers`,
+    );
+    setText(
       registerState,
       status.can_register
         ? "registration allowed"
@@ -144,6 +175,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     if (loginButton) loginButton.disabled = !status.available;
     if (logoutButton) logoutButton.disabled = !status.has_session;
     if (revokeButton) revokeButton.disabled = !status.has_session;
+    renderProofList();
   }
 
   async function register() {
@@ -222,11 +254,37 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     const data = (await response.json()) as TResponse;
     const apiData = data as ApiResult;
     if (!response.ok) {
-      throw new Error(
+      throw new ApiError(
         apiData.detail ?? apiData.error ?? `request failed: ${response.status}`,
+        apiData.next_safe_action,
       );
     }
     return data;
+  }
+
+  function renderProofList() {
+    if (!status || !proofList) return;
+    proofList.replaceChildren(
+      ...status.proof_items.map((item) => {
+        const row = document.createElement("article");
+        row.className = `proof-item ${item.complete ? "complete" : "blocked"}`;
+        row.innerHTML = `
+          <span class="proof-dot" aria-hidden="true"></span>
+          <span>
+            <strong></strong>
+            <small></small>
+          </span>
+          <code></code>
+        `;
+        const title = row.querySelector("strong");
+        const detail = row.querySelector("small");
+        const count = row.querySelector("code");
+        setText(title, item.label);
+        setText(detail, item.complete ? "recorded" : item.next_safe_action);
+        setText(count, String(item.count));
+        return row;
+      }),
+    );
   }
 
   function setBusy(busy: boolean) {
@@ -241,6 +299,19 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
   }
 
   function errorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.nextSafeAction) {
+      return error.nextSafeAction;
+    }
     return error instanceof Error ? error.message : "passkey request failed";
+  }
+
+  class ApiError extends Error {
+    nextSafeAction: string | undefined;
+
+    constructor(message: string, nextSafeAction: string | undefined) {
+      super(message);
+      this.name = "ApiError";
+      this.nextSafeAction = nextSafeAction;
+    }
   }
 </script>
