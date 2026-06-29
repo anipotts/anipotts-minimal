@@ -332,7 +332,17 @@ export async function verifyRegistration(
     .prepare(
       `INSERT INTO admin_passkey_credentials
         (id, user_id, credential_id, public_key, counter, transports, device_type, backed_up, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(credential_id) DO UPDATE SET
+        user_id = excluded.user_id,
+        public_key = excluded.public_key,
+        counter = excluded.counter,
+        transports = excluded.transports,
+        device_type = excluded.device_type,
+        backed_up = excluded.backed_up,
+        last_used_at = NULL,
+        revoked_at = NULL,
+        updated_at = excluded.updated_at`,
     )
     .bind(
       randomId(),
