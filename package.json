@@ -35,9 +35,10 @@
     "test:workspace": "node scripts/ci/workspace-inventory.test.mjs",
     "test:workflows": "node scripts/ci/workflow-inventory.test.mjs",
     "test:security-review": "node scripts/ci/security-review.test.mjs",
+    "test:ci-invariants": "pnpm test:workspace && pnpm test:deploy-targets && pnpm test:admin-routes && pnpm test:public-boundary && pnpm test:public-routes && pnpm test:path-hygiene && pnpm test:content-platform && pnpm test:workflows && pnpm test:security-review",
     "test:unit": "turbo test",
     "test": "pnpm test:unit",
-    "validate": "turbo build && turbo lint && turbo typecheck && turbo test",
+    "validate": "pnpm test:ci-invariants && pnpm format:check && pnpm build && pnpm lint && pnpm typecheck && pnpm test",
     "prepare": "husky"
   },
   "lint-staged": {

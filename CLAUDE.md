@@ -132,6 +132,10 @@ pnpm turbo build --filter=@anipotts/admin-solid...
 pnpm validate
 ```
 
+`pnpm validate` mirrors the local PR gate: workspace/deploy/admin/public/path
+invariants, content platform invariants, workflow/security guards, formatting,
+and full build/lint/typecheck/test.
+
 For deploys, record:
 
 - PR number and merge SHA
