@@ -154,6 +154,8 @@ for (const route of ROUTES) {
 for (const marker of [
   "Access removal runbook",
   "passkey-runbook",
+  "passkey-return-path",
+  "sanitizeAdminReturnPath",
   "buildRunbookSteps",
   "ready_for_access_removal",
 ]) {
