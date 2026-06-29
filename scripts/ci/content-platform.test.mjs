@@ -2,15 +2,25 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import {
+  buildPasskeyProofItems,
   countProofEntries,
   contentInventorySource,
   disabledRuntimeOverlayResponse,
+  expectedPasskeyTables,
+  manualPasskeyEnrollmentSequence,
+  missingRequiredPasskeyAuditEvents,
   needsAniBuckets,
   needsAniItemsFromJson,
+  nextPasskeyProofAction,
+  nextPasskeyStatusAction,
+  passkeyAccessRemovalBlockers,
+  passkeyMissingProofItems,
   proofSource,
   recordsFromSourceModules,
   readProofEntries,
+  REQUIRED_PASSKEY_AUDIT_EVENTS,
   RUNTIME_FEED_PATH,
   runtimeOverlayErrorResponse,
   runtimeOverlayResponseFromFeed,
@@ -76,6 +86,124 @@ assert.deepEqual(
 );
 assert.equal(needsFixture.length, 1);
 assert.equal(needsFixture[0]?.id, "need-test-action");
+
+assert.deepEqual(
+  REQUIRED_PASSKEY_AUDIT_EVENTS,
+  [
+    "passkey.credential.registered",
+    "passkey.session.created",
+    "passkey.session.revoked",
+    "passkey.credential.revoked",
+    "passkey.authentication.denied",
+  ],
+  "passkey audit events must stay stable for Access removal proof",
+);
+assert.deepEqual(
+  expectedPasskeyTables,
+  [
+    "admin_passkey_audit",
+    "admin_passkey_challenges",
+    "admin_passkey_credentials",
+    "admin_passkey_sessions",
+  ],
+  "passkey proof must check every required D1 table",
+);
+assert.equal(manualPasskeyEnrollmentSequence.length, 7);
+
+const passkeyAuditEvents = {
+  "passkey.credential.registered": 1,
+  "passkey.session.created": 1,
+  "passkey.session.revoked": 0,
+  "passkey.credential.revoked": 0,
+  "passkey.authentication.denied": 0,
+};
+assert.deepEqual(missingRequiredPasskeyAuditEvents(passkeyAuditEvents), [
+  "passkey.session.revoked",
+  "passkey.credential.revoked",
+  "passkey.authentication.denied",
+]);
+assert.deepEqual(
+  passkeyAccessRemovalBlockers({
+    credentialCount: 1,
+    sessionCount: 1,
+    auditEvents: passkeyAuditEvents,
+  }),
+  [
+    "passkey.session.revoked",
+    "passkey.credential.revoked",
+    "passkey.authentication.denied",
+  ],
+);
+assert.deepEqual(
+  passkeyAccessRemovalBlockers({
+    schemaReady: false,
+    credentialCount: 0,
+    sessionCount: 0,
+    auditEvents: {},
+  }),
+  [
+    "schema_ready",
+    "active_credential",
+    "active_session",
+    ...REQUIRED_PASSKEY_AUDIT_EVENTS,
+  ],
+);
+assert.deepEqual(
+  passkeyMissingProofItems({
+    accessRemovalBlockers: ["active_credential"],
+    routeBoundary: "unknown",
+  }),
+  ["active_credential", "app_native_route_boundary"],
+);
+assert.equal(
+  nextPasskeyProofAction({
+    credentialCount: 0,
+    sessionCount: 0,
+    missingAuditEvents: REQUIRED_PASSKEY_AUDIT_EVENTS,
+  }),
+  "open /auth/passkey behind Cloudflare Access and register the first platform passkey",
+);
+assert.equal(
+  nextPasskeyProofAction({
+    credentialCount: 1,
+    sessionCount: 1,
+    missingAuditEvents: [],
+    routeBoundary: "cloudflare_access",
+  }),
+  "passkey proof is staged; remove Cloudflare Access and rerun this proof",
+);
+assert.equal(
+  nextPasskeyStatusAction({
+    hasSession: false,
+    credentialCount: 0,
+    accessIdentityVerified: true,
+  }),
+  "register the first passkey with verified Cloudflare Access identity",
+);
+assert.deepEqual(
+  buildPasskeyProofItems(1, true, passkeyAuditEvents).map((item) => [
+    item.id,
+    item.complete,
+  ]),
+  [
+    ["active_credential", true],
+    ["active_session", true],
+    ["passkey.credential.registered", true],
+    ["passkey.session.created", true],
+    ["passkey.session.revoked", false],
+    ["passkey.credential.revoked", false],
+    ["passkey.authentication.denied", false],
+  ],
+);
+
+const passkeyProofScript = readFileSync(
+  "scripts/admin/passkey-proof.mjs",
+  "utf8",
+);
+assert.ok(passkeyProofScript.includes("REQUIRED_PASSKEY_AUDIT_EVENTS"));
+assert.ok(passkeyProofScript.includes("expectedPasskeyTables"));
+assert.equal(passkeyProofScript.includes("const REQUIRED_AUDIT_EVENTS"), false);
+assert.equal(passkeyProofScript.includes("function nextSafeAction"), false);
 
 const disabledRuntime = disabledRuntimeOverlayResponse();
 assert.equal(disabledRuntime.mode, "disabled");
