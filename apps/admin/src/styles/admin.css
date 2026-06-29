@@ -431,6 +431,24 @@ th {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.editor-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr);
+  gap: 16px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.editor-main,
+.editor-side {
+  display: grid;
+  gap: 16px;
+}
+
+.owner-editor-form {
+  min-width: 0;
+}
+
 .draft-editor-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -659,13 +677,28 @@ dd {
   padding: 16px;
 }
 
+.editor-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
 .draft-form label {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
 
-.draft-form label span {
+.editor-field-grid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.draft-form label span,
+.editor-field-grid label > span,
+.preview-meta {
   color: var(--muted);
   font-size: 11px;
   text-transform: uppercase;
@@ -673,6 +706,9 @@ dd {
 
 .draft-form input,
 .draft-form textarea,
+.editor-field-grid input,
+.editor-field-grid select,
+.editor-field-grid textarea,
 .field-input-chip input {
   width: 100%;
   min-width: 0;
@@ -685,12 +721,15 @@ dd {
 }
 
 .draft-form input,
+.editor-field-grid input,
+.editor-field-grid select,
 .field-input-chip input {
   min-height: 38px;
   padding: 8px 10px;
 }
 
-.draft-form textarea {
+.draft-form textarea,
+.editor-field-grid textarea {
   resize: vertical;
   padding: 10px;
 }
@@ -771,8 +810,55 @@ dd {
   text-transform: none;
 }
 
+[data-editor-status] {
+  align-self: center;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .page-editor-actions {
   padding: 16px;
+}
+
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.48;
+}
+
+.revision-row h3 {
+  font-size: 14px;
+}
+
+.editor-preview {
+  margin-top: 24px;
+}
+
+.preview-document {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.preview-document p {
+  margin: 0;
+}
+
+.preview-summary {
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.preview-document pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--border);
+  background: #111;
+  color: var(--text);
+  padding: 14px;
+  line-height: 1.55;
 }
 
 .draft-proof-grid {
@@ -980,6 +1066,7 @@ dd {
   }
 
   .preview-grid,
+  .editor-workspace,
   .draft-editor-grid,
   .lane-grid,
   .newsletter-detail,
@@ -990,6 +1077,10 @@ dd {
   .draft-form,
   .draft-proof-grid,
   .diff-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-field-grid {
     grid-template-columns: 1fr;
   }
 

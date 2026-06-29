@@ -24,7 +24,7 @@ const pageContentState = await readPageContentInventoryStore(
 
 <AdminLayout
   title="content inventory"
-  deck="Current editable public-site surfaces and their source refs. This is read-only inventory from the shared content model."
+  deck="Current editable public-site surfaces and their source refs. Existing rows open in the D1 editor; new writing starts as a private draft."
 >
   <section class="meta-strip" aria-label="content inventory source">
     <span>{contentInventory.length} rows</span>
@@ -43,7 +43,7 @@ const pageContentState = await readPageContentInventoryStore(
         <p>d1 page_content</p>
         <h2>{pageContentState.row_count} records</h2>
       </div>
-      <span>read only</span>
+      <span>draft and publish editor</span>
     </div>
     <div class="record-list">
       {
@@ -96,7 +96,7 @@ const pageContentState = await readPageContentInventoryStore(
                 </div>
                 <div>
                   <dt>write state</dt>
-                  <dd>draft operation save only; no publish endpoint</dd>
+                  <dd>save draft to D1; publish selected draft with proof</dd>
                 </div>
               </dl>
               <div class="inline-actions">
@@ -135,6 +135,12 @@ const pageContentState = await readPageContentInventoryStore(
       }
     </div>
   </section>
+
+  <nav class="inline-actions" aria-label="content creation">
+    <a class="button" href="/content/edit/new"> new writing draft </a>
+    <a class="button secondary" href="/content/drafts"> draft history </a>
+    <a class="button secondary" href="/content/operations"> operation proof </a>
+  </nav>
 
   <section class="table-card operation-card">
     <div class="section-head">

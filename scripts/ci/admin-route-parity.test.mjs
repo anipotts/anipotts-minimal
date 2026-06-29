@@ -137,9 +137,10 @@ for (const marker of [
 
 for (const marker of [
   "readPageContentInventoryStore",
-  "publish disabled",
-  "/api/admin/content/draft-operation",
-  "draft operation only",
+  "/api/admin/content/editor",
+  "publish selected draft",
+  "content_draft_operations",
+  "new content starts as a private draft",
 ]) {
   assert.ok(
     contentEditorSource.includes(marker),

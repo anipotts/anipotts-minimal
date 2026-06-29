@@ -33,6 +33,7 @@ export {
 } from "./homepage.js";
 
 export type {
+  CmsWritingContent,
   HomepageMention,
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,

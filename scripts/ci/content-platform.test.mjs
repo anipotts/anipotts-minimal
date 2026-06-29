@@ -544,7 +544,7 @@ assert.deepEqual(
   [
     ["content_records", "schema_only"],
     ["content_draft_operations", "draft_save_only"],
-    ["content_publish_events", "future_publish"],
+    ["content_publish_events", "publish_with_proof"],
   ],
-  "content operation tables must preserve draft-only write posture",
+  "content operation tables must preserve selected-draft publish posture",
 );
