@@ -518,14 +518,16 @@ dd {
 }
 
 .field-chip span,
-.field-gap span {
+.field-gap span,
+.body-preview span {
   color: var(--muted);
   font-size: 11px;
   text-transform: uppercase;
 }
 
 .field-chip strong,
-.field-gap p {
+.field-gap p,
+.body-preview p {
   min-width: 0;
   margin: 0;
   overflow-wrap: anywhere;
@@ -551,6 +553,15 @@ dd {
   border: 1px solid #4a3b28;
   background: #181510;
   padding: 10px;
+}
+
+.body-preview {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  background: #111;
+  padding: 12px;
 }
 
 .lane-grid {

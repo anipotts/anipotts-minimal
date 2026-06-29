@@ -165,10 +165,22 @@ const pageContentState = await readPageContentInventoryStore(
                 <dd>{record.summary}</dd>
               </div>
               <div>
+                <dt>body state</dt>
+                <dd>{record.body_state}</dd>
+              </div>
+              <div>
+                <dt>sections</dt>
+                <dd>{record.body_section_count}</dd>
+              </div>
+              <div>
                 <dt>next</dt>
                 <dd>{record.next_safe_action}</dd>
               </div>
             </dl>
+            <div class="body-preview">
+              <span>markdown body preview</span>
+              <p>{record.body_preview}</p>
+            </div>
             <div class="field-grid" aria-label={`${record.slug} source fields`}>
               {record.fields.slice(0, 14).map((field) => (
                 <div class="field-chip">

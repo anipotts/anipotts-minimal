@@ -28,6 +28,9 @@ or any live write path.
 Admin `/content` now renders the D1 `page_content` rows and bundled read-only
 metadata from the project and writing markdown collections. It still does not
 add a save endpoint, publish endpoint, provider sync, or source file mutation.
+The source collection rows include markdown body state, section count, and a
+short body preview so project detail and writing body edits can be reviewed
+before any editor write path exists.
 Admin `/content/drafts` renders the first inert draft-editor shape with disabled
 controls backed by `page_content` and `content_draft_operations`. It is an
 editor surface model only, not a write path.
