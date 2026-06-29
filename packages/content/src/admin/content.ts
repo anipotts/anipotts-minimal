@@ -194,6 +194,21 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.homepage.summary.source"],
   },
   {
+    id: "homepage.about",
+    surface: "homepage",
+    title: "about section",
+    source_ref:
+      "D1 page_content:home.sections.about seeded by drizzle/migrations/0021_seed_homepage_about_section.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+    current_value:
+      "The homepage about label and paragraphs are structured page_content when present.",
+    editability: "ready",
+    risk_level: "medium",
+    next_safe_action:
+      "Preview about copy changes before any save path edits the home content record.",
+    required_authority: [],
+    proof_ids: ["content.homepage.about.page-content"],
+  },
+  {
     id: "homepage.mentions",
     surface: "homepage",
     title: "homepage mention metadata",
@@ -474,6 +489,10 @@ function sourceBackedFields(
 
   if (!hasNestedField(content, ["proof_cards"])) {
     gaps.push("proof_cards");
+  }
+
+  if (!hasNestedField(content, ["sections", "about", "paragraphs"])) {
+    gaps.push("sections.about.paragraphs");
   }
 
   if (!hasNestedField(content, ["sections", "past_work", "project_slugs"])) {

@@ -40,6 +40,16 @@ SELECT
   END AS home_rich_summary_count,
   CASE
     WHEN page_key = 'home'
+    THEN coalesce(json_array_length(json_extract(content, '$.sections.about.paragraphs')), 0)
+    ELSE NULL
+  END AS home_about_paragraph_count,
+  CASE
+    WHEN page_key = 'home'
+    THEN coalesce(json_type(content, '$.sections.about.label'), 'missing')
+    ELSE NULL
+  END AS home_about_label_type,
+  CASE
+    WHEN page_key = 'home'
     THEN coalesce(json_array_length(json_extract(content, '$.proof_cards')), 0)
     ELSE NULL
   END AS home_proof_card_count,
@@ -141,6 +151,16 @@ const homeMakingSlugCount = Number(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_making_slug_count ?? 0,
 );
+const homeAboutParagraphCount = Number(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_about_paragraph_count ?? 0,
+);
+const homeAboutLabelType = String(
+  pageRows.find(
+    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
+  )?.home_about_label_type ?? "missing",
+);
 const homeWritingSlugCount = Number(
   pageRows.find(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
@@ -168,6 +188,9 @@ const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
   ...(homeSubheadingType === "text" ? [] : ["home_intro_subheading"]),
   ...(homeRichSummaryCount === 2 ? [] : ["home_rich_summary"]),
+  ...(homeAboutParagraphCount === 2 && homeAboutLabelType === "text"
+    ? []
+    : ["home_about_section"]),
   ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
@@ -203,6 +226,12 @@ const proof = {
       row.home_rich_summary_count === undefined
         ? null
         : Number(row.home_rich_summary_count),
+    home_about_paragraph_count:
+      row.home_about_paragraph_count === null ||
+      row.home_about_paragraph_count === undefined
+        ? null
+        : Number(row.home_about_paragraph_count),
+    home_about_label_type: row.home_about_label_type ?? null,
     home_proof_card_count:
       row.home_proof_card_count === null ||
       row.home_proof_card_count === undefined
