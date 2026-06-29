@@ -63,7 +63,13 @@ SELECT
     THEN json_extract(content, '$.mentions.structuredAi.logoSrc')
     ELSE NULL
   END AS home_structured_ai_logo,
-  json_extract(content, '$.headline') AS newsletter_headline
+  json_extract(content, '$.headline') AS newsletter_headline,
+  coalesce(json_type(content, '$.deck'), 'missing') AS newsletter_deck_type,
+  coalesce(json_type(content, '$.cta_label'), 'missing') AS newsletter_cta_label_type,
+  coalesce(json_type(content, '$.success_message'), 'missing') AS newsletter_success_message_type,
+  coalesce(json_type(content, '$.error_message'), 'missing') AS newsletter_error_message_type,
+  coalesce(json_type(content, '$.footer_text'), 'missing') AS newsletter_footer_text_type,
+  json_extract(content, '$.buttondown_url') AS newsletter_buttondown_url
 FROM page_content
 ORDER BY page_key ASC, version DESC;
 `);
@@ -150,6 +156,13 @@ const homeSubheadingType = String(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_subheading_type ?? "missing",
 );
+const newsletterRow = pageRows.find(
+  (row) => String(row.page_key) === "newsletter" && Number(row.published) === 1,
+);
+const newsletterFieldTypes = newsletterProofFieldTypes(newsletterRow);
+const missingNewsletterFields = Object.entries(newsletterFieldTypes)
+  .filter(([, type]) => type !== "text")
+  .map(([field]) => `newsletter_${field}`);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -159,6 +172,7 @@ const missingProof = [
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
+  ...missingNewsletterFields,
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...staleOperationSources.map(
     (operationId) => `stale_content_operation_source:${operationId}`,
@@ -210,6 +224,10 @@ const proof = {
         : Number(row.home_mention_count),
     home_structured_ai_logo: row.home_structured_ai_logo ?? null,
     newsletter_headline: row.newsletter_headline ?? null,
+    newsletter_field_types:
+      String(row.page_key) === "newsletter"
+        ? newsletterProofFieldTypes(row)
+        : null,
   })),
   content_draft_operations: operationRows.map((row) => ({
     operation_id: String(row.operation_id),
@@ -310,4 +328,24 @@ function summarizeBoundary(routes) {
   if (boundaries.has("cloudflare_access")) return "cloudflare_access";
   if (boundaries.has("app_native_passkey")) return "app_native_passkey";
   return "unknown";
+}
+
+function newsletterProofFieldTypes(row) {
+  return {
+    headline:
+      typeof row?.newsletter_headline === "string" &&
+      row.newsletter_headline.trim().length > 0
+        ? "text"
+        : "missing",
+    deck: String(row?.newsletter_deck_type ?? "missing"),
+    cta_label: String(row?.newsletter_cta_label_type ?? "missing"),
+    success_message: String(row?.newsletter_success_message_type ?? "missing"),
+    error_message: String(row?.newsletter_error_message_type ?? "missing"),
+    footer_text: String(row?.newsletter_footer_text_type ?? "missing"),
+    buttondown_url:
+      typeof row?.newsletter_buttondown_url === "string" &&
+      row.newsletter_buttondown_url.startsWith("https://")
+        ? "text"
+        : "missing",
+  };
 }
