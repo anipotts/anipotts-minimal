@@ -124,7 +124,9 @@ controls disabled:
 
 No hidden API routes should exist for disabled controls. The draft-save API is
 explicitly same-origin, passkey-middleware protected, and limited to draft
-operation rows.
+operation rows. A successful draft save may also refresh the metadata-only
+`proof.admin.content-draft-save` row in `admin_proof_events`; it must not store
+the proposed copy in the proof row.
 
 ## storage
 
@@ -144,6 +146,10 @@ only static templates.
 The schema and seed rows do not authorize public-site runtime reads from draft
 records, browser writes to `page_content`, outbound sends, deploys, or publish
 actions.
+
+`drizzle/migrations/0034_seed_content_draft_save_proof.sql` seeds the pending
+draft-save proof row. The proof row is verified only after a passkey-authenticated
+draft save updates both `content_draft_operations` and `admin_proof_events`.
 
 ## proof requirements before publish writes
 

@@ -474,18 +474,27 @@ assert.equal(
 );
 
 assert.equal(proofSource.mode, "read_only_d1_plus_runtime_metadata");
-assert.equal(proofSource.live_writes, "disabled");
+assert.equal(proofSource.live_writes, "draft_save_proof_only");
 
 const proofEntriesWithoutDb = await readProofEntries(undefined);
 assert.deepEqual(
   countProofEntries(proofEntriesWithoutDb),
   {
-    total: 6,
+    total: 7,
     verified: 4,
     blocked: 1,
-    pending: 1,
+    pending: 2,
   },
   "proof exports must preserve read-only fallback status without an app D1 binding",
+);
+assert.ok(
+  proofEntriesWithoutDb.some(
+    (entry) =>
+      entry.id === "proof.admin.content-draft-save" &&
+      entry.status === "pending" &&
+      entry.next_safe_action.includes("save one draft operation"),
+  ),
+  "proof fallback must expose the draft-save proof gate before first save",
 );
 assert.ok(
   proofEntriesWithoutDb.some(

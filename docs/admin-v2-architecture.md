@@ -23,7 +23,9 @@ Live baseline:
 - protection: Cloudflare Access plus staged app-native passkey middleware
 - deployed state: Astro admin operator and content shell
 - latest protected route set: `/`, `/content`, `/content/review`,
-  `/content/preview`, `/content/operations`, `/newsletter`,
+  `/content/drafts`, `/content/edit/home`,
+  `/api/admin/content/draft-operation`, `/content/preview`,
+  `/content/operations`, `/newsletter`,
   `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, `/proof`,
   `/repos`, `/handoffs`, `/fleet`, `/mutations`, and `/ops/destructive`
 
@@ -35,6 +37,7 @@ Current strengths:
   routes
 - `/repos` can render the local-dev Infra runtime repo overlay metadata through
   `/api/admin/runtime-feed`
+- `admin_proof_events` provides durable proof rows in D1
 - deploy workflow can target only admin
 - unauthenticated users are blocked by Cloudflare Access before app content
   renders
@@ -44,8 +47,8 @@ Current gaps:
 
 - no active passkey credential exists yet
 - Cloudflare Access is still the outer boundary until passkey proof is complete
-- admin proof rows are still static source data, not durable D1 records
-- content draft-operation saves are staged, but publish writes remain inert
+- first draft-save proof is still pending passkey-authenticated save proof
+- content draft-operation saves are staged, but publish writes remain blocked
 - `apps/admin-solid` remains as a legacy rollback surface
 
 ## recommended v2 shape
@@ -253,7 +256,7 @@ Current next slice:
 Follow-up content slice:
 
 - move proof records into D1-backed read models
-- make content draft-operation saves visible from D1
+- make content draft-operation saves and proof rows visible from D1
 - keep publish, send, and live controls inert until audit proof exists
 
 ## verification expectations
