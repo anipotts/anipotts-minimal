@@ -279,5 +279,9 @@ Rules:
     from `@anipotts/content/public`; D1 readers stay in `@anipotts/lib/cms`.
     Metadata-only source-ref refresh is covered by
     `drizzle/migrations/0029_update_public_content_contract_source_refs.sql`.
-32. reduce deploy workflow inputs to retained production targets after rollback
+32. expand `/orchestrating` page content from hero-only copy into structured
+    section labels, loop cards, and public-tool cards. Covered by
+    `drizzle/migrations/0030_expand_orchestrating_page_content.sql`; route
+    fallback remains in `@anipotts/content/public`.
+33. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

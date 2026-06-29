@@ -30,7 +30,11 @@ import {
   contentOperationTables,
   contentOperationTemplates,
 } from "../../packages/content/dist/admin/operations.js";
-import { contentInventorySource as rootContentInventorySource } from "../../packages/content/dist/index.js";
+import {
+  contentInventorySource as rootContentInventorySource,
+  normalizeOrchestratingPageContent,
+  validateOrchestratingPageContent,
+} from "../../packages/content/dist/index.js";
 
 const EXPECTED_OPERATION_IDS = [
   "content-draft-homepage-summary-2026-06-28",
@@ -373,6 +377,61 @@ assert.equal(
   rootContentInventorySource.mode,
   "read_only_static_plus_d1_page_content",
 );
+
+const orchestratingContent = normalizeOrchestratingPageContent({
+  sections: {
+    systems: "systems",
+    loop: "operator loop",
+    public_tools: "public tooling",
+    public_tools_note: "agent notes and local tools",
+    status: "status",
+    status_note: "tool calls + file mutations",
+    records: "strange highs",
+    plugin: "local console",
+    hooks: "safety rails",
+    playbooks: "notes",
+    sessions: "recent traces",
+  },
+  loop_cards: [
+    {
+      label: "logs",
+      title: "everything leaves a trail",
+      detail: "local sessions and cron output get captured for review.",
+    },
+  ],
+  public_tools: [
+    {
+      title: "claude code tips",
+      href: "/projects/claude-code-tips",
+      detail: "agent notes from actual sessions.",
+    },
+  ],
+});
+assert.equal(orchestratingContent.sections.loop, "operator loop");
+assert.equal(orchestratingContent.loop_cards.length, 1);
+assert.equal(
+  orchestratingContent.public_tools[0]?.href,
+  "/projects/claude-code-tips",
+);
+assert.deepEqual(validateOrchestratingPageContent(orchestratingContent), {
+  ok: true,
+});
+assert.equal(
+  validateOrchestratingPageContent(
+    normalizeOrchestratingPageContent({
+      public_tools: [
+        {
+          title: "unsafe",
+          href: "javascript:alert(1)",
+          detail: "bad route",
+        },
+      ],
+    }),
+  ).ok,
+  true,
+  "invalid orchestrating cards fall back to safe defaults before validation",
+);
+
 assert.equal(
   execFileSync(
     process.execPath,

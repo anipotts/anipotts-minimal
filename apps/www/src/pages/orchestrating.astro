@@ -88,48 +88,6 @@ const heroStats = [
   { label: "streak", value: `${stats.totals.streakDays}d` },
 ];
 
-const loop = [
-  {
-    label: "logs",
-    title: "everything leaves a trail",
-    detail:
-      "local sessions and cron output get captured so future me can debug instead of guess.",
-  },
-  {
-    label: "edges",
-    title: "experiments stay inspectable",
-    detail:
-      "labs and odd tools can be public without pretending to be products.",
-  },
-  {
-    label: "guards",
-    title: "sharp tools get rails",
-    detail:
-      "small checks keep agents and scripts from doing expensive dumb things while still letting them move.",
-  },
-  {
-    label: "controls",
-    title: "repeated work gets a surface",
-    detail:
-      "if an action matters twice, it becomes a command, dashboard, admin field, or tiny page.",
-  },
-];
-
-const publicTools = [
-  {
-    title: "claude code tips",
-    href: "/projects/claude-code-tips",
-    detail:
-      "hooks, agents, plugin notes, and working patterns from actual agent sessions.",
-  },
-  {
-    title: "imessage mcp",
-    href: "/projects/imessage-mcp",
-    detail:
-      "local-first mcp for searching message history without turning private data into a cloud product.",
-  },
-];
-
 const r = stats.records;
 const records = [
   {
@@ -202,7 +160,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="systems">
-    <h2 class="section-label">systems</h2>
+    <h2 class="section-label">{copy.sections.systems}</h2>
     <div class="stat-grid mobile-carousel">
       {
         heroStats.map((s) => (
@@ -216,10 +174,10 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="loop">
-    <h2 class="section-label">how it stays useful</h2>
+    <h2 class="section-label">{copy.sections.loop}</h2>
     <div class="loop-grid mobile-carousel">
       {
-        loop.map((item) => (
+        copy.loop_cards.map((item) => (
           <article class="loop-card">
             <span class="mono loop-label">{item.label}</span>
             <h3>{item.title}</h3>
@@ -232,12 +190,12 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="public-tools">
     <span class="split-head">
-      <h2 class="section-label">public tooling</h2>
-      <span class="mono muted">agent notes and local tools</span>
+      <h2 class="section-label">{copy.sections.public_tools}</h2>
+      <span class="mono muted">{copy.sections.public_tools_note}</span>
     </span>
     <div class="grid-2 mobile-carousel">
       {
-        publicTools.map((tool) => (
+        copy.public_tools.map((tool) => (
           <a href={tool.href} class="doc-card">
             <span class="row-title">{tool.title}</span>
             <span class="dek">{tool.detail}</span>
@@ -249,8 +207,8 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="status">
     <span class="split-head">
-      <h2 class="section-label">status</h2>
-      <span class="mono muted">tool calls + file mutations</span>
+      <h2 class="section-label">{copy.sections.status}</h2>
+      <span class="mono muted">{copy.sections.status_note}</span>
     </span>
     <div class="chart-card">
       <div
@@ -272,7 +230,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="edges">
-    <h2 class="section-label">strange highs</h2>
+    <h2 class="section-label">{copy.sections.records}</h2>
     <div class="grid-2 mobile-carousel">
       {
         records.map((rec) => (
@@ -287,7 +245,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="plugin">
-    <h2 class="section-label">local console</h2>
+    <h2 class="section-label">{copy.sections.plugin}</h2>
     <div class="mine-card">
       <div class="mine-copy">
         <span class="row-title">{minePlugin.name}</span>
@@ -312,7 +270,7 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="hooks">
     <span class="split-head">
-      <h2 class="section-label">safety rails</h2>
+      <h2 class="section-label">{copy.sections.hooks}</h2>
       <a
         href={TIPS_REPO}
         class="quiet-link mono"
@@ -342,7 +300,7 @@ const fmtSessionTime = (iso: string) =>
 
   <section data-rise class="stack" id="playbooks">
     <span class="split-head">
-      <h2 class="section-label">notes</h2>
+      <h2 class="section-label">{copy.sections.playbooks}</h2>
       <a
         href={MINE_REPO}
         class="quiet-link mono"
@@ -368,7 +326,7 @@ const fmtSessionTime = (iso: string) =>
   </section>
 
   <section data-rise class="stack" id="sessions">
-    <h2 class="section-label">recent traces</h2>
+    <h2 class="section-label">{copy.sections.sessions}</h2>
     <div class="table-wrap">
       <table class="stat-table">
         <thead>

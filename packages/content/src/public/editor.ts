@@ -573,7 +573,80 @@ export function normalizeOrchestratingPageContent(
       source.panel_copy,
       DEFAULT_ORCHESTRATING_CONTENT.panel_copy,
     ).trim(),
+    sections: normalizeOrchestratingSectionLabels(source.sections),
+    loop_cards: normalizeOrchestratingLoopCards(source.loop_cards),
+    public_tools: normalizeOrchestratingLinkCards(source.public_tools),
   };
+}
+
+function normalizeOrchestratingSectionLabels(
+  value: unknown,
+): OrchestratingPageContent["sections"] {
+  const fallback = DEFAULT_ORCHESTRATING_CONTENT.sections;
+  const source =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+
+  return {
+    systems: coerceString(source.systems, fallback.systems).trim(),
+    loop: coerceString(source.loop, fallback.loop).trim(),
+    public_tools: coerceString(
+      source.public_tools,
+      fallback.public_tools,
+    ).trim(),
+    public_tools_note: coerceString(
+      source.public_tools_note,
+      fallback.public_tools_note,
+    ).trim(),
+    status: coerceString(source.status, fallback.status).trim(),
+    status_note: coerceString(source.status_note, fallback.status_note).trim(),
+    records: coerceString(source.records, fallback.records).trim(),
+    plugin: coerceString(source.plugin, fallback.plugin).trim(),
+    hooks: coerceString(source.hooks, fallback.hooks).trim(),
+    playbooks: coerceString(source.playbooks, fallback.playbooks).trim(),
+    sessions: coerceString(source.sessions, fallback.sessions).trim(),
+  };
+}
+
+function normalizeOrchestratingLoopCards(
+  value: unknown,
+): OrchestratingPageContent["loop_cards"] {
+  if (!Array.isArray(value)) return DEFAULT_ORCHESTRATING_CONTENT.loop_cards;
+
+  const cards = value
+    .filter((item): item is Record<string, unknown> =>
+      Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    )
+    .slice(0, 8)
+    .map((item) => ({
+      label: coerceString(item.label, "").trim(),
+      title: coerceString(item.title, "").trim(),
+      detail: coerceString(item.detail, "").trim(),
+    }))
+    .filter((item) => item.label && item.title && item.detail);
+
+  return cards.length > 0 ? cards : DEFAULT_ORCHESTRATING_CONTENT.loop_cards;
+}
+
+function normalizeOrchestratingLinkCards(
+  value: unknown,
+): OrchestratingPageContent["public_tools"] {
+  if (!Array.isArray(value)) return DEFAULT_ORCHESTRATING_CONTENT.public_tools;
+
+  const cards = value
+    .filter((item): item is Record<string, unknown> =>
+      Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    )
+    .slice(0, 8)
+    .map((item) => ({
+      title: coerceString(item.title, "").trim(),
+      href: coerceString(item.href, "").trim(),
+      detail: coerceString(item.detail, "").trim(),
+    }))
+    .filter((item) => item.title && isSafeCmsUrl(item.href) && item.detail);
+
+  return cards.length > 0 ? cards : DEFAULT_ORCHESTRATING_CONTENT.public_tools;
 }
 
 export function validateOrchestratingPageContent(
@@ -614,7 +687,80 @@ export function validateOrchestratingPageContent(
       content.panel_copy,
       "Orchestrating panel copy",
       CMS_TEXT_LIMITS.summary,
-    );
+    ) ??
+    validateOrchestratingSections(content) ??
+    validateOrchestratingLoopCards(content) ??
+    validateOrchestratingLinkCards(content);
 
   return error ? { ok: false, error } : { ok: true };
+}
+
+function validateOrchestratingSections(
+  content: OrchestratingPageContent,
+): string | null {
+  return (
+    Object.entries(content.sections)
+      .map(([key, value]) =>
+        validateCmsString(
+          value,
+          `Orchestrating ${key.replaceAll("_", " ")}`,
+          CMS_TEXT_LIMITS.linkLabel,
+        ),
+      )
+      .find(Boolean) ?? null
+  );
+}
+
+function validateOrchestratingLoopCards(
+  content: OrchestratingPageContent,
+): string | null {
+  return (
+    content.loop_cards
+      .flatMap((card, index) => [
+        validateCmsString(
+          card.label,
+          `Orchestrating loop card ${index + 1} label`,
+          CMS_TEXT_LIMITS.linkLabel,
+        ),
+        validateCmsString(
+          card.title,
+          `Orchestrating loop card ${index + 1} title`,
+          CMS_TEXT_LIMITS.title,
+        ),
+        validateCmsString(
+          card.detail,
+          `Orchestrating loop card ${index + 1} detail`,
+          CMS_TEXT_LIMITS.summary,
+        ),
+      ])
+      .find(Boolean) ?? null
+  );
+}
+
+function validateOrchestratingLinkCards(
+  content: OrchestratingPageContent,
+): string | null {
+  for (const [index, card] of content.public_tools.entries()) {
+    const error =
+      validateCmsString(
+        card.title,
+        `Orchestrating public tool ${index + 1} title`,
+        CMS_TEXT_LIMITS.title,
+      ) ??
+      validateCmsString(
+        card.href,
+        `Orchestrating public tool ${index + 1} link`,
+        CMS_TEXT_LIMITS.linkUrl,
+      ) ??
+      (!isSafeCmsUrl(card.href)
+        ? `Orchestrating public tool ${index + 1} link must start with /, https://, or mailto:`
+        : null) ??
+      validateCmsString(
+        card.detail,
+        `Orchestrating public tool ${index + 1} detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return error;
+  }
+  return null;
 }
