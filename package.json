@@ -28,6 +28,7 @@
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "test:deploy-targets": "node scripts/ci/compute-deploy-targets.test.mjs",
     "test:admin-routes": "node scripts/ci/admin-route-parity.test.mjs",
+    "test:workflows": "node scripts/ci/workflow-inventory.test.mjs",
     "test:security-review": "node scripts/ci/security-review.test.mjs",
     "test:unit": "turbo test",
     "test": "pnpm test:unit",
