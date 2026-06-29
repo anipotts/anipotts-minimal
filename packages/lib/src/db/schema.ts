@@ -840,6 +840,12 @@ export const contentDraftOperations = sqliteTable(
     rollback_ref: text("rollback_ref").notNull(),
     reviewer_note: text("reviewer_note"),
     metadata: text("metadata").notNull().default("{}"),
+    page_key: text("page_key"),
+    slug: text("slug"),
+    title: text("title"),
+    visibility: text("visibility"),
+    updated_by: text("updated_by"),
+    published_from_operation_id: text("published_from_operation_id"),
   },
   (table) => [
     index("idx_content_draft_operations_status").on(
@@ -853,6 +859,16 @@ export const contentDraftOperations = sqliteTable(
     index("idx_content_draft_operations_risk").on(
       table.risk_level,
       table.authority_state,
+    ),
+    index("idx_content_draft_operations_page_key_status").on(
+      table.page_key,
+      table.status,
+      table.updated_at,
+    ),
+    index("idx_content_draft_operations_slug").on(table.slug),
+    index("idx_content_draft_operations_visibility").on(
+      table.visibility,
+      table.updated_at,
     ),
   ],
 );

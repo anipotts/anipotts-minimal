@@ -19,7 +19,13 @@ const editorState = await readContentEditorState(
 const current = editorState.current;
 const isNew = pageKey === "writing:new";
 const latestDraft = editorState.latest_draft;
+const latestDraftPublishable = latestDraft?.status === "published";
 const tagText = current.tags.join(", ");
+const currentRollbackReference =
+  editorState.current_version > 0
+    ? `page_content:${editorState.page_key}@v${editorState.current_version}`
+    : `new_private_draft:${editorState.page_key}`;
+const currentPublicRoute = routeForEditor(current.page_key, current.slug);
 
 function safeDecodePageKey(value: string | undefined): string {
   if (!value) return "writing:new";
@@ -28,6 +34,13 @@ function safeDecodePageKey(value: string | undefined): string {
   } catch {
     return value;
   }
+}
+
+function routeForEditor(pageKey: string, slug: string): string {
+  if (pageKey.startsWith("writing:")) return `/writing/${slug}`;
+  if (pageKey.startsWith("project:")) return `/projects/${slug}`;
+  if (pageKey === "home") return "/";
+  return `/${pageKey.replaceAll("_", "/").replaceAll(":", "/")}`;
 }
 ---
 
@@ -95,7 +108,11 @@ function safeDecodePageKey(value: string | undefined): string {
                   ["private", "draft", "hidden", "published"].map((option) => (
                     <option
                       value={option}
-                      selected={current.visibility === option}
+                      selected={
+                        isNew
+                          ? option === "private"
+                          : current.visibility === option
+                      }
                     >
                       {option}
                     </option>
@@ -145,7 +162,13 @@ function safeDecodePageKey(value: string | undefined): string {
               type="button"
               data-publish-draft
               data-operation-id={latestDraft?.id ?? ""}
-              disabled={!latestDraft}
+              data-publish-route={currentPublicRoute}
+              data-publish-version={String(editorState.current_version + 1)}
+              data-publish-visibility={latestDraft?.status ??
+                current.visibility}
+              data-publish-rollback={latestDraft?.rollback_target ??
+                currentRollbackReference}
+              disabled={!latestDraftPublishable}
             >
               publish selected draft
             </button>
@@ -218,7 +241,7 @@ function safeDecodePageKey(value: string | undefined): string {
             <p>revision history</p>
             <h2>{editorState.revisions.length} entries</h2>
           </div>
-          <span>rollback inert</span>
+          <span>rollback reference only</span>
         </div>
         <div class="record-list">
           {
@@ -248,7 +271,7 @@ function safeDecodePageKey(value: string | undefined): string {
                       <dd>{revision.author}</dd>
                     </div>
                     <div>
-                      <dt>rollback target</dt>
+                      <dt>rollback reference</dt>
                       <dd>{revision.rollback_target}</dd>
                     </div>
                     <div>
@@ -273,6 +296,51 @@ function safeDecodePageKey(value: string | undefined): string {
       </nav>
     </aside>
   </section>
+
+  <dialog class="publish-dialog" data-publish-dialog>
+    <div class="publish-dialog-inner">
+      <div>
+        <p>publish selected draft</p>
+        <h2 data-publish-title>{current.title}</h2>
+      </div>
+      <dl>
+        <div>
+          <dt>route</dt>
+          <dd data-publish-dialog-route>{currentPublicRoute}</dd>
+        </div>
+        <div>
+          <dt>version</dt>
+          <dd data-publish-dialog-version>
+            v{editorState.current_version + 1}
+          </dd>
+        </div>
+        <div>
+          <dt>visibility</dt>
+          <dd data-publish-dialog-visibility>
+            {latestDraft?.status ?? current.visibility}
+          </dd>
+        </div>
+        <div>
+          <dt>rollback reference</dt>
+          <dd data-publish-dialog-rollback>
+            {latestDraft?.rollback_target ?? currentRollbackReference}
+          </dd>
+        </div>
+      </dl>
+      <p>
+        publish writes public page_content and content_publish_events only. it
+        does not send newsletters, deploy, or write source files.
+      </p>
+      <div class="publish-dialog-actions">
+        <button class="button ghost" type="button" data-cancel-publish>
+          cancel
+        </button>
+        <button class="button danger" type="button" data-confirm-publish>
+          confirm publish
+        </button>
+      </div>
+    </div>
+  </dialog>
 </AdminLayout>
 
 <script>
@@ -282,6 +350,11 @@ function safeDecodePageKey(value: string | undefined): string {
     preview_href?: string;
     publishable?: boolean;
     public_route?: string;
+    next_version?: number;
+    rollback_ref?: string;
+    visibility?: string;
+    title?: string;
+    slug?: string;
     version?: number;
     error?: string;
   };
@@ -298,9 +371,20 @@ function safeDecodePageKey(value: string | undefined): string {
   const statusNode = document.querySelector<HTMLElement>(
     "[data-editor-status]",
   );
+  const publishDialog = document.querySelector<HTMLDialogElement>(
+    "[data-publish-dialog]",
+  );
+  const confirmPublishButton = document.querySelector<HTMLButtonElement>(
+    "[data-confirm-publish]",
+  );
+  const cancelPublishButton = document.querySelector<HTMLButtonElement>(
+    "[data-cancel-publish]",
+  );
 
   saveButton?.addEventListener("click", () => void saveDraft());
-  publishButton?.addEventListener("click", () => void publishDraft());
+  publishButton?.addEventListener("click", () => openPublishDialog());
+  confirmPublishButton?.addEventListener("click", () => void publishDraft());
+  cancelPublishButton?.addEventListener("click", () => publishDialog?.close());
 
   async function saveDraft() {
     if (!form || !saveButton) return;
@@ -321,8 +405,21 @@ function safeDecodePageKey(value: string | undefined): string {
       }
       if (publishButton) {
         publishButton.dataset.operationId = data.operation_id;
+        if (data.public_route) {
+          publishButton.dataset.publishRoute = data.public_route;
+        }
+        if (data.next_version) {
+          publishButton.dataset.publishVersion = String(data.next_version);
+        }
+        if (data.rollback_ref) {
+          publishButton.dataset.publishRollback = data.rollback_ref;
+        }
+        if (data.visibility) {
+          publishButton.dataset.publishVisibility = data.visibility;
+        }
         publishButton.disabled = !data.publishable;
       }
+      updatePublishDialog(data);
       setText(statusNode, `saved ${data.operation_id}`);
     } catch (error) {
       setText(
@@ -335,10 +432,11 @@ function safeDecodePageKey(value: string | undefined): string {
   }
 
   async function publishDraft() {
-    if (!publishButton) return;
+    if (!publishButton || !confirmPublishButton) return;
     const operationId = publishButton.dataset.operationId;
     if (!operationId) return;
     publishButton.disabled = true;
+    confirmPublishButton.disabled = true;
     setText(statusNode, "publishing selected draft");
 
     try {
@@ -351,13 +449,51 @@ function safeDecodePageKey(value: string | undefined): string {
         statusNode,
         `published v${data.version} to ${data.public_route ?? "public route"}`,
       );
+      publishDialog?.close();
     } catch (error) {
       setText(
         statusNode,
         error instanceof Error ? error.message : "publish failed",
       );
       publishButton.disabled = false;
+      confirmPublishButton.disabled = false;
     }
+  }
+
+  function openPublishDialog() {
+    if (!publishButton || publishButton.disabled) return;
+    updatePublishDialog({});
+    if (publishDialog?.showModal) {
+      publishDialog.showModal();
+    } else {
+      void publishDraft();
+    }
+  }
+
+  function updatePublishDialog(data: Partial<EditorResponse>) {
+    if (!publishButton) return;
+    const route = data.public_route ?? publishButton.dataset.publishRoute ?? "";
+    const version =
+      data.next_version ?? Number(publishButton.dataset.publishVersion || "0");
+    const visibility =
+      data.visibility ?? publishButton.dataset.publishVisibility ?? "draft";
+    const rollback =
+      data.rollback_ref ?? publishButton.dataset.publishRollback ?? "";
+    const title =
+      data.title ??
+      String(form ? new FormData(form).get("title") : "selected draft");
+
+    setText(document.querySelector("[data-publish-title]"), title);
+    setText(document.querySelector("[data-publish-dialog-route]"), route);
+    setText(
+      document.querySelector("[data-publish-dialog-version]"),
+      version ? `v${version}` : "next version",
+    );
+    setText(
+      document.querySelector("[data-publish-dialog-visibility]"),
+      visibility,
+    );
+    setText(document.querySelector("[data-publish-dialog-rollback]"), rollback);
   }
 
   async function postEditor(body: Record<string, FormDataEntryValue | string>) {

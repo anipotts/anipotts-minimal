@@ -31,6 +31,7 @@ export {
   normalizeHomepageContent,
   validateHomepageContent,
 } from "./homepage.js";
+export { parseMarkdownBlocks } from "./markdown.js";
 
 export type {
   CmsWritingContent,
@@ -47,3 +48,4 @@ export type {
   ThoughtSummary,
   WritingSummary,
 } from "@anipotts/types";
+export type { InlineSegment, MarkdownBlock } from "./markdown.js";

@@ -7,6 +7,7 @@ import {
   type ContentEditorPublishInput,
   type ContentEditorSaveInput,
 } from "../../../../lib/content-editor";
+import { getPasskeyActor } from "../../../../lib/passkey-auth";
 
 export const POST: APIRoute = async (context) => {
   try {
@@ -23,15 +24,16 @@ export const POST: APIRoute = async (context) => {
     const body = (await context.request.json()) as
       | ContentEditorSaveInput
       | ContentEditorPublishInput;
+    const actor = await getPasskeyActor(context);
 
     if (body.action === "save_draft") {
-      return Response.json(await saveEditorDraft(db, body), {
+      return Response.json(await saveEditorDraft(db, body, actor), {
         headers: { "cache-control": "no-store" },
       });
     }
 
     if (body.action === "publish") {
-      return Response.json(await publishEditorDraft(db, body), {
+      return Response.json(await publishEditorDraft(db, body, actor), {
         headers: { "cache-control": "no-store" },
       });
     }

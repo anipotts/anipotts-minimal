@@ -292,6 +292,22 @@ SELECT 'content_publish_events', COUNT(*) FROM content_publish_events;
 `).map((row) => [String(row.table_name), Number(row.count)]),
 );
 
+const publishEventRows = runD1(`
+SELECT
+  id,
+  operation_id,
+  status,
+  created_by,
+  created_at,
+  rollback_ref,
+  json_extract(metadata, '$.page_key') AS page_key,
+  json_extract(metadata, '$.route') AS route,
+  json_extract(metadata, '$.published_version') AS published_version
+FROM content_publish_events
+ORDER BY created_at DESC
+LIMIT 50;
+`);
+
 const [draftSaveProof] = runD1(`
 SELECT
   id,
@@ -303,10 +319,22 @@ FROM admin_proof_events
 WHERE id = 'proof.admin.content-draft-save';
 `);
 
-const [adminRoutes, publicRoutes] = await Promise.all([
-  Promise.all(ADMIN_ROUTES.map((path) => probeRoute(ADMIN_ORIGIN, path))),
-  Promise.all(PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path))),
-]);
+const publishedEventRoutes = [
+  ...new Set(
+    publishEventRows
+      .map((row) => String(row.route ?? ""))
+      .filter((route) => route.startsWith("/")),
+  ),
+];
+
+const [adminRoutes, publicRoutes, publishedEventRouteChecks] =
+  await Promise.all([
+    Promise.all(ADMIN_ROUTES.map((path) => probeRoute(ADMIN_ORIGIN, path))),
+    Promise.all(PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path))),
+    Promise.all(
+      publishedEventRoutes.map((path) => probeRoute(WWW_ORIGIN, path)),
+    ),
+  ]);
 
 const publishedPageKeys = pageRows
   .filter((row) => Number(row.published) === 1)
@@ -330,6 +358,9 @@ const missingOperations = REQUIRED_OPERATIONS.filter(
   (operationId) => !operationIds.includes(operationId),
 );
 const publicRouteFailures = publicRoutes.filter(
+  (route) => route.status !== 200,
+);
+const publishedEventRouteFailures = publishedEventRouteChecks.filter(
   (route) => route.status !== 200,
 );
 const adminBoundary = summarizeBoundary(adminRoutes);
@@ -432,6 +463,9 @@ const missingProof = [
   ),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
   ...publicRouteFailures.map((route) => `public_route:${route.path}`),
+  ...publishedEventRouteFailures.map(
+    (route) => `published_event_route:${route.path}`,
+  ),
   ...(adminBoundary === "cloudflare_access" ||
   adminBoundary === "app_native_passkey"
     ? []
@@ -511,6 +545,20 @@ const proof = {
     risk_level: String(row.risk_level),
     authority_state: String(row.authority_state),
   })),
+  content_publish_events: publishEventRows.map((row) => ({
+    id: String(row.id),
+    operation_id: row.operation_id ? String(row.operation_id) : null,
+    status: String(row.status),
+    page_key: row.page_key ? String(row.page_key) : null,
+    route: row.route ? String(row.route) : null,
+    published_version:
+      row.published_version === null || row.published_version === undefined
+        ? null
+        : Number(row.published_version),
+    rollback_ref: String(row.rollback_ref),
+    created_by: String(row.created_by),
+    created_at: String(row.created_at),
+  })),
   draft_save_proof: draftSaveProof
     ? {
         id: String(draftSaveProof.id),
@@ -522,6 +570,7 @@ const proof = {
     : null,
   admin_routes: adminRoutes,
   public_routes: publicRoutes,
+  published_event_routes: publishedEventRouteChecks,
   route_boundary: adminBoundary,
   publish_writes_proof_backed: publishEvents >= 0,
   field_record_writes_inert: contentRecords === 0,
