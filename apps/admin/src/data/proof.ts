@@ -41,7 +41,7 @@ const baseProofEntries: ProofEntry[] = [
       "https://github.com/anipotts/anipotts.com/actions/workflows/deploy.yml",
     redaction: "public_metadata",
     next_safe_action:
-      "Keep deploy proof attached to admin route-level changes until proof rows move into D1.",
+      "Keep scoped deploy and skipped-target proof current in admin_proof_events after each admin route-level change.",
   },
   {
     id: "proof.site.public-routes",
@@ -70,14 +70,14 @@ const baseProofEntries: ProofEntry[] = [
   {
     id: "proof.admin.write-paths",
     kind: "gate",
-    status: "pending",
+    status: "verified",
     title: "admin write paths remain inert",
     summary:
       "Content preview, review, operations, mutation, and destructive-operation routes expose no save, publish, send, or live-control endpoint.",
     evidence_uri: "apps/admin/src/pages",
     redaction: "metadata_only",
     next_safe_action:
-      "Before adding writes, require audited D1 operation records, rollback, and route proof.",
+      "Keep content save, publish, send, and live-control endpoints absent until a reviewed write path is approved.",
   },
 ];
 
