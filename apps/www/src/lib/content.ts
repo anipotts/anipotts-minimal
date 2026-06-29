@@ -1,11 +1,15 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import {
+  type CmsWritingContent,
   cmsProjectPageKey,
   cmsWritingPageKey,
   normalizeCmsProject,
   normalizeCmsWriting,
 } from "@anipotts/content/public";
-import { fetchPageContent } from "@anipotts/lib/cms";
+import {
+  fetchPageContent,
+  fetchPublishedPageContentByPrefix,
+} from "@anipotts/lib/cms";
 
 type ProjectEntry = CollectionEntry<"projects">;
 type WritingEntry = CollectionEntry<"writing">;
@@ -151,13 +155,56 @@ async function writingFromEntry(entry: WritingEntry): Promise<Writing> {
   };
 }
 
+function writingFromCmsPage(
+  page: Awaited<
+    ReturnType<typeof fetchPublishedPageContentByPrefix<CmsWritingContent>>
+  >[number],
+): Writing | null {
+  const cms = normalizeCmsWriting(page.content);
+  if (!cms.visible) return null;
+  const source = cms.sourceLinks[0];
+
+  return {
+    id: page.page_key,
+    slug: cms.slug,
+    body: cms.body,
+    source: "cms",
+    data: {
+      title: cms.title,
+      slug: cms.slug,
+      summary: cms.preview,
+      tags: cms.tags,
+      status: "published",
+      published_at: new Date(`${cms.date}T00:00:00.000Z`),
+      content_type: "article",
+      artifact_url: source?.url,
+      artifact_type:
+        source?.label === "repo" ||
+        source?.label === "gist" ||
+        source?.label === "demo" ||
+        source?.label === "screenshot" ||
+        source?.label === "recording"
+          ? source.label
+          : undefined,
+    },
+  };
+}
+
 export async function publishedWriting(): Promise<Writing[]> {
   const entries = await getCollection(
     "writing",
     (t) => t.data.status === "published",
   );
   const all = await Promise.all(entries.map(writingFromEntry));
-  return all
+  const markdownSlugs = new Set(all.map((item) => item.slug));
+  const cmsRows =
+    await fetchPublishedPageContentByPrefix<CmsWritingContent>("writing:");
+  const cmsOnly = cmsRows
+    .map(writingFromCmsPage)
+    .filter((item): item is Writing => Boolean(item))
+    .filter((item) => !markdownSlugs.has(item.slug));
+
+  return [...all, ...cmsOnly]
     .filter((item) => item.data.status === "published")
     .sort(
       (a, b) =>

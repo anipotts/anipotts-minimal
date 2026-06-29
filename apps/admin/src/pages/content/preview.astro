@@ -5,6 +5,7 @@ import {
   contentPreviewItems,
   readContentOperationStore,
 } from "../../data/content";
+import { readDraftPreview } from "../../lib/content-editor";
 
 const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
 const d1PreviewItems = readState.operations.filter((operation) =>
@@ -12,6 +13,11 @@ const d1PreviewItems = readState.operations.filter((operation) =>
 );
 const previewSource =
   d1PreviewItems.length > 0 ? "d1 draft operations" : "static previews";
+const operationId = Astro.url.searchParams.get("operation_id") ?? "";
+const selectedDraft = await readDraftPreview(
+  Astro.locals.runtime?.env.DB,
+  operationId,
+);
 ---
 
 <AdminLayout
@@ -29,8 +35,43 @@ const previewSource =
     <span>{readState.mode}</span>
     <span>{previewSource}</span>
     <span>{contentInventorySource.mode}</span>
-    <span>publish path inactive</span>
+    <span>{selectedDraft ? "selected draft" : "queue"}</span>
   </section>
+
+  {
+    selectedDraft && (
+      <section class="editor-preview table-card">
+        <div class="section-head">
+          <div>
+            <p>
+              {selectedDraft.kind} / {selectedDraft.visibility}
+            </p>
+            <h2>{selectedDraft.title}</h2>
+          </div>
+          <span>{selectedDraft.page_key}</span>
+        </div>
+        <div class="preview-document">
+          <p class="preview-meta">
+            {selectedDraft.date} / {selectedDraft.tags.join(", ") || "untagged"}
+          </p>
+          <p class="preview-summary">{selectedDraft.summary}</p>
+          <pre>{selectedDraft.body}</pre>
+        </div>
+        <div class="draft-control-row page-editor-actions">
+          <a
+            class="button secondary"
+            href={`/content/edit/${encodeURIComponent(selectedDraft.page_key)}`}
+          >
+            back to editor
+          </a>
+          <span>
+            preview reads content_draft_operations only; no public page_content
+            row is written here.
+          </span>
+        </div>
+      </section>
+    )
+  }
 
   <div class="preview-grid">
     {

@@ -16,35 +16,31 @@ const operations =
   operationState.operations.length > 0
     ? operationState.operations
     : contentOperationTemplates;
-const writableRows = operationState.counts.filter(
-  (row) =>
-    row.table_name === "content_records" ||
-    row.table_name === "content_publish_events",
-);
-const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
+const publishEventCount =
+  operationState.counts.find(
+    (row) => row.table_name === "content_publish_events",
+  )?.rows ?? 0;
 ---
 
 <AdminLayout
   title="content drafts"
-  deck="Field-level draft review. Focused editor saves draft operation rows only; publish and public content writes stay blocked."
+  deck="Draft history for the owner editor. Drafts stay private until a selected published draft is promoted into page_content with a publish event."
 >
   <section class="meta-strip" aria-label="content draft editor state">
     <span>{operations.length} draft operations</span>
     <span>{pageContentState.published_count} published page rows</span>
     <span>{operationState.mode}</span>
-    <span
-      >{writeRowsEmpty ? "public writes empty" : "review public writes"}</span
-    >
-    <span>publish disabled</span>
+    <span>{publishEventCount} publish events</span>
+    <span>newsletter send absent</span>
   </section>
 
   <section class="table-card operation-card">
     <div class="section-head">
       <div>
         <p>editor gate</p>
-        <h2>{writeRowsEmpty ? "draft-save only" : "review write rows"}</h2>
+        <h2>draft-save plus publish proof</h2>
       </div>
-      <span>no publish route</span>
+      <span>selected draft only</span>
     </div>
     <div class="record-list">
       <article class="record-row">
@@ -52,9 +48,7 @@ const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
           <p>write state</p>
           <h3>
             {
-              writeRowsEmpty
-                ? "content_records and content_publish_events are empty"
-                : "write tables contain rows and need review"
+              "content_draft_operations stores drafts; content_publish_events records explicit publish proof"
             }
           </h3>
         </div>
@@ -120,7 +114,7 @@ const writeRowsEmpty = writableRows.every((row) => row.rows === 0);
                 request review
               </button>
               <button class="button secondary danger" type="button" disabled>
-                publish
+                publish from editor
               </button>
             </div>
           </form>

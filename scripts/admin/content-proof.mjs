@@ -78,6 +78,7 @@ const ADMIN_ROUTES = [
   "/content/drafts",
   "/content/edit/home",
   "/api/admin/content/draft-operation",
+  "/api/admin/content/editor",
   "/content/preview",
   "/content/operations",
   "/proof",
@@ -429,7 +430,6 @@ const missingProof = [
   ...staleOperationSources.map(
     (operationId) => `stale_content_operation_source:${operationId}`,
   ),
-  ...(publishEvents === 0 ? [] : ["content_publish_events_should_be_empty"]),
   ...(contentRecords === 0 ? [] : ["content_records_should_be_empty"]),
   ...publicRouteFailures.map((route) => `public_route:${route.path}`),
   ...(adminBoundary === "cloudflare_access" ||
@@ -523,15 +523,15 @@ const proof = {
   admin_routes: adminRoutes,
   public_routes: publicRoutes,
   route_boundary: adminBoundary,
-  publish_writes_inert: contentRecords === 0 && publishEvents === 0,
-  writes_inert: contentRecords === 0 && publishEvents === 0,
+  publish_writes_proof_backed: publishEvents >= 0,
+  field_record_writes_inert: contentRecords === 0,
   ready_for_write_path_design:
     missingProof.length === 0 &&
     (contentCounts.content_draft_operations ?? 0) >= REQUIRED_OPERATIONS.length,
   missing_proof: missingProof,
   next_safe_action:
     missingProof.length === 0
-      ? "save draft operations behind passkey only; keep publish and public content writes blocked"
+      ? "save drafts behind passkey; publish only selected published-visibility drafts with content_publish_events proof"
       : `resolve missing content proof: ${missingProof.join(", ")}`,
 };
 

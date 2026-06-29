@@ -116,7 +116,7 @@ export type ContentOperationTable = {
     | "content_draft_operations"
     | "content_publish_events";
   purpose: string;
-  write_state: "schema_only" | "draft_save_only" | "future_publish";
+  write_state: "schema_only" | "draft_save_only" | "publish_with_proof";
   blocked_actions: string[];
 };
 
@@ -125,7 +125,7 @@ export const contentOperationSchemaSource = {
   migration:
     "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql + drizzle/migrations/0032_seed_remaining_detail_page_content.sql + drizzle/migrations/0033_refresh_draft_operation_save_metadata.sql",
   schema: "packages/lib/src/db/schema.ts",
-  mode: "d1_schema_with_passkey_draft_operation_save",
+  mode: "d1_schema_with_passkey_draft_and_publish_proof",
 };
 
 export const contentOperationTables: ContentOperationTable[] = [
@@ -146,9 +146,9 @@ export const contentOperationTables: ContentOperationTable[] = [
   {
     table: "content_publish_events",
     purpose:
-      "future immutable proof trail for approved publish and rollback events",
-    write_state: "future_publish",
-    blocked_actions: ["send", "schedule", "publish without proof"],
+      "immutable proof trail for selected-draft publish and future rollback events",
+    write_state: "publish_with_proof",
+    blocked_actions: ["send", "schedule", "publish without selected draft"],
   },
 ];
 

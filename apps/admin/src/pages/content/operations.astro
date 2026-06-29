@@ -11,12 +11,12 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
 
 <AdminLayout
   title="content operations"
-  deck="Live D1 view for draft operations. Draft saves are passkey-protected; publishing, sending, deploying, and public content writes remain blocked."
+  deck="Live D1 view for draft operations and publish proof. Draft saves and selected-draft publish are passkey-protected; newsletter send remains absent."
 >
   <section class="meta-strip" aria-label="content operation read source">
     <span>{readState.mode}</span>
     <span>{contentOperationSchemaSource.migration}</span>
-    <span>draft save only</span>
+    <span>publish with proof</span>
   </section>
 
   <div class="surface-grid">
@@ -44,15 +44,19 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
                   <dd>
                     {row.table_name === "content_draft_operations"
                       ? "draft save allowed after passkey"
-                      : "read only"}
+                      : row.table_name === "content_publish_events"
+                        ? "publish proof event"
+                        : "schema only"}
                   </dd>
                 </div>
                 <div>
                   <dt>next</dt>
                   <dd>
                     {row.table_name === "content_draft_operations"
-                      ? "review saved draft proposals before any publish path"
-                      : "keep public writes blocked"}
+                      ? "review saved draft proposals before publishing"
+                      : row.table_name === "content_publish_events"
+                        ? "verify selected-draft publish history"
+                        : "keep field records schema-only"}
                   </dd>
                 </div>
               </dl>
@@ -133,10 +137,10 @@ const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
   <section class="table-card operation-card">
     <div class="section-head">
       <div>
-        <p>inert operation templates</p>
+        <p>seeded operation templates</p>
         <h2>{contentOperationTemplates.length} proposals modeled</h2>
       </div>
-      <span>preview only</span>
+      <span>legacy preview seeds</span>
     </div>
     <div class="record-list">
       {

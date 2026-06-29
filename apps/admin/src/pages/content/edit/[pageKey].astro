@@ -1,241 +1,376 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { readPageContentInventoryStore } from "../../../data/content";
+import { readContentEditorState } from "../../../lib/content-editor";
 
-const pageKey = safeDecodePageKey(Astro.params.pageKey);
+const requestedPageKey = safeDecodePageKey(Astro.params.pageKey);
+const pageKey =
+  requestedPageKey === "new" || requestedPageKey === "writing:new"
+    ? "writing:new"
+    : requestedPageKey;
 const pageContentState = await readPageContentInventoryStore(
   Astro.locals.runtime?.env.DB,
 );
 const pageRow = pageContentState.rows.find((row) => row.page_key === pageKey);
-
-if (!pageRow) {
-  Astro.response.status = 404;
-}
+const editorState = await readContentEditorState(
+  Astro.locals.runtime?.env.DB,
+  pageKey,
+);
+const current = editorState.current;
+const isNew = pageKey === "writing:new";
+const latestDraft = editorState.latest_draft;
+const tagText = current.tags.join(", ");
 
 function safeDecodePageKey(value: string | undefined): string {
-  if (!value) return "";
+  if (!value) return "writing:new";
   try {
     return decodeURIComponent(value);
   } catch {
     return value;
   }
 }
-
-function textareaRows(value: string): number {
-  const lineCount = value.split("\n").length;
-  const lengthRows = Math.ceil(value.length / 78);
-  return Math.min(14, Math.max(3, lineCount, lengthRows));
-}
 ---
 
 <AdminLayout
-  title={pageRow ? `edit ${pageRow.page_key}` : "content row missing"}
-  deck="Focused page_content editor shape. Fields are disabled until the audited save path exists."
+  title={isNew ? "new writing draft" : `edit ${editorState.page_key}`}
+  deck="Owner-facing D1 editor for writing and page content. Drafts save to content_draft_operations; publish writes page_content with proof."
 >
   <section class="meta-strip" aria-label="content edit state">
     <span>{pageContentState.mode}</span>
-    <span>{pageRow ? `${pageRow.field_count} fields` : "0 fields"}</span>
-    <span>{pageRow?.published ? "published" : "draft or missing"}</span>
-    <span>save disabled</span>
-    <span>publish disabled</span>
+    <span>{pageRow ? `${pageRow.field_count} source fields` : "new draft"}</span
+    >
+    <span>{editorState.current_version} public versions</span>
+    <span>{editorState.revisions.length} revisions</span>
+    <span>passkey session required</span>
   </section>
 
-  {
-    pageRow ? (
-      <>
+  <section class="editor-workspace" aria-labelledby="editor-fields-heading">
+    <form
+      class="owner-editor-form"
+      aria-label={`${editorState.page_key} content editor`}
+      data-editor-form
+    >
+      <input type="hidden" name="kind" value={current.kind} />
+      <input type="hidden" name="page_key" value={current.page_key} />
+
+      <div class="editor-main">
+        <section class="editor-panel">
+          <div class="section-head">
+            <div>
+              <p>{current.kind} content</p>
+              <h2 id="editor-fields-heading">
+                {isNew ? "private draft first" : current.title}
+              </h2>
+            </div>
+            <span>{current.visibility}</span>
+          </div>
+
+          <div class="editor-field-grid">
+            <label>
+              <span>title</span>
+              <input
+                name="title"
+                value={isNew ? "" : current.title}
+                maxlength="160"
+                required
+              />
+            </label>
+            <label>
+              <span>slug</span>
+              <input
+                name="slug"
+                value={isNew ? "" : current.slug}
+                maxlength="96"
+                required
+              />
+            </label>
+            <label>
+              <span>date</span>
+              <input name="date" type="date" value={current.date} required />
+            </label>
+            <label>
+              <span>visibility</span>
+              <select name="visibility">
+                {
+                  ["private", "draft", "hidden", "published"].map((option) => (
+                    <option
+                      value={option}
+                      selected={current.visibility === option}
+                    >
+                      {option}
+                    </option>
+                  ))
+                }
+              </select>
+            </label>
+            <label class="wide-field">
+              <span>summary / preview</span>
+              <textarea name="summary" rows="3" maxlength="600" required>
+                {isNew ? "" : current.summary}
+              </textarea>
+            </label>
+            <label class="wide-field">
+              <span>tags</span>
+              <input
+                name="tags"
+                value={isNew ? "" : tagText}
+                placeholder="agents, codex, admin"
+              />
+            </label>
+            <label class="wide-field">
+              <span>markdown body</span>
+              <textarea name="body" rows="18" required>
+                {isNew ? "" : current.body}
+              </textarea>
+            </label>
+          </div>
+
+          <div class="draft-control-row page-editor-actions">
+            <button class="button" type="button" data-save-draft>
+              save draft
+            </button>
+            <a
+              class:list={[
+                "button",
+                "secondary",
+                !latestDraft && "disabled-link",
+              ]}
+              href={latestDraft?.view_href ?? "#"}
+              data-preview-link
+            >
+              preview draft
+            </a>
+            <button
+              class="button secondary danger"
+              type="button"
+              data-publish-draft
+              data-operation-id={latestDraft?.id ?? ""}
+              disabled={!latestDraft}
+            >
+              publish selected draft
+            </button>
+            <span data-editor-status>
+              {
+                latestDraft
+                  ? `latest draft ${latestDraft.id}`
+                  : "new content starts as a private draft"
+              }
+            </span>
+          </div>
+        </section>
+
         <section class="table-card operation-card">
           <div class="section-head">
             <div>
-              <p>page_content record</p>
-              <h2>{pageRow.summary}</h2>
+              <p>current public record</p>
+              <h2>{pageRow ? pageRow.summary : "none yet"}</h2>
             </div>
-            <span>read only</span>
+            <span>{pageRow?.published ? "published" : "not public"}</span>
           </div>
           <div class="record-list">
             <article class="record-row">
               <div>
                 <p>
-                  {pageRow.page_key} / v{pageRow.version}
+                  {editorState.page_key} / v{editorState.current_version}
                 </p>
-                <h3>{pageRow.source_ref}</h3>
+                <h3>
+                  {
+                    pageRow
+                      ? "publishing creates a new page_content version"
+                      : "saving does not create public page_content"
+                  }
+                </h3>
               </div>
               <dl>
                 <div>
-                  <dt>published</dt>
-                  <dd>{pageRow.published ? "true" : "false"}</dd>
+                  <dt>source</dt>
+                  <dd>{pageRow?.source_ref ?? "new D1 draft"}</dd>
                 </div>
                 <div>
                   <dt>updated</dt>
-                  <dd>{pageRow.updated_at || "unknown"}</dd>
+                  <dd>{pageRow?.updated_at || "not published"}</dd>
                 </div>
                 <div>
                   <dt>updated by</dt>
-                  <dd>{pageRow.updated_by || "unknown"}</dd>
+                  <dd>{pageRow?.updated_by || "unknown"}</dd>
                 </div>
                 <div>
-                  <dt>write state</dt>
-                  <dd>draft operation save only; no publish route</dd>
+                  <dt>public visibility</dt>
+                  <dd>
+                    {
+                      current.visibility === "published"
+                        ? "publish can make this public"
+                        : "private, draft, and hidden stay out of public readers"
+                    }
+                  </dd>
                 </div>
               </dl>
             </article>
           </div>
         </section>
+      </div>
+    </form>
 
-        <section class="editor-panel" aria-labelledby="editor-fields-heading">
-          <div class="section-head">
-            <div>
-              <p>draft operation editor</p>
-              <h2 id="editor-fields-heading">field review</h2>
-            </div>
-            <span>publish disabled</span>
-          </div>
-          <form
-            class="page-editor-form"
-            aria-label={`${pageRow.page_key} fields`}
-          >
-            {pageRow.fields.map((field) => (
-              <article
-                class="page-editor-field"
-                data-draft-field
-                data-page-key={pageRow.page_key}
-                data-field-path={field.path}
-                data-source-ref={pageRow.source_ref}
-              >
-                <label>
-                  <span>{field.path}</span>
-                  <textarea
-                    name="proposed_value"
-                    rows={textareaRows(field.raw_value)}
-                  >
-                    {field.raw_value}
-                  </textarea>
-                </label>
-                <small>
-                  {field.kind} / source {pageRow.source_ref}
-                </small>
-                <div class="draft-control-row">
-                  <button
-                    class="button secondary"
-                    type="button"
-                    data-draft-save
-                  >
-                    save draft
-                  </button>
-                  <span data-draft-save-status>draft operation only</span>
-                </div>
-              </article>
-            ))}
-            <div class="draft-control-row page-editor-actions">
-              <button class="button secondary" type="button" disabled>
-                request review
-              </button>
-              <button class="button secondary" type="button" disabled>
-                preview public route
-              </button>
-              <button class="button secondary danger" type="button" disabled>
-                publish
-              </button>
-            </div>
-          </form>
-        </section>
-
-        {pageRow.source_backed_fields.length > 0 && (
-          <section class="notice">
-            Source-backed gaps remain before this row can be treated as
-            complete:
-            {` ${pageRow.source_backed_fields.join(", ")}`}
-          </section>
-        )}
-
-        <nav class="inline-actions" aria-label="content editor navigation">
-          <a class="button secondary" href="/content">
-            back to inventory
-          </a>
-          <a class="button secondary" href="/content/drafts">
-            all draft controls
-          </a>
-          <a class="button secondary" href="/content/preview">
-            preview queue
-          </a>
-        </nav>
-      </>
-    ) : (
-      <section class="table-card operation-card">
+    <aside class="editor-side">
+      <section class="table-card">
         <div class="section-head">
           <div>
-            <p>missing page_content</p>
-            <h2>{pageKey || "unknown page key"}</h2>
+            <p>revision history</p>
+            <h2>{editorState.revisions.length} entries</h2>
           </div>
-          <span>404</span>
+          <span>rollback inert</span>
         </div>
         <div class="record-list">
-          <article class="record-row">
-            <div>
-              <p>next safe action</p>
-              <h3>
-                Return to inventory and choose an existing D1 page_content row.
-              </h3>
-            </div>
-          </article>
+          {
+            editorState.revisions.length === 0 ? (
+              <article class="record-row">
+                <div>
+                  <p>empty</p>
+                  <h3>No saved revisions for this page key yet.</h3>
+                </div>
+              </article>
+            ) : (
+              editorState.revisions.map((revision) => (
+                <article class="record-row revision-row">
+                  <div>
+                    <p>
+                      {revision.source} / {revision.status}
+                    </p>
+                    <h3>{revision.summary}</h3>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>time</dt>
+                      <dd>{revision.timestamp}</dd>
+                    </div>
+                    <div>
+                      <dt>author</dt>
+                      <dd>{revision.author}</dd>
+                    </div>
+                    <div>
+                      <dt>rollback target</dt>
+                      <dd>{revision.rollback_target}</dd>
+                    </div>
+                    <div>
+                      <dt>action</dt>
+                      <dd>
+                        <a href={revision.view_href}>view version</a>
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              ))
+            )
+          }
         </div>
       </section>
-    )
-  }
+
+      <nav class="inline-actions" aria-label="content editor navigation">
+        <a class="button secondary" href="/content"> inventory </a>
+        <a class="button secondary" href="/content/edit/new"> new writing </a>
+        <a class="button secondary" href="/content/drafts"> drafts </a>
+        <a class="button secondary" href="/content/preview"> preview queue </a>
+      </nav>
+    </aside>
+  </section>
 </AdminLayout>
 
 <script>
-  type DraftSaveResponse = {
+  type EditorResponse = {
     ok?: boolean;
     operation_id?: string;
-    next_safe_action?: string;
+    preview_href?: string;
+    publishable?: boolean;
+    public_route?: string;
+    version?: number;
     error?: string;
   };
 
-  const draftFields =
-    document.querySelectorAll<HTMLElement>("[data-draft-field]");
+  const form = document.querySelector<HTMLFormElement>("[data-editor-form]");
+  const saveButton =
+    document.querySelector<HTMLButtonElement>("[data-save-draft]");
+  const publishButton = document.querySelector<HTMLButtonElement>(
+    "[data-publish-draft]",
+  );
+  const previewLink = document.querySelector<HTMLAnchorElement>(
+    "[data-preview-link]",
+  );
+  const statusNode = document.querySelector<HTMLElement>(
+    "[data-editor-status]",
+  );
 
-  for (const field of draftFields) {
-    const button = field.querySelector<HTMLButtonElement>("[data-draft-save]");
-    button?.addEventListener("click", () => void saveDraft(field, button));
-  }
+  saveButton?.addEventListener("click", () => void saveDraft());
+  publishButton?.addEventListener("click", () => void publishDraft());
 
-  async function saveDraft(field: HTMLElement, button: HTMLButtonElement) {
-    const textarea = field.querySelector<HTMLTextAreaElement>(
-      "textarea[name='proposed_value']",
-    );
-    const status = field.querySelector<HTMLElement>("[data-draft-save-status]");
-
-    if (!textarea) return;
-
-    button.disabled = true;
-    setText(status, "saving draft operation");
+  async function saveDraft() {
+    if (!form || !saveButton) return;
+    saveButton.disabled = true;
+    setText(statusNode, "saving draft to D1");
 
     try {
-      const response = await fetch("/api/admin/content/draft-operation", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          page_key: field.dataset.pageKey,
-          field_path: field.dataset.fieldPath,
-          source_ref: field.dataset.sourceRef,
-          proposed_value: textarea.value,
-        }),
+      const data = await postEditor({
+        action: "save_draft",
+        ...Object.fromEntries(new FormData(form).entries()),
       });
-      const data = (await response.json()) as DraftSaveResponse;
-      if (!response.ok || !data.ok) {
-        throw new Error(
-          data.next_safe_action ?? data.error ?? "draft save failed",
-        );
+      if (!data.ok || !data.operation_id) {
+        throw new Error(data.error ?? "draft save failed");
       }
-      setText(status, `saved ${data.operation_id}`);
+      if (previewLink && data.preview_href) {
+        previewLink.href = data.preview_href;
+        previewLink.classList.remove("disabled-link");
+      }
+      if (publishButton) {
+        publishButton.dataset.operationId = data.operation_id;
+        publishButton.disabled = !data.publishable;
+      }
+      setText(statusNode, `saved ${data.operation_id}`);
     } catch (error) {
       setText(
-        status,
+        statusNode,
         error instanceof Error ? error.message : "draft save failed",
       );
     } finally {
-      button.disabled = false;
+      saveButton.disabled = false;
     }
+  }
+
+  async function publishDraft() {
+    if (!publishButton) return;
+    const operationId = publishButton.dataset.operationId;
+    if (!operationId) return;
+    publishButton.disabled = true;
+    setText(statusNode, "publishing selected draft");
+
+    try {
+      const data = await postEditor({
+        action: "publish",
+        operation_id: operationId,
+      });
+      if (!data.ok) throw new Error(data.error ?? "publish failed");
+      setText(
+        statusNode,
+        `published v${data.version} to ${data.public_route ?? "public route"}`,
+      );
+    } catch (error) {
+      setText(
+        statusNode,
+        error instanceof Error ? error.message : "publish failed",
+      );
+      publishButton.disabled = false;
+    }
+  }
+
+  async function postEditor(body: Record<string, FormDataEntryValue | string>) {
+    const response = await fetch("/api/admin/content/editor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = (await response.json()) as EditorResponse;
+    if (!response.ok) {
+      throw new Error(data.error ?? "content editor request failed");
+    }
+    return data;
   }
 
   function setText(node: Element | null, value: string) {

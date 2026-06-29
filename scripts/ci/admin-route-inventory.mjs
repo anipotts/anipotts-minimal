@@ -80,6 +80,12 @@ export const ADMIN_ROUTES = [
     file: "apps/admin/src/pages/api/admin/content/draft-operation.ts",
     nav: false,
   },
+  {
+    route: "/api/admin/content/editor",
+    file: "apps/admin/src/pages/api/admin/content/editor.ts",
+    nav: false,
+    smoke: false,
+  },
 ];
 
 export const PUBLIC_UNSMOKED_ROUTE_FILES = [

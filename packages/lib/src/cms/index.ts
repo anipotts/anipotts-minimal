@@ -29,7 +29,7 @@ export {
   normalizeHomepageContent,
   validateHomepageContent,
 } from "./homepage";
-export { fetchPageContent } from "./page";
+export { fetchPageContent, fetchPublishedPageContentByPrefix } from "./page";
 export { fetchProjects } from "./projects";
 export {
   fetchAllSiteSettings,
