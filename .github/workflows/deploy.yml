@@ -7,11 +7,12 @@
 #   TYPEFULLY_API_KEY       - Typefully API key
 #   TYPEFULLY_SOCIAL_SET_ID - Typefully social set ID
 #
-# Path-filtered deploys: each deploy-X job only runs when files relevant to
-# that target actually changed. Root dependency changes do not fan out to every
-# target; use workflow_dispatch for an explicit deploy when a root-only change
-# needs promotion. Docs-only commits skip the workflow entirely via
-# paths-ignore. Workflow-only changes run detection but deploy nothing. No
+# Path-filtered deploys: each retained production job only runs when files
+# relevant to that target actually changed. `apps/admin-solid` is a legacy
+# rollback surface and is workflow_dispatch-only. Root dependency changes do not
+# fan out to every target; use workflow_dispatch for an explicit deploy when a
+# root-only change needs promotion. Docs-only commits skip the workflow entirely
+# via paths-ignore. Workflow-only changes run detection but deploy nothing. No
 # untrusted input is interpolated into run: blocks anywhere here.
 
 name: Deploy
@@ -80,7 +81,6 @@ jobs:
     outputs:
       www: ${{ steps.filter.outputs.www }}
       admin: ${{ steps.filter.outputs.admin }}
-      admin-solid: ${{ steps.filter.outputs.admin-solid }}
       ingest: ${{ steps.filter.outputs.ingest }}
       newsletter: ${{ steps.filter.outputs.newsletter }}
       state: ${{ steps.filter.outputs.state }}
@@ -100,8 +100,6 @@ jobs:
             admin:
               - "apps/admin/**"
               - "packages/content/**"
-            admin-solid:
-              - "apps/admin-solid/**"
             ingest:
               - "workers/ingest/**"
             newsletter:
@@ -236,8 +234,7 @@ jobs:
     name: Deploy admin-solid
     needs: [changes]
     if: >
-      (github.event_name == 'workflow_dispatch' && inputs.admin_solid == 'true') ||
-      (github.event_name == 'push' && needs.changes.outputs['admin-solid'] == 'true')
+      github.event_name == 'workflow_dispatch' && inputs.admin_solid == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

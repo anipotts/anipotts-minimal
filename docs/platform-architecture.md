@@ -7,27 +7,27 @@ structured content/state model, and one predictable CI/CD path.
 
 ## target state
 
-| Surface        | Target                              | Status              | Next action                                              |
-| -------------- | ----------------------------------- | ------------------- | -------------------------------------------------------- |
-| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`              |
-| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access        |
-| current admin  | `apps/admin-solid`                  | legacy rollback     | keep briefly, then archive or delete after passkey proof |
-| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                                |
-| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                          |
-| workers        | `workers/*`                         | review individually | keep only production-required workers                    |
-| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables           |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | seed inert content operations, then prove admin reads    |
+| Surface        | Target                              | Status              | Next action                                           |
+| -------------- | ----------------------------------- | ------------------- | ----------------------------------------------------- |
+| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`           |
+| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access     |
+| current admin  | `apps/admin-solid`                  | manual rollback     | no auto-deploy; archive or delete after passkey proof |
+| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                             |
+| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                       |
+| workers        | `workers/*`                         | review individually | keep only production-required workers                 |
+| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables        |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | seed inert content operations, then prove admin reads |
 
 ## current inventory
 
 ### apps
 
-| Path                | Role today                                 | Classification      |
-| ------------------- | ------------------------------------------ | ------------------- |
-| `apps/www`          | public Astro site and newsletter endpoints | keep                |
-| `apps/admin`        | Astro admin app for `admin.anipotts.com`   | keep                |
-| `apps/admin-solid`  | legacy Solid admin rollback surface        | archive/remove next |
-| `docs/archive/labs` | archived labs reference material           | keep as archive     |
+| Path                | Role today                                 | Classification  |
+| ------------------- | ------------------------------------------ | --------------- |
+| `apps/www`          | public Astro site and newsletter endpoints | keep            |
+| `apps/admin`        | Astro admin app for `admin.anipotts.com`   | keep            |
+| `apps/admin-solid`  | legacy Solid admin rollback surface        | manual rollback |
+| `docs/archive/labs` | archived labs reference material           | keep as archive |
 
 ### workers
 
@@ -142,6 +142,8 @@ Rules:
 - public site changes deploy `www` only.
 - admin changes and `packages/content` changes deploy only the Astro admin
   target.
+- `apps/admin-solid` changes do not auto-deploy. Its deploy job remains
+  workflow-dispatch only for rollback while passkey proof is incomplete.
 - `packages/lib` and `packages/styles` changes deploy `www` only because
   `apps/admin` does not depend on them.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
@@ -187,4 +189,6 @@ Rules:
 14. move homepage rich summary text and mention keys into D1 `page_content`;
     seeded by `drizzle/migrations/0016_seed_homepage_rich_summary.sql` with
     Astro brand visual metadata still retained.
-15. reduce deploy workflow inputs to retained production targets.
+15. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
+16. reduce deploy workflow inputs to retained production targets after rollback
+    no longer needs `apps/admin-solid`.
