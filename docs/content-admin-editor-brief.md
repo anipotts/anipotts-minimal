@@ -36,9 +36,11 @@ The source-content parser and summary builder live in
 `packages/content/src/admin/source-content.ts`; `apps/admin` only owns the raw
 markdown import boundary.
 Admin `/content/edit/:pageKey` renders the focused editor and may save
-passkey-protected draft operation rows only. Admin `/content/drafts` renders the
-draft queue and page-content field map. Publish, provider sync, public route
-mutation, and source file mutation remain blocked.
+passkey-protected draft operation rows only. Successful draft saves also refresh
+metadata-only proof in `admin_proof_events` without storing proposed copy in the
+proof row. Admin `/content/drafts` renders the draft queue and page-content
+field map. Publish, provider sync, public route mutation, and source file
+mutation remain blocked.
 The D1 review queue includes inert homepage, newsletter, project, and writing
 operations seeded by `drizzle/migrations/0008_seed_content_draft_operations.sql`
 and `drizzle/migrations/0011_seed_source_content_review_operations.sql`.

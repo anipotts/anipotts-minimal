@@ -285,6 +285,17 @@ SELECT 'content_publish_events', COUNT(*) FROM content_publish_events;
 `).map((row) => [String(row.table_name), Number(row.count)]),
 );
 
+const [draftSaveProof] = runD1(`
+SELECT
+  id,
+  status,
+  summary,
+  updated_at,
+  metadata
+FROM admin_proof_events
+WHERE id = 'proof.admin.content-draft-save';
+`);
+
 const [adminRoutes, publicRoutes] = await Promise.all([
   Promise.all(ADMIN_ROUTES.map((path) => probeRoute(ADMIN_ORIGIN, path))),
   Promise.all(PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path))),
@@ -494,6 +505,15 @@ const proof = {
     risk_level: String(row.risk_level),
     authority_state: String(row.authority_state),
   })),
+  draft_save_proof: draftSaveProof
+    ? {
+        id: String(draftSaveProof.id),
+        status: String(draftSaveProof.status),
+        summary: String(draftSaveProof.summary),
+        updated_at: String(draftSaveProof.updated_at),
+        metadata: parseJsonObject(draftSaveProof.metadata),
+      }
+    : null,
   admin_routes: adminRoutes,
   public_routes: publicRoutes,
   route_boundary: adminBoundary,
@@ -537,6 +557,18 @@ function runD1(command) {
     throw new Error(`D1 content proof query failed for ${D1_DATABASE}`);
   }
   return firstResult.results ?? [];
+}
+
+function parseJsonObject(value) {
+  if (typeof value !== "string") return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed
+      : {};
+  } catch {
+    return {};
+  }
 }
 
 async function probeRoute(origin, path) {

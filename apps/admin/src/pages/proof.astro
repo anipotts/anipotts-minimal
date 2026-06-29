@@ -13,7 +13,7 @@ const proofCounts = countProofEntries(proofEntries);
 
 <AdminLayout
   title="proof log"
-  deck="Read-only proof records for deploys, route probes, auth gates, and repo state. This page does not write audit records yet."
+  deck="Proof records for deploys, route probes, auth gates, repo state, and draft-only content writes. This page is read-only."
 >
   <section class="meta-strip" aria-label="proof log source">
     <span>{proofCounts.total} proof rows</span>
@@ -74,7 +74,8 @@ const proofCounts = countProofEntries(proofEntries);
   </div>
 
   <div class="notice">
-    This route reads D1 metadata for content-operation and passkey proof without
-    creating proof rows, updating sessions, or writing audit records.
+    This route reads D1 metadata for content-operation and passkey proof. The
+    focused editor may update draft-save proof metadata, but this page does not
+    create rows, update sessions, publish content, or trigger deploys.
   </div>
 </AdminLayout>

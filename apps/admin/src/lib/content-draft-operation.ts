@@ -21,6 +21,7 @@ export type DraftOperationSaveResult = {
   next_safe_action: string;
 };
 
+const DRAFT_SAVE_PROOF_ID = "proof.admin.content-draft-save";
 const MAX_PAGE_KEY_LENGTH = 160;
 const MAX_FIELD_PATH_LENGTH = 320;
 const MAX_PROPOSED_VALUE_LENGTH = 20_000;
@@ -146,6 +147,14 @@ export async function saveDraftOperation(
     throw statusError(500, "draft_save_failed");
   }
 
+  await writeDraftSaveProof(db, {
+    operationId,
+    pageKey,
+    fieldPath,
+    route,
+    now,
+  });
+
   return {
     ok: true,
     operation_id: operationId,
@@ -153,6 +162,74 @@ export async function saveDraftOperation(
     next_safe_action:
       "review the draft preview; publish remains unavailable until the audited publish path exists",
   };
+}
+
+async function writeDraftSaveProof(
+  db: DraftOperationD1Database,
+  input: {
+    operationId: string;
+    pageKey: string;
+    fieldPath: string;
+    route: string;
+    now: string;
+  },
+): Promise<void> {
+  const metadata = JSON.stringify({
+    operation_id: input.operationId,
+    page_key: input.pageKey,
+    field_path: input.fieldPath,
+    route: input.route,
+    write_scope: "draft_operation_only",
+  });
+  const summary = `Latest draft save wrote ${input.operationId} for ${input.pageKey}.${input.fieldPath} to content_draft_operations only. No page_content, public route, publish event, send, deploy, or source file was changed.`;
+
+  const result = await db
+    .prepare(
+      `INSERT INTO admin_proof_events (
+        id,
+        kind,
+        status,
+        title,
+        summary,
+        evidence_uri,
+        redaction,
+        next_safe_action,
+        source_ref,
+        created_at,
+        updated_at,
+        metadata
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+        kind = excluded.kind,
+        status = excluded.status,
+        title = excluded.title,
+        summary = excluded.summary,
+        evidence_uri = excluded.evidence_uri,
+        redaction = excluded.redaction,
+        next_safe_action = excluded.next_safe_action,
+        source_ref = excluded.source_ref,
+        updated_at = excluded.updated_at,
+        metadata = excluded.metadata`,
+    )
+    .bind(
+      DRAFT_SAVE_PROOF_ID,
+      "gate",
+      "verified",
+      "content draft saves are proof-backed",
+      summary,
+      "D1 anipotts-db content_draft_operations and admin_proof_events",
+      "metadata_only",
+      "review the saved draft operation from /content/drafts before any publish or public content write path exists",
+      "apps/admin/src/lib/content-draft-operation.ts",
+      input.now,
+      input.now,
+      metadata,
+    )
+    .run();
+
+  if (result.success === false) {
+    throw statusError(500, "draft_save_proof_failed");
+  }
 }
 
 export function assertSameOriginRequest(request: Request, url: URL): void {

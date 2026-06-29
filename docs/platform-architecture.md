@@ -145,8 +145,10 @@ admin route boundaries.
 The admin proof log reads durable rows from D1 table `admin_proof_events` when
 available, then appends live D1 metadata for content operations and passkey
 proof. The table is seeded by
-`drizzle/migrations/0012_admin_proof_events.sql`. There is still no admin proof
-write API.
+`drizzle/migrations/0012_admin_proof_events.sql`. The focused draft-save route
+may update `proof.admin.content-draft-save` with metadata-only proof after a
+passkey-authenticated `content_draft_operations` write; there is still no
+publish, send, deploy, or public-content proof write path.
 
 ## ci/cd target
 
@@ -303,5 +305,8 @@ Rules:
     not write page_content, publish events, source files, sends, or deploys.
     Existing D1 draft operation metadata is refreshed by
     `drizzle/migrations/0033_refresh_draft_operation_save_metadata.sql`.
-36. reduce deploy workflow inputs to retained production targets after rollback
+36. add durable `admin_proof_events` coverage for the draft-save write path.
+    `drizzle/migrations/0034_seed_content_draft_save_proof.sql` seeds the
+    pending proof row, and successful draft saves update it with metadata only.
+37. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

@@ -32,7 +32,7 @@ export const proofSource = {
   mode: "read_only_d1_plus_runtime_metadata",
   generated_from:
     "admin_proof_events, route probes, PR state, and read-only D1 metadata",
-  live_writes: "disabled",
+  live_writes: "draft_save_proof_only",
 };
 
 const baseProofEntries: ProofEntry[] = [
@@ -84,6 +84,19 @@ const baseProofEntries: ProofEntry[] = [
     redaction: "metadata_only",
     next_safe_action:
       "Keep publish, send, public-content writes, and live-control endpoints absent until reviewed write paths are approved.",
+  },
+  {
+    id: "proof.admin.content-draft-save",
+    kind: "gate",
+    status: "pending",
+    title: "content draft saves need proof",
+    summary:
+      "The focused editor can save draft operation rows only. This proof row becomes verified after a passkey-authenticated draft save records a content_draft_operations row and refreshes admin_proof_events.",
+    evidence_uri:
+      "D1 anipotts-db content_draft_operations and admin_proof_events",
+    redaction: "metadata_only",
+    next_safe_action:
+      "enroll passkey, save one draft operation from /content/edit/home, then verify this proof row and keep publish blocked",
   },
 ];
 
