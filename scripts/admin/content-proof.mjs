@@ -182,6 +182,9 @@ const DETAIL_PAGE_PROOF = {
     published: true,
   },
 };
+const UNPUBLISHED_PUBLIC_ROUTES = Object.values(DETAIL_PAGE_PROOF)
+  .filter((item) => item.published === false)
+  .map((item) => item.route);
 
 const checkedAt = new Date().toISOString();
 
@@ -327,14 +330,19 @@ const publishedEventRoutes = [
   ),
 ];
 
-const [adminRoutes, publicRoutes, publishedEventRouteChecks] =
-  await Promise.all([
-    Promise.all(ADMIN_ROUTES.map((path) => probeRoute(ADMIN_ORIGIN, path))),
-    Promise.all(PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path))),
-    Promise.all(
-      publishedEventRoutes.map((path) => probeRoute(WWW_ORIGIN, path)),
-    ),
-  ]);
+const [
+  adminRoutes,
+  publicRoutes,
+  publishedEventRouteChecks,
+  unpublishedPublicRouteChecks,
+] = await Promise.all([
+  Promise.all(ADMIN_ROUTES.map((path) => probeRoute(ADMIN_ORIGIN, path))),
+  Promise.all(PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path))),
+  Promise.all(publishedEventRoutes.map((path) => probeRoute(WWW_ORIGIN, path))),
+  Promise.all(
+    UNPUBLISHED_PUBLIC_ROUTES.map((path) => probeRoute(WWW_ORIGIN, path)),
+  ),
+]);
 
 const publishedPageKeys = pageRows
   .filter((row) => Number(row.published) === 1)
@@ -362,6 +370,9 @@ const publicRouteFailures = publicRoutes.filter(
 );
 const publishedEventRouteFailures = publishedEventRouteChecks.filter(
   (route) => route.status !== 200,
+);
+const unpublishedPublicRouteFailures = unpublishedPublicRouteChecks.filter(
+  (route) => route.status === 200,
 );
 const adminBoundary = summarizeBoundary(adminRoutes);
 const publishEvents = contentCounts.content_publish_events ?? 0;
@@ -465,6 +476,9 @@ const missingProof = [
   ...publicRouteFailures.map((route) => `public_route:${route.path}`),
   ...publishedEventRouteFailures.map(
     (route) => `published_event_route:${route.path}`,
+  ),
+  ...unpublishedPublicRouteFailures.map(
+    (route) => `unpublished_route_visible:${route.path}`,
   ),
   ...(adminBoundary === "cloudflare_access" ||
   adminBoundary === "app_native_passkey"
@@ -571,6 +585,7 @@ const proof = {
   admin_routes: adminRoutes,
   public_routes: publicRoutes,
   published_event_routes: publishedEventRouteChecks,
+  unpublished_public_routes: unpublishedPublicRouteChecks,
   route_boundary: adminBoundary,
   publish_writes_proof_backed: publishEvents >= 0,
   field_record_writes_inert: contentRecords === 0,
