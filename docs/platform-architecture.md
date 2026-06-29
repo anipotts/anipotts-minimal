@@ -1,6 +1,6 @@
 # platform architecture
 
-Last updated: 2026-06-27
+Last updated: 2026-06-29
 
 This repo is being reduced to one public Astro app, one admin Astro app, one
 structured content/state model, and one predictable CI/CD path.
@@ -236,5 +236,9 @@ Rules:
     `page_content`; seeded by
     `drizzle/migrations/0027_seed_orchestrating_page_content.sql` with source
     fallback still retained.
-28. reduce deploy workflow inputs to retained production targets after rollback
+28. seed inert D1 review operations for D1-backed listing/page copy on
+    `/making`, `/projects`, `/writing`, `/newsletter/archive`, and
+    `/orchestrating`; seeded by
+    `drizzle/migrations/0028_seed_listing_content_review_operations.sql`.
+29. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.
