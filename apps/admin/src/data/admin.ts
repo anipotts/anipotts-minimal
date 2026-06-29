@@ -28,7 +28,7 @@ export type DeployRow = {
 };
 
 export const navItems: NavItem[] = [
-  { href: "/", label: "overview", status: "migrating" },
+  { href: "/", label: "overview", status: "live-source" },
   { href: "/content", label: "content", status: "live-source" },
   { href: "/content/review", label: "review", status: "live-source" },
   { href: "/content/drafts", label: "drafts", status: "live-source" },
@@ -60,9 +60,9 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "content platform",
-    status: "draft save staged",
+    status: "D1-backed review state",
     risk: "medium",
-    next: "enroll passkey and prove draft operation saves before publish design",
+    next: "enroll passkey and save one draft operation before publish design",
   },
   {
     title: "proof log",
@@ -78,13 +78,13 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "newsletter drafts",
-    status: "static preview model",
+    status: "D1 page content plus static issue preview",
     risk: "medium",
     next: "review issue structure in admin before any D1 write or send path",
   },
   {
     title: "legacy cleanup",
-    status: "started",
+    status: "blocked by passkey proof",
     risk: "low",
     next: "archive or remove admin-solid after passkey proof",
   },
@@ -94,26 +94,26 @@ export const contentRows: QueueRow[] = [
   {
     title: "homepage intro",
     owner: "apps/www",
-    status: "structured source candidate",
-    evidence: "apps/www/src/data/site.ts",
+    status: "published D1 page_content with source fallback",
+    evidence: "D1 page_content:home and @anipotts/content/public",
   },
   {
     title: "projects",
     owner: "apps/www",
-    status: "content collection",
-    evidence: "apps/www/src/content/projects",
+    status: "published D1 detail rows with source fallback",
+    evidence: "D1 page_content:project:* and apps/www/src/content/projects",
   },
   {
     title: "writing",
     owner: "apps/www",
-    status: "content collection",
-    evidence: "apps/www/src/content/writing",
+    status: "published D1 detail rows with source fallback",
+    evidence: "D1 page_content:writing:* and apps/www/src/content/writing",
   },
   {
     title: "newsletter",
     owner: "apps/www",
-    status: "D1 and queue backed",
-    evidence: "drizzle/migrations/0005_newsletter_system.sql",
+    status: "D1 page content, subscribe surface, and retained send worker",
+    evidence: "D1 page_content:newsletter and workers/newsletter",
   },
 ];
 
@@ -127,14 +127,14 @@ export const needsRows: QueueRow[] = [
   {
     title: "Astro admin route parity",
     owner: "site/admin",
-    status: "in progress",
-    evidence: "docs/platform-architecture.md",
+    status: "covered by route parity guard",
+    evidence: "scripts/ci/admin-route-inventory.mjs",
   },
   {
     title: "legacy worker review",
     owner: "site/platform",
-    status: "pending classification",
-    evidence: "workers/*",
+    status: "retained after 2026-06-29 review",
+    evidence: "docs/worker-inventory.md",
   },
 ];
 
@@ -149,13 +149,13 @@ export const repoRows: QueueRow[] = [
     title: "apps/admin",
     owner: "admin.anipotts.com",
     status: "canonical Astro app",
-    evidence: "deploy run 28302990801",
+    evidence: "apps/admin and docs/platform-architecture.md",
   },
   {
     title: "apps/admin-solid",
     owner: "legacy-admin-solid.anipotts.com",
     status: "legacy rollback",
-    evidence: "deploy run 28302990801",
+    evidence: "manual-only deploy input until passkey proof",
   },
 ];
 
