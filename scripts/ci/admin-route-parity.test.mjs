@@ -77,6 +77,7 @@ const ROUTES = [
 ];
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
+const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeySource = readFileSync(
   "apps/admin/src/pages/auth/passkey.astro",
   "utf8",
@@ -85,9 +86,51 @@ const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
 const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
+const publicPaths = extractStringList(middlewareSource, "PUBLIC_PATHS");
+const publicPasskeyApiPaths = extractStringList(
+  middlewareSource,
+  "PUBLIC_PASSKEY_API_PATHS",
+);
+const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
+
+assert.deepEqual(publicPaths, [
+  "/api/health",
+  "/apple-touch-icon.png",
+  "/auth/passkey",
+  "/favicon-16x16.png",
+  "/favicon-32x32.png",
+]);
+assert.deepEqual(publicPasskeyApiPaths, [
+  "/api/admin/passkey/login-options",
+  "/api/admin/passkey/login-verify",
+  "/api/admin/passkey/logout",
+  "/api/admin/passkey/register-options",
+  "/api/admin/passkey/register-verify",
+  "/api/admin/passkey/revoke-current",
+  "/api/admin/passkey/status",
+]);
+assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 
 for (const route of ROUTES) {
   assert.ok(existsSync(route.file), `${route.route} missing ${route.file}`);
+
+  if (route.route !== "/auth/passkey") {
+    assert.equal(
+      publicPaths.includes(route.route),
+      false,
+      `${route.route} must stay behind passkey middleware`,
+    );
+    assert.equal(
+      publicPasskeyApiPaths.includes(route.route),
+      false,
+      `${route.route} must not be exposed as a public passkey API`,
+    );
+    assert.equal(
+      publicPrefixes.some((prefix) => route.route.startsWith(prefix)),
+      false,
+      `${route.route} must not match a public static prefix`,
+    );
+  }
 
   if (route.nav) {
     assert.ok(
@@ -126,4 +169,14 @@ function extractShellForRoutes(source) {
       .flatMap((match) => match[1].trim().split(/\s+/))
       .filter((route) => route.startsWith("/")),
   );
+}
+
+function extractStringList(source, name) {
+  const match =
+    source.match(new RegExp(`const ${name} = new Set\\(\\[([\\s\\S]*?)\\]\\);`)) ??
+    source.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
+  assert.ok(match, `missing middleware list ${name}`);
+  return [...match[1].matchAll(/"([^"]+)"/g)]
+    .map((item) => item[1])
+    .sort();
 }
