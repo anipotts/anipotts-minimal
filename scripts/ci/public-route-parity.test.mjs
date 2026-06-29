@@ -13,7 +13,15 @@ const PUBLIC_ROUTES = [
   { route: "/making", file: "apps/www/src/pages/making.astro" },
   { route: "/orchestrating", file: "apps/www/src/pages/orchestrating.astro" },
   { route: "/projects", file: "apps/www/src/pages/projects/index.astro" },
+  {
+    route: "/projects/quantercise",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
   { route: "/writing", file: "apps/www/src/pages/writing/index.astro" },
+  {
+    route: "/writing/saturdays-are-for-claude-code",
+    file: "apps/www/src/pages/writing/[slug].astro",
+  },
 ];
 
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");

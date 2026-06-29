@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import Shell from "../../layouts/Shell.astro";
+import CmsMarkdown from "../../components/CmsMarkdown.astro";
 import { Icon } from "astro-icon/components";
 import { projectSlug, visibleProjects } from "../../lib/content";
 import { setDB } from "@anipotts/lib/db";
@@ -22,10 +23,6 @@ const rendered =
 const Content = rendered?.Content;
 const hasBody = Boolean(project.body?.trim());
 const d = project.data;
-const cmsParagraphs = project.body
-  .split(/\n{2,}/)
-  .map((paragraph) => paragraph.trim())
-  .filter(Boolean);
 ---
 
 <Shell
@@ -83,11 +80,7 @@ const cmsParagraphs = project.body
     {
       hasBody ? (
         <div class="article-body">
-          {Content ? (
-            <Content />
-          ) : (
-            cmsParagraphs.map((paragraph) => <p>{paragraph}</p>)
-          )}
+          {Content ? <Content /> : <CmsMarkdown body={project.body} />}
         </div>
       ) : (
         <p class="overview">{d.description}</p>

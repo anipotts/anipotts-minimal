@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import Shell from "../../layouts/Shell.astro";
+import CmsMarkdown from "../../components/CmsMarkdown.astro";
 import { Icon } from "astro-icon/components";
 import {
   formatDate,
@@ -25,10 +26,6 @@ const rendered =
 const Content = rendered?.Content;
 const d = item.data;
 const minutes = readingTime(item.body ?? "");
-const cmsParagraphs = item.body
-  .split(/\n{2,}/)
-  .map((paragraph) => paragraph.trim())
-  .filter(Boolean);
 
 const articleLd = {
   "@context": "https://schema.org",
@@ -84,13 +81,7 @@ const articleLd = {
     </header>
 
     <div data-rise class="article-body">
-      {
-        Content ? (
-          <Content />
-        ) : (
-          cmsParagraphs.map((paragraph) => <p>{paragraph}</p>)
-        )
-      }
+      {Content ? <Content /> : <CmsMarkdown body={item.body} />}
     </div>
   </article>
 </Shell>

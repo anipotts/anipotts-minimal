@@ -32,7 +32,7 @@ jobs:
         if: inputs.target == 'www'
         run: |
           set -euo pipefail
-          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /writing; do
+          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /projects/quantercise /writing /writing/saturdays-are-for-claude-code; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"
             echo "https://anipotts.com${path} -> ${code}"
             test "$code" = "200"

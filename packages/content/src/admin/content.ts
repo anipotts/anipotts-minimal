@@ -321,15 +321,19 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.detail_body",
     surface: "projects",
     title: "project detail body",
-    source_ref: "apps/www/src/content/projects/*.md body",
+    source_ref:
+      "D1 page_content:project:quantercise seeded by drizzle/migrations/0031_seed_detail_page_content.sql for the first detail row, fallback apps/www/src/content/projects/*.md body",
     current_value:
-      "Project bodies plus optional technical and roadmap arrays drive detail pages where present.",
+      "Quantercise now has a structured detail page_content row. Other project bodies plus optional technical and roadmap arrays still fall back to Astro markdown.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Add read-only markdown preview before body editing because detail pages carry public claims.",
+      "Extend detail page_content rows one project at a time before adding any save path, because detail pages carry public claims.",
     required_authority: [],
-    proof_ids: ["content.projects.body.schema"],
+    proof_ids: [
+      "content.projects.body.schema",
+      "content.projects.quantercise.page-content",
+    ],
   },
   {
     id: "projects.duplicate_source",
@@ -378,15 +382,19 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.body",
     surface: "writing",
     title: "writing body",
-    source_ref: "apps/www/src/content/writing/*.md body",
+    source_ref:
+      "D1 page_content:writing:saturdays-are-for-claude-code seeded by drizzle/migrations/0031_seed_detail_page_content.sql for the first detail row, fallback apps/www/src/content/writing/*.md body",
     current_value:
-      "Published article bodies are markdown files in the Astro writing collection.",
+      "Saturdays are for Claude Code now has a structured detail page_content row. Other published article bodies still fall back to Astro markdown.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Use preview-only diffs before edits; publishing and outbound syndication stay separate.",
+      "Extend detail page_content rows one writing item at a time; publishing and outbound syndication stay separate.",
     required_authority: [],
-    proof_ids: ["content.writing.body.source"],
+    proof_ids: [
+      "content.writing.body.source",
+      "content.writing.saturdays.page-content",
+    ],
   },
   {
     id: "writing.claude_stats_link",

@@ -43,9 +43,11 @@ const EXPECTED_OPERATION_IDS = [
   "content-draft-newsletter-copy-2026-06-28",
   "content-draft-orchestrating-hero-copy-2026-06-29",
   "content-draft-project-card-fields-2026-06-28",
+  "content-draft-project-quantercise-detail-2026-06-29",
   "content-draft-projects-index-copy-2026-06-29",
   "content-draft-writing-index-copy-2026-06-29",
   "content-draft-writing-newsletter-backfill-2026-06-28",
+  "content-draft-writing-saturdays-detail-2026-06-29",
 ];
 
 const UNSAFE_ALLOWED_ACTIONS = new Set([
