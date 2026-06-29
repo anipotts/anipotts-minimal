@@ -1,5 +1,25 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const requestedNext = Astro.url.searchParams.get("next");
+const passkeyReturnPath = sanitizeAdminReturnPath(requestedNext);
+const shouldAutoReturn = requestedNext !== null;
+
+function sanitizeAdminReturnPath(path: string | null): string {
+  if (!path) return "/proof";
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) {
+    return "/proof";
+  }
+
+  try {
+    const parsed = new URL(path, "https://admin.anipotts.com");
+    if (parsed.origin !== "https://admin.anipotts.com") return "/proof";
+    if (parsed.pathname === "/auth/passkey") return "/proof";
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return "/proof";
+  }
+}
 ---
 
 <AdminLayout
@@ -32,7 +52,18 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       <h2>restore Access</h2>
       <p>Rollback is the prior Cloudflare Access app or policy.</p>
     </article>
+    <article class="panel">
+      <p>return path</p>
+      <h2 id="passkey-return-label">{passkeyReturnPath}</h2>
+      <p>after app-native login, continue to this protected route.</p>
+    </article>
   </section>
+
+  <span
+    id="passkey-return-path"
+    data-next-path={passkeyReturnPath}
+    data-auto-return={String(shouldAutoReturn)}
+    hidden></span>
 
   <div class="actions">
     <button class="button" id="register-passkey" type="button">
@@ -47,6 +78,9 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     <button class="button secondary danger" id="revoke-passkey" type="button">
       revoke current passkey
     </button>
+    <a class="button secondary" id="open-passkey-next" href={passkeyReturnPath}>
+      open protected route
+    </a>
   </div>
 
   <p class="notice" id="passkey-message">
@@ -196,6 +230,13 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     document.querySelector<HTMLButtonElement>("#logout-passkey");
   const revokeButton =
     document.querySelector<HTMLButtonElement>("#revoke-passkey");
+  const returnPathNode = document.querySelector<HTMLElement>(
+    "#passkey-return-path",
+  );
+  const returnLink =
+    document.querySelector<HTMLAnchorElement>("#open-passkey-next");
+  const nextPath = returnPathNode?.dataset.nextPath ?? "/proof";
+  const shouldAutoReturn = returnPathNode?.dataset.autoReturn === "true";
 
   let status: PasskeyStatus | null = null;
 
@@ -241,6 +282,13 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     if (loginButton) loginButton.disabled = !status.available;
     if (logoutButton) logoutButton.disabled = !status.has_session;
     if (revokeButton) revokeButton.disabled = !status.has_session;
+    if (returnLink) {
+      returnLink.href = nextPath;
+      returnLink.setAttribute(
+        "aria-disabled",
+        status.has_session ? "false" : "true",
+      );
+    }
     renderRunbook();
     renderProofList();
   }
@@ -272,6 +320,10 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       );
       setText(message, result.next_safe_action ?? "passkey session active");
       await refreshStatus();
+      if (shouldAutoReturn && status?.has_session) {
+        setText(message, `passkey session active; opening ${nextPath}`);
+        window.location.assign(nextPath);
+      }
     });
   }
 
