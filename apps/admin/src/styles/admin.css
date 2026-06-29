@@ -295,6 +295,7 @@ th {
   margin-top: 12px;
 }
 
+.handoff-board,
 .runbook-board,
 .proof-checklist {
   margin-top: 24px;
@@ -302,23 +303,27 @@ th {
   background: var(--panel);
 }
 
+.handoff-board .section-header,
 .runbook-board .section-header,
 .proof-checklist .section-header {
   padding: 16px;
   border-bottom: 1px solid var(--border);
 }
 
+.handoff-list,
 .runbook-list,
 .proof-list {
   display: grid;
 }
 
+.handoff-list,
 .runbook-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.handoff-list li,
 .runbook-step,
 .proof-item {
   display: grid;
@@ -334,11 +339,21 @@ th {
   grid-template-columns: 34px minmax(0, 1fr);
 }
 
+.handoff-list li {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.handoff-list li:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
 .runbook-step:last-child,
 .proof-item:last-child {
   border-bottom: 0;
 }
 
+.handoff-list strong,
+.handoff-list small,
 .runbook-step strong,
 .runbook-step small,
 .proof-item strong,
@@ -346,6 +361,7 @@ th {
   display: block;
 }
 
+.handoff-list small,
 .runbook-step small,
 .proof-item small {
   color: var(--muted);
