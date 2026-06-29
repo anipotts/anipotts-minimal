@@ -145,6 +145,10 @@ Public site code should become stable. More public text and project copy should
 move into structured content that admin can review, draft, preview, and later
 publish through an authorized write path.
 
+Pure public content defaults, normalizers, validators, page-key helpers, and
+homepage summary helpers live in `@anipotts/content/public`. D1-backed readers
+and search functions stay in `@anipotts/lib/cms`.
+
 Admin should become one Astro app for content, fleet state, proof, repo status,
 handoffs, blockers, and future editing. Current Solid admin work is migration
 source, not the long-term home.

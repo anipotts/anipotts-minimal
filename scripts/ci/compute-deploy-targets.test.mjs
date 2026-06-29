@@ -92,6 +92,12 @@ expectTargets(
 );
 
 expectTargets(
+  "public content contracts deploy public and admin consumers",
+  ["packages/content/src/public/defaults.ts"],
+  { www: true, admin: true },
+);
+
+expectTargets(
   "root dependency files do not fan out",
   ["package.json", "pnpm-lock.yaml"],
   {},

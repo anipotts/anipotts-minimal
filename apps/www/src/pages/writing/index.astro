@@ -6,10 +6,10 @@ import { publishedWriting } from "../../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 import {
-  fetchPageContent,
   normalizeListingPageContent,
   type ListingPageContent,
-} from "@anipotts/lib/cms";
+} from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 
 export const prerender = false;
 

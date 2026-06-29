@@ -3,10 +3,10 @@ import Shell from "../layouts/Shell.astro";
 import { docs, hooks, minePlugin, MINE_REPO, TIPS_REPO } from "../data/claude";
 import statsJson from "../data/claude-stats.json";
 import {
-  fetchPageContent,
   normalizeOrchestratingPageContent,
   type OrchestratingPageContent,
-} from "@anipotts/lib/cms";
+} from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 

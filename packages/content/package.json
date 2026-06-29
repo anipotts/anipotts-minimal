@@ -11,15 +11,34 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./public": {
+      "types": "./dist/public/index.d.ts",
+      "import": "./dist/public/index.js"
+    },
+    "./public/defaults": {
+      "types": "./dist/public/defaults.d.ts",
+      "import": "./dist/public/defaults.js"
+    },
+    "./public/editor": {
+      "types": "./dist/public/editor.d.ts",
+      "import": "./dist/public/editor.js"
+    },
+    "./public/homepage": {
+      "types": "./dist/public/homepage.d.ts",
+      "import": "./dist/public/homepage.js"
+    },
     "./admin": {
       "types": "./dist/admin/index.d.ts",
       "import": "./dist/admin/index.js"
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm --filter @anipotts/types build && tsc",
     "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pnpm --filter @anipotts/types build && tsc --noEmit"
+  },
+  "dependencies": {
+    "@anipotts/types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5"

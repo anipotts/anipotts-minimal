@@ -9,11 +9,11 @@ import { publishedWriting, visibleProjects } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 import {
-  fetchPageContent,
   homepageSummaryText,
   normalizeHomepageContent,
   normalizeNewsletterContent,
-} from "@anipotts/lib/cms";
+} from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 
 export const prerender = false;
 
