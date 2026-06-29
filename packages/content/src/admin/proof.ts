@@ -87,8 +87,8 @@ const baseProofEntries: ProofEntry[] = [
   },
 ];
 
-const REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS = 7;
-const REQUIRED_CONTENT_DRAFT_OPERATIONS = 9;
+const REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS = 20;
+const REQUIRED_CONTENT_DRAFT_OPERATIONS = 24;
 
 type ProofEventRow = {
   id: string;

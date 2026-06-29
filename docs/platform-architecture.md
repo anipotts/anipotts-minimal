@@ -180,7 +180,8 @@ Rules:
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
   `pnpm test:public-routes` keeps deploy smoke, manual smoke, and content proof
   aligned on the public route set: `/`, `/newsletter`, `/newsletter/archive`,
-  `/making`, `/orchestrating`, `/projects`, and `/writing`.
+  `/making`, `/orchestrating`, `/projects`, visible project detail routes,
+  `/writing`, and published writing detail routes.
 - D1 migrations run as reviewed migration steps before app deploy.
 - `security-review.yml` does not call Anthropic, Claude Code, or any external
   model API. It scans sensitive diffs for literal secrets, disabled LLM review
@@ -289,5 +290,11 @@ Rules:
     `/projects/quantercise` and `/writing/saturdays-are-for-claude-code`.
     This proves the detail-record path without adding save APIs, publish
     writes, sends, source rewrites, or external mutations.
-34. reduce deploy workflow inputs to retained production targets after rollback
+34. seed the remaining tracked project and writing detail records into
+    `page_content` while preserving source fallbacks. Covered by
+    `drizzle/migrations/0032_seed_remaining_detail_page_content.sql` for all
+    visible project and published writing detail routes, plus unpublished
+    review-only rows for hidden project and draft writing content. This keeps
+    write paths inert while making detail content reviewable from D1.
+35. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

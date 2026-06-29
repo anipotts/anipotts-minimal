@@ -14,12 +14,56 @@ const PUBLIC_ROUTES = [
   { route: "/orchestrating", file: "apps/www/src/pages/orchestrating.astro" },
   { route: "/projects", file: "apps/www/src/pages/projects/index.astro" },
   {
+    route: "/projects/chainedchat",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/claude-code-tips",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/imessage-mcp",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/nyu-purity-test",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/options-pricing-sensitivity",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/pgi-research-platform",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
     route: "/projects/quantercise",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/quantercise-extension",
+    file: "apps/www/src/pages/projects/[slug].astro",
+  },
+  {
+    route: "/projects/saeshify",
     file: "apps/www/src/pages/projects/[slug].astro",
   },
   { route: "/writing", file: "apps/www/src/pages/writing/index.astro" },
   {
+    route: "/writing/i-built-a-monitor-for-my-claude-code-sessions",
+    file: "apps/www/src/pages/writing/[slug].astro",
+  },
+  {
     route: "/writing/saturdays-are-for-claude-code",
+    file: "apps/www/src/pages/writing/[slug].astro",
+  },
+  {
+    route: "/writing/search-will-be-dead-by-2030",
+    file: "apps/www/src/pages/writing/[slug].astro",
+  },
+  {
+    route: "/writing/stop-ending-your-day-with-fix-the-bug",
     file: "apps/www/src/pages/writing/[slug].astro",
   },
 ];

@@ -150,7 +150,7 @@ jobs:
       - name: Smoke www routes
         run: |
           set -euo pipefail
-          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /projects/quantercise /writing /writing/saturdays-are-for-claude-code; do
+          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /projects/chainedchat /projects/claude-code-tips /projects/imessage-mcp /projects/nyu-purity-test /projects/options-pricing-sensitivity /projects/pgi-research-platform /projects/quantercise /projects/quantercise-extension /projects/saeshify /writing /writing/i-built-a-monitor-for-my-claude-code-sessions /writing/saturdays-are-for-claude-code /writing/search-will-be-dead-by-2030 /writing/stop-ending-your-day-with-fix-the-bug; do
             ok=false
             for _ in $(seq 1 6); do
               code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"

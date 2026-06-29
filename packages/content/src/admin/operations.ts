@@ -123,7 +123,7 @@ export type ContentOperationTable = {
 export const contentOperationSchemaSource = {
   source_doc: "docs/admin-content-draft-operations.md",
   migration:
-    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql",
+    "drizzle/migrations/0007_content_operations.sql + drizzle/migrations/0008_seed_content_draft_operations.sql + drizzle/migrations/0011_seed_source_content_review_operations.sql + drizzle/migrations/0028_seed_listing_content_review_operations.sql + drizzle/migrations/0030_expand_orchestrating_page_content.sql + drizzle/migrations/0031_seed_detail_page_content.sql + drizzle/migrations/0032_seed_remaining_detail_page_content.sql",
   schema: "packages/lib/src/db/schema.ts",
   mode: "d1_schema_no_write_endpoint",
 };
@@ -316,6 +316,168 @@ function parseCreatedBy(value: string): ContentOperation["created_by"] {
   return value === "agent" || value === "ani" || value === "system"
     ? value
     : "agent";
+}
+
+type DetailOperationSeed = {
+  kind: "project" | "writing";
+  slug: string;
+  title: string;
+  published: boolean;
+  sourceFile: string;
+};
+
+const REMAINING_DETAIL_OPERATION_CREATED_AT = "2026-06-29T07:45:00Z";
+const REMAINING_DETAIL_OPERATION_MIGRATION =
+  "drizzle/migrations/0032_seed_remaining_detail_page_content.sql";
+const REMAINING_DETAIL_OPERATION_SEEDS: DetailOperationSeed[] = [
+  {
+    kind: "project",
+    slug: "chainedchat",
+    title: "chainedchat",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/chainedchat.md",
+  },
+  {
+    kind: "project",
+    slug: "claude-code-tips",
+    title: "claude code tips",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/claude-code-tips.md",
+  },
+  {
+    kind: "project",
+    slug: "habittracker-obh",
+    title: "artist scouting dashboard",
+    published: false,
+    sourceFile: "apps/www/src/content/projects/habittracker-obh.md",
+  },
+  {
+    kind: "project",
+    slug: "imessage-mcp",
+    title: "imessage mcp",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/imessage-mcp.md",
+  },
+  {
+    kind: "project",
+    slug: "nyu-purity-test",
+    title: "nyu purity test",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/nyu-purity-test.md",
+  },
+  {
+    kind: "project",
+    slug: "options-pricing-sensitivity",
+    title: "options pricing + sensitivity analysis",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/options-pricing-sensitivity.md",
+  },
+  {
+    kind: "project",
+    slug: "pgi-research-platform",
+    title: "pgi research portal",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/pgi-research-platform.md",
+  },
+  {
+    kind: "project",
+    slug: "quantercise-extension",
+    title: "mental math extension",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/quantercise-extension.md",
+  },
+  {
+    kind: "project",
+    slug: "saeshify",
+    title: "saeshify",
+    published: true,
+    sourceFile: "apps/www/src/content/projects/saeshify.md",
+  },
+  {
+    kind: "writing",
+    slug: "i-built-a-monitor-for-my-claude-code-sessions",
+    title: "i built a monitor for my claude code sessions",
+    published: true,
+    sourceFile:
+      "apps/www/src/content/writing/i-built-a-monitor-for-my-claude-code-sessions.md",
+  },
+  {
+    kind: "writing",
+    slug: "jpegmafia-is-our-kanye-west",
+    title: "jpegmafia is our kanye west",
+    published: false,
+    sourceFile: "apps/www/src/content/writing/jpegmafia-is-our-kanye-west.md",
+  },
+  {
+    kind: "writing",
+    slug: "search-will-be-dead-by-2030",
+    title: "search will be dead by 2030",
+    published: true,
+    sourceFile: "apps/www/src/content/writing/search-will-be-dead-by-2030.md",
+  },
+  {
+    kind: "writing",
+    slug: "stop-ending-your-day-with-fix-the-bug",
+    title: 'stop ending your day with "fix the bug"',
+    published: true,
+    sourceFile:
+      "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+  },
+];
+
+const remainingDetailContentOperationTemplates: ContentOperation[] =
+  REMAINING_DETAIL_OPERATION_SEEDS.map(detailOperationFromSeed);
+
+function detailOperationFromSeed(seed: DetailOperationSeed): ContentOperation {
+  const collection = seed.kind === "project" ? "projects" : "writing";
+  const pageKey = `${seed.kind}:${seed.slug}`;
+  const route =
+    seed.kind === "project"
+      ? `/projects/${seed.slug}`
+      : `/writing/${seed.slug}`;
+  const forbiddenActions =
+    seed.kind === "project"
+      ? ["save", "publish", "deploy", "rewrite_markdown", "sync_external"]
+      : [
+          "save",
+          "publish",
+          "send",
+          "schedule",
+          "rewrite_markdown",
+          "sync_provider",
+        ];
+
+  return {
+    operation_id: `content-draft-${seed.kind}-${seed.slug}-detail-2026-06-29`,
+    kind: "content_draft",
+    surface: "public_site",
+    route,
+    source_ref: `D1 page_content:${pageKey} seeded by ${REMAINING_DETAIL_OPERATION_MIGRATION}, fallback ${seed.sourceFile}`,
+    field_path: `${collection}.${seed.slug.replaceAll("-", "_")}.detail`,
+    current_value_ref: `${seed.published ? "published" : "unpublished"}_page_content:${pageKey}`,
+    proposed_value: `Review future edits to the ${seed.title} title, summary, body, links, tags, and visibility through preview-only operations before any save path edits page_content.`,
+    status: "previewed",
+    risk_level: seed.published ? "medium" : "low",
+    authority_state: "detail_page_content_preview_only_no_write",
+    required_approval_ids: [],
+    allowed_actions: ["render_preview", "request_review"],
+    forbidden_actions: forbiddenActions,
+    preview_targets: seed.published
+      ? ["/content/review", "/content/preview", route]
+      : ["/content/review", "/content/preview"],
+    proof_ids: [
+      `content.${collection}.${seed.slug.replaceAll("-", ".")}.page-content`,
+      "admin.content.preview.d1",
+    ],
+    evidence_uri: `repo://${seed.sourceFile}`,
+    redaction: "public_copy_only",
+    created_by: "agent",
+    created_at: REMAINING_DETAIL_OPERATION_CREATED_AT,
+    updated_at: REMAINING_DETAIL_OPERATION_CREATED_AT,
+    expires_at: "2026-07-29T07:45:00Z",
+    rollback_ref: `source_markdown:${seed.sourceFile}`,
+    reviewer_note: `${seed.published ? "Published" : "Unpublished"} detail row seeded as inert preview metadata. No save route, source rewrite, external sync, send, schedule, or publish event is created.`,
+  };
 }
 
 export const contentOperationTemplates: ContentOperation[] = [
@@ -548,6 +710,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     reviewer_note:
       "First writing detail row seeded as inert preview metadata. No source rewrite, send, save route, or publish event is created.",
   },
+  ...remainingDetailContentOperationTemplates,
   {
     operation_id: "content-draft-making-index-copy-2026-06-29",
     kind: "content_draft",
