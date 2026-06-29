@@ -2,10 +2,10 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import {
   cmsProjectPageKey,
   cmsWritingPageKey,
-  fetchPageContent,
   normalizeCmsProject,
   normalizeCmsWriting,
-} from "@anipotts/lib/cms";
+} from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 
 type ProjectEntry = CollectionEntry<"projects">;
 type WritingEntry = CollectionEntry<"writing">;

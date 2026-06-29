@@ -2,10 +2,10 @@
 import Shell from "../../layouts/Shell.astro";
 import {
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
-  fetchPageContent,
   normalizeListingPageContent,
   type ListingPageContent,
-} from "@anipotts/lib/cms";
+} from "@anipotts/content/public";
+import { fetchPageContent } from "@anipotts/lib/cms";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 

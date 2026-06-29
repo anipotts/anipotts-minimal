@@ -115,7 +115,7 @@ export const contentInventorySource = {
   architecture_doc: "docs/admin-v2-architecture.md",
   mode: "read_only_static_plus_d1_page_content",
   generated_from:
-    "current tracked apps/www source files plus @anipotts/lib/cms page_content reader paths",
+    "current tracked apps/www source files, D1 page_content rows, and @anipotts/content/public fallback contracts",
 };
 
 export async function readPageContentInventoryStore(
@@ -174,7 +174,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero heading",
     source_ref:
-      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value: "hi, i'm ani",
     editability: "ready",
     risk_level: "low",
@@ -188,7 +188,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "Homepage intro summary uses structured D1 text and mention keys when present.",
     editability: "ready",
@@ -203,7 +203,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "about section",
     source_ref:
-      "D1 page_content:home.sections.about seeded by drizzle/migrations/0021_seed_homepage_about_section.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.sections.about seeded by drizzle/migrations/0021_seed_homepage_about_section.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "The homepage about label and paragraphs are structured page_content when present.",
     editability: "ready",
@@ -218,7 +218,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage mention metadata",
     source_ref:
-      "D1 page_content:home.mentions seeded by drizzle/migrations/0017_seed_homepage_mentions.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.mentions seeded by drizzle/migrations/0017_seed_homepage_mentions.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "Structured AI, YC F25, Our Bad Habit, Atlantic Records, and Business Insider labels, links, and local logo paths are now structured homepage content.",
     editability: "ready",
@@ -233,7 +233,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "proof cards",
     source_ref:
-      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from D1 when present.",
     editability: "ready",
@@ -248,7 +248,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage making selection",
     source_ref:
-      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "D1 controls the making label, limit, view-all link, and ordered homepage project slugs when present.",
     editability: "ready",
@@ -263,7 +263,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage writing selection",
     source_ref:
-      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback @anipotts/lib/cms DEFAULT_HOMEPAGE_CONTENT",
+      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
     current_value:
       "D1 controls the writing label, limit, view-all link, and ordered homepage writing slugs when present.",
     editability: "ready",
@@ -292,7 +292,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "projects",
     title: "making index copy",
     source_ref:
-      "D1 page_content:making seeded by drizzle/migrations/0023_seed_making_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_MAKING_INDEX_CONTENT",
+      "D1 page_content:making seeded by drizzle/migrations/0023_seed_making_index_page_content.sql, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
     current_value:
       "The /making title, meta description, hero title, and hero summary use structured page_content when present.",
     editability: "ready",
@@ -307,7 +307,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "projects",
     title: "project archive index copy",
     source_ref:
-      "D1 page_content:projects seeded by drizzle/migrations/0024_seed_projects_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_PROJECTS_INDEX_CONTENT",
+      "D1 page_content:projects seeded by drizzle/migrations/0024_seed_projects_index_page_content.sql, fallback @anipotts/content/public DEFAULT_PROJECTS_INDEX_CONTENT",
     current_value:
       "The /projects title, meta description, hero title, hero summary, and /making hero link use structured page_content when present.",
     editability: "ready",
@@ -364,7 +364,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "writing",
     title: "writing index copy",
     source_ref:
-      "D1 page_content:writing seeded by drizzle/migrations/0022_seed_writing_index_page_content.sql, fallback @anipotts/lib/cms DEFAULT_WRITING_INDEX_CONTENT",
+      "D1 page_content:writing seeded by drizzle/migrations/0022_seed_writing_index_page_content.sql, fallback @anipotts/content/public DEFAULT_WRITING_INDEX_CONTENT",
     current_value:
       "The /writing title, meta description, hero summary, and search placeholder use structured page_content when present.",
     editability: "ready",
@@ -407,9 +407,9 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "newsletter",
     title: "subscribe block copy",
     source_ref:
-      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql and updated by drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_CONTENT",
+      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql and updated by drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql, fallback @anipotts/content/public DEFAULT_NEWSLETTER_CONTENT",
     current_value:
-      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, archive label, archive copy, and archive URL use the @anipotts/lib/cms reader path with D1 page_content as the live source.",
+      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, archive label, archive copy, and archive URL use D1 page_content as the live source with @anipotts/content/public as the fallback contract.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -425,7 +425,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "newsletter",
     title: "newsletter archive copy",
     source_ref:
-      "D1 page_content:newsletter_archive seeded by drizzle/migrations/0025_seed_newsletter_archive_page_content.sql, fallback @anipotts/lib/cms DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
+      "D1 page_content:newsletter_archive seeded by drizzle/migrations/0025_seed_newsletter_archive_page_content.sql, fallback @anipotts/content/public DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
     current_value:
       "The /newsletter/archive title, meta description, section label, and hero summary use structured page_content when present.",
     editability: "ready",
@@ -455,7 +455,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "orchestrating",
     title: "orchestrating hero copy",
     source_ref:
-      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql, fallback @anipotts/lib/cms DEFAULT_ORCHESTRATING_CONTENT",
+      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
     current_value:
       "The /orchestrating title, meta description, section label, hero title, hero summary, and live-session panel copy use structured page_content when present.",
     editability: "ready",

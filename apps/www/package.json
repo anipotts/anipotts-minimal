@@ -12,6 +12,7 @@
     "deploy:preview": "wrangler deploy"
   },
   "dependencies": {
+    "@anipotts/content": "workspace:*",
     "@anipotts/lib": "workspace:*",
     "@anipotts/styles": "workspace:*",
     "@astrojs/cloudflare": "^12.6.0",

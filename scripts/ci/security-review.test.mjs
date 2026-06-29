@@ -16,6 +16,7 @@ expectSensitive("apps/admin/src/middleware.ts", true);
 expectSensitive("apps/admin/src/pages/api/admin/passkey/status.ts", true);
 expectSensitive("apps/admin/src/pages/auth/passkey.astro", true);
 expectSensitive("workers/state/src/index.ts", true);
+expectSensitive("packages/content/src/public/defaults.ts", true);
 expectSensitive("packages/lib/src/cms/homepage.ts", true);
 expectSensitive("drizzle/migrations/0016_seed_homepage_rich_summary.sql", true);
 expectSensitive("scripts/ci/security-review.mjs", true);
