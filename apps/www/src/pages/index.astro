@@ -3,15 +3,14 @@ import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import WritingRow from "../components/WritingRow.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
-import InlineMention from "../components/InlineMention.astro";
 import HomepageRichSummary from "../components/HomepageRichSummary.astro";
 import { Icon } from "astro-icon/components";
-import { homeContent } from "../data/site";
 import { publishedWriting, visibleProjects } from "../lib/content";
 import { setDB } from "@anipotts/lib/db";
 import type { D1Database } from "@anipotts/lib/db";
 import {
   fetchPageContent,
+  homepageSummaryText,
   normalizeHomepageContent,
   normalizeNewsletterContent,
 } from "@anipotts/lib/cms";
@@ -23,53 +22,16 @@ const [homePage, newsletterPage] = await Promise.all([
   fetchPageContent("home"),
   fetchPageContent("newsletter"),
 ]);
-const rawHomeContent =
-  homePage?.content && typeof homePage.content === "object"
-    ? (homePage.content as {
-        sections?: {
-          intro?: {
-            heading?: unknown;
-            subheading?: unknown;
-            rich_summary?: unknown;
-          };
-        };
-      })
-    : null;
 const cmsHome = normalizeHomepageContent(homePage?.content);
 const newsletterCopy = normalizeNewsletterContent(newsletterPage?.content);
-const cmsIntroSource = rawHomeContent?.sections?.intro;
-const hasCmsHeading = hasText(cmsIntroSource?.heading);
-const hasCmsSubheading = hasText(cmsIntroSource?.subheading);
-const hasCmsRichSummary = hasNonEmptyArray(cmsIntroSource?.rich_summary);
 const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
-const heading = hasCmsHeading ? intro.heading : homeContent.heading;
-const proofCards =
-  cmsHome.proof_cards.length > 0 ? cmsHome.proof_cards : homeContent.proof;
-const mentionMap =
-  Object.keys(cmsHome.mentions).length > 0
-    ? cmsHome.mentions
-    : homeContent.mentions;
-const homeMakingSlugs = [
-  "quantercise",
-  "quantercise-extension",
-  "saeshify",
-  "nyu-purity-test",
-] as const;
-const homeWritingSlugs = [
-  "saturdays-are-for-claude-code",
-  "i-built-a-monitor-for-my-claude-code-sessions",
-  "stop-ending-your-day-with-fix-the-bug",
-] as const;
-const selectedMakingSlugs =
-  work.project_slugs && work.project_slugs.length > 0
-    ? work.project_slugs
-    : [...homeMakingSlugs];
-const selectedWritingSlugs =
-  writing.writing_slugs && writing.writing_slugs.length > 0
-    ? writing.writing_slugs
-    : [...homeWritingSlugs];
+const heading = intro.heading;
+const proofCards = cmsHome.proof_cards;
+const mentionMap = cmsHome.mentions;
+const selectedMakingSlugs = work.project_slugs ?? [];
+const selectedWritingSlugs = writing.writing_slugs ?? [];
 const homeMakingOrder = new Map<string, number>(
   selectedMakingSlugs.map((slug, index) => [slug, index]),
 );
@@ -92,60 +54,23 @@ const writingEntries = (await publishedWriting())
   .slice(0, writing.limit ?? 3);
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
-const ycMention = mentionMap.yCombinatorF25;
-
-function hasText(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function hasNonEmptyArray(value: unknown): value is unknown[] {
-  return Array.isArray(value) && value.length > 0;
-}
+const summaryText = homepageSummaryText(cmsHome);
 ---
 
-<Shell title="ani potts" description={homeContent.summary} path="/">
+<Shell title="ani potts" description={summaryText} path="/">
   <section data-rise>
     <h1 class="home-hero">
       {heading}<span class="spark">.</span>
     </h1>
     <p class="hero-summary hero-line">
       {
-        hasCmsRichSummary && intro.rich_summary ? (
+        intro.rich_summary && intro.rich_summary.length > 0 ? (
           <HomepageRichSummary
             sentences={intro.rich_summary}
             mentions={mentionMap}
           />
-        ) : hasCmsSubheading ? (
-          (intro.subheading ?? homeContent.summary)
         ) : (
-          <>
-            <span class="hero-sentence">
-              previously worked on real-time agent i/o at{" "}
-              <span class="mention-cluster">
-                <InlineMention {...mentionMap.structuredAi} />
-                <span class="brand-parens">
-                  <>
-                    <span>(</span>
-                    <InlineMention {...ycMention} />
-                    <span>)</span>
-                  </>
-                </span>
-              </span>{" "}
-              and{" "}
-              <span class="mention-cluster">
-                <InlineMention {...mentionMap.badHabit} suffix="," />
-                <span>an</span>
-                <InlineMention {...mentionMap.atlanticRecords} />
-                <span>venture.</span>
-              </span>
-            </span>
-            <span class="hero-break" aria-hidden="true" />
-            <span class="hero-sentence">
-              every now and then i post about what i'm doing with claude code
-              and codex, as featured on{" "}
-              <InlineMention {...mentionMap.businessInsider} suffix="." />
-            </span>
-          </>
+          summaryText
         )
       }
     </p>

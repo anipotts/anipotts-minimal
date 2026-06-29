@@ -36,7 +36,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       label: "index",
       heading: "hi, i'm ani",
       subheading:
-        "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex",
+        "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
       rich_summary: [
         {
           segments: [
