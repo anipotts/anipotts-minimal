@@ -34,6 +34,11 @@ const REQUIRED_OPERATIONS = [
   "content-draft-newsletter-copy-2026-06-28",
   "content-draft-project-card-fields-2026-06-28",
   "content-draft-writing-newsletter-backfill-2026-06-28",
+  "content-draft-making-index-copy-2026-06-29",
+  "content-draft-projects-index-copy-2026-06-29",
+  "content-draft-writing-index-copy-2026-06-29",
+  "content-draft-newsletter-archive-copy-2026-06-29",
+  "content-draft-orchestrating-hero-copy-2026-06-29",
 ];
 const ADMIN_ROUTES = [
   "/content",
@@ -333,7 +338,7 @@ const proof = {
   writes_inert: contentRecords === 0 && publishEvents === 0,
   ready_for_write_path_design:
     missingProof.length === 0 &&
-    (contentCounts.content_draft_operations ?? 0) >= 4,
+    (contentCounts.content_draft_operations ?? 0) >= REQUIRED_OPERATIONS.length,
   missing_proof: missingProof,
   next_safe_action:
     missingProof.length === 0

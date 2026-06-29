@@ -31,6 +31,11 @@ add a save endpoint, publish endpoint, provider sync, or source file mutation.
 The D1 review queue includes inert homepage, newsletter, project, and writing
 operations seeded by `drizzle/migrations/0008_seed_content_draft_operations.sql`
 and `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
+Listing-page review operations for making, projects, writing,
+newsletter archive, and orchestrating are seeded by
+`drizzle/migrations/0028_seed_listing_content_review_operations.sql`. These
+rows are preview-only and explicitly keep save, publish, deploy, source rewrite,
+provider sync, send, and schedule actions blocked.
 
 ## highest-leverage cleanup batch
 
@@ -51,6 +56,7 @@ and `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
 | p1       | add newsletter headline, deck, cta, and status messages | these fields now have a D1 page-content source and need audited operations before writes | admin editor                  |
 | p1       | keep newsletter archive placeholder D1-visible          | archive copy should stay structured before the first send path fills it                  | admin editor                  |
 | p1       | keep orchestrating hero copy D1-visible                 | public operator copy should be editable separately from generated local stats            | admin editor                  |
+| p1       | keep listing-page review operations D1-visible          | every D1-backed route copy surface needs a visible preview-only operation before writes  | admin editor                  |
 | p2       | decide canonical project source                         | markdown and `packages/lib/src/data/projects.ts` duplicate similar facts                 | admin editor plus site thread |
 | p2       | classify old posts before publishing to the newsletter  | current writing can seed the newsletter, but should not be auto-sent                     | newsletter thread             |
 
