@@ -46,6 +46,9 @@ jobs:
       - name: Validate public route smoke parity
         run: pnpm test:public-routes
 
+      - name: Validate active path hygiene
+        run: pnpm test:path-hygiene
+
       - name: Validate content platform invariants
         run: pnpm test:content-platform
 
