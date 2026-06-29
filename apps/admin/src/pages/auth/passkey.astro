@@ -55,6 +55,53 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     proven.
   </p>
 
+  <section class="handoff-board" aria-labelledby="passkey-handoff-heading">
+    <div class="section-header">
+      <div>
+        <p>operator handoff</p>
+        <h2 id="passkey-handoff-heading">biometric proof sequence</h2>
+      </div>
+      <span>requires a real browser passkey prompt</span>
+    </div>
+    <ol class="handoff-list">
+      <li>
+        <strong>open this route through Cloudflare Access</strong>
+        <small>Access identity unlocks the first credential registration.</small
+        >
+      </li>
+      <li>
+        <strong>register passkey</strong>
+        <small
+          >finish the platform biometric prompt and wait for D1 status.</small
+        >
+      </li>
+      <li>
+        <strong>authenticate</strong>
+        <small>create the first app-native admin session.</small>
+      </li>
+      <li>
+        <strong>open a protected route</strong>
+        <small>reload content or proof to prove session persistence.</small>
+      </li>
+      <li>
+        <strong>logout, then authenticate again</strong>
+        <small
+          >record session revocation and recovery before Access removal.</small
+        >
+      </li>
+      <li>
+        <strong>revoke current passkey</strong>
+        <small>keep Access on so a replacement can be registered safely.</small>
+      </li>
+      <li>
+        <strong>authenticate once while revoked, then replace it</strong>
+        <small
+          >record denial proof, register a replacement, and sign in again.</small
+        >
+      </li>
+    </ol>
+  </section>
+
   <section class="runbook-board" aria-labelledby="passkey-runbook-heading">
     <div class="section-header">
       <div>

@@ -32,6 +32,15 @@ const REQUIRED_AUDIT_EVENTS = [
   "passkey.credential.revoked",
   "passkey.authentication.denied",
 ];
+const MANUAL_ENROLLMENT_SEQUENCE = [
+  "open /auth/passkey through Cloudflare Access",
+  "click register passkey and finish the platform biometric prompt",
+  "click authenticate to create an app-native admin session",
+  "reload a protected route to prove session persistence",
+  "logout once, then authenticate again",
+  "revoke the current passkey while Cloudflare Access remains active",
+  "authenticate once while revoked to record denial, then register and authenticate a replacement passkey",
+];
 
 const tableSql = `
 SELECT name
@@ -122,6 +131,11 @@ const proof = {
     removalBlockers.length === 0 && cloudflareAccessStillActive,
   post_access_removal_verified:
     removalBlockers.length === 0 && appNativeRouteBoundaryReady,
+  manual_enrollment: {
+    url: `${ADMIN_ORIGIN}/auth/passkey`,
+    requires_browser_passkey_prompt: removalBlockers.length > 0,
+    sequence: MANUAL_ENROLLMENT_SEQUENCE,
+  },
   routes,
   route_boundary: routeBoundary,
   next_safe_action: nextSafeAction({
