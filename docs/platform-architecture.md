@@ -52,13 +52,13 @@ deploy target coverage, and live version history.
 
 ### packages
 
-| Path               | Role today                                      | Classification                  |
-| ------------------ | ----------------------------------------------- | ------------------------------- |
-| `packages/lib`     | shared CMS, admin, db, data, services helpers   | keep, split later if useful     |
-| `packages/content` | shared content inventory, previews, and drafts  | keep, expand toward D1 adapters |
-| `packages/styles`  | shared style tokens                             | keep                            |
-| `packages/types`   | shared generated types                          | keep                            |
-| `packages/config`  | shared TypeScript, Tailwind, and PostCSS config | keep minimal shared config      |
+| Path               | Role today                                                     | Classification                  |
+| ------------------ | -------------------------------------------------------------- | ------------------------------- |
+| `packages/lib`     | shared CMS, admin, db, data, services helpers                  | keep, split later if useful     |
+| `packages/content` | shared content inventory, previews, source parsers, and drafts | keep, expand toward D1 adapters |
+| `packages/styles`  | shared style tokens                                            | keep                            |
+| `packages/types`   | shared generated types                                         | keep                            |
+| `packages/config`  | shared TypeScript, Tailwind, and PostCSS config                | keep minimal shared config      |
 
 ## route parity target
 
@@ -268,5 +268,7 @@ Rules:
     `drizzle/migrations/0028_seed_listing_content_review_operations.sql`.
 29. add a first-class inert `/content/drafts` admin route with disabled editor
     controls backed by page_content and content_draft_operations.
-30. reduce deploy workflow inputs to retained production targets after rollback
+30. move project and writing source-content parsing into `packages/content` so
+    the admin app only owns the Vite raw-markdown import boundary.
+31. reduce deploy workflow inputs to retained production targets after rollback
     no longer needs `apps/admin-solid`.

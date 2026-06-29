@@ -31,6 +31,9 @@ add a save endpoint, publish endpoint, provider sync, or source file mutation.
 The source collection rows include markdown body state, section count, and a
 short body preview so project detail and writing body edits can be reviewed
 before any editor write path exists.
+The source-content parser and summary builder live in
+`packages/content/src/admin/source-content.ts`; `apps/admin` only owns the raw
+markdown import boundary.
 Admin `/content/drafts` renders the first inert draft-editor shape with disabled
 controls backed by `page_content` and `content_draft_operations`. It is an
 editor surface model only, not a write path.
