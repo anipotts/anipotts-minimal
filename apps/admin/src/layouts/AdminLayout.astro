@@ -8,6 +8,23 @@ type Props = {
 };
 
 const { title = routeTitle(Astro.url.pathname), deck = "" } = Astro.props;
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const primaryNav = navItems.filter((item) => item.group === "primary");
+const secondaryNav = [
+  {
+    label: "content queues",
+    items: navItems.filter((item) => item.group === "content"),
+  },
+  {
+    label: "advanced",
+    items: navItems.filter((item) => item.group === "advanced"),
+  },
+];
+
+function isActive(href: string): boolean {
+  if (href === "/") return currentPath === "/";
+  return currentPath === href || currentPath.startsWith(`${href}/`);
+}
 ---
 
 <!doctype html>
@@ -15,8 +32,40 @@ const { title = routeTitle(Astro.url.pathname), deck = "" } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#101010" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#fbfaf7"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#11111b"
+    />
     <title>{title} | anipotts admin</title>
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem("theme");
+        const theme =
+          stored === "dark" || stored === "light"
+            ? stored
+            : matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.dataset.theme = theme;
+
+        const requestedFont = new URLSearchParams(location.search).get("font");
+        const storedFont = localStorage.getItem("font");
+        const font =
+          requestedFont === "geist" || requestedFont === "instrument"
+            ? requestedFont
+            : storedFont === "geist" || storedFont === "instrument"
+              ? storedFont
+              : "instrument";
+        document.documentElement.dataset.font = font;
+        localStorage.setItem("font", font);
+      })();
+    </script>
   </head>
   <body>
     <div class="shell">
@@ -25,25 +74,53 @@ const { title = routeTitle(Astro.url.pathname), deck = "" } = Astro.props;
           <span class="brand-mark">a</span>
           <span>
             <strong>anipotts admin</strong>
-            <small>Astro canonical</small>
+            <small>operator console</small>
           </span>
         </a>
-        <nav>
+        <nav class="nav-stack">
+          <section class="nav-section" aria-label="primary admin routes">
+            <p class="nav-section-title">primary</p>
+            <div class="nav-section-links">
+              {
+                primaryNav.map((item) => (
+                  <a
+                    class:list={["nav-link", isActive(item.href) && "active"]}
+                    href={item.href}
+                  >
+                    <span>{item.label}</span>
+                    <small>{item.description}</small>
+                  </a>
+                ))
+              }
+            </div>
+          </section>
           {
-            navItems.map((item) => (
-              <a
-                class:list={[
-                  "nav-link",
-                  Astro.url.pathname === item.href && "active",
-                ]}
-                href={item.href}
+            secondaryNav.map((section) => (
+              <details
+                class="nav-section nav-details"
+                open={section.items.some((item) => isActive(item.href))}
               >
-                <span>{item.label}</span>
-                <small>{item.status}</small>
-              </a>
+                <summary>{section.label}</summary>
+                <div class="nav-section-links">
+                  {section.items.map((item) => (
+                    <a
+                      class:list={["nav-link", isActive(item.href) && "active"]}
+                      href={item.href}
+                    >
+                      <span>{item.label}</span>
+                      <small>{item.description}</small>
+                    </a>
+                  ))}
+                </div>
+              </details>
             ))
           }
         </nav>
+        <div class="sidebar-proof">
+          <span>auth state</span>
+          <strong>passkey active, Access outer guard</strong>
+          <small>remove Access only after revoked and denied auth proof.</small>
+        </div>
       </aside>
       <main>
         <header class="page-header">
