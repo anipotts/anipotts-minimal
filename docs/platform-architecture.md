@@ -5,6 +5,9 @@ Last updated: 2026-06-27
 This repo is being reduced to one public Astro app, one admin Astro app, one
 structured content/state model, and one predictable CI/CD path.
 
+`pnpm test:workspace` enforces the active app, package, and worker inventory so
+archived surfaces do not re-enter the workspace quietly.
+
 ## target state
 
 | Surface        | Target                              | Status              | Next action                                           |
