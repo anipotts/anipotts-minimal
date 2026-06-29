@@ -8,7 +8,18 @@ const WWW_ORIGIN =
   process.env.WWW_ORIGIN?.replace(/\/$/, "") ?? "https://anipotts.com";
 const D1_DATABASE = process.env.ADMIN_D1_DATABASE ?? "anipotts-db";
 
-const REQUIRED_PAGE_KEYS = ["home", "making", "newsletter", "writing"];
+const REQUIRED_PAGE_KEYS = [
+  "home",
+  "making",
+  "newsletter",
+  "projects",
+  "writing",
+];
+const LISTING_PAGE_PROOF = {
+  making: { heroLink: false, search: false },
+  projects: { heroLink: true, search: false },
+  writing: { heroLink: false, search: true },
+};
 const REQUIRED_OPERATIONS = [
   "content-draft-homepage-summary-2026-06-28",
   "content-draft-newsletter-copy-2026-06-28",
@@ -22,7 +33,7 @@ const ADMIN_ROUTES = [
   "/content/operations",
   "/proof",
 ];
-const PUBLIC_ROUTES = ["/", "/newsletter", "/making", "/writing"];
+const PUBLIC_ROUTES = ["/", "/newsletter", "/making", "/projects", "/writing"];
 
 const checkedAt = new Date().toISOString();
 
@@ -80,13 +91,12 @@ SELECT
   coalesce(json_type(content, '$.error_message'), 'missing') AS newsletter_error_message_type,
   coalesce(json_type(content, '$.footer_text'), 'missing') AS newsletter_footer_text_type,
   json_extract(content, '$.buttondown_url') AS newsletter_buttondown_url,
-  json_extract(content, '$.hero_title') AS writing_hero_title,
-  coalesce(json_type(content, '$.description'), 'missing') AS writing_description_type,
-  coalesce(json_type(content, '$.hero_summary'), 'missing') AS writing_hero_summary_type,
-  coalesce(json_type(content, '$.search_placeholder'), 'missing') AS writing_search_placeholder_type,
-  json_extract(content, '$.hero_title') AS making_hero_title,
-  coalesce(json_type(content, '$.description'), 'missing') AS making_description_type,
-  coalesce(json_type(content, '$.hero_summary'), 'missing') AS making_hero_summary_type
+  json_extract(content, '$.hero_title') AS listing_hero_title,
+  coalesce(json_type(content, '$.description'), 'missing') AS listing_description_type,
+  coalesce(json_type(content, '$.hero_summary'), 'missing') AS listing_hero_summary_type,
+  coalesce(json_type(content, '$.search_placeholder'), 'missing') AS listing_search_placeholder_type,
+  coalesce(json_type(content, '$.hero_link_label'), 'missing') AS listing_hero_link_label_type,
+  json_extract(content, '$.hero_link_href') AS listing_hero_link_href
 FROM page_content
 ORDER BY page_key ASC, version DESC;
 `);
@@ -190,20 +200,17 @@ const newsletterFieldTypes = newsletterProofFieldTypes(newsletterRow);
 const missingNewsletterFields = Object.entries(newsletterFieldTypes)
   .filter(([, type]) => type !== "text")
   .map(([field]) => `newsletter_${field}`);
-const writingRow = pageRows.find(
-  (row) => String(row.page_key) === "writing" && Number(row.published) === 1,
+const missingListingFields = Object.entries(LISTING_PAGE_PROOF).flatMap(
+  ([pageKey, options]) => {
+    const row = pageRows.find(
+      (pageRow) =>
+        String(pageRow.page_key) === pageKey && Number(pageRow.published) === 1,
+    );
+    return Object.entries(listingProofFieldTypes(row, options))
+      .filter(([, type]) => type !== "text")
+      .map(([field]) => `${pageKey}_${field}`);
+  },
 );
-const writingFieldTypes = writingProofFieldTypes(writingRow);
-const missingWritingFields = Object.entries(writingFieldTypes)
-  .filter(([, type]) => type !== "text")
-  .map(([field]) => `writing_${field}`);
-const makingRow = pageRows.find(
-  (row) => String(row.page_key) === "making" && Number(row.published) === 1,
-);
-const makingFieldTypes = makingProofFieldTypes(makingRow);
-const missingMakingFields = Object.entries(makingFieldTypes)
-  .filter(([, type]) => type !== "text")
-  .map(([field]) => `making_${field}`);
 
 const missingProof = [
   ...missingPageKeys.map((pageKey) => `published_page_content:${pageKey}`),
@@ -216,9 +223,8 @@ const missingProof = [
   ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
-  ...missingMakingFields,
   ...missingNewsletterFields,
-  ...missingWritingFields,
+  ...missingListingFields,
   ...missingOperations.map((operationId) => `content_operation:${operationId}`),
   ...staleOperationSources.map(
     (operationId) => `stale_content_operation_source:${operationId}`,
@@ -280,12 +286,14 @@ const proof = {
       String(row.page_key) === "newsletter"
         ? newsletterProofFieldTypes(row)
         : null,
-    writing_hero_title: row.writing_hero_title ?? null,
-    writing_field_types:
-      String(row.page_key) === "writing" ? writingProofFieldTypes(row) : null,
-    making_hero_title: row.making_hero_title ?? null,
-    making_field_types:
-      String(row.page_key) === "making" ? makingProofFieldTypes(row) : null,
+    listing_hero_title:
+      String(row.page_key) in LISTING_PAGE_PROOF
+        ? (row.listing_hero_title ?? null)
+        : null,
+    listing_field_types:
+      String(row.page_key) in LISTING_PAGE_PROOF
+        ? listingProofFieldTypes(row, LISTING_PAGE_PROOF[String(row.page_key)])
+        : null,
   })),
   content_draft_operations: operationRows.map((row) => ({
     operation_id: String(row.operation_id),
@@ -408,29 +416,38 @@ function newsletterProofFieldTypes(row) {
   };
 }
 
-function writingProofFieldTypes(row) {
-  return {
+function listingProofFieldTypes(row, options) {
+  const fields = {
     hero_title:
-      typeof row?.writing_hero_title === "string" &&
-      row.writing_hero_title.trim().length > 0
+      typeof row?.listing_hero_title === "string" &&
+      row.listing_hero_title.trim().length > 0
         ? "text"
         : "missing",
-    description: String(row?.writing_description_type ?? "missing"),
-    hero_summary: String(row?.writing_hero_summary_type ?? "missing"),
-    search_placeholder: String(
-      row?.writing_search_placeholder_type ?? "missing",
-    ),
+    description: String(row?.listing_description_type ?? "missing"),
+    hero_summary: String(row?.listing_hero_summary_type ?? "missing"),
   };
+
+  if (options.search) {
+    fields.search_placeholder = String(
+      row?.listing_search_placeholder_type ?? "missing",
+    );
+  }
+
+  if (options.heroLink) {
+    fields.hero_link_label = String(
+      row?.listing_hero_link_label_type ?? "missing",
+    );
+    fields.hero_link_href =
+      typeof row?.listing_hero_link_href === "string" &&
+      isSafeProofHref(row.listing_hero_link_href)
+        ? "text"
+        : "missing";
+  }
+
+  return fields;
 }
 
-function makingProofFieldTypes(row) {
-  return {
-    hero_title:
-      typeof row?.making_hero_title === "string" &&
-      row.making_hero_title.trim().length > 0
-        ? "text"
-        : "missing",
-    description: String(row?.making_description_type ?? "missing"),
-    hero_summary: String(row?.making_hero_summary_type ?? "missing"),
-  };
+function isSafeProofHref(href) {
+  if (href.startsWith("/")) return !href.startsWith("//");
+  return href.startsWith("https://") || href.startsWith("mailto:");
 }

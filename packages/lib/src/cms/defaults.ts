@@ -231,6 +231,15 @@ export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
     "work i built or helped ship. product surfaces, data systems, quant tools, and the older pieces that still explain how i think.",
 };
 
+export const DEFAULT_PROJECTS_INDEX_CONTENT: ListingPageContent = {
+  title: "projects",
+  description: "every project with a page. flat list.",
+  hero_title: "archive",
+  hero_summary: "every project with a page. the curated story is at",
+  hero_link_label: "/making",
+  hero_link_href: "/making",
+};
+
 export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   {
     slug: "quantercise",

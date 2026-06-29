@@ -8,6 +8,7 @@ import {
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_NEWSLETTER_CONTENT,
+  DEFAULT_PROJECTS_INDEX_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
   normalizeCmsProject,
   normalizeCmsWriting,
@@ -616,6 +617,22 @@ describe("owner editor cms validation", () => {
     expect(validateListingPageContent(listing)).toEqual({
       ok: false,
       error: "Listing page hero title is required",
+    });
+  });
+
+  it("validates listing page hero links", () => {
+    const listing = normalizeListingPageContent(
+      {
+        ...DEFAULT_PROJECTS_INDEX_CONTENT,
+        hero_link_href: "javascript:alert(1)",
+      },
+      DEFAULT_PROJECTS_INDEX_CONTENT,
+    );
+
+    expect(listing.hero_link_label).toBe("/making");
+    expect(validateListingPageContent(listing)).toEqual({
+      ok: false,
+      error: "Listing page hero link must start with /, https://, or mailto:",
     });
   });
 });
