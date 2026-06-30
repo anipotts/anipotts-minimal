@@ -490,13 +490,13 @@ export async function publishEditorDraft(
       ),
   ];
 
-  if (db.batch) {
-    const results = await db.batch(statements);
-    if (results.some((result) => result.success === false)) {
-      throw statusError(500, "publish_batch_failed");
-    }
-  } else {
-    await runSequentialPublish(statements);
+  if (!db.batch) {
+    throw statusError(503, "publish_batch_required");
+  }
+
+  const results = await db.batch(statements);
+  if (results.some((result) => result.success === false)) {
+    throw statusError(500, "publish_batch_failed");
   }
 
   return {
@@ -583,13 +583,6 @@ async function validatePayloadForPublish(
 function assertWritingSlugAllowed(slug: string) {
   if (RESERVED_WRITING_SLUGS.has(slug)) {
     throw statusError(409, "reserved_writing_slug");
-  }
-}
-
-async function runSequentialPublish(statements: D1PreparedStatement[]) {
-  for (const statement of statements) {
-    const result = await statement.run();
-    if (result.success === false) throw statusError(500, "publish_failed");
   }
 }
 

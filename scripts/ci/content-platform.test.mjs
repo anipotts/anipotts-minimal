@@ -237,6 +237,24 @@ assert.ok(
   "passkey replacement registration must reactivate a previously revoked credential",
 );
 
+const contentEditorSource = readFileSync(
+  "apps/admin/src/lib/content-editor.ts",
+  "utf8",
+);
+assert.ok(
+  contentEditorSource.includes("publish_batch_required"),
+  "content editor publish must fail closed when D1 batch semantics are unavailable",
+);
+assert.equal(
+  contentEditorSource.includes("runSequentialPublish"),
+  false,
+  "content editor publish must not fall back to sequential public writes",
+);
+assert.ok(
+  contentEditorSource.includes("content_publish_events"),
+  "content editor publish must keep explicit publish proof writes",
+);
+
 const disabledRuntime = disabledRuntimeOverlayResponse();
 assert.equal(disabledRuntime.mode, "disabled");
 assert.equal(disabledRuntime.available, false);
