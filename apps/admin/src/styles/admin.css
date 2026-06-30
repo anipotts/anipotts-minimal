@@ -856,6 +856,98 @@ dd {
   padding: 16px;
 }
 
+.carousel-set-grid {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.carousel-brief {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.carousel-brief p {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.carousel-brief dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.carousel-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.compact-section-head {
+  padding-block: 14px;
+}
+
+.crop-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.crop-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.crop-card p,
+.crop-card h3,
+.crop-card small {
+  margin: 0;
+}
+
+.crop-card p,
+.crop-card small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.crop-card h3 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.crop-frame {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--field-surface);
+}
+
+.crop-frame span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.aspect-4-5 {
+  aspect-ratio: 4 / 5;
+}
+
+.aspect-9-16 {
+  aspect-ratio: 9 / 16;
+}
+
+.aspect-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
 .draft-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1312,6 +1404,8 @@ dd {
   .lane-grid,
   .newsletter-detail,
   .newsletter-preview-layout,
+  .carousel-brief dl,
+  .crop-board,
   .record-row dl,
   .need-row dl,
   .proposal-row dl,

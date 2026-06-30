@@ -61,6 +61,13 @@ export const navItems: NavItem[] = [
     description: "draft operations and editable rows",
   },
   {
+    href: "/content/carousels",
+    label: "carousels",
+    status: "media",
+    group: "primary",
+    description: "slides, crops, captions, exports",
+  },
+  {
     href: "/proof",
     label: "proof/auth",
     status: "passkeys",

@@ -1,0 +1,176 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import {
+  carouselBoundary,
+  carouselSets,
+  carouselSummary,
+} from "../../data/carousels";
+
+function cropClass(aspect: string): string {
+  return `crop-frame aspect-${aspect.replace(":", "-")}`;
+}
+---
+
+<AdminLayout
+  title="content carousels"
+  deck="Read-only carousel review for anipottsbuilds media sets. It tracks source paths, crop targets, slide files, captions, and export readiness without posting or scheduling."
+>
+  <section class="meta-strip" aria-label="carousel review source">
+    <span>{carouselSummary.sets} set</span>
+    <span>{carouselSummary.crops} crops</span>
+    <span>{carouselSummary.slides} slides</span>
+    <span>{carouselBoundary.mode}</span>
+    <span>{carouselBoundary.sourceStatus}</span>
+  </section>
+
+  <section class="table-card operation-card">
+    <div class="section-head">
+      <div>
+        <p>data boundary</p>
+        <h2>static manifest first</h2>
+      </div>
+      <span>read only</span>
+    </div>
+    <div class="lane-grid">
+      <div>
+        <h3>app boundary</h3>
+        <p class="muted">{carouselBoundary.allowed}</p>
+        <div class="body-preview">
+          <span>source root</span>
+          <p>{carouselBoundary.source}</p>
+        </div>
+      </div>
+      <div>
+        <h3>runtime boundary</h3>
+        <p class="muted">{carouselBoundary.runtime}</p>
+        <div class="body-preview">
+          <span>blocked</span>
+          <p>{carouselBoundary.blocked}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="carousel-set-grid">
+    {
+      carouselSets.map((set) => (
+        <article class="table-card">
+          <div class="section-head">
+            <div>
+              <p>
+                {set.audience} / {set.status}
+              </p>
+              <h2>{set.title}</h2>
+            </div>
+            <span>{set.id}</span>
+          </div>
+
+          <div class="carousel-brief">
+            <p>{set.concept}</p>
+            <dl>
+              <div>
+                <dt>source thread</dt>
+                <dd>{set.sourceThread}</dd>
+              </div>
+              <div>
+                <dt>source root</dt>
+                <dd>{set.sourceRoot}</dd>
+              </div>
+              <div>
+                <dt>next</dt>
+                <dd>{set.nextSafeAction}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <section class="carousel-section" aria-label={`${set.title} crops`}>
+            <div class="section-head compact-section-head">
+              <div>
+                <p>crops</p>
+                <h3>platform targets</h3>
+              </div>
+              <span>{set.crops.length} expected</span>
+            </div>
+            <div class="crop-board">
+              {set.crops.map((crop) => (
+                <article class="crop-card">
+                  <div class={cropClass(crop.aspect)}>
+                    <span>{crop.aspect}</span>
+                  </div>
+                  <div>
+                    <p>
+                      {crop.platform} / {crop.surface}
+                    </p>
+                    <h3>{crop.size}</h3>
+                    <small>{crop.exportName}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section class="carousel-section" aria-label={`${set.title} slides`}>
+            <div class="section-head compact-section-head">
+              <div>
+                <p>slides</p>
+                <h3>copy and caption refs</h3>
+              </div>
+              <span>{set.slides.length} expected</span>
+            </div>
+            <div class="record-list">
+              {set.slides.map((slide) => (
+                <article class="record-row">
+                  <div>
+                    <p>
+                      slide {slide.number} / {slide.state}
+                    </p>
+                    <h3>{slide.title}</h3>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>role</dt>
+                      <dd>{slide.role}</dd>
+                    </div>
+                    <div>
+                      <dt>slide file</dt>
+                      <dd>{slide.slideFile}</dd>
+                    </div>
+                    <div>
+                      <dt>caption file</dt>
+                      <dd>{slide.captionFile}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <div class="newsletter-detail">
+            <section>
+              <h3>export files</h3>
+              <div class="record-list">
+                {set.exportFiles.map((file) => (
+                  <article class="compact-row">
+                    <strong>{file}</strong>
+                    <small>expected from media manifest sync</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section>
+              <h3>blocked live actions</h3>
+              <div class="record-list">
+                {set.blockedActions.map((action) => (
+                  <article class="compact-row">
+                    <strong>{action}</strong>
+                    <small>not part of this admin review route</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</AdminLayout>
