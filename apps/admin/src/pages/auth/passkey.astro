@@ -22,161 +22,186 @@ function sanitizeAdminReturnPath(path: string | null): string {
 }
 ---
 
-<AdminLayout
-  title="passkey auth"
-  deck="Biometric passkey auth is staged here before Cloudflare Access is removed from the canonical admin route."
->
-  <section class="grid">
-    <article class="panel">
-      <p>database</p>
-      <h2 id="passkey-db">checking</h2>
-      <p id="passkey-origin">expected origin: admin.anipotts.com</p>
-    </article>
-    <article class="panel">
-      <p>credentials</p>
-      <h2 id="passkey-credentials">0</h2>
-      <p id="passkey-register-state">registration requires Access identity</p>
-    </article>
-    <article class="panel">
-      <p>session</p>
-      <h2 id="passkey-session">inactive</h2>
-      <p id="passkey-next">loading</p>
-    </article>
-    <article class="panel">
-      <p>audit</p>
-      <h2 id="passkey-audit">0</h2>
-      <p>registration, login, denial, and logout proof rows</p>
-    </article>
-    <article class="panel">
-      <p>rollback</p>
-      <h2>restore Access</h2>
-      <p>Rollback is the prior Cloudflare Access app or policy.</p>
-    </article>
-    <article class="panel">
-      <p>return path</p>
-      <h2 id="passkey-return-label">{passkeyReturnPath}</h2>
-      <p>after app-native login, continue to this protected route.</p>
-    </article>
-  </section>
-
+<AdminLayout title="passkey auth" chrome="auth" hideHeader>
   <span
     id="passkey-return-path"
     data-next-path={passkeyReturnPath}
     data-auto-return={String(shouldAutoReturn)}
     hidden></span>
 
-  <div class="actions">
-    <button class="button" id="register-passkey" type="button">
-      register passkey
-    </button>
-    <button class="button secondary" id="login-passkey" type="button">
-      authenticate
-    </button>
-    <button class="button secondary" id="logout-passkey" type="button">
-      logout
-    </button>
-    <button class="button secondary danger" id="revoke-passkey" type="button">
-      revoke current passkey
-    </button>
-    <a class="button secondary" id="open-passkey-next" href={passkeyReturnPath}>
-      open protected route
-    </a>
-  </div>
-
-  <p class="notice" id="passkey-message">
-    Cloudflare Access must remain on until registration, login, logout, session
-    persistence, revoked credential denial, and unauthenticated blocking are
-    proven.
-  </p>
-
-  <section
-    class="proof-command-board"
-    aria-labelledby="passkey-command-heading"
-  >
-    <div class="section-header">
-      <div>
-        <p>proof command</p>
-        <h2 id="passkey-command-heading">do not remove Access yet</h2>
+  <section class="passkey-auth" aria-labelledby="passkey-heading">
+    <div class="passkey-card">
+      <div class="passkey-sigil" aria-hidden="true">
+        <span class="passkey-ring"></span>
+        <span class="passkey-ring offset"></span>
+        <span class="passkey-core"></span>
       </div>
-      <span>rerun after every browser step</span>
-    </div>
-    <div class="command-row">
-      <code>pnpm --silent proof:admin-passkey</code>
-      <p>
-        Access removal is allowed only when this reports an active credential,
-        an active session, required audit events, and
-        <code>ready_for_access_removal: true</code>.
+
+      <div class="passkey-copy">
+        <p class="passkey-kicker">admin.anipotts.com</p>
+        <h1 id="passkey-heading">unlock admin</h1>
+        <p id="passkey-next" class="passkey-lede">checking secure route</p>
+      </div>
+
+      <div class="passkey-state-grid" aria-label="passkey status">
+        <span>
+          <small>session</small>
+          <strong id="passkey-session">inactive</strong>
+        </span>
+        <span>
+          <small>database</small>
+          <strong id="passkey-db">checking</strong>
+        </span>
+        <span>
+          <small>keys</small>
+          <strong id="passkey-credentials">0</strong>
+        </span>
+        <span>
+          <small>audit</small>
+          <strong id="passkey-audit">0</strong>
+        </span>
+      </div>
+
+      <div class="passkey-actions" aria-label="passkey actions">
+        <button
+          class="button passkey-primary"
+          id="register-passkey"
+          type="button"
+        >
+          create passkey
+        </button>
+        <button class="button secondary" id="login-passkey" type="button">
+          sign in
+        </button>
+        <button class="button secondary" id="logout-passkey" type="button">
+          log out
+        </button>
+        <a
+          class="button secondary"
+          id="open-passkey-next"
+          href={passkeyReturnPath}
+        >
+          open admin
+        </a>
+      </div>
+
+      <p class="passkey-message" id="passkey-message">
+        passkey proof is staged behind Access.
       </p>
-    </div>
-  </section>
 
-  <section class="handoff-board" aria-labelledby="passkey-handoff-heading">
-    <div class="section-header">
-      <div>
-        <p>operator handoff</p>
-        <h2 id="passkey-handoff-heading">biometric proof sequence</h2>
+      <div class="passkey-meta-line">
+        <span id="passkey-register-state"
+          >registration requires Access identity</span
+        >
+        <span id="passkey-origin">expected origin: admin.anipotts.com</span>
+        <span
+          >return <strong id="passkey-return-label">{passkeyReturnPath}</strong
+          ></span
+        >
       </div>
-      <span>requires a real browser passkey prompt</span>
     </div>
-    <ol class="handoff-list">
-      <li>
-        <strong>open this route through Cloudflare Access</strong>
-        <small>Access identity unlocks the first credential registration.</small
-        >
-      </li>
-      <li>
-        <strong>register passkey</strong>
-        <small
-          >finish the platform biometric prompt and wait for D1 status.</small
-        >
-      </li>
-      <li>
-        <strong>authenticate</strong>
-        <small>create the first app-native admin session.</small>
-      </li>
-      <li>
-        <strong>open a protected route</strong>
-        <small>reload content or proof to prove session persistence.</small>
-      </li>
-      <li>
-        <strong>logout, then authenticate again</strong>
-        <small
-          >record session revocation and recovery before Access removal.</small
-        >
-      </li>
-      <li>
-        <strong>revoke current passkey</strong>
-        <small>keep Access on so a replacement can be registered safely.</small>
-      </li>
-      <li>
-        <strong>authenticate once while revoked, then replace it</strong>
-        <small
-          >record denial proof, register a replacement, and sign in again.</small
-        >
-      </li>
-    </ol>
-  </section>
 
-  <section class="runbook-board" aria-labelledby="passkey-runbook-heading">
-    <div class="section-header">
-      <div>
-        <p>production sequence</p>
-        <h2 id="passkey-runbook-heading">Access removal runbook</h2>
-      </div>
-      <span id="passkey-runbook-summary">loading</span>
-    </div>
-    <ol id="passkey-runbook" class="runbook-list" aria-live="polite"></ol>
-  </section>
+    <details class="passkey-proof-details">
+      <summary>proof details</summary>
 
-  <section class="proof-checklist" aria-labelledby="passkey-proof-heading">
-    <div class="section-header">
-      <div>
-        <p>access removal proof</p>
-        <h2 id="passkey-proof-heading">passkey checklist</h2>
-      </div>
-      <span id="passkey-proof-summary">loading</span>
-    </div>
-    <div id="passkey-proof-list" class="proof-list" aria-live="polite"></div>
+      <section
+        class="proof-command-board"
+        aria-labelledby="passkey-command-heading"
+      >
+        <div class="section-header">
+          <div>
+            <p>proof command</p>
+            <h2 id="passkey-command-heading">do not remove Access yet</h2>
+          </div>
+          <span>rerun after every browser step</span>
+        </div>
+        <div class="command-row">
+          <code>pnpm --silent proof:admin-passkey</code>
+          <p>
+            Access removal is allowed only when this reports an active
+            credential, an active session, required audit events, and
+            <code>ready_for_access_removal: true</code>.
+          </p>
+        </div>
+      </section>
+
+      <section class="handoff-board" aria-labelledby="passkey-handoff-heading">
+        <div class="section-header">
+          <div>
+            <p>operator handoff</p>
+            <h2 id="passkey-handoff-heading">biometric proof sequence</h2>
+          </div>
+          <span>requires a real browser passkey prompt</span>
+        </div>
+        <ol class="handoff-list">
+          <li>
+            <strong>open this route through Cloudflare Access</strong>
+            <small
+              >Access identity unlocks the first credential registration.</small
+            >
+          </li>
+          <li>
+            <strong>register passkey</strong>
+            <small
+              >finish the platform biometric prompt and wait for D1 status.</small
+            >
+          </li>
+          <li>
+            <strong>authenticate</strong>
+            <small>create the first app-native admin session.</small>
+          </li>
+          <li>
+            <strong>open a protected route</strong>
+            <small>reload content or proof to prove session persistence.</small>
+          </li>
+          <li>
+            <strong>logout, then authenticate again</strong>
+            <small
+              >record session revocation and recovery before Access removal.</small
+            >
+          </li>
+          <li>
+            <strong>revoke current passkey</strong>
+            <small
+              >keep Access on so a replacement can be registered safely.</small
+            >
+          </li>
+          <li>
+            <strong>authenticate once while revoked, then replace it</strong>
+            <small
+              >record denial proof, register a replacement, and sign in again.</small
+            >
+          </li>
+        </ol>
+      </section>
+
+      <section class="runbook-board" aria-labelledby="passkey-runbook-heading">
+        <div class="section-header">
+          <div>
+            <p>production sequence</p>
+            <h2 id="passkey-runbook-heading">Access removal runbook</h2>
+          </div>
+          <span id="passkey-runbook-summary">loading</span>
+        </div>
+        <ol id="passkey-runbook" class="runbook-list" aria-live="polite"></ol>
+      </section>
+
+      <section class="proof-checklist" aria-labelledby="passkey-proof-heading">
+        <div class="section-header">
+          <div>
+            <p>access removal proof</p>
+            <h2 id="passkey-proof-heading">passkey checklist</h2>
+          </div>
+          <span id="passkey-proof-summary">loading</span>
+        </div>
+        <div id="passkey-proof-list" class="proof-list" aria-live="polite">
+        </div>
+      </section>
+
+      <button class="button secondary danger" id="revoke-passkey" type="button">
+        revoke current passkey
+      </button>
+    </details>
   </section>
 </AdminLayout>
 
@@ -231,6 +256,8 @@ function sanitizeAdminReturnPath(path: string | null): string {
     complete: boolean;
   };
 
+  const authShell = document.querySelector<HTMLElement>(".auth-shell");
+  const passkeyCard = document.querySelector<HTMLElement>(".passkey-card");
   const dbLabel = document.querySelector("#passkey-db");
   const originLabel = document.querySelector("#passkey-origin");
   const credentialsLabel = document.querySelector("#passkey-credentials");
@@ -278,10 +305,23 @@ function sanitizeAdminReturnPath(path: string | null): string {
 
   function renderStatus() {
     if (!status) return;
+    const authState = status.has_session ? "signed-in" : "signed-out";
+    authShell?.setAttribute("data-auth-state", authState);
+    passkeyCard?.setAttribute("data-auth-state", authState);
+    loginButton?.classList.toggle(
+      "passkey-primary",
+      status.credential_count > 0,
+    );
+    loginButton?.classList.toggle("secondary", status.credential_count === 0);
+    registerButton?.classList.toggle(
+      "passkey-primary",
+      status.credential_count === 0,
+    );
+    registerButton?.classList.toggle("secondary", status.credential_count > 0);
     setText(dbLabel, status.available ? "available" : "missing");
     setText(
       originLabel,
-      `expected ${status.expected_origin}; rp ${status.expected_rp_id}; current ${status.current_origin}`,
+      `${status.current_origin} / rp ${status.expected_rp_id}`,
     );
     setText(credentialsLabel, String(status.credential_count));
     setText(auditLabel, String(status.audit_count));
@@ -371,6 +411,7 @@ function sanitizeAdminReturnPath(path: string | null): string {
 
   async function withBusy(label: string, action: () => Promise<void>) {
     setBusy(true);
+    passkeyCard?.classList.add("is-busy");
     setText(message, label);
     try {
       await action();
@@ -378,6 +419,7 @@ function sanitizeAdminReturnPath(path: string | null): string {
       setText(message, errorMessage(error));
     } finally {
       setBusy(false);
+      passkeyCard?.classList.remove("is-busy");
       renderStatus();
     }
   }

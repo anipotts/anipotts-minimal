@@ -5,9 +5,16 @@ import { navItems, routeTitle } from "../data/admin";
 type Props = {
   title?: string;
   deck?: string;
+  chrome?: "admin" | "auth";
+  hideHeader?: boolean;
 };
 
-const { title = routeTitle(Astro.url.pathname), deck = "" } = Astro.props;
+const {
+  title = routeTitle(Astro.url.pathname),
+  deck = "",
+  chrome = "admin",
+  hideHeader = false,
+} = Astro.props;
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
 const primaryNav = navItems.filter((item) => item.group === "primary");
 const secondaryNav = [
@@ -68,11 +75,14 @@ function isActive(href: string): boolean {
     </script>
   </head>
   <body>
-    <div class="shell">
+    <div
+      class:list={["shell", chrome === "auth" && "auth-shell"]}
+      data-auth-state={chrome === "auth" ? "checking" : "signed-in"}
+    >
       <aside class="sidebar" aria-label="admin navigation">
         <a class="brand" href="/">
           <span class="brand-mark">a</span>
-          <span>
+          <span class="brand-copy">
             <strong>anipotts admin</strong>
             <small>admin</small>
           </span>
@@ -118,15 +128,23 @@ function isActive(href: string): boolean {
           <strong>passkey + Access</strong>
           <small>Access stays until proof passes.</small>
         </div>
+        <div class="sidebar-lock">
+          <span></span>
+          <small>locked</small>
+        </div>
       </aside>
-      <main>
-        <header class="page-header">
-          <div>
-            <p>admin.anipotts.com</p>
-            <h1>{title}</h1>
-          </div>
-          {deck && <span>{deck}</span>}
-        </header>
+      <main class:list={[chrome === "auth" && "auth-main"]}>
+        {
+          !hideHeader && (
+            <header class="page-header">
+              <div>
+                <p>admin.anipotts.com</p>
+                <h1>{title}</h1>
+              </div>
+              {deck && <span>{deck}</span>}
+            </header>
+          )
+        }
         <slot />
       </main>
     </div>
