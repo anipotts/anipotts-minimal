@@ -1,91 +1,77 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { navItems, overviewCards } from "../data/admin";
 
-const primaryLinks = navItems.filter(
-  (item) => item.group === "primary" && item.href !== "/",
-);
-
-const proofRows = [
+const primaryRoutes = [
   {
-    label: "passkeys",
-    value: "2 credentials",
-    detail: "1 active session, revoke/denial proof still missing",
+    href: "/fleet",
+    label: "fleet",
+    detail: "machines, repo state, current work",
   },
   {
+    href: "/content",
     label: "content",
-    value: "D1 backed",
-    detail: "inventory, review queue, draft operation editor",
+    detail: "public-site content inventory",
   },
   {
-    label: "threads",
-    value: "2 worktrees",
-    detail: "orchestrating redesign and real writing editor",
+    href: "/content/drafts",
+    label: "writing editor",
+    detail: "drafts and editable rows",
   },
   {
-    label: "guard",
-    value: "Access on",
-    detail: "remove only after app-native passkey proof is ready",
+    href: "/proof",
+    label: "proof/auth",
+    detail: "passkeys and blocked checks",
+  },
+  {
+    href: "/deploys",
+    label: "deploys",
+    detail: "target map and proof",
+  },
+];
+
+const quietRoutes = [
+  {
+    href: "/needs-ani",
+    label: "needs ani",
+  },
+  {
+    href: "/repos",
+    label: "repos",
+  },
+  {
+    href: "/handoffs",
+    label: "handoffs",
+  },
+  {
+    href: "/mutations",
+    label: "mutations",
   },
 ];
 ---
 
-<AdminLayout
-  title="operator overview"
-  deck="Small surface first. Primary routes answer what is safe next; advanced queues stay available without dominating the screen."
->
-  <section class="overview-hero" aria-labelledby="safe-next-heading">
-    <p class="section-label">what is safe next</p>
-    <h2 id="safe-next-heading">
-      finish passkey revoke proof, keep content writes scoped, and let the
-      editor worktree own publishing.
-    </h2>
-    <p>
-      This admin surface is now organized like a docs console: fleet, content,
-      writing, proof, and deploys are first. Handoffs, raw repos, mutations, and
-      destructive operations stay one level down.
-    </p>
-    <div class="hero-actions" aria-label="primary admin routes">
+<AdminLayout title="overview">
+  <section class="minimal-home" aria-labelledby="admin-next-heading">
+    <div class="next-panel">
+      <p>next</p>
+      <h2 id="admin-next-heading">
+        prove passkey revoke and denied login before removing Access.
+      </h2>
+      <span>writes off. publishing gated. social actions off.</span>
+    </div>
+
+    <nav class="route-list" aria-label="primary admin routes">
       {
-        primaryLinks.map((item) => (
-          <a class="button secondary" href={item.href}>
-            {item.label}
+        primaryRoutes.map((route) => (
+          <a class="route-row" href={route.href}>
+            <strong>{route.label}</strong>
+            <span>{route.detail}</span>
           </a>
         ))
       }
-    </div>
-  </section>
+    </nav>
 
-  <section class="quick-grid" aria-label="current operator state">
-    {
-      proofRows.map((row) => (
-        <article class="quick-card">
-          <p>{row.label}</p>
-          <h2>{row.value}</h2>
-          <span>{row.detail}</span>
-        </article>
-      ))
-    }
+    <nav class="quiet-links" aria-label="secondary admin routes">
+      {quietRoutes.map((route) => <a href={route.href}>{route.label}</a>)}
+    </nav>
   </section>
-
-  <section class="surface-grid" aria-label="operator overview cards">
-    {
-      overviewCards.map((card) => (
-        <article class="panel">
-          <p class={`risk-${card.risk}`}>{card.risk} risk</p>
-          <h2>{card.title}</h2>
-          <p>{card.status}</p>
-          <p>{card.next}</p>
-          <a class="panel-link" href={card.href}>
-            {card.action}
-          </a>
-        </article>
-      ))
-    }
-  </section>
-  <div class="notice">
-    Cloudflare Access stays in front of admin.anipotts.com until app-native
-    passkey proof reports ready. This page does not register passkeys, revoke
-    credentials, publish content, dispatch deploys, or write public-site data.
-  </div>
 </AdminLayout>

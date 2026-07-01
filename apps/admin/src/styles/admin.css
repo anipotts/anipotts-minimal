@@ -58,7 +58,7 @@ a {
 
 .shell {
   display: grid;
-  grid-template-columns: 292px minmax(0, 1fr);
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -77,7 +77,7 @@ a {
   grid-template-columns: 36px 1fr;
   gap: 12px;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .brand-mark {
@@ -99,7 +99,6 @@ a {
 }
 
 .brand small,
-.nav-link small,
 .page-header p,
 .panel p,
 td {
@@ -147,8 +146,7 @@ td {
 
 .nav-link {
   display: grid;
-  gap: 4px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid transparent;
   font-size: 14px;
 }
@@ -157,10 +155,6 @@ td {
 .nav-link:hover {
   border-color: var(--border);
   background: var(--panel);
-}
-
-.nav-link small {
-  line-height: 1.35;
 }
 
 .sidebar-proof {
@@ -178,6 +172,87 @@ td {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.minimal-home {
+  display: grid;
+  gap: 18px;
+  max-width: 720px;
+  padding-top: 28px;
+}
+
+.next-panel {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.next-panel p,
+.next-panel h2,
+.next-panel span {
+  margin: 0;
+}
+
+.next-panel p {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.next-panel h2 {
+  max-width: 640px;
+  font-size: clamp(30px, 4.5vw, 56px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.next-panel span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.route-list {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+
+.route-row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 18px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.route-row strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.route-row span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.route-row:hover strong,
+.quiet-links a:hover {
+  color: var(--accent);
+}
+
+.quiet-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.quiet-links a {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .sidebar-proof strong {
