@@ -16,6 +16,12 @@ export const ADMIN_ROUTES = [
     nav: true,
   },
   {
+    route: "/content/carousels",
+    file: "apps/admin/src/pages/content/carousels.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/content/drafts",
     file: "apps/admin/src/pages/content/drafts.astro",
     nav: true,

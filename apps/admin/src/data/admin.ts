@@ -82,6 +82,13 @@ export const navItems: NavItem[] = [
     description: "proposed copy and review state",
   },
   {
+    href: "/content/carousels",
+    label: "carousels",
+    status: "media",
+    group: "content",
+    description: "carousel sets and export review",
+  },
+  {
     href: "/content/preview",
     label: "preview",
     status: "content",
