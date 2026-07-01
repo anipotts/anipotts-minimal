@@ -46,7 +46,7 @@ function routeForEditor(pageKey: string, slug: string): string {
 
 <AdminLayout
   title={isNew ? "new writing draft" : `edit ${editorState.page_key}`}
-  deck="Owner-facing D1 editor for writing and page content. Drafts save to content_draft_operations; publish writes page_content with proof."
+  deck="Focused writing surface. Save starts private; preview and history stay one click away."
 >
   <section class="meta-strip" aria-label="content edit state">
     <span>{pageContentState.mode}</span>
@@ -70,12 +70,12 @@ function routeForEditor(pageKey: string, slug: string): string {
         <section class="editor-panel">
           <div class="section-head">
             <div>
-              <p>{current.kind} content</p>
+              <p>{isNew ? "writing surface" : `${current.kind} content`}</p>
               <h2 id="editor-fields-heading">
-                {isNew ? "private draft first" : current.title}
+                {isNew ? "write new draft" : current.title}
               </h2>
             </div>
-            <span>{current.visibility}</span>
+            <span>{isNew ? "private default" : current.visibility}</span>
           </div>
 
           <div class="editor-field-grid">
@@ -121,7 +121,7 @@ function routeForEditor(pageKey: string, slug: string): string {
               </select>
             </label>
             <label class="wide-field">
-              <span>summary / preview</span>
+              <span>summary</span>
               <textarea name="summary" rows="3" maxlength="600" required>
                 {isNew ? "" : current.summary}
               </textarea>
@@ -135,7 +135,7 @@ function routeForEditor(pageKey: string, slug: string): string {
               />
             </label>
             <label class="wide-field">
-              <span>markdown body</span>
+              <span>body</span>
               <textarea name="body" rows="18" required>
                 {isNew ? "" : current.body}
               </textarea>
@@ -218,6 +218,10 @@ function routeForEditor(pageKey: string, slug: string): string {
                   <dd>{pageRow?.updated_by || "unknown"}</dd>
                 </div>
                 <div>
+                  <dt>draft storage</dt>
+                  <dd>content_draft_operations</dd>
+                </div>
+                <div>
                   <dt>public visibility</dt>
                   <dd>
                     {
@@ -292,7 +296,8 @@ function routeForEditor(pageKey: string, slug: string): string {
         <a class="button secondary" href="/content"> inventory </a>
         <a class="button secondary" href="/content/edit/new"> new writing </a>
         <a class="button secondary" href="/content/drafts"> drafts </a>
-        <a class="button secondary" href="/content/preview"> preview queue </a>
+        <a class="button secondary" href="/content/preview"> preview </a>
+        <a class="button secondary" href="/content/operations"> history </a>
       </nav>
     </aside>
   </section>

@@ -162,9 +162,9 @@ export async function readContentEditorState(
   }
 
   const [published, drafts, events] = await Promise.all([
-    readPageRows(db, cleanPageKey),
-    readDraftRows(db, cleanPageKey),
-    readPublishEvents(db, cleanPageKey),
+    readOptionalRows(() => readPageRows(db, cleanPageKey)),
+    readOptionalRows(() => readDraftRows(db, cleanPageKey)),
+    readOptionalRows(() => readPublishEvents(db, cleanPageKey)),
   ]);
   const currentRow =
     published.find((row) => isPublished(row.published)) ?? published[0] ?? null;
@@ -185,6 +185,15 @@ export async function readContentEditorState(
     latest_draft: draftRevisions[0] ?? null,
     revisions,
   };
+}
+
+async function readOptionalRows<T>(reader: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await reader();
+  } catch (error) {
+    if (isMissingContentStorage(error)) return [];
+    throw error;
+  }
 }
 
 export async function readDraftPreview(
@@ -1030,6 +1039,16 @@ function isoDate(date: Date): string {
 
 function escapeLike(value: string): string {
   return value.replaceAll("%", "\\%").replaceAll("_", "\\_");
+}
+
+function isMissingContentStorage(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("no such table") &&
+    (message.includes("page_content") ||
+      message.includes("content_draft_operations") ||
+      message.includes("content_publish_events"))
+  );
 }
 
 export function statusError(status: number, message: string): Response {

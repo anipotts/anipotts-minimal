@@ -59,6 +59,7 @@ a {
 .shell {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
+  min-width: 0;
   min-height: 100vh;
 }
 
@@ -266,6 +267,7 @@ td {
 }
 
 main {
+  min-width: 0;
   padding: clamp(20px, 4vw, 44px);
 }
 
@@ -510,6 +512,48 @@ th {
   font-size: 12px;
 }
 
+.content-action-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  min-width: 0;
+  margin-top: 18px;
+}
+
+.workflow-action {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 12px;
+}
+
+.workflow-action.primary {
+  border-color: var(--accent);
+}
+
+.workflow-action strong,
+.workflow-action span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.workflow-action strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.workflow-action span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.workflow-action:hover strong {
+  color: var(--accent);
+}
+
 .surface-grid,
 .review-board,
 .needs-grid,
@@ -721,6 +765,7 @@ th {
 .proposal-row,
 .draft-editor-card,
 .editor-panel {
+  min-width: 0;
   border: 1px solid var(--border);
   background: var(--panel);
 }
@@ -770,6 +815,7 @@ dt,
 .record-row,
 .need-row,
 .compact-row {
+  min-width: 0;
   border-bottom: 1px solid var(--border);
   padding: 16px;
 }
@@ -804,6 +850,7 @@ dt {
 
 dd {
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: 13px;
 }
 
@@ -1579,7 +1626,8 @@ dd {
 
   .grid,
   .quick-grid,
-  .surface-grid {
+  .surface-grid,
+  .content-action-strip {
     grid-template-columns: 1fr;
   }
 

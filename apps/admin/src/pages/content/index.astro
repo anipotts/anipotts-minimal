@@ -17,6 +17,39 @@ const surfaces = [
   "newsletter",
   "orchestrating",
 ] as const;
+const contentWorkflow = [
+  {
+    href: "/content",
+    label: "inventory",
+    detail: "source refs and current fields",
+  },
+  {
+    href: "/content/edit/new",
+    label: "edit",
+    detail: "new writing opens in the focused editor",
+    primary: true,
+  },
+  {
+    href: "/content/preview",
+    label: "preview",
+    detail: "draft render queue",
+  },
+  {
+    href: "/content/drafts",
+    label: "drafts",
+    detail: "saved draft operations",
+  },
+  {
+    href: "/content/carousels",
+    label: "carousels",
+    detail: "review media handoff assets",
+  },
+  {
+    href: "/content/operations",
+    label: "history",
+    detail: "operation and publish trail",
+  },
+];
 const pageContentState = await readPageContentInventoryStore(
   Astro.locals.runtime?.env.DB,
 );
@@ -36,6 +69,20 @@ const pageContentState = await readPageContentInventoryStore(
     <span>{sourceContentSummary.visible_projects} visible projects</span>
     <span>{sourceContentSummary.published_writing} published writing</span>
   </section>
+
+  <nav class="content-action-strip" aria-label="content workflow">
+    {
+      contentWorkflow.map((item) => (
+        <a
+          class:list={["workflow-action", item.primary && "primary"]}
+          href={item.href}
+        >
+          <strong>{item.label}</strong>
+          <span>{item.detail}</span>
+        </a>
+      ))
+    }
+  </nav>
 
   <section class="table-card">
     <div class="section-head">
@@ -106,6 +153,9 @@ const pageContentState = await readPageContentInventoryStore(
                 >
                   open editor
                 </a>
+                <a class="button secondary" href="/content/operations">
+                  history
+                </a>
               </div>
               <div class="field-grid" aria-label={`${row.page_key} d1 fields`}>
                 {row.fields.slice(0, 16).map((field) => (
@@ -135,13 +185,6 @@ const pageContentState = await readPageContentInventoryStore(
       }
     </div>
   </section>
-
-  <nav class="inline-actions" aria-label="content creation">
-    <a class="button" href="/content/edit/new"> new writing draft </a>
-    <a class="button secondary" href="/content/drafts"> draft history </a>
-    <a class="button secondary" href="/content/carousels"> carousel review </a>
-    <a class="button secondary" href="/content/operations"> operation proof </a>
-  </nav>
 
   <section class="table-card operation-card">
     <div class="section-head">
