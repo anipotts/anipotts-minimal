@@ -54,11 +54,11 @@ export const navItems: NavItem[] = [
     description: "public-site content inventory",
   },
   {
-    href: "/content/drafts",
+    href: "/content/edit/new",
     label: "writing editor",
-    status: "drafts",
+    status: "editor",
     group: "primary",
-    description: "draft operations and editable rows",
+    description: "write and publish content",
   },
   {
     href: "/proof",

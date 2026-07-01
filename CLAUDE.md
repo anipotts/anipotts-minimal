@@ -45,14 +45,17 @@ the same PR checks and scoped deploy logic as other changes.
 ## current standing authority
 
 Ani approved these standing lanes on 2026-06-27.
+Ani removed the normal branch-protection/PR gate on 2026-06-30 for faster solo
+iteration. For the lanes below, prefer direct verified commits to `main` when
+the worktree is clean, the diff is scoped, and local checks pass. Use a branch
+or PR only when the change is risky, unclear, blocked by GitHub permissions, or
+Ani asks for review.
 
 ### admin lane
 
 For admin UI, feed, content review, auth staging, and operator-dashboard work:
 
-- branch or update the current PR
-- mark ready once required checks are green
-- merge after green checks
+- commit verified scoped changes directly to `main` when safe
 - deploy only the affected admin target
 - record deploy run, skipped targets, and route proof
 
@@ -61,24 +64,22 @@ cutover and passkey proof are complete, then archive or remove it. It is not a
 normal auto-deploy target; use the explicit manual `admin_solid=true` deploy
 input only for rollback.
 
-Approved includes reviewed D1 migrations needed by the green PR, passkey auth
-rollout, and Cloudflare Access removal after passkey proof.
+Approved includes reviewed D1 migrations needed by the checked change, passkey
+auth rollout, and Cloudflare Access removal after passkey proof.
 
 ### public-site lane
 
 For `apps/www` copy, layout, static content, accessibility, route, and
 presentation work:
 
-- branch or update the current PR
-- mark ready once required checks are green
-- merge after green checks
+- commit verified scoped changes directly to `main` when safe
 - deploy `www=true` only
 - record deploy run and route proof
 
 ### docs lane
 
-Docs-only changes may merge after green checks. They should not run app deploy
-targets.
+Docs-only changes may commit directly to `main` after formatting/basic checks.
+They should not run app deploy targets.
 
 ## passkey and Access sequence
 
