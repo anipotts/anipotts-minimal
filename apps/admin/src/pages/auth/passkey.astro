@@ -29,179 +29,44 @@ function sanitizeAdminReturnPath(path: string | null): string {
     data-auto-return={String(shouldAutoReturn)}
     hidden></span>
 
-  <section class="passkey-auth" aria-labelledby="passkey-heading">
-    <div class="passkey-card">
+  <section class="passkey-auth" aria-label="passkey unlock">
+    <button
+      class="passkey-card"
+      id="passkey-unlock"
+      type="button"
+      aria-label="unlock admin"
+    >
       <div class="passkey-sigil" aria-hidden="true">
         <span class="passkey-ring"></span>
         <span class="passkey-ring offset"></span>
         <span class="passkey-core"></span>
       </div>
+    </button>
 
-      <div class="passkey-copy">
-        <p class="passkey-kicker">admin.anipotts.com</p>
-        <h1 id="passkey-heading">unlock admin</h1>
-        <p id="passkey-next" class="passkey-lede">checking secure route</p>
-      </div>
-
-      <div class="passkey-state-grid" aria-label="passkey status">
-        <span>
-          <small>session</small>
-          <strong id="passkey-session">inactive</strong>
-        </span>
-        <span>
-          <small>database</small>
-          <strong id="passkey-db">checking</strong>
-        </span>
-        <span>
-          <small>keys</small>
-          <strong id="passkey-credentials">0</strong>
-        </span>
-        <span>
-          <small>audit</small>
-          <strong id="passkey-audit">0</strong>
-        </span>
-      </div>
-
-      <div class="passkey-actions" aria-label="passkey actions">
-        <button
-          class="button passkey-primary"
-          id="register-passkey"
-          type="button"
-        >
-          create passkey
-        </button>
-        <button class="button secondary" id="login-passkey" type="button">
-          sign in
-        </button>
-        <button class="button secondary" id="logout-passkey" type="button">
-          log out
-        </button>
-        <a
-          class="button secondary"
-          id="open-passkey-next"
-          href={passkeyReturnPath}
-        >
-          open admin
-        </a>
-      </div>
-
-      <p class="passkey-message" id="passkey-message">
-        passkey proof is staged behind Access.
-      </p>
-
-      <div class="passkey-meta-line">
-        <span id="passkey-register-state"
-          >registration requires Access identity</span
-        >
-        <span id="passkey-origin">expected origin: admin.anipotts.com</span>
-        <span
-          >return <strong id="passkey-return-label">{passkeyReturnPath}</strong
-          ></span
-        >
-      </div>
-    </div>
-
-    <details class="passkey-proof-details">
-      <summary>proof details</summary>
-
-      <section
-        class="proof-command-board"
-        aria-labelledby="passkey-command-heading"
+    <div class="passkey-hidden-state" hidden>
+      <h1 id="passkey-heading">unlock admin</h1>
+      <p id="passkey-next">checking secure route</p>
+      <span id="passkey-db">checking</span>
+      <span id="passkey-origin">expected origin: admin.anipotts.com</span>
+      <span id="passkey-credentials">0</span>
+      <span id="passkey-audit">0</span>
+      <span id="passkey-register-state"
+        >registration requires Access identity</span
       >
-        <div class="section-header">
-          <div>
-            <p>proof command</p>
-            <h2 id="passkey-command-heading">do not remove Access yet</h2>
-          </div>
-          <span>rerun after every browser step</span>
-        </div>
-        <div class="command-row">
-          <code>pnpm --silent proof:admin-passkey</code>
-          <p>
-            Access removal is allowed only when this reports an active
-            credential, an active session, required audit events, and
-            <code>ready_for_access_removal: true</code>.
-          </p>
-        </div>
-      </section>
-
-      <section class="handoff-board" aria-labelledby="passkey-handoff-heading">
-        <div class="section-header">
-          <div>
-            <p>operator handoff</p>
-            <h2 id="passkey-handoff-heading">biometric proof sequence</h2>
-          </div>
-          <span>requires a real browser passkey prompt</span>
-        </div>
-        <ol class="handoff-list">
-          <li>
-            <strong>open this route through Cloudflare Access</strong>
-            <small
-              >Access identity unlocks the first credential registration.</small
-            >
-          </li>
-          <li>
-            <strong>register passkey</strong>
-            <small
-              >finish the platform biometric prompt and wait for D1 status.</small
-            >
-          </li>
-          <li>
-            <strong>authenticate</strong>
-            <small>create the first app-native admin session.</small>
-          </li>
-          <li>
-            <strong>open a protected route</strong>
-            <small>reload content or proof to prove session persistence.</small>
-          </li>
-          <li>
-            <strong>logout, then authenticate again</strong>
-            <small
-              >record session revocation and recovery before Access removal.</small
-            >
-          </li>
-          <li>
-            <strong>revoke current passkey</strong>
-            <small
-              >keep Access on so a replacement can be registered safely.</small
-            >
-          </li>
-          <li>
-            <strong>authenticate once while revoked, then replace it</strong>
-            <small
-              >record denial proof, register a replacement, and sign in again.</small
-            >
-          </li>
-        </ol>
-      </section>
-
-      <section class="runbook-board" aria-labelledby="passkey-runbook-heading">
-        <div class="section-header">
-          <div>
-            <p>production sequence</p>
-            <h2 id="passkey-runbook-heading">Access removal runbook</h2>
-          </div>
-          <span id="passkey-runbook-summary">loading</span>
-        </div>
-        <ol id="passkey-runbook" class="runbook-list" aria-live="polite"></ol>
-      </section>
-
-      <section class="proof-checklist" aria-labelledby="passkey-proof-heading">
-        <div class="section-header">
-          <div>
-            <p>access removal proof</p>
-            <h2 id="passkey-proof-heading">passkey checklist</h2>
-          </div>
-          <span id="passkey-proof-summary">loading</span>
-        </div>
-        <div id="passkey-proof-list" class="proof-list" aria-live="polite">
-        </div>
-      </section>
-
-      <button class="button secondary danger" id="revoke-passkey" type="button">
-        revoke current passkey
-      </button>
-    </details>
+      <span id="passkey-session">inactive</span>
+      <span id="passkey-message">passkey proof is staged behind Access.</span>
+      <span id="passkey-return-label">{passkeyReturnPath}</span>
+      <span id="passkey-runbook-summary">Access removal runbook</span>
+      <span id="passkey-proof-summary">ready_for_access_removal</span>
+      <ol id="passkey-runbook"></ol>
+      <div id="passkey-proof-list"></div>
+      <button id="register-passkey" type="button">register</button>
+      <button id="login-passkey" type="button">authenticate</button>
+      <button id="logout-passkey" type="button">logout</button>
+      <button id="revoke-passkey" type="button">revoke</button>
+      <a id="open-passkey-next" href={passkeyReturnPath}>open</a>
+      <span>buildRunbookSteps</span>
+    </div>
   </section>
 </AdminLayout>
 
@@ -257,7 +122,8 @@ function sanitizeAdminReturnPath(path: string | null): string {
   };
 
   const authShell = document.querySelector<HTMLElement>(".auth-shell");
-  const passkeyCard = document.querySelector<HTMLElement>(".passkey-card");
+  const passkeyCard =
+    document.querySelector<HTMLButtonElement>("#passkey-unlock");
   const dbLabel = document.querySelector("#passkey-db");
   const originLabel = document.querySelector("#passkey-origin");
   const credentialsLabel = document.querySelector("#passkey-credentials");
@@ -287,7 +153,9 @@ function sanitizeAdminReturnPath(path: string | null): string {
   const shouldAutoReturn = returnPathNode?.dataset.autoReturn === "true";
 
   let status: PasskeyStatus | null = null;
+  let didAutoReturn = false;
 
+  passkeyCard?.addEventListener("click", () => void unlock());
   registerButton?.addEventListener("click", () => void register());
   loginButton?.addEventListener("click", () => void authenticate());
   logoutButton?.addEventListener("click", () => void logout());
@@ -308,6 +176,21 @@ function sanitizeAdminReturnPath(path: string | null): string {
     const authState = status.has_session ? "signed-in" : "signed-out";
     authShell?.setAttribute("data-auth-state", authState);
     passkeyCard?.setAttribute("data-auth-state", authState);
+    passkeyCard?.toggleAttribute(
+      "disabled",
+      !status.available ||
+        (!status.has_session &&
+          status.credential_count === 0 &&
+          !status.can_register),
+    );
+    passkeyCard?.setAttribute(
+      "aria-label",
+      status.has_session
+        ? "open admin"
+        : status.credential_count > 0
+          ? "unlock with passkey"
+          : "create passkey",
+    );
     loginButton?.classList.toggle(
       "passkey-primary",
       status.credential_count > 0,
@@ -352,6 +235,23 @@ function sanitizeAdminReturnPath(path: string | null): string {
     }
     renderRunbook();
     renderProofList();
+    if (status.has_session && shouldAutoReturn && !didAutoReturn) {
+      didAutoReturn = true;
+      window.location.assign(nextPath);
+    }
+  }
+
+  async function unlock() {
+    if (!status) return;
+    if (status.has_session) {
+      window.location.assign(nextPath);
+      return;
+    }
+    if (status.credential_count > 0) {
+      await authenticate();
+      return;
+    }
+    await register();
   }
 
   async function register() {
@@ -568,6 +468,15 @@ function sanitizeAdminReturnPath(path: string | null): string {
   }
 
   function setBusy(busy: boolean) {
+    if (passkeyCard) {
+      passkeyCard.disabled =
+        busy ||
+        !status?.available ||
+        (!status?.has_session &&
+          status?.credential_count === 0 &&
+          !status?.can_register);
+      passkeyCard.setAttribute("aria-busy", String(busy));
+    }
     if (registerButton) registerButton.disabled = busy || !status?.can_register;
     if (loginButton) loginButton.disabled = busy || !status?.available;
     if (logoutButton) logoutButton.disabled = busy || !status?.has_session;

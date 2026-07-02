@@ -279,7 +279,7 @@ main {
 }
 
 .auth-shell {
-  grid-template-columns: 86px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   background:
     radial-gradient(
       circle at 54% 38%,
@@ -295,19 +295,15 @@ main {
 }
 
 .auth-shell[data-auth-state="signed-in"] {
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .auth-shell .sidebar {
-  display: grid;
-  align-content: start;
-  grid-template-rows: auto auto;
-  background: color-mix(in srgb, var(--bg) 94%, var(--accent));
+  display: none;
 }
 
 .auth-shell[data-auth-state="signed-in"] .sidebar {
-  align-content: stretch;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  display: none;
 }
 
 .auth-shell .brand {
@@ -370,8 +366,9 @@ main {
 
 main.auth-main {
   display: grid;
-  align-items: center;
+  place-items: center;
   min-height: 100vh;
+  padding: 0;
 }
 
 .page-header {
@@ -604,8 +601,9 @@ th {
 
 .passkey-auth {
   display: grid;
-  gap: 18px;
-  width: min(100%, 760px);
+  place-items: center;
+  width: min(100%, 100vw);
+  min-height: 100vh;
   margin: 0 auto;
 }
 
@@ -613,47 +611,40 @@ th {
   --passkey-edge: color-mix(in srgb, var(--border) 72%, var(--accent));
   position: relative;
   display: grid;
-  justify-items: center;
-  gap: 18px;
-  overflow: hidden;
-  border: 1px solid var(--passkey-edge);
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--panel) 92%, transparent),
-      transparent
-    ),
-    radial-gradient(
-      circle at 50% 0%,
-      color-mix(in srgb, var(--accent) 16%, transparent),
-      transparent 34%
-    ),
-    var(--bg);
-  padding: clamp(28px, 6vw, 56px);
+  place-items: center;
+  width: clamp(138px, 20vw, 220px);
+  aspect-ratio: 1;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
   text-align: center;
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
 }
 
 .passkey-card::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -42%;
   pointer-events: none;
   background:
     linear-gradient(
       90deg,
-      transparent,
-      color-mix(in srgb, var(--accent) 18%, transparent),
-      transparent
+      transparent 12%,
+      color-mix(in srgb, var(--accent) 42%, transparent),
+      transparent 88%
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       180deg,
-      transparent 0 26px,
-      color-mix(in srgb, var(--border) 36%, transparent) 27px 28px
+      transparent 22%,
+      color-mix(in srgb, #3ee7b0 28%, transparent),
+      transparent 78%
     );
-  opacity: 0.22;
-  transform: translateY(-100%);
-  animation: passkey-scan 4.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  opacity: 0.26;
+  transform: rotate(12deg) scaleX(0.72);
+  animation: passkey-scan 5.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 
 .passkey-card[data-auth-state="signed-in"] {
@@ -674,9 +665,9 @@ th {
 .passkey-sigil {
   display: grid;
   place-items: center;
-  width: clamp(92px, 18vw, 128px);
+  width: 100%;
   aspect-ratio: 1;
-  border: 1px solid color-mix(in srgb, var(--accent) 52%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   border-radius: 50%;
   background:
     radial-gradient(
@@ -686,8 +677,25 @@ th {
     ),
     color-mix(in srgb, var(--panel) 72%, transparent);
   box-shadow:
-    inset 0 0 34px color-mix(in srgb, var(--accent) 18%, transparent),
-    0 0 42px color-mix(in srgb, var(--accent) 18%, transparent);
+    inset 0 0 48px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 0 80px color-mix(in srgb, var(--accent) 18%, transparent);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.passkey-card:not(:disabled):hover .passkey-sigil,
+.passkey-card:focus-visible .passkey-sigil {
+  border-color: color-mix(in srgb, var(--accent) 82%, #3ee7b0);
+  box-shadow:
+    inset 0 0 58px color-mix(in srgb, var(--accent) 22%, transparent),
+    0 0 110px color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: scale(1.025);
+}
+
+.passkey-card:focus-visible {
+  outline: 0;
 }
 
 .passkey-ring {
@@ -914,12 +922,12 @@ th {
 
 @keyframes passkey-scan {
   0%,
-  42% {
-    transform: translateY(-100%);
+  40% {
+    transform: rotate(12deg) translateX(-42%) scaleX(0.72);
   }
   66%,
   100% {
-    transform: translateY(100%);
+    transform: rotate(12deg) translateX(42%) scaleX(0.72);
   }
 }
 
@@ -2087,10 +2095,7 @@ dd {
   }
 
   .auth-shell .sidebar {
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    gap: 14px;
-    padding: 14px 16px;
+    display: none;
   }
 
   .auth-shell .brand {
@@ -2127,8 +2132,8 @@ dd {
   }
 
   main.auth-main {
-    min-height: calc(100vh - 78px);
-    align-items: start;
+    min-height: 100vh;
+    place-items: center;
   }
 
   .page-header {
@@ -2150,15 +2155,12 @@ dd {
   }
 
   .passkey-auth {
-    align-content: start;
+    place-items: center;
   }
 
   .passkey-card {
-    padding: 24px 16px;
-  }
-
-  .passkey-copy h1 {
-    font-size: clamp(38px, 13vw, 58px);
+    width: clamp(132px, 44vw, 178px);
+    padding: 0;
   }
 
   .passkey-state-grid {
