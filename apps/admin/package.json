@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@anipotts/content": "workspace:*",
+    "@anipotts/lib": "workspace:*",
     "@anipotts/styles": "workspace:*",
     "@fontsource-variable/instrument-sans": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.5",

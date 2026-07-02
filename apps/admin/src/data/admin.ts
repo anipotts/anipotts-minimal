@@ -34,10 +34,10 @@ export type DeployRow = {
 export const navItems: NavItem[] = [
   {
     href: "/",
-    label: "overview",
+    label: "inbox",
     status: "source",
     group: "primary",
-    description: "what is safe to do next",
+    description: "attention queue and approvals",
   },
   {
     href: "/fleet",
@@ -48,10 +48,10 @@ export const navItems: NavItem[] = [
   },
   {
     href: "/content",
-    label: "content",
+    label: "studio",
     status: "D1",
     group: "primary",
-    description: "public-site content inventory",
+    description: "pieces, drafts, exports",
   },
   {
     href: "/content/edit/new",

@@ -8,6 +8,7 @@ export default defineConfig({
     "feature-flags/index": "src/feature-flags/index.ts",
     "data/index": "src/data/index.ts",
     "admin/index": "src/admin/index.ts",
+    "admin-control/index": "src/admin-control/index.ts",
     "metrics/index": "src/metrics/index.ts",
     "status/index": "src/status/index.ts",
     "typefully/index": "src/typefully/index.ts",

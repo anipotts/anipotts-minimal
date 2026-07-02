@@ -907,3 +907,129 @@ export const contentPublishEvents = sqliteTable(
     ),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 27. admin control-plane event core and projections
+// ---------------------------------------------------------------------------
+
+export const adminEvents = sqliteTable(
+  "admin_events",
+  {
+    schema_version: integer("schema_version").notNull().default(1),
+    event_id: text("event_id").primaryKey(),
+    dedupe_key: text("dedupe_key").notNull(),
+    source: text("source").notNull(),
+    provider: text("provider"),
+    account: text("account"),
+    actor: text("actor").notNull(),
+    kind: text("kind").notNull(),
+    ts: text("ts").notNull(),
+    privacy: text("privacy").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    href: text("href"),
+    payload_ref: text("payload_ref"),
+    created_by: text("created_by").notNull(),
+    created_at: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_events_dedupe").on(table.dedupe_key),
+    index("idx_admin_events_source_ts").on(table.source, table.ts),
+    index("idx_admin_events_kind_ts").on(table.kind, table.ts),
+  ],
+);
+
+export const adminInboxItems = sqliteTable(
+  "admin_inbox_items",
+  {
+    item_id: text("item_id").primaryKey(),
+    dedupe_key: text("dedupe_key").notNull().unique(),
+    event_refs: text("event_refs").notNull().default("[]"),
+    source: text("source").notNull(),
+    account: text("account"),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    href: text("href"),
+    status: text("status").notNull(),
+    urgency: text("urgency").notNull().default("normal"),
+    owner: text("owner").notNull(),
+    action_kind: text("action_kind").notNull().default("open"),
+    expires_at: text("expires_at"),
+    last_seen_at: text("last_seen_at"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_inbox_status_urgency").on(table.status, table.urgency),
+    index("idx_admin_inbox_source").on(table.source, table.updated_at),
+    index("idx_admin_inbox_expires").on(table.expires_at),
+  ],
+);
+
+export const adminPieceStates = sqliteTable(
+  "admin_piece_states",
+  {
+    piece_id: text("piece_id").primaryKey(),
+    dedupe_key: text("dedupe_key").notNull().unique(),
+    event_refs: text("event_refs").notNull().default("[]"),
+    title: text("title").notNull(),
+    state: text("state").notNull(),
+    channels: text("channels").notNull().default("[]"),
+    source_refs: text("source_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [index("idx_admin_piece_state").on(table.state, table.updated_at)],
+);
+
+export const adminFleetStatus = sqliteTable(
+  "admin_fleet_status",
+  {
+    subject_id: text("subject_id").primaryKey(),
+    kind: text("kind").notNull(),
+    title: text("title").notNull(),
+    status: text("status").notNull(),
+    summary: text("summary").notNull(),
+    owner: text("owner").notNull(),
+    href: text("href"),
+    event_refs: text("event_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_fleet_kind_status").on(table.kind, table.status),
+  ],
+);
+
+export const adminDeployStates = sqliteTable(
+  "admin_deploy_states",
+  {
+    deploy_id: text("deploy_id").primaryKey(),
+    target: text("target").notNull(),
+    status: text("status").notNull(),
+    scope: text("scope").notNull(),
+    href: text("href"),
+    last_run_at: text("last_run_at"),
+    event_refs: text("event_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_deploy_target_status").on(table.target, table.status),
+  ],
+);
+
+export const adminCapabilityStates = sqliteTable(
+  "admin_capability_states",
+  {
+    capability_id: text("capability_id").primaryKey(),
+    machine: text("machine").notNull(),
+    status: text("status").notNull(),
+    auth_model: text("auth_model").notNull(),
+    write_enabled: integer("write_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    summary: text("summary").notNull(),
+    event_refs: text("event_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_capability_machine").on(table.machine, table.status),
+  ],
+);

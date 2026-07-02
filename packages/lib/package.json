@@ -27,6 +27,10 @@
       "types": "./dist/admin/index.d.ts",
       "import": "./dist/admin/index.js"
     },
+    "./admin-control": {
+      "types": "./dist/admin-control/index.d.ts",
+      "import": "./dist/admin-control/index.js"
+    },
     "./metrics": {
       "types": "./dist/metrics/index.d.ts",
       "import": "./dist/metrics/index.js"

@@ -1,77 +1,287 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
+import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
 
-const primaryRoutes = [
-  {
-    href: "/fleet",
-    label: "fleet",
-    detail: "machines, repo state, current work",
-  },
-  {
-    href: "/content",
-    label: "content",
-    detail: "public-site content inventory",
-  },
-  {
-    href: "/content/edit/new",
-    label: "writing editor",
-    detail: "write, preview, publish",
-  },
-  {
-    href: "/proof",
-    label: "proof/auth",
-    detail: "passkeys and blocked checks",
-  },
-  {
-    href: "/deploys",
-    label: "deploys",
-    detail: "target map and proof",
-  },
+const snapshot = await loadAdminControlSnapshot(Astro.locals.runtime?.env.DB);
+const inboxItems = snapshot.projections.inbox_items;
+const urgentItems = inboxItems.filter((item) =>
+  ["urgent", "high"].includes(item.urgency),
+);
+const reviewItems = inboxItems.filter((item) =>
+  ["approve", "review", "verify", "decide", "deadline"].includes(
+    item.action_kind,
+  ),
+);
+const pieceStates = snapshot.projections.piece_states;
+const fleetItems = snapshot.projections.fleet_status;
+const capabilityItems = snapshot.projections.capability_states;
+const deployItems = snapshot.projections.deploy_states;
+
+const stateOrder = [
+  "idea",
+  "draft",
+  "review",
+  "export-ready",
+  "publish-ready",
+  "published",
+  "archived",
 ];
 
-const quietRoutes = [
-  {
-    href: "/needs-ani",
-    label: "needs ani",
-  },
-  {
-    href: "/repos",
-    label: "repos",
-  },
-  {
-    href: "/handoffs",
-    label: "handoffs",
-  },
-  {
-    href: "/mutations",
-    label: "mutations",
-  },
-];
+const sourceLabels = new Intl.ListFormat("en", {
+  style: "narrow",
+  type: "conjunction",
+});
+
+function countBy<T>(
+  items: T[],
+  read: (item: T) => string,
+): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const key = read(item);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
+}
+
+const pieceCounts = countBy(pieceStates, (piece) => piece.state);
 ---
 
-<AdminLayout title="overview">
-  <section class="minimal-home" aria-labelledby="admin-next-heading">
-    <div class="next-panel">
-      <p>next</p>
-      <h2 id="admin-next-heading">
-        prove passkey revoke and denied login before removing Access.
-      </h2>
-      <span>content writes require passkey. social actions off.</span>
-    </div>
+<AdminLayout title="inbox" hideHeader>
+  <section class="inbox-shell" aria-labelledby="inbox-heading">
+    <header class="inbox-hero">
+      <div>
+        <p>admin.anipotts.com</p>
+        <h1 id="inbox-heading">inbox</h1>
+        <span>
+          shared projections for Ani and agents. refresh-on-open plus light
+          polling now, durable objects and websocket hibernation later.
+        </span>
+      </div>
+      <aside class="inbox-contract-card" aria-label="admin api contract">
+        <span>api + mcp</span>
+        <strong>read-only surface live</strong>
+        <small>
+          {snapshot.source_mode} data · schema v{snapshot.schema_version} · {
+            snapshot.auth.mcp
+          }
+        </small>
+      </aside>
+    </header>
 
-    <nav class="route-list" aria-label="primary admin routes">
-      {
-        primaryRoutes.map((route) => (
-          <a class="route-row" href={route.href}>
-            <strong>{route.label}</strong>
-            <span>{route.detail}</span>
+    <section class="inbox-metrics" aria-label="projection summary">
+      <div>
+        <span>{inboxItems.length}</span>
+        <small>inbox cards</small>
+      </div>
+      <div>
+        <span>{urgentItems.length}</span>
+        <small>high attention</small>
+      </div>
+      <div>
+        <span>{pieceStates.length}</span>
+        <small>pieces</small>
+      </div>
+      <div>
+        <span>{capabilityItems.length}</span>
+        <small>capabilities</small>
+      </div>
+    </section>
+
+    <div class="inbox-grid">
+      <section class="inbox-panel inbox-attention" aria-labelledby="attention">
+        <div class="section-header">
+          <div>
+            <p>attention</p>
+            <h2 id="attention">today</h2>
+          </div>
+          <span data-projection-updated>{snapshot.generated_at}</span>
+        </div>
+        <div class="inbox-card-list">
+          {
+            inboxItems.map((item) => (
+              <article class:list={["inbox-card", `urgency-${item.urgency}`]}>
+                <div>
+                  <p>
+                    {item.source}
+                    {item.account ? ` · ${item.account}` : ""}
+                  </p>
+                  <h3>{item.title}</h3>
+                  <span>{item.summary}</span>
+                </div>
+                <footer>
+                  <span>{item.action_kind}</span>
+                  <span>{item.owner}</span>
+                  {item.href && <a href={item.href}>open</a>}
+                </footer>
+                <small>events {item.event_refs.join(", ")}</small>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <aside class="inbox-panel" aria-labelledby="review-heading">
+        <div class="section-header compact">
+          <div>
+            <p>review</p>
+            <h2 id="review-heading">human loop</h2>
+          </div>
+          <span>{reviewItems.length}</span>
+        </div>
+        <div class="inbox-mini-list">
+          {
+            reviewItems.map((item) => (
+              <a href={item.href ?? "/needs-ani"}>
+                <strong>{item.title}</strong>
+                <span>{item.status}</span>
+              </a>
+            ))
+          }
+        </div>
+      </aside>
+
+      <section
+        class="inbox-panel studio-panel"
+        aria-labelledby="studio-heading"
+      >
+        <div class="section-header">
+          <div>
+            <p>studio</p>
+            <h2 id="studio-heading">pieces</h2>
+          </div>
+          <a href="/content">open studio</a>
+        </div>
+        <ol class="state-rail" aria-label="piece statechart">
+          {
+            stateOrder.map((state) => (
+              <li>
+                <span>{pieceCounts.get(state) ?? 0}</span>
+                <small>{state}</small>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="piece-list">
+          {
+            pieceStates.map((piece) => (
+              <article>
+                <strong>{piece.title}</strong>
+                <span>
+                  {piece.state} · {sourceLabels.format(piece.channels)}
+                </span>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="inbox-panel fleet-panel" aria-labelledby="fleet-heading">
+        <div class="section-header">
+          <div>
+            <p>fleet</p>
+            <h2 id="fleet-heading">runtime</h2>
+          </div>
+          <a href="/fleet">open fleet</a>
+        </div>
+        <div class="fleet-split">
+          <div>
+            <h3>machines</h3>
+            {
+              fleetItems.map((item) => (
+                <p>
+                  <strong>{item.title}</strong>
+                  <span>{item.status}</span>
+                </p>
+              ))
+            }
+          </div>
+          <div>
+            <h3>capabilities</h3>
+            {
+              capabilityItems.map((item) => (
+                <p>
+                  <strong>{item.machine}</strong>
+                  <span>{item.status}</span>
+                </p>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="inbox-panel api-panel" aria-labelledby="api-heading">
+        <div class="section-header">
+          <div>
+            <p>headless</p>
+            <h2 id="api-heading">api and mcp</h2>
+          </div>
+          <a href="/api/mcp">manifest</a>
+        </div>
+        <div class="api-grid">
+          <a href="/api/admin/projections">
+            <strong>projection api</strong>
+            <span>same shape used by the ui</span>
           </a>
-        ))
-      }
-    </nav>
+          <a href="/api/mcp">
+            <strong>read-only mcp</strong>
+            <span>resources and tools, no writes</span>
+          </a>
+          <div>
+            <strong>retention</strong>
+            <span>
+              {snapshot.retention.event_store} events, {
+                snapshot.retention.payload_store
+              } payload refs
+            </span>
+          </div>
+          <div>
+            <strong>sync</strong>
+            <span>{snapshot.sync.v1}</span>
+          </div>
+        </div>
+      </section>
 
-    <nav class="quiet-links" aria-label="secondary admin routes">
-      {quietRoutes.map((route) => <a href={route.href}>{route.label}</a>)}
-    </nav>
+      <section
+        class="inbox-panel deploy-panel"
+        aria-labelledby="deploy-heading"
+      >
+        <div class="section-header compact">
+          <div>
+            <p>deploy</p>
+            <h2 id="deploy-heading">admin lane</h2>
+          </div>
+          <a href="/deploys">proof</a>
+        </div>
+        {
+          deployItems.map((item) => (
+            <article>
+              <strong>{item.target}</strong>
+              <span>{item.status}</span>
+              <small>{item.scope}</small>
+            </article>
+          ))
+        }
+      </section>
+    </div>
   </section>
+  <script is:inline>
+    (() => {
+      const target = document.querySelector("[data-projection-updated]");
+      async function refreshProjectionStatus() {
+        if (!target) return;
+        try {
+          const res = await fetch("/api/admin/projections", {
+            cache: "no-store",
+          });
+          if (!res.ok) return;
+          const data = await res.json();
+          target.textContent = data.generated_at || "refreshed";
+        } catch {
+          target.textContent = "polling paused";
+        }
+      }
+      window.setInterval(refreshProjectionStatus, 45000);
+    })();
+  </script>
 </AdminLayout>

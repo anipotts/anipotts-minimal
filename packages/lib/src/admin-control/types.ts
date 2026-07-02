@@ -1,0 +1,163 @@
+export const ADMIN_EVENT_SCHEMA_VERSION = 1;
+
+export type AdminControlSourceMode = "d1" | "fixture" | "mixed";
+
+export type AdminEventPrivacy = "public" | "internal" | "private" | "sensitive";
+
+export interface AdminEventEnvelope {
+  schema_version: number;
+  event_id: string;
+  dedupe_key: string;
+  source: string;
+  provider: string | null;
+  account: string | null;
+  actor: string;
+  kind: string;
+  ts: string;
+  privacy: AdminEventPrivacy | string;
+  title: string;
+  summary: string;
+  href: string | null;
+  payload_ref: string | null;
+  created_by: string;
+}
+
+export type InboxActionKind =
+  | "approve"
+  | "review"
+  | "verify"
+  | "decide"
+  | "deadline"
+  | "open"
+  | "none";
+
+export interface AdminInboxItem {
+  item_id: string;
+  dedupe_key: string;
+  event_refs: string[];
+  source: string;
+  account: string | null;
+  title: string;
+  summary: string;
+  href: string | null;
+  status: string;
+  urgency: "low" | "normal" | "high" | "urgent" | string;
+  owner: string;
+  action_kind: InboxActionKind | string;
+  expires_at: string | null;
+  last_seen_at: string | null;
+}
+
+export type PieceStateName =
+  | "idea"
+  | "draft"
+  | "review"
+  | "export-ready"
+  | "publish-ready"
+  | "published"
+  | "archived";
+
+export interface AdminPieceState {
+  piece_id: string;
+  dedupe_key: string;
+  event_refs: string[];
+  title: string;
+  state: PieceStateName | string;
+  channels: string[];
+  source_refs: string[];
+  updated_at: string | null;
+}
+
+export interface AdminFleetStatus {
+  subject_id: string;
+  kind: string;
+  title: string;
+  status: string;
+  summary: string;
+  owner: string;
+  href: string | null;
+  event_refs: string[];
+  updated_at: string | null;
+}
+
+export interface AdminDeployState {
+  deploy_id: string;
+  target: string;
+  status: string;
+  scope: string;
+  href: string | null;
+  last_run_at: string | null;
+  event_refs: string[];
+  updated_at: string | null;
+}
+
+export interface AdminCapabilityState {
+  capability_id: string;
+  machine: string;
+  status: string;
+  auth_model: string;
+  write_enabled: boolean;
+  summary: string;
+  event_refs: string[];
+  updated_at: string | null;
+}
+
+export interface AdminServiceRegistryViewItem {
+  service_id: string;
+  name: string;
+  hostname: string;
+  visibility: string;
+  owner: string;
+  status: string;
+  updated_at: string | null;
+  event_refs: string[];
+}
+
+export interface AdminControlRetention {
+  event_store: "d1";
+  payload_store: "r2";
+  payload_ref_required: boolean;
+  archive_target: "r2";
+  archive_policy: string;
+}
+
+export interface AdminControlSyncContract {
+  v1: "refresh-on-open-plus-light-polling";
+  push_swappable: true;
+  target: "durable-objects-websocket-hibernation";
+}
+
+export interface AdminControlAuthContract {
+  ui: "passkey-session";
+  mcp: "cloudflare-access-service-token-per-machine";
+  write_tools: "disabled-until-broker-and-signed-connect-diff";
+}
+
+export interface AdminControlContracts {
+  event_fields: (keyof AdminEventEnvelope)[];
+  inbox_card_fields: (keyof AdminInboxItem)[];
+  piece_states: PieceStateName[];
+  legal_piece_cycles: string[];
+}
+
+export interface AdminControlProjections {
+  inbox_items: AdminInboxItem[];
+  piece_states: AdminPieceState[];
+  fleet_status: AdminFleetStatus[];
+  deploy_states: AdminDeployState[];
+  capability_states: AdminCapabilityState[];
+  service_registry_view: AdminServiceRegistryViewItem[];
+}
+
+export interface AdminControlSnapshot {
+  schema_version: number;
+  generated_at: string;
+  source_mode: AdminControlSourceMode;
+  sync: AdminControlSyncContract;
+  retention: AdminControlRetention;
+  auth: AdminControlAuthContract;
+  contracts: AdminControlContracts;
+  events: AdminEventEnvelope[];
+  projections: AdminControlProjections;
+  errors: string[];
+}
