@@ -165,3 +165,12 @@ the first static draft fixture is
 local draft content until chief/site or ani approves the next safe slice. this
 doc remains the contract: agents can draft against it, admin can preview against
 it, and all live actions stay gated.
+
+## current thread split
+
+`chief/pro/site` owns active local browser work for passkey proof, admin preview,
+and editor polish. do not duplicate that live preview loop from mini.
+
+`chief/site` on mini owns committed source truth, deploy proof, and the read-only
+newsletter pipeline. after `chief/pro/site` closes out local browser findings,
+absorb only the committed or explicitly handed-off source changes.

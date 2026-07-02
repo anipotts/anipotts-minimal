@@ -1,0 +1,84 @@
+{
+  "id": "newsletter-draft-agents-execute-awareness-closes-loop",
+  "slug": "agents-execute-awareness-closes-the-loop",
+  "status": "ready_for_review",
+  "title": "agents execute. awareness closes the loop.",
+  "subject": "agents execute. awareness closes the loop.",
+  "summary": "a practical note on why agent work gets better when the system can show intent, authority, proof, and current state.",
+  "dek": "this is the spine for anipotts.com, admin.anipotts.com, and the way i want agents to work around me instead of asking me to hold every thread in my head.",
+  "audience": "builders using coding agents across multiple repos, machines, and live surfaces",
+  "source_refs": [
+    {
+      "ref": "AGENTS.md",
+      "use": "authority, lanes, hard stops, and proof expectations"
+    },
+    {
+      "ref": "docs/admin-v2-architecture.md",
+      "use": "admin control-plane direction and operator dashboard model"
+    },
+    {
+      "ref": "apps/admin/src/pages/index.astro",
+      "use": "current admin overview and safe-next framing"
+    },
+    {
+      "ref": "apps/admin/src/pages/proof.astro",
+      "use": "proof surface for route, deploy, auth, and content evidence"
+    }
+  ],
+  "spine": ["intent", "authority", "operation", "proof", "state"],
+  "sections": [
+    {
+      "kind": "opening",
+      "body": "agents are good at executing. the part that keeps breaking is awareness: what is allowed, what changed, what is blocked, and what proof exists.",
+      "source_refs": ["AGENTS.md", "docs/admin-v2-architecture.md"]
+    },
+    {
+      "kind": "note",
+      "heading": "the useful loop",
+      "body": "the loop i keep coming back to is intent, authority, operation, proof, state. what did i ask for, what was allowed, what happened, how do we know, and what is true now.",
+      "source_refs": ["AGENTS.md", "docs/admin-v2-architecture.md"]
+    },
+    {
+      "kind": "worklog",
+      "heading": "what this changes",
+      "items": [
+        "public writing can be drafted without pretending it is ready",
+        "admin can show the next safe content action",
+        "publish and send paths stay separate from writing",
+        "proof can travel with the draft before anything goes live"
+      ],
+      "body": "the site work is already moving this way. public copy is becoming structured content. admin has the content editor. passkey auth is taking over the boundary. deploys prove which target moved.",
+      "source_refs": [
+        "apps/admin/src/pages/content/edit/[pageKey].astro",
+        "docs/newsletter-content-structure.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claim": "the repo uses explicit safe lanes and hard stops to separate normal work from gated actions",
+      "status": "source_backed",
+      "source_refs": ["AGENTS.md"]
+    },
+    {
+      "claim": "newsletter writing should remain separate from send and schedule paths",
+      "status": "source_backed",
+      "source_refs": ["docs/newsletter-system.md"]
+    }
+  ],
+  "links": [],
+  "assets": [],
+  "preview_notes": "lead candidate for first issue. strong spine, still needs ani voice pass before public use.",
+  "blocked_actions": [
+    "write production d1 issue",
+    "publish archive page",
+    "send test email",
+    "broadcast to subscribers",
+    "change DNS",
+    "change auth or Cloudflare Access",
+    "modify env or secrets",
+    "change workers or endpoints",
+    "add admin write path"
+  ],
+  "approval_refs": []
+}

@@ -1,0 +1,92 @@
+{
+  "id": "newsletter-draft-writing-when-low-energy",
+  "slug": "writing-when-low-energy",
+  "status": "draft",
+  "title": "how i keep writing when i do not feel like writing",
+  "subject": "how i keep writing when i do not feel like writing",
+  "summary": "a low-energy content pipeline that starts from receipts, rough notes, and admin drafts instead of a blank page.",
+  "dek": "the point is not to force a big essay every day. the point is to keep useful raw material moving until i have enough energy to make it sound like me.",
+  "audience": "builders who want a content system that still works on low-energy days",
+  "source_refs": [
+    {
+      "ref": "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+      "use": "existing post about specific prompts and next-day continuity"
+    },
+    {
+      "ref": "docs/newsletter-content-structure.md",
+      "use": "draft issue shape and low-risk preview model"
+    },
+    {
+      "ref": "apps/admin/src/pages/content/edit/[pageKey].astro",
+      "use": "admin content editor that can hold drafts before publish"
+    },
+    {
+      "ref": "apps/admin/src/pages/newsletter.astro",
+      "use": "newsletter queue where drafts can sit without sending"
+    }
+  ],
+  "spine": [
+    "receipt",
+    "rough pass",
+    "voice pass",
+    "proof pass",
+    "publish later"
+  ],
+  "sections": [
+    {
+      "kind": "opening",
+      "body": "some days i do not want to write. that should not break the system.",
+      "source_refs": [
+        "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md"
+      ]
+    },
+    {
+      "kind": "note",
+      "heading": "start from receipts",
+      "body": "the easiest writing source is work that already happened. commits, screenshots, admin proof, route checks, and rough handoff notes are all better than a blank page.",
+      "source_refs": ["apps/admin/src/pages/proof.astro"]
+    },
+    {
+      "kind": "worklog",
+      "heading": "split the job",
+      "items": [
+        "source pass: collect commits, pages, screenshots, and notes",
+        "rough pass: turn receipts into plain sentences",
+        "voice pass: remove generic phrasing and make it sound like me",
+        "proof pass: keep only claims with public evidence or mark them blocked",
+        "publish pass: choose blog, newsletter, or keep it in admin"
+      ],
+      "body": "the pipeline should split writing into smaller jobs so i can do one of them on a bad day.",
+      "source_refs": ["docs/newsletter-content-structure.md"]
+    }
+  ],
+  "claims": [
+    {
+      "claim": "the admin editor can hold draft state before a public publish decision",
+      "status": "source_backed",
+      "source_refs": ["apps/admin/src/pages/content/edit/[pageKey].astro"]
+    },
+    {
+      "claim": "the existing writing post argues for specific next-session prompts",
+      "status": "source_backed",
+      "source_refs": [
+        "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md"
+      ]
+    }
+  ],
+  "links": [],
+  "assets": [],
+  "preview_notes": "recurring fallback issue. useful when no fresh essay is ready and the system needs one concrete next writing action.",
+  "blocked_actions": [
+    "write production d1 issue",
+    "publish archive page",
+    "send test email",
+    "broadcast to subscribers",
+    "change DNS",
+    "change auth or Cloudflare Access",
+    "modify env or secrets",
+    "change workers or endpoints",
+    "add admin write path"
+  ],
+  "approval_refs": []
+}

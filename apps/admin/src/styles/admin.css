@@ -1021,6 +1021,26 @@ th {
   margin-top: 24px;
 }
 
+.newsletter-pipeline {
+  margin-top: 24px;
+}
+
+.pipeline-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.pipeline-row dl {
+  margin: 0;
+}
+
+.pipeline-row .actions {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
 .operation-card {
   margin-top: 24px;
 }
@@ -2163,6 +2183,7 @@ dd {
   .editor-workspace,
   .draft-editor-grid,
   .lane-grid,
+  .pipeline-row,
   .newsletter-detail,
   .newsletter-preview-layout,
   .carousel-brief-body,
@@ -2181,6 +2202,10 @@ dd {
 
   .editor-field-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pipeline-row .actions {
+    justify-content: flex-start;
   }
 
   .carousel-brief-body dl,

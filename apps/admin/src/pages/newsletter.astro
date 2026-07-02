@@ -1,6 +1,20 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
 import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
+
+const pipelineRows = newsletterDrafts.map((draft) => ({
+  title: draft.title,
+  href: `/newsletter/${draft.slug}`,
+  status: draft.status,
+  lane: draft.pipeline.lane,
+  stage: draft.pipeline.stage,
+  energy: draft.pipeline.energy,
+  next: draft.pipeline.next_action,
+}));
+
+const readyCount = pipelineRows.filter(
+  (row) => row.stage === "ready_for_review" || row.stage === "fallback_ready",
+).length;
 ---
 
 <AdminLayout
@@ -8,9 +22,50 @@ import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
   deck="Read-only issue drafts and source-backed preview structure. No D1 writes, archive publishing, sends, or worker controls."
 >
   <section class="meta-strip" aria-label="newsletter source">
-    <span>{newsletterDrafts.length} draft</span>
+    <span>{newsletterDrafts.length} drafts</span>
+    <span>{readyCount} low-friction</span>
     <span>{newsletterDraftsSource.source_doc}</span>
     <span>{newsletterDraftsSource.mode}</span>
+  </section>
+
+  <section class="table-card newsletter-pipeline">
+    <div class="section-head">
+      <div>
+        <p>pipeline</p>
+        <h2>drafts ready before writing energy is high</h2>
+      </div>
+      <span>read only</span>
+    </div>
+    <div class="record-list">
+      {
+        pipelineRows.map((row) => (
+          <article class="record-row pipeline-row">
+            <div>
+              <p>
+                {row.lane} / {row.stage} / {row.energy} energy
+              </p>
+              <h3>{row.title}</h3>
+            </div>
+            <dl>
+              <div>
+                <dt>status</dt>
+                <dd>{row.status}</dd>
+              </div>
+              <div>
+                <dt>next</dt>
+                <dd>{row.next}</dd>
+              </div>
+            </dl>
+            <div class="actions">
+              <a class="button secondary" href={row.href}>
+                review
+              </a>
+              <span class="button secondary inert-button">send disabled</span>
+            </div>
+          </article>
+        ))
+      }
+    </div>
   </section>
 
   <div class="newsletter-grid">
@@ -39,6 +94,17 @@ import { newsletterDrafts, newsletterDraftsSource } from "../data/newsletter";
                 </span>
               </div>
               <dl>
+                <div>
+                  <dt>pipeline</dt>
+                  <dd>
+                    {draft.pipeline.lane} / {draft.pipeline.stage} /{" "}
+                    {draft.pipeline.energy} energy
+                  </dd>
+                </div>
+                <div>
+                  <dt>next</dt>
+                  <dd>{draft.pipeline.next_action}</dd>
+                </div>
                 <div>
                   <dt>subject</dt>
                   <dd>{draft.subject}</dd>
