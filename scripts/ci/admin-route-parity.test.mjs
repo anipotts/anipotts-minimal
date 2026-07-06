@@ -36,6 +36,7 @@ const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
 
 assert.deepEqual(publicPaths, [
   "/api/health",
+  "/api/mcp",
   "/apple-touch-icon.png",
   "/auth/passkey",
   "/favicon-16x16.png",

@@ -941,7 +941,7 @@ th {
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(138px, 20vw, 220px);
+  width: clamp(112px, 14vw, 164px);
   aspect-ratio: 1;
   overflow: visible;
   border: 0;
@@ -956,24 +956,17 @@ th {
 .passkey-card::before {
   content: "";
   position: absolute;
-  inset: -42%;
+  inset: -18%;
+  border-radius: 50%;
   pointer-events: none;
-  background:
-    linear-gradient(
-      90deg,
-      transparent 12%,
-      color-mix(in srgb, var(--accent) 42%, transparent),
-      transparent 88%
-    ),
-    linear-gradient(
-      180deg,
-      transparent 22%,
-      color-mix(in srgb, #3ee7b0 28%, transparent),
-      transparent 78%
-    );
-  opacity: 0.26;
-  transform: rotate(12deg) scaleX(0.72);
-  animation: passkey-scan 5.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 10%, transparent),
+    transparent 68%
+  );
+  opacity: 0.46;
+  transform: scale(0.96);
+  animation: passkey-idle 5.8s ease-in-out infinite;
 }
 
 .passkey-card[data-auth-state="signed-in"] {
@@ -996,18 +989,19 @@ th {
   place-items: center;
   width: 100%;
   aspect-ratio: 1;
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
   border-radius: 50%;
   background:
     radial-gradient(
       circle,
-      color-mix(in srgb, var(--accent) 20%, transparent),
-      transparent 54%
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 58%
     ),
-    color-mix(in srgb, var(--panel) 72%, transparent);
+    color-mix(in srgb, var(--panel) 58%, transparent);
   box-shadow:
-    inset 0 0 48px color-mix(in srgb, var(--accent) 16%, transparent),
-    0 0 80px color-mix(in srgb, var(--accent) 18%, transparent);
+    inset 0 0 32px color-mix(in srgb, var(--accent) 10%, transparent),
+    0 0 36px color-mix(in srgb, var(--accent) 10%, transparent);
+  animation: passkey-breathe 6.4s ease-in-out infinite;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -1016,11 +1010,11 @@ th {
 
 .passkey-card:not(:disabled):hover .passkey-sigil,
 .passkey-card:focus-visible .passkey-sigil {
-  border-color: color-mix(in srgb, var(--accent) 82%, #3ee7b0);
+  border-color: color-mix(in srgb, var(--accent) 58%, #3ee7b0);
   box-shadow:
-    inset 0 0 58px color-mix(in srgb, var(--accent) 22%, transparent),
-    0 0 110px color-mix(in srgb, var(--accent) 30%, transparent);
-  transform: scale(1.025);
+    inset 0 0 36px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 0 48px color-mix(in srgb, var(--accent) 14%, transparent);
+  transform: scale(1.015);
 }
 
 .passkey-card:focus-visible {
@@ -1029,26 +1023,26 @@ th {
 
 .passkey-ring {
   position: absolute;
-  inset: 10px;
-  border: 1px solid color-mix(in srgb, var(--accent) 48%, transparent);
+  inset: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   border-left-color: transparent;
   border-radius: 50%;
-  animation: passkey-ring 3.6s linear infinite;
+  animation: passkey-ring 11s linear infinite;
 }
 
 .passkey-ring.offset {
-  inset: 20px;
-  border-color: color-mix(in srgb, #3ee7b0 48%, transparent);
+  inset: 24px;
+  border-color: color-mix(in srgb, #3ee7b0 26%, transparent);
   border-right-color: transparent;
-  animation-duration: 4.8s;
+  animation-duration: 14s;
   animation-direction: reverse;
 }
 
 .passkey-core {
   position: relative;
-  width: 30px;
-  height: 42px;
-  border: 2px solid var(--accent);
+  width: 22px;
+  height: 32px;
+  border: 1px solid color-mix(in srgb, var(--accent) 82%, #3ee7b0);
   border-radius: 18px;
   background: color-mix(in srgb, var(--bg) 62%, transparent);
 }
@@ -1062,18 +1056,18 @@ th {
 }
 
 .passkey-core::before {
-  top: 9px;
-  width: 8px;
-  height: 8px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #3ee7b0;
-  box-shadow: 0 0 16px rgba(62, 231, 176, 0.75);
+  box-shadow: 0 0 10px rgba(62, 231, 176, 0.48);
 }
 
 .passkey-core::after {
-  bottom: 8px;
+  bottom: 7px;
   width: 2px;
-  height: 11px;
+  height: 8px;
   background: color-mix(in srgb, var(--accent) 74%, #3ee7b0);
 }
 
@@ -1191,7 +1185,7 @@ th {
 }
 
 .passkey-card.is-busy .passkey-sigil {
-  animation: passkey-pulse 900ms ease-in-out infinite alternate;
+  animation: passkey-pulse 1.2s ease-in-out infinite alternate;
 }
 
 .passkey-meta-line {
@@ -1249,14 +1243,29 @@ th {
   }
 }
 
-@keyframes passkey-scan {
+@keyframes passkey-idle {
   0%,
-  40% {
-    transform: rotate(12deg) translateX(-42%) scaleX(0.72);
-  }
-  66%,
   100% {
-    transform: rotate(12deg) translateX(42%) scaleX(0.72);
+    opacity: 0.36;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.58;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes passkey-breathe {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 30px color-mix(in srgb, var(--accent) 9%, transparent),
+      0 0 32px color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 36px color-mix(in srgb, var(--accent) 13%, transparent),
+      0 0 44px color-mix(in srgb, var(--accent) 12%, transparent);
   }
 }
 
@@ -1264,7 +1273,7 @@ th {
   to {
     box-shadow:
       inset 0 0 42px color-mix(in srgb, var(--accent) 28%, transparent),
-      0 0 58px color-mix(in srgb, var(--accent) 30%, transparent);
+      0 0 54px color-mix(in srgb, var(--accent) 20%, transparent);
   }
 }
 
@@ -1280,6 +1289,7 @@ th {
   }
 
   .passkey-card::before,
+  .passkey-sigil,
   .passkey-ring,
   .passkey-card.is-busy .passkey-sigil {
     animation: none;
@@ -2523,7 +2533,7 @@ dd {
   }
 
   .passkey-card {
-    width: clamp(132px, 44vw, 178px);
+    width: clamp(112px, 34vw, 148px);
     padding: 0;
   }
 

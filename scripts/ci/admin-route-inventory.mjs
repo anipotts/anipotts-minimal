@@ -82,6 +82,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/api/admin/projections",
+    file: "apps/admin/src/pages/api/admin/projections.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
     route: "/api/admin/content/draft-operation",
     file: "apps/admin/src/pages/api/admin/content/draft-operation.ts",
     nav: false,
@@ -96,6 +102,7 @@ export const ADMIN_ROUTES = [
 
 export const PUBLIC_UNSMOKED_ROUTE_FILES = [
   "apps/admin/src/pages/api/health.ts",
+  "apps/admin/src/pages/api/mcp.ts",
   "apps/admin/src/pages/api/admin/passkey/login-options.ts",
   "apps/admin/src/pages/api/admin/passkey/login-verify.ts",
   "apps/admin/src/pages/api/admin/passkey/logout.ts",
