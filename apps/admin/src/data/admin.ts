@@ -40,6 +40,13 @@ export const navItems: NavItem[] = [
     description: "attention queue and approvals",
   },
   {
+    href: "/inbox",
+    label: "inbox",
+    status: "queue",
+    group: "primary",
+    description: "proof, content, fleet, and decision queue",
+  },
+  {
     href: "/fleet",
     label: "fleet",
     status: "runtime",
@@ -94,6 +101,13 @@ export const navItems: NavItem[] = [
     status: "content",
     group: "content",
     description: "draft preview surfaces",
+  },
+  {
+    href: "/content/drafts",
+    label: "drafts",
+    status: "content",
+    group: "content",
+    description: "saved draft operations and publish state",
   },
   {
     href: "/content/operations",
@@ -157,12 +171,11 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "writing editor",
-    status:
-      "draft operation editor is live; full publish flow moved to a worktree",
+    status: "D1 draft save and selected-draft publish are live",
     risk: "medium",
-    next: "build D1 save, preview, publish, visibility, and revision history",
-    href: "/content/drafts",
-    action: "review editor",
+    next: "use the Astryx editor for save, preview, publish, and history",
+    href: "/content/edit/new",
+    action: "open editor",
   },
   {
     title: "content inventory",
@@ -351,8 +364,8 @@ export const mutationRows: QueueRow[] = [
   {
     title: "publish content edits",
     owner: "content admin",
-    status: "future write path",
-    evidence: "must be logged, reversible, and proof-backed",
+    status: "selected-draft publish with proof",
+    evidence: "content_publish_events and page_content version history",
   },
 ];
 

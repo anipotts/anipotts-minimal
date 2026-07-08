@@ -2589,3 +2589,443 @@ dd {
     border-top: 1px solid var(--border);
   }
 }
+
+/* Astryx admin port layer. Keeps older route classes working while the shell
+   and editor move to the design system. */
+
+html[data-astryx-theme="neutral"] {
+  background: var(--color-background-body);
+  color-scheme: light dark;
+}
+
+html[data-astryx-theme="neutral"] body {
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  line-height: var(--text-body-leading);
+}
+
+html[data-astryx-theme="neutral"] a {
+  color: var(--color-text-primary);
+}
+
+.admin-astryx-root {
+  min-height: 100vh;
+  background: var(--color-background-body);
+}
+
+.admin-astryx-root [data-astryx-component="AppShell"],
+.admin-astryx-root main {
+  min-width: 0;
+}
+
+.admin-side-nav {
+  border-right: 1px solid var(--color-border);
+  background: var(--color-background-surface);
+}
+
+.admin-mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.admin-nav-footer {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-muted);
+}
+
+.admin-nav-footer p,
+.admin-nav-footer span {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.admin-nav-footer-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-mobile-strip {
+  display: none;
+}
+
+.admin-page-frame {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.admin-page-content {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+html[data-astryx-theme="neutral"] .page-header {
+  margin: 0;
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+html[data-astryx-theme="neutral"] .page-header p,
+html[data-astryx-theme="neutral"] .section-head p,
+html[data-astryx-theme="neutral"] .record-row p,
+html[data-astryx-theme="neutral"] .need-row p,
+html[data-astryx-theme="neutral"] dt {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-astryx-theme="neutral"] .page-header h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+}
+
+html[data-astryx-theme="neutral"] .page-header > span {
+  max-width: 560px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+html[data-astryx-theme="neutral"] .meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+html[data-astryx-theme="neutral"] .meta-strip span {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  padding: 6px 9px;
+}
+
+html[data-astryx-theme="neutral"] .table-card,
+html[data-astryx-theme="neutral"] .operation-card,
+html[data-astryx-theme="neutral"] .panel,
+html[data-astryx-theme="neutral"] .quick-card,
+html[data-astryx-theme="neutral"] .draft-editor-card,
+html[data-astryx-theme="neutral"] .newsletter-article-preview,
+html[data-astryx-theme="neutral"] .newsletter-proof-panel,
+html[data-astryx-theme="neutral"] .source-audit-card,
+html[data-astryx-theme="neutral"] .proof-route-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-surface);
+  box-shadow: none;
+}
+
+html[data-astryx-theme="neutral"] .section-head {
+  align-items: start;
+  border-bottom-color: var(--color-border);
+}
+
+html[data-astryx-theme="neutral"] .section-head h2,
+html[data-astryx-theme="neutral"] .record-row h3,
+html[data-astryx-theme="neutral"] .need-row h3 {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+}
+
+html[data-astryx-theme="neutral"] .section-head > span,
+html[data-astryx-theme="neutral"] .record-row span,
+html[data-astryx-theme="neutral"] .need-row span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+html[data-astryx-theme="neutral"] .record-row,
+html[data-astryx-theme="neutral"] .need-row {
+  border-color: var(--color-border);
+}
+
+html[data-astryx-theme="neutral"] .record-row dl,
+html[data-astryx-theme="neutral"] .need-row dl,
+.astryx-proof-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 14px;
+}
+
+html[data-astryx-theme="neutral"] dd,
+.astryx-proof-list dd {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+html[data-astryx-theme="neutral"] .button {
+  border-radius: 6px;
+}
+
+.minimal-home {
+  max-width: 980px;
+}
+
+.next-panel h2 {
+  max-width: 780px;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.04;
+}
+
+.route-row {
+  grid-template-columns: minmax(130px, 0.34fr) minmax(0, 1fr);
+}
+
+.inbox-list {
+  display: grid;
+  gap: 0;
+}
+
+.inbox-row {
+  position: relative;
+}
+
+.inbox-row::before {
+  content: "";
+  position: absolute;
+  inset: 14px auto auto 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-success);
+}
+
+.inbox-row.risk-high::before {
+  background: var(--color-error);
+}
+
+.inbox-row.risk-medium::before {
+  background: var(--color-warning);
+}
+
+.inbox-row > div:first-child {
+  padding-left: 18px;
+}
+
+.astryx-editor {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.astryx-editor-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+
+.astryx-editor-panel,
+.astryx-editor-side > .table-card,
+.astryx-publish-dialog {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-surface);
+}
+
+.astryx-editor-panel {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+.astryx-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.astryx-wide {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.astryx-native-field {
+  display: grid;
+  gap: 6px;
+}
+
+.astryx-native-field span {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.astryx-native-field select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: 6px;
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 0 10px;
+}
+
+.astryx-editor-actions,
+.publish-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.astryx-editor-actions > span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.astryx-editor-side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.astryx-proof-list {
+  margin: 0;
+}
+
+.astryx-proof-list dt,
+.astryx-proof-list dd {
+  margin: 0;
+}
+
+.compact-list .record-row {
+  padding: 12px 0;
+}
+
+.astryx-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: var(--color-overlay);
+  padding: 18px;
+}
+
+.astryx-publish-dialog {
+  display: grid;
+  gap: 16px;
+  width: min(560px, 100%);
+  padding: 18px;
+}
+
+.astryx-publish-dialog p,
+.astryx-publish-dialog h2 {
+  margin: 0;
+}
+
+.admin-auth-frame {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--color-background-body);
+}
+
+.admin-auth-card {
+  width: min(100%, 560px);
+}
+
+@media (max-width: 900px) {
+  .admin-page-frame {
+    padding: 18px;
+  }
+
+  .admin-mobile-strip {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 10px;
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(
+      in srgb,
+      var(--color-background-surface) 94%,
+      transparent
+    );
+  }
+
+  .admin-mobile-strip a {
+    flex: 0 0 auto;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .admin-mobile-strip a.is-active {
+    border-color: var(--color-border-emphasized);
+    color: var(--color-text-primary);
+    background: var(--color-background-muted);
+  }
+
+  .astryx-editor-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-page-frame {
+    padding: 14px;
+  }
+
+  .page-header {
+    display: grid;
+    gap: 8px;
+  }
+
+  .route-row,
+  html[data-astryx-theme="neutral"] .record-row,
+  html[data-astryx-theme="neutral"] .need-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .astryx-editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .astryx-editor-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin: 0 -16px -16px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-background-surface);
+  }
+}

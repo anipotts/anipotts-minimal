@@ -1,0 +1,77 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { readAdminInbox } from "../data/inbox";
+
+const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
+const sourceLabels = Array.from(
+  new Set(inbox.items.map((item) => item.source)),
+);
+---
+
+<AdminLayout
+  title="inbox"
+  deck="Unified action queue from proof, content, needs, runtime, newsletter, and carousel state. No outbound actions run from here."
+>
+  <section class="meta-strip" aria-label="admin inbox source">
+    <span>{inbox.counts.total} items</span>
+    <span>{inbox.counts.high} high</span>
+    <span>{inbox.counts.medium} medium</span>
+    <span>{inbox.counts.low} low</span>
+    <span>{inbox.mode}</span>
+    <span>{sourceLabels.join(", ") || "empty"}</span>
+  </section>
+
+  <section class="table-card">
+    <div class="section-head">
+      <div>
+        <p>what is safe next</p>
+        <h2>action inbox</h2>
+      </div>
+      <span>read only</span>
+    </div>
+    <div class="record-list inbox-list">
+      {
+        inbox.items.length === 0 ? (
+          <article class="record-row">
+            <div>
+              <p>clear</p>
+              <h3>No current admin action items.</h3>
+            </div>
+          </article>
+        ) : (
+          inbox.items.map((item) => (
+            <article class={`record-row inbox-row risk-${item.risk}`}>
+              <div>
+                <p>
+                  {item.source} / {item.status} / {item.risk}
+                </p>
+                <h3>{item.title}</h3>
+                <span>{item.summary}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>next</dt>
+                  <dd>{item.next_action}</dd>
+                </div>
+                <div>
+                  <dt>proof</dt>
+                  <dd>{item.proof}</dd>
+                </div>
+                <div>
+                  <dt>updated</dt>
+                  <dd>{item.updated_at}</dd>
+                </div>
+                <div>
+                  <dt>open</dt>
+                  <dd>
+                    <a href={item.href}>open source</a>
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))
+        )
+      }
+    </div>
+  </section>
+</AdminLayout>
