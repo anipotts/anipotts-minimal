@@ -144,7 +144,7 @@ const summaryText = homepageSummaryText(cmsHome);
 <style>
   .home-hero {
     font-size: clamp(3rem, 12vw, 7rem);
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
     line-height: 0.95;
     margin-bottom: var(--s-4);
     font-weight: 600;
@@ -239,7 +239,7 @@ const summaryText = homepageSummaryText(cmsHome);
   .proof-label {
     color: var(--ink-muted);
     font-size: 0.72rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
@@ -309,11 +309,19 @@ const summaryText = homepageSummaryText(cmsHome);
     }
 
     .hero-sentence {
+      min-width: 0;
       max-width: 32rem;
+      overflow-wrap: anywhere;
     }
 
     .mention-cluster {
-      column-gap: 0.18em;
+      display: inline;
+      min-width: 0;
+      white-space: normal;
+    }
+
+    .brand-parens {
+      white-space: normal;
     }
 
     .hero-line :global(.inline-mention) {

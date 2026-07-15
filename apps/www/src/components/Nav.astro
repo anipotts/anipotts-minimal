@@ -7,7 +7,20 @@ const current = Astro.url.pathname;
 
 <header class="frame nav">
   <a href="/" class="wordmark" aria-label="home">
-    ani potts<span class="dot">.</span>
+    <img
+      class="brand-mark brand-mark-light"
+      src="/brand/ap-on-white.svg"
+      width="48"
+      height="48"
+      alt=""
+    />
+    <img
+      class="brand-mark brand-mark-dark"
+      src="/brand/ap-on-black.svg"
+      width="48"
+      height="48"
+      alt=""
+    />
   </a>
   <nav
     id="primary-nav"
@@ -65,19 +78,29 @@ const current = Astro.url.pathname;
   }
 
   .wordmark {
-    font-family: var(--sans);
-    font-size: 1.5rem;
-    font-weight: 600;
     text-decoration: none;
-    color: var(--ink);
     margin-right: auto;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
   }
 
-  .dot {
-    color: var(--accent);
+  .brand-mark {
+    display: block;
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .brand-mark-dark {
+    display: none;
+  }
+
+  :global(html[data-theme="dark"]) .brand-mark-light {
+    display: none;
+  }
+
+  :global(html[data-theme="dark"]) .brand-mark-dark {
+    display: block;
   }
 
   .primary-nav {
@@ -166,8 +189,9 @@ const current = Astro.url.pathname;
       -webkit-backdrop-filter: blur(16px);
     }
 
-    .wordmark {
-      font-size: 1.25rem;
+    .brand-mark {
+      width: 3.5rem;
+      height: 3.5rem;
     }
 
     .theme-toggle {

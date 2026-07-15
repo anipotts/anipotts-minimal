@@ -25,6 +25,7 @@
 html {
   background: var(--bg);
   color-scheme: light;
+  overflow-x: clip;
 }
 
 html[data-theme="dark"] {
@@ -41,6 +42,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -59,7 +61,7 @@ h3 {
   font-weight: 500;
   line-height: var(--lh-tight);
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 /* one orchestrated reveal on first paint. opacity:0 stays INSIDE the
@@ -70,12 +72,24 @@ h3 {
     transform: translateY(14px);
     animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
   }
-  [data-rise]:nth-child(1) { animation-delay: 0.06s; }
-  [data-rise]:nth-child(2) { animation-delay: 0.16s; }
-  [data-rise]:nth-child(3) { animation-delay: 0.26s; }
-  [data-rise]:nth-child(4) { animation-delay: 0.36s; }
-  [data-rise]:nth-child(5) { animation-delay: 0.46s; }
-  [data-rise]:nth-child(n + 6) { animation-delay: 0.54s; }
+  [data-rise]:nth-child(1) {
+    animation-delay: 0.06s;
+  }
+  [data-rise]:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+  [data-rise]:nth-child(3) {
+    animation-delay: 0.26s;
+  }
+  [data-rise]:nth-child(4) {
+    animation-delay: 0.36s;
+  }
+  [data-rise]:nth-child(5) {
+    animation-delay: 0.46s;
+  }
+  [data-rise]:nth-child(n + 6) {
+    animation-delay: 0.54s;
+  }
   @keyframes rise {
     to {
       opacity: 1;
@@ -87,6 +101,8 @@ h3 {
 /* ---------- layout primitives ---------- */
 
 .frame {
+  width: 100%;
+  min-width: 0;
   max-width: 64rem;
   margin-inline: auto;
   padding-inline: clamp(1.25rem, 5vw, 2.5rem);
@@ -100,16 +116,17 @@ h3 {
 }
 
 .section-label {
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: 0.75rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--ink-muted);
 }
 
 .hero-title {
   font-size: var(--p-hero);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   font-weight: 500;
 }
 
@@ -125,7 +142,8 @@ h3 {
 }
 
 .mono {
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: var(--p-mono);
 }
 
@@ -187,7 +205,8 @@ h3 {
   color: var(--accent);
   border-radius: 99px;
   padding: 0.15rem 0.6rem;
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: 0.75rem;
 }
 
@@ -203,7 +222,7 @@ h3 {
 .stat-table th {
   color: var(--ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   font-weight: 400;
   font-size: 0.7rem;
   text-align: left;
@@ -263,7 +282,8 @@ button.fill:disabled {
 }
 
 .chip {
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: 0.75rem;
   color: var(--ink-muted);
   background: var(--surface);
@@ -399,7 +419,7 @@ button.fill:disabled {
 .article-body th {
   color: var(--ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   font-weight: 500;
   text-align: left;
   padding: var(--s-2) var(--s-3);
