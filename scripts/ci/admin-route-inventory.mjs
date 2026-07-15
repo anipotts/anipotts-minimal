@@ -8,6 +8,18 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/work/projects/admin-control-plane",
+    file: "apps/admin/src/pages/work/projects/[projectId].astro",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/work/tasks/task-admin-work-core-contract",
+    file: "apps/admin/src/pages/work/tasks/[taskId].astro",
+    nav: false,
+    smoke: false,
+  },
+  {
     route: "/life",
     file: "apps/admin/src/pages/life/index.astro",
     nav: true,

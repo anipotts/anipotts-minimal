@@ -1,9 +1,16 @@
 ---
-import AdminTable from "../components/AdminTable.astro";
+import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
+import { FleetView } from "../components/astryx/UnifiedShellViews";
+import { selectAdminControlSource } from "../data/admin-control-source";
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { fleetRows } from "../data/admin";
+
+const source = selectAdminControlSource(
+  Astro.locals.runtime?.env.DB,
+  Astro.url,
+);
+const snapshot = await loadAdminControlSnapshot(source.database);
 ---
 
-<AdminLayout title="fleet" deck="Machine and agent status summary.">
-  <AdminTable rows={fleetRows} />
+<AdminLayout title="fleet" deck="Machine, runtime, and cleanup state.">
+  <FleetView snapshot={snapshot} fixtureMode={source.fixtureMode} />
 </AdminLayout>

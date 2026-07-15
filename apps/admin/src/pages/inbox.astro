@@ -5,9 +5,9 @@ import { readAdminInbox } from "../data/inbox";
 const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
 const categories = [
   {
-    id: "health",
-    label: "health",
-    detail: "diet, vices, metrics, and decisions owned by chief/health",
+    id: "work",
+    label: "work",
+    detail: "business, jobs, payments, and follow-up",
   },
   {
     id: "content",
@@ -15,14 +15,19 @@ const categories = [
     detail: "site, writing, newsletter, brand, and carousel work",
   },
   {
-    id: "income",
-    label: "income",
-    detail: "business, jobs, payments, and outbound follow-up",
+    id: "life",
+    label: "life",
+    detail: "health and personal decisions",
+  },
+  {
+    id: "fleet",
+    label: "fleet",
+    detail: "machines, repos, runtime, and drift",
   },
   {
     id: "system",
     label: "system",
-    detail: "infra, fleet, repos, deploys, proof, and gated operations",
+    detail: "proof, deploys, auth, and gated operations",
   },
 ] as const;
 
@@ -37,6 +42,9 @@ const selectedCategory = categories.find(
 const visibleSections = selectedCategory
   ? sections.filter((section) => section.id === selectedCategory.id)
   : sections;
+const visibleHistory = selectedCategory
+  ? inbox.history.filter((item) => item.category === selectedCategory.id)
+  : inbox.history;
 
 const countByTimeframe = (timeframe: string) =>
   inbox.items.filter((item) => item.timeframe === timeframe).length;
@@ -65,9 +73,8 @@ const countByTimeframe = (timeframe: string) =>
     </div>
     <div class="inbox-intro-copy">
       <p>
-        The queue combines source-backed health, content, income, and system
-        blockers. Copying text does not send, approve, publish, or continue a
-        task.
+        One queue, filtered by domain. Copying text does not send, approve,
+        publish, or continue a task.
       </p>
       <div class="inbox-monitoring-status">
         <small>monitoring</small>
@@ -170,34 +177,98 @@ const countByTimeframe = (timeframe: string) =>
     }
   </div>
 
+  <details class="table-card inbox-history">
+    <summary>resolved history / {visibleHistory.length}</summary>
+    <div class="inbox-history-tools">
+      <label for="inbox-history-filter">filter history</label>
+      <input
+        id="inbox-history-filter"
+        type="search"
+        placeholder="title, source, owner, status"
+        data-inbox-history-filter
+      />
+    </div>
+    <div class="record-list inbox-list" data-inbox-history-list>
+      {
+        visibleHistory.length === 0 ? (
+          <article class="record-row inbox-empty-row">
+            <div>
+              <p>history</p>
+              <h3>no resolved rows</h3>
+            </div>
+          </article>
+        ) : (
+          visibleHistory.map((item) => (
+            <article
+              class="record-row inbox-history-row"
+              data-inbox-history-row
+              data-history-search={`${item.title} ${item.summary} ${item.source} ${item.owner} ${item.status} ${item.category}`.toLowerCase()}
+            >
+              <div>
+                <p>
+                  {item.category} / {item.source} / {item.owner} / {item.status}
+                </p>
+                <h3>{item.title}</h3>
+                <span>{item.summary}</span>
+              </div>
+              <a class="button ghost" href={item.href}>
+                open source
+              </a>
+            </article>
+          ))
+        )
+      }
+    </div>
+  </details>
+
   <script is:inline data-astro-rerun>
     (() => {
-      if (document.documentElement.dataset.inboxCopyBound === "true") return;
-      document.documentElement.dataset.inboxCopyBound = "true";
+      if (document.documentElement.dataset.inboxCopyBound !== "true") {
+        document.documentElement.dataset.inboxCopyBound = "true";
 
-      async function copyText(value) {
-        if (!navigator.clipboard?.writeText)
-          throw new Error("copy unavailable");
-        await navigator.clipboard.writeText(value);
+        async function copyText(value) {
+          if (!navigator.clipboard?.writeText)
+            throw new Error("copy unavailable");
+          await navigator.clipboard.writeText(value);
+        }
+
+        document.addEventListener("click", async (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+
+          const button = target.closest("[data-copy-text]");
+          if (!(button instanceof HTMLButtonElement)) return;
+
+          const value = button.getAttribute("data-copy-text") ?? "";
+          const status =
+            button.parentElement?.querySelector("[data-copy-status]");
+          try {
+            await copyText(value);
+            if (status) status.textContent = "copied";
+          } catch {
+            if (status) status.textContent = "copy failed";
+          }
+        });
       }
 
-      document.addEventListener("click", async (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-
-        const button = target.closest("[data-copy-text]");
-        if (!(button instanceof HTMLButtonElement)) return;
-
-        const value = button.getAttribute("data-copy-text") ?? "";
-        const status =
-          button.parentElement?.querySelector("[data-copy-status]");
-        try {
-          await copyText(value);
-          if (status) status.textContent = "copied";
-        } catch {
-          if (status) status.textContent = "copy failed";
-        }
-      });
+      const historyFilter = document.querySelector(
+        "[data-inbox-history-filter]",
+      );
+      if (
+        historyFilter instanceof HTMLInputElement &&
+        historyFilter.dataset.filterBound !== "true"
+      ) {
+        historyFilter.dataset.filterBound = "true";
+        historyFilter.addEventListener("input", () => {
+          const query = historyFilter.value.trim().toLowerCase();
+          for (const row of document.querySelectorAll(
+            "[data-inbox-history-row]",
+          )) {
+            if (!(row instanceof HTMLElement)) continue;
+            row.hidden = !(row.dataset.historySearch ?? "").includes(query);
+          }
+        });
+      }
     })();
   </script>
 </AdminLayout>

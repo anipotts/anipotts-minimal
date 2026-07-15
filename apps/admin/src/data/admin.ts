@@ -44,7 +44,7 @@ export const navItems: NavItem[] = [
   {
     href: "/work",
     label: "work",
-    status: "empty",
+    status: "read only",
     group: "primary",
     primary: true,
     description: "projects, tasks, and history",

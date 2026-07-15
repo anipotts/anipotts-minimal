@@ -12,6 +12,10 @@ import {
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const inboxDataSource = readFileSync("apps/admin/src/data/inbox.ts", "utf8");
 const inboxSource = readFileSync("apps/admin/src/pages/inbox.astro", "utf8");
+const adminControlSource = readFileSync(
+  "apps/admin/src/data/admin-control-source.ts",
+  "utf8",
+);
 const rootSource = readFileSync("apps/admin/src/pages/index.astro", "utf8");
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeyProofSource = readFileSync(
@@ -50,6 +54,11 @@ assert.deepEqual(publicPaths, [
   "/auth/passkey",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
+  "/favicon-dark-32.png",
+  "/favicon-dark.svg",
+  "/favicon-light-32.png",
+  "/favicon-light.svg",
+  "/favicon.svg",
 ]);
 assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/login-options",
@@ -160,9 +169,10 @@ assert.equal(
 );
 
 for (const marker of [
-  'id: "health"',
+  'id: "work"',
   'id: "content"',
-  'id: "income"',
+  'id: "life"',
+  'id: "fleet"',
   'id: "system"',
   "data-copy-text",
   "data-astro-rerun",
@@ -180,6 +190,8 @@ for (const marker of [
   "loadAdminControlSnapshot",
   "control.projections.inbox_items",
   "dedupeInboxItems",
+  "requiresHumanInboxAttention",
+  "partitionInboxProjectionItems",
   "copy_text",
 ]) {
   assert.ok(
@@ -196,6 +208,14 @@ assert.equal(
   inboxSource.includes("needs ani"),
   false,
   "canonical inbox must not expose the retired queue label",
+);
+assert.ok(
+  adminControlSource.includes("import.meta.env.DEV"),
+  "fixture source switch must remain development-only",
+);
+assert.ok(
+  adminControlSource.includes("database: fixtureMode ? undefined : db"),
+  "fixture mode must remove the database before loading projections",
 );
 
 for (const marker of [

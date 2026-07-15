@@ -14,7 +14,16 @@ import {
   type AdminInboxItem as AdminControlInboxItem,
 } from "@anipotts/lib/admin-control";
 import { carouselPosts, carouselSummary } from "./carousels";
+import {
+  canonicalInboxDomain,
+  partitionInboxProjectionItems,
+  requiresHumanInboxAttention,
+  shouldPromoteRuntimeOverlay,
+  type AdminInboxCategory,
+} from "./inbox-policy";
 import { loadRuntimeOverlayResponse } from "./runtime";
+
+export type { AdminInboxCategory } from "./inbox-policy";
 
 type BoundAdminControlDatabase = Exclude<
   AdminControlDatabase,
@@ -26,7 +35,6 @@ type AdminInboxDb = ContentInventoryD1Database &
   ProofD1Database &
   BoundAdminControlDatabase;
 
-export type AdminInboxCategory = "health" | "content" | "income" | "system";
 export type AdminInboxTimeframe =
   | "now"
   | "today"
@@ -36,7 +44,7 @@ export type AdminInboxTimeframe =
 export type AdminInboxItem = {
   id: string;
   dedupe_key: string;
-  domain: string;
+  domain: AdminInboxCategory;
   entity_ref: string | null;
   attention_kind: string;
   source: string;
@@ -65,15 +73,8 @@ export type AdminInboxReadState = {
     low: number;
   };
   items: AdminInboxItem[];
+  history: AdminInboxItem[];
 };
-
-const CLOSED_STATUSES = new Set([
-  "archived",
-  "closed",
-  "completed",
-  "resolved",
-  "verified",
-]);
 
 export async function readAdminInbox(
   db: AdminInboxDb | null | undefined,
@@ -86,17 +87,18 @@ export async function readAdminInbox(
     readPageContentInventoryStore(db),
     loadRuntimeOverlayResponse(),
   ]);
+  const projectionInbox = partitionInboxProjectionItems(
+    control.projections.inbox_items,
+  );
 
   const items: AdminInboxItem[] = [
-    ...control.projections.inbox_items
-      .filter((item) => isOpenProjectionItem(item))
-      .map((item) => inboxItemFromProjection(item, now)),
+    ...projectionInbox.open.map((item) => inboxItemFromProjection(item, now)),
     ...proof
-      .filter((entry) => entry.status !== "verified")
+      .filter((entry) => entry.status === "blocked")
       .map<AdminInboxItem>((entry) => ({
         id: entry.id,
         dedupe_key: `proof:${entry.id}`,
-        domain: "proof",
+        domain: "system",
         entity_ref: `proof:${entry.id}`,
         attention_kind: "verification",
         source: entry.kind === "auth" ? "auth" : "deploy",
@@ -116,9 +118,7 @@ export async function readAdminInbox(
       })),
     ...operations.operations
       .filter((operation) =>
-        ["draft", "previewed", "needs_ani", "blocked"].includes(
-          operation.status,
-        ),
+        ["needs_ani", "blocked"].includes(operation.status),
       )
       .slice(0, 8)
       .map<AdminInboxItem>((operation) => {
@@ -151,14 +151,7 @@ export async function readAdminInbox(
         };
       }),
     ...runtime.overlays
-      .filter(
-        (overlay) =>
-          (overlay.ahead ?? 0) > 0 ||
-          (overlay.behind ?? 0) > 0 ||
-          (overlay.dirty_tracked_count ?? 0) > 0 ||
-          (overlay.untracked_count ?? 0) > 0 ||
-          !overlay.git_available,
-      )
+      .filter((overlay) => shouldPromoteRuntimeOverlay(overlay))
       .map<AdminInboxItem>((overlay) => ({
         id: overlay.repo_state_id,
         dedupe_key: `fleet:${overlay.repo_state_id}`,
@@ -175,7 +168,7 @@ export async function readAdminInbox(
           ? normalizeStatus(overlay.deploy_impact)
           : "git unavailable",
         risk: overlay.deploy_impact === "production" ? "high" : "medium",
-        category: "system",
+        category: "fleet",
         timeframe: overlay.deploy_impact === "production" ? "now" : "today",
         href: "/fleet",
         next_action: overlay.notes,
@@ -184,17 +177,19 @@ export async function readAdminInbox(
         updated_at: runtime.generated_at ?? now,
       })),
     ...runtime.gmail_sent_awareness.projections.inbox_items
-      .filter((item) => isOpenProjectionItem(item))
+      .filter((item) => requiresHumanInboxAttention(item))
       .map<AdminInboxItem>((item) => {
         const nextAction =
           item.action_kind === "none"
             ? "no action required"
             : "review the projected follow-up; sent-mail proof is event-only";
 
+        const category = canonicalInboxDomain(item);
+
         return {
           id: item.item_id,
           dedupe_key: item.dedupe_key,
-          domain: item.domain ?? "mail",
+          domain: category,
           entity_ref: item.entity_ref ?? null,
           attention_kind: item.attention_kind ?? "review",
           source: "gmail",
@@ -204,9 +199,9 @@ export async function readAdminInbox(
           summary: item.summary,
           status: normalizeStatus(item.status),
           risk: riskForUrgency(item.urgency),
-          category: "income",
+          category,
           timeframe: timeframeForProjection(item),
-          href: item.href ?? "/inbox?category=income",
+          href: item.href ?? `/inbox?category=${category}`,
           next_action: nextAction,
           copy_text: item.action_kind === "none" ? undefined : nextAction,
           proof: item.event_refs.join(", ") || item.dedupe_key,
@@ -215,7 +210,7 @@ export async function readAdminInbox(
         };
       }),
     ...newsletterDrafts
-      .filter((draft) => draft.status !== "ready_for_review")
+      .filter((draft) => draft.status === "blocked")
       .slice(0, 4)
       .map<AdminInboxItem>((draft) => ({
         id: draft.id,
@@ -239,7 +234,7 @@ export async function readAdminInbox(
         updated_at: now,
       })),
     ...carouselPosts
-      .filter((post) => post.staleCount > 0 || post.soundStatus !== "approved")
+      .filter((post) => post.status === "blocked")
       .slice(0, 4)
       .map<AdminInboxItem>((post) => {
         const nextAction =
@@ -275,7 +270,7 @@ export async function readAdminInbox(
     items.push({
       id: "admin-control.read-unavailable",
       dedupe_key: "admin-control:read-unavailable",
-      domain: "fleet",
+      domain: "system",
       entity_ref: "admin-control:read",
       attention_kind: "verification",
       source: "system",
@@ -328,6 +323,9 @@ export async function readAdminInbox(
   const sorted = dedupeInboxItems(items).sort(
     (a, b) => score(b) - score(a) || b.updated_at.localeCompare(a.updated_at),
   );
+  const history = dedupeInboxItems(
+    projectionInbox.history.map((item) => inboxItemFromProjection(item, now)),
+  ).sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 
   return {
     generated_at: now,
@@ -345,25 +343,20 @@ export async function readAdminInbox(
       low: sorted.filter((item) => item.risk === "low").length,
     },
     items: sorted,
+    history,
   };
-}
-
-function isOpenProjectionItem(
-  item: Pick<AdminControlInboxItem, "action_kind" | "status">,
-): boolean {
-  return item.action_kind !== "none" && !CLOSED_STATUSES.has(item.status);
 }
 
 function inboxItemFromProjection(
   item: AdminControlInboxItem,
   now: string,
 ): AdminInboxItem {
-  const category = categoryForProjection(item);
+  const category = canonicalInboxDomain(item);
 
   return {
     id: item.item_id,
     dedupe_key: item.dedupe_key,
-    domain: item.domain,
+    domain: category,
     entity_ref: item.entity_ref,
     attention_kind: item.attention_kind,
     source: item.source,
@@ -380,37 +373,6 @@ function inboxItemFromProjection(
     proof: item.event_refs.join(", ") || item.dedupe_key,
     updated_at: item.last_seen_at ?? item.expires_at ?? now,
   };
-}
-
-function categoryForProjection(
-  item: AdminControlInboxItem,
-): AdminInboxCategory {
-  const ref = [item.source, item.owner, item.account, item.title]
-    .filter(Boolean)
-    .join(":")
-    .toLowerCase();
-
-  if (ref.includes("health") || ref.includes("vitals")) return "health";
-  if (
-    ref.includes("business") ||
-    ref.includes("jobs") ||
-    ref.includes("income") ||
-    ref.includes("payment") ||
-    ref.includes("gmail")
-  ) {
-    return "income";
-  }
-  if (
-    ref.includes("brand") ||
-    ref.includes("site") ||
-    ref.includes("content") ||
-    ref.includes("newsletter") ||
-    ref.includes("media") ||
-    ref.includes("carousel")
-  ) {
-    return "content";
-  }
-  return "system";
 }
 
 function timeframeForProjection(

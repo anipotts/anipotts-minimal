@@ -1,10 +1,16 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
 import { WorkView } from "../components/astryx/UnifiedShellViews";
+import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
+import { selectAdminControlSource } from "../data/admin-control-source";
 
-const isLoading = Astro.url.searchParams.get("state") === "loading";
+const source = selectAdminControlSource(
+  Astro.locals.runtime?.env.DB,
+  Astro.url,
+);
+const snapshot = await loadAdminControlSnapshot(source.database);
 ---
 
 <AdminLayout title="work" deck="Projects, tasks, and history.">
-  <WorkView isLoading={isLoading} />
+  <WorkView snapshot={snapshot} fixtureMode={source.fixtureMode} />
 </AdminLayout>
