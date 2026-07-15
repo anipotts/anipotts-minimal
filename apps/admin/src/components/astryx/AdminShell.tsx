@@ -20,14 +20,6 @@ type AdminShellProps = {
   title: string;
 };
 
-const MOBILE_NAV_HREFS = new Set([
-  "/inbox",
-  "/inbox?category=health",
-  "/content",
-  "/inbox?category=income",
-  "/inbox?category=system",
-]);
-
 export function AdminShell({
   children,
   chrome,
@@ -45,13 +37,10 @@ export function AdminShell({
     );
   }
 
+  const primary = navItems.filter((item) => item.primary);
   const life = navItems.filter((item) => item.group === "life");
   const content = navItems.filter((item) => item.group === "content");
-  const income = navItems.filter((item) => item.group === "income");
   const system = navItems.filter((item) => item.group === "system");
-  const mobileItems = navItems.filter((item) =>
-    MOBILE_NAV_HREFS.has(item.href),
-  );
 
   const sideNav = (
     <SideNav
@@ -79,13 +68,13 @@ export function AdminShell({
         </div>
       }
     >
-      <SideNavSection title="life">
-        {life.map((item) => (
+      <SideNavSection title="main">
+        {primary.map((item) => (
           <SideNavItem
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
+            isSelected={isActive(currentRoute, item)}
             endContent={<Badge label={item.status} variant="neutral" />}
           />
         ))}
@@ -96,18 +85,17 @@ export function AdminShell({
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
+            isSelected={isActive(currentRoute, item)}
           />
         ))}
       </SideNavSection>
-      <SideNavSection title="income">
-        {income.map((item) => (
+      <SideNavSection title="life">
+        {life.map((item) => (
           <SideNavItem
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
-            endContent={<Badge label={item.status} variant="neutral" />}
+            isSelected={isActive(currentRoute, item)}
           />
         ))}
       </SideNavSection>
@@ -117,7 +105,7 @@ export function AdminShell({
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
+            isSelected={isActive(currentRoute, item)}
           />
         ))}
       </SideNavSection>
@@ -127,10 +115,10 @@ export function AdminShell({
   return (
     <div className="admin-astryx-root">
       <nav className="admin-mobile-strip" aria-label="admin mobile navigation">
-        {mobileItems.map((item) => (
+        {primary.map((item) => (
           <a
             key={item.href}
-            className={isActive(currentRoute, item.href) ? "is-active" : ""}
+            className={isActive(currentRoute, item) ? "is-active" : ""}
             href={item.href}
           >
             {item.label}
@@ -176,10 +164,36 @@ function ThemeToggle() {
   );
 }
 
-function isActive(currentRoute: string, href: string): boolean {
+function isActive(currentRoute: string, item: NavItem): boolean {
+  const { href, primary } = item;
   const [currentPath, currentQuery = ""] = currentRoute.split("?");
   const [targetPath, targetQuery = ""] = href.split("?");
   const currentParams = new URLSearchParams(currentQuery);
+
+  if (primary) {
+    if (href === "/content") {
+      return (
+        currentPath === "/content" ||
+        currentPath.startsWith("/content/") ||
+        currentPath === "/newsletter" ||
+        currentPath.startsWith("/newsletter/")
+      );
+    }
+    if (href === "/life") {
+      return currentPath === "/life" || currentPath.startsWith("/life/");
+    }
+    if (href === "/system") {
+      return (
+        currentPath === "/system" ||
+        currentPath === "/proof" ||
+        currentPath === "/deploys" ||
+        currentPath === "/repos" ||
+        currentPath === "/handoffs" ||
+        currentPath === "/mutations" ||
+        currentPath.startsWith("/ops/")
+      );
+    }
+  }
 
   if (targetQuery) {
     const targetParams = new URLSearchParams(targetQuery);

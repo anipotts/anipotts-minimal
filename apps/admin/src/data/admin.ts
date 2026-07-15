@@ -2,7 +2,8 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "life" | "content" | "income" | "system";
+  group: "primary" | "life" | "content" | "system";
+  primary?: boolean;
   description: string;
 };
 
@@ -36,22 +37,49 @@ export const navItems: NavItem[] = [
     href: "/inbox",
     label: "inbox",
     status: "queue",
-    group: "life",
+    group: "primary",
+    primary: true,
     description: "what needs attention and what can move next",
   },
   {
-    href: "/inbox?category=health",
-    label: "health",
-    status: "queue",
-    group: "life",
-    description: "diet, vices, metrics, and health decisions",
+    href: "/work",
+    label: "work",
+    status: "empty",
+    group: "primary",
+    primary: true,
+    description: "projects, tasks, and history",
   },
   {
     href: "/content",
     label: "content",
     status: "D1",
-    group: "content",
+    group: "primary",
+    primary: true,
     description: "pieces, drafts, exports",
+  },
+  {
+    href: "/life",
+    label: "life",
+    status: "status",
+    group: "primary",
+    primary: true,
+    description: "health and personal references",
+  },
+  {
+    href: "/fleet",
+    label: "fleet",
+    status: "runtime",
+    group: "primary",
+    primary: true,
+    description: "machines, repo state, current work",
+  },
+  {
+    href: "/system",
+    label: "system",
+    status: "read only",
+    group: "primary",
+    primary: true,
+    description: "proof, deploys, repos, handoffs, and gates",
   },
   {
     href: "/content/edit/new",
@@ -103,25 +131,18 @@ export const navItems: NavItem[] = [
     description: "issue preview without sends",
   },
   {
-    href: "/inbox?category=income",
-    label: "income",
-    status: "queue",
-    group: "income",
-    description: "business, jobs, payments, and follow-up",
+    href: "/life/health",
+    label: "health",
+    status: "status only",
+    group: "life",
+    description: "health status",
   },
   {
-    href: "/inbox?category=system",
-    label: "system",
-    status: "queue",
-    group: "system",
-    description: "infra, fleet, repos, deploys, and proof",
-  },
-  {
-    href: "/fleet",
-    label: "fleet",
-    status: "runtime",
-    group: "system",
-    description: "machines, repo state, current work",
+    href: "/life/aesthetics",
+    label: "aesthetics",
+    status: "empty",
+    group: "life",
+    description: "wardrobe, outfits, looks, references, and personal style",
   },
   {
     href: "/proof",
