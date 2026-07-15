@@ -22,6 +22,7 @@ const {
   icon,
   mark,
   logoSrc,
+  logoAlt,
   logoTone,
   logoShape,
   badgeSrc,
@@ -31,6 +32,7 @@ const {
 } = Astro.props;
 const Tag = href ? "a" : "span";
 const hasVisual = Boolean(logoSrc || icon || mark);
+const accessibleLabel = logoAlt ? `${logoAlt}: ${label}` : label;
 const mentionClass = ["inline-mention", wrap ? "inline-mention-wrap" : ""]
   .filter(Boolean)
   .join(" ");
@@ -51,7 +53,7 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
   class={mentionClass}
   target={href ? "_blank" : undefined}
   rel={href ? "noopener noreferrer" : undefined}
-  aria-label={label}
+  aria-label={accessibleLabel}
 >
   {
     hasVisual && (

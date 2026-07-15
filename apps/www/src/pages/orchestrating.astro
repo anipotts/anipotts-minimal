@@ -60,7 +60,7 @@ import InlineMention from "../components/InlineMention.astro";
           wrap
         />. the forced pauses made me review what had happened instead of
         letting a session run until it lost coherence. i kept finding missed
-        tests, unnecessary abstractions, and approaches that technically worked
+        tests and unnecessary abstractions. some approaches technically worked
         but were solving the wrong shape of the problem. the constraint made the
         loop visible.
       </p>
@@ -87,8 +87,8 @@ import InlineMention from "../components/InlineMention.astro";
         the operator still owns the model of the solution, the quality bar, the
         proof, and the decision to close the loop. awareness is how that
         ownership stays intact while more of the motion happens somewhere else.
-        that is the part i am trying to get better at, formalize, test, and
-        write down while it is happening.
+        that is the part i am trying to formalize and test. i am writing it down
+        while it is happening so i can get better at it.
       </p>
     </div>
   </article>
@@ -130,13 +130,6 @@ import InlineMention from "../components/InlineMention.astro";
     text-wrap: pretty;
   }
 
-  .essay-body a {
-    color: var(--accent);
-    text-decoration: underline;
-    text-decoration-thickness: 0.06em;
-    text-underline-offset: 0.18em;
-  }
-
   .essay-body :global(a.inline-mention) {
     color: var(--accent);
   }
@@ -167,9 +160,9 @@ import InlineMention from "../components/InlineMention.astro";
     }
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 359px) {
     .essay-header h1 {
-      font-size: 1.35rem;
+      font-size: 1.1rem;
     }
   }
 </style>
