@@ -48,6 +48,17 @@ export interface AdminInboxItem {
   last_seen_at: string | null;
 }
 
+export type AdminSentMailAttachmentPresence = boolean | "unknown";
+
+export interface AdminSentMailMetadata {
+  account: string;
+  sent_ref: string;
+  subject: string;
+  sent_at: string;
+  has_attachments: AdminSentMailAttachmentPresence;
+  href: string | null;
+}
+
 export type PieceStateName =
   | "idea"
   | "draft"
@@ -136,6 +147,15 @@ export interface AdminControlAuthContract {
 export interface AdminControlContracts {
   event_fields: (keyof AdminEventEnvelope)[];
   inbox_card_fields: (keyof AdminInboxItem)[];
+  sent_mail_metadata_fields: (keyof AdminSentMailMetadata)[];
+  sent_mail_card_policy: {
+    dedupe: "gmail-message-id-derived-ref";
+    completed_obligation: "event-only";
+    followups: "separate-inbox-items";
+    sync: "refresh-on-open-plus-light-polling";
+    raw_identifiers: "omitted";
+    snippet: "omitted";
+  };
   piece_states: PieceStateName[];
   legal_piece_cycles: string[];
 }

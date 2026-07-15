@@ -25,7 +25,8 @@ export type AdminInboxItem = {
     | "needs"
     | "deploy"
     | "newsletter"
-    | "carousel";
+    | "carousel"
+    | "gmail";
   title: string;
   summary: string;
   status: string;
@@ -133,6 +134,29 @@ export async function readAdminInbox(
         proof: overlay.live_runtime_role,
         updated_at: runtime.generated_at ?? now,
       })),
+    ...runtime.gmail_sent_awareness.projections.inbox_items.map<AdminInboxItem>(
+      (item) => ({
+        id: item.item_id,
+        source: "gmail",
+        title: item.title,
+        summary: item.summary,
+        status: item.status,
+        risk:
+          item.urgency === "urgent" || item.urgency === "high"
+            ? "high"
+            : item.urgency === "low"
+              ? "low"
+              : "medium",
+        href: item.href ?? "/inbox",
+        next_action:
+          item.action_kind === "none"
+            ? "no action required"
+            : "review the projected follow-up; sent-mail proof is event-only",
+        proof: item.event_refs.join(", ") || item.dedupe_key,
+        updated_at:
+          item.last_seen_at ?? runtime.generated_at ?? item.expires_at ?? now,
+      }),
+    ),
     ...newsletterDrafts
       .filter((draft) => draft.status !== "ready_for_review")
       .slice(0, 4)
