@@ -27,6 +27,9 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
@@ -40,7 +43,23 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
     <title>{title} | anipotts admin</title>
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem("theme");
+        const readPreference = (key) => {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        };
+        const writePreference = (key, value) => {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            // Preferences remain session-local when storage is unavailable.
+          }
+        };
+
+        const stored =
+          readPreference("admin-theme:v1") ?? readPreference("theme");
         const theme =
           stored === "dark" || stored === "light"
             ? stored
@@ -50,7 +69,8 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
         document.documentElement.dataset.theme = theme;
 
         const requestedFont = new URLSearchParams(location.search).get("font");
-        const storedFont = localStorage.getItem("font");
+        const storedFont =
+          readPreference("admin-font:v1") ?? readPreference("font");
         const font =
           requestedFont === "geist" || requestedFont === "instrument"
             ? requestedFont
@@ -58,7 +78,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
               ? storedFont
               : "instrument";
         document.documentElement.dataset.font = font;
-        localStorage.setItem("font", font);
+        writePreference("admin-font:v1", font);
       })();
     </script>
   </head>
@@ -73,5 +93,38 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
     >
       <slot />
     </AdminShell>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const toggles = document.querySelectorAll("[data-theme-toggle]");
+
+        const syncToggleLabels = () => {
+          const isDark = root.dataset.theme === "dark";
+          for (const toggle of toggles) {
+            toggle.setAttribute("aria-pressed", String(isDark));
+            const label = toggle.querySelector("[data-theme-label]");
+            if (label) label.textContent = isDark ? "light mode" : "dark mode";
+          }
+        };
+
+        const setTheme = (theme) => {
+          root.dataset.theme = theme;
+          try {
+            localStorage.setItem("admin-theme:v1", theme);
+          } catch {
+            // The visible toggle still works for this page session.
+          }
+          syncToggleLabels();
+        };
+
+        for (const toggle of toggles) {
+          toggle.addEventListener("click", () => {
+            setTheme(root.dataset.theme === "dark" ? "light" : "dark");
+          });
+        }
+
+        syncToggleLabels();
+      })();
+    </script>
   </body>
 </html>

@@ -58,6 +58,12 @@ expectTargets(
 );
 
 expectTargets(
+  "admin-control library code deploys admin only",
+  ["packages/lib/src/admin-control/index.ts"],
+  { admin: true },
+);
+
+expectTargets(
   "admin worker config deploys admin",
   ["apps/admin/wrangler.toml"],
   { admin: true },

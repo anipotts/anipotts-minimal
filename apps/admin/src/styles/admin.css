@@ -2595,7 +2595,29 @@ dd {
 
 html[data-astryx-theme="neutral"] {
   background: var(--color-background-body);
-  color-scheme: light dark;
+  --font-family-body: var(--sans);
+  --font-family-heading: var(--sans);
+  --font-family-code: var(--mono);
+  --color-background-body: var(--bg);
+  --color-background-surface: var(--surface);
+  --color-background-card: var(--surface);
+  --color-background-muted: color-mix(in srgb, var(--surface) 76%, var(--bg));
+  --color-accent: var(--accent);
+  --color-accent-muted: var(--accent-soft);
+  --color-text-primary: var(--ink);
+  --color-text-secondary: var(--ink-muted);
+  --color-text-accent: var(--accent);
+  --color-on-accent: var(--inverse-ink);
+  --color-border: var(--border);
+  --color-border-emphasized: color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+html[data-astryx-theme="neutral"][data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-astryx-theme="neutral"][data-theme="dark"] {
+  color-scheme: dark;
 }
 
 html[data-astryx-theme="neutral"] body {
@@ -2632,10 +2654,15 @@ html[data-astryx-theme="neutral"] a {
   place-items: center;
   border: 1px solid var(--color-border-emphasized);
   border-radius: 6px;
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-weight: 700;
-  line-height: 1;
+  overflow: hidden;
+  background: transparent;
+}
+
+.admin-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .admin-nav-footer {
@@ -2658,6 +2685,26 @@ html[data-astryx-theme="neutral"] a {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.admin-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.admin-theme-toggle:hover,
+.admin-theme-toggle:focus-visible {
+  border-color: var(--color-border-emphasized);
 }
 
 .admin-mobile-strip {
@@ -2806,8 +2853,31 @@ html[data-astryx-theme="neutral"] .button {
   gap: 0;
 }
 
+.inbox-intro-copy {
+  max-width: 720px;
+  padding: 16px;
+}
+
+.inbox-intro-copy p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.inbox-category-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.inbox-category {
+  scroll-margin-top: 70px;
+}
+
 .inbox-row {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.34fr);
+  gap: 18px;
+  align-items: start;
 }
 
 .inbox-row::before {
@@ -2830,6 +2900,72 @@ html[data-astryx-theme="neutral"] .button {
 
 .inbox-row > div:first-child {
   padding-left: 18px;
+}
+
+.inbox-card-copy > span {
+  display: block;
+}
+
+.inbox-next-action {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  border-left: 2px solid var(--color-accent);
+  background: var(--color-accent-muted);
+  padding: 10px 12px;
+}
+
+.inbox-next-action small {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-xs);
+}
+
+.inbox-next-action strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.5;
+}
+
+.inbox-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.inbox-card-actions .button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.inbox-card-actions [data-copy-status] {
+  min-width: 48px;
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+}
+
+.inbox-proof-details {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.inbox-proof-details summary {
+  cursor: pointer;
+}
+
+.inbox-proof-details dl {
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 12px;
+}
+
+.inbox-empty-row {
+  color: var(--color-text-secondary);
 }
 
 .astryx-editor {
@@ -2988,6 +3124,10 @@ html[data-astryx-theme="neutral"] .button {
     font-size: var(--font-size-sm);
   }
 
+  .admin-mobile-strip .admin-theme-toggle {
+    flex: 0 0 auto;
+  }
+
   .admin-mobile-strip a.is-active {
     border-color: var(--color-border-emphasized);
     color: var(--color-text-primary);
@@ -3013,6 +3153,10 @@ html[data-astryx-theme="neutral"] .button {
   html[data-astryx-theme="neutral"] .record-row,
   html[data-astryx-theme="neutral"] .need-row {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inbox-proof-details {
+    padding-left: 18px;
   }
 
   .astryx-editor-grid {

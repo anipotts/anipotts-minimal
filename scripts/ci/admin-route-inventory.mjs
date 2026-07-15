@@ -1,5 +1,5 @@
 export const ADMIN_ROUTES = [
-  { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
+  { route: "/", file: "apps/admin/src/pages/index.astro", nav: false },
   { route: "/inbox", file: "apps/admin/src/pages/inbox.astro", nav: true },
   {
     route: "/auth/passkey",
@@ -55,7 +55,7 @@ export const ADMIN_ROUTES = [
   {
     route: "/needs-ani",
     file: "apps/admin/src/pages/needs-ani.astro",
-    nav: true,
+    nav: false,
   },
   { route: "/proof", file: "apps/admin/src/pages/proof.astro", nav: true },
   { route: "/deploys", file: "apps/admin/src/pages/deploys.astro", nav: true },

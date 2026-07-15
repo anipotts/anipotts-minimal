@@ -10,6 +10,12 @@ import {
 } from "./admin-route-inventory.mjs";
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
+const inboxSource = readFileSync("apps/admin/src/pages/inbox.astro", "utf8");
+const rootSource = readFileSync("apps/admin/src/pages/index.astro", "utf8");
+const needsAniSource = readFileSync(
+  "apps/admin/src/pages/needs-ani.astro",
+  "utf8",
+);
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
@@ -120,6 +126,31 @@ for (const route of ADMIN_ROUTES) {
       `${route.route} missing from shared passkey proof route set`,
     );
   }
+}
+
+assert.equal(
+  [...navSource.matchAll(/label: "inbox"/g)].length,
+  1,
+  "admin nav must expose one primary inbox entry",
+);
+assert.ok(
+  rootSource.includes('return Astro.redirect("/inbox", 302)'),
+  "admin root must redirect to the canonical inbox",
+);
+assert.ok(
+  needsAniSource.includes('return Astro.redirect("/inbox", 302)'),
+  "needs-ani must resolve to the canonical inbox",
+);
+
+for (const marker of [
+  'id: "health"',
+  'id: "content"',
+  'id: "income"',
+  'id: "system"',
+  "data-copy-text",
+  "waiting / gated",
+]) {
+  assert.ok(inboxSource.includes(marker), `/inbox missing marker ${marker}`);
 }
 
 for (const marker of [

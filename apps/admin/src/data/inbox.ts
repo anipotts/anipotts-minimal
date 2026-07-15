@@ -31,6 +31,8 @@ export type AdminInboxItem = {
   summary: string;
   status: string;
   risk: RiskLevel;
+  category: "health" | "content" | "income" | "system";
+  timeframe: "now" | "today" | "this week" | "waiting / gated";
   href: string;
   next_action: string;
   proof: string;
@@ -70,6 +72,8 @@ export async function readAdminInbox(
         summary: entry.summary,
         status: entry.status,
         risk: entry.status === "blocked" ? "high" : "medium",
+        category: "system",
+        timeframe: entry.status === "blocked" ? "waiting / gated" : "now",
         href: entry.kind === "auth" ? "/proof" : "/deploys",
         next_action: entry.next_safe_action,
         proof: entry.evidence_uri,
@@ -84,7 +88,14 @@ export async function readAdminInbox(
         summary: item.why,
         status: item.type,
         risk: item.bucket === "unblockable_now" ? "high" : "medium",
-        href: "/needs-ani",
+        category: categoryForNeed(item.owner, item.id),
+        timeframe:
+          item.bucket === "unblockable_now"
+            ? "now"
+            : item.bucket === "waiting_on_account_or_device"
+              ? "waiting / gated"
+              : "today",
+        href: `/inbox#${categoryForNeed(item.owner, item.id)}`,
         next_action: item.ani_action,
         proof: item.proof,
         updated_at: item.expires_stale,
@@ -103,6 +114,8 @@ export async function readAdminInbox(
         summary: operation.reviewer_note ?? operation.proposed_value,
         status: operation.status,
         risk: operation.risk_level,
+        category: "content",
+        timeframe: operation.status === "blocked" ? "waiting / gated" : "today",
         href: operation.preview_targets[0] ?? "/content/drafts",
         next_action:
           operation.status === "blocked"
@@ -129,6 +142,8 @@ export async function readAdminInbox(
           ? overlay.deploy_impact
           : "git unavailable",
         risk: overlay.deploy_impact === "production" ? "high" : "medium",
+        category: "system",
+        timeframe: overlay.deploy_impact === "production" ? "now" : "today",
         href: "/fleet",
         next_action: overlay.notes,
         proof: overlay.live_runtime_role,
@@ -147,6 +162,11 @@ export async function readAdminInbox(
             : item.urgency === "low"
               ? "low"
               : "medium",
+        category: "income",
+        timeframe:
+          item.urgency === "urgent" || item.urgency === "high"
+            ? "now"
+            : "today",
         href: item.href ?? "/inbox",
         next_action:
           item.action_kind === "none"
@@ -167,6 +187,8 @@ export async function readAdminInbox(
         summary: draft.summary,
         status: draft.status,
         risk: draft.status === "blocked" ? "high" : "low",
+        category: "content",
+        timeframe: draft.status === "blocked" ? "waiting / gated" : "this week",
         href: `/newsletter/${draft.slug}`,
         next_action: draft.pipeline.next_action,
         proof: draft.source_fixture,
@@ -182,6 +204,8 @@ export async function readAdminInbox(
         summary: `${post.readyExports}/${post.slideCount * 2} exports ready; sound ${post.soundStatus}`,
         status: post.status,
         risk: post.staleCount > 0 ? "medium" : "low",
+        category: "content",
+        timeframe: "this week",
         href: "/content/carousels",
         next_action:
           carouselSummary.staleExports > 0
@@ -203,6 +227,8 @@ export async function readAdminInbox(
           : "D1 binding is missing in this runtime.",
       status: pageContent.mode,
       risk: "medium",
+      category: "content",
+      timeframe: "today",
       href: "/content",
       next_action:
         "fix DB binding or local runtime before editing public content",
@@ -229,8 +255,36 @@ export async function readAdminInbox(
   };
 }
 
+function categoryForNeed(
+  owner: string,
+  id: string,
+): AdminInboxItem["category"] {
+  const ref = `${owner}:${id}`.toLowerCase();
+  if (ref.includes("health")) return "health";
+  if (
+    ref.includes("business") ||
+    ref.includes("jobs") ||
+    ref.includes("payment") ||
+    ref.includes("income")
+  ) {
+    return "income";
+  }
+  if (
+    ref.includes("brand") ||
+    ref.includes("site") ||
+    ref.includes("content") ||
+    ref.includes("newsletter") ||
+    ref.includes("media")
+  ) {
+    return "content";
+  }
+  return "system";
+}
+
 function score(item: AdminInboxItem): number {
   const risk = item.risk === "high" ? 30 : item.risk === "medium" ? 20 : 10;
   const source = item.source === "auth" || item.source === "needs" ? 5 : 0;
-  return risk + source;
+  const timeframe =
+    item.timeframe === "now" ? 4 : item.timeframe === "today" ? 2 : 0;
+  return risk + source + timeframe;
 }

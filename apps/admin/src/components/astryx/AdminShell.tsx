@@ -20,6 +20,8 @@ type AdminShellProps = {
   title: string;
 };
 
+const MOBILE_NAV_HREFS = new Set(["/inbox", "/content", "/fleet", "/proof"]);
+
 export function AdminShell({
   children,
   chrome,
@@ -37,9 +39,12 @@ export function AdminShell({
     );
   }
 
-  const primary = navItems.filter((item) => item.group === "primary");
+  const life = navItems.filter((item) => item.group === "life");
   const content = navItems.filter((item) => item.group === "content");
-  const advanced = navItems.filter((item) => item.group === "advanced");
+  const system = navItems.filter((item) => item.group === "system");
+  const mobileItems = navItems.filter((item) =>
+    MOBILE_NAV_HREFS.has(item.href),
+  );
 
   const sideNav = (
     <SideNav
@@ -47,9 +52,13 @@ export function AdminShell({
       header={
         <SideNavHeading
           heading="anipotts admin"
-          headingHref="/"
+          headingHref="/inbox"
           subheading="operator console"
-          icon={<span className="admin-mark">a</span>}
+          icon={
+            <span className="admin-mark" aria-hidden="true">
+              <img src="/apple-touch-icon.png" alt="" />
+            </span>
+          }
         />
       }
       footer={
@@ -59,11 +68,12 @@ export function AdminShell({
             <span>Access on</span>
           </div>
           <p>remove only after app-native passkey proof is ready.</p>
+          <ThemeToggle />
         </div>
       }
     >
-      <SideNavSection title="primary">
-        {primary.map((item) => (
+      <SideNavSection title="life">
+        {life.map((item) => (
           <SideNavItem
             key={item.href}
             href={item.href}
@@ -83,8 +93,8 @@ export function AdminShell({
           />
         ))}
       </SideNavSection>
-      <SideNavSection title="advanced">
-        {advanced.map((item) => (
+      <SideNavSection title="system">
+        {system.map((item) => (
           <SideNavItem
             key={item.href}
             href={item.href}
@@ -99,7 +109,7 @@ export function AdminShell({
   return (
     <div className="admin-astryx-root">
       <nav className="admin-mobile-strip" aria-label="admin mobile navigation">
-        {primary.map((item) => (
+        {mobileItems.map((item) => (
           <a
             key={item.href}
             className={isActive(currentPath, item.href) ? "is-active" : ""}
@@ -108,6 +118,7 @@ export function AdminShell({
             {item.label}
           </a>
         ))}
+        <ThemeToggle />
       </nav>
       <AppShell
         variant="section"
@@ -130,6 +141,20 @@ export function AdminShell({
         </div>
       </AppShell>
     </div>
+  );
+}
+
+function ThemeToggle() {
+  return (
+    <button
+      type="button"
+      className="admin-theme-toggle"
+      data-theme-toggle=""
+      aria-label="switch color theme"
+      aria-pressed={false}
+    >
+      <span data-theme-label="">theme</span>
+    </button>
   );
 }
 

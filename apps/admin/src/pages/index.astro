@@ -2,6 +2,8 @@
 import AdminLayout from "../layouts/AdminLayout.astro";
 import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
 
+if (Astro.url.pathname === "/") return Astro.redirect("/inbox", 302);
+
 const snapshot = await loadAdminControlSnapshot(Astro.locals.runtime?.env.DB);
 const inboxItems = snapshot.projections.inbox_items;
 const urgentItems = inboxItems.filter((item) =>

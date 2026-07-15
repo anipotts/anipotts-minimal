@@ -26,10 +26,13 @@ export function computeDeployTargets(files) {
 
   for (const file of files) {
     if (!file || isIgnoredForDeploy(file)) continue;
+    const isAdminControlLib = file.startsWith(
+      "packages/lib/src/admin-control/",
+    );
 
     if (
       file.startsWith("apps/www/") ||
-      file.startsWith("packages/lib/") ||
+      (file.startsWith("packages/lib/") && !isAdminControlLib) ||
       file.startsWith("packages/content/src/public/") ||
       file === "packages/content/package.json" ||
       file === "packages/content/src/index.ts" ||
@@ -41,7 +44,8 @@ export function computeDeployTargets(files) {
 
     if (
       file.startsWith("apps/admin/") ||
-      file.startsWith("packages/content/")
+      file.startsWith("packages/content/") ||
+      isAdminControlLib
     ) {
       targets.admin = true;
     }

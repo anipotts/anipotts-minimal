@@ -3,75 +3,160 @@ import AdminLayout from "../layouts/AdminLayout.astro";
 import { readAdminInbox } from "../data/inbox";
 
 const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
-const sourceLabels = Array.from(
-  new Set(inbox.items.map((item) => item.source)),
-);
+const categories = [
+  {
+    id: "health",
+    label: "health",
+    detail: "diet, vices, metrics, and decisions owned by chief/health",
+  },
+  {
+    id: "content",
+    label: "content",
+    detail: "site, writing, newsletter, brand, and carousel work",
+  },
+  {
+    id: "income",
+    label: "income",
+    detail: "business, jobs, payments, and outbound follow-up",
+  },
+  {
+    id: "system",
+    label: "system",
+    detail: "infra, fleet, repos, deploys, proof, and gated operations",
+  },
+] as const;
+
+const sections = categories.map((category) => ({
+  ...category,
+  items: inbox.items.filter((item) => item.category === category.id),
+}));
+
+const countByTimeframe = (timeframe: string) =>
+  inbox.items.filter((item) => item.timeframe === timeframe).length;
 ---
 
 <AdminLayout
   title="inbox"
-  deck="Unified action queue from proof, content, needs, runtime, newsletter, and carousel state. No outbound actions run from here."
+  deck="What needs Ani, what can move next, and what is waiting on a gate. Copy controls are local-only."
 >
   <section class="meta-strip" aria-label="admin inbox source">
     <span>{inbox.counts.total} items</span>
-    <span>{inbox.counts.high} high</span>
-    <span>{inbox.counts.medium} medium</span>
-    <span>{inbox.counts.low} low</span>
-    <span>{inbox.mode}</span>
-    <span>{sourceLabels.join(", ") || "empty"}</span>
+    <span>{countByTimeframe("now")} now</span>
+    <span>{countByTimeframe("today")} today</span>
+    <span>{countByTimeframe("this week")} this week</span>
+    <span>{countByTimeframe("waiting / gated")} waiting / gated</span>
   </section>
 
-  <section class="table-card">
+  <section class="table-card inbox-intro">
     <div class="section-head">
       <div>
-        <p>what is safe next</p>
-        <h2>action inbox</h2>
+        <p>needs ani</p>
+        <h2>blocking work</h2>
       </div>
-      <span>read only</span>
+      <span>{inbox.mode} / read only</span>
     </div>
-    <div class="record-list inbox-list">
-      {
-        inbox.items.length === 0 ? (
-          <article class="record-row">
-            <div>
-              <p>clear</p>
-              <h3>No current admin action items.</h3>
-            </div>
-          </article>
-        ) : (
-          inbox.items.map((item) => (
-            <article class={`record-row inbox-row risk-${item.risk}`}>
-              <div>
-                <p>
-                  {item.source} / {item.status} / {item.risk}
-                </p>
-                <h3>{item.title}</h3>
-                <span>{item.summary}</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>next</dt>
-                  <dd>{item.next_action}</dd>
-                </div>
-                <div>
-                  <dt>proof</dt>
-                  <dd>{item.proof}</dd>
-                </div>
-                <div>
-                  <dt>updated</dt>
-                  <dd>{item.updated_at}</dd>
-                </div>
-                <div>
-                  <dt>open</dt>
-                  <dd>
-                    <a href={item.href}>open source</a>
-                  </dd>
-                </div>
-              </dl>
-            </article>
-          ))
-        )
-      }
+    <div class="inbox-intro-copy">
+      <p>
+        The queue combines typed approvals with health, content, income, and
+        system blockers. Copying text does not send, approve, publish, or
+        continue a task.
+      </p>
     </div>
   </section>
+
+  <div class="inbox-category-grid">
+    {
+      sections.map((section) => (
+        <section class="table-card inbox-category" id={section.id}>
+          <div class="section-head">
+            <div>
+              <p>{section.detail}</p>
+              <h2>{section.label}</h2>
+            </div>
+            <span>{section.items.length} open</span>
+          </div>
+          <div class="record-list inbox-list">
+            {section.items.length === 0 ? (
+              <article class="record-row inbox-empty-row">
+                <div>
+                  <p>clear</p>
+                  <h3>nothing blocking this lane</h3>
+                </div>
+              </article>
+            ) : (
+              section.items.map((item) => (
+                <article class={`record-row inbox-row risk-${item.risk}`}>
+                  <div class="inbox-card-copy">
+                    <p>
+                      {item.timeframe} / {item.source} / {item.status}
+                    </p>
+                    <h3>{item.title}</h3>
+                    <span>{item.summary}</span>
+                    <div class="inbox-next-action">
+                      <small>next action</small>
+                      <strong>{item.next_action}</strong>
+                    </div>
+                    <div class="inbox-card-actions">
+                      <button
+                        type="button"
+                        class="button secondary inbox-copy-button"
+                        data-copy-text={item.next_action}
+                      >
+                        {item.source === "needs"
+                          ? "copy approval"
+                          : "copy next action"}
+                      </button>
+                      <a class="button ghost" href={item.href}>
+                        open source
+                      </a>
+                      <span data-copy-status aria-live="polite" />
+                    </div>
+                  </div>
+                  <details class="inbox-proof-details">
+                    <summary>proof and timing</summary>
+                    <dl>
+                      <div>
+                        <dt>proof</dt>
+                        <dd>{item.proof}</dd>
+                      </div>
+                      <div>
+                        <dt>updated</dt>
+                        <dd>{item.updated_at}</dd>
+                      </div>
+                    </dl>
+                  </details>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <script is:inline>
+    (() => {
+      const buttons = document.querySelectorAll("[data-copy-text]");
+
+      async function copyText(value) {
+        if (!navigator.clipboard?.writeText)
+          throw new Error("copy unavailable");
+        await navigator.clipboard.writeText(value);
+      }
+
+      for (const button of buttons) {
+        button.addEventListener("click", async () => {
+          const value = button.getAttribute("data-copy-text") ?? "";
+          const status =
+            button.parentElement?.querySelector("[data-copy-status]");
+          try {
+            await copyText(value);
+            if (status) status.textContent = "copied";
+          } catch {
+            if (status) status.textContent = "copy failed";
+          }
+        });
+      }
+    })();
+  </script>
 </AdminLayout>

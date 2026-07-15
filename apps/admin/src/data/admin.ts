@@ -2,7 +2,7 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "primary" | "content" | "advanced";
+  group: "life" | "content" | "system";
   description: string;
 };
 
@@ -33,53 +33,25 @@ export type DeployRow = {
 
 export const navItems: NavItem[] = [
   {
-    href: "/",
-    label: "inbox",
-    status: "source",
-    group: "primary",
-    description: "attention queue and approvals",
-  },
-  {
     href: "/inbox",
     label: "inbox",
     status: "queue",
-    group: "primary",
-    description: "proof, content, fleet, and decision queue",
-  },
-  {
-    href: "/fleet",
-    label: "fleet",
-    status: "runtime",
-    group: "primary",
-    description: "machines, repo state, current work",
+    group: "life",
+    description: "what needs Ani and what can move next",
   },
   {
     href: "/content",
-    label: "studio",
+    label: "content",
     status: "D1",
-    group: "primary",
+    group: "content",
     description: "pieces, drafts, exports",
   },
   {
     href: "/content/edit/new",
     label: "writing editor",
     status: "editor",
-    group: "primary",
+    group: "content",
     description: "write and publish content",
-  },
-  {
-    href: "/proof",
-    label: "proof/auth",
-    status: "passkeys",
-    group: "primary",
-    description: "auth, proof, and blocked checks",
-  },
-  {
-    href: "/deploys",
-    label: "deploys",
-    status: "scoped",
-    group: "primary",
-    description: "target map and deploy proof",
   },
   {
     href: "/content/review",
@@ -124,38 +96,52 @@ export const navItems: NavItem[] = [
     description: "issue preview without sends",
   },
   {
-    href: "/needs-ani",
-    label: "needs ani",
-    status: "queue",
-    group: "content",
-    description: "typed approval and decision queue",
+    href: "/fleet",
+    label: "fleet",
+    status: "runtime",
+    group: "system",
+    description: "machines, repo state, current work",
+  },
+  {
+    href: "/proof",
+    label: "proof and auth",
+    status: "passkeys",
+    group: "system",
+    description: "auth, proof, and blocked checks",
+  },
+  {
+    href: "/deploys",
+    label: "deploys",
+    status: "scoped",
+    group: "system",
+    description: "target map and deploy proof",
   },
   {
     href: "/repos",
     label: "repos",
     status: "details",
-    group: "advanced",
+    group: "system",
     description: "dirty state and branch drift",
   },
   {
     href: "/handoffs",
     label: "handoffs",
     status: "details",
-    group: "advanced",
+    group: "system",
     description: "handoff freshness and absorption",
   },
   {
     href: "/mutations",
     label: "mutations",
     status: "gated",
-    group: "advanced",
+    group: "system",
     description: "proposed, approved, running, verified",
   },
   {
     href: "/ops/destructive",
     label: "destructive ops",
     status: "gated",
-    group: "advanced",
+    group: "system",
     description: "delete, dns, auth, deploy, secrets",
   },
 ];
