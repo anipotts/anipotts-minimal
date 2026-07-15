@@ -53,8 +53,43 @@ const personLd = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/brand/favicon-light-32.png?v=20260715"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/brand/favicon-dark-32.png?v=20260715"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="icon"
+      href="/favicon.svg?v=20260715"
+      type="image/svg+xml"
+      sizes="any"
+    />
+    <link
+      rel="icon"
+      href="/brand/favicon-light.svg?v=20260715"
+      type="image/svg+xml"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      href="/brand/favicon-dark.svg?v=20260715"
+      type="image/svg+xml"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/brand/apple-touch-icon.png?v=20260715"
+    />
     <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
     <meta
       name="theme-color"
