@@ -2854,6 +2854,8 @@ html[data-astryx-theme="neutral"] .button {
 }
 
 .inbox-intro-copy {
+  display: grid;
+  gap: 14px;
   max-width: 720px;
   padding: 16px;
 }
@@ -2861,6 +2863,24 @@ html[data-astryx-theme="neutral"] .button {
 .inbox-intro-copy p {
   margin: 0;
   color: var(--color-text-secondary);
+}
+
+.inbox-monitoring-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.inbox-monitoring-status small,
+.inbox-monitoring-status span {
+  color: var(--color-text-secondary);
+}
+
+.inbox-monitoring-status small {
+  font-family: var(--font-family-code);
 }
 
 .inbox-category-grid {

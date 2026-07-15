@@ -45,6 +45,7 @@ const countByTimeframe = (timeframe: string) =>
     <span>{countByTimeframe("today")} today</span>
     <span>{countByTimeframe("this week")} this week</span>
     <span>{countByTimeframe("waiting / gated")} waiting / gated</span>
+    <span>refresh on open</span>
   </section>
 
   <section class="table-card inbox-intro">
@@ -61,6 +62,11 @@ const countByTimeframe = (timeframe: string) =>
         system blockers. Copying text does not send, approve, publish, or
         continue a task.
       </p>
+      <div class="inbox-monitoring-status">
+        <small>monitoring</small>
+        <strong>read-only on open</strong>
+        <span>recurring monitor not connected</span>
+      </div>
     </div>
   </section>
 

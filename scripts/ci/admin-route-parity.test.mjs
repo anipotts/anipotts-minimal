@@ -148,6 +148,7 @@ for (const marker of [
   'id: "income"',
   'id: "system"',
   "data-copy-text",
+  "recurring monitor not connected",
   "waiting / gated",
 ]) {
   assert.ok(inboxSource.includes(marker), `/inbox missing marker ${marker}`);
