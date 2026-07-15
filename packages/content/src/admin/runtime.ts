@@ -1,5 +1,3 @@
-import { needsAniItemsFromJson, type NeedsAniItem } from "./needs.js";
-
 export const RUNTIME_FEED_PATH =
   "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json";
 
@@ -119,7 +117,6 @@ export type RuntimeOverlayResponse = {
   source_path: string;
   safety: RuntimeSafety | null;
   overlays: RuntimeRepoOverlay[];
-  needs_ani_queue: NeedsAniItem[];
   gmail_sent_awareness: RuntimeGmailSentAwareness;
   error?: string;
 };
@@ -128,7 +125,6 @@ export type RuntimeFeedFile = {
   generated_at?: string;
   machine?: string;
   runtime?: {
-    needs_ani_queue?: unknown;
     repo_state_overlays?: unknown;
     safety?: unknown;
     gmail_sent_awareness?: unknown;
@@ -158,7 +154,6 @@ export function runtimeOverlayResponseFromFeed(
     source_path: sourcePath,
     safety: runtimeSafetyFromJson(runtime.safety),
     overlays: runtimeRepoOverlaysFromJson(runtime.repo_state_overlays),
-    needs_ani_queue: needsAniItemsFromJson(runtime.needs_ani_queue),
     gmail_sent_awareness: gmailSentAwarenessFromJson(
       runtime.gmail_sent_awareness,
     ),
@@ -176,7 +171,6 @@ export function disabledRuntimeOverlayResponse(
     source_path: sourcePath,
     safety: null,
     overlays: [],
-    needs_ani_queue: [],
     gmail_sent_awareness: emptyGmailSentAwareness(),
   };
 }

@@ -30,6 +30,13 @@ const sections = categories.map((category) => ({
   ...category,
   items: inbox.items.filter((item) => item.category === category.id),
 }));
+const requestedCategory = Astro.url.searchParams.get("category");
+const selectedCategory = categories.find(
+  (category) => category.id === requestedCategory,
+);
+const visibleSections = selectedCategory
+  ? sections.filter((section) => section.id === selectedCategory.id)
+  : sections;
 
 const countByTimeframe = (timeframe: string) =>
   inbox.items.filter((item) => item.timeframe === timeframe).length;
@@ -37,7 +44,7 @@ const countByTimeframe = (timeframe: string) =>
 
 <AdminLayout
   title="inbox"
-  deck="What needs Ani, what can move next, and what is waiting on a gate. Copy controls are local-only."
+  deck="What needs attention, what can move next, and what is waiting on a gate. Copy controls are local-only."
 >
   <section class="meta-strip" aria-label="admin inbox source">
     <span>{inbox.counts.total} items</span>
@@ -51,16 +58,16 @@ const countByTimeframe = (timeframe: string) =>
   <section class="table-card inbox-intro">
     <div class="section-head">
       <div>
-        <p>needs ani</p>
-        <h2>blocking work</h2>
+        <p>action queue</p>
+        <h2>what needs attention</h2>
       </div>
       <span>{inbox.mode} / read only</span>
     </div>
     <div class="inbox-intro-copy">
       <p>
-        The queue combines typed approvals with health, content, income, and
-        system blockers. Copying text does not send, approve, publish, or
-        continue a task.
+        The queue combines source-backed health, content, income, and system
+        blockers. Copying text does not send, approve, publish, or continue a
+        task.
       </p>
       <div class="inbox-monitoring-status">
         <small>monitoring</small>
@@ -68,11 +75,31 @@ const countByTimeframe = (timeframe: string) =>
         <span>recurring monitor not connected</span>
       </div>
     </div>
+    <nav class="inbox-category-filter" aria-label="filter inbox by category">
+      <a
+        class:list={[!selectedCategory && "is-active"]}
+        href="/inbox"
+        aria-current={!selectedCategory ? "page" : undefined}>all</a
+      >
+      {
+        categories.map((category) => (
+          <a
+            class:list={[selectedCategory?.id === category.id && "is-active"]}
+            href={`/inbox?category=${category.id}`}
+            aria-current={
+              selectedCategory?.id === category.id ? "page" : undefined
+            }
+          >
+            {category.label}
+          </a>
+        ))
+      }
+    </nav>
   </section>
 
   <div class="inbox-category-grid">
     {
-      sections.map((section) => (
+      visibleSections.map((section) => (
         <section class="table-card inbox-category" id={section.id}>
           <div class="section-head">
             <div>
@@ -94,7 +121,8 @@ const countByTimeframe = (timeframe: string) =>
                 <article class={`record-row inbox-row risk-${item.risk}`}>
                   <div class="inbox-card-copy">
                     <p>
-                      {item.timeframe} / {item.source} / {item.status}
+                      {item.timeframe} / {item.source} / {item.owner} /{" "}
+                      {item.status}
                     </p>
                     <h3>{item.title}</h3>
                     <span>{item.summary}</span>
@@ -103,15 +131,17 @@ const countByTimeframe = (timeframe: string) =>
                       <strong>{item.next_action}</strong>
                     </div>
                     <div class="inbox-card-actions">
-                      <button
-                        type="button"
-                        class="button secondary inbox-copy-button"
-                        data-copy-text={item.next_action}
-                      >
-                        {item.source === "needs"
-                          ? "copy approval"
-                          : "copy next action"}
-                      </button>
+                      {item.copy_text && (
+                        <button
+                          type="button"
+                          class="button secondary inbox-copy-button"
+                          data-copy-text={item.copy_text}
+                        >
+                          {["approve", "decide"].includes(item.action_kind)
+                            ? "copy approval"
+                            : "copy next action"}
+                        </button>
+                      )}
                       <a class="button ghost" href={item.href}>
                         open source
                       </a>

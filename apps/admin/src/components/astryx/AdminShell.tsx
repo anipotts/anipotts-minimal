@@ -13,19 +13,25 @@ import type { NavItem } from "../../data/admin";
 type AdminShellProps = {
   children: ReactNode;
   chrome: "admin" | "auth";
-  currentPath: string;
+  currentRoute: string;
   deck?: string;
   hideHeader?: boolean;
   navItems: NavItem[];
   title: string;
 };
 
-const MOBILE_NAV_HREFS = new Set(["/inbox", "/content", "/fleet", "/proof"]);
+const MOBILE_NAV_HREFS = new Set([
+  "/inbox",
+  "/inbox?category=health",
+  "/content",
+  "/inbox?category=income",
+  "/inbox?category=system",
+]);
 
 export function AdminShell({
   children,
   chrome,
-  currentPath,
+  currentRoute,
   deck,
   hideHeader = false,
   navItems,
@@ -41,6 +47,7 @@ export function AdminShell({
 
   const life = navItems.filter((item) => item.group === "life");
   const content = navItems.filter((item) => item.group === "content");
+  const income = navItems.filter((item) => item.group === "income");
   const system = navItems.filter((item) => item.group === "system");
   const mobileItems = navItems.filter((item) =>
     MOBILE_NAV_HREFS.has(item.href),
@@ -78,7 +85,7 @@ export function AdminShell({
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentPath, item.href)}
+            isSelected={isActive(currentRoute, item.href)}
             endContent={<Badge label={item.status} variant="neutral" />}
           />
         ))}
@@ -89,7 +96,18 @@ export function AdminShell({
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentPath, item.href)}
+            isSelected={isActive(currentRoute, item.href)}
+          />
+        ))}
+      </SideNavSection>
+      <SideNavSection title="income">
+        {income.map((item) => (
+          <SideNavItem
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            isSelected={isActive(currentRoute, item.href)}
+            endContent={<Badge label={item.status} variant="neutral" />}
           />
         ))}
       </SideNavSection>
@@ -99,7 +117,7 @@ export function AdminShell({
             key={item.href}
             href={item.href}
             label={item.label}
-            isSelected={isActive(currentPath, item.href)}
+            isSelected={isActive(currentRoute, item.href)}
           />
         ))}
       </SideNavSection>
@@ -112,7 +130,7 @@ export function AdminShell({
         {mobileItems.map((item) => (
           <a
             key={item.href}
-            className={isActive(currentPath, item.href) ? "is-active" : ""}
+            className={isActive(currentRoute, item.href) ? "is-active" : ""}
             href={item.href}
           >
             {item.label}
@@ -158,7 +176,24 @@ function ThemeToggle() {
   );
 }
 
-function isActive(currentPath: string, href: string): boolean {
+function isActive(currentRoute: string, href: string): boolean {
+  const [currentPath, currentQuery = ""] = currentRoute.split("?");
+  const [targetPath, targetQuery = ""] = href.split("?");
+  const currentParams = new URLSearchParams(currentQuery);
+
+  if (targetQuery) {
+    const targetParams = new URLSearchParams(targetQuery);
+    return (
+      currentPath === targetPath &&
+      [...targetParams].every(
+        ([key, value]) => currentParams.get(key) === value,
+      )
+    );
+  }
+
+  if (href === "/inbox") {
+    return currentPath === "/inbox" && !currentParams.has("category");
+  }
   if (href === "/") return currentPath === "/";
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }

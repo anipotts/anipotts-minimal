@@ -2888,6 +2888,28 @@ html[data-astryx-theme="neutral"] .button {
   gap: 18px;
 }
 
+.inbox-category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inbox-category-filter a {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+
+.inbox-category-filter a:hover,
+.inbox-category-filter a.is-active {
+  border-color: var(--color-border-emphasized);
+  background: var(--color-background-muted);
+  color: var(--color-text-primary);
+}
+
 .inbox-category {
   scroll-margin-top: 70px;
 }

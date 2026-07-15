@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 
 const ALLOW_PREFIXES = ["docs/archive/"];
 const RETIRED_ACCOUNT_PATH = "/Users/" + "rudy";
@@ -19,6 +19,7 @@ const files = execFileSync("git", ["ls-files"], { encoding: "utf8" })
   .filter(Boolean);
 
 for (const file of files) {
+  if (!existsSync(file)) continue;
   if (ALLOW_PREFIXES.some((prefix) => file.startsWith(prefix))) {
     continue;
   }

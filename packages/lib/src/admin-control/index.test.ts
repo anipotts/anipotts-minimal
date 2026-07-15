@@ -32,6 +32,47 @@ describe("admin-control", () => {
     ]);
   });
 
+  it("keeps empty production projections empty instead of showing fixtures", async () => {
+    const db = {
+      prepare: () => ({
+        bind() {
+          return this;
+        },
+        async all() {
+          return { results: [] };
+        },
+      }),
+    };
+
+    const snapshot = await loadAdminControlSnapshot(db);
+
+    expect(snapshot.source_mode).toBe("d1");
+    expect(snapshot.events).toEqual([]);
+    expect(snapshot.projections.inbox_items).toEqual([]);
+    expect(snapshot.errors).toEqual([]);
+  });
+
+  it("reports production read failures without substituting fixture work", async () => {
+    const db = {
+      prepare: () => ({
+        bind() {
+          return this;
+        },
+        async all() {
+          throw new Error("read unavailable");
+        },
+      }),
+    };
+
+    const snapshot = await loadAdminControlSnapshot(db);
+
+    expect(snapshot.source_mode).toBe("d1");
+    expect(snapshot.events).toEqual([]);
+    expect(snapshot.projections.inbox_items).toEqual([]);
+    expect(snapshot.errors.length).toBeGreaterThan(0);
+    expect(snapshot.errors.join(" ")).toContain("read unavailable");
+  });
+
   it("exposes read-only mcp tools over the same projections", async () => {
     const snapshot = await loadAdminControlSnapshot(null);
     const manifest = adminMcpManifest(snapshot);

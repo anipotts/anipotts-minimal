@@ -85,7 +85,8 @@ operation tables, or publish-event tables.
 
 | Route                                               | Purpose                              |
 | --------------------------------------------------- | ------------------------------------ |
-| `/`                                                 | operator overview                    |
+| `/`                                                 | redirect to canonical inbox          |
+| `/inbox`                                            | normalized human action queue        |
 | `/auth/passkey`                                     | app-native passkey auth              |
 | `/content`                                          | content inventory                    |
 | `/content/review`                                   | content proposal queue               |
@@ -96,7 +97,6 @@ operation tables, or publish-event tables.
 | `/content/operations`                               | read-only D1 content operation state |
 | `/newsletter`                                       | newsletter issue queue               |
 | `/newsletter/first-thing-agents-need-control-plane` | newsletter issue detail preview      |
-| `/needs-ani`                                        | typed human decision queue           |
 | `/proof`                                            | deploy, auth, and route proof log    |
 | `/deploys`                                          | scoped deploy target map             |
 | `/repos`                                            | repo and worktree state              |
@@ -133,8 +133,8 @@ revoked-credential denial. It reports missing pre-removal evidence in
 until the edge gate is removed, not a blocker by itself. After Access removal,
 the same script must show app-native route blocking. The route probe set must
 include content inventory, review, drafts, focused page editor, draft-save API,
-preview, operations, newsletter queue, newsletter detail preview, needs-ani,
-proof, deploys, repos, handoffs, fleet, mutations, and destructive-ops routes.
+preview, operations, newsletter queue, newsletter detail preview, inbox, proof,
+deploys, repos, handoffs, fleet, mutations, and destructive-ops routes.
 
 First-passkey bootstrap in production requires a verified Cloudflare Access
 application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it

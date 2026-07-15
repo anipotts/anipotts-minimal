@@ -223,7 +223,7 @@ export const fixtureInboxItems: AdminInboxItem[] = [
     summary:
       "personal/business value-serving stays off; only the signed diff can open that lane.",
     href: "/fleet",
-    status: "needs ani",
+    status: "action required",
     urgency: "high",
     owner: "codex chief",
     action_kind: "approve",

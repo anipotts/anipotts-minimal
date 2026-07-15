@@ -22,20 +22,19 @@ Live baseline:
 - host: `admin.anipotts.com`
 - protection: Cloudflare Access plus staged app-native passkey middleware
 - deployed state: Astro admin operator and content shell
-- latest protected route set: `/`, `/content`, `/content/review`,
+- latest protected route set: `/`, `/inbox`, `/content`, `/content/review`,
   `/content/drafts`, `/content/edit/home`,
   `/api/admin/content/draft-operation`, `/content/preview`,
   `/content/operations`, `/newsletter`,
-  `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, `/proof`,
-  `/deploys`, `/repos`, `/handoffs`, `/fleet`, `/mutations`, and
-  `/ops/destructive`
+  `/newsletter/first-thing-agents-need-control-plane`, `/proof`, `/deploys`,
+  `/repos`, `/handoffs`, `/fleet`, `/mutations`, and `/ops/destructive`
 
 Current strengths:
 
 - Astro admin is canonical for `admin.anipotts.com`
-- `NEEDS-ANI`, content inventory, content review, operations, newsletter,
-  proof, repos, handoffs, fleet, mutations, and destructive ops have protected
-  routes
+- the canonical inbox, content inventory, content review, operations,
+  newsletter, proof, repos, handoffs, fleet, mutations, and destructive ops
+  have protected routes
 - `/repos` can render the local-dev Infra runtime repo overlay metadata through
   `/api/admin/runtime-feed`
 - `admin_proof_events` provides durable proof rows in D1
@@ -73,22 +72,16 @@ The next architecture milestone is proof, not another framework migration:
 
 Primary sidebar:
 
-- overview
-- needs ani
-- mutations
-- fleet
-- repos
-- handoffs
-- deploys
+- inbox
+- health
 - content
-- proof
-- destructive ops
-- settings
+- income
+- system
 
-Overview should show:
+Inbox should show:
 
 - safe next action
-- blocked-by-Ani queue count
+- action-required queue count
 - active operations
 - stale handoffs
 - dirty repo count

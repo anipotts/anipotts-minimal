@@ -326,16 +326,15 @@ async function readRows<T>(
       ? result.results.map(mapRow)
       : [];
     return {
-      rows: rows.length > 0 ? rows : fallback,
-      usedFallback: rows.length === 0,
-      error:
-        rows.length === 0 ? `${tableName} empty; using fixture rows` : null,
+      rows,
+      usedFallback: false,
+      error: null,
     };
   } catch (error) {
     return {
-      rows: fallback,
-      usedFallback: true,
-      error: `${tableName} read failed; using fixture rows: ${String(error)}`,
+      rows: [],
+      usedFallback: false,
+      error: `${tableName} read failed: ${String(error)}`,
     };
   }
 }

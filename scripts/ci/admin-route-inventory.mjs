@@ -52,11 +52,6 @@ export const ADMIN_ROUTES = [
     file: "apps/admin/src/pages/newsletter/[slug].astro",
     nav: false,
   },
-  {
-    route: "/needs-ani",
-    file: "apps/admin/src/pages/needs-ani.astro",
-    nav: false,
-  },
   { route: "/proof", file: "apps/admin/src/pages/proof.astro", nav: true },
   { route: "/deploys", file: "apps/admin/src/pages/deploys.astro", nav: true },
   { route: "/repos", file: "apps/admin/src/pages/repos.astro", nav: true },

@@ -2,7 +2,7 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "life" | "content" | "system";
+  group: "life" | "content" | "income" | "system";
   description: string;
 };
 
@@ -37,7 +37,14 @@ export const navItems: NavItem[] = [
     label: "inbox",
     status: "queue",
     group: "life",
-    description: "what needs Ani and what can move next",
+    description: "what needs attention and what can move next",
+  },
+  {
+    href: "/inbox?category=health",
+    label: "health",
+    status: "queue",
+    group: "life",
+    description: "diet, vices, metrics, and health decisions",
   },
   {
     href: "/content",
@@ -94,6 +101,20 @@ export const navItems: NavItem[] = [
     status: "retained",
     group: "content",
     description: "issue preview without sends",
+  },
+  {
+    href: "/inbox?category=income",
+    label: "income",
+    status: "queue",
+    group: "income",
+    description: "business, jobs, payments, and follow-up",
+  },
+  {
+    href: "/inbox?category=system",
+    label: "system",
+    status: "queue",
+    group: "system",
+    description: "infra, fleet, repos, deploys, and proof",
   },
   {
     href: "/fleet",
@@ -224,7 +245,7 @@ export const contentRows: QueueRow[] = [
   },
 ];
 
-export const needsRows: QueueRow[] = [
+export const handoffRows: QueueRow[] = [
   {
     title: "passkey registration proof",
     owner: "site/admin",

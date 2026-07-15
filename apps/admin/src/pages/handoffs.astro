@@ -1,9 +1,9 @@
 ---
 import AdminTable from "../components/AdminTable.astro";
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { needsRows } from "../data/admin";
+import { handoffRows } from "../data/admin";
 ---
 
 <AdminLayout title="handoffs" deck="Newest, stale, and unabsorbed handoffs.">
-  <AdminTable rows={needsRows} />
+  <AdminTable rows={handoffRows} />
 </AdminLayout>

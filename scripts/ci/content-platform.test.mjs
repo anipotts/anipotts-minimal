@@ -11,8 +11,6 @@ import {
   expectedPasskeyTables,
   manualPasskeyEnrollmentSequence,
   missingRequiredPasskeyAuditEvents,
-  needsAniBuckets,
-  needsAniItemsFromJson,
   nextPasskeyProofAction,
   nextPasskeyStatusAction,
   passkeyAccessRemovalBlockers,
@@ -74,37 +72,6 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_provider",
   "sync_external",
 ]);
-
-const needsFixture = needsAniItemsFromJson([
-  {
-    agent_next: "continue after approval",
-    ani_action: "approve test action",
-    bucket: "unblockable_now",
-    expires_stale: "2026-07-01",
-    id: "need-test-action",
-    owner: "chief/site",
-    primary_action: "approve test action",
-    proof: "",
-    requires_ani: true,
-    source: "coord/NEEDS-ANI.md",
-    status: "open",
-    type: "approve",
-    why: "valid row should render",
-  },
-  {
-    id: "invalid-row",
-    type: "send",
-    bucket: "unblockable_now",
-  },
-]);
-
-assert.deepEqual(
-  needsAniBuckets.map((group) => group.bucket),
-  ["unblockable_now", "waiting_on_account_or_device", "review_delete_packets"],
-  "needs-ani buckets must stay stable for the admin route",
-);
-assert.equal(needsFixture.length, 1);
-assert.equal(needsFixture[0]?.id, "need-test-action");
 
 assert.deepEqual(
   REQUIRED_PASSKEY_AUDIT_EVENTS,
@@ -260,20 +227,11 @@ assert.equal(disabledRuntime.mode, "disabled");
 assert.equal(disabledRuntime.available, false);
 assert.equal(disabledRuntime.source_path, RUNTIME_FEED_PATH);
 assert.deepEqual(disabledRuntime.overlays, []);
-assert.deepEqual(disabledRuntime.needs_ani_queue, []);
 
 const runtimeOverlay = runtimeOverlayResponseFromFeed({
   generated_at: "2026-06-29T12:00:00Z",
   machine: "ap-mini.local",
   runtime: {
-    needs_ani_queue: [
-      needsFixture[0],
-      {
-        id: "invalid-runtime-need",
-        type: "send",
-        bucket: "unblockable_now",
-      },
-    ],
     repo_state_overlays: [
       {
         ahead: 0,
@@ -337,8 +295,6 @@ assert.equal(runtimeOverlay.overlays.length, 2);
 assert.equal(runtimeOverlay.overlays[0]?.repo, "anipotts-com");
 assert.equal(runtimeOverlay.overlays[0]?.behind, 1);
 assert.equal(runtimeOverlay.overlays[1]?.deploy_impact, "unknown");
-assert.equal(runtimeOverlay.needs_ani_queue.length, 1);
-assert.equal(runtimeOverlay.needs_ani_queue[0]?.id, "need-test-action");
 
 const missingRuntime = runtimeOverlayErrorResponse(
   Object.assign(new Error("missing feed"), { code: "ENOENT" }),

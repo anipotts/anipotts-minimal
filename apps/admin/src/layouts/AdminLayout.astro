@@ -20,6 +20,7 @@ const {
   hideHeader = false,
 } = Astro.props;
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const currentRoute = `${currentPath}${Astro.url.search}`;
 ---
 
 <!doctype html>
@@ -85,7 +86,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
   <body>
     <AdminShell
       chrome={chrome}
-      currentPath={currentPath}
+      currentRoute={currentRoute}
       deck={deck}
       hideHeader={hideHeader}
       navItems={navItems}
