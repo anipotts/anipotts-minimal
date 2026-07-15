@@ -165,6 +165,7 @@ for (const marker of [
   'id: "income"',
   'id: "system"',
   "data-copy-text",
+  "data-astro-rerun",
   "inboxCopyBound",
   'target.closest("[data-copy-text]")',
   "action queue",
