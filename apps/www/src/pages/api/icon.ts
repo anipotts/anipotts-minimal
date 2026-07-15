@@ -6,8 +6,8 @@ export const prerender = false;
 export const GET: APIRoute = ({ url }) => {
   const dark = url.searchParams.get("theme") === "dark";
   const asset = dark
-    ? "/brand/favicon-dark.svg?v=20260715"
-    : "/brand/favicon-light.svg?v=20260715";
+    ? "/brand/favicon-dark.svg?v=20260715b"
+    : "/brand/favicon-light.svg?v=20260715b";
 
   return Response.redirect(new URL(asset, url), 307);
 };
