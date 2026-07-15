@@ -1,238 +1,168 @@
 ---
 import Shell from "../layouts/Shell.astro";
-
-const receipts = [
-  {
-    label: "press",
-    title: "business insider",
-    href: "/writing/saturdays-are-for-claude-code",
-    detail:
-      "how usage limits forced tighter agent loops, sharper scopes, and better stopping points.",
-  },
-  {
-    label: "product",
-    title: "quantercise",
-    href: "/projects/quantercise",
-    detail:
-      "a solo product with python grading, math rendering, progress, payments, and real user flows.",
-  },
-  {
-    label: "tools",
-    title: "claude code tips",
-    href: "/projects/claude-code-tips",
-    detail:
-      "public notes from real agent work: hooks, commands, patterns, and small safety rails.",
-  },
-  {
-    label: "local",
-    title: "imessage mcp",
-    href: "/projects/imessage-mcp",
-    detail:
-      "a local-first mcp server for querying private message history without turning it into a cloud product.",
-  },
-];
+import InlineMention from "../components/InlineMention.astro";
 ---
 
 <Shell
   title="orchestrating"
-  description="a working thesis on agent loops, awareness, and proof."
+  description="learnings from orchestrating hella agents."
   path="/orchestrating"
   mood="calm"
 >
-  <section data-rise class="hero">
-    <p class="mono eyebrow">working thesis</p>
-    <h1>orchestrating hella agents</h1>
-    <p class="lede">agents execute. awareness closes the loop.</p>
-  </section>
+  <article data-rise class="essay">
+    <header class="essay-header">
+      <p class="kicker">learnings from</p>
+      <h1>orchestrating hella agents</h1>
+    </header>
 
-  <section data-rise class="manifesto" aria-label="working manifesto">
-    <p>
-      awareness here means the engineer's live model of the solution state: what
-      matters, what can break, what proof counts, and when the loop should stop.
-    </p>
-    <p>
-      cheap execution creates a new failure mode. without a clear loop, agents
-      can keep editing forever and still never converge on work that can be
-      trusted.
-    </p>
-    <p>
-      the skill i care about is capturing asynchronous, durable work loops:
-      define the shape, hand off the motion, collect proof, and keep judgment
-      with the operator.
-    </p>
-    <p>
-      the next stretch of ai work will be powered by domain loops: coding,
-      research, review, operations, and services moving into places that have
-      not had native ai workflows yet.
-    </p>
-  </section>
+    <div class="essay-body">
+      <p>
+        i keep coming back to the same thing: awareness is alpha when you're
+        orchestrating agents. i don't mean awareness as just noticing what is
+        around you. i mean being aware of what you're thinking, what the system
+        is doing, what you are actually trying to finish, and what the completed
+        solution should feel like when it exists.
+      </p>
 
-  <section data-rise class="receipts" aria-label="receipts">
-    <div class="section-head">
-      <h2 class="section-label">receipts</h2>
-      <p>public traces of the work behind the thesis.</p>
+      <p>
+        the more abstract version is awareness across the whole working system.
+        it can live in the person, in an agent, in tooling, or across the loop
+        between all of them. it is the live model of the current state, the
+        target state, uncertainty, constraints, proof, and the stopping
+        condition. when that model is accurate and durable, execution can move
+        without the work losing the plot.
+      </p>
+
+      <p>
+        agents make execution cheap. that creates a weird new failure mode where
+        an agent can keep editing code forever while the actual solution gets
+        less clear. every new output looks like motion. the repository changes,
+        tests move around, and more context gets consumed, but nobody has held a
+        stable definition of what should exist at the end.
+      </p>
+
+      <p>
+        this is where vibe coding turns into an endless reaction to whatever the
+        model did last. the engineering work is identifying the loop before
+        handing it off: what state needs to change, what evidence would prove
+        that it changed, what boundaries need to hold, and what should make the
+        agent stop. once those things are captured, the work can become
+        asynchronous without becoming vague.
+      </p>
+
+      <p>
+        i had to learn this partly because i started
+        <InlineMention
+          label="planning my work around session limits"
+          href="https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4"
+          logoSrc="/images/brand/business-insider-favicon.svg"
+          logoAlt="business insider"
+          wrap
+        />. the forced pauses made me review what had happened instead of
+        letting a session run until it lost coherence. i kept finding missed
+        tests and unnecessary abstractions. some approaches technically worked
+        but were solving the wrong shape of the problem. the constraint made the
+        loop visible.
+      </p>
+
+      <p>
+        now i run a lot of work asynchronously across agents, branches,
+        worktrees, handoffs, and checks. keeping agents busy is easy. making
+        each loop durable enough that i can leave, come back later, understand
+        what happened, inspect the proof, and know whether the work should
+        continue is the actual challenge. the system has to preserve awareness
+        while my attention moves somewhere else.
+      </p>
+
+      <p>
+        i think these durable loops are going to power a lot of the next two
+        years of ai work. the obvious coding workflows are only the beginning.
+        the larger expansion happens as the same kind of loops move through
+        research, operations, services, and domains that have much less native
+        familiarity with ai. execution will keep getting cheaper. knowing what
+        to execute, how to verify it, and when to stop will matter more.
+      </p>
+
+      <p>
+        the operator still owns the model of the solution, the quality bar, the
+        proof, and the decision to close the loop. awareness is how that
+        ownership stays intact while more of the motion happens somewhere else.
+        that is the part i am trying to formalize and test. i am writing it down
+        while it is happening so i can get better at it.
+      </p>
     </div>
-
-    <div class="ledger">
-      {
-        receipts.map((receipt) => (
-          <a href={receipt.href} class="receipt-row">
-            <span class="mono receipt-label">{receipt.label}</span>
-            <span>
-              <span class="receipt-title">{receipt.title}</span>
-              <span class="receipt-detail">{receipt.detail}</span>
-            </span>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <section data-rise class="note" aria-label="status">
-    <p>
-      this page is intentionally sparse while i keep sharpening the principle.
-    </p>
-  </section>
+  </article>
 </Shell>
 
 <style>
-  :global(main.frame) {
+  .essay {
     width: 100%;
-    max-width: 76rem;
   }
 
-  .hero,
-  .manifesto,
-  .receipts,
-  .note {
-    max-width: 58rem;
+  .essay-header {
+    padding-block: var(--s-5) var(--s-7);
   }
 
-  .hero {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
-    padding-block: clamp(2rem, 8vw, 7rem) var(--s-3);
-  }
-
-  .hero h1 {
-    max-width: 10ch;
+  .essay-header h1 {
     margin: 0;
-    text-wrap: balance;
+    font-size: 4rem;
+    line-height: 1;
+    letter-spacing: 0;
+    white-space: nowrap;
   }
 
-  .eyebrow {
-    margin: 0;
+  .kicker {
+    margin: 0 0 var(--s-2);
     color: var(--ink-muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-size: var(--p-small);
   }
 
-  .lede {
-    max-width: 42rem;
-    margin: 0;
-    color: var(--accent);
-    font-size: clamp(1.35rem, 3vw, 2.25rem);
-    line-height: 1.15;
-    text-wrap: balance;
-  }
-
-  .manifesto {
+  .essay-body {
     display: flex;
     flex-direction: column;
     gap: var(--s-4);
-    border-top: 1px solid var(--border);
-    padding-top: var(--s-6);
   }
 
-  .manifesto p {
-    max-width: 47rem;
+  .essay-body p {
     margin: 0;
-    font-size: clamp(1.05rem, 2vw, 1.3rem);
-    line-height: 1.55;
+    font-size: 1.125rem;
+    line-height: 1.65;
     text-wrap: pretty;
   }
 
-  .receipts {
-    display: grid;
-    gap: var(--s-4);
-  }
-
-  .section-head {
-    display: grid;
-    gap: var(--s-2);
-    max-width: 34rem;
-  }
-
-  .section-head p {
-    margin: 0;
-    color: var(--ink-muted);
-    font-size: var(--p-small);
-    line-height: 1.55;
-  }
-
-  .ledger {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid var(--border);
-  }
-
-  .receipt-row {
-    display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr);
-    gap: var(--s-4);
-    border-bottom: 1px solid var(--border);
-    padding-block: var(--s-4);
-    text-decoration: none;
-  }
-
-  .receipt-row:hover .receipt-title {
+  .essay-body :global(a.inline-mention) {
     color: var(--accent);
   }
 
-  .receipt-label {
-    color: var(--ink-muted);
-    font-size: 0.8rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  @media (max-width: 900px) {
+    .essay-header h1 {
+      font-size: 3rem;
+    }
   }
 
-  .receipt-title,
-  .receipt-detail {
-    display: block;
+  @media (max-width: 720px) {
+    .essay-header {
+      padding-block: var(--s-3) var(--s-6);
+    }
+
+    .essay-header h1 {
+      font-size: 2.25rem;
+    }
+
+    .essay-body p {
+      font-size: 1rem;
+    }
   }
 
-  .receipt-title {
-    color: var(--ink);
-    font-size: clamp(1.05rem, 2vw, 1.25rem);
-    line-height: 1.25;
-    transition: color 160ms ease;
+  @media (max-width: 480px) {
+    .essay-header h1 {
+      font-size: 1.65rem;
+    }
   }
 
-  .receipt-detail {
-    margin-top: var(--s-2);
-    color: var(--ink-muted);
-    font-size: var(--p-small);
-    line-height: 1.55;
-  }
-
-  .note {
-    border-top: 1px solid var(--border);
-    padding-top: var(--s-4);
-  }
-
-  .note p {
-    max-width: 32rem;
-    margin: 0;
-    color: var(--ink-muted);
-    font-size: var(--p-small);
-    line-height: 1.55;
-  }
-
-  @media (max-width: 640px) {
-    .receipt-row {
-      grid-template-columns: 1fr;
-      gap: var(--s-2);
+  @media (max-width: 359px) {
+    .essay-header h1 {
+      font-size: 1.1rem;
     }
   }
 </style>

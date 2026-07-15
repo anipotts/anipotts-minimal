@@ -21,6 +21,33 @@ v1 sync is refresh-on-open plus light polling. adapter and projection contracts
 must remain push-swappable. target realtime architecture is durable objects plus
 websocket hibernation.
 
+## sent mail awareness
+
+Gmail Sent awareness uses the existing event and inbox projection model. It does
+not create a new queue.
+
+For each sent message, the adapter writes one `admin_events` envelope:
+
+- `source`: `gmail`
+- `provider`: `gmail`
+- `kind`: `outbound.sent`
+- `dedupe_key`: an opaque ref derived from the Gmail message id, never the raw
+  id.
+- `href`: a metadata-only path/ref unless a later reviewed policy allows a Gmail
+  deep link that does not expose raw ids.
+- `account`, `subject`, `sent_at`, and `has_attachments` are metadata only.
+- raw message id, raw thread id, recipients, body, and snippet stay omitted.
+
+Completed outbound obligations are event-only. They do not emit an inbox card.
+If a distinct reply, proof, or payment follow-up remains, the adapter writes a
+separate `admin_inbox_items` row with its own dedupe key, such as
+`brand:rayban-meta:payment-followup:2026-07-09`. That keeps sent-mail proof from
+keeping completed work visible while preserving real follow-ups.
+
+The Ray-Ban 30-day sent proof is modeled as a metadata-only sent event from
+2026-07-08. The 2026-07-09 acknowledgement closes the reply obligation. Payment
+proof, if still absent, remains a separate Brand/Business follow-up card.
+
 ## read-only mcp
 
 `/api/mcp` exposes the same projections the Astro ui uses.

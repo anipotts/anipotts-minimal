@@ -1,5 +1,9 @@
 ---
+import "@astryxdesign/core/reset.css";
+import "@astryxdesign/core/astryx.css";
+import "@astryxdesign/theme-neutral/theme.css";
 import "../styles/admin.css";
+import { AdminShell } from "../components/astryx/AdminShell";
 import { navItems, routeTitle } from "../data/admin";
 
 type Props = {
@@ -16,29 +20,17 @@ const {
   hideHeader = false,
 } = Astro.props;
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
-const primaryNav = navItems.filter((item) => item.group === "primary");
-const secondaryNav = [
-  {
-    label: "content",
-    items: navItems.filter((item) => item.group === "content"),
-  },
-  {
-    label: "advanced",
-    items: navItems.filter((item) => item.group === "advanced"),
-  },
-];
-
-function isActive(href: string): boolean {
-  if (href === "/") return currentPath === "/";
-  return currentPath === href || currentPath.startsWith(`${href}/`);
-}
+const currentRoute = `${currentPath}${Astro.url.search}`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-astryx-theme="neutral">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
@@ -52,7 +44,23 @@ function isActive(href: string): boolean {
     <title>{title} | anipotts admin</title>
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem("theme");
+        const readPreference = (key) => {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        };
+        const writePreference = (key, value) => {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            // Preferences remain session-local when storage is unavailable.
+          }
+        };
+
+        const stored =
+          readPreference("admin-theme:v1") ?? readPreference("theme");
         const theme =
           stored === "dark" || stored === "light"
             ? stored
@@ -62,7 +70,8 @@ function isActive(href: string): boolean {
         document.documentElement.dataset.theme = theme;
 
         const requestedFont = new URLSearchParams(location.search).get("font");
-        const storedFont = localStorage.getItem("font");
+        const storedFont =
+          readPreference("admin-font:v1") ?? readPreference("font");
         const font =
           requestedFont === "geist" || requestedFont === "instrument"
             ? requestedFont
@@ -70,83 +79,53 @@ function isActive(href: string): boolean {
               ? storedFont
               : "instrument";
         document.documentElement.dataset.font = font;
-        localStorage.setItem("font", font);
+        writePreference("admin-font:v1", font);
       })();
     </script>
   </head>
   <body>
-    <div
-      class:list={["shell", chrome === "auth" && "auth-shell"]}
-      data-auth-state={chrome === "auth" ? "checking" : "signed-in"}
+    <AdminShell
+      chrome={chrome}
+      currentRoute={currentRoute}
+      deck={deck}
+      hideHeader={hideHeader}
+      navItems={navItems}
+      title={title}
     >
-      <aside class="sidebar" aria-label="admin navigation">
-        <a class="brand" href="/">
-          <span class="brand-mark">a</span>
-          <span class="brand-copy">
-            <strong>anipotts admin</strong>
-            <small>admin</small>
-          </span>
-        </a>
-        <nav class="nav-stack">
-          <section class="nav-section" aria-label="primary admin routes">
-            <p class="nav-section-title">primary</p>
-            <div class="nav-section-links">
-              {
-                primaryNav.map((item) => (
-                  <a
-                    class:list={["nav-link", isActive(item.href) && "active"]}
-                    href={item.href}
-                  >
-                    <span>{item.label}</span>
-                  </a>
-                ))
-              }
-            </div>
-          </section>
-          {
-            secondaryNav.map((section) => (
-              <details
-                class="nav-section nav-details"
-                open={section.items.some((item) => isActive(item.href))}
-              >
-                <summary>{section.label}</summary>
-                <div class="nav-section-links">
-                  {section.items.map((item) => (
-                    <a
-                      class:list={["nav-link", isActive(item.href) && "active"]}
-                      href={item.href}
-                    >
-                      <span>{item.label}</span>
-                    </a>
-                  ))}
-                </div>
-              </details>
-            ))
+      <slot />
+    </AdminShell>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const toggles = document.querySelectorAll("[data-theme-toggle]");
+
+        const syncToggleLabels = () => {
+          const isDark = root.dataset.theme === "dark";
+          for (const toggle of toggles) {
+            toggle.setAttribute("aria-pressed", String(isDark));
+            const label = toggle.querySelector("[data-theme-label]");
+            if (label) label.textContent = isDark ? "light mode" : "dark mode";
           }
-        </nav>
-        <div class="sidebar-proof">
-          <strong>passkey + Access</strong>
-          <small>Access stays until proof passes.</small>
-        </div>
-        <div class="sidebar-lock">
-          <span></span>
-          <small>locked</small>
-        </div>
-      </aside>
-      <main class:list={[chrome === "auth" && "auth-main"]}>
-        {
-          !hideHeader && (
-            <header class="page-header">
-              <div>
-                <p>admin.anipotts.com</p>
-                <h1>{title}</h1>
-              </div>
-              {deck && <span>{deck}</span>}
-            </header>
-          )
+        };
+
+        const setTheme = (theme) => {
+          root.dataset.theme = theme;
+          try {
+            localStorage.setItem("admin-theme:v1", theme);
+          } catch {
+            // The visible toggle still works for this page session.
+          }
+          syncToggleLabels();
+        };
+
+        for (const toggle of toggles) {
+          toggle.addEventListener("click", () => {
+            setTheme(root.dataset.theme === "dark" ? "light" : "dark");
+          });
         }
-        <slot />
-      </main>
-    </div>
+
+        syncToggleLabels();
+      })();
+    </script>
   </body>
 </html>

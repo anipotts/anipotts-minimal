@@ -10,8 +10,50 @@ import {
   type AdminPieceState,
   type AdminServiceRegistryViewItem,
 } from "./types";
+import {
+  buildSentMailAwareness,
+  buildSentMailMetadata,
+  gmailSentDedupeKey,
+} from "./sent-mail";
 
 const NOW = "2026-07-02T16:45:00.000Z";
+const RAYBAN_SENT_AT = "2026-07-08T00:00:00.000Z";
+
+const raybanSentMail = buildSentMailMetadata({
+  account: "hello@anipotts.com",
+  sent_ref: "rayban-30-day-analytics-2026-07-08",
+  subject: "Ray-Ban 30-day analytics",
+  sent_at: RAYBAN_SENT_AT,
+  has_attachments: "unknown",
+  href: "metadata://gmail/sent/rayban-30-day-analytics-2026-07-08",
+});
+
+const raybanSentAwareness = buildSentMailAwareness(raybanSentMail, {
+  completed: true,
+  dedupe_key: gmailSentDedupeKey("rayban-30-day-analytics-2026-07-08"),
+  event_id: "evt-gmail-sent-rayban-30-day-analytics-2026-07-08",
+  privacy: "private",
+});
+
+const raybanPaymentFollowUp = buildSentMailAwareness(raybanSentMail, {
+  completed: true,
+  dedupe_key: gmailSentDedupeKey("rayban-30-day-analytics-2026-07-08"),
+  event_id: "evt-gmail-sent-rayban-30-day-analytics-2026-07-08",
+  privacy: "private",
+  follow_up: {
+    id: "inbox-rayban-payment-followup",
+    dedupe_key: "brand:rayban-meta:payment-followup:2026-07-09",
+    kind: "payment",
+    title: "ray-ban payment follow-up",
+    summary:
+      "30-day sent mail and acknowledgement are proof; payment follow-up stays separate.",
+    owner: "chief/brand",
+    urgency: "normal",
+    status: "waiting_payment_proof",
+    href: raybanSentMail.href,
+    last_seen_at: "2026-07-09T00:00:00.000Z",
+  },
+});
 
 export const adminControlContracts: AdminControlContracts = {
   event_fields: [
@@ -47,6 +89,22 @@ export const adminControlContracts: AdminControlContracts = {
     "expires_at",
     "last_seen_at",
   ],
+  sent_mail_metadata_fields: [
+    "account",
+    "sent_ref",
+    "subject",
+    "sent_at",
+    "has_attachments",
+    "href",
+  ],
+  sent_mail_card_policy: {
+    dedupe: "gmail-message-id-derived-ref",
+    completed_obligation: "event-only",
+    followups: "separate-inbox-items",
+    sync: "refresh-on-open-plus-light-polling",
+    raw_identifiers: "omitted",
+    snippet: "omitted",
+  },
   piece_states: [
     "idea",
     "draft",
@@ -78,6 +136,7 @@ export const fixtureEvents: AdminEventEnvelope[] = [
     payload_ref: "r2://admin-event-payloads/2026/07/02/admin-contract.json",
     created_by: "codex",
   },
+  raybanSentAwareness.event,
   {
     schema_version: ADMIN_EVENT_SCHEMA_VERSION,
     event_id: "evt-rayban-analytics-2026-07-02",
@@ -153,23 +212,7 @@ export const fixtureInboxItems: AdminInboxItem[] = [
     expires_at: null,
     last_seen_at: null,
   },
-  {
-    item_id: "inbox-rayban-analytics",
-    dedupe_key: "brand:rayban-meta:analytics-reminder:2026-07-02",
-    event_refs: ["evt-rayban-analytics-2026-07-02"],
-    source: "brand",
-    account: "ray-ban meta",
-    title: "ray-ban analytics reminder",
-    summary:
-      "single deal closeout item left: analytics reminder for payment follow-through.",
-    href: null,
-    status: "deadline",
-    urgency: "high",
-    owner: "chief/brand",
-    action_kind: "deadline",
-    expires_at: "2026-07-02T23:59:00.000Z",
-    last_seen_at: null,
-  },
+  raybanPaymentFollowUp.inbox_item!,
   {
     item_id: "inbox-connect-topology",
     dedupe_key: "infra:connect:topology-diff:2026-07-02",
@@ -180,7 +223,7 @@ export const fixtureInboxItems: AdminInboxItem[] = [
     summary:
       "personal/business value-serving stays off; only the signed diff can open that lane.",
     href: "/fleet",
-    status: "needs ani",
+    status: "action required",
     urgency: "high",
     owner: "codex chief",
     action_kind: "approve",

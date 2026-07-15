@@ -10,6 +10,9 @@ import {
 } from "./admin-route-inventory.mjs";
 
 const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
+const inboxDataSource = readFileSync("apps/admin/src/data/inbox.ts", "utf8");
+const inboxSource = readFileSync("apps/admin/src/pages/inbox.astro", "utf8");
+const rootSource = readFileSync("apps/admin/src/pages/index.astro", "utf8");
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
@@ -33,6 +36,12 @@ const publicPasskeyApiPaths = extractStringList(
   "PUBLIC_PASSKEY_API_PATHS",
 );
 const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
+const retiredActionQueueFiles = [
+  "apps/admin/src/pages/needs-ani.astro",
+  "apps/admin/src/data/needs.ts",
+  "apps/admin/src/data/static/needs-ani.syscalls.json",
+  "packages/content/src/admin/needs.ts",
+];
 
 assert.deepEqual(publicPaths, [
   "/api/health",
@@ -121,6 +130,72 @@ for (const route of ADMIN_ROUTES) {
     );
   }
 }
+
+assert.equal(
+  [...navSource.matchAll(/label: "inbox"/g)].length,
+  1,
+  "admin nav must expose one primary inbox entry",
+);
+assert.ok(
+  rootSource.includes('return Astro.redirect("/inbox", 302)'),
+  "admin root must redirect to the canonical inbox",
+);
+for (const file of retiredActionQueueFiles) {
+  assert.equal(existsSync(file), false, `${file} must stay retired`);
+}
+assert.equal(
+  ADMIN_ROUTES.some((route) => route.route === "/needs-ani"),
+  false,
+  "retired action queue route must not be classified",
+);
+assert.equal(
+  deploySmokeRoutes.has("/needs-ani"),
+  false,
+  "retired action queue route must not stay in deploy smoke",
+);
+assert.equal(
+  manualSmokeRoutes.has("/needs-ani"),
+  false,
+  "retired action queue route must not stay in manual smoke",
+);
+
+for (const marker of [
+  'id: "health"',
+  'id: "content"',
+  'id: "income"',
+  'id: "system"',
+  "data-copy-text",
+  "inboxCopyBound",
+  'target.closest("[data-copy-text]")',
+  "action queue",
+  "inbox-category-filter",
+  "recurring monitor not connected",
+  "waiting / gated",
+]) {
+  assert.ok(inboxSource.includes(marker), `/inbox missing marker ${marker}`);
+}
+
+for (const marker of [
+  "loadAdminControlSnapshot",
+  "control.projections.inbox_items",
+  "dedupeInboxItems",
+  "copy_text",
+]) {
+  assert.ok(
+    inboxDataSource.includes(marker),
+    `admin inbox adapter missing marker ${marker}`,
+  );
+}
+assert.equal(
+  inboxDataSource.includes('from "./needs"'),
+  false,
+  "admin inbox must not import the retired static action queue",
+);
+assert.equal(
+  inboxSource.includes("needs ani"),
+  false,
+  "canonical inbox must not expose the retired queue label",
+);
 
 for (const marker of [
   "Access removal runbook",

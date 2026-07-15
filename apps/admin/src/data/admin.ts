@@ -2,7 +2,7 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "primary" | "content" | "advanced";
+  group: "life" | "content" | "income" | "system";
   description: string;
 };
 
@@ -33,46 +33,32 @@ export type DeployRow = {
 
 export const navItems: NavItem[] = [
   {
-    href: "/",
+    href: "/inbox",
     label: "inbox",
-    status: "source",
-    group: "primary",
-    description: "attention queue and approvals",
+    status: "queue",
+    group: "life",
+    description: "what needs attention and what can move next",
   },
   {
-    href: "/fleet",
-    label: "fleet",
-    status: "runtime",
-    group: "primary",
-    description: "machines, repo state, current work",
+    href: "/inbox?category=health",
+    label: "health",
+    status: "queue",
+    group: "life",
+    description: "diet, vices, metrics, and health decisions",
   },
   {
     href: "/content",
-    label: "studio",
+    label: "content",
     status: "D1",
-    group: "primary",
+    group: "content",
     description: "pieces, drafts, exports",
   },
   {
     href: "/content/edit/new",
     label: "writing editor",
     status: "editor",
-    group: "primary",
+    group: "content",
     description: "write and publish content",
-  },
-  {
-    href: "/proof",
-    label: "proof/auth",
-    status: "passkeys",
-    group: "primary",
-    description: "auth, proof, and blocked checks",
-  },
-  {
-    href: "/deploys",
-    label: "deploys",
-    status: "scoped",
-    group: "primary",
-    description: "target map and deploy proof",
   },
   {
     href: "/content/review",
@@ -96,6 +82,13 @@ export const navItems: NavItem[] = [
     description: "draft preview surfaces",
   },
   {
+    href: "/content/drafts",
+    label: "drafts",
+    status: "content",
+    group: "content",
+    description: "saved draft operations and publish state",
+  },
+  {
     href: "/content/operations",
     label: "operations",
     status: "content",
@@ -110,38 +103,66 @@ export const navItems: NavItem[] = [
     description: "issue preview without sends",
   },
   {
-    href: "/needs-ani",
-    label: "needs ani",
+    href: "/inbox?category=income",
+    label: "income",
     status: "queue",
-    group: "content",
-    description: "typed approval and decision queue",
+    group: "income",
+    description: "business, jobs, payments, and follow-up",
+  },
+  {
+    href: "/inbox?category=system",
+    label: "system",
+    status: "queue",
+    group: "system",
+    description: "infra, fleet, repos, deploys, and proof",
+  },
+  {
+    href: "/fleet",
+    label: "fleet",
+    status: "runtime",
+    group: "system",
+    description: "machines, repo state, current work",
+  },
+  {
+    href: "/proof",
+    label: "proof and auth",
+    status: "passkeys",
+    group: "system",
+    description: "auth, proof, and blocked checks",
+  },
+  {
+    href: "/deploys",
+    label: "deploys",
+    status: "scoped",
+    group: "system",
+    description: "target map and deploy proof",
   },
   {
     href: "/repos",
     label: "repos",
     status: "details",
-    group: "advanced",
+    group: "system",
     description: "dirty state and branch drift",
   },
   {
     href: "/handoffs",
     label: "handoffs",
     status: "details",
-    group: "advanced",
+    group: "system",
     description: "handoff freshness and absorption",
   },
   {
     href: "/mutations",
     label: "mutations",
     status: "gated",
-    group: "advanced",
+    group: "system",
     description: "proposed, approved, running, verified",
   },
   {
     href: "/ops/destructive",
     label: "destructive ops",
     status: "gated",
-    group: "advanced",
+    group: "system",
     description: "delete, dns, auth, deploy, secrets",
   },
 ];
@@ -157,12 +178,11 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "writing editor",
-    status:
-      "draft operation editor is live; full publish flow moved to a worktree",
+    status: "D1 draft save and selected-draft publish are live",
     risk: "medium",
-    next: "build D1 save, preview, publish, visibility, and revision history",
-    href: "/content/drafts",
-    action: "review editor",
+    next: "use the Astryx editor for save, preview, publish, and history",
+    href: "/content/edit/new",
+    action: "open editor",
   },
   {
     title: "content inventory",
@@ -225,7 +245,7 @@ export const contentRows: QueueRow[] = [
   },
 ];
 
-export const needsRows: QueueRow[] = [
+export const handoffRows: QueueRow[] = [
   {
     title: "passkey registration proof",
     owner: "site/admin",
@@ -351,8 +371,8 @@ export const mutationRows: QueueRow[] = [
   {
     title: "publish content edits",
     owner: "content admin",
-    status: "future write path",
-    evidence: "must be logged, reversible, and proof-backed",
+    status: "selected-draft publish with proof",
+    evidence: "content_publish_events and page_content version history",
   },
 ];
 

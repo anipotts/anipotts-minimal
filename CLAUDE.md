@@ -94,8 +94,8 @@ For `admin.anipotts.com`, use this order:
    `/content/drafts`, `/content/edit/home`,
    `/api/admin/content/draft-operation`, `/content/preview`,
    `/content/operations`, `/newsletter`,
-   `/newsletter/first-thing-agents-need-control-plane`, `/needs-ani`, and
-   `/proof`, `/deploys`
+   `/newsletter/first-thing-agents-need-control-plane`, `/inbox`, `/proof`, and
+   `/deploys`
 6. remove Cloudflare Access only after proof passes
 7. verify app-native unauthenticated block and authenticated passkey access
 8. rollback by restoring the previous Access app or policy if proof fails

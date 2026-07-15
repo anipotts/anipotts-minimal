@@ -1,5 +1,6 @@
 export const ADMIN_ROUTES = [
-  { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
+  { route: "/", file: "apps/admin/src/pages/index.astro", nav: false },
+  { route: "/inbox", file: "apps/admin/src/pages/inbox.astro", nav: true },
   {
     route: "/auth/passkey",
     file: "apps/admin/src/pages/auth/passkey.astro",
@@ -51,11 +52,6 @@ export const ADMIN_ROUTES = [
     file: "apps/admin/src/pages/newsletter/[slug].astro",
     nav: false,
   },
-  {
-    route: "/needs-ani",
-    file: "apps/admin/src/pages/needs-ani.astro",
-    nav: true,
-  },
   { route: "/proof", file: "apps/admin/src/pages/proof.astro", nav: true },
   { route: "/deploys", file: "apps/admin/src/pages/deploys.astro", nav: true },
   { route: "/repos", file: "apps/admin/src/pages/repos.astro", nav: true },
@@ -78,6 +74,12 @@ export const ADMIN_ROUTES = [
   {
     route: "/api/admin/runtime-feed",
     file: "apps/admin/src/pages/api/admin/runtime-feed.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/inbox",
+    file: "apps/admin/src/pages/api/admin/inbox.ts",
     nav: false,
     smoke: false,
   },

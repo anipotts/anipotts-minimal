@@ -1,0 +1,203 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { readAdminInbox } from "../data/inbox";
+
+const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
+const categories = [
+  {
+    id: "health",
+    label: "health",
+    detail: "diet, vices, metrics, and decisions owned by chief/health",
+  },
+  {
+    id: "content",
+    label: "content",
+    detail: "site, writing, newsletter, brand, and carousel work",
+  },
+  {
+    id: "income",
+    label: "income",
+    detail: "business, jobs, payments, and outbound follow-up",
+  },
+  {
+    id: "system",
+    label: "system",
+    detail: "infra, fleet, repos, deploys, proof, and gated operations",
+  },
+] as const;
+
+const sections = categories.map((category) => ({
+  ...category,
+  items: inbox.items.filter((item) => item.category === category.id),
+}));
+const requestedCategory = Astro.url.searchParams.get("category");
+const selectedCategory = categories.find(
+  (category) => category.id === requestedCategory,
+);
+const visibleSections = selectedCategory
+  ? sections.filter((section) => section.id === selectedCategory.id)
+  : sections;
+
+const countByTimeframe = (timeframe: string) =>
+  inbox.items.filter((item) => item.timeframe === timeframe).length;
+---
+
+<AdminLayout
+  title="inbox"
+  deck="What needs attention, what can move next, and what is waiting on a gate. Copy controls are local-only."
+>
+  <section class="meta-strip" aria-label="admin inbox source">
+    <span>{inbox.counts.total} items</span>
+    <span>{countByTimeframe("now")} now</span>
+    <span>{countByTimeframe("today")} today</span>
+    <span>{countByTimeframe("this week")} this week</span>
+    <span>{countByTimeframe("waiting / gated")} waiting / gated</span>
+    <span>refresh on open</span>
+  </section>
+
+  <section class="table-card inbox-intro">
+    <div class="section-head">
+      <div>
+        <p>action queue</p>
+        <h2>what needs attention</h2>
+      </div>
+      <span>{inbox.mode} / read only</span>
+    </div>
+    <div class="inbox-intro-copy">
+      <p>
+        The queue combines source-backed health, content, income, and system
+        blockers. Copying text does not send, approve, publish, or continue a
+        task.
+      </p>
+      <div class="inbox-monitoring-status">
+        <small>monitoring</small>
+        <strong>read-only on open</strong>
+        <span>recurring monitor not connected</span>
+      </div>
+    </div>
+    <nav class="inbox-category-filter" aria-label="filter inbox by category">
+      <a
+        class:list={[!selectedCategory && "is-active"]}
+        href="/inbox"
+        aria-current={!selectedCategory ? "page" : undefined}>all</a
+      >
+      {
+        categories.map((category) => (
+          <a
+            class:list={[selectedCategory?.id === category.id && "is-active"]}
+            href={`/inbox?category=${category.id}`}
+            aria-current={
+              selectedCategory?.id === category.id ? "page" : undefined
+            }
+          >
+            {category.label}
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  <div class="inbox-category-grid">
+    {
+      visibleSections.map((section) => (
+        <section class="table-card inbox-category" id={section.id}>
+          <div class="section-head">
+            <div>
+              <p>{section.detail}</p>
+              <h2>{section.label}</h2>
+            </div>
+            <span>{section.items.length} open</span>
+          </div>
+          <div class="record-list inbox-list">
+            {section.items.length === 0 ? (
+              <article class="record-row inbox-empty-row">
+                <div>
+                  <p>clear</p>
+                  <h3>nothing blocking this lane</h3>
+                </div>
+              </article>
+            ) : (
+              section.items.map((item) => (
+                <article class={`record-row inbox-row risk-${item.risk}`}>
+                  <div class="inbox-card-copy">
+                    <p>
+                      {item.timeframe} / {item.source} / {item.owner} /{" "}
+                      {item.status}
+                    </p>
+                    <h3>{item.title}</h3>
+                    <span>{item.summary}</span>
+                    <div class="inbox-next-action">
+                      <small>next action</small>
+                      <strong>{item.next_action}</strong>
+                    </div>
+                    <div class="inbox-card-actions">
+                      {item.copy_text && (
+                        <button
+                          type="button"
+                          class="button secondary inbox-copy-button"
+                          data-copy-text={item.copy_text}
+                        >
+                          {["approve", "decide"].includes(item.action_kind)
+                            ? "copy approval"
+                            : "copy next action"}
+                        </button>
+                      )}
+                      <a class="button ghost" href={item.href}>
+                        open source
+                      </a>
+                      <span data-copy-status aria-live="polite" />
+                    </div>
+                  </div>
+                  <details class="inbox-proof-details">
+                    <summary>proof and timing</summary>
+                    <dl>
+                      <div>
+                        <dt>proof</dt>
+                        <dd>{item.proof}</dd>
+                      </div>
+                      <div>
+                        <dt>updated</dt>
+                        <dd>{item.updated_at}</dd>
+                      </div>
+                    </dl>
+                  </details>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <script is:inline>
+    (() => {
+      if (document.documentElement.dataset.inboxCopyBound === "true") return;
+      document.documentElement.dataset.inboxCopyBound = "true";
+
+      async function copyText(value) {
+        if (!navigator.clipboard?.writeText)
+          throw new Error("copy unavailable");
+        await navigator.clipboard.writeText(value);
+      }
+
+      document.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const button = target.closest("[data-copy-text]");
+        if (!(button instanceof HTMLButtonElement)) return;
+
+        const value = button.getAttribute("data-copy-text") ?? "";
+        const status =
+          button.parentElement?.querySelector("[data-copy-status]");
+        try {
+          await copyText(value);
+          if (status) status.textContent = "copied";
+        } catch {
+          if (status) status.textContent = "copy failed";
+        }
+      });
+    })();
+  </script>
+</AdminLayout>
