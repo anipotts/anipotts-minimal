@@ -47,8 +47,8 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #050505;
-  --surface: #141414;
+  --bg: #11111b;
+  --surface: #1e1e2e;
   --ink: #ffffff;
   --ink-muted: #a3a3a3;
   --accent: #61abea;

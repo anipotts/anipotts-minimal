@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <style>
-    :root { --surface: #ffffff; --mark: #61abea; --outline: #050505; }
+    :root { --surface: #ffffff; --mark: #61abea; --outline: #11111b; }
     @media (prefers-color-scheme: dark) {
-      :root { --surface: #050505; --mark: #61abea; --outline: #ffffff; }
+      :root { --surface: #11111b; --mark: #61abea; --outline: #ffffff; }
     }
   </style>
   <rect width="512" height="512" fill="var(--surface)"/>
