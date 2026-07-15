@@ -13,6 +13,7 @@ interface Props {
   badgeSrc?: string;
   badgeAlt?: string;
   suffix?: string;
+  wrap?: boolean;
 }
 
 const {
@@ -21,14 +22,20 @@ const {
   icon,
   mark,
   logoSrc,
+  logoAlt,
   logoTone,
   logoShape,
   badgeSrc,
   badgeAlt,
   suffix,
+  wrap = false,
 } = Astro.props;
 const Tag = href ? "a" : "span";
 const hasVisual = Boolean(logoSrc || icon || mark);
+const accessibleLabel = logoAlt ? `${logoAlt}: ${label}` : label;
+const mentionClass = ["inline-mention", wrap ? "inline-mention-wrap" : ""]
+  .filter(Boolean)
+  .join(" ");
 const markClass = [
   "brand-mark",
   logoTone === "white" ? "brand-mark-white" : "",
@@ -43,10 +50,10 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
 
 <Tag
   href={href}
-  class="inline-mention"
+  class={mentionClass}
   target={href ? "_blank" : undefined}
   rel={href ? "noopener noreferrer" : undefined}
-  aria-label={label}
+  aria-label={accessibleLabel}
 >
   {
     hasVisual && (
@@ -86,6 +93,15 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
     text-decoration: none;
     white-space: nowrap;
     vertical-align: -0.08em;
+  }
+
+  .inline-mention-wrap {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .inline-mention-wrap .text {
+    min-width: 0;
   }
 
   a.inline-mention {
