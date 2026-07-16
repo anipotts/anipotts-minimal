@@ -1,0 +1,141 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const requestedNext = Astro.url.searchParams.get("next");
+const nextPath = sanitizeReturnPath(requestedNext);
+
+function sanitizeReturnPath(path: string | null): string {
+  if (
+    !path ||
+    !path.startsWith("/") ||
+    path.startsWith("//") ||
+    path.includes("\\")
+  )
+    return "/inbox";
+  try {
+    const parsed = new URL(path, Astro.url.origin);
+    return parsed.origin === Astro.url.origin &&
+      !parsed.pathname.startsWith("/auth")
+      ? `${parsed.pathname}${parsed.search}${parsed.hash}`
+      : "/inbox";
+  } catch {
+    return "/inbox";
+  }
+}
+---
+
+<AdminLayout title="auth" chrome="auth" hideHeader>
+  <main class="native-auth" data-next={nextPath}>
+    <button
+      class="native-auth-mark"
+      type="button"
+      data-password-reveal
+      aria-label="show password login"
+    >
+      <span>ap</span>
+    </button>
+    <section class="native-auth-panel" hidden data-password-panel>
+      <p>admin.anipotts.com</p>
+      <h1>unlock</h1>
+      <form data-password-form>
+        <label for="admin-password">password</label>
+        <input
+          id="admin-password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        <button class="button" type="submit">continue</button>
+      </form>
+      <button class="button ghost" type="button" data-passkey
+        >use passkey</button
+      >
+      <p class="native-auth-message" data-auth-message aria-live="polite"></p>
+    </section>
+  </main>
+</AdminLayout>
+
+<script>
+  import { startAuthentication } from "@simplewebauthn/browser";
+  import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/server";
+
+  const root = document.querySelector<HTMLElement>(".native-auth");
+  const mark = document.querySelector<HTMLButtonElement>(
+    "[data-password-reveal]",
+  );
+  const panel = document.querySelector<HTMLElement>("[data-password-panel]");
+  const form = document.querySelector<HTMLFormElement>("[data-password-form]");
+  const passkey = document.querySelector<HTMLButtonElement>("[data-passkey]");
+  const message = document.querySelector<HTMLElement>("[data-auth-message]");
+  const next = root?.dataset.next ?? "/inbox";
+
+  mark?.addEventListener("click", () => {
+    if (!panel) return;
+    panel.hidden = false;
+    mark.setAttribute("aria-expanded", "true");
+    panel.querySelector<HTMLInputElement>("input")?.focus();
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const input = form.querySelector<HTMLInputElement>("input[name=password]");
+    if (!input) return;
+    setBusy(true, "checking");
+    const status = await fetch("/api/admin/auth/status", {
+      cache: "no-store",
+    }).then((response) => response.json());
+    const endpoint = status.password_configured
+      ? "/api/admin/auth/login"
+      : "/api/admin/auth/bootstrap";
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-admin-csrf": "same-origin",
+      },
+      body: JSON.stringify({ password: input.value }),
+    });
+    const result = await response.json();
+    if (response.ok && endpoint.endsWith("bootstrap")) {
+      setBusy(false, "temporary password saved. continue to sign in");
+      input.value = "";
+      return;
+    }
+    if (response.ok) window.location.assign(next);
+    else setBusy(false, result.error ?? "authentication failed");
+  });
+
+  passkey?.addEventListener("click", async () => {
+    setBusy(true, "waiting for passkey");
+    try {
+      const optionsResponse = await fetch("/api/admin/passkey/login-options", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      });
+      if (!optionsResponse.ok) throw new Error("passkey unavailable");
+      const options =
+        (await optionsResponse.json()) as PublicKeyCredentialRequestOptionsJSON;
+      const credential = await startAuthentication({ optionsJSON: options });
+      const verify = await fetch("/api/admin/passkey/login-verify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(credential),
+      });
+      if (!verify.ok) throw new Error("passkey denied");
+      window.location.assign(next);
+    } catch (error) {
+      setBusy(false, error instanceof Error ? error.message : "passkey failed");
+    }
+  });
+
+  function setBusy(busy: boolean, text: string) {
+    mark?.toggleAttribute("data-busy", busy);
+    if (form)
+      for (const control of form.elements)
+        (control as HTMLInputElement | HTMLButtonElement).disabled = busy;
+    if (passkey) passkey.disabled = busy;
+    if (message) message.textContent = text;
+  }
+</script>

@@ -1,12 +1,103 @@
 ---
-import AdminTable from "../components/AdminTable.astro";
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { mutationRows } from "../data/admin";
 ---
 
 <AdminLayout
-  title="mutations"
-  deck="Proposed, approved, running, verified, and blocked mutations."
+  title="actions"
+  deck="Exact proposals, individual confirmation, manual execution, and proof."
 >
-  <AdminTable rows={mutationRows} />
+  <section class="meta-strip">
+    <span>24h approval</span><span>encrypted payloads</span><span
+      >manual ap-pro runner</span
+    >
+  </section>
+  <section class="table-card">
+    <div class="section-head">
+      <div><p>queue</p><h2>Confirmed actions</h2></div><span data-action-count
+        >loading</span
+      >
+    </div>
+    <div class="record-list" data-action-list></div>
+  </section>
+  <section class="table-card">
+    <div class="section-head">
+      <div><p>proposal only</p><h2>Gated adapters</h2></div><span>disabled</span
+      >
+    </div>
+    <div class="record-list">
+      <div class="record-row">publishing and newsletters</div>
+      <div class="record-row">social posting and deploys</div>
+      <div class="record-row">
+        credentials, health writes, and destructive operations
+      </div>
+      <div class="record-row">non-job outbound actions</div>
+    </div>
+  </section>
 </AdminLayout>
+
+<script>
+  const fixturePreview =
+    new URLSearchParams(window.location.search).get("source") === "fixture";
+  if (fixturePreview) {
+    const count = document.querySelector<HTMLElement>("[data-action-count]");
+    if (count) count.textContent = "0 rows";
+  } else {
+    await refresh();
+  }
+  async function refresh() {
+    const response = await fetch("/api/admin/actions", { cache: "no-store" });
+    const body = await response.json().catch(() => ({ actions: [] }));
+    const list = document.querySelector<HTMLElement>("[data-action-list]");
+    const count = document.querySelector<HTMLElement>("[data-action-count]");
+    if (count) count.textContent = `${body.actions.length} rows`;
+    if (!list) return;
+    list.replaceChildren(
+      ...body.actions.map((action: any) => {
+        const row = document.createElement("article");
+        row.className = "record-row";
+        const preview = document.createElement("div");
+        const label = document.createElement("p");
+        label.textContent = `${action.domain} / ${action.action_type} / ${action.status}`;
+        const heading = document.createElement("h3");
+        heading.textContent = String(
+          action.preview.summary ??
+            action.preview.subject ??
+            action.action_type,
+        );
+        const expiry = document.createElement("span");
+        expiry.textContent = `expires ${action.expires_at}`;
+        preview.append(label, heading);
+        if (action.confirmation) {
+          const confirmation = document.createElement("pre");
+          confirmation.className = "action-confirmation";
+          confirmation.textContent = JSON.stringify(
+            action.confirmation,
+            null,
+            2,
+          );
+          preview.append(confirmation);
+        }
+        preview.append(expiry);
+        row.append(preview);
+        if (action.status === "proposed") {
+          const approve = document.createElement("button");
+          approve.className = "button secondary";
+          approve.textContent = "confirm this action";
+          approve.addEventListener("click", async () => {
+            await fetch(`/api/admin/actions/${action.action_id}/approve`, {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+                "x-admin-csrf": "same-origin",
+              },
+              body: "{}",
+            });
+            await refresh();
+          });
+          row.append(approve);
+        }
+        return row;
+      }),
+    );
+  }
+</script>

@@ -34,6 +34,11 @@ const aestheticsSurfaces = [
 
 const systemSurfaces = [
   {
+    href: "/system/security",
+    title: "security",
+    detail: "password, passkeys, sessions, tokens, and audit",
+  },
+  {
     href: "/proof",
     title: "proof and auth",
     detail: "passkey, route, and operation proof",
@@ -69,6 +74,211 @@ type WorkViewProps = {
   snapshot: AdminControlSnapshot;
   fixtureMode?: boolean;
 };
+
+export function CareerView({ snapshot, fixtureMode = false }: WorkViewProps) {
+  const projects = snapshot.projections.project_states.filter(
+    (project) => project.domain === "career",
+  );
+  const tasks = snapshot.projections.task_states.filter((task) =>
+    projects.some((project) => project.project_id === task.project_ref),
+  );
+  const openTasks = tasks.filter(
+    (task) => !CLOSED_LIFECYCLES.has(task.lifecycle),
+  );
+  return (
+    <>
+      <section className="meta-strip" aria-label="career projection state">
+        <span>read only</span>
+        <span>{snapshot.source_mode}</span>
+        <span>{projects.length} projects</span>
+        <span>{openTasks.length} open tasks</span>
+      </section>
+      <section className="projection-board work-project-board">
+        <div className="section-head">
+          <div>
+            <p>career</p>
+            <h2>Current</h2>
+          </div>
+          <span>{projects.length} active</span>
+        </div>
+        <div className="work-project-grid">
+          {projects.map((project) => (
+            <ProjectCard
+              fixtureMode={fixtureMode}
+              key={project.project_id}
+              project={project}
+              taskCount={
+                tasks.filter((task) => task.project_ref === project.project_id)
+                  .length
+              }
+            />
+          ))}
+        </div>
+      </section>
+      <a className="button secondary" href="/career/job-search">
+        open job search
+      </a>
+    </>
+  );
+}
+
+export function JobSearchView({
+  snapshot,
+  fixtureMode = false,
+}: WorkViewProps) {
+  const career = snapshot.projections.career_snapshots[0];
+  const targets = career
+    ? snapshot.projections.career_targets.filter(
+        (target) => target.snapshot_ref === career.snapshot_id,
+      )
+    : [];
+  const project = snapshot.projections.project_states.find(
+    (item) => item.project_key === "job-search",
+  );
+  const tasks = project
+    ? snapshot.projections.task_states.filter(
+        (task) => task.project_ref === project.project_id,
+      )
+    : [];
+  const lineage = new Set(tasks.map((task) => task.task_id));
+  const relatedLineage = snapshot.projections.task_lineage.filter((row) =>
+    lineage.has(row.task_ref),
+  );
+
+  return (
+    <>
+      <section className="meta-strip" aria-label="job search source state">
+        <span>read only</span>
+        <span>{snapshot.source_mode}</span>
+        <span>{career?.stale ? "stale" : "current"}</span>
+        <span>{targets.length} targets</span>
+        <span>{tasks.length} related tasks</span>
+      </section>
+      {!career ? (
+        <section className="notice">
+          <strong>job search unavailable</strong>
+        </section>
+      ) : (
+        <>
+          <section className="table-card work-detail-card">
+            <div className="section-head">
+              <div>
+                <p>current focus</p>
+                <h2>{career.current_focus}</h2>
+              </div>
+              <WorkBadge value={career.readiness} />
+            </div>
+            <div className="work-next-action">
+              <span>next action</span>
+              <strong>{career.next_action}</strong>
+            </div>
+            <dl className="work-detail-grid">
+              <Detail label="generated" value={career.generated_at} />
+              <Detail
+                label="commitments"
+                value={career.commitments.join(", ")}
+              />
+              <Detail
+                label="contradictions"
+                value={career.contradictions.join(", ") || "none"}
+              />
+              <Detail
+                label="owner"
+                value={project?.owner_chief ?? "chief/jobs"}
+              />
+            </dl>
+          </section>
+          <section className="table-card work-task-board">
+            <div className="section-head">
+              <div>
+                <p>sources</p>
+                <h2>Freshness</h2>
+              </div>
+              <span>{career.source_status.length} sources</span>
+            </div>
+            <div className="work-task-list">
+              {career.source_status.map((source) => (
+                <article className="work-task-row" key={source.source}>
+                  <div className="work-task-heading">
+                    <div>
+                      <span>{source.observed_at ?? "not refreshed"}</span>
+                      <h3>{source.source}</h3>
+                    </div>
+                    <WorkBadge value={source.status} />
+                  </div>
+                  <p>{source.summary}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="table-card work-task-board">
+            <div className="section-head">
+              <div>
+                <p>targets</p>
+                <h2>Active search</h2>
+              </div>
+              <span>{targets.length} rows</span>
+            </div>
+            <div className="work-task-list">
+              {targets.map((target) => (
+                <article className="work-task-row" key={target.target_id}>
+                  <div className="work-task-heading">
+                    <div>
+                      <span>{target.company}</span>
+                      <h3>{target.role}</h3>
+                    </div>
+                    <WorkBadge value={target.stage} />
+                  </div>
+                  <div className="work-next-action">
+                    <span>next action</span>
+                    <strong>{target.next_action}</strong>
+                  </div>
+                  {target.source_link_refs.length > 0 ? (
+                    <div className="work-task-footer">
+                      {target.source_link_refs.map((ref) => (
+                        <a
+                          className="button ghost"
+                          href={`/api/admin/source/${encodeURIComponent(ref)}`}
+                          key={ref}
+                        >
+                          open source
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </section>
+          <details className="table-card work-history">
+            <summary>
+              {tasks.length} related tasks / {relatedLineage.length} lineage
+              rows
+            </summary>
+            <div className="work-task-list">
+              {tasks.map((task) => (
+                <TaskRow
+                  fixtureMode={fixtureMode}
+                  key={task.task_id}
+                  task={task}
+                />
+              ))}
+            </div>
+          </details>
+          {tasks.length > 1 ? (
+            <section className="notice">
+              <strong>convergence proposal</strong>
+              <span>
+                keep the current chief/jobs task canonical; preserve related
+                tasks as lineage until merge and archive controls are enabled.
+              </span>
+            </section>
+          ) : null}
+        </>
+      )}
+    </>
+  );
+}
 
 export function WorkView({ snapshot, fixtureMode = false }: WorkViewProps) {
   const projects = snapshot.projections.project_states;
@@ -355,7 +565,7 @@ export function TaskDetailView({
           <a
             className="button secondary"
             href={adminControlHref(
-              `/work/projects/${encodeURIComponent(project.project_key)}`,
+              `/projects/${encodeURIComponent(project.project_key)}`,
               fixtureMode,
             )}
           >
@@ -392,7 +602,7 @@ export function TaskDetailView({
               return (
                 <a
                   href={adminControlHref(
-                    `/work/tasks/${encodeURIComponent(row.task_ref)}`,
+                    `/tasks/${encodeURIComponent(row.task_ref)}`,
                     fixtureMode,
                   )}
                   key={row.lineage_id}
@@ -457,7 +667,7 @@ export function FleetView({ snapshot, fixtureMode = false }: WorkViewProps) {
                   <a
                     className="button ghost"
                     href={adminControlHref(
-                      "/work/projects/personal-system-cleanup",
+                      "/projects/personal-system-cleanup",
                       fixtureMode,
                     )}
                   >
@@ -492,7 +702,7 @@ function ProjectCard({
     <a
       className={`work-project-card${compact ? " is-compact" : ""}`}
       href={adminControlHref(
-        `/work/projects/${encodeURIComponent(project.project_key)}`,
+        `/projects/${encodeURIComponent(project.project_key)}`,
         fixtureMode,
       )}
     >
@@ -544,7 +754,7 @@ function TaskRow({
         <a
           className="button ghost"
           href={adminControlHref(
-            `/work/tasks/${encodeURIComponent(task.task_id)}`,
+            `/tasks/${encodeURIComponent(task.task_id)}`,
             fixtureMode,
           )}
         >

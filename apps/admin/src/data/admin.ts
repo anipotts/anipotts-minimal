@@ -2,8 +2,9 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "primary" | "life" | "content" | "system";
+  group: "standalone" | "career" | "content" | "life" | "fleet" | "system";
   primary?: boolean;
+  parent?: boolean;
   description: string;
 };
 
@@ -37,49 +38,68 @@ export const navItems: NavItem[] = [
     href: "/inbox",
     label: "inbox",
     status: "queue",
-    group: "primary",
+    group: "standalone",
     primary: true,
     description: "what needs attention and what can move next",
   },
   {
-    href: "/work",
-    label: "work",
-    status: "read only",
-    group: "primary",
+    href: "/career",
+    label: "career",
+    status: "current",
+    group: "career",
     primary: true,
-    description: "projects, tasks, and history",
+    parent: true,
+    description: "job search and career state",
+  },
+  {
+    href: "/career/job-search",
+    label: "job search",
+    status: "sources",
+    group: "career",
+    description: "targets, commitments, source freshness, and task lineage",
   },
   {
     href: "/content",
     label: "content",
     status: "D1",
-    group: "primary",
+    group: "content",
     primary: true,
+    parent: true,
     description: "pieces, drafts, exports",
   },
   {
     href: "/life",
     label: "life",
     status: "status",
-    group: "primary",
+    group: "life",
     primary: true,
+    parent: true,
     description: "health and personal references",
   },
   {
     href: "/fleet",
     label: "fleet",
     status: "runtime",
-    group: "primary",
+    group: "fleet",
     primary: true,
+    parent: true,
     description: "machines, repo state, current work",
   },
   {
     href: "/system",
     label: "system",
     status: "read only",
-    group: "primary",
+    group: "system",
     primary: true,
+    parent: true,
     description: "proof, deploys, repos, handoffs, and gates",
+  },
+  {
+    href: "/system/security",
+    label: "security",
+    status: "native auth",
+    group: "system",
+    description: "password, passkeys, sessions, machine tokens, and audit",
   },
   {
     href: "/content/edit/new",
@@ -194,7 +214,7 @@ export const overviewCards: DashboardCard[] = [
     status: "two credentials registered, one active session",
     risk: "high",
     next: "record revoked-credential and denied-auth proof before Access removal",
-    href: "/auth/passkey",
+    href: "/system/security",
     action: "open auth proof",
   },
   {

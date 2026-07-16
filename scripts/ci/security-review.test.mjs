@@ -95,3 +95,12 @@ assert.deepEqual(findings.map((finding) => finding.rule).sort(), [
 ]);
 
 assert.deepEqual(reviewFiles([".github/workflows/deploy.yml"], readFake), []);
+
+assert.deepEqual(
+  reviewFiles(["scripts/env.ts", "packages/lib/src/types.ts"], (file) =>
+    file.endsWith("env.ts")
+      ? "const to" + "ken = process.env.ADMIN_MACHINE_TOKEN;\n"
+      : "au" + "th: AdminControlAuthContract;\n",
+  ),
+  [],
+);

@@ -1,36 +1,6 @@
 ---
-import {
-  findAdminProjectState,
-  loadAdminControlSnapshot,
-} from "@anipotts/lib/admin-control";
-import AdminLayout from "../../../layouts/AdminLayout.astro";
-import { ProjectDetailView } from "../../../components/astryx/UnifiedShellViews";
-import { selectAdminControlSource } from "../../../data/admin-control-source";
-
-const source = selectAdminControlSource(
-  Astro.locals.runtime?.env.DB,
-  Astro.url,
+return Astro.redirect(
+  `/projects/${encodeURIComponent(Astro.params.projectId ?? "")}${Astro.url.search}`,
+  301,
 );
-const snapshot = await loadAdminControlSnapshot(source.database);
-const projectId = Astro.params.projectId ?? "";
-const project = findAdminProjectState(snapshot, projectId);
-
-if (!project) Astro.response.status = 404;
 ---
-
-<AdminLayout
-  title={project?.display_name ?? "project unavailable"}
-  deck="Read-only project state."
->
-  {
-    project ? (
-      <ProjectDetailView
-        snapshot={snapshot}
-        project={project}
-        fixtureMode={source.fixtureMode}
-      />
-    ) : (
-      <section class="notice">Project unavailable.</section>
-    )
-  }
-</AdminLayout>

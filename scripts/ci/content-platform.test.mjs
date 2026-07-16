@@ -115,6 +115,7 @@ assert.deepEqual(
     auditEvents: passkeyAuditEvents,
   }),
   [
+    "two_independent_credentials",
     "passkey.session.revoked",
     "passkey.credential.revoked",
     "passkey.authentication.denied",
@@ -129,17 +130,17 @@ assert.deepEqual(
   }),
   [
     "schema_ready",
-    "active_credential",
+    "two_independent_credentials",
     "active_session",
     ...REQUIRED_PASSKEY_AUDIT_EVENTS,
   ],
 );
 assert.deepEqual(
   passkeyMissingProofItems({
-    accessRemovalBlockers: ["active_credential"],
+    accessRemovalBlockers: ["two_independent_credentials"],
     routeBoundary: "unknown",
   }),
-  ["active_credential", "app_native_route_boundary"],
+  ["two_independent_credentials", "app_native_route_boundary"],
 );
 assert.equal(
   nextPasskeyProofAction({
@@ -156,7 +157,7 @@ assert.equal(
     missingAuditEvents: [],
     routeBoundary: "cloudflare_access",
   }),
-  "passkey proof is staged; remove Cloudflare Access and rerun this proof",
+  "register a second independent passkey while Cloudflare Access remains active",
 );
 assert.equal(
   nextPasskeyStatusAction({
@@ -172,7 +173,7 @@ assert.deepEqual(
     item.complete,
   ]),
   [
-    ["active_credential", true],
+    ["independent_credentials", false],
     ["active_session", true],
     ["passkey.credential.registered", true],
     ["passkey.session.created", true],

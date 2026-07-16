@@ -2657,6 +2657,38 @@ html[data-astryx-theme="neutral"] a {
   background: var(--color-background-surface);
 }
 
+.admin-nav-header {
+  position: relative;
+}
+
+.admin-nav-header .admin-theme-toggle {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 30px;
+  min-height: 30px;
+  overflow: hidden;
+  padding: 0;
+  color: transparent;
+}
+
+.admin-nav-header .admin-theme-toggle::before {
+  content: "◐";
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: 13px;
+}
+
+.admin-nav-child {
+  margin-left: 16px;
+  opacity: 0.76;
+}
+
+.admin-nav-child:focus-within,
+.admin-nav-child:hover {
+  opacity: 1;
+}
+
 .admin-mark {
   display: grid;
   width: 28px;
@@ -3669,7 +3701,162 @@ html[data-astryx-theme="neutral"] .button {
   width: min(100%, 560px);
 }
 
+.native-auth {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+}
+
+.native-auth-mark {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: 12px;
+  background: var(--accent);
+  color: #050505;
+  font-family: var(--sans);
+  font-size: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease;
+}
+
+.native-auth-mark:hover,
+.native-auth-mark:focus-visible {
+  border-color: var(--color-text-primary);
+}
+
+.native-auth-mark:active {
+  transform: scale(0.96);
+}
+
+.native-auth-mark[data-busy] {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+.native-auth-panel {
+  width: min(100%, 360px);
+  border-top: 1px solid var(--color-border);
+  padding-top: 18px;
+}
+
+.native-auth-panel p,
+.native-auth-panel h1 {
+  margin: 0;
+}
+
+.native-auth-panel > p:first-child,
+.native-auth-message {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-xs);
+}
+
+.native-auth-panel h1 {
+  margin: 4px 0 18px;
+  font-size: var(--font-size-2xl);
+  font-weight: 500;
+}
+
+.native-auth-panel form,
+.security-form {
+  display: grid;
+  gap: 12px;
+}
+
+.native-auth-panel label,
+.security-form label,
+.security-form legend {
+  display: grid;
+  gap: 5px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-xs);
+}
+
+.native-auth-panel input,
+.security-form input:not([type="checkbox"]) {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  padding: 10px 11px;
+  font: inherit;
+}
+
+.native-auth-panel > .button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.native-auth-message {
+  min-height: 1.4em;
+  margin-top: 10px !important;
+}
+
+.security-card {
+  display: grid;
+  gap: 16px;
+}
+
+.security-form fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  padding: 12px;
+}
+
+.security-form fieldset label {
+  display: flex;
+  align-items: center;
+}
+
+.security-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.security-token {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  border: 1px solid var(--warn-border);
+  background: var(--warn-surface);
+  padding: 12px;
+}
+
+.action-confirmation {
+  max-width: min(720px, 100%);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-background-surface);
+  padding: 12px;
+  color: var(--color-text-primary);
+  font: 400 12px/1.55 var(--font-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .native-auth-mark {
+    transition: none;
+  }
+}
+
 @media (max-width: 900px) {
+  .admin-astryx-root .astryx-app-shell-sidenav {
+    display: none;
+  }
+
   .admin-page-frame {
     padding: 18px;
   }

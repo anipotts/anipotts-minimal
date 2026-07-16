@@ -4,6 +4,7 @@ import {
   loadAdminControlSnapshot,
   type McpJsonRpcRequest,
 } from "@anipotts/lib/admin-control";
+import { requireMachineToken } from "../../lib/native-auth";
 
 type EndpointContext = {
   locals: App.Locals;
@@ -11,8 +12,8 @@ type EndpointContext = {
 };
 
 export async function GET({ locals, request }: EndpointContext) {
-  const auth = requireMcpAccess(request);
-  if (auth) return auth;
+  const auth = await requireMachineToken({ locals, request }, "mcp:read");
+  if (auth instanceof Response) return auth;
 
   const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
   return Response.json(adminMcpManifest(snapshot), {
@@ -23,8 +24,8 @@ export async function GET({ locals, request }: EndpointContext) {
 }
 
 export async function POST({ locals, request }: EndpointContext) {
-  const auth = requireMcpAccess(request);
-  if (auth) return auth;
+  const auth = await requireMachineToken({ locals, request }, "mcp:read");
+  if (auth instanceof Response) return auth;
 
   const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
   const body = (await request
@@ -47,23 +48,4 @@ export async function POST({ locals, request }: EndpointContext) {
       "cache-control": "no-store",
     },
   });
-}
-
-function requireMcpAccess(request: Request): Response | null {
-  if (import.meta.env.DEV) return null;
-
-  const hasAccessIdentity =
-    request.headers.has("cf-access-jwt-assertion") ||
-    request.headers.has("cf-access-authenticated-user-email") ||
-    request.headers.has("cf-access-client-id");
-
-  if (hasAccessIdentity) return null;
-
-  return Response.json(
-    {
-      error: "cloudflare access service-token identity required",
-      mode: "read-only mcp",
-    },
-    { status: 401 },
-  );
 }

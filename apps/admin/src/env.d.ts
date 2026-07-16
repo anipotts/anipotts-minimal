@@ -3,7 +3,11 @@
 type D1PreparedStatement = {
   bind(...values: unknown[]): D1PreparedStatement;
   first<T = unknown>(): Promise<T | null>;
-  run(): Promise<{ results?: unknown[]; success?: boolean; meta?: unknown }>;
+  run(): Promise<{
+    results?: unknown[];
+    success?: boolean;
+    meta?: { changes?: number; [key: string]: unknown };
+  }>;
   all<T = unknown>(): Promise<{ results?: T[] }>;
 };
 
@@ -16,10 +20,12 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   PUBLIC_STATE_API: string;
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_POLICY_AUD: string;
+  ADMIN_ACTION_ENCRYPTION_KEY?: string;
 }>;
 
 declare namespace App {
   interface Locals extends Runtime {
     passkeySessionActive?: boolean;
+    nativeSessionActive?: boolean;
   }
 }

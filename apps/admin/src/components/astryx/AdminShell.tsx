@@ -1,13 +1,11 @@
 import React, { type ReactNode } from "react";
 import { AppShell } from "@astryxdesign/core/AppShell";
-import { Badge } from "@astryxdesign/core/Badge";
 import {
   SideNav,
   SideNavHeading,
   SideNavItem,
   SideNavSection,
 } from "@astryxdesign/core/SideNav";
-import { StatusDot } from "@astryxdesign/core/StatusDot";
 import type { NavItem } from "../../data/admin";
 
 type AdminShellProps = {
@@ -37,50 +35,31 @@ export function AdminShell({
     );
   }
 
-  const primary = navItems.filter((item) => item.primary);
-  const life = navItems.filter((item) => item.group === "life");
-  const content = navItems.filter((item) => item.group === "content");
-  const system = navItems.filter((item) => item.group === "system");
+  const mobile = navItems.filter((item) => item.primary);
+  const inbox = navItems.filter((item) => item.group === "standalone");
+  const groups = ["career", "content", "life", "fleet", "system"] as const;
 
   const sideNav = (
     <SideNav
       className="admin-side-nav"
       header={
-        <SideNavHeading
-          heading="anipotts admin"
-          headingHref="/inbox"
-          subheading="operator console"
-          icon={
-            <span className="admin-mark" aria-hidden="true">
-              <img src="/apple-touch-icon.png" alt="" />
-            </span>
-          }
-        />
-      }
-      footer={
-        <div className="admin-nav-footer">
-          <div className="admin-nav-footer-row">
-            <StatusDot variant="warning" label="Access outer guard active" />
-            <span>Access on</span>
-          </div>
-          <p>remove only after app-native passkey proof is ready.</p>
+        <div className="admin-nav-header">
+          <SideNavHeading
+            heading="anipotts admin"
+            headingHref="/inbox"
+            subheading="operator console"
+            icon={
+              <span className="admin-mark" aria-hidden="true">
+                <img src="/apple-touch-icon.png" alt="" />
+              </span>
+            }
+          />
           <ThemeToggle />
         </div>
       }
     >
-      <SideNavSection title="main">
-        {primary.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item)}
-            endContent={<Badge label={item.status} variant="neutral" />}
-          />
-        ))}
-      </SideNavSection>
-      <SideNavSection title="content">
-        {content.map((item) => (
+      <SideNavSection title="">
+        {inbox.map((item) => (
           <SideNavItem
             key={item.href}
             href={item.href}
@@ -89,33 +68,31 @@ export function AdminShell({
           />
         ))}
       </SideNavSection>
-      <SideNavSection title="life">
-        {life.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item)}
-          />
-        ))}
-      </SideNavSection>
-      <SideNavSection title="system">
-        {system.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item)}
-          />
-        ))}
-      </SideNavSection>
+      {groups.map((group) => (
+        <SideNavSection key={group} title="">
+          {navItems
+            .filter((item) => item.group === group)
+            .map((item) => (
+              <div
+                className={item.parent ? "admin-nav-parent" : "admin-nav-child"}
+                key={item.href}
+              >
+                <SideNavItem
+                  href={item.href}
+                  label={item.label}
+                  isSelected={isActive(currentRoute, item)}
+                />
+              </div>
+            ))}
+        </SideNavSection>
+      ))}
     </SideNav>
   );
 
   return (
     <div className="admin-astryx-root">
       <nav className="admin-mobile-strip" aria-label="admin mobile navigation">
-        {primary.map((item) => (
+        {mobile.map((item) => (
           <a
             key={item.href}
             className={isActive(currentRoute, item) ? "is-active" : ""}
@@ -171,6 +148,9 @@ function isActive(currentRoute: string, item: NavItem): boolean {
   const currentParams = new URLSearchParams(currentQuery);
 
   if (primary) {
+    if (href === "/career") {
+      return currentPath === "/career" || currentPath.startsWith("/career/");
+    }
     if (href === "/content") {
       return (
         currentPath === "/content" ||
@@ -185,6 +165,7 @@ function isActive(currentRoute: string, item: NavItem): boolean {
     if (href === "/system") {
       return (
         currentPath === "/system" ||
+        currentPath.startsWith("/system/") ||
         currentPath === "/proof" ||
         currentPath === "/deploys" ||
         currentPath === "/repos" ||

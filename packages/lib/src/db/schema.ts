@@ -1120,3 +1120,187 @@ export const adminCapabilityStates = sqliteTable(
     index("idx_admin_capability_machine").on(table.machine, table.status),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 28. native admin auth, Career projections, and encrypted actions
+// ---------------------------------------------------------------------------
+
+export const adminPasswordCredentials = sqliteTable(
+  "admin_password_credentials",
+  {
+    user_id: text("user_id").primaryKey(),
+    password_hash: text("password_hash").notNull(),
+    must_change: integer("must_change", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+  },
+);
+
+export const adminAuthSessions = sqliteTable(
+  "admin_auth_sessions",
+  {
+    id: text("id").primaryKey(),
+    token_hash: text("token_hash").notNull().unique(),
+    user_id: text("user_id").notNull(),
+    auth_method: text("auth_method").notNull(),
+    credential_ref: text("credential_ref"),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    last_seen_at: text("last_seen_at").notNull(),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_auth_sessions_active").on(
+      table.token_hash,
+      table.expires_at,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminAuthAttempts = sqliteTable("admin_auth_attempts", {
+  actor_key: text("actor_key").primaryKey(),
+  failure_count: integer("failure_count").notNull().default(0),
+  window_started_at: text("window_started_at").notNull(),
+  locked_until: text("locked_until"),
+  updated_at: text("updated_at").notNull(),
+});
+
+export const adminAuthAudit = sqliteTable(
+  "admin_auth_audit",
+  {
+    id: text("id").primaryKey(),
+    event_type: text("event_type").notNull(),
+    auth_method: text("auth_method"),
+    credential_ref: text("credential_ref"),
+    summary: text("summary").notNull(),
+    created_at: text("created_at").notNull(),
+  },
+  (table) => [index("idx_admin_auth_audit_created").on(table.created_at)],
+);
+
+export const adminMachineTokens = sqliteTable(
+  "admin_machine_tokens",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    token_hash: text("token_hash").notNull().unique(),
+    scopes: text("scopes").notNull().default("[]"),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at"),
+    last_used_at: text("last_used_at"),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_machine_tokens_active").on(
+      table.token_hash,
+      table.expires_at,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminCareerSnapshots = sqliteTable(
+  "admin_career_snapshots",
+  {
+    snapshot_id: text("snapshot_id").primaryKey(),
+    project_ref: text("project_ref").notNull(),
+    generated_at: text("generated_at").notNull(),
+    stale: integer("stale", { mode: "boolean" }).notNull().default(false),
+    source_status: text("source_status").notNull().default("[]"),
+    current_focus: text("current_focus").notNull(),
+    readiness: text("readiness").notNull(),
+    next_action: text("next_action").notNull(),
+    contradictions: text("contradictions").notNull().default("[]"),
+    commitments: text("commitments").notNull().default("[]"),
+    proof_refs: text("proof_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_career_snapshots_project").on(
+      table.project_ref,
+      table.generated_at,
+    ),
+  ],
+);
+
+export const adminCareerTargets = sqliteTable(
+  "admin_career_targets",
+  {
+    target_id: text("target_id").primaryKey(),
+    snapshot_ref: text("snapshot_ref").notNull(),
+    company: text("company").notNull(),
+    role: text("role").notNull(),
+    stage: text("stage").notNull(),
+    status: text("status").notNull(),
+    last_contact_at: text("last_contact_at"),
+    interview_at: text("interview_at"),
+    next_action: text("next_action").notNull(),
+    source_refs: text("source_refs").notNull().default("[]"),
+    source_link_refs: text("source_link_refs").notNull().default("[]"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_career_targets_snapshot").on(
+      table.snapshot_ref,
+      table.status,
+      table.updated_at,
+    ),
+  ],
+);
+
+export const adminSourceLinks = sqliteTable(
+  "admin_source_links",
+  {
+    source_link_id: text("source_link_id").primaryKey(),
+    domain: text("domain").notNull(),
+    provider: text("provider").notNull(),
+    label: text("label").notNull(),
+    locator_ciphertext: text("locator_ciphertext").notNull(),
+    locator_iv: text("locator_iv").notNull(),
+    key_version: integer("key_version").notNull(),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at"),
+    last_opened_at: text("last_opened_at"),
+  },
+  (table) => [
+    index("idx_admin_source_links_domain").on(table.domain, table.expires_at),
+  ],
+);
+
+export const adminActions = sqliteTable(
+  "admin_actions",
+  {
+    action_id: text("action_id").primaryKey(),
+    domain: text("domain").notNull(),
+    action_type: text("action_type").notNull(),
+    status: text("status").notNull(),
+    idempotency_key: text("idempotency_key").notNull().unique(),
+    exact_scope: text("exact_scope").notNull(),
+    preview: text("preview").notNull(),
+    payload_ciphertext: text("payload_ciphertext").notNull(),
+    payload_iv: text("payload_iv").notNull(),
+    key_version: integer("key_version").notNull(),
+    proof_requirement: text("proof_requirement").notNull(),
+    created_by: text("created_by").notNull(),
+    runner_token_id: text("runner_token_id"),
+    error_code: text("error_code"),
+    proof: text("proof"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+    approved_at: text("approved_at"),
+    claimed_at: text("claimed_at"),
+    completed_at: text("completed_at"),
+    expires_at: text("expires_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_actions_queue").on(
+      table.status,
+      table.domain,
+      table.expires_at,
+    ),
+    index("idx_admin_actions_runner").on(table.runner_token_id, table.status),
+  ],
+);

@@ -22,8 +22,8 @@ const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
   "utf8",
 );
-const passkeySource = readFileSync(
-  "apps/admin/src/pages/auth/passkey.astro",
+const authSource = readFileSync(
+  "apps/admin/src/pages/auth/index.astro",
   "utf8",
 );
 const contentEditorSource = readFileSync(
@@ -39,6 +39,10 @@ const publicPasskeyApiPaths = extractStringList(
   middlewareSource,
   "PUBLIC_PASSKEY_API_PATHS",
 );
+const publicNativeAuthApiPaths = extractStringList(
+  middlewareSource,
+  "PUBLIC_NATIVE_AUTH_API_PATHS",
+);
 const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
 const retiredActionQueueFiles = [
   "apps/admin/src/pages/needs-ani.astro",
@@ -51,6 +55,7 @@ assert.deepEqual(publicPaths, [
   "/api/health",
   "/api/mcp",
   "/apple-touch-icon.png",
+  "/auth",
   "/auth/passkey",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
@@ -68,6 +73,12 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/register-verify",
   "/api/admin/passkey/revoke-current",
   "/api/admin/passkey/status",
+]);
+assert.deepEqual(publicNativeAuthApiPaths, [
+  "/api/admin/auth/bootstrap",
+  "/api/admin/auth/login",
+  "/api/admin/auth/logout",
+  "/api/admin/auth/status",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 
@@ -99,7 +110,7 @@ assert.ok(
 for (const route of ADMIN_ROUTES) {
   assert.ok(existsSync(route.file), `${route.route} missing ${route.file}`);
 
-  if (route.route !== "/auth/passkey") {
+  if (!["/auth", "/auth/passkey"].includes(route.route)) {
     assert.equal(
       publicPaths.includes(route.route),
       false,
@@ -169,7 +180,7 @@ assert.equal(
 );
 
 for (const marker of [
-  'id: "work"',
+  'id: "career"',
   'id: "content"',
   'id: "life"',
   'id: "fleet"',
@@ -219,16 +230,15 @@ assert.ok(
 );
 
 for (const marker of [
-  "Access removal runbook",
-  "passkey-runbook",
-  "passkey-return-path",
-  "sanitizeAdminReturnPath",
-  "buildRunbookSteps",
-  "ready_for_access_removal",
+  "native-auth-mark",
+  "data-password-reveal",
+  "data-password-form",
+  "use passkey",
+  "x-admin-csrf",
 ]) {
   assert.ok(
-    passkeySource.includes(marker),
-    `/auth/passkey missing proof runbook marker ${marker}`,
+    authSource.includes(marker),
+    `/auth missing native auth marker ${marker}`,
   );
 }
 

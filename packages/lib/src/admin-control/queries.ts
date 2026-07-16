@@ -6,6 +6,8 @@ import {
 import {
   ADMIN_EVENT_SCHEMA_VERSION,
   type AdminCapabilityState,
+  type AdminCareerSnapshot,
+  type AdminCareerTarget,
   type AdminControlProjections,
   type AdminControlSnapshot,
   type AdminControlSourceMode,
@@ -56,9 +58,9 @@ const RETENTION_CONTRACT = {
 } as const;
 
 const AUTH_CONTRACT = {
-  ui: "passkey-session",
-  mcp: "cloudflare-access-service-token-per-machine",
-  write_tools: "disabled-until-broker-and-signed-connect-diff",
+  ui: "password-or-passkey-session",
+  mcp: "scoped-hashed-bearer-token",
+  write_tools: "encrypted-proposal-plus-manual-pro-runner",
 } as const;
 
 export async function loadAdminControlSnapshot(
@@ -70,6 +72,8 @@ export async function loadAdminControlSnapshot(
     projectStates,
     taskStates,
     taskLineage,
+    careerSnapshots,
+    careerTargets,
     pieceStates,
     fleetStatus,
     deployStates,
@@ -81,6 +85,8 @@ export async function loadAdminControlSnapshot(
     readProjectStates(db),
     readTaskStates(db),
     readTaskLineage(db),
+    readCareerSnapshots(db),
+    readCareerTargets(db),
     readPieceStates(db),
     readFleetStatus(db),
     readDeployStates(db),
@@ -94,6 +100,8 @@ export async function loadAdminControlSnapshot(
     projectStates,
     taskStates,
     taskLineage,
+    careerSnapshots,
+    careerTargets,
     pieceStates,
     fleetStatus,
     deployStates,
@@ -106,6 +114,8 @@ export async function loadAdminControlSnapshot(
     project_states: dedupeByKey(projectStates.rows, "dedupe_key"),
     task_states: dedupeByKey(taskStates.rows, "dedupe_key"),
     task_lineage: dedupeByKey(taskLineage.rows, "lineage_id"),
+    career_snapshots: dedupeByKey(careerSnapshots.rows, "snapshot_id"),
+    career_targets: dedupeByKey(careerTargets.rows, "target_id"),
     piece_states: pieceStates.rows,
     fleet_status: fleetStatus.rows,
     deploy_states: deployStates.rows,
@@ -336,6 +346,64 @@ async function readTaskLineage(
       agent_source: asString(row.agent_source),
       event_refs: parseStringArray(row.event_refs),
       updated_at: nullableString(row.updated_at),
+    }),
+  );
+}
+
+async function readCareerSnapshots(
+  db: AdminControlDatabase,
+): Promise<ReadResult<AdminCareerSnapshot>> {
+  return readRows(
+    db,
+    "admin_career_snapshots",
+    `SELECT snapshot_id, project_ref, generated_at, stale, source_status,
+            current_focus, readiness, next_action, contradictions, commitments,
+            proof_refs, updated_at
+       FROM admin_career_snapshots
+      ORDER BY generated_at DESC LIMIT 12`,
+    fixtureProjections.career_snapshots,
+    (row) => ({
+      snapshot_id: asString(row.snapshot_id),
+      project_ref: asString(row.project_ref),
+      generated_at: asString(row.generated_at),
+      stale: toBoolean(row.stale),
+      source_status: parseJsonArray(row.source_status),
+      current_focus: asString(row.current_focus),
+      readiness: asString(row.readiness),
+      next_action: asString(row.next_action),
+      contradictions: parseStringArray(row.contradictions),
+      commitments: parseStringArray(row.commitments),
+      proof_refs: parseStringArray(row.proof_refs),
+      updated_at: asString(row.updated_at),
+    }),
+  );
+}
+
+async function readCareerTargets(
+  db: AdminControlDatabase,
+): Promise<ReadResult<AdminCareerTarget>> {
+  return readRows(
+    db,
+    "admin_career_targets",
+    `SELECT target_id, snapshot_ref, company, role, stage, status,
+            last_contact_at, interview_at, next_action, source_refs,
+            source_link_refs, updated_at
+       FROM admin_career_targets
+      ORDER BY updated_at DESC`,
+    fixtureProjections.career_targets,
+    (row) => ({
+      target_id: asString(row.target_id),
+      snapshot_ref: asString(row.snapshot_ref),
+      company: asString(row.company),
+      role: asString(row.role),
+      stage: asString(row.stage),
+      status: asString(row.status),
+      last_contact_at: nullableString(row.last_contact_at),
+      interview_at: nullableString(row.interview_at),
+      next_action: asString(row.next_action),
+      source_refs: parseStringArray(row.source_refs),
+      source_link_refs: parseStringArray(row.source_link_refs),
+      updated_at: asString(row.updated_at),
     }),
   );
 }
@@ -580,6 +648,17 @@ function parseStringArray(value: unknown): string[] {
     return Array.isArray(parsed)
       ? parsed.filter((item) => typeof item === "string")
       : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseJsonArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (typeof value !== "string" || value.length === 0) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
   } catch {
     return [];
   }

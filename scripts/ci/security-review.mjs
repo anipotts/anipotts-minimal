@@ -132,7 +132,9 @@ function scanForSecrets(file, content) {
     for (const { id, pattern } of SECRET_PATTERNS) {
       if (
         id === "inline-secret-assignment" &&
-        isPublicMetadataAssignment(line)
+        (isPublicMetadataAssignment(line) ||
+          isEnvironmentReference(line) ||
+          isTypeOnlyDeclaration(line))
       ) {
         continue;
       }
@@ -149,8 +151,18 @@ function scanForSecrets(file, content) {
   return findings;
 }
 
+function isEnvironmentReference(line) {
+  return /=\s*(?:import\.meta\.)?process\.env\.[A-Z0-9_]+\s*;?\s*$/.test(line);
+}
+
+function isTypeOnlyDeclaration(line) {
+  return /^\s*[A-Za-z_$][A-Za-z0-9_$]*\??:\s*[A-Z][A-Za-z0-9_$<>,[\]. |]+;\s*$/.test(
+    line,
+  );
+}
+
 function isPublicMetadataAssignment(line) {
-  return /^(?:authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*(?::|=)/.test(
+  return /^(?:auth_model|authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*(?::|=)/.test(
     line.trim(),
   );
 }

@@ -1,16 +1,3 @@
 ---
-import AdminLayout from "../layouts/AdminLayout.astro";
-import { WorkView } from "../components/astryx/UnifiedShellViews";
-import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
-import { selectAdminControlSource } from "../data/admin-control-source";
-
-const source = selectAdminControlSource(
-  Astro.locals.runtime?.env.DB,
-  Astro.url,
-);
-const snapshot = await loadAdminControlSnapshot(source.database);
+return Astro.redirect("/career", 301);
 ---
-
-<AdminLayout title="work" deck="Projects, tasks, and history.">
-  <WorkView snapshot={snapshot} fixtureMode={source.fixtureMode} />
-</AdminLayout>

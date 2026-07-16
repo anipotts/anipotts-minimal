@@ -1,0 +1,19 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { JobSearchView } from "../../components/astryx/UnifiedShellViews";
+import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
+import { selectAdminControlSource } from "../../data/admin-control-source";
+
+const source = selectAdminControlSource(
+  Astro.locals.runtime?.env.DB,
+  Astro.url,
+);
+const snapshot = await loadAdminControlSnapshot(source.database);
+---
+
+<AdminLayout
+  title="job search"
+  deck="Targets, sources, commitments, and related tasks."
+>
+  <JobSearchView snapshot={snapshot} fixtureMode={source.fixtureMode} />
+</AdminLayout>

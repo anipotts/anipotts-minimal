@@ -1,0 +1,278 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout
+  title="security"
+  deck="Password, passkeys, sessions, machine tokens, and audit."
+>
+  <section
+    class="meta-strip"
+    aria-label="native auth cutover state"
+    data-security-meta
+  >
+    <span>loading</span>
+  </section>
+
+  <section class="table-card security-card">
+    <div class="section-head">
+      <div><p>password</p><h2>Credential</h2></div><span data-password-state
+        >checking</span
+      >
+    </div>
+    <form class="security-form" data-password-change>
+      <label
+        >current password <input
+          name="current_password"
+          type="password"
+          autocomplete="current-password"
+        /></label
+      >
+      <label
+        >new password <input
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          minlength="12"
+          required
+        /></label
+      >
+      <button class="button secondary" type="submit">change password</button>
+    </form>
+  </section>
+
+  <section class="table-card security-card">
+    <div class="section-head">
+      <div><p>passkeys</p><h2>Credentials</h2></div><span data-passkey-count
+        >checking</span
+      >
+    </div>
+    <div class="security-actions">
+      <button class="button secondary" type="button" data-register-passkey
+        >register passkey</button
+      >
+      <button class="button ghost" type="button" data-revoke-passkey
+        >revoke current passkey</button
+      >
+    </div>
+  </section>
+
+  <section class="table-card security-card">
+    <div class="section-head">
+      <div><p>machine auth</p><h2>Scoped tokens</h2></div><span>shown once</span
+      >
+    </div>
+    <form class="security-form" data-token-create>
+      <label
+        >name <input
+          name="name"
+          required
+          placeholder="ap-pro career refresh"
+        /></label
+      >
+      <fieldset>
+        <legend>scopes</legend>
+        <label
+          ><input type="checkbox" name="scope" value="mcp:read" /> mcp:read</label
+        >
+        <label
+          ><input type="checkbox" name="scope" value="projections:write" /> projections:write</label
+        >
+        <label
+          ><input type="checkbox" name="scope" value="actions:claim" /> actions:claim</label
+        >
+        <label
+          ><input type="checkbox" name="scope" value="actions:proof" /> actions:proof</label
+        >
+      </fieldset>
+      <button class="button secondary" type="submit">create token</button>
+    </form>
+    <pre class="security-token" hidden data-new-token></pre>
+    <div class="record-list" data-token-list></div>
+  </section>
+
+  <details class="table-card security-card">
+    <summary>sessions and audit</summary>
+    <div class="record-list" data-session-list></div>
+    <div class="record-list" data-audit-list></div>
+  </details>
+
+  <p class="native-auth-message" data-security-message aria-live="polite"></p>
+</AdminLayout>
+
+<script>
+  import { startRegistration } from "@simplewebauthn/browser";
+  import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
+
+  const message = document.querySelector<HTMLElement>(
+    "[data-security-message]",
+  );
+  const passwordForm = document.querySelector<HTMLFormElement>(
+    "[data-password-change]",
+  );
+  const tokenForm = document.querySelector<HTMLFormElement>(
+    "[data-token-create]",
+  );
+  document
+    .querySelector("[data-register-passkey]")
+    ?.addEventListener("click", () => void registerPasskey());
+  document
+    .querySelector("[data-revoke-passkey]")
+    ?.addEventListener(
+      "click",
+      () => void mutate("/api/admin/passkey/revoke-current", {}),
+    );
+  passwordForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(passwordForm);
+    await mutate("/api/admin/auth/password", Object.fromEntries(data));
+  });
+  tokenForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(tokenForm);
+    const result = await mutate("/api/admin/machine-tokens", {
+      name: data.get("name"),
+      scopes: data.getAll("scope"),
+    });
+    const output = document.querySelector<HTMLElement>("[data-new-token]");
+    if (output && result?.token) {
+      output.hidden = false;
+      output.textContent = result.token;
+    }
+  });
+
+  const fixturePreview =
+    new URLSearchParams(window.location.search).get("source") === "fixture";
+  if (fixturePreview) {
+    const meta = document.querySelector<HTMLElement>("[data-security-meta]");
+    if (meta)
+      meta.innerHTML =
+        "<span>local preview</span><span>auth state unavailable</span>";
+    setText("[data-password-state]", "unavailable");
+    setText("[data-passkey-count]", "unavailable");
+  } else {
+    await refresh();
+  }
+
+  async function refresh() {
+    const response = await fetch("/api/admin/auth/security", {
+      cache: "no-store",
+    });
+    if (!response.ok) return setMessage("security state unavailable");
+    const state = await response.json();
+    const meta = document.querySelector<HTMLElement>("[data-security-meta]");
+    if (meta)
+      meta.innerHTML = `<span>${state.status.ready_for_access_cutover ? "cutover ready" : "cutover blocked"}</span><span>${state.status.passkey_count} passkeys</span><span>${state.sessions.length} sessions</span><span>${state.tokens.length} tokens</span>`;
+    setText(
+      "[data-password-state]",
+      state.status.password_replaced
+        ? "replaced"
+        : state.status.password_configured
+          ? "temporary"
+          : "missing",
+    );
+    setText("[data-passkey-count]", `${state.status.passkey_count} / 2`);
+    renderManagedRows("[data-token-list]", state.tokens, {
+      label: (row: any) =>
+        `${row.name} / ${row.scopes.join(", ")} / ${row.revoked_at ? "revoked" : "active"}`,
+      action: (row: any) =>
+        row.revoked_at
+          ? null
+          : `/api/admin/machine-tokens/${encodeURIComponent(row.id)}`,
+    });
+    renderManagedRows("[data-session-list]", state.sessions, {
+      label: (row: any) =>
+        `${row.auth_method} / ${row.last_seen_at} / expires ${row.expires_at}`,
+      action: (row: any) =>
+        `/api/admin/auth/sessions/${encodeURIComponent(row.id)}`,
+    });
+    renderRows(
+      "[data-audit-list]",
+      state.audit,
+      (row: any) => `${row.created_at} / ${row.event_type} / ${row.summary}`,
+    );
+  }
+
+  async function registerPasskey() {
+    setMessage("waiting for passkey");
+    const response = await fetch("/api/admin/passkey/register-options", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+    });
+    if (!response.ok) return setMessage("registration unavailable");
+    const options =
+      (await response.json()) as PublicKeyCredentialCreationOptionsJSON;
+    const credential = await startRegistration({ optionsJSON: options });
+    await mutate("/api/admin/passkey/register-verify", credential);
+  }
+
+  async function mutate(url: string, body: unknown) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-admin-csrf": "same-origin",
+      },
+      body: JSON.stringify(body),
+    });
+    const result = await response.json().catch(() => ({}));
+    setMessage(response.ok ? "saved" : (result.error ?? "request failed"));
+    if (response.ok) await refresh();
+    return result;
+  }
+
+  function setText(selector: string, value: string) {
+    const node = document.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = value;
+  }
+  function setMessage(value: string) {
+    if (message) message.textContent = value;
+  }
+  function renderRows(
+    selector: string,
+    rows: any[],
+    label: (row: any) => string,
+  ) {
+    const node = document.querySelector<HTMLElement>(selector);
+    if (!node) return;
+    node.replaceChildren(
+      ...rows.map((row) => {
+        const item = document.createElement("div");
+        item.className = "record-row";
+        item.textContent = label(row);
+        return item;
+      }),
+    );
+  }
+  function renderManagedRows(
+    selector: string,
+    rows: any[],
+    options: {
+      label: (row: any) => string;
+      action: (row: any) => string | null;
+    },
+  ) {
+    const node = document.querySelector<HTMLElement>(selector);
+    if (!node) return;
+    node.replaceChildren(
+      ...rows.map((row) => {
+        const item = document.createElement("div");
+        item.className = "record-row";
+        const label = document.createElement("span");
+        label.textContent = options.label(row);
+        item.append(label);
+        const action = options.action(row);
+        if (action) {
+          const revoke = document.createElement("button");
+          revoke.type = "button";
+          revoke.className = "button ghost";
+          revoke.textContent = "revoke";
+          revoke.addEventListener("click", () => void mutate(action, {}));
+          item.append(revoke);
+        }
+        return item;
+      }),
+    );
+  }
+</script>

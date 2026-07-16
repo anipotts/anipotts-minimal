@@ -10,7 +10,7 @@ import {
 import { fixtureProjections } from "../../packages/lib/src/admin-control/fixtures";
 
 const baseItem: InboxPolicyItem = {
-  domain: "work",
+  domain: "career",
   source: "test",
   owner: "chief/site",
   account: null,
@@ -22,7 +22,9 @@ const baseItem: InboxPolicyItem = {
 
 describe("admin inbox policy", () => {
   it("maps source domains into the five canonical filters", () => {
-    expect(canonicalInboxDomain({ ...baseItem, domain: "jobs" })).toBe("work");
+    expect(canonicalInboxDomain({ ...baseItem, domain: "jobs" })).toBe(
+      "career",
+    );
     expect(canonicalInboxDomain({ ...baseItem, domain: "brand" })).toBe(
       "content",
     );

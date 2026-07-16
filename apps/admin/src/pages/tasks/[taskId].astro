@@ -1,0 +1,36 @@
+---
+import {
+  filterAdminTaskLineage,
+  findAdminTaskState,
+  loadAdminControlSnapshot,
+} from "@anipotts/lib/admin-control";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { TaskDetailView } from "../../components/astryx/UnifiedShellViews";
+import { selectAdminControlSource } from "../../data/admin-control-source";
+const source = selectAdminControlSource(
+  Astro.locals.runtime?.env.DB,
+  Astro.url,
+);
+const snapshot = await loadAdminControlSnapshot(source.database);
+const task = findAdminTaskState(snapshot, Astro.params.taskId ?? "");
+const lineage = task ? filterAdminTaskLineage(snapshot, task.task_id) : [];
+if (!task) Astro.response.status = 404;
+---
+
+<AdminLayout
+  title={task?.goal ?? "task unavailable"}
+  deck="Read-only task state."
+>
+  {
+    task ? (
+      <TaskDetailView
+        snapshot={snapshot}
+        task={task}
+        lineage={lineage}
+        fixtureMode={source.fixtureMode}
+      />
+    ) : (
+      <section class="notice">Task unavailable.</section>
+    )
+  }
+</AdminLayout>

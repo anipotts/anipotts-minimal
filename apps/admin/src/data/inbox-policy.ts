@@ -1,5 +1,5 @@
 export type AdminInboxCategory =
-  | "work"
+  | "career"
   | "content"
   | "life"
   | "fleet"
@@ -51,9 +51,17 @@ export function canonicalInboxDomain(
   const domain = item.domain?.trim().toLowerCase() ?? "";
 
   if (
-    ["work", "business", "jobs", "income", "finance", "mail"].includes(domain)
+    [
+      "work",
+      "career",
+      "business",
+      "jobs",
+      "income",
+      "finance",
+      "mail",
+    ].includes(domain)
   ) {
-    return "work";
+    return "career";
   }
   if (["content", "brand", "media", "site", "newsletter"].includes(domain)) {
     return "content";
@@ -77,7 +85,7 @@ export function canonicalInboxDomain(
     ref.includes("payment") ||
     ref.includes("gmail")
   ) {
-    return "work";
+    return "career";
   }
   if (
     ref.includes("brand") ||

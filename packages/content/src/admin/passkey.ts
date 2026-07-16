@@ -76,11 +76,11 @@ export function buildPasskeyProofItems(
   const normalized = normalizePasskeyAuditEvents(auditEvents);
   return [
     {
-      id: "active_credential",
-      label: "active credential",
+      id: "independent_credentials",
+      label: "independent credentials",
       count: credentialCount,
-      complete: credentialCount > 0,
-      next_safe_action: "register the first platform passkey",
+      complete: credentialCount >= 2,
+      next_safe_action: "register two independent platform passkeys",
     },
     {
       id: "active_session",
@@ -150,7 +150,7 @@ export function passkeyAccessRemovalBlockers({
     missingAuditEvents ?? missingRequiredPasskeyAuditEvents(auditEvents ?? {});
 
   if (!schemaReady) blockers.push("schema_ready");
-  if (credentialCount === 0) blockers.push("active_credential");
+  if (credentialCount < 2) blockers.push("two_independent_credentials");
   if (!sessionReady) blockers.push("active_session");
   blockers.push(...missingEvents);
   return blockers;
@@ -189,6 +189,9 @@ export function nextPasskeyProofAction({
   }
   if (credentialCount === 0) {
     return "open /auth/passkey behind Cloudflare Access and register the first platform passkey";
+  }
+  if (credentialCount < 2) {
+    return "register a second independent passkey while Cloudflare Access remains active";
   }
   if (sessionCount === 0) {
     return "authenticate with the registered passkey and prove a durable app-native session";
@@ -229,6 +232,9 @@ export function nextPasskeyStatusAction({
   }
   if (credentialCount === 0) {
     return "authenticate through Cloudflare Access before first passkey registration";
+  }
+  if (credentialCount < 2 && accessIdentityVerified) {
+    return "register a second independent passkey before Access removal";
   }
   return "authenticate with the registered passkey";
 }

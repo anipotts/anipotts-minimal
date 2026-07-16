@@ -14,6 +14,36 @@ export {
 } from "./auth";
 
 export {
+  ADMIN_ACTION_STATES,
+  ADMIN_DOMAINS,
+  ADMIN_MACHINE_TOKEN_SCOPES,
+  assertAdminActionTransition,
+  assertSanitizedAdminActionMetadata,
+  assertSameOriginMutation,
+  canAuthorizeAdminPasswordReplacement,
+  canTransitionAdminAction,
+  createOpaqueAdminToken,
+  decryptAdminPayload,
+  encryptAdminPayload,
+  hashAdminPasswordWeb,
+  hashOpaqueAdminToken,
+  hasAdminMachineScope,
+  importAdminEncryptionKey,
+  isActionExpired,
+  isAdminDomain,
+  isAdminIdempotencyConflict,
+  isAdminMachineTokenScope,
+  isAdminProjectionStale,
+  isAdminRateLimited,
+  isAdminSessionActive,
+  verifyAdminPasswordWeb,
+  type AdminActionRecord,
+  type AdminActionState,
+  type AdminDomain,
+  type AdminMachineTokenScope,
+} from "./native-control";
+
+export {
   fetchAllThoughts,
   upsertThoughtRecord,
   deleteThoughtRecord,

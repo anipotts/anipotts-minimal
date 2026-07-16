@@ -133,7 +133,7 @@ describe("admin-control", () => {
     }
   });
 
-  it("models personal-system-cleanup in work and fleet without inbox noise", async () => {
+  it("models personal-system-cleanup in fleet without inbox noise", async () => {
     const snapshot = await loadAdminControlSnapshot(null);
     const project = snapshot.projections.project_states.find(
       (item) => item.project_key === "personal-system-cleanup",
@@ -142,13 +142,13 @@ describe("admin-control", () => {
       (item) => item.task_id === "task-personal-system-cleanup-current",
     );
 
-    expect(project?.domain).toBe("work");
+    expect(project?.domain).toBe("fleet");
     expect(project?.owner_chief).toBe("fleet/boss");
     expect(project?.task_refs).toEqual([
       "task-personal-system-cleanup-current",
     ]);
     expect(task?.project_ref).toBe("project-personal-system-cleanup");
-    expect(task?.current_summary).toContain("one Work task");
+    expect(task?.current_summary).toContain("visible in Fleet");
     expect(
       snapshot.projections.fleet_status.map((row) => row.subject_id),
     ).toEqual(
@@ -332,7 +332,7 @@ describe("admin-control", () => {
     const manifest = adminMcpManifest(snapshot);
 
     expect(manifest.write_tools).toBe(
-      "disabled-until-broker-and-signed-connect-diff",
+      "encrypted-proposal-plus-manual-pro-runner",
     );
 
     const response = handleAdminMcpRequest(snapshot, {

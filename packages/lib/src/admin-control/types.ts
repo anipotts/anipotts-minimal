@@ -174,6 +174,43 @@ export interface AdminTaskLineage {
   updated_at: string | null;
 }
 
+export interface AdminCareerSourceStatus {
+  source: string;
+  status: "fresh" | "stale" | "unavailable" | string;
+  observed_at: string | null;
+  summary: string;
+}
+
+export interface AdminCareerSnapshot {
+  snapshot_id: string;
+  project_ref: string;
+  generated_at: string;
+  stale: boolean;
+  source_status: AdminCareerSourceStatus[];
+  current_focus: string;
+  readiness: string;
+  next_action: string;
+  contradictions: string[];
+  commitments: string[];
+  proof_refs: string[];
+  updated_at: string;
+}
+
+export interface AdminCareerTarget {
+  target_id: string;
+  snapshot_ref: string;
+  company: string;
+  role: string;
+  stage: string;
+  status: string;
+  last_contact_at: string | null;
+  interview_at: string | null;
+  next_action: string;
+  source_refs: string[];
+  source_link_refs: string[];
+  updated_at: string;
+}
+
 export interface AdminFleetStatus {
   subject_id: string;
   kind: string;
@@ -234,9 +271,9 @@ export interface AdminControlSyncContract {
 }
 
 export interface AdminControlAuthContract {
-  ui: "passkey-session";
-  mcp: "cloudflare-access-service-token-per-machine";
-  write_tools: "disabled-until-broker-and-signed-connect-diff";
+  ui: "password-or-passkey-session";
+  mcp: "scoped-hashed-bearer-token";
+  write_tools: "encrypted-proposal-plus-manual-pro-runner";
 }
 
 export interface AdminControlContracts {
@@ -263,6 +300,8 @@ export interface AdminControlProjections {
   project_states: AdminProjectState[];
   task_states: AdminTaskState[];
   task_lineage: AdminTaskLineage[];
+  career_snapshots: AdminCareerSnapshot[];
+  career_targets: AdminCareerTarget[];
   piece_states: AdminPieceState[];
   fleet_status: AdminFleetStatus[];
   deploy_states: AdminDeployState[];
