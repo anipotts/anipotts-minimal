@@ -1,7 +1,12 @@
 @import "@anipotts/styles/tokens-www.css";
 @import "@fontsource-variable/instrument-sans";
+@import "@fontsource/urbanist/latin-900.css";
 @import "@fontsource/geist-sans";
 @import "@fontsource-variable/jetbrains-mono";
+
+:root {
+  --display: "Urbanist", var(--sans);
+}
 
 /* shiki css-variables theme: tint-on-tint, accent on one token role */
 :root {
@@ -57,11 +62,12 @@ a {
 h1,
 h2,
 h3 {
-  font-family: var(--sans);
-  font-weight: 500;
-  line-height: var(--lh-tight);
+  font-family: var(--display);
+  font-weight: 900;
+  line-height: 0.95;
   margin: 0;
   letter-spacing: 0;
+  font-synthesis: none;
 }
 
 /* one orchestrated reveal on first paint. opacity:0 stays INSIDE the
@@ -119,6 +125,7 @@ h3 {
   font-family: var(--sans);
   font-weight: 600;
   font-size: 0.75rem;
+  line-height: var(--lh-tight);
   letter-spacing: 0;
   text-transform: uppercase;
   color: var(--ink-muted);
@@ -127,7 +134,7 @@ h3 {
 .hero-title {
   font-size: var(--p-hero);
   letter-spacing: 0;
-  font-weight: 500;
+  font-weight: 900;
 }
 
 .hero-summary {
@@ -187,9 +194,12 @@ h3 {
 }
 
 .row-title {
-  font-family: var(--sans);
+  font-family: var(--display);
   font-size: var(--p-h3);
-  font-weight: 500;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  font-synthesis: none;
   transition: color 0.2s;
 }
 
@@ -343,13 +353,13 @@ button.fill:disabled {
 
 .article-body h2 {
   font-size: var(--p-h2);
-  font-weight: 500;
+  font-weight: 900;
   margin: var(--s-7) 0 var(--s-3);
 }
 
 .article-body h3 {
   font-size: var(--p-h3);
-  font-weight: 500;
+  font-weight: 900;
   margin: var(--s-6) 0 var(--s-2);
 }
 
