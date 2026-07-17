@@ -30,6 +30,7 @@ import {
 } from "../../packages/content/dist/admin/operations.js";
 import {
   contentInventorySource as rootContentInventorySource,
+  DEFAULT_HOMEPAGE_CONTENT,
   normalizeOrchestratingPageContent,
   validateOrchestratingPageContent,
 } from "../../packages/content/dist/index.js";
@@ -72,6 +73,26 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_provider",
   "sync_external",
 ]);
+
+const homepageSummary =
+  DEFAULT_HOMEPAGE_CONTENT.sections.intro.rich_summary ?? [];
+assert.equal(homepageSummary.length, 2);
+assert.deepEqual(homepageSummary[0], {
+  segments: [
+    {
+      kind: "text",
+      text: "every now and then i post about what i'm doing with claude code and codex, as featured on ",
+    },
+    { kind: "mention", key: "businessInsider", suffix: "." },
+  ],
+});
+assert.equal(homepageSummary[1]?.segments[0]?.kind, "text");
+assert.equal(
+  homepageSummary[1]?.segments[0]?.kind === "text"
+    ? homepageSummary[1].segments[0].text
+    : "",
+  "previously worked on real-time agent i/o at ",
+);
 
 assert.deepEqual(
   REQUIRED_PASSKEY_AUDIT_EVENTS,
