@@ -50,6 +50,11 @@ assert.deepEqual(publicPaths, [
   "/auth/passkey",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
+  "/favicon-dark-32.png",
+  "/favicon-dark.svg",
+  "/favicon-light-32.png",
+  "/favicon-light.svg",
+  "/favicon.svg",
 ]);
 assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/login-options",
