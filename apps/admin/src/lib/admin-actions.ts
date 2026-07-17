@@ -65,8 +65,9 @@ export async function listAdminActions(
     .prepare(
       `SELECT action_id, domain, action_type, status, idempotency_key, exact_scope,
             preview, payload_ciphertext, payload_iv, key_version, proof_requirement, created_by,
-            runner_token_id, error_code, proof, created_at, updated_at, approved_at,
-            claimed_at, completed_at, expires_at
+            runner_token_id, proof_token_id, claim_handle_used_at, execution_started_at,
+            error_code, proof, created_at, updated_at, approved_at, claimed_at,
+            completed_at, expires_at
        FROM admin_actions ORDER BY created_at DESC LIMIT 100`,
     )
     .all<ActionRow>();

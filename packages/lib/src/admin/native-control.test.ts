@@ -106,7 +106,7 @@ describe("native admin control", () => {
   it("rejects tampered AES-GCM ciphertext", async () => {
     const key = await importAdminEncryptionKey(createOpaqueAdminToken());
     const encrypted = await encryptAdminPayload({ summary: "safe" }, key, 1);
-    const tampered = `${encrypted.ciphertext.slice(0, -1)}${encrypted.ciphertext.endsWith("A") ? "B" : "A"}`;
+    const tampered = `${encrypted.ciphertext.startsWith("A") ? "B" : "A"}${encrypted.ciphertext.slice(1)}`;
     await expect(
       decryptAdminPayload({ ...encrypted, ciphertext: tampered }, key),
     ).rejects.toThrow();

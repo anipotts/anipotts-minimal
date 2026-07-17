@@ -8,18 +8,28 @@ export async function runAdminAction({
 }) {
   const recovery = await journal.load();
   if (recovery) {
-    await prove(recovery);
+    if (recovery.stage !== "accepted") {
+      throw new Error("action outcome requires explicit reconciliation");
+    }
+    await prove(recovery.request);
     await journal.remove();
     return {
       ok: true,
       action_id: actionId,
-      status: recovery.succeeded ? "succeeded" : "failed",
+      status: "succeeded",
       recovered: true,
     };
   }
 
   const claimed = await claim({});
   const proofBase = { claim_handle: claimed.claim_handle };
+  await journal.save({
+    stage: "claimed",
+    action_id: actionId,
+    claim_handle: claimed.claim_handle,
+    action_type: claimed.action_type,
+    expires_at: claimed.expires_at,
+  });
   if (Date.parse(claimed.expires_at) <= now().getTime()) {
     await prove({
       ...proofBase,
@@ -32,6 +42,7 @@ export async function runAdminAction({
         provider_state: "not_started",
       },
     });
+    await journal.remove();
     throw new Error("action expired before provider execution");
   }
 
@@ -39,22 +50,34 @@ export async function runAdminAction({
   try {
     proof = adapter(claimed.action_type, claimed.payload);
   } catch (error) {
-    await prove({
+    const unknownRequest = {
       ...proofBase,
       succeeded: false,
-      error_code: "provider_command_failed",
+      error_code: "provider_outcome_unknown",
       proof: {
         provider: providerFor(claimed.action_type),
         observed_at: now().toISOString(),
-        summary: "provider command failed",
-        provider_state: "rejected",
+        summary: "provider command outcome could not be confirmed",
+        provider_state: "unknown",
       },
+    };
+    await journal.save({
+      stage: "outcome_unknown",
+      action_id: actionId,
+      claim_handle: claimed.claim_handle,
+      request: unknownRequest,
     });
+    await prove(unknownRequest);
+    await journal.remove();
     throw error;
   }
-  const recoveryEntry = { ...proofBase, succeeded: true, proof };
+  const recoveryEntry = {
+    stage: "accepted",
+    action_id: actionId,
+    request: { ...proofBase, succeeded: true, proof },
+  };
   await journal.save(recoveryEntry);
-  await prove(recoveryEntry);
+  await prove(recoveryEntry.request);
   await journal.remove();
   return {
     ok: true,
