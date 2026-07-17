@@ -58,6 +58,11 @@ a {
   color: inherit;
 }
 
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 h1,
 h2,
 h3 {
