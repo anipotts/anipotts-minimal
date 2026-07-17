@@ -2,8 +2,8 @@ import {
   ADMIN_MACHINE_TOKEN_SCOPES,
   assertSameOriginMutation,
   canAuthorizeAdminPasswordReplacement,
+  canUseAdminMachineToken,
   createOpaqueAdminToken,
-  hasAdminMachineScope,
   hashAdminPasswordWeb,
   hashOpaqueAdminToken,
   isAdminMachineTokenScope,
@@ -454,13 +454,28 @@ export async function requireMachineToken(
   const tokenHash = await hashOpaqueAdminToken(token);
   const row = await db
     .prepare(
-      `SELECT id, name, scopes FROM admin_machine_tokens
-       WHERE token_hash = ? AND revoked_at IS NULL
-         AND (expires_at IS NULL OR expires_at > ?)`,
+      `SELECT id, name, scopes, expires_at, revoked_at FROM admin_machine_tokens
+       WHERE token_hash = ?`,
     )
-    .bind(tokenHash, new Date().toISOString())
-    .first<{ id: string; name: string; scopes: string }>();
-  if (!row || !hasAdminMachineScope(parseScopes(row.scopes), scope)) {
+    .bind(tokenHash)
+    .first<{
+      id: string;
+      name: string;
+      scopes: string;
+      expires_at: string | null;
+      revoked_at: string | null;
+    }>();
+  if (
+    !row ||
+    !canUseAdminMachineToken(
+      {
+        scopes: parseScopes(row.scopes),
+        expiresAt: row.expires_at,
+        revokedAt: row.revoked_at,
+      },
+      scope,
+    )
+  ) {
     return json(
       { error: "insufficient_machine_scope", required_scope: scope },
       { status: 401 },

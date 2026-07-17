@@ -13,6 +13,13 @@ type D1PreparedStatement = {
 
 type D1Database = {
   prepare(query: string): D1PreparedStatement;
+  batch(statements: D1PreparedStatement[]): Promise<
+    Array<{
+      results?: unknown[];
+      success?: boolean;
+      meta?: { changes?: number; [key: string]: unknown };
+    }>
+  >;
 };
 
 type Runtime = import("@astrojs/cloudflare").Runtime<{
@@ -21,6 +28,8 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_POLICY_AUD: string;
   ADMIN_ACTION_ENCRYPTION_KEY?: string;
+  ADMIN_ACTION_ENCRYPTION_KEYS?: string;
+  ADMIN_ACTION_ENCRYPTION_KEY_VERSION?: string;
 }>;
 
 declare namespace App {

@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "lint": "astro check",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test": "vitest run"
   },
   "dependencies": {
     "@anipotts/content": "workspace:*",
@@ -36,6 +37,7 @@
     "@astryxdesign/cli": "^0.1.4",
     "@types/react": "^19",
     "@types/react-dom": "^19.2.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.1"
   }
 }

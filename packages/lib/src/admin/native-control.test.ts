@@ -3,6 +3,7 @@ import {
   assertSanitizedAdminActionMetadata,
   assertSameOriginMutation,
   canAuthorizeAdminPasswordReplacement,
+  canUseAdminMachineToken,
   canTransitionAdminAction,
   createOpaqueAdminToken,
   decryptAdminPayload,
@@ -11,6 +12,8 @@ import {
   hashOpaqueAdminToken,
   hasAdminMachineScope,
   importAdminEncryptionKey,
+  parseAdminEncryptionKeyring,
+  resolveAdminEncryptionKey,
   isActionExpired,
   isAdminIdempotencyConflict,
   isAdminProjectionStale,
@@ -49,6 +52,64 @@ describe("native admin control", () => {
       recipient: "safe-test@example.com",
       content: "proof",
     });
+  });
+
+  it("round-trips the configured current encryption key version", async () => {
+    const encoded = createOpaqueAdminToken();
+    const ring = await parseAdminEncryptionKeyring({
+      currentVersion: "2",
+      keysJson: JSON.stringify({ 2: encoded }),
+    });
+    const encrypted = await encryptAdminPayload(
+      { summary: "safe" },
+      resolveAdminEncryptionKey(ring, ring.currentVersion),
+      ring.currentVersion,
+    );
+    expect(encrypted.key_version).toBe(2);
+    await expect(
+      decryptAdminPayload(
+        encrypted,
+        resolveAdminEncryptionKey(ring, encrypted.key_version),
+      ),
+    ).resolves.toEqual({ summary: "safe" });
+  });
+
+  it("reads an old encryption key without selecting it for writes", async () => {
+    const oldKey = createOpaqueAdminToken();
+    const ring = await parseAdminEncryptionKeyring({
+      currentVersion: "2",
+      keysJson: JSON.stringify({ 1: oldKey, 2: createOpaqueAdminToken() }),
+    });
+    const encrypted = await encryptAdminPayload(
+      { summary: "old" },
+      resolveAdminEncryptionKey(ring, 1),
+      1,
+    );
+    await expect(
+      decryptAdminPayload(encrypted, resolveAdminEncryptionKey(ring, 1)),
+    ).resolves.toEqual({ summary: "old" });
+  });
+
+  it("fails closed for unknown versions and malformed keyrings", async () => {
+    const ring = await parseAdminEncryptionKeyring({
+      legacyKey: createOpaqueAdminToken(),
+    });
+    expect(() => resolveAdminEncryptionKey(ring, 2)).toThrow("unavailable");
+    await expect(
+      parseAdminEncryptionKeyring({ currentVersion: "bad", keysJson: "{}" }),
+    ).rejects.toThrow("version");
+    await expect(
+      parseAdminEncryptionKeyring({ keysJson: "not-json" }),
+    ).rejects.toThrow("malformed");
+  });
+
+  it("rejects tampered AES-GCM ciphertext", async () => {
+    const key = await importAdminEncryptionKey(createOpaqueAdminToken());
+    const encrypted = await encryptAdminPayload({ summary: "safe" }, key, 1);
+    const tampered = `${encrypted.ciphertext.slice(0, -1)}${encrypted.ciphertext.endsWith("A") ? "B" : "A"}`;
+    await expect(
+      decryptAdminPayload({ ...encrypted, ciphertext: tampered }, key),
+    ).rejects.toThrow();
   });
 
   it("keeps private confirmation fields out of action metadata", () => {
@@ -173,6 +234,27 @@ describe("native admin control", () => {
   it("keeps machine token scopes independent", () => {
     expect(hasAdminMachineScope(["mcp:read"], "mcp:read")).toBe(true);
     expect(hasAdminMachineScope(["mcp:read"], "actions:claim")).toBe(false);
+  });
+
+  it("denies wrong-scope, expired, and revoked machine tokens", () => {
+    const now = new Date("2026-07-17T12:00:00.000Z");
+    expect(
+      canUseAdminMachineToken({ scopes: ["mcp:read"] }, "actions:claim", now),
+    ).toBe(false);
+    expect(
+      canUseAdminMachineToken(
+        { scopes: ["mcp:read"], expiresAt: "2026-07-17T11:00:00.000Z" },
+        "mcp:read",
+        now,
+      ),
+    ).toBe(false);
+    expect(
+      canUseAdminMachineToken(
+        { scopes: ["mcp:read"], revokedAt: "2026-07-17T11:00:00.000Z" },
+        "mcp:read",
+        now,
+      ),
+    ).toBe(false);
   });
 
   it("marks a projection stale when any source is incomplete", () => {

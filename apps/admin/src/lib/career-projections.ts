@@ -1,6 +1,7 @@
 import {
   encryptAdminPayload,
-  importAdminEncryptionKey,
+  parseAdminEncryptionKeyring,
+  resolveAdminEncryptionKey,
   isAdminProjectionStale,
 } from "@anipotts/lib/admin";
 import { json } from "./passkey-auth";
@@ -33,11 +34,15 @@ export async function refreshCareerProjection(
   assertSanitized(body);
 
   const now = new Date().toISOString();
-  const snapshotId = text(snapshot.snapshot_id) || crypto.randomUUID();
   const stale = isAdminProjectionStale(sourceStatus);
-  await db
-    .prepare(
-      `INSERT INTO admin_career_snapshots
+  const requestedSnapshotId = text(snapshot.snapshot_id) || crypto.randomUUID();
+  const snapshotId = stale
+    ? `${requestedSnapshotId}-stale-${crypto.randomUUID()}`
+    : requestedSnapshotId;
+  const statements = [
+    db
+      .prepare(
+        `INSERT INTO admin_career_snapshots
       (snapshot_id, project_ref, generated_at, stale, source_status,
        current_focus, readiness, next_action, contradictions, commitments,
        proof_refs, updated_at)
@@ -48,64 +53,115 @@ export async function refreshCareerProjection(
        next_action = excluded.next_action, contradictions = excluded.contradictions,
        commitments = excluded.commitments, proof_refs = excluded.proof_refs,
        updated_at = excluded.updated_at`,
-    )
-    .bind(
-      snapshotId,
-      text(snapshot.generated_at) || now,
-      stale ? 1 : 0,
-      JSON.stringify(sourceStatus),
-      text(snapshot.current_focus),
-      text(snapshot.readiness) || "not assessed",
-      text(snapshot.next_action),
-      JSON.stringify(stringArray(snapshot.contradictions)),
-      JSON.stringify(stringArray(snapshot.commitments)),
-      JSON.stringify(stringArray(snapshot.proof_refs)),
-      now,
-    )
-    .run();
+      )
+      .bind(
+        snapshotId,
+        text(snapshot.generated_at) || now,
+        stale ? 1 : 0,
+        JSON.stringify(sourceStatus),
+        text(snapshot.current_focus),
+        text(snapshot.readiness) || "not assessed",
+        text(snapshot.next_action),
+        JSON.stringify(stringArray(snapshot.contradictions)),
+        JSON.stringify(stringArray(snapshot.commitments)),
+        JSON.stringify(stringArray(snapshot.proof_refs)),
+        now,
+      ),
+  ];
 
-  const keyText = context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEY;
-  const key = keyText ? await importAdminEncryptionKey(keyText) : null;
+  if (stale) {
+    await db.batch(statements);
+    return json(
+      {
+        ok: false,
+        preserved_last_good: true,
+        stale: true,
+        snapshot_id: snapshotId,
+        targets: 0,
+      },
+      { status: 202 },
+    );
+  }
+
+  const keyring = await optionalKeyring(context);
+  const preparedTargets: Array<{
+    target: Record<string, unknown>;
+    targetId: string;
+    links: Array<{
+      id: string;
+      provider: string;
+      label: string;
+      ciphertext: string;
+      iv: string;
+      keyVersion: number;
+    }>;
+  }> = [];
   for (const target of targets) {
     const targetId = text(target.target_id) || crypto.randomUUID();
-    const linkRefs: string[] = [];
     const links = Array.isArray(target.source_links)
       ? target.source_links.map(object)
       : [];
-    if (links.length > 0 && !key)
+    if (
+      !text(target.company) ||
+      !text(target.role) ||
+      !text(target.next_action)
+    ) {
+      return json({ error: "invalid_sanitized_target" }, { status: 400 });
+    }
+    if (links.length > 0 && !keyring)
       return json(
         { error: "source_link_encryption_key_missing" },
         { status: 503 },
       );
+    const encryptedLinks = [];
     for (const link of links) {
       const locator = text(link.locator);
       if (!allowedSourceLocator(locator))
         return json({ error: "source_locator_not_allowed" }, { status: 400 });
-      const encrypted = await encryptAdminPayload({ locator }, key!, 1);
-      const linkId = crypto.randomUUID();
-      await db
-        .prepare(
-          `INSERT INTO admin_source_links
+      const encrypted = await encryptAdminPayload(
+        { locator },
+        resolveAdminEncryptionKey(keyring!, keyring!.currentVersion),
+        keyring!.currentVersion,
+      );
+      encryptedLinks.push({
+        id: crypto.randomUUID(),
+        provider: text(link.provider),
+        label: text(link.label),
+        ciphertext: encrypted.ciphertext,
+        iv: encrypted.iv,
+        keyVersion: encrypted.key_version,
+      });
+    }
+    preparedTargets.push({ target, targetId, links: encryptedLinks });
+  }
+
+  for (const prepared of preparedTargets) {
+    const linkRefs = prepared.links.map((link) => link.id);
+    for (const link of prepared.links) {
+      statements.push(
+        db
+          .prepare(
+            `INSERT INTO admin_source_links
           (source_link_id, domain, provider, label, locator_ciphertext,
            locator_iv, key_version, created_at, expires_at)
          VALUES (?, 'career', ?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          linkId,
-          text(link.provider),
-          text(link.label),
-          encrypted.ciphertext,
-          encrypted.iv,
-          encrypted.key_version,
-          now,
-          new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        )
-        .run();
-      linkRefs.push(linkId);
+          )
+          .bind(
+            link.id,
+            link.provider,
+            link.label,
+            link.ciphertext,
+            link.iv,
+            link.keyVersion,
+            now,
+            new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          ),
+      );
     }
-    await db
-      .prepare(
-        `INSERT INTO admin_career_targets
+    statements.push(
+      db
+        .prepare(
+          `INSERT INTO admin_career_targets
         (target_id, snapshot_ref, company, role, stage, status, last_contact_at,
          interview_at, next_action, source_refs, source_link_refs, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -115,23 +171,24 @@ export async function refreshCareerProjection(
          interview_at = excluded.interview_at, next_action = excluded.next_action,
          source_refs = excluded.source_refs, source_link_refs = excluded.source_link_refs,
          updated_at = excluded.updated_at`,
-      )
-      .bind(
-        targetId,
-        snapshotId,
-        text(target.company),
-        text(target.role),
-        text(target.stage),
-        text(target.status),
-        nullableText(target.last_contact_at),
-        nullableText(target.interview_at),
-        text(target.next_action),
-        JSON.stringify(stringArray(target.source_refs)),
-        JSON.stringify(linkRefs),
-        now,
-      )
-      .run();
+        )
+        .bind(
+          prepared.targetId,
+          snapshotId,
+          text(prepared.target.company),
+          text(prepared.target.role),
+          text(prepared.target.stage),
+          text(prepared.target.status),
+          nullableText(prepared.target.last_contact_at),
+          nullableText(prepared.target.interview_at),
+          text(prepared.target.next_action),
+          JSON.stringify(stringArray(prepared.target.source_refs)),
+          JSON.stringify(linkRefs),
+          now,
+        ),
+    );
   }
+  await db.batch(statements);
   return json({
     ok: true,
     snapshot_id: snapshotId,
@@ -145,18 +202,19 @@ export async function openCareerSourceLink(
   sourceLinkId: string,
 ): Promise<Response> {
   const db = context.locals.runtime?.env.DB;
-  const keyText = context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEY;
-  if (!db || !keyText)
+  const keyring = await optionalKeyring(context);
+  if (!db || !keyring)
     return json({ error: "source_link_unavailable" }, { status: 503 });
   const row = await db
     .prepare(
-      `SELECT locator_ciphertext, locator_iv, expires_at FROM admin_source_links
+      `SELECT locator_ciphertext, locator_iv, key_version, expires_at FROM admin_source_links
      WHERE source_link_id = ? AND domain = 'career'`,
     )
     .bind(sourceLinkId)
     .first<{
       locator_ciphertext: string;
       locator_iv: string;
+      key_version: number;
       expires_at: string | null;
     }>();
   if (!row || (row.expires_at && Date.parse(row.expires_at) <= Date.now())) {
@@ -165,7 +223,7 @@ export async function openCareerSourceLink(
   const { decryptAdminPayload } = await import("@anipotts/lib/admin");
   const payload = await decryptAdminPayload<{ locator: string }>(
     { ciphertext: row.locator_ciphertext, iv: row.locator_iv },
-    await importAdminEncryptionKey(keyText),
+    resolveAdminEncryptionKey(keyring, row.key_version),
   );
   if (!allowedSourceLocator(payload.locator))
     return json({ error: "source_locator_not_allowed" }, { status: 400 });
@@ -183,6 +241,25 @@ export async function openCareerSourceLink(
       "referrer-policy": "no-referrer",
     },
   });
+}
+
+async function optionalKeyring(context: ProjectionContext) {
+  const env = context.locals.runtime?.env;
+  if (!env?.ADMIN_ACTION_ENCRYPTION_KEYS && !env?.ADMIN_ACTION_ENCRYPTION_KEY) {
+    return null;
+  }
+  try {
+    return await parseAdminEncryptionKeyring({
+      currentVersion: env.ADMIN_ACTION_ENCRYPTION_KEY_VERSION,
+      keysJson: env.ADMIN_ACTION_ENCRYPTION_KEYS,
+      legacyKey: env.ADMIN_ACTION_ENCRYPTION_KEY,
+    });
+  } catch {
+    throw json(
+      { error: "source_link_encryption_key_unavailable" },
+      { status: 503 },
+    );
+  }
 }
 
 function allowedSourceLocator(locator: string): boolean {

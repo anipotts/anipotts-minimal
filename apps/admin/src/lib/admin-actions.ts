@@ -4,7 +4,8 @@ import {
   assertSameOriginMutation,
   decryptAdminPayload,
   encryptAdminPayload,
-  importAdminEncryptionKey,
+  parseAdminEncryptionKeyring,
+  resolveAdminEncryptionKey,
   isActionExpired,
   isAdminIdempotencyConflict,
   hashOpaqueAdminToken,
@@ -57,7 +58,7 @@ export async function listAdminActions(
   const result = await db
     .prepare(
       `SELECT action_id, domain, action_type, status, idempotency_key, exact_scope,
-            preview, payload_ciphertext, payload_iv, proof_requirement, created_by,
+            preview, payload_ciphertext, payload_iv, key_version, proof_requirement, created_by,
             runner_token_id, error_code, proof, created_at, updated_at, approved_at,
             claimed_at, completed_at, expires_at
        FROM admin_actions ORDER BY created_at DESC LIMIT 100`,
@@ -65,7 +66,7 @@ export async function listAdminActions(
     .all<ActionRow>();
   const rows = result.results ?? [];
   const key = rows.some((row) => ["proposed", "approved"].includes(row.status))
-    ? await actionKey(context)
+    ? await actionKeyring(context)
     : null;
   const actions = await Promise.all(
     rows.map(async (row) => ({
@@ -77,7 +78,7 @@ export async function listAdminActions(
                 ciphertext: row.payload_ciphertext,
                 iv: row.payload_iv,
               },
-              key,
+              resolveAdminEncryptionKey(key, row.key_version),
             )
           : null,
     })),
@@ -107,8 +108,12 @@ export async function proposeAdminAction(
   } catch {
     return json({ error: "private_action_metadata_rejected" }, { status: 400 });
   }
-  const encryptionKey = await actionKey(context);
-  const encrypted = await encryptAdminPayload(payload, encryptionKey, 1);
+  const keyring = await actionKeyring(context);
+  const encrypted = await encryptAdminPayload(
+    payload,
+    resolveAdminEncryptionKey(keyring, keyring.currentVersion),
+    keyring.currentVersion,
+  );
   const now = new Date();
   const actionId = crypto.randomUUID();
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
@@ -205,10 +210,10 @@ export async function claimAdminAction(
     .run();
   if (result.meta?.changes !== 1)
     return json({ error: "action_state_conflict" }, { status: 409 });
-  const key = await actionKey(context);
+  const keyring = await actionKeyring(context);
   const payload = await decryptAdminPayload(
     { ciphertext: row.payload_ciphertext, iv: row.payload_iv },
-    key,
+    resolveAdminEncryptionKey(keyring, row.key_version),
   );
   return json({
     action_id: row.action_id,
@@ -266,11 +271,17 @@ function requiredDb(context: ActionContext): D1Database {
   return db;
 }
 
-async function actionKey(context: ActionContext): Promise<CryptoKey> {
-  const configured = context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEY;
-  if (!configured)
-    throw json({ error: "action_encryption_key_missing" }, { status: 503 });
-  return importAdminEncryptionKey(configured);
+async function actionKeyring(context: ActionContext) {
+  try {
+    return await parseAdminEncryptionKeyring({
+      currentVersion:
+        context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEY_VERSION,
+      keysJson: context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEYS,
+      legacyKey: context.locals.runtime?.env.ADMIN_ACTION_ENCRYPTION_KEY,
+    });
+  } catch {
+    throw json({ error: "action_encryption_key_unavailable" }, { status: 503 });
+  }
 }
 
 async function readAction(

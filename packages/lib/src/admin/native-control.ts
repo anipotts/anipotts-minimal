@@ -72,6 +72,23 @@ export function hasAdminMachineScope(
   return scopes.includes(required);
 }
 
+export function canUseAdminMachineToken(
+  token: {
+    scopes: readonly AdminMachineTokenScope[];
+    expiresAt?: string | null;
+    revokedAt?: string | null;
+  },
+  required: AdminMachineTokenScope,
+  now = new Date(),
+): boolean {
+  if (token.revokedAt) return false;
+  if (token.expiresAt) {
+    const expiresAt = Date.parse(token.expiresAt);
+    if (!Number.isFinite(expiresAt) || expiresAt <= now.getTime()) return false;
+  }
+  return hasAdminMachineScope(token.scopes, required);
+}
+
 export function isAdminRateLimited(
   lockedUntil: string | null | undefined,
   now = new Date(),
@@ -256,6 +273,76 @@ export async function importAdminEncryptionKey(
     "encrypt",
     "decrypt",
   ]);
+}
+
+export type AdminEncryptionKeyring = {
+  currentVersion: number;
+  keys: ReadonlyMap<number, CryptoKey>;
+};
+
+export async function parseAdminEncryptionKeyring(input: {
+  currentVersion?: string;
+  keysJson?: string;
+  legacyKey?: string;
+}): Promise<AdminEncryptionKeyring> {
+  const currentVersion = parseKeyVersion(input.currentVersion ?? "1");
+  const encodedKeys = new Map<number, string>();
+
+  if (input.keysJson) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(input.keysJson);
+    } catch {
+      throw new Error("admin encryption keyring is malformed");
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("admin encryption keyring is malformed");
+    }
+    for (const [versionText, encoded] of Object.entries(parsed)) {
+      const version = parseKeyVersion(versionText);
+      if (typeof encoded !== "string" || !encoded) {
+        throw new Error("admin encryption keyring is malformed");
+      }
+      encodedKeys.set(version, encoded);
+    }
+  } else if (input.legacyKey) {
+    if (currentVersion !== 1) {
+      throw new Error("legacy admin encryption key only supports version 1");
+    }
+    encodedKeys.set(1, input.legacyKey);
+  } else {
+    throw new Error("admin encryption keyring is missing");
+  }
+
+  if (!encodedKeys.has(currentVersion)) {
+    throw new Error("current admin encryption key version is unavailable");
+  }
+  const keys = new Map<number, CryptoKey>();
+  for (const [version, encoded] of encodedKeys) {
+    keys.set(version, await importAdminEncryptionKey(encoded));
+  }
+  return { currentVersion, keys };
+}
+
+export function resolveAdminEncryptionKey(
+  keyring: AdminEncryptionKeyring,
+  version: number,
+): CryptoKey {
+  const normalized = parseKeyVersion(String(version));
+  const key = keyring.keys.get(normalized);
+  if (!key) throw new Error("admin encryption key version is unavailable");
+  return key;
+}
+
+function parseKeyVersion(value: string): number {
+  if (!/^[1-9][0-9]*$/.test(value)) {
+    throw new Error("admin encryption key version is malformed");
+  }
+  const version = Number(value);
+  if (!Number.isSafeInteger(version)) {
+    throw new Error("admin encryption key version is malformed");
+  }
+  return version;
 }
 
 export async function encryptAdminPayload(

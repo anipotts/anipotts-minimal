@@ -21,6 +21,7 @@ export {
   assertSanitizedAdminActionMetadata,
   assertSameOriginMutation,
   canAuthorizeAdminPasswordReplacement,
+  canUseAdminMachineToken,
   canTransitionAdminAction,
   createOpaqueAdminToken,
   decryptAdminPayload,
@@ -29,6 +30,8 @@ export {
   hashOpaqueAdminToken,
   hasAdminMachineScope,
   importAdminEncryptionKey,
+  parseAdminEncryptionKeyring,
+  resolveAdminEncryptionKey,
   isActionExpired,
   isAdminDomain,
   isAdminIdempotencyConflict,
@@ -41,6 +44,7 @@ export {
   type AdminActionState,
   type AdminDomain,
   type AdminMachineTokenScope,
+  type AdminEncryptionKeyring,
 } from "./native-control";
 
 export {
