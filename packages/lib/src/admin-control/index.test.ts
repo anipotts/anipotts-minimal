@@ -10,10 +10,70 @@ import {
   gmailSentDedupeKey,
   handleAdminMcpRequest,
   loadAdminControlSnapshot,
+  selectAdminCareerProjectionView,
   type AdminControlDatabase,
 } from "./index";
 
 describe("admin-control", () => {
+  it("shows last-good targets with the newest stale source status", () => {
+    const good = {
+      snapshot_id: "good",
+      project_ref: "project-job-search",
+      generated_at: "2026-07-17T12:00:00.000Z",
+      stale: false,
+      source_status: [
+        {
+          source: "jobs",
+          status: "fresh",
+          observed_at: null,
+          summary: "fresh",
+        },
+      ],
+      current_focus: "good focus",
+      readiness: "ready",
+      next_action: "review",
+      contradictions: [],
+      commitments: [],
+      proof_refs: [],
+      updated_at: "2026-07-17T12:00:00.000Z",
+    };
+    const stale = {
+      ...good,
+      snapshot_id: "stale",
+      generated_at: "2026-07-17T13:00:00.000Z",
+      stale: true,
+      source_status: [
+        {
+          source: "jobs",
+          status: "unavailable",
+          observed_at: null,
+          summary: "refresh failed",
+        },
+      ],
+    };
+    const view = selectAdminCareerProjectionView({
+      career_snapshots: [stale, good],
+      career_targets: [
+        {
+          target_id: "target",
+          snapshot_ref: "good",
+          company: "company",
+          role: "role",
+          stage: "review",
+          status: "active",
+          last_contact_at: null,
+          interview_at: null,
+          next_action: "review",
+          source_refs: [],
+          source_link_refs: [],
+          updated_at: "2026-07-17T12:00:00.000Z",
+        },
+      ],
+    });
+    expect(view.statusSnapshot?.stale).toBe(true);
+    expect(view.displaySnapshot?.snapshot_id).toBe("good");
+    expect(view.targets.map((target) => target.target_id)).toEqual(["target"]);
+  });
   it("loads fixture projections with schema version and event refs", async () => {
     const snapshot = await loadAdminControlSnapshot(null);
 

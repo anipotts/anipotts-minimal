@@ -1,9 +1,10 @@
 import React from "react";
-import type {
-  AdminControlSnapshot,
-  AdminProjectState,
-  AdminTaskLineage,
-  AdminTaskState,
+import {
+  selectAdminCareerProjectionView,
+  type AdminControlSnapshot,
+  type AdminProjectState,
+  type AdminTaskLineage,
+  type AdminTaskState,
 } from "@anipotts/lib/admin-control";
 import { adminControlHref } from "../../data/admin-control-source";
 
@@ -126,12 +127,11 @@ export function JobSearchView({
   snapshot,
   fixtureMode = false,
 }: WorkViewProps) {
-  const career = snapshot.projections.career_snapshots[0];
-  const targets = career
-    ? snapshot.projections.career_targets.filter(
-        (target) => target.snapshot_ref === career.snapshot_id,
-      )
-    : [];
+  const {
+    displaySnapshot: career,
+    statusSnapshot: careerStatus,
+    targets,
+  } = selectAdminCareerProjectionView(snapshot.projections);
   const project = snapshot.projections.project_states.find(
     (item) => item.project_key === "job-search",
   );
@@ -150,7 +150,7 @@ export function JobSearchView({
       <section className="meta-strip" aria-label="job search source state">
         <span>read only</span>
         <span>{snapshot.source_mode}</span>
-        <span>{career?.stale ? "stale" : "current"}</span>
+        <span>{careerStatus?.stale ? "stale" : "current"}</span>
         <span>{targets.length} targets</span>
         <span>{tasks.length} related tasks</span>
       </section>
@@ -194,10 +194,10 @@ export function JobSearchView({
                 <p>sources</p>
                 <h2>Freshness</h2>
               </div>
-              <span>{career.source_status.length} sources</span>
+              <span>{careerStatus?.source_status.length ?? 0} sources</span>
             </div>
             <div className="work-task-list">
-              {career.source_status.map((source) => (
+              {(careerStatus?.source_status ?? []).map((source) => (
                 <article className="work-task-row" key={source.source}>
                   <div className="work-task-heading">
                     <div>
