@@ -44,6 +44,15 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
           segments: [
             {
               kind: "text",
+              text: "every now and then i post about what i'm doing with claude code and codex, as featured on ",
+            },
+            { kind: "mention", key: "businessInsider", suffix: "." },
+          ],
+        },
+        {
+          segments: [
+            {
+              kind: "text",
               text: "previously worked on real-time agent i/o at ",
             },
             {
@@ -66,15 +75,6 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
                 { kind: "text", text: " venture." },
               ],
             },
-          ],
-        },
-        {
-          segments: [
-            {
-              kind: "text",
-              text: "every now and then i post about what i'm doing with claude code and codex, as featured on ",
-            },
-            { kind: "mention", key: "businessInsider", suffix: "." },
           ],
         },
       ],

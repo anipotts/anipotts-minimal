@@ -1,7 +1,6 @@
 @import "@anipotts/styles/tokens-www.css";
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource/urbanist/latin-900.css";
-@import "@fontsource/geist-sans";
 @import "@fontsource-variable/jetbrains-mono";
 
 :root {
@@ -17,10 +16,10 @@
   --astro-code-token-comment: var(--ink-muted);
   --astro-code-token-keyword: var(--ink-muted);
   --astro-code-token-parameter: var(--ink);
-  --astro-code-token-function: var(--accent);
+  --astro-code-token-function: var(--interactive);
   --astro-code-token-string-expression: var(--ink-muted);
   --astro-code-token-punctuation: var(--ink-muted);
-  --astro-code-token-link: var(--accent);
+  --astro-code-token-link: var(--interactive);
 }
 
 * {
@@ -51,12 +50,17 @@ body {
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--bg);
+  background: var(--interactive);
+  color: var(--interactive-ink);
 }
 
 a {
   color: inherit;
+}
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 h1,
@@ -68,6 +72,10 @@ h3 {
   margin: 0;
   letter-spacing: 0;
   font-synthesis: none;
+}
+
+h1 {
+  color: var(--brand-display);
 }
 
 /* one orchestrated reveal on first paint. opacity:0 stays INSIDE the
@@ -131,6 +139,10 @@ h3 {
   color: var(--ink-muted);
 }
 
+h2.section-label {
+  color: var(--ink);
+}
+
 .hero-title {
   font-size: var(--p-hero);
   letter-spacing: 0;
@@ -155,7 +167,7 @@ h3 {
 }
 
 .accent-link {
-  color: var(--accent);
+  color: var(--interactive);
   text-decoration: none;
 }
 
@@ -172,7 +184,7 @@ h3 {
 }
 
 .quiet-link:hover {
-  color: var(--accent);
+  color: var(--interactive);
 }
 
 /* post-list row: fill on hover marks the row, never a line */
@@ -190,7 +202,7 @@ h3 {
 }
 
 .row-link:hover .row-title {
-  color: var(--accent);
+  color: var(--ink);
 }
 
 .row-title {
@@ -211,8 +223,8 @@ h3 {
 
 .pill {
   display: inline-block;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--surface);
+  color: var(--ink);
   border-radius: 99px;
   padding: 0.15rem 0.6rem;
   font-family: var(--sans);
@@ -266,19 +278,19 @@ h3 {
 
 .field:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--focus);
 }
 
 .field::placeholder {
   color: var(--ink-muted);
 }
 
-button.fill {
+.fill {
   font-family: var(--sans);
   font-weight: 500;
   font-size: var(--p-small);
-  background: var(--accent);
-  color: var(--bg);
+  background: var(--interactive);
+  color: var(--interactive-ink);
   border: 0;
   border-radius: 0.5rem;
   min-height: 44px;
@@ -305,8 +317,8 @@ button.fill:disabled {
 }
 
 .chip[aria-pressed="true"] {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--interactive);
+  color: var(--interactive-ink);
 }
 
 @media (max-width: 720px) {
@@ -364,7 +376,7 @@ button.fill:disabled {
 }
 
 .article-body a {
-  color: var(--accent);
+  color: var(--interactive);
   text-decoration: underline;
   text-underline-offset: 0.18em;
   text-decoration-thickness: 0.06em;

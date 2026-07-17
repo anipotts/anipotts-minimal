@@ -110,17 +110,17 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
 
   a.inline-mention .text {
     text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, var(--accent) 72%, transparent);
+    text-decoration-color: var(--border-strong);
     text-decoration-thickness: 0.052em;
     text-underline-offset: 0.22em;
   }
 
   a.inline-mention:hover {
-    color: var(--accent);
+    color: var(--interactive);
   }
 
   a.inline-mention:hover .text {
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--interactive);
   }
 
   .brand-mark {
@@ -185,7 +185,7 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
   }
 
   .mark {
-    color: var(--accent);
+    color: var(--ink);
     font-family: var(--mono);
     font-size: 0.72em;
     line-height: 1;
