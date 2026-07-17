@@ -247,15 +247,12 @@ export async function proveAdminAction(
   if (!row) {
     return json({ error: "claimed_action_not_found" }, { status: 404 });
   }
-  if (row.status !== "claimed") {
-    return json({ error: "action_state_conflict" }, { status: 409 });
-  }
   // A claim records execution_started_at before its payload is released. Proof
   // may arrive after expires_at so an accepted provider result can be recovered
   // without executing the adapter a second time.
   const body = await readBody(context.request);
   const claimHandle = text(body.claim_handle);
-  if (!claimHandle || !row.claim_handle_hash || row.claim_handle_used_at) {
+  if (!claimHandle || !row.claim_handle_hash) {
     return json({ error: "claim_handle_invalid" }, { status: 401 });
   }
   const claimHandleHash = await hashOpaqueAdminToken(claimHandle);
@@ -263,12 +260,33 @@ export async function proveAdminAction(
     return json({ error: "claim_handle_invalid" }, { status: 401 });
   }
   const nextState = body.succeeded === true ? "succeeded" : "failed";
-  assertAdminActionTransition(row.status, nextState);
   const proofResult = sanitizeProof(object(body.proof), nextState);
   if (proofResult instanceof Response) return proofResult;
   const proof = proofResult;
   const errorCode = boundedErrorCode(body.error_code, nextState);
   if (errorCode instanceof Response) return errorCode;
+  const serializedProof = JSON.stringify(proof);
+  if (row.status === "succeeded" || row.status === "failed") {
+    if (
+      row.status === nextState &&
+      Boolean(row.claim_handle_used_at) &&
+      row.proof_token_id === proofTokenId &&
+      row.proof === serializedProof &&
+      row.error_code === errorCode
+    ) {
+      return json({
+        action_id: actionId,
+        status: nextState,
+        proof,
+        idempotent: true,
+      });
+    }
+    return json({ error: "action_state_conflict" }, { status: 409 });
+  }
+  if (row.status !== "claimed" || row.claim_handle_used_at) {
+    return json({ error: "action_state_conflict" }, { status: 409 });
+  }
+  assertAdminActionTransition(row.status, nextState);
   const now = new Date().toISOString();
   const result = await db
     .prepare(
@@ -278,7 +296,7 @@ export async function proveAdminAction(
     )
     .bind(
       nextState,
-      JSON.stringify(proof),
+      serializedProof,
       errorCode,
       proofTokenId,
       now,

@@ -24,6 +24,7 @@ beforeAll(async () => {
 
 class ActionDb {
   row: Record<string, unknown>;
+  proofTransitions = 0;
   constructor() {
     this.row = {
       action_id: "action-safe",
@@ -76,6 +77,7 @@ class ActionDb {
           db.row.error_code = values[2];
           db.row.proof_token_id = values[3];
           db.row.claim_handle_used_at = values[4];
+          db.proofTransitions += 1;
           return { meta: { changes: 1 } };
         }
         if (query.includes("status = 'claimed'")) {
@@ -212,7 +214,7 @@ describe("admin action service boundary", () => {
           context(db, {
             claim_handle: claimed.claim_handle,
             succeeded: true,
-            proof: successProof,
+            proof: { ...successProof, summary: "different proof" },
           }),
           "action-safe",
           "proof-token-id",
@@ -229,6 +231,44 @@ describe("admin action service boundary", () => {
           }),
           "action-safe",
           "proof-token-id",
+        )
+      ).status,
+    ).toBe(409);
+  });
+
+  it("replays an exactly committed proof idempotently after response loss", async () => {
+    const db = new ActionDb();
+    const claimed = await (
+      await claimAdminAction(context(db), "action-safe", "claim-token-id")
+    ).json();
+    const request = {
+      claim_handle: claimed.claim_handle,
+      succeeded: true,
+      proof: successProof,
+    };
+    expect(
+      (
+        await proveAdminAction(
+          context(db, request),
+          "action-safe",
+          "proof-token-id",
+        )
+      ).status,
+    ).toBe(200);
+    const retry = await proveAdminAction(
+      context(db, request),
+      "action-safe",
+      "proof-token-id",
+    );
+    expect(retry.status).toBe(200);
+    expect(await retry.json()).toMatchObject({ idempotent: true });
+    expect(db.proofTransitions).toBe(1);
+    expect(
+      (
+        await proveAdminAction(
+          context(db, request),
+          "action-safe",
+          "different-proof-token-id",
         )
       ).status,
     ).toBe(409);
