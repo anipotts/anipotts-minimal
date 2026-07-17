@@ -263,6 +263,20 @@ export async function hashOpaqueAdminToken(token: string): Promise<string> {
   return toBase64Url(new Uint8Array(hash));
 }
 
+export function constantTimeEqualAdminDigest(
+  actual: string,
+  expected: string,
+): boolean {
+  const actualBytes = encoder.encode(actual);
+  const expectedBytes = encoder.encode(expected);
+  if (actualBytes.length !== expectedBytes.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < actualBytes.length; index += 1) {
+    mismatch |= actualBytes[index]! ^ expectedBytes[index]!;
+  }
+  return mismatch === 0;
+}
+
 export async function importAdminEncryptionKey(
   base64UrlKey: string,
 ): Promise<CryptoKey> {

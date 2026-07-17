@@ -23,6 +23,7 @@ export {
   canAuthorizeAdminPasswordReplacement,
   canUseAdminMachineToken,
   canTransitionAdminAction,
+  constantTimeEqualAdminDigest,
   createOpaqueAdminToken,
   decryptAdminPayload,
   encryptAdminPayload,

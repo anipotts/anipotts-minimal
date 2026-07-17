@@ -2,6 +2,8 @@ import {
   assertAdminActionTransition,
   assertSanitizedAdminActionMetadata,
   assertSameOriginMutation,
+  constantTimeEqualAdminDigest,
+  createOpaqueAdminToken,
   decryptAdminPayload,
   encryptAdminPayload,
   parseAdminEncryptionKeyring,
@@ -41,6 +43,10 @@ type ActionRow = {
   proof_requirement: string;
   created_by: string;
   runner_token_id: string | null;
+  proof_token_id: string | null;
+  claim_handle_hash: string | null;
+  claim_handle_used_at: string | null;
+  execution_started_at: string | null;
   error_code: string | null;
   proof: string | null;
   created_at: string;
@@ -201,12 +207,15 @@ export async function claimAdminAction(
   }
   assertAdminActionTransition(row.status, "claimed");
   const now = new Date().toISOString();
+  const claimHandle = createOpaqueAdminToken();
+  const claimHandleHash = await hashOpaqueAdminToken(claimHandle);
   const result = await db
     .prepare(
-      `UPDATE admin_actions SET status = 'claimed', runner_token_id = ?, claimed_at = ?, updated_at = ?
+      `UPDATE admin_actions SET status = 'claimed', runner_token_id = ?, claim_handle_hash = ?,
+       execution_started_at = ?, claimed_at = ?, updated_at = ?
      WHERE action_id = ? AND status = 'approved'`,
     )
-    .bind(runnerTokenId, now, now, actionId)
+    .bind(runnerTokenId, claimHandleHash, now, now, now, actionId)
     .run();
   if (result.meta?.changes !== 1)
     return json({ error: "action_state_conflict" }, { status: 409 });
@@ -222,6 +231,7 @@ export async function claimAdminAction(
     preview: parseObject(row.preview),
     proof_requirement: row.proof_requirement,
     expires_at: row.expires_at,
+    claim_handle: claimHandle,
     payload,
   });
 }
@@ -229,34 +239,51 @@ export async function claimAdminAction(
 export async function proveAdminAction(
   context: ActionContext,
   actionId: string,
-  runnerTokenId: string,
+  proofTokenId: string,
 ): Promise<Response> {
   const db = requiredDb(context);
   const row = await readAction(db, actionId);
-  if (!row || row.runner_token_id !== runnerTokenId) {
+  if (!row) {
     return json({ error: "claimed_action_not_found" }, { status: 404 });
   }
   if (row.status !== "claimed") {
     return json({ error: "action_state_conflict" }, { status: 409 });
   }
+  // A claim records execution_started_at before its payload is released. Proof
+  // may arrive after expires_at so an accepted provider result can be recovered
+  // without executing the adapter a second time.
   const body = await readBody(context.request);
+  const claimHandle = text(body.claim_handle);
+  if (!claimHandle || !row.claim_handle_hash || row.claim_handle_used_at) {
+    return json({ error: "claim_handle_invalid" }, { status: 401 });
+  }
+  const claimHandleHash = await hashOpaqueAdminToken(claimHandle);
+  if (!constantTimeEqualAdminDigest(claimHandleHash, row.claim_handle_hash)) {
+    return json({ error: "claim_handle_invalid" }, { status: 401 });
+  }
   const nextState = body.succeeded === true ? "succeeded" : "failed";
   assertAdminActionTransition(row.status, nextState);
-  const proof = await sanitizeProof(object(body.proof));
+  const proofResult = sanitizeProof(object(body.proof), nextState);
+  if (proofResult instanceof Response) return proofResult;
+  const proof = proofResult;
+  const errorCode = boundedErrorCode(body.error_code, nextState);
+  if (errorCode instanceof Response) return errorCode;
   const now = new Date().toISOString();
   const result = await db
     .prepare(
-      `UPDATE admin_actions SET status = ?, proof = ?, error_code = ?, completed_at = ?, updated_at = ?
-     WHERE action_id = ? AND status = 'claimed' AND runner_token_id = ?`,
+      `UPDATE admin_actions SET status = ?, proof = ?, error_code = ?, proof_token_id = ?,
+       claim_handle_used_at = ?, completed_at = ?, updated_at = ?
+     WHERE action_id = ? AND status = 'claimed' AND claim_handle_used_at IS NULL`,
     )
     .bind(
       nextState,
       JSON.stringify(proof),
-      text(body.error_code) || null,
+      errorCode,
+      proofTokenId,
+      now,
       now,
       now,
       actionId,
-      runnerTokenId,
     )
     .run();
   if (result.meta?.changes !== 1) {
@@ -314,6 +341,7 @@ function sanitizeActionRow(row: ActionRow) {
   const {
     payload_ciphertext: _payloadCiphertext,
     payload_iv: _payloadIv,
+    claim_handle_hash: _claimHandleHash,
     ...safeRow
   } = row;
   return {
@@ -324,14 +352,59 @@ function sanitizeActionRow(row: ActionRow) {
   };
 }
 
-async function sanitizeProof(proof: Record<string, unknown>) {
-  const receipt = text(proof.receipt_ref);
+function sanitizeProof(
+  proof: Record<string, unknown>,
+  state: "succeeded" | "failed",
+): Record<string, string> | Response {
+  const provider = text(proof.provider);
+  const receiptDigest = text(proof.receipt_digest);
+  const observedAt = text(proof.observed_at);
+  const summary = text(proof.summary).trim();
+  const providerState = text(proof.provider_state);
+  try {
+    assertSanitizedAdminActionMetadata({ provider, summary, providerState });
+  } catch {
+    return json({ error: "private_proof_metadata_rejected" }, { status: 400 });
+  }
+  if (!/^[a-z0-9_-]{1,32}$/.test(provider))
+    return json({ error: "proof_provider_invalid" }, { status: 400 });
+  if (!observedAt || !Number.isFinite(Date.parse(observedAt)))
+    return json({ error: "proof_timestamp_invalid" }, { status: 400 });
+  if (!summary || summary.length > 240)
+    return json({ error: "proof_summary_invalid" }, { status: 400 });
+  if (state === "succeeded") {
+    if (!/^[A-Za-z0-9_-]{43}$/.test(receiptDigest))
+      return json({ error: "proof_receipt_invalid" }, { status: 400 });
+    if (providerState !== "accepted")
+      return json({ error: "provider_state_invalid" }, { status: 400 });
+  } else if (
+    !["not_started", "rejected", "unknown", "accepted_unconfirmed"].includes(
+      providerState,
+    )
+  ) {
+    return json({ error: "provider_state_invalid" }, { status: 400 });
+  }
   return {
-    provider: text(proof.provider),
-    receipt_ref: receipt ? await hashOpaqueAdminToken(receipt) : "",
-    observed_at: text(proof.observed_at) || new Date().toISOString(),
-    summary: text(proof.summary),
+    provider,
+    receipt_digest: state === "succeeded" ? receiptDigest : "",
+    observed_at: new Date(observedAt).toISOString(),
+    summary,
+    provider_state: providerState,
   };
+}
+
+function boundedErrorCode(
+  value: unknown,
+  state: "succeeded" | "failed",
+): string | null | Response {
+  const code = text(value);
+  if (state === "succeeded")
+    return code
+      ? json({ error: "error_code_not_allowed" }, { status: 400 })
+      : null;
+  return /^[a-z0-9_]{1,64}$/.test(code)
+    ? code
+    : json({ error: "error_code_invalid" }, { status: 400 });
 }
 
 async function readBody(request: Request): Promise<Record<string, unknown>> {

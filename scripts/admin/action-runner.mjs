@@ -1,6 +1,17 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import {
+  chmod,
+  mkdir,
+  readFile,
+  rename,
+  unlink,
+  writeFile,
+} from "node:fs/promises";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
+import { runAdminAction } from "./action-runner-lib.mjs";
 
 const actionId = valueAfter("--action");
 const execute = process.argv.includes("--execute");
@@ -10,60 +21,32 @@ const proofToken = process.env.ADMIN_ACTION_PROOF_TOKEN;
 if (!actionId) throw new Error("--action is required");
 if (!execute) {
   process.stdout.write(
-    JSON.stringify({
-      ok: true,
-      mode: "dry-run",
-      action_id: actionId,
-      claimed: false,
-    }) + "\n",
+    `${JSON.stringify({ ok: true, mode: "dry-run", action_id: actionId, claimed: false })}\n`,
   );
   process.exit(0);
 }
-if (!baseUrl || !claimToken || !proofToken)
-  throw new Error(
-    "ADMIN_BASE_URL, ADMIN_ACTION_CLAIM_TOKEN, and ADMIN_ACTION_PROOF_TOKEN are required",
-  );
-
-const claim = await api(
-  `/api/admin/actions/${encodeURIComponent(actionId)}/claim`,
-  {},
-  claimToken,
-);
-let proof;
-try {
-  proof = runAdapter(claim.action_type, claim.payload);
-  await api(
-    `/api/admin/actions/${encodeURIComponent(actionId)}/proof`,
-    {
-      succeeded: true,
-      proof,
-    },
-    proofToken,
-  );
-} catch (error) {
-  await api(
-    `/api/admin/actions/${encodeURIComponent(actionId)}/proof`,
-    {
-      succeeded: false,
-      error_code: "provider_command_failed",
-      proof: {
-        provider: providerFor(claim.action_type),
-        summary: "provider command failed",
-        observed_at: new Date().toISOString(),
-      },
-    },
-    proofToken,
-  );
-  throw error;
+if (!baseUrl || !claimToken || !proofToken) {
+  throw new Error("admin action runner configuration is incomplete");
 }
-process.stdout.write(
-  JSON.stringify({
-    ok: true,
-    action_id: actionId,
-    status: "succeeded",
-    receipt_ref: proof.receipt_ref,
-  }) + "\n",
-);
+
+const result = await runAdminAction({
+  actionId,
+  claim: (body) =>
+    api(
+      `/api/admin/actions/${encodeURIComponent(actionId)}/claim`,
+      body,
+      claimToken,
+    ),
+  prove: (body) =>
+    api(
+      `/api/admin/actions/${encodeURIComponent(actionId)}/proof`,
+      body,
+      proofToken,
+    ),
+  adapter: runAdapter,
+  journal: fileJournal(actionId),
+});
+process.stdout.write(`${JSON.stringify(result)}\n`);
 
 async function api(pathname, body, token) {
   const response = await fetch(new URL(pathname, baseUrl), {
@@ -78,6 +61,7 @@ async function api(pathname, body, token) {
     throw new Error(`admin action API rejected with ${response.status}`);
   return response.json();
 }
+
 function runAdapter(type, payload) {
   const common = {
     encoding: "utf8",
@@ -160,15 +144,48 @@ function runAdapter(type, payload) {
     throw new Error("proposal-only action cannot execute");
   }
   const parsed = JSON.parse(output);
+  const providerReceipt = parsed.id ?? parsed.updatedRange;
+  if (typeof providerReceipt !== "string" || !providerReceipt) {
+    throw new Error("provider response omitted its receipt");
+  }
   return {
     provider: providerFor(type),
-    receipt_ref: createHash("sha256")
-      .update(String(parsed.id ?? parsed.updatedRange ?? "provider-accepted"))
+    receipt_digest: createHash("sha256")
+      .update(providerReceipt)
       .digest("base64url"),
     observed_at: new Date().toISOString(),
     summary: "provider accepted the confirmed action",
+    provider_state: "accepted",
   };
 }
+
+function fileJournal(actionId) {
+  const path = join(
+    homedir(),
+    ".local",
+    "state",
+    "anipotts",
+    "admin-action-runner",
+    `${actionId}.json`,
+  );
+  return {
+    async load() {
+      return JSON.parse(await readFile(path, "utf8").catch(() => "null"));
+    },
+    async save(entry) {
+      await mkdir(dirname(path), { recursive: true, mode: 0o700 });
+      await chmod(dirname(path), 0o700);
+      const temporary = `${path}.tmp`;
+      await writeFile(temporary, JSON.stringify(entry), { mode: 0o600 });
+      await rename(temporary, path);
+      await chmod(path, 0o600);
+    },
+    async remove() {
+      await unlink(path).catch(() => undefined);
+    },
+  };
+}
+
 function providerFor(type) {
   return type.includes("gmail")
     ? "gmail"
