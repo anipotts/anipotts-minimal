@@ -57,38 +57,38 @@ const personLd = {
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/brand/favicon-light-32.png?v=20260715c"
+      href="/brand/ap-favicon-light-32.png?v=20260717"
       media="(prefers-color-scheme: light)"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/brand/favicon-dark-32.png?v=20260715c"
+      href="/brand/ap-favicon-dark-32.png?v=20260717"
       media="(prefers-color-scheme: dark)"
     />
     <link
       rel="icon"
-      href="/favicon.svg?v=20260715c"
+      href="/brand/ap-favicon.svg?v=20260717"
       type="image/svg+xml"
       sizes="any"
     />
     <link
       rel="icon"
-      href="/brand/favicon-light.svg?v=20260715c"
+      href="/brand/ap-favicon-light.svg?v=20260717"
       type="image/svg+xml"
       media="(prefers-color-scheme: light)"
     />
     <link
       rel="icon"
-      href="/brand/favicon-dark.svg?v=20260715c"
+      href="/brand/ap-favicon-dark.svg?v=20260717"
       type="image/svg+xml"
       media="(prefers-color-scheme: dark)"
     />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="/brand/apple-touch-icon.png?v=20260715c"
+      href="/brand/apple-touch-icon.png?v=20260717"
     />
     <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
     <meta
@@ -126,17 +126,6 @@ const personLd = {
               ? "dark"
               : "light";
         document.documentElement.dataset.theme = theme;
-
-        const requestedFont = new URLSearchParams(location.search).get("font");
-        const storedFont = localStorage.getItem("font");
-        const font =
-          requestedFont === "geist" || requestedFont === "instrument"
-            ? requestedFont
-            : storedFont === "geist" || storedFont === "instrument"
-              ? storedFont
-              : "instrument";
-        document.documentElement.dataset.font = font;
-        localStorage.setItem("font", font);
       })();
     </script>
     <script
