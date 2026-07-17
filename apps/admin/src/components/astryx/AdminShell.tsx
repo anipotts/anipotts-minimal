@@ -7,6 +7,7 @@ import {
   SideNavItem,
   SideNavSection,
 } from "@astryxdesign/core/SideNav";
+import { StatusDot } from "@astryxdesign/core/StatusDot";
 import type { NavItem } from "../../data/admin";
 
 type AdminShellProps = {
@@ -68,6 +69,15 @@ export function AdminShell({
             }
           />
           <ThemeToggle />
+        </div>
+      }
+      footer={
+        <div className="admin-nav-footer">
+          <div className="admin-nav-footer-row">
+            <StatusDot variant="warning" label="Access outer guard active" />
+            <span>Access on</span>
+          </div>
+          <p>remove only after app-native passkey proof is ready.</p>
         </div>
       }
     >
