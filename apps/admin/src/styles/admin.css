@@ -1,19 +1,54 @@
-@import "@anipotts/styles/tokens-www.css";
 @import "@fontsource-variable/instrument-sans";
-@import "@fontsource/geist-sans";
 @import "@fontsource-variable/jetbrains-mono";
 
 :root {
   color-scheme: light;
+  --brand-dark-blue: #11111b;
+  --brand-blue: #61abea;
+  --brand-white: #ffffff;
+  --brand-display: var(--brand-dark-blue);
+  --interactive: var(--brand-dark-blue);
+  --interactive-ink: var(--brand-white);
+  --focus: var(--brand-dark-blue);
+  --sans:
+    "Instrument Sans Variable", "Instrument Sans", -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --code:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo,
+    monospace;
+  --mono: var(--sans);
+  --bg: var(--brand-white);
+  --surface: color-mix(in srgb, var(--brand-dark-blue) 4%, var(--brand-white));
+  --ink: var(--brand-dark-blue);
+  --ink-muted: color-mix(in srgb, var(--brand-dark-blue) 64%, transparent);
+  --accent: var(--brand-blue);
+  --accent-soft: color-mix(in srgb, var(--brand-blue) 14%, transparent);
+  --border: color-mix(in srgb, var(--brand-dark-blue) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand-dark-blue) 28%, transparent);
+  --p-h1: clamp(2rem, 4vw, 2.9rem);
+  --p-h3: 1.25rem;
+  --p-hero: clamp(2.4rem, 6vw, 4rem);
+  --p-body: clamp(1rem, 0.5vw + 0.9rem, 1.0625rem);
+  --measure: 65ch;
+  --lh-body: 1.65;
+  --lh-tight: 1.1;
   --panel: var(--surface);
-  --panel-strong: #ebe8e0;
+  --panel-strong: color-mix(
+    in srgb,
+    var(--brand-dark-blue) 8%,
+    var(--brand-white)
+  );
   --text: var(--ink);
   --muted: var(--ink-muted);
   --risk: #b45309;
   --danger-border: #c2410c;
   --danger-text: #9a3412;
-  --inverse-ink: #fbfaf7;
-  --field-surface: #f7f5ef;
+  --inverse-ink: var(--interactive-ink);
+  --field-surface: color-mix(
+    in srgb,
+    var(--brand-dark-blue) 2%,
+    var(--brand-white)
+  );
   --warn-border: #d6a950;
   --warn-surface: #fbf4dd;
 }
@@ -25,12 +60,31 @@ html {
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --panel-strong: #252538;
+  --brand-display: var(--brand-blue);
+  --interactive: var(--brand-blue);
+  --interactive-ink: var(--brand-dark-blue);
+  --focus: var(--brand-blue);
+  --bg: var(--brand-dark-blue);
+  --surface: color-mix(in srgb, var(--brand-white) 6%, var(--brand-dark-blue));
+  --ink: var(--brand-white);
+  --ink-muted: color-mix(in srgb, var(--brand-white) 64%, transparent);
+  --accent-soft: color-mix(in srgb, var(--brand-blue) 18%, transparent);
+  --border: color-mix(in srgb, var(--brand-white) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand-white) 28%, transparent);
+  --panel-strong: color-mix(
+    in srgb,
+    var(--brand-white) 10%,
+    var(--brand-dark-blue)
+  );
   --risk: #f9e2af;
   --danger-border: #f38ba8;
   --danger-text: #f38ba8;
-  --inverse-ink: #11111b;
-  --field-surface: #181825;
+  --inverse-ink: var(--interactive-ink);
+  --field-surface: color-mix(
+    in srgb,
+    var(--brand-white) 4%,
+    var(--brand-dark-blue)
+  );
   --warn-border: #f9e2af;
   --warn-surface: #1f1d2a;
 }
@@ -54,6 +108,18 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--code);
 }
 
 .shell {
@@ -249,7 +315,7 @@ td {
 
 .route-row:hover strong,
 .quiet-links a:hover {
-  color: var(--accent);
+  color: var(--interactive);
 }
 
 .inbox-shell {
@@ -412,7 +478,7 @@ td {
 }
 
 .section-header > a:hover {
-  color: var(--accent);
+  color: var(--interactive);
 }
 
 .inbox-card-list,
@@ -483,8 +549,8 @@ td {
 }
 
 .inbox-card footer a:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--interactive);
+  color: var(--interactive);
 }
 
 .inbox-card > small {
@@ -838,13 +904,13 @@ main.auth-main {
 }
 
 .panel-link {
-  color: var(--accent);
+  color: var(--interactive);
   font-size: 13px;
   font-weight: 650;
 }
 
 .risk-low {
-  color: var(--accent);
+  color: var(--color-success);
 }
 
 .risk-medium,
@@ -898,9 +964,9 @@ th {
 }
 
 .button {
-  border: 1px solid var(--border);
-  background: var(--accent);
-  color: var(--inverse-ink);
+  border: 1px solid var(--interactive);
+  background: var(--interactive);
+  color: var(--interactive-ink);
   padding: 10px 12px;
   font: inherit;
   font-size: 14px;
@@ -909,7 +975,8 @@ th {
 
 .button.secondary {
   background: transparent;
-  color: var(--text);
+  border-color: var(--border-strong);
+  color: var(--interactive);
 }
 
 .button.danger {
@@ -1354,7 +1421,7 @@ th {
 }
 
 .workflow-action:hover strong {
-  color: var(--accent);
+  color: var(--interactive);
 }
 
 .surface-grid,
@@ -1625,7 +1692,7 @@ dt,
 }
 
 .section-head span {
-  color: var(--accent);
+  color: var(--interactive);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -1713,7 +1780,7 @@ dd {
 }
 
 .field-chip small {
-  color: var(--accent);
+  color: var(--interactive);
   font-size: 11px;
 }
 
@@ -2612,14 +2679,14 @@ html[data-astryx-theme="neutral"] {
   --color-background-surface: var(--surface);
   --color-background-card: var(--surface);
   --color-background-muted: color-mix(in srgb, var(--surface) 76%, var(--bg));
-  --color-accent: var(--accent);
-  --color-accent-muted: var(--accent-soft);
+  --color-accent: var(--interactive);
+  --color-accent-muted: color-mix(in srgb, var(--interactive) 14%, transparent);
   --color-text-primary: var(--ink);
   --color-text-secondary: var(--ink-muted);
-  --color-text-accent: var(--accent);
-  --color-on-accent: var(--inverse-ink);
+  --color-text-accent: var(--interactive);
+  --color-on-accent: var(--interactive-ink);
   --color-border: var(--border);
-  --color-border-emphasized: color-mix(in srgb, var(--ink) 20%, transparent);
+  --color-border-emphasized: var(--border-strong);
 }
 
 html[data-astryx-theme="neutral"][data-theme="light"] {
@@ -2639,7 +2706,7 @@ html[data-astryx-theme="neutral"] body {
 }
 
 html[data-astryx-theme="neutral"] a {
-  color: var(--color-text-primary);
+  color: var(--interactive);
 }
 
 .admin-astryx-root {
@@ -2657,13 +2724,22 @@ html[data-astryx-theme="neutral"] a {
   background: var(--color-background-surface);
 }
 
+.admin-nav-header {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-nav-header .admin-theme-toggle {
+  justify-self: start;
+}
+
 .admin-mark {
   display: grid;
   width: 28px;
   height: 28px;
   place-items: center;
-  border: 1px solid var(--color-border-emphasized);
-  border-radius: 6px;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
   background: transparent;
 }
@@ -2717,6 +2793,10 @@ html[data-astryx-theme="neutral"] a {
   border-color: var(--color-border-emphasized);
 }
 
+.admin-theme-toggle:focus-visible {
+  outline-color: var(--focus);
+}
+
 .admin-mobile-strip {
   display: none;
 }
@@ -2758,6 +2838,7 @@ html[data-astryx-theme="neutral"] .page-header h1 {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0;
+  color: var(--color-text-primary);
 }
 
 html[data-astryx-theme="neutral"] .page-header > span {
@@ -2842,6 +2923,19 @@ html[data-astryx-theme="neutral"] dd,
 
 html[data-astryx-theme="neutral"] .button {
   border-radius: 6px;
+}
+
+html[data-astryx-theme="neutral"] .button:not(.danger):not(.ghost) {
+  border-color: var(--interactive);
+  background: var(--interactive);
+  color: var(--interactive-ink);
+}
+
+html[data-astryx-theme="neutral"] .button.secondary,
+html[data-astryx-theme="neutral"] .button.ghost {
+  border-color: var(--color-border-emphasized);
+  background: transparent;
+  color: var(--interactive);
 }
 
 .minimal-home {
@@ -3147,6 +3241,10 @@ html[data-astryx-theme="neutral"] .button {
 }
 
 @media (max-width: 900px) {
+  .admin-side-nav {
+    display: none;
+  }
+
   .admin-page-frame {
     padding: 18px;
   }

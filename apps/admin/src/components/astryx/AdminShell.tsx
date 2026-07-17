@@ -7,7 +7,6 @@ import {
   SideNavItem,
   SideNavSection,
 } from "@astryxdesign/core/SideNav";
-import { StatusDot } from "@astryxdesign/core/StatusDot";
 import type { NavItem } from "../../data/admin";
 
 type AdminShellProps = {
@@ -57,24 +56,17 @@ export function AdminShell({
     <SideNav
       className="admin-side-nav"
       header={
-        <SideNavHeading
-          heading="anipotts admin"
-          headingHref="/inbox"
-          subheading="operator console"
-          icon={
-            <span className="admin-mark" aria-hidden="true">
-              <img src="/apple-touch-icon.png" alt="" />
-            </span>
-          }
-        />
-      }
-      footer={
-        <div className="admin-nav-footer">
-          <div className="admin-nav-footer-row">
-            <StatusDot variant="warning" label="Access outer guard active" />
-            <span>Access on</span>
-          </div>
-          <p>remove only after app-native passkey proof is ready.</p>
+        <div className="admin-nav-header">
+          <SideNavHeading
+            heading="anipotts admin"
+            headingHref="/inbox"
+            subheading="operator console"
+            icon={
+              <span className="admin-mark" aria-hidden="true">
+                <img src="/apple-touch-icon.png" alt="" />
+              </span>
+            }
+          />
           <ThemeToggle />
         </div>
       }
