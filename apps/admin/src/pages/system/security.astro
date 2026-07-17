@@ -197,7 +197,10 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     setMessage("waiting for passkey");
     const response = await fetch("/api/admin/passkey/register-options", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        "x-admin-csrf": "same-origin",
+      },
       body: "{}",
     });
     if (!response.ok) return setMessage("registration unavailable");

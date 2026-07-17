@@ -111,7 +111,10 @@ function sanitizeReturnPath(path: string | null): string {
     try {
       const optionsResponse = await fetch("/api/admin/passkey/login-options", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "x-admin-csrf": "same-origin",
+        },
         body: "{}",
       });
       if (!optionsResponse.ok) throw new Error("passkey unavailable");
@@ -120,7 +123,10 @@ function sanitizeReturnPath(path: string | null): string {
       const credential = await startAuthentication({ optionsJSON: options });
       const verify = await fetch("/api/admin/passkey/login-verify", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "x-admin-csrf": "same-origin",
+        },
         body: JSON.stringify(credential),
       });
       if (!verify.ok) throw new Error("passkey denied");

@@ -221,18 +221,27 @@ export async function openCareerSourceLink(
     return json({ error: "source_link_not_found" }, { status: 404 });
   }
   const { decryptAdminPayload } = await import("@anipotts/lib/admin");
-  const payload = await decryptAdminPayload<{ locator: string }>(
-    { ciphertext: row.locator_ciphertext, iv: row.locator_iv },
-    resolveAdminEncryptionKey(keyring, row.key_version),
-  );
+  let payload: { locator: string };
+  try {
+    payload = await decryptAdminPayload<{ locator: string }>(
+      { ciphertext: row.locator_ciphertext, iv: row.locator_iv },
+      resolveAdminEncryptionKey(keyring, row.key_version),
+    );
+  } catch {
+    return json({ error: "source_link_invalid" }, { status: 404 });
+  }
   if (!allowedSourceLocator(payload.locator))
-    return json({ error: "source_locator_not_allowed" }, { status: 400 });
-  await db
-    .prepare(
-      `UPDATE admin_source_links SET last_opened_at = ? WHERE source_link_id = ?`,
-    )
-    .bind(new Date().toISOString(), sourceLinkId)
-    .run();
+    return json({ error: "source_link_not_allowed" }, { status: 400 });
+  try {
+    await db
+      .prepare(
+        `UPDATE admin_source_links SET last_opened_at = ? WHERE source_link_id = ?`,
+      )
+      .bind(new Date().toISOString(), sourceLinkId)
+      .run();
+  } catch {
+    return json({ error: "source_link_audit_failed" }, { status: 503 });
+  }
   return new Response(null, {
     status: 302,
     headers: {

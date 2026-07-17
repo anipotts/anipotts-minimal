@@ -21,6 +21,7 @@ import {
   type PasskeyProofItem,
   type RequiredPasskeyAuditEvent,
 } from "@anipotts/content/admin";
+import { assertSameOriginMutation } from "@anipotts/lib/admin";
 
 export const PASSKEY_SESSION_COOKIE = "admin_passkey_session";
 
@@ -307,6 +308,7 @@ export async function getPasskeyActor(
 export async function registrationOptions(
   context: PasskeyContext,
 ): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = requiredDb(context);
   const status = await getPasskeyStatus(context);
   if (!status.can_register) {
@@ -348,6 +350,7 @@ export async function registrationOptions(
 export async function verifyRegistration(
   context: PasskeyContext,
 ): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = requiredDb(context);
   const body = (await context.request.json()) as RegistrationResponseJSON;
   const challenge = await consumeChallenge(db, "registration");
@@ -412,6 +415,7 @@ export async function verifyRegistration(
 export async function authenticationOptions(
   context: PasskeyContext,
 ): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = requiredDb(context);
   const credentials = await listActiveCredentials(db);
   if (credentials.length === 0) {
@@ -450,6 +454,7 @@ export async function authenticationOptions(
 export async function verifyAuthentication(
   context: PasskeyContext,
 ): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = requiredDb(context);
   const body = (await context.request.json()) as AuthenticationResponseJSON;
   const credential = await findCredential(db, body.id);
@@ -536,6 +541,7 @@ export async function verifyAuthentication(
 }
 
 export async function logout(context: PasskeyContext): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = dbFromContext(context);
   const token = context.cookies.get(PASSKEY_SESSION_COOKIE)?.value;
   if (db && token) {
@@ -566,6 +572,7 @@ export async function logout(context: PasskeyContext): Promise<Response> {
 export async function revokeCurrentCredential(
   context: PasskeyContext,
 ): Promise<Response> {
+  assertSameOriginMutation(context.request);
   const db = requiredDb(context);
   const session = await getSession(context, db);
   if (!session) {
