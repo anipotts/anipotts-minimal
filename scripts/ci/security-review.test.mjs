@@ -68,6 +68,13 @@ const fakeFiles = new Map([
 `,
   ],
   ["drizzle/migrations/0100_public_metadata.sql", publicSqlMetadataAssignment],
+  [
+    "packages/content/src/admin/runtime.ts",
+    `const safety = {
+  secret_values_included: value.secret_values_included,
+};
+`,
+  ],
 ]);
 
 function readFake(file) {
@@ -95,6 +102,11 @@ assert.deepEqual(findings.map((finding) => finding.rule).sort(), [
 ]);
 
 assert.deepEqual(reviewFiles([".github/workflows/deploy.yml"], readFake), []);
+
+assert.deepEqual(
+  reviewFiles(["packages/content/src/admin/runtime.ts"], readFake),
+  [],
+);
 
 assert.deepEqual(
   reviewFiles(["scripts/env.ts", "packages/lib/src/types.ts"], (file) =>

@@ -134,6 +134,7 @@ function scanForSecrets(file, content) {
         id === "inline-secret-assignment" &&
         (isPublicMetadataAssignment(line) ||
           isEnvironmentReference(line) ||
+          isPropertyReferenceAssignment(line) ||
           isTypeOnlyDeclaration(line))
       ) {
         continue;
@@ -157,6 +158,12 @@ function isEnvironmentReference(line) {
 
 function isTypeOnlyDeclaration(line) {
   return /^\s*[A-Za-z_$][A-Za-z0-9_$]*\??:\s*[A-Z][A-Za-z0-9_$<>,[\]. |]+;\s*$/.test(
+    line,
+  );
+}
+
+function isPropertyReferenceAssignment(line) {
+  return /[=:]\s*[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)+\s*[,;]?\s*$/.test(
     line,
   );
 }
