@@ -9,6 +9,7 @@ import {
   decryptAdminPayload,
   encryptAdminPayload,
   hashAdminPasswordWeb,
+  hashAdminActionPayload,
   hashOpaqueAdminToken,
   hasAdminMachineScope,
   importAdminEncryptionKey,
@@ -38,6 +39,43 @@ describe("native admin control", () => {
     expect(await hashOpaqueAdminToken(token)).toBe(
       await hashOpaqueAdminToken(token),
     );
+  });
+
+  it("fingerprints canonical action payloads without retaining content", async () => {
+    const first = await hashAdminActionPayload({
+      payload: { content: "private", recipient: "safe-test@example.com" },
+      preview: { summary: "confirmed action" },
+    });
+    const reordered = await hashAdminActionPayload({
+      preview: { summary: "confirmed action" },
+      payload: { recipient: "safe-test@example.com", content: "private" },
+    });
+    const changed = await hashAdminActionPayload({
+      preview: { summary: "confirmed action" },
+      payload: { recipient: "safe-test@example.com", content: "changed" },
+    });
+    expect(first).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(first).toBe(reordered);
+    expect(first).not.toBe(changed);
+    expect(first).not.toContain("private");
+  });
+
+  it("uses locale-independent ordinal key order for fingerprints", async () => {
+    const fingerprint = await hashAdminActionPayload({
+      ä: 4,
+      a: 3,
+      "!": 1,
+      A: 2,
+    });
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode('{"!":1,"A":2,"a":3,"ä":4}'),
+    );
+    const expected = btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
+    expect(fingerprint).toBe(expected);
   });
 
   it("encrypts action payloads with AES-GCM", async () => {

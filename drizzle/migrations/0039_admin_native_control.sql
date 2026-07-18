@@ -119,6 +119,10 @@ CREATE TABLE IF NOT EXISTS admin_actions (
   payload_ciphertext TEXT NOT NULL,
   payload_iv TEXT NOT NULL,
   key_version INTEGER NOT NULL,
+  payload_fingerprint TEXT NOT NULL CHECK (length(payload_fingerprint) = 43),
+  approved_payload_fingerprint TEXT CHECK (
+    approved_payload_fingerprint IS NULL OR length(approved_payload_fingerprint) = 43
+  ),
   proof_requirement TEXT NOT NULL,
   created_by TEXT NOT NULL,
   runner_token_id TEXT,

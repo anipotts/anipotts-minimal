@@ -2,16 +2,21 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   createOpaqueAdminToken,
   encryptAdminPayload,
+  hashAdminActionPayload,
   importAdminEncryptionKey,
 } from "@anipotts/lib/admin";
 import {
+  approveAdminAction,
   claimAdminAction,
   proveAdminAction,
   proposeAdminAction,
+  reviseAdminAction,
 } from "./admin-actions";
+import { PATCH as patchAdminAction } from "../pages/api/admin/actions/index";
 
 let encodedKey: string;
 let encrypted: Awaited<ReturnType<typeof encryptAdminPayload>>;
+let payloadFingerprint: string;
 
 beforeAll(async () => {
   encodedKey = createOpaqueAdminToken();
@@ -20,6 +25,14 @@ beforeAll(async () => {
     await importAdminEncryptionKey(encodedKey),
     1,
   );
+  payloadFingerprint = await hashAdminActionPayload({
+    domain: "career",
+    action_type: "career.gmail.send",
+    exact_scope: {},
+    preview: {},
+    payload: { operation: "safe" },
+    proof_requirement: "provider receipt",
+  });
 });
 
 class ActionDb {
@@ -37,6 +50,8 @@ class ActionDb {
       payload_ciphertext: encrypted.ciphertext,
       payload_iv: encrypted.iv,
       key_version: 1,
+      payload_fingerprint: payloadFingerprint,
+      approved_payload_fingerprint: payloadFingerprint,
       proof_requirement: "provider receipt",
       created_by: "ani",
       runner_token_id: null,
@@ -89,6 +104,43 @@ class ActionDb {
           db.row.claimed_at = values[3];
           return { meta: { changes: 1 } };
         }
+        if (query.includes("payload_ciphertext = ?")) {
+          if (!["proposed", "approved"].includes(String(db.row.status))) {
+            return { meta: { changes: 0 } };
+          }
+          if (db.row.payload_fingerprint !== values[9]) {
+            return { meta: { changes: 0 } };
+          }
+          db.row.status = "proposed";
+          db.row.exact_scope = values[0];
+          db.row.preview = values[1];
+          db.row.payload_ciphertext = values[2];
+          db.row.payload_iv = values[3];
+          db.row.key_version = values[4];
+          db.row.payload_fingerprint = values[5];
+          db.row.approved_payload_fingerprint = null;
+          db.row.proof_requirement = values[6];
+          db.row.approved_at = null;
+          return { meta: { changes: 1 } };
+        }
+        if (query.includes("SET status = 'approved'")) {
+          if (
+            db.row.status !== "proposed" ||
+            db.row.payload_fingerprint !== values[4]
+          ) {
+            return { meta: { changes: 0 } };
+          }
+          db.row.status = "approved";
+          db.row.approved_payload_fingerprint = values[0];
+          db.row.approved_at = values[1];
+          return { meta: { changes: 1 } };
+        }
+        if (query.includes("approved_payload_fingerprint = NULL")) {
+          db.row.status = "proposed";
+          db.row.approved_payload_fingerprint = null;
+          db.row.approved_at = null;
+          return { meta: { changes: 1 } };
+        }
         return { meta: { changes: 1 } };
       },
     };
@@ -114,6 +166,39 @@ function context(db: ActionDb, body: Record<string, unknown> = {}) {
     ),
     locals: {
       runtime: { env: { DB: db, ADMIN_ACTION_ENCRYPTION_KEY: encodedKey } },
+    },
+  } as never;
+}
+
+function routeContext(
+  body: Record<string, unknown>,
+  options: {
+    origin?: string;
+    db?: unknown;
+    onDatabaseAccess?: () => void;
+  } = {},
+) {
+  const request = new Request("https://admin.anipotts.com/api/admin/actions", {
+    method: "PATCH",
+    headers: {
+      origin: options.origin ?? "https://admin.anipotts.com",
+      "content-type": "application/json",
+      "x-admin-csrf": "same-origin",
+    },
+    body: JSON.stringify(body),
+  });
+  return {
+    request,
+    url: new URL(request.url),
+    locals: {
+      runtime: {
+        env: {
+          get DB() {
+            options.onDatabaseAccess?.();
+            return options.db;
+          },
+        },
+      },
     },
   } as never;
 }
@@ -175,6 +260,146 @@ describe("admin action service boundary", () => {
     expect(response.status).toBe(200);
     expect(db.row.runner_token_id).toBe("claim-token-id");
     expect(db.row.proof_token_id).toBe("proof-token-id");
+  });
+
+  it("binds approval to the canonical payload fingerprint and rejects replay", async () => {
+    const db = new ActionDb();
+    db.row.status = "proposed";
+    db.row.approved_payload_fingerprint = null;
+    db.row.approved_at = null;
+    const approved = await approveAdminAction(context(db), "action-safe");
+    expect(approved.status).toBe(200);
+    expect(db.row.approved_payload_fingerprint).toBe(payloadFingerprint);
+    expect((await approveAdminAction(context(db), "action-safe")).status).toBe(
+      409,
+    );
+  });
+
+  it("requires renewed approval after a payload change", async () => {
+    const db = new ActionDb();
+    const revised = await reviseAdminAction(
+      context(db, {
+        expected_payload_fingerprint: payloadFingerprint,
+        exact_scope: {},
+        preview: { summary: "changed confirmed action" },
+        payload: { operation: "changed" },
+        proof_requirement: "provider receipt",
+      }),
+      "action-safe",
+    );
+    expect(revised.status).toBe(200);
+    const revision = await revised.json();
+    expect(revision).toMatchObject({
+      status: "proposed",
+      approval_required: true,
+      approval_renewed: true,
+    });
+    expect(revision.payload_fingerprint).not.toBe(payloadFingerprint);
+    expect(db.row.approved_payload_fingerprint).toBeNull();
+    expect(
+      (
+        await reviseAdminAction(
+          context(db, {
+            expected_payload_fingerprint: payloadFingerprint,
+            exact_scope: {},
+            preview: { summary: "changed confirmed action" },
+            payload: { operation: "changed" },
+            proof_requirement: "provider receipt",
+          }),
+          "action-safe",
+        )
+      ).status,
+    ).toBe(409);
+    expect(
+      (await claimAdminAction(context(db), "action-safe", "claim-token-id"))
+        .status,
+    ).toBe(409);
+    expect((await approveAdminAction(context(db), "action-safe")).status).toBe(
+      200,
+    );
+    expect(
+      (await claimAdminAction(context(db), "action-safe", "claim-token-id"))
+        .status,
+    ).toBe(200);
+  });
+
+  it("keeps an identical approved payload revision idempotent", async () => {
+    const db = new ActionDb();
+    const response = await reviseAdminAction(
+      context(db, {
+        expected_payload_fingerprint: payloadFingerprint,
+        exact_scope: {},
+        preview: {},
+        payload: { operation: "safe" },
+        proof_requirement: "provider receipt",
+      }),
+      "action-safe",
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: "approved",
+      payload_fingerprint: payloadFingerprint,
+      approval_required: false,
+      idempotent: true,
+    });
+    expect(db.row.approved_payload_fingerprint).toBe(payloadFingerprint);
+  });
+
+  it("rejects an identical revision when ciphertext integrity is lost", async () => {
+    const db = new ActionDb();
+    db.row.payload_ciphertext = `${String(db.row.payload_ciphertext).startsWith("A") ? "B" : "A"}${String(db.row.payload_ciphertext).slice(1)}`;
+    const response = await reviseAdminAction(
+      context(db, {
+        expected_payload_fingerprint: payloadFingerprint,
+        exact_scope: {},
+        preview: {},
+        payload: { operation: "safe" },
+        proof_requirement: "provider receipt",
+      }),
+      "action-safe",
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: "action_payload_integrity_failed",
+    });
+  });
+
+  it("rejects identical revision with null or stale approval binding", async () => {
+    for (const approvedFingerprint of [null, "c".repeat(43)]) {
+      const db = new ActionDb();
+      db.row.approved_payload_fingerprint = approvedFingerprint;
+      const response = await reviseAdminAction(
+        context(db, {
+          expected_payload_fingerprint: payloadFingerprint,
+          exact_scope: {},
+          preview: {},
+          payload: { operation: "safe" },
+          proof_requirement: "provider receipt",
+        }),
+        "action-safe",
+      );
+      expect(response.status).toBe(409);
+      expect(await response.json()).toEqual({
+        error: "action_approval_required",
+      });
+      expect(db.row.status).toBe("proposed");
+    }
+  });
+
+  it("fails closed when stored payload and fingerprint diverge", async () => {
+    const db = new ActionDb();
+    db.row.payload_fingerprint = "b".repeat(43);
+    const response = await claimAdminAction(
+      context(db),
+      "action-safe",
+      "claim-token-id",
+    );
+    expect(response.status).toBe(409);
+    const body = await response.json();
+    expect(body).toEqual({
+      error: "action_payload_integrity_failed",
+    });
+    expect(JSON.stringify(body)).not.toContain(encrypted.ciphertext);
   });
 
   it("fails closed for missing, wrong, and reused handles plus duplicate claims", async () => {
@@ -311,5 +536,72 @@ describe("admin action service boundary", () => {
         )
       ).status,
     ).toBe(200);
+  });
+});
+
+describe("admin action revision route", () => {
+  it("rejects missing or invalid action ids before database access", async () => {
+    for (const actionId of [undefined, "bad/action"]) {
+      let databaseAccessed = false;
+      const response = await patchAdminAction(
+        routeContext(
+          {
+            action_id: actionId,
+            expected_payload_fingerprint: "a".repeat(43),
+          },
+          { onDatabaseAccess: () => (databaseAccessed = true) },
+        ),
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: "action_id_invalid" });
+      expect(databaseAccessed).toBe(false);
+    }
+  });
+
+  it("enforces same-origin mutation guard before database access", async () => {
+    let databaseAccessed = false;
+    const response = await patchAdminAction(
+      routeContext(
+        { action_id: "action-safe" },
+        {
+          origin: "https://outside.invalid",
+          onDatabaseAccess: () => (databaseAccessed = true),
+        },
+      ),
+    );
+    expect(response.status).toBe(400);
+    expect(databaseAccessed).toBe(false);
+  });
+
+  it("rejects a stale payload fingerprint through the route", async () => {
+    const row = {
+      action_id: "action-safe",
+      status: "approved",
+      expires_at: "2099-07-18T12:00:00.000Z",
+      payload_fingerprint: "b".repeat(43),
+    };
+    const db = {
+      prepare() {
+        return {
+          bind() {
+            return this;
+          },
+          async first() {
+            return row;
+          },
+        };
+      },
+    };
+    const response = await patchAdminAction(
+      routeContext(
+        {
+          action_id: "action-safe",
+          expected_payload_fingerprint: "a".repeat(43),
+        },
+        { db },
+      ),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({ error: "action_payload_conflict" });
   });
 });

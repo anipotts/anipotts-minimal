@@ -378,6 +378,44 @@ export async function encryptAdminPayload(
   };
 }
 
+export async function hashAdminActionPayload(
+  payload: unknown,
+): Promise<string> {
+  const canonical = JSON.stringify(canonicalizeAdminActionPayload(payload));
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    encoder.encode(canonical),
+  );
+  return toBase64Url(new Uint8Array(digest));
+}
+
+function canonicalizeAdminActionPayload(value: unknown): unknown {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new Error("admin action payload contains a non-finite number");
+    }
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(canonicalizeAdminActionPayload);
+  }
+  if (typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+        .map(([key, item]) => [key, canonicalizeAdminActionPayload(item)]),
+    );
+  }
+  throw new Error("admin action payload is not JSON serializable");
+}
+
 export async function decryptAdminPayload<T>(
   encrypted: { ciphertext: string; iv: string },
   key: CryptoKey,

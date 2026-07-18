@@ -28,6 +28,7 @@ export {
   decryptAdminPayload,
   encryptAdminPayload,
   hashAdminPasswordWeb,
+  hashAdminActionPayload,
   hashOpaqueAdminToken,
   hasAdminMachineScope,
   importAdminEncryptionKey,

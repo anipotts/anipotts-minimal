@@ -14,6 +14,7 @@
  */
 
 import {
+  check,
   sqliteTable,
   text,
   integer,
@@ -21,6 +22,7 @@ import {
   primaryKey,
   real,
 } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
 // 1. thoughts (blog posts / content)
@@ -1283,9 +1285,15 @@ export const adminActions = sqliteTable(
     payload_ciphertext: text("payload_ciphertext").notNull(),
     payload_iv: text("payload_iv").notNull(),
     key_version: integer("key_version").notNull(),
+    payload_fingerprint: text("payload_fingerprint").notNull(),
+    approved_payload_fingerprint: text("approved_payload_fingerprint"),
     proof_requirement: text("proof_requirement").notNull(),
     created_by: text("created_by").notNull(),
     runner_token_id: text("runner_token_id"),
+    proof_token_id: text("proof_token_id"),
+    claim_handle_hash: text("claim_handle_hash").unique(),
+    claim_handle_used_at: text("claim_handle_used_at"),
+    execution_started_at: text("execution_started_at"),
     error_code: text("error_code"),
     proof: text("proof"),
     created_at: text("created_at").notNull(),
@@ -1296,6 +1304,14 @@ export const adminActions = sqliteTable(
     expires_at: text("expires_at").notNull(),
   },
   (table) => [
+    check(
+      "admin_actions_payload_fingerprint_length",
+      sql`length(${table.payload_fingerprint}) = 43`,
+    ),
+    check(
+      "admin_actions_approved_payload_fingerprint_length",
+      sql`${table.approved_payload_fingerprint} IS NULL OR length(${table.approved_payload_fingerprint}) = 43`,
+    ),
     index("idx_admin_actions_queue").on(
       table.status,
       table.domain,
