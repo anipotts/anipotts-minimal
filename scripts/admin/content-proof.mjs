@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { PUBLIC_SMOKE_ROUTES } from "../ci/public-route-inventory.mjs";
 
 const ADMIN_ORIGIN =
   process.env.ADMIN_ORIGIN?.replace(/\/$/, "") ?? "https://admin.anipotts.com";
@@ -83,28 +84,7 @@ const ADMIN_ROUTES = [
   "/content/operations",
   "/proof",
 ];
-const PUBLIC_ROUTES = [
-  "/",
-  "/newsletter",
-  "/newsletter/archive",
-  "/making",
-  "/orchestrating",
-  "/projects",
-  "/projects/chainedchat",
-  "/projects/claude-code-tips",
-  "/projects/imessage-mcp",
-  "/projects/nyu-purity-test",
-  "/projects/options-pricing-sensitivity",
-  "/projects/pgi-research-platform",
-  "/projects/quantercise",
-  "/projects/quantercise-extension",
-  "/projects/saeshify",
-  "/writing",
-  "/writing/i-built-a-monitor-for-my-claude-code-sessions",
-  "/writing/saturdays-are-for-claude-code",
-  "/writing/search-will-be-dead-by-2030",
-  "/writing/stop-ending-your-day-with-fix-the-bug",
-];
+const PUBLIC_ROUTES = PUBLIC_SMOKE_ROUTES;
 const DETAIL_PAGE_PROOF = {
   "project:chainedchat": {
     route: "/projects/chainedchat",
