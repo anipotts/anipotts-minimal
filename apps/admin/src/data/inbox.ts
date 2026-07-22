@@ -35,6 +35,7 @@ export type AdminInboxTimeframe =
 
 export type AdminInboxItem = {
   id: string;
+  entity_id: string;
   dedupe_key: string;
   source: string;
   owner: string;
@@ -92,9 +93,10 @@ export async function readAdminInbox(
       .filter((entry) => entry.status !== "verified")
       .map<AdminInboxItem>((entry) => ({
         id: entry.id,
+        entity_id: entityIdFor(`proof:${entry.id}`),
         dedupe_key: `proof:${entry.id}`,
         source: entry.kind === "auth" ? "auth" : "deploy",
-        owner: "site/admin",
+        owner: "chief/anipotts.com",
         action_kind: "verify",
         title: entry.title,
         summary: entry.summary,
@@ -123,6 +125,7 @@ export async function readAdminInbox(
 
         return {
           id: operation.operation_id,
+          entity_id: entityIdFor(`content-operation:${operation.operation_id}`),
           dedupe_key: `content-operation:${operation.operation_id}`,
           source: "content",
           owner: operation.created_by,
@@ -152,6 +155,7 @@ export async function readAdminInbox(
       )
       .map<AdminInboxItem>((overlay) => ({
         id: overlay.repo_state_id,
+        entity_id: entityIdFor(`fleet:${overlay.repo_state_id}`),
         dedupe_key: `fleet:${overlay.repo_state_id}`,
         source: "fleet",
         owner: "chief/infra",
@@ -180,6 +184,7 @@ export async function readAdminInbox(
 
         return {
           id: item.item_id,
+          entity_id: entityIdFor(item.dedupe_key),
           dedupe_key: item.dedupe_key,
           source: "gmail",
           owner: item.owner,
@@ -203,9 +208,10 @@ export async function readAdminInbox(
       .slice(0, 4)
       .map<AdminInboxItem>((draft) => ({
         id: draft.id,
+        entity_id: entityIdFor(`newsletter:${draft.id}`),
         dedupe_key: `newsletter:${draft.id}`,
         source: "newsletter",
-        owner: "chief/site",
+        owner: "chief/anipotts.com",
         action_kind: "review",
         title: draft.title,
         summary: draft.summary,
@@ -230,6 +236,7 @@ export async function readAdminInbox(
 
         return {
           id: post.id,
+          entity_id: entityIdFor(`carousel:${post.id}`),
           dedupe_key: `carousel:${post.id}`,
           source: "carousel",
           owner: "media/carousels",
@@ -252,9 +259,10 @@ export async function readAdminInbox(
   if (control.errors.length > 0) {
     items.push({
       id: "admin-control.read-unavailable",
+      entity_id: entityIdFor("admin-control:read-unavailable"),
       dedupe_key: "admin-control:read-unavailable",
       source: "system",
-      owner: "site/admin",
+      owner: "chief/anipotts.com",
       action_kind: "verify",
       title: "admin projection read is partial",
       summary: `${control.errors.length} projection sources could not return live D1 state.`,
@@ -274,9 +282,10 @@ export async function readAdminInbox(
   if (pageContent.mode !== "ready") {
     items.push({
       id: "content.page-content.unavailable",
+      entity_id: entityIdFor("content:page-content:unavailable"),
       dedupe_key: "content:page-content:unavailable",
       source: "content",
-      owner: "chief/site",
+      owner: "chief/anipotts.com",
       action_kind: "verify",
       title: "page_content read unavailable",
       summary:
@@ -332,6 +341,7 @@ function inboxItemFromProjection(
 
   return {
     id: item.item_id,
+    entity_id: entityIdFor(item.dedupe_key),
     dedupe_key: item.dedupe_key,
     source: item.source,
     owner: item.owner,
@@ -440,4 +450,11 @@ function score(item: AdminInboxItem): number {
   const timeframe =
     item.timeframe === "now" ? 4 : item.timeframe === "today" ? 2 : 0;
   return risk + action + timeframe;
+}
+
+function entityIdFor(dedupeKey: string): string {
+  return `entity-${dedupeKey
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 }

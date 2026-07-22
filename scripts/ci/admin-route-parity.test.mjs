@@ -13,6 +13,14 @@ const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const inboxDataSource = readFileSync("apps/admin/src/data/inbox.ts", "utf8");
 const inboxSource = readFileSync("apps/admin/src/pages/inbox.astro", "utf8");
 const rootSource = readFileSync("apps/admin/src/pages/index.astro", "utf8");
+const homeSource = readFileSync(
+  "apps/admin/src/components/AdminHome.astro",
+  "utf8",
+);
+const lifecycleSource = readFileSync(
+  "packages/lib/src/admin-control/work-lifecycle.ts",
+  "utf8",
+);
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
 const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
@@ -142,8 +150,21 @@ assert.equal(
   "admin nav must expose one primary inbox entry",
 );
 assert.ok(
-  rootSource.includes('return Astro.redirect("/inbox", 302)'),
-  "admin root must redirect to the canonical inbox",
+  rootSource.includes('import AdminHome from "../components/AdminHome.astro"'),
+  "admin root must render the canonical home projection",
+);
+assert.ok(
+  inboxSource.includes('import AdminHome from "../components/AdminHome.astro"'),
+  "/inbox must render the same canonical home projection",
+);
+assert.equal(
+  inboxSource,
+  rootSource,
+  "/ and /inbox must resolve the identical attention component",
+);
+assert.ok(
+  navSource.includes('href: "/",\n    label: "inbox"'),
+  "admin inbox navigation must use the canonical root URL",
 );
 for (const file of retiredActionQueueFiles) {
   assert.equal(existsSync(file), false, `${file} must stay retired`);
@@ -170,15 +191,46 @@ for (const marker of [
   'id: "income"',
   'id: "system"',
   "data-copy-text",
+  "data-attention-id",
+  "data-entity-id",
   "data-astro-rerun",
-  "inboxCopyBound",
+  "adminHomeBound",
   'target.closest("[data-copy-text]")',
-  "action queue",
+  "what needs attention",
   "inbox-category-filter",
-  "recurring monitor not connected",
+  "refresh on open",
   "waiting / gated",
 ]) {
-  assert.ok(inboxSource.includes(marker), `/inbox missing marker ${marker}`);
+  assert.ok(homeSource.includes(marker), `admin home missing marker ${marker}`);
+}
+
+for (const marker of [
+  "source → entity → outcome → attention → history",
+  "data-lifecycle-search",
+  "data-archive-candidate",
+  "data-propose-archive",
+  "data-confirm-archive",
+  "data-restore-archive",
+  "admin projection only",
+  "ChatGPT conversation",
+  "Codex task",
+]) {
+  assert.ok(homeSource.includes(marker), `admin lifecycle missing ${marker}`);
+}
+
+for (const marker of [
+  "sourceIdentityKey",
+  "upsertSourceImport",
+  "evaluateArchiveCandidate",
+  "createArchiveProposalBatches",
+  "confirmArchiveProposal",
+  "restoreArchiveReceipt",
+  "MAX_ARCHIVE_BATCH_SIZE = 20",
+]) {
+  assert.ok(
+    lifecycleSource.includes(marker),
+    `lifecycle seam missing ${marker}`,
+  );
 }
 
 for (const marker of [
@@ -198,7 +250,7 @@ assert.equal(
   "admin inbox must not import the retired static action queue",
 );
 assert.equal(
-  inboxSource.includes("needs ani"),
+  homeSource.includes("needs ani"),
   false,
   "canonical inbox must not expose the retired queue label",
 );

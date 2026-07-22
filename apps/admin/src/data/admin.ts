@@ -33,14 +33,14 @@ export type DeployRow = {
 
 export const navItems: NavItem[] = [
   {
-    href: "/inbox",
+    href: "/",
     label: "inbox",
     status: "queue",
     group: "life",
     description: "what needs attention and what can move next",
   },
   {
-    href: "/inbox?category=health",
+    href: "/?category=health",
     label: "health",
     status: "queue",
     group: "life",
@@ -103,14 +103,14 @@ export const navItems: NavItem[] = [
     description: "issue preview without sends",
   },
   {
-    href: "/inbox?category=income",
+    href: "/?category=income",
     label: "income",
     status: "queue",
     group: "income",
     description: "business, jobs, payments, and follow-up",
   },
   {
-    href: "/inbox?category=system",
+    href: "/?category=system",
     label: "system",
     status: "queue",
     group: "system",

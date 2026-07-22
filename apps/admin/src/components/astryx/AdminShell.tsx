@@ -21,11 +21,11 @@ type AdminShellProps = {
 };
 
 const MOBILE_NAV_HREFS = new Set([
-  "/inbox",
-  "/inbox?category=health",
+  "/",
+  "/?category=health",
   "/content",
-  "/inbox?category=income",
-  "/inbox?category=system",
+  "/?category=income",
+  "/?category=system",
 ]);
 
 export function AdminShell({
@@ -60,7 +60,7 @@ export function AdminShell({
         <div className="admin-nav-header">
           <SideNavHeading
             heading="anipotts admin"
-            headingHref="/inbox"
+            headingHref="/"
             subheading="operator console"
             icon={
               <span className="admin-mark" aria-hidden="true">
@@ -181,21 +181,23 @@ function ThemeToggle() {
 function isActive(currentRoute: string, href: string): boolean {
   const [currentPath, currentQuery = ""] = currentRoute.split("?");
   const [targetPath, targetQuery = ""] = href.split("?");
+  const canonicalCurrentPath = currentPath === "/inbox" ? "/" : currentPath;
   const currentParams = new URLSearchParams(currentQuery);
 
   if (targetQuery) {
     const targetParams = new URLSearchParams(targetQuery);
     return (
-      currentPath === targetPath &&
+      canonicalCurrentPath === targetPath &&
       [...targetParams].every(
         ([key, value]) => currentParams.get(key) === value,
       )
     );
   }
 
-  if (href === "/inbox") {
-    return currentPath === "/inbox" && !currentParams.has("category");
+  if (href === "/") {
+    return canonicalCurrentPath === "/" && !currentParams.has("category");
   }
-  if (href === "/") return currentPath === "/";
-  return currentPath === href || currentPath.startsWith(`${href}/`);
+  return (
+    canonicalCurrentPath === href || canonicalCurrentPath.startsWith(`${href}/`)
+  );
 }
