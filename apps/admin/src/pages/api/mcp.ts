@@ -4,30 +4,40 @@ import {
   loadAdminControlSnapshot,
   type McpJsonRpcRequest,
 } from "@anipotts/lib/admin-control";
+import { verifyAccessIdentity } from "../../lib/passkey-auth";
 
 type EndpointContext = {
   locals: App.Locals;
   request: Request;
+  url: URL;
 };
 
-export async function GET({ locals, request }: EndpointContext) {
-  const auth = requireMcpAccess(request);
+const PRIVATE_HEADERS = {
+  "cache-control": "private, no-store",
+  pragma: "no-cache",
+  vary: "cf-access-jwt-assertion",
+};
+
+export async function GET(context: EndpointContext) {
+  const auth = await requireMcpAccess(context);
   if (auth) return auth;
 
-  const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
+  const snapshot = await loadAdminControlSnapshot(
+    context.locals.runtime?.env.DB,
+  );
   return Response.json(adminMcpManifest(snapshot), {
-    headers: {
-      "cache-control": "no-store",
-    },
+    headers: PRIVATE_HEADERS,
   });
 }
 
-export async function POST({ locals, request }: EndpointContext) {
-  const auth = requireMcpAccess(request);
+export async function POST(context: EndpointContext) {
+  const auth = await requireMcpAccess(context);
   if (auth) return auth;
 
-  const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
-  const body = (await request
+  const snapshot = await loadAdminControlSnapshot(
+    context.locals.runtime?.env.DB,
+  );
+  const body = (await context.request
     .json()
     .catch(() => null)) as McpJsonRpcRequest | null;
 
@@ -38,32 +48,26 @@ export async function POST({ locals, request }: EndpointContext) {
         id: null,
         error: { code: -32700, message: "invalid json-rpc body" },
       },
-      { status: 400 },
+      { status: 400, headers: PRIVATE_HEADERS },
     );
   }
 
   return Response.json(handleAdminMcpRequest(snapshot, body), {
-    headers: {
-      "cache-control": "no-store",
-    },
+    headers: PRIVATE_HEADERS,
   });
 }
 
-function requireMcpAccess(request: Request): Response | null {
-  if (import.meta.env.DEV) return null;
-
-  const hasAccessIdentity =
-    request.headers.has("cf-access-jwt-assertion") ||
-    request.headers.has("cf-access-authenticated-user-email") ||
-    request.headers.has("cf-access-client-id");
-
-  if (hasAccessIdentity) return null;
+async function requireMcpAccess(
+  context: EndpointContext,
+): Promise<Response | null> {
+  const identity = await verifyAccessIdentity(context);
+  if (identity.verified) return null;
 
   return Response.json(
     {
-      error: "cloudflare access service-token identity required",
+      error: "verified cloudflare access identity required",
       mode: "read-only mcp",
     },
-    { status: 401 },
+    { status: 401, headers: PRIVATE_HEADERS },
   );
 }

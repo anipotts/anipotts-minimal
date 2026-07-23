@@ -35,6 +35,10 @@ const USER_ID = "ani";
 const USER_NAME = "ani@admin.anipotts.com";
 const USER_DISPLAY_NAME = "Ani";
 const ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
+const accessJwksByIssuer = new Map<
+  string,
+  ReturnType<typeof createRemoteJWKSet>
+>();
 
 type D1Result<T = unknown> = {
   results?: T[];
@@ -88,7 +92,7 @@ type SessionRow = {
   revoked_at: string | null;
 };
 
-type AccessIdentity = {
+export type AccessIdentity = {
   verified: boolean;
   hint: string | null;
 };
@@ -157,7 +161,7 @@ export async function getPasskeyStatus(
   context: PasskeyContext,
 ): Promise<PasskeyStatus> {
   const db = dbFromContext(context);
-  const accessIdentity = await resolveAccessIdentity(context);
+  const accessIdentity = await verifyAccessIdentity(context);
   if (!db) {
     const auditEvents = emptyPasskeyAuditEvents();
     const blockers = passkeyAccessRemovalBlockers({
@@ -825,8 +829,8 @@ function expectedRpId(context: PasskeyContext): string {
   return PRODUCTION_RP_ID;
 }
 
-async function resolveAccessIdentity(
-  context: PasskeyContext,
+export async function verifyAccessIdentity(
+  context: Pick<PasskeyContext, "request" | "url" | "locals">,
 ): Promise<AccessIdentity> {
   if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
     return { verified: true, hint: "local-dev" };
@@ -845,7 +849,7 @@ async function resolveAccessIdentity(
 
   try {
     const issuer = teamDomain.replace(/\/$/, "");
-    const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
+    const jwks = accessJwks(issuer);
     const { payload } = await jwtVerify(cfJwt, jwks, {
       issuer,
       audience,
@@ -858,6 +862,14 @@ async function resolveAccessIdentity(
   } catch {
     return { verified: false, hint: null };
   }
+}
+
+function accessJwks(issuer: string): ReturnType<typeof createRemoteJWKSet> {
+  const cached = accessJwksByIssuer.get(issuer);
+  if (cached) return cached;
+  const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
+  accessJwksByIssuer.set(issuer, jwks);
+  return jwks;
 }
 
 function maskEmail(email: string): string {

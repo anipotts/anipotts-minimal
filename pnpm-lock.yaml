@@ -115,6 +115,9 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.1(@types/node@20.19.30)(lightningcss@1.32.0)(terser@5.47.1)
 
   apps/admin-solid:
     dependencies:
