@@ -1,4 +1,5 @@
 import type { AdminControlProjections, AdminControlSnapshot } from "./types";
+import { buildKnowledgeContextBundle, getKnowledgeCard } from "./knowledge";
 
 export type McpJsonRpcRequest = {
   jsonrpc?: "2.0";
@@ -14,6 +15,8 @@ export const ADMIN_MCP_RESOURCE_URIS = [
   "admin://projections/deploy_states",
   "admin://projections/capability_states",
   "admin://projections/service_registry_view",
+  "admin://projections/knowledge_cards",
+  "admin://contracts/knowledge-retrieval",
   "admin://contracts/event",
 ] as const;
 
@@ -21,6 +24,8 @@ export const ADMIN_MCP_TOOL_NAMES = [
   "admin.get_projection",
   "admin.get_inbox",
   "admin.get_capabilities",
+  "admin.search_knowledge",
+  "admin.get_knowledge_card",
 ] as const;
 
 type ProjectionName = keyof AdminControlProjections;
@@ -100,6 +105,39 @@ export function handleAdminMcpRequest(
             description: "read machine capability states",
             inputSchema: { type: "object", properties: {} },
           },
+          {
+            name: "admin.search_knowledge",
+            description:
+              "search bounded knowledge cards before asking Ani for context",
+            inputSchema: {
+              type: "object",
+              properties: {
+                query: { type: "string" },
+                domain: {
+                  type: "string",
+                  enum: ["work", "content", "life", "fleet", "system"],
+                },
+                limit: { type: "integer", minimum: 1, maximum: 20 },
+                context_budget_tokens: {
+                  type: "integer",
+                  minimum: 100,
+                  maximum: 4000,
+                },
+              },
+              required: ["query"],
+            },
+          },
+          {
+            name: "admin.get_knowledge_card",
+            description: "read one knowledge card by stable id",
+            inputSchema: {
+              type: "object",
+              properties: {
+                card_id: { type: "string" },
+              },
+              required: ["card_id"],
+            },
+          },
         ],
       });
 
@@ -127,6 +165,35 @@ function callTool(
     return toolResult(id, snapshot.projections.capability_states);
   }
 
+  if (toolName === "admin.search_knowledge") {
+    const query = readStringParam(args, "query");
+    const domain = readOptionalStringParam(args, "domain");
+    const limit = readOptionalNumberParam(args, "limit");
+    const contextBudgetTokens = readOptionalNumberParam(
+      args,
+      "context_budget_tokens",
+    );
+    return toolResult(
+      id,
+      buildKnowledgeContextBundle(snapshot.projections.knowledge_cards, query, {
+        domain:
+          domain &&
+          ["work", "content", "life", "fleet", "system"].includes(domain)
+            ? (domain as AdminControlProjections["knowledge_cards"][number]["domain"])
+            : null,
+        limit: limit ?? undefined,
+        context_budget_tokens: contextBudgetTokens ?? undefined,
+      }),
+    );
+  }
+
+  if (toolName === "admin.get_knowledge_card") {
+    const cardId = readStringParam(args, "card_id");
+    const card = getKnowledgeCard(snapshot.projections.knowledge_cards, cardId);
+    if (!card) return error(id, -32602, `unknown knowledge card: ${cardId}`);
+    return toolResult(id, card);
+  }
+
   if (toolName === "admin.get_projection") {
     const projection = readStringParam(args, "projection") as ProjectionName;
     if (!isProjectionName(projection)) {
@@ -150,6 +217,10 @@ function toolResult(id: string | number | null, value: unknown) {
 }
 
 function resourceValue(snapshot: AdminControlSnapshot, uri: string) {
+  if (uri === "admin://contracts/knowledge-retrieval") {
+    return snapshot.contracts.knowledge_retrieval;
+  }
+
   if (uri === "admin://contracts/event") {
     return {
       schema_version: snapshot.schema_version,
@@ -174,6 +245,7 @@ function isProjectionName(value: string): value is ProjectionName {
     "deploy_states",
     "capability_states",
     "service_registry_view",
+    "knowledge_cards",
   ].includes(value);
 }
 
@@ -190,6 +262,7 @@ function projectionInputSchema() {
           "deploy_states",
           "capability_states",
           "service_registry_view",
+          "knowledge_cards",
         ],
       },
     },
@@ -209,6 +282,17 @@ function readStringParam(params: unknown, key: string): string {
   if (!params || typeof params !== "object") return "";
   const value = (params as Record<string, unknown>)[key];
   return typeof value === "string" ? value : "";
+}
+
+function readOptionalStringParam(params: unknown, key: string): string | null {
+  const value = readStringParam(params, key);
+  return value || null;
+}
+
+function readOptionalNumberParam(params: unknown, key: string): number | null {
+  if (!params || typeof params !== "object") return null;
+  const value = (params as Record<string, unknown>)[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function readObjectParam(

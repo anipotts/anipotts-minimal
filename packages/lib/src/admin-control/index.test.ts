@@ -19,6 +19,10 @@ describe("admin-control", () => {
     expect(
       snapshot.projections.inbox_items[0]?.event_refs.length,
     ).toBeGreaterThan(0);
+    expect(snapshot.projections.knowledge_cards.length).toBeGreaterThan(0);
+    expect(snapshot.contracts.knowledge_retrieval.query_before_asking).toBe(
+      true,
+    );
     expect(snapshot.retention.payload_store).toBe("r2");
   });
 
@@ -49,6 +53,7 @@ describe("admin-control", () => {
     expect(snapshot.source_mode).toBe("d1");
     expect(snapshot.events).toEqual([]);
     expect(snapshot.projections.inbox_items).toEqual([]);
+    expect(snapshot.projections.knowledge_cards).toEqual([]);
     expect(snapshot.errors).toEqual([]);
   });
 
@@ -92,6 +97,37 @@ describe("admin-control", () => {
     });
 
     expect(JSON.stringify(response)).toContain("inbox-admin-contract-review");
+  });
+
+  it("exposes bounded knowledge search and stable-card reads over mcp", async () => {
+    const snapshot = await loadAdminControlSnapshot(null);
+    const search = handleAdminMcpRequest(snapshot, {
+      jsonrpc: "2.0",
+      id: 2,
+      method: "tools/call",
+      params: {
+        name: "admin.search_knowledge",
+        arguments: {
+          query: "brain",
+          domain: "life",
+          limit: 2,
+          context_budget_tokens: 500,
+        },
+      },
+    });
+    const card = handleAdminMcpRequest(snapshot, {
+      jsonrpc: "2.0",
+      id: 3,
+      method: "tools/call",
+      params: {
+        name: "admin.get_knowledge_card",
+        arguments: { card_id: "knowledge-brain-life-record" },
+      },
+    });
+
+    expect(JSON.stringify(search)).toContain("knowledge-brain-life-record");
+    expect(JSON.stringify(search)).not.toContain("knowledge-infra-fleet");
+    expect(JSON.stringify(card)).toContain("brain://vault");
   });
 
   it("models sent gmail as event proof without an inbox card when complete", () => {

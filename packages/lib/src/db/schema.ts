@@ -1033,3 +1033,47 @@ export const adminCapabilityStates = sqliteTable(
     index("idx_admin_capability_machine").on(table.machine, table.status),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// 28. bounded knowledge-card projection
+// ---------------------------------------------------------------------------
+
+export const adminKnowledgeCards = sqliteTable(
+  "admin_knowledge_cards",
+  {
+    card_id: text("card_id").primaryKey(),
+    entity_ref: text("entity_ref").notNull(),
+    domain: text("domain").notNull(),
+    kind: text("kind").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    source_system: text("source_system").notNull(),
+    source_locator: text("source_locator").notNull(),
+    source_native_id: text("source_native_id"),
+    canonical_host: text("canonical_host").notNull(),
+    canonical_path: text("canonical_path"),
+    sensitivity: text("sensitivity").notNull(),
+    reveal_policy: text("reveal_policy").notNull(),
+    freshness_state: text("freshness_state").notNull(),
+    observed_at: text("observed_at"),
+    stale_after_seconds: integer("stale_after_seconds"),
+    content_hash: text("content_hash").notNull(),
+    proof_refs: text("proof_refs").notNull().default("[]"),
+    lineage_refs: text("lineage_refs").notNull().default("[]"),
+    related_card_ids: text("related_card_ids").notNull().default("[]"),
+    retrieval_instructions: text("retrieval_instructions").notNull(),
+    context_budget_tokens: integer("context_budget_tokens")
+      .notNull()
+      .default(200),
+    event_refs: text("event_refs").notNull().default("[]"),
+    indexed_at: text("indexed_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_knowledge_domain").on(table.domain, table.kind),
+    index("idx_admin_knowledge_entity").on(table.entity_ref),
+    index("idx_admin_knowledge_freshness").on(
+      table.freshness_state,
+      table.observed_at,
+    ),
+  ],
+);
