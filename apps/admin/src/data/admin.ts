@@ -2,7 +2,7 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "life" | "content" | "income" | "system";
+  group: "home" | "work" | "content" | "life" | "fleet" | "system";
   description: string;
 };
 
@@ -36,15 +36,22 @@ export const navItems: NavItem[] = [
     href: "/",
     label: "inbox",
     status: "queue",
-    group: "life",
+    group: "home",
     description: "what needs attention and what can move next",
   },
   {
-    href: "/?category=health",
-    label: "health",
-    status: "queue",
-    group: "life",
-    description: "diet, vices, metrics, and health decisions",
+    href: "/knowledge",
+    label: "knowledge",
+    status: "index",
+    group: "home",
+    description: "canonical context cards and retrieval proof",
+  },
+  {
+    href: "/work",
+    label: "work",
+    status: "lineage",
+    group: "work",
+    description: "projects, tasks, loose chats, and outcomes",
   },
   {
     href: "/content",
@@ -103,11 +110,25 @@ export const navItems: NavItem[] = [
     description: "issue preview without sends",
   },
   {
-    href: "/?category=income",
-    label: "income",
-    status: "queue",
-    group: "income",
-    description: "business, jobs, payments, and follow-up",
+    href: "/life",
+    label: "life",
+    status: "status",
+    group: "life",
+    description: "quiet personal overview",
+  },
+  {
+    href: "/life/health",
+    label: "health",
+    status: "status",
+    group: "life",
+    description: "status-only health visibility",
+  },
+  {
+    href: "/life/aesthetics",
+    label: "aesthetics",
+    status: "shell",
+    group: "life",
+    description: "wardrobe, outfits, looks, and references",
   },
   {
     href: "/?category=system",
@@ -120,7 +141,7 @@ export const navItems: NavItem[] = [
     href: "/fleet",
     label: "fleet",
     status: "runtime",
-    group: "system",
+    group: "fleet",
     description: "machines, repo state, current work",
   },
   {

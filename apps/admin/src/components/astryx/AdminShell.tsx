@@ -22,9 +22,11 @@ type AdminShellProps = {
 
 const MOBILE_NAV_HREFS = new Set([
   "/",
-  "/?category=health",
+  "/knowledge",
+  "/work",
   "/content",
-  "/?category=income",
+  "/life",
+  "/fleet",
   "/?category=system",
 ]);
 
@@ -45,10 +47,14 @@ export function AdminShell({
     );
   }
 
-  const life = navItems.filter((item) => item.group === "life");
-  const content = navItems.filter((item) => item.group === "content");
-  const income = navItems.filter((item) => item.group === "income");
-  const system = navItems.filter((item) => item.group === "system");
+  const groups = [
+    ["home", navItems.filter((item) => item.group === "home")],
+    ["work", navItems.filter((item) => item.group === "work")],
+    ["content", navItems.filter((item) => item.group === "content")],
+    ["life", navItems.filter((item) => item.group === "life")],
+    ["fleet", navItems.filter((item) => item.group === "fleet")],
+    ["system", navItems.filter((item) => item.group === "system")],
+  ] as const;
   const mobileItems = navItems.filter((item) =>
     MOBILE_NAV_HREFS.has(item.href),
   );
@@ -81,48 +87,19 @@ export function AdminShell({
         </div>
       }
     >
-      <SideNavSection title="life">
-        {life.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
-            endContent={<Badge label={item.status} variant="neutral" />}
-          />
-        ))}
-      </SideNavSection>
-      <SideNavSection title="content">
-        {content.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
-          />
-        ))}
-      </SideNavSection>
-      <SideNavSection title="income">
-        {income.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
-            endContent={<Badge label={item.status} variant="neutral" />}
-          />
-        ))}
-      </SideNavSection>
-      <SideNavSection title="system">
-        {system.map((item) => (
-          <SideNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isSelected={isActive(currentRoute, item.href)}
-          />
-        ))}
-      </SideNavSection>
+      {groups.map(([title, items]) => (
+        <SideNavSection key={title} title={title}>
+          {items.map((item) => (
+            <SideNavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              isSelected={isActive(currentRoute, item.href)}
+              endContent={<Badge label={item.status} variant="neutral" />}
+            />
+          ))}
+        </SideNavSection>
+      ))}
     </SideNav>
   );
 

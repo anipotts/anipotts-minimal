@@ -1,0 +1,161 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { readAdminWorkLifecycle } from "../data/work-lifecycle";
+
+const lifecycle = await readAdminWorkLifecycle();
+const openEntities = lifecycle.entities.filter(
+  (entity) => entity.lifecycle === "open",
+);
+const historicalEntities = lifecycle.entities.filter(
+  (entity) => entity.lifecycle !== "open",
+);
+const linkedSourceIds = new Set(
+  lifecycle.entities.flatMap((entity) => entity.source_ids),
+);
+const looseSources = lifecycle.sources.filter(
+  (source) => !linkedSourceIds.has(source.source_id),
+);
+const humanize = (value: string) => value.replaceAll("_", " ");
+const sourcesFor = (sourceIds: string[]) =>
+  lifecycle.sources.filter((source) => sourceIds.includes(source.source_id));
+const outcomesFor = (entityId: string) =>
+  lifecycle.outcomes.filter((outcome) => outcome.entity_id === entityId);
+const historyFor = (entityId: string) =>
+  lifecycle.history.filter((entry) => entry.entity_id === entityId);
+---
+
+<AdminLayout
+  title="work"
+  deck="Projects, tasks, source conversations, outcomes, and lineage. Native runtime state stays separate from durable lifecycle state."
+>
+  <section class="meta-strip" aria-label="work lifecycle state">
+    <span>{openEntities.length} current</span>
+    <span>{historicalEntities.length} historical</span>
+    <span>{lifecycle.sources.length} source records</span>
+    <span>{looseSources.length} loose chats</span>
+    <span>{lifecycle.source_mode}</span>
+    <span>{lifecycle.adapter_version}</span>
+  </section>
+
+  <section class="table-card work-current" aria-labelledby="work-current-title">
+    <div class="section-head">
+      <div>
+        <p>one entity / many source surfaces</p>
+        <h2 id="work-current-title">current work</h2>
+      </div>
+      <span>read only</span>
+    </div>
+    <div class="work-entity-list">
+      {
+        openEntities.map((entity) => {
+          const sources = sourcesFor(entity.source_ids);
+          const outcomes = outcomesFor(entity.entity_id);
+          const history = historyFor(entity.entity_id);
+          return (
+            <article class="work-entity">
+              <div class="work-entity-main">
+                <p>
+                  {entity.kind} / {entity.lifecycle} / {entity.owner}
+                </p>
+                <h3>{entity.title}</h3>
+                <span>{entity.summary}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>lifecycle</dt>
+                  <dd>{entity.lifecycle}</dd>
+                </div>
+                <div>
+                  <dt>owner state</dt>
+                  <dd>{humanize(entity.owner_state)}</dd>
+                </div>
+                <div>
+                  <dt>source records</dt>
+                  <dd>{sources.length}</dd>
+                </div>
+                <div>
+                  <dt>attention</dt>
+                  <dd>{entity.attention_ids.length}</dd>
+                </div>
+              </dl>
+              <div class="work-source-lineage" aria-label="source lineage">
+                {sources.map((source) => (
+                  <div>
+                    <span>{source.surface}</span>
+                    <strong>{source.title}</strong>
+                    <small>
+                      runtime {humanize(source.native_runtime)} / lifecycle{" "}
+                      {humanize(source.native_status)}
+                    </small>
+                    <code>{source.locator}</code>
+                  </div>
+                ))}
+              </div>
+              <details>
+                <summary>
+                  {outcomes.length} outcomes / {history.length} history entries
+                </summary>
+                <div class="work-proof-list">
+                  {[...outcomes, ...history].map((item) => (
+                    <p>{item.summary}</p>
+                  ))}
+                  {outcomes.length === 0 && history.length === 0 && (
+                    <p>no outcome or history receipt recorded yet.</p>
+                  )}
+                </div>
+              </details>
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <section class="table-card work-loose-chats">
+    <details>
+      <summary>
+        <span>loose chats</span>
+        <strong>{looseSources.length} preserved and collapsed</strong>
+      </summary>
+      <div class="work-loose-list">
+        {
+          looseSources.map((source) => (
+            <article>
+              <p>
+                {source.surface} / {humanize(source.reconciliation_state)}
+              </p>
+              <h3>{source.title}</h3>
+              <span>{source.summary}</span>
+              <code>{source.locator}</code>
+            </article>
+          ))
+        }
+      </div>
+    </details>
+  </section>
+
+  <section class="table-card work-history">
+    <div class="section-head">
+      <div>
+        <p>searchable history</p>
+        <h2>completed and preserved</h2>
+      </div>
+      <span>{historicalEntities.length} entities</span>
+    </div>
+    <div class="work-history-list">
+      {
+        historicalEntities.map((entity) => (
+          <details>
+            <summary>
+              <span>
+                {entity.kind} / {entity.lifecycle}
+              </span>
+              <strong>{entity.title}</strong>
+            </summary>
+            <p>{entity.summary}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</AdminLayout>

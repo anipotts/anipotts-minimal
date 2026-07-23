@@ -1,0 +1,234 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { readAdminKnowledge } from "../data/knowledge";
+
+const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB);
+const domains = ["work", "content", "life", "fleet", "system"] as const;
+const freshnessCounts = Object.fromEntries(
+  ["fresh", "partial", "stale", "unknown", "unavailable"].map((state) => [
+    state,
+    knowledge.cards.filter((card) => card.freshness_state === state).length,
+  ]),
+);
+const humanize = (value: string) => value.replaceAll("_", " ");
+---
+
+<AdminLayout
+  title="knowledge"
+  deck="The predictable map to canonical life, work, content, and system truth. Cards stay small; source evidence stays where it belongs."
+>
+  <section class="meta-strip" aria-label="knowledge catalog state">
+    <span>{knowledge.cards.length} cards</span>
+    <span>{knowledge.source_mode} projection</span>
+    <span>{freshnessCounts.fresh} fresh</span>
+    <span>{freshnessCounts.partial} partial</span>
+    <span>{freshnessCounts.unknown} unknown</span>
+    <span>{freshnessCounts.stale} stale</span>
+  </section>
+
+  <section class="table-card knowledge-contract">
+    <div class="section-head">
+      <div>
+        <p>card → bounded proof → canonical source</p>
+        <h2>retrieval contract</h2>
+      </div>
+      <span
+        >read only / {knowledge.contract.default_context_budget_tokens} token default</span
+      >
+    </div>
+    <dl class="knowledge-contract-grid">
+      <div>
+        <dt>before asking Ani</dt>
+        <dd>query cards, then retrieve current source proof</dd>
+      </div>
+      <div>
+        <dt>attention boundary</dt>
+        <dd>knowledge never becomes Inbox without a real action</dd>
+      </div>
+      <div>
+        <dt>closed tier</dt>
+        <dd>values never enter the index</dd>
+      </div>
+      <div>
+        <dt>stale result</dt>
+        <dd>return the locator and freshness, then verify</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section
+    class="table-card knowledge-search"
+    aria-labelledby="knowledge-title"
+  >
+    <div class="section-head">
+      <div>
+        <p>
+          people, projects, decisions, concepts, places, moments, and systems
+        </p>
+        <h2 id="knowledge-title">find canonical context</h2>
+      </div>
+      <span data-knowledge-count>{knowledge.cards.length} visible</span>
+    </div>
+    <div class="knowledge-search-controls">
+      <label>
+        <span>search</span>
+        <input
+          type="search"
+          placeholder="what do you need context on?"
+          autocomplete="off"
+          data-knowledge-search
+        />
+      </label>
+      <div class="knowledge-domain-filter" aria-label="knowledge domain filter">
+        <button type="button" class="is-active" data-knowledge-domain="all">
+          all
+        </button>
+        {
+          domains.map((domain) => (
+            <button type="button" data-knowledge-domain={domain}>
+              {domain}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="knowledge-card-list" data-knowledge-list>
+      {
+        knowledge.cards.map((card) => {
+          const searchText = [
+            card.title,
+            card.summary,
+            card.entity_ref,
+            card.domain,
+            card.kind,
+            card.source_system,
+            card.source_locator,
+            card.canonical_host,
+            card.canonical_path ?? "",
+            ...card.proof_refs,
+            ...card.lineage_refs,
+          ]
+            .join(" ")
+            .toLowerCase();
+          return (
+            <article
+              class={`knowledge-card freshness-${card.freshness_state}`}
+              data-knowledge-card
+              data-domain={card.domain}
+              data-search-text={searchText}
+            >
+              <div class="knowledge-card-main">
+                <p>
+                  {card.domain} / {humanize(card.kind)} / {card.source_system}
+                </p>
+                <h3>{card.title}</h3>
+                <span>{card.summary}</span>
+                <div class="knowledge-retrieval">
+                  <small>retrieve</small>
+                  <strong>{card.retrieval_instructions}</strong>
+                </div>
+              </div>
+              <dl>
+                <div>
+                  <dt>host</dt>
+                  <dd>{card.canonical_host}</dd>
+                </div>
+                <div>
+                  <dt>freshness</dt>
+                  <dd>{humanize(card.freshness_state)}</dd>
+                </div>
+                <div>
+                  <dt>access</dt>
+                  <dd>{humanize(card.reveal_policy)}</dd>
+                </div>
+                <div>
+                  <dt>budget</dt>
+                  <dd>{card.context_budget_tokens} tokens</dd>
+                </div>
+              </dl>
+              <div class="knowledge-card-actions">
+                <a
+                  class="button ghost"
+                  href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
+                >
+                  card json
+                </a>
+                <code>{card.source_locator}</code>
+              </div>
+              <details>
+                <summary>proof and lineage</summary>
+                <p>
+                  {[...card.proof_refs, ...card.lineage_refs].join(" · ") ||
+                    "no proof reference recorded"}
+                </p>
+              </details>
+            </article>
+          );
+        })
+      }
+      <p class="knowledge-empty" data-knowledge-empty hidden>
+        no indexed card matches this query.
+      </p>
+    </div>
+  </section>
+
+  {
+    knowledge.errors.length > 0 && (
+      <section class="table-card knowledge-warning">
+        <div class="section-head">
+          <div>
+            <p>adapter state</p>
+            <h2>live catalog unavailable</h2>
+          </div>
+          <span>fixture review remains read only</span>
+        </div>
+        <p>{knowledge.errors.join(" · ")}</p>
+      </section>
+    )
+  }
+
+  <script is:inline>
+    (() => {
+      let domain = "all";
+      let query = "";
+      const apply = () => {
+        let visible = 0;
+        for (const card of document.querySelectorAll("[data-knowledge-card]")) {
+          const domainMatches =
+            domain === "all" || card.getAttribute("data-domain") === domain;
+          const text = card.getAttribute("data-search-text") ?? "";
+          const terms = query.split(/\s+/).filter(Boolean);
+          const queryMatches = terms.every((term) => text.includes(term));
+          card.hidden = !(domainMatches && queryMatches);
+          if (!card.hidden) visible += 1;
+        }
+        const count = document.querySelector("[data-knowledge-count]");
+        if (count) count.textContent = `${visible} visible`;
+        const empty = document.querySelector("[data-knowledge-empty]");
+        if (empty) empty.hidden = visible !== 0;
+      };
+
+      document
+        .querySelector("[data-knowledge-search]")
+        ?.addEventListener("input", (event) => {
+          query = event.target.value.trim().toLowerCase();
+          apply();
+        });
+
+      for (const button of document.querySelectorAll(
+        "[data-knowledge-domain]",
+      )) {
+        button.addEventListener("click", () => {
+          domain = button.getAttribute("data-knowledge-domain") ?? "all";
+          for (const candidate of document.querySelectorAll(
+            "[data-knowledge-domain]",
+          )) {
+            candidate.classList.toggle("is-active", candidate === button);
+          }
+          apply();
+        });
+      }
+    })();
+  </script>
+</AdminLayout>

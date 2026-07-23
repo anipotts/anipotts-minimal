@@ -13,19 +13,24 @@ const [inbox, lifecycle] = await Promise.all([
 ]);
 const categories = [
   {
-    id: "health",
-    label: "health",
-    detail: "diet, vices, metrics, and decisions owned by chief/health",
+    id: "work",
+    label: "work",
+    detail: "projects, jobs, business, payments, tasks, and decisions",
   },
   {
     id: "content",
     label: "content",
-    detail: "site, writing, newsletter, brand, and carousel work",
+    detail: "site, writing, newsletter, brand, social, and carousel work",
   },
   {
-    id: "income",
-    label: "income",
-    detail: "business, jobs, payments, and outbound follow-up",
+    id: "life",
+    label: "life",
+    detail: "health, people, schedule, aesthetics, and personal decisions",
+  },
+  {
+    id: "fleet",
+    label: "fleet",
+    detail: "machines, repositories, runtimes, services, and capabilities",
   },
   {
     id: "system",
@@ -94,7 +99,7 @@ const humanize = (value: string) => value.replaceAll("_", " ");
 ---
 
 <AdminLayout
-  title="home"
+  title="inbox"
   deck="One current attention projection. Conversations stay evidence, while completed work remains searchable and reversible."
 >
   <section class="meta-strip" aria-label="admin home source state">
@@ -116,9 +121,10 @@ const humanize = (value: string) => value.replaceAll("_", " ");
     </div>
     <div class="inbox-intro-copy">
       <p>
-        The home view combines source-backed health, content, income, and system
-        blockers. Related conversations resolve to one work entity. Copy
-        controls do not send, approve, publish, or continue a task.
+        The home view combines only real human attention across work, content,
+        life, fleet, and system. Related conversations resolve to one work
+        entity. Knowledge cards remain outside the queue. Copy controls do not
+        send, approve, publish, or continue a task.
       </p>
       <div class="inbox-monitoring-status">
         <small>monitoring</small>

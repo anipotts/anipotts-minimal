@@ -2,6 +2,36 @@ export const ADMIN_ROUTES = [
   { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
   { route: "/inbox", file: "apps/admin/src/pages/inbox.astro", nav: false },
   {
+    route: "/knowledge",
+    file: "apps/admin/src/pages/knowledge.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/work",
+    file: "apps/admin/src/pages/work.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life",
+    file: "apps/admin/src/pages/life/index.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life/health",
+    file: "apps/admin/src/pages/life/health.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life/aesthetics",
+    file: "apps/admin/src/pages/life/aesthetics.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/auth/passkey",
     file: "apps/admin/src/pages/auth/passkey.astro",
     nav: false,
@@ -86,6 +116,12 @@ export const ADMIN_ROUTES = [
   {
     route: "/api/admin/projections",
     file: "apps/admin/src/pages/api/admin/projections.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/knowledge",
+    file: "apps/admin/src/pages/api/admin/knowledge.ts",
     nav: false,
     smoke: false,
   },

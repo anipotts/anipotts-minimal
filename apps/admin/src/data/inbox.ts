@@ -26,7 +26,12 @@ type AdminInboxDb = ContentInventoryD1Database &
   ProofD1Database &
   BoundAdminControlDatabase;
 
-export type AdminInboxCategory = "health" | "content" | "income" | "system";
+export type AdminInboxCategory =
+  | "work"
+  | "content"
+  | "life"
+  | "fleet"
+  | "system";
 export type AdminInboxTimeframe =
   | "now"
   | "today"
@@ -102,7 +107,7 @@ export async function readAdminInbox(
         summary: entry.summary,
         status: normalizeStatus(entry.status),
         risk: entry.status === "blocked" ? "high" : "medium",
-        category: "system",
+        category: "fleet",
         timeframe: entry.status === "blocked" ? "waiting / gated" : "now",
         href: entry.kind === "auth" ? "/proof" : "/deploys",
         next_action: entry.next_safe_action,
@@ -193,9 +198,9 @@ export async function readAdminInbox(
           summary: item.summary,
           status: normalizeStatus(item.status),
           risk: riskForUrgency(item.urgency),
-          category: "income",
+          category: "work",
           timeframe: timeframeForProjection(item),
-          href: item.href ?? "/inbox?category=income",
+          href: item.href ?? "/?category=work",
           next_action: nextAction,
           copy_text: item.action_kind === "none" ? undefined : nextAction,
           proof: item.event_refs.join(", ") || item.dedupe_key,
@@ -352,7 +357,7 @@ function inboxItemFromProjection(
     risk: riskForUrgency(item.urgency),
     category,
     timeframe: timeframeForProjection(item),
-    href: item.href ?? `/inbox?category=${category}`,
+    href: item.href ?? `/?category=${category}`,
     next_action: nextActionForProjection(item),
     proof: item.event_refs.join(", ") || item.dedupe_key,
     updated_at: item.last_seen_at ?? item.expires_at ?? now,
@@ -367,7 +372,7 @@ function categoryForProjection(
     .join(":")
     .toLowerCase();
 
-  if (ref.includes("health") || ref.includes("vitals")) return "health";
+  if (ref.includes("health") || ref.includes("vitals")) return "life";
   if (
     ref.includes("business") ||
     ref.includes("jobs") ||
@@ -375,7 +380,7 @@ function categoryForProjection(
     ref.includes("payment") ||
     ref.includes("gmail")
   ) {
-    return "income";
+    return "work";
   }
   if (
     ref.includes("brand") ||
@@ -386,6 +391,14 @@ function categoryForProjection(
     ref.includes("carousel")
   ) {
     return "content";
+  }
+  if (
+    ref.includes("fleet") ||
+    ref.includes("infra") ||
+    ref.includes("machine") ||
+    ref.includes("runtime")
+  ) {
+    return "fleet";
   }
   return "system";
 }

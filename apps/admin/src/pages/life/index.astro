@@ -1,0 +1,75 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { readAdminKnowledge } from "../../data/knowledge";
+
+const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB, "", {
+  domain: "life",
+  limit: 6,
+});
+const areas = [
+  {
+    href: "/life/health",
+    label: "health",
+    state: "status only",
+    detail:
+      "Shows source freshness and retrieval boundaries without generating tasks from vitals.",
+  },
+  {
+    href: "/life/aesthetics",
+    label: "aesthetics",
+    state: "clean shell",
+    detail:
+      "Future home for wardrobe, outfits, looks, references, and personal style.",
+  },
+];
+---
+
+<AdminLayout
+  title="life"
+  deck="A quiet overview of personal areas. Anything requiring action appears once in the global Inbox."
+>
+  <section class="meta-strip" aria-label="life overview state">
+    <span>{areas.length} areas</span>
+    <span>{knowledge.bundle.cards.length} indexed references</span>
+    <span>no separate inbox</span>
+    <span>private sources stay local</span>
+  </section>
+
+  <section class="life-area-grid" aria-label="life areas">
+    {
+      areas.map((area) => (
+        <a class="life-area" href={area.href}>
+          <p>{area.state}</p>
+          <h2>{area.label}</h2>
+          <span>{area.detail}</span>
+        </a>
+      ))
+    }
+  </section>
+
+  <section class="table-card life-reference-panel">
+    <div class="section-head">
+      <div>
+        <p>bounded pointers only</p>
+        <h2>life knowledge</h2>
+      </div>
+      <a href="/knowledge">search all knowledge</a>
+    </div>
+    <div class="life-reference-list">
+      {
+        knowledge.bundle.cards.map((card) => (
+          <article>
+            <div>
+              <p>
+                {card.kind} / {card.freshness_state}
+              </p>
+              <h3>{card.title}</h3>
+            </div>
+            <span>{card.summary}</span>
+            <code>{card.source_locator}</code>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</AdminLayout>

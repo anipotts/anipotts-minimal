@@ -17,6 +17,23 @@ const homeSource = readFileSync(
   "apps/admin/src/components/AdminHome.astro",
   "utf8",
 );
+const knowledgeSource = readFileSync(
+  "apps/admin/src/pages/knowledge.astro",
+  "utf8",
+);
+const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const lifeSource = readFileSync(
+  "apps/admin/src/pages/life/index.astro",
+  "utf8",
+);
+const healthSource = readFileSync(
+  "apps/admin/src/pages/life/health.astro",
+  "utf8",
+);
+const aestheticsSource = readFileSync(
+  "apps/admin/src/pages/life/aesthetics.astro",
+  "utf8",
+);
 const lifecycleSource = readFileSync(
   "packages/lib/src/admin-control/work-lifecycle.ts",
   "utf8",
@@ -186,9 +203,10 @@ assert.equal(
 );
 
 for (const marker of [
-  'id: "health"',
+  'id: "work"',
   'id: "content"',
-  'id: "income"',
+  'id: "life"',
+  'id: "fleet"',
   'id: "system"',
   "data-copy-text",
   "data-attention-id",
@@ -203,6 +221,45 @@ for (const marker of [
 ]) {
   assert.ok(homeSource.includes(marker), `admin home missing marker ${marker}`);
 }
+
+for (const marker of [
+  "card → bounded proof → canonical source",
+  "before asking Ani",
+  "knowledge never becomes Inbox",
+  "data-knowledge-search",
+  "data-knowledge-domain",
+]) {
+  assert.ok(
+    knowledgeSource.includes(marker),
+    `admin knowledge missing marker ${marker}`,
+  );
+}
+
+for (const marker of [
+  "Native runtime state stays separate",
+  "current work",
+  "source lineage",
+  "loose chats",
+  "preserved and collapsed",
+]) {
+  assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
+}
+
+for (const marker of [
+  "no separate inbox",
+  "/life/health",
+  "/life/aesthetics",
+]) {
+  assert.ok(lifeSource.includes(marker), `admin life missing marker ${marker}`);
+}
+assert.ok(
+  healthSource.includes("does not infer tasks"),
+  "health must remain status only",
+);
+assert.ok(
+  aestheticsSource.includes("No wardrobe automation or image ingestion"),
+  "aesthetics must remain a clean data boundary",
+);
 
 for (const marker of [
   "source → entity → outcome → attention → history",
