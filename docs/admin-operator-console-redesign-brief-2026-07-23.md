@@ -4,7 +4,9 @@ status: visual direction review
 
 date: 2026-07-23
 
-owner: `chief/anipotts.com`
+owner: `chief/site`
+
+lane: `site/admin`
 
 source branch: `codex/pro/admin-home-lifecycle-2026-07-22`
 
@@ -40,6 +42,85 @@ The current lifecycle contract remains intact:
 - Codex, Claude, ChatGPT, GitHub, and handoffs are sources or execution surfaces
 - archive remains searchable and restorable
 - runtime, lifecycle, attention, and freshness remain separate state dimensions
+
+## canonical Infra knowledge contract
+
+The fixture prototype consumes the sanitized Admin projection from canonical
+Infra main. It does not import raw source records or create a competing schema.
+
+Contract source:
+
+- Infra PR: `#10`
+- merged commit: `8696dfd7ea70479679aa6dad643aaaec1714ab09`
+- source registry: `memory/schema/knowledge-sources.yml`
+- card schema: `memory/schema/knowledge-card.schema.json`
+- fixture cards: `memory/schema/fixtures/knowledge-cards.yml`
+- sanitizer: `memory/interfaces/cli/knowledge_cards.py project-admin`
+
+Pinned source hashes:
+
+| source                                       | sha-256                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------ |
+| `memory/schema/knowledge-sources.yml`        | `c10a0d804b577ca8132744250f4c941c44d0c8ef64f389b18be284c3ddb175e0` |
+| `memory/schema/knowledge-card.schema.json`   | `22f612421d92086f74d0b20067751206673119037fd7eed228b583b547741ee1` |
+| `memory/schema/fixtures/knowledge-cards.yml` | `f2a525b4582d75bf530a1ccc062c655ea5a659e81ab4c0857ffe48f72a73de2b` |
+| `memory/interfaces/cli/knowledge_cards.py`   | `3fc060819771ff210798381f91331bbeff2b82c891fdb6f746448f2642675128` |
+
+The `project-admin` output is the UI boundary. Every projected card always
+includes stable identity and routing:
+
+- `card_id`
+- `knowledge_ref`
+- `entity_ref`
+- `domain`
+- `area`
+- `kind`
+- `source_id`
+- `mode`
+
+Allowed display fields are added only when both the source policy and projection
+mode permit them. These may include title, freshness, bounded current summary,
+current assertion reference, retrieval instructions, source locator, proof
+references, or lineage references.
+
+The UI must not reconstruct omitted fields from the raw fixture. In particular:
+
+- `closed` cards do not enter Admin
+- `intimate` cards are metadata-only at most
+- metadata-only cards never expose `current_summary`
+- source locators, proof refs, and lineage refs appear only when the sanitized
+  projection emits them
+- a missing observation remains unknown, never healthy
+- conflicting sources stay conflicting until stronger proof resolves them
+
+### fixture mapping
+
+| domain  | projected fixture                                   | native presentation rule                                                                  |
+| ------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Work    | `Admin redesign in progress` from Codex             | show bounded activity, current freshness, source identity, and a route to the Work entity |
+| Content | `Social message needs review` from social platforms | show metadata-only inbound review without sender, body, attachment, or inferred urgency   |
+| Life    | `Life context updated` from Brain                   | show current status and assertion reference without exposing the private value            |
+| Fleet   | `ap-mini durable runtime` from Infra memory         | show bounded host summary, exact freshness, and allowed proof or locator fields           |
+| System  | `Source contradiction requires review` from Admin   | show conflicting state and a comparison action without silently choosing a source         |
+
+Knowledge search may retrieve these cards across domains. Their primary
+representation still belongs to the native domain view.
+
+### forbidden Admin payload
+
+Never copy these into Admin fixtures, browser state, D1, screenshots, or design
+examples:
+
+- private values or closed records
+- social message bodies, sender details, or attachments
+- raw prompts or transcripts
+- health measurements or care values
+- finance balances, transactions, or exact receipts
+- credentials, tokens, secrets, private keys, or provider payloads
+
+The prototype may display safe titles, freshness, projection mode, source
+identity, bounded summaries, proof state, and retrieval actions exactly as
+emitted by `project-admin`.
 
 ## audit scope
 

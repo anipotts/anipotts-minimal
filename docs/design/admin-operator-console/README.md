@@ -4,6 +4,10 @@ status: awaiting Ani's visual selection
 
 date: 2026-07-23
 
+owner: `chief/site`
+
+lane: `site/admin`
+
 source checkpoint: `ab210add5df58c9219cd96173a7b5c31eb17d8cf`
 
 review branch: `codex/pro/admin-operator-console-design-2026-07-23`
@@ -21,6 +25,11 @@ Each route has:
 The six audited routes are Inbox, Work, Knowledge, Life, Fleet, and Content.
 The findings and redesign contract live in
 [`../../admin-operator-console-redesign-brief-2026-07-23.md`](../../admin-operator-console-redesign-brief-2026-07-23.md).
+
+The brief also pins and maps the fixture-first knowledge contract merged in
+Infra PR `#10` at
+`8696dfd7ea70479679aa6dad643aaaec1714ab09`. The local prototype must consume
+only the sanitized `knowledge_cards.py project-admin` output.
 
 ## visual directions
 
