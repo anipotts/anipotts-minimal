@@ -5,9 +5,10 @@ import {
   proofSource,
   readProofEntries,
 } from "../data/proof";
+import { env } from "cloudflare:workers";
 
 const groups = ["verified", "blocked", "pending"] as const;
-const proofEntries = await readProofEntries(Astro.locals.runtime?.env.DB);
+const proofEntries = await readProofEntries(env.DB);
 const proofCounts = countProofEntries(proofEntries);
 ---
 

@@ -9,6 +9,7 @@ import {
   contentPreviewItems,
   readContentOperationStore,
 } from "../../data/content";
+import { env } from "cloudflare:workers";
 
 const surfaces = [
   "homepage",
@@ -17,7 +18,7 @@ const surfaces = [
   "newsletter",
   "orchestrating",
 ] as const;
-const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
+const readState = await readContentOperationStore(env.DB);
 const d1Operations = readState.operations;
 
 function operationMatchesSurface(

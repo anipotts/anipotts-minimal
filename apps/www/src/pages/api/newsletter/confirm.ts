@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import {
   confirmSubscriber,
   html,
@@ -7,8 +8,7 @@ import {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
+export const GET: APIRoute = async ({ request }) => {
   if (!env.DB) return missingDbResponse();
 
   const token = new URL(request.url).searchParams.get("token") ?? "";

@@ -16,7 +16,7 @@
     "@anipotts/content": "workspace:*",
     "@anipotts/lib": "workspace:*",
     "@anipotts/styles": "workspace:*",
-    "@astrojs/cloudflare": "^12.6.0",
+    "@astrojs/cloudflare": "^13.1.10",
     "@astrojs/react": "^4.4.2",
     "@astryxdesign/core": "^0.1.8",
     "@astryxdesign/theme-neutral": "^0.1.8",
@@ -25,8 +25,8 @@
     "@fontsource/geist-sans": "^5.2.5",
     "@simplewebauthn/browser": "13.3.0",
     "@simplewebauthn/server": "13.3.2",
-    "@stylexjs/stylex": "^0.18.3",
-    "astro": "^5.16.0",
+    "@stylexjs/stylex": "^0.19.0",
+    "astro": "^6.4.6",
     "jose": "^6.2.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
@@ -34,6 +34,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@astryxdesign/cli": "^0.1.4",
+    "@cloudflare/workers-types": "^5.20260722.1",
     "@types/react": "^19",
     "@types/react-dom": "^19.2.3",
     "typescript": "^5"

@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import {
   assertSameOriginRequest,
   saveDraftOperation,
@@ -10,7 +11,7 @@ export const POST: APIRoute = async (context) => {
   try {
     assertSameOriginRequest(context.request, context.url);
 
-    const db = context.locals.runtime?.env.DB;
+    const db = env.DB;
     if (!db) {
       throw statusError(503, "db_binding_missing");
     }

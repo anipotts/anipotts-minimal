@@ -7,18 +7,16 @@ import {
   readContentOperationStore,
 } from "../../data/content";
 import { readDraftPreview } from "../../lib/content-editor";
+import { env } from "cloudflare:workers";
 
-const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
+const readState = await readContentOperationStore(env.DB);
 const d1PreviewItems = readState.operations.filter((operation) =>
   operation.preview_targets.includes("/content/preview"),
 );
 const previewSource =
   d1PreviewItems.length > 0 ? "d1 draft operations" : "static previews";
 const operationId = Astro.url.searchParams.get("operation_id") ?? "";
-const selectedDraft = await readDraftPreview(
-  Astro.locals.runtime?.env.DB,
-  operationId,
-);
+const selectedDraft = await readDraftPreview(env.DB, operationId);
 ---
 
 <AdminLayout

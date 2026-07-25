@@ -21,6 +21,7 @@ import {
   type PasskeyProofItem,
   type RequiredPasskeyAuditEvent,
 } from "@anipotts/content/admin";
+import { env } from "cloudflare:workers";
 
 export const PASSKEY_SESSION_COOKIE = "admin_passkey_session";
 
@@ -617,8 +618,8 @@ export async function revokeCurrentCredential(
   );
 }
 
-export function dbFromContext(context: PasskeyContext): D1Database | null {
-  return context.locals.runtime?.env.DB ?? null;
+export function dbFromContext(_context: PasskeyContext): D1Database | null {
+  return env.DB ?? null;
 }
 
 function requiredDb(context: PasskeyContext): D1Database {
@@ -832,8 +833,8 @@ async function resolveAccessIdentity(
     return { verified: true, hint: "local-dev" };
   }
 
-  const teamDomain = context.locals.runtime?.env.ACCESS_TEAM_DOMAIN;
-  const audience = context.locals.runtime?.env.ACCESS_POLICY_AUD;
+  const teamDomain = env.ACCESS_TEAM_DOMAIN;
+  const audience = env.ACCESS_POLICY_AUD;
   if (!teamDomain || !audience) {
     return { verified: false, hint: null };
   }

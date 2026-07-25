@@ -15,18 +15,18 @@
     "@anipotts/content": "workspace:*",
     "@anipotts/lib": "workspace:*",
     "@anipotts/styles": "workspace:*",
-    "@astrojs/cloudflare": "^12.6.0",
+    "@astrojs/cloudflare": "^13.1.10",
     "@astrojs/rss": "^4.0.19",
     "@fontsource-variable/instrument-sans": "^5.2.8",
     "@fontsource/geist-sans": "^5.2.5",
     "@fontsource/urbanist": "^5.2.7",
-    "astro": "^5.16.0",
+    "astro": "^6.4.6",
     "astro-icon": "^1.1.5",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@cloudflare/workers-types": "^4.20250523.0",
+    "@cloudflare/workers-types": "^5.20260722.1",
     "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@iconify-json/ph": "^1.2.2",
     "typescript": "^5.8.3"

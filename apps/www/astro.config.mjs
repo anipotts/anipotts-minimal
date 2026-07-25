@@ -14,7 +14,6 @@ export default defineConfig({
     },
   },
   adapter: cloudflare({
-    platformProxy: { enabled: true },
     imageService: "passthrough",
   }),
   integrations: [icon()],

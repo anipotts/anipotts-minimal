@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import {
   html,
   missingDbResponse,
@@ -12,8 +13,7 @@ export const GET: APIRoute = async ({ request }) => {
   return html(render(token));
 };
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
+export const POST: APIRoute = async ({ request }) => {
   if (!env.DB) return missingDbResponse();
 
   const url = new URL(request.url);

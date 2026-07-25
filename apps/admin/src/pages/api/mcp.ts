@@ -4,17 +4,17 @@ import {
   loadAdminControlSnapshot,
   type McpJsonRpcRequest,
 } from "@anipotts/lib/admin-control";
+import { env } from "cloudflare:workers";
 
 type EndpointContext = {
-  locals: App.Locals;
   request: Request;
 };
 
-export async function GET({ locals, request }: EndpointContext) {
+export async function GET({ request }: EndpointContext) {
   const auth = requireMcpAccess(request);
   if (auth) return auth;
 
-  const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
+  const snapshot = await loadAdminControlSnapshot(env.DB);
   return Response.json(adminMcpManifest(snapshot), {
     headers: {
       "cache-control": "no-store",
@@ -22,11 +22,11 @@ export async function GET({ locals, request }: EndpointContext) {
   });
 }
 
-export async function POST({ locals, request }: EndpointContext) {
+export async function POST({ request }: EndpointContext) {
   const auth = requireMcpAccess(request);
   if (auth) return auth;
 
-  const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
+  const snapshot = await loadAdminControlSnapshot(env.DB);
   const body = (await request
     .json()
     .catch(() => null)) as McpJsonRpcRequest | null;

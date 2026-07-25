@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { json } from "../../../../lib/api";
 import {
   missingDbResponse,
@@ -28,8 +29,7 @@ const SUPPRESSION_EVENTS = new Set([
   "email.suppressed",
 ]);
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
+export const POST: APIRoute = async ({ request }) => {
   if (!env.DB) return missingDbResponse();
   if (!env.RESEND_WEBHOOK_SECRET) {
     return json({ error: "resend webhook not configured" }, 501);

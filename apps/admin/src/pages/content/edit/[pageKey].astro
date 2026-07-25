@@ -3,20 +3,16 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { WritingEditor } from "../../../components/astryx/WritingEditor";
 import { readPageContentInventoryStore } from "../../../data/content";
 import { readContentEditorState } from "../../../lib/content-editor";
+import { env } from "cloudflare:workers";
 
 const requestedPageKey = safeDecodePageKey(Astro.params.pageKey);
 const pageKey =
   requestedPageKey === "new" || requestedPageKey === "writing:new"
     ? "writing:new"
     : requestedPageKey;
-const pageContentState = await readPageContentInventoryStore(
-  Astro.locals.runtime?.env.DB,
-);
+const pageContentState = await readPageContentInventoryStore(env.DB);
 const pageRow = pageContentState.rows.find((row) => row.page_key === pageKey);
-const editorState = await readContentEditorState(
-  Astro.locals.runtime?.env.DB,
-  pageKey,
-);
+const editorState = await readContentEditorState(env.DB, pageKey);
 const current = editorState.current;
 const isNew = pageKey === "writing:new";
 const currentRollbackReference =

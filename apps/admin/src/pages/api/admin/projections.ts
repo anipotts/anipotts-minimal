@@ -1,7 +1,8 @@
 import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
+import { env } from "cloudflare:workers";
 
-export async function GET({ locals }: { locals: App.Locals }) {
-  const snapshot = await loadAdminControlSnapshot(locals.runtime?.env.DB);
+export async function GET() {
+  const snapshot = await loadAdminControlSnapshot(env.DB);
 
   return Response.json(snapshot, {
     headers: {

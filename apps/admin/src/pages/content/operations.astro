@@ -5,8 +5,9 @@ import {
   contentOperationTemplates,
   readContentOperationStore,
 } from "../../data/content";
+import { env } from "cloudflare:workers";
 
-const readState = await readContentOperationStore(Astro.locals.runtime?.env.DB);
+const readState = await readContentOperationStore(env.DB);
 ---
 
 <AdminLayout

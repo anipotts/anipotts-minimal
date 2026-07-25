@@ -14,10 +14,11 @@ import {
   normalizeNewsletterContent,
 } from "@anipotts/content/public";
 import { fetchPageContent } from "@anipotts/lib/cms";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+setDB(env.DB as unknown as D1Database);
 const [homePage, newsletterPage] = await Promise.all([
   fetchPageContent("home"),
   fetchPageContent("newsletter"),

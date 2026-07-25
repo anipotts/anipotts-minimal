@@ -1,8 +1,9 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
 import { readAdminInbox } from "../data/inbox";
+import { env } from "cloudflare:workers";
 
-const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
+const inbox = await readAdminInbox(env.DB);
 const categories = [
   {
     id: "health",

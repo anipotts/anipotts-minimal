@@ -5,13 +5,10 @@ import {
   readContentOperationStore,
   readPageContentInventoryStore,
 } from "../../data/content";
+import { env } from "cloudflare:workers";
 
-const operationState = await readContentOperationStore(
-  Astro.locals.runtime?.env.DB,
-);
-const pageContentState = await readPageContentInventoryStore(
-  Astro.locals.runtime?.env.DB,
-);
+const operationState = await readContentOperationStore(env.DB);
+const pageContentState = await readPageContentInventoryStore(env.DB);
 const operations =
   operationState.operations.length > 0
     ? operationState.operations

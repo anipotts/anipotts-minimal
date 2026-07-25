@@ -13,7 +13,6 @@ export default defineConfig({
     port: 3001,
   },
   adapter: cloudflare({
-    platformProxy: { enabled: true },
     imageService: "passthrough",
   }),
 });

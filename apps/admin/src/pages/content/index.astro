@@ -9,6 +9,7 @@ import {
   sourceContentRecords,
   sourceContentSummary,
 } from "../../data/source-content";
+import { env } from "cloudflare:workers";
 
 const surfaces = [
   "homepage",
@@ -50,9 +51,7 @@ const contentWorkflow = [
     detail: "operation and publish trail",
   },
 ];
-const pageContentState = await readPageContentInventoryStore(
-  Astro.locals.runtime?.env.DB,
-);
+const pageContentState = await readPageContentInventoryStore(env.DB);
 ---
 
 <AdminLayout

@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { checkOrigin, checkRateLimit, json } from "../../../lib/api";
 import {
   createDoubleOptIn,
@@ -9,12 +10,11 @@ import {
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const forbidden = checkOrigin(request);
     if (forbidden) return forbidden;
 
-    const env = locals.runtime.env;
     if (!env.DB) return missingDbResponse();
 
     const allowed = await checkRateLimit(request, env.DB);

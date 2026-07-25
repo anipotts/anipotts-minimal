@@ -1,13 +1,14 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { json } from "../../lib/api";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ locals }) => {
+export const GET: APIRoute = async () => {
   let d1: "connected" | "error" = "error";
   let tablesOk = false;
   try {
-    const db = locals.runtime.env.DB;
+    const db = env.DB;
     const result = await db
       .prepare("SELECT COUNT(*) as cnt FROM thoughts LIMIT 1")
       .first<{ cnt: number }>();
