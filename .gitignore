@@ -2,6 +2,7 @@ node_modules
 .next
 .env
 .env.local
+.dev.vars
 .DS_Store
 dist
 out
