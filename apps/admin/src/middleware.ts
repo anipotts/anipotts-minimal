@@ -5,6 +5,7 @@ import {
   isPublicAdminPath,
 } from "./lib/admin-access-policy";
 import { hasActivePasskeySession } from "./lib/passkey-auth";
+import { hasActivePasswordSession } from "./lib/password-auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   if (isPublicAdminPath(context.url.pathname)) return next();
@@ -18,7 +19,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  const hasSession = await hasActivePasskeySession(context);
+  const hasSession =
+    (await hasActivePasswordSession(context)) ||
+    (await hasActivePasskeySession(context));
   const decision = decideAdminAccess({
     isDev: import.meta.env.DEV,
     method: context.request.method,

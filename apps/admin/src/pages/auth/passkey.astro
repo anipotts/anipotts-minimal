@@ -22,26 +22,99 @@ function sanitizeAdminReturnPath(path: string | null): string {
 }
 ---
 
-<AdminLayout title="passkey auth" chrome="auth" hideHeader>
+<AdminLayout title="sign in" chrome="auth" hideHeader>
   <span
     id="passkey-return-path"
     data-next-path={passkeyReturnPath}
     data-auto-return={String(shouldAutoReturn)}
     hidden></span>
 
-  <section class="passkey-auth" aria-label="passkey unlock">
-    <button
-      class="passkey-card"
-      id="passkey-unlock"
-      type="button"
-      aria-label="unlock admin"
-    >
-      <div class="passkey-sigil" aria-hidden="true">
-        <span class="passkey-ring"></span>
-        <span class="passkey-ring offset"></span>
-        <span class="passkey-core"></span>
+  <section class="native-auth" aria-labelledby="native-auth-heading">
+    <div class="native-auth-card">
+      <header class="native-auth-header">
+        <span class="native-auth-mark" aria-hidden="true">ap</span>
+        <div>
+          <h1 id="native-auth-heading">sign in</h1>
+          <p>admin.anipotts.com</p>
+        </div>
+      </header>
+
+      <div class="native-auth-tabs" role="tablist" aria-label="sign in method">
+        <button
+          id="password-tab"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="password-panel">password</button
+        >
+        <button
+          id="passkey-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="passkey-panel">passkey</button
+        >
       </div>
-    </button>
+
+      <div
+        class="native-auth-panel"
+        id="password-panel"
+        role="tabpanel"
+        aria-labelledby="password-tab"
+      >
+        <form id="password-form" class="native-auth-form">
+          <label for="admin-password">password</label>
+          <div class="native-password-field">
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              maxlength="200"
+              required
+            />
+            <button
+              id="toggle-password"
+              type="button"
+              aria-label="show password">show</button
+            >
+          </div>
+          <button id="password-submit" class="native-auth-primary" type="submit"
+            >sign in</button
+          >
+          <p
+            id="password-message"
+            class="native-auth-message"
+            aria-live="polite"
+          >
+            checking password access
+          </p>
+        </form>
+      </div>
+
+      <div
+        class="native-auth-panel"
+        id="passkey-panel"
+        role="tabpanel"
+        aria-labelledby="passkey-tab"
+        hidden
+      >
+        <button
+          class="passkey-card"
+          id="passkey-unlock"
+          type="button"
+          aria-label="unlock admin"
+        >
+          <div class="passkey-sigil" aria-hidden="true">
+            <span class="passkey-ring"></span>
+            <span class="passkey-ring offset"></span>
+            <span class="passkey-core"></span>
+          </div>
+          <span id="passkey-button-label">use passkey</span>
+        </button>
+        <p class="native-auth-message">touch id or your device passkey</p>
+      </div>
+    </div>
 
     <div class="passkey-hidden-state" hidden>
       <h1 id="passkey-heading">unlock admin</h1>
@@ -122,6 +195,21 @@ function sanitizeAdminReturnPath(path: string | null): string {
   };
 
   const authShell = document.querySelector<HTMLElement>(".auth-shell");
+  const passwordTab =
+    document.querySelector<HTMLButtonElement>("#password-tab");
+  const passkeyTab = document.querySelector<HTMLButtonElement>("#passkey-tab");
+  const passwordPanel = document.querySelector<HTMLElement>("#password-panel");
+  const passkeyPanel = document.querySelector<HTMLElement>("#passkey-panel");
+  const passwordForm =
+    document.querySelector<HTMLFormElement>("#password-form");
+  const passwordInput =
+    document.querySelector<HTMLInputElement>("#admin-password");
+  const passwordSubmit =
+    document.querySelector<HTMLButtonElement>("#password-submit");
+  const passwordMessage = document.querySelector("#password-message");
+  const togglePassword =
+    document.querySelector<HTMLButtonElement>("#toggle-password");
+  const passkeyButtonLabel = document.querySelector("#passkey-button-label");
   const passkeyCard =
     document.querySelector<HTMLButtonElement>("#passkey-unlock");
   const dbLabel = document.querySelector("#passkey-db");
@@ -155,13 +243,103 @@ function sanitizeAdminReturnPath(path: string | null): string {
   let status: PasskeyStatus | null = null;
   let didAutoReturn = false;
 
+  passwordTab?.addEventListener("click", () => selectMethod("password"));
+  passkeyTab?.addEventListener("click", () => selectMethod("passkey"));
+  passwordForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void passwordLogin();
+  });
+  togglePassword?.addEventListener("click", () => {
+    if (!passwordInput || !togglePassword) return;
+    const showing = passwordInput.type === "text";
+    passwordInput.type = showing ? "password" : "text";
+    togglePassword.textContent = showing ? "show" : "hide";
+    togglePassword.setAttribute(
+      "aria-label",
+      showing ? "show password" : "hide password",
+    );
+    passwordInput.focus();
+  });
   passkeyCard?.addEventListener("click", () => void unlock());
   registerButton?.addEventListener("click", () => void register());
   loginButton?.addEventListener("click", () => void authenticate());
   logoutButton?.addEventListener("click", () => void logout());
   revokeButton?.addEventListener("click", () => void revokeCurrent());
 
-  await refreshStatus();
+  await Promise.all([refreshStatus(), refreshPasswordStatus()]);
+
+  function selectMethod(method: "password" | "passkey") {
+    const passwordSelected = method === "password";
+    passwordTab?.setAttribute("aria-selected", String(passwordSelected));
+    passkeyTab?.setAttribute("aria-selected", String(!passwordSelected));
+    passwordPanel?.toggleAttribute("hidden", !passwordSelected);
+    passkeyPanel?.toggleAttribute("hidden", passwordSelected);
+    if (passwordSelected) passwordInput?.focus();
+    else passkeyCard?.focus();
+  }
+
+  async function refreshPasswordStatus() {
+    try {
+      const response = await fetch("/api/admin/password/status", {
+        cache: "no-store",
+      });
+      const passwordStatus = (await response.json()) as {
+        available?: boolean;
+        has_session?: boolean;
+      };
+      if (passwordSubmit) passwordSubmit.disabled = false;
+      if (passwordInput) passwordInput.disabled = false;
+      setText(
+        passwordMessage,
+        passwordStatus.has_session
+          ? "signed in"
+          : passwordStatus.available
+            ? ""
+            : "preview only until the owner password is configured",
+      );
+      if (passwordStatus.has_session && shouldAutoReturn) {
+        window.location.assign(nextPath);
+      }
+    } catch {
+      if (passwordSubmit) passwordSubmit.disabled = false;
+      if (passwordInput) passwordInput.disabled = false;
+      setText(passwordMessage, "password access is unavailable");
+    }
+  }
+
+  async function passwordLogin() {
+    if (!passwordInput || !passwordSubmit) return;
+    passwordSubmit.disabled = true;
+    setText(passwordMessage, "signing in");
+    try {
+      const response = await fetch("/api/admin/password/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ password: passwordInput.value }),
+      });
+      const result = (await response.json()) as {
+        ok?: boolean;
+        error?: string;
+      };
+      if (!response.ok || !result.ok) {
+        throw new Error(
+          result.error === "try_again_later"
+            ? "too many attempts. try again in 15 minutes"
+            : result.error === "password_unavailable"
+              ? "password access is unavailable"
+              : "password is incorrect",
+        );
+      }
+      passwordInput.value = "";
+      setText(passwordMessage, "signed in");
+      window.location.assign(nextPath);
+    } catch (error) {
+      setText(passwordMessage, errorMessage(error));
+      passwordInput.select();
+    } finally {
+      passwordSubmit.disabled = false;
+    }
+  }
 
   async function refreshStatus() {
     const response = await fetch("/api/admin/passkey/status", {
@@ -189,6 +367,14 @@ function sanitizeAdminReturnPath(path: string | null): string {
         ? "open admin"
         : status.credential_count > 0
           ? "unlock with passkey"
+          : "create passkey",
+    );
+    setText(
+      passkeyButtonLabel,
+      status.has_session
+        ? "open admin"
+        : status.credential_count > 0
+          ? "use passkey"
           : "create passkey",
     );
     loginButton?.classList.toggle(

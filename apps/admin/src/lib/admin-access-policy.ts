@@ -20,6 +20,9 @@ const PUBLIC_PASSKEY_API_PATHS = new Set([
   "/api/admin/passkey/register-verify",
   "/api/admin/passkey/revoke-current",
   "/api/admin/passkey/status",
+  "/api/admin/password/login",
+  "/api/admin/password/logout",
+  "/api/admin/password/status",
 ]);
 
 const PUBLIC_PREFIXES = ["/_astro/", "/assets/"];

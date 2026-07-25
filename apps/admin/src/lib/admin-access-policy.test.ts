@@ -2,12 +2,21 @@ import { describe, expect, test } from "vitest";
 import {
   decideAdminAccess,
   isDevLoopbackPreviewRequest,
+  isPublicAdminPath,
 } from "./admin-access-policy";
 
 const local = (path: string, origin = "http://localhost:4311") =>
   new URL(path, origin);
 
 describe("admin access policy", () => {
+  test.each([
+    "/api/admin/password/status",
+    "/api/admin/password/login",
+    "/api/admin/password/logout",
+  ])("exposes only the password authentication endpoint %s", (path) => {
+    expect(isPublicAdminPath(path)).toBe(true);
+  });
+
   test.each(["/", "/inbox", "/work?view=now"])(
     "allows the read-only development preview for %s",
     (path) => {
@@ -68,7 +77,7 @@ describe("admin access policy", () => {
       method: "GET",
       url: local("/content"),
     },
-  ])("does not bypass passkey for $name", ({ isDev, method, url }) => {
+  ])("does not bypass native auth for $name", ({ isDev, method, url }) => {
     expect(
       isDevLoopbackPreviewRequest({
         isDev,
@@ -78,7 +87,7 @@ describe("admin access policy", () => {
     ).toBe(false);
   });
 
-  test("requires passkey for an unauthenticated production admin route", () => {
+  test("requires native auth for an unauthenticated production admin route", () => {
     expect(
       decideAdminAccess({
         isDev: false,

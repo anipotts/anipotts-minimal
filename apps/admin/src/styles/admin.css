@@ -1005,6 +1005,235 @@ th {
   margin: 0 auto;
 }
 
+.native-auth {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.native-auth-card {
+  width: min(100%, 420px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  box-shadow: 0 20px 64px rgba(8, 16, 35, 0.1);
+  padding: 28px;
+}
+
+.native-auth-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.native-auth-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: "AP Structural", "Urbanist", sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.native-auth-header h1,
+.native-auth-header p,
+.native-auth-message {
+  margin: 0;
+}
+
+.native-auth-header h1 {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.native-auth-header p,
+.native-auth-message {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.native-auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--border) 62%, transparent);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.native-auth-tabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.native-auth-tabs button[aria-selected="true"] {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(8, 16, 35, 0.1);
+}
+
+.native-auth-tabs button:focus-visible,
+.native-password-field button:focus-visible,
+.native-auth-primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 54%, transparent);
+  outline-offset: 2px;
+}
+
+.native-auth-panel[hidden] {
+  display: none;
+}
+
+.native-auth-form {
+  display: grid;
+  gap: 10px;
+}
+
+.native-auth-form > label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.native-password-field {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.native-password-field:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 58%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.native-password-field input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 15px;
+}
+
+.native-password-field input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.native-password-field button {
+  min-width: 54px;
+  align-self: stretch;
+  border: 0;
+  border-left: 1px solid var(--border);
+  border-radius: 0 9px 9px 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.native-auth-primary {
+  min-height: 44px;
+  border: 1px solid var(--ink);
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.native-auth-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+}
+
+.native-auth-message {
+  min-height: 20px;
+  padding-top: 2px;
+  line-height: 1.45;
+}
+
+.native-auth-panel .passkey-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 74px;
+  aspect-ratio: auto;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.native-auth-panel .passkey-card::before {
+  display: none;
+}
+
+.native-auth-panel .passkey-sigil {
+  width: 46px;
+  flex: 0 0 46px;
+}
+
+.native-auth-panel .passkey-ring {
+  inset: 5px;
+}
+
+.native-auth-panel .passkey-ring.offset {
+  inset: 11px;
+}
+
+.native-auth-panel .passkey-core {
+  width: 10px;
+  height: 18px;
+}
+
+.native-auth-panel .passkey-core::before {
+  top: 3px;
+  width: 3px;
+  height: 3px;
+}
+
+.native-auth-panel .passkey-core::after {
+  bottom: 3px;
+  height: 4px;
+}
+
+.native-auth-panel > .native-auth-message {
+  padding-top: 10px;
+  text-align: center;
+}
+
 .passkey-card {
   --passkey-edge: color-mix(in srgb, var(--border) 72%, var(--accent));
   position: relative;
