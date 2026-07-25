@@ -109,6 +109,9 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/register-verify",
   "/api/admin/passkey/revoke-current",
   "/api/admin/passkey/status",
+  "/api/admin/password/login",
+  "/api/admin/password/logout",
+  "/api/admin/password/status",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 assert.deepEqual(devLoopbackOrigins, [
@@ -235,11 +238,11 @@ assert.equal(
 for (const marker of [
   "data-astro-rerun",
   "data-attention-projection",
-  "ranked actions",
+  "needs you",
   "being handled",
   "/work?view=now",
   "inbox-category-filter",
-  "later and waiting",
+  "everything else",
 ]) {
   assert.ok(homeSource.includes(marker), `admin home missing marker ${marker}`);
 }
@@ -251,11 +254,10 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
 }
 
 for (const marker of [
-  "card → bounded proof → canonical source",
-  "before asking Ani",
-  "knowledge never becomes Inbox",
   "data-knowledge-search",
-  "data-knowledge-domain",
+  "data-knowledge-card",
+  "/knowledge?kind=",
+  "Search current context",
 ]) {
   assert.ok(
     knowledgeSource.includes(marker),
@@ -265,10 +267,10 @@ for (const marker of [
 
 for (const marker of [
   "data-work-now",
-  "data-work-group={group.id}",
-  "foreground",
-  "background",
-  "recently completed",
+  "Currently working",
+  "OperatorWorkTable",
+  "view=projects",
+  "view=history",
   "data-inspect-task",
   "loose conversations",
   "preserved",
@@ -289,7 +291,9 @@ for (const marker of [
 }
 
 for (const marker of [
-  "no separate inbox",
+  "Today",
+  "Recent changes",
+  "/knowledge?kind=people",
   "/life/health",
   "/life/aesthetics",
 ]) {
@@ -334,7 +338,7 @@ for (const marker of [
 for (const marker of [
   "loadAdminControlSnapshot",
   "control.projections.inbox_items",
-  "dedupeInboxItems",
+  "rankInboxItems",
   "copy_text",
 ]) {
   assert.ok(

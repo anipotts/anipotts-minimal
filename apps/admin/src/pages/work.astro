@@ -1,12 +1,11 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
 import { SourceMark } from "../components/SourceMark";
-import OperatorTaskRow from "../components/OperatorTaskRow.astro";
+import { OperatorWorkTable } from "../components/astryx/OperatorWorkTable";
 import {
   assertValidOperatorWorkProjection,
   groupOperatorTasks,
   readOperatorWorkProjection,
-  type OperatorWorkLane,
 } from "../data/operator-work";
 
 if (!Astro.url.searchParams.has("view")) {
@@ -17,33 +16,18 @@ const projection = readOperatorWorkProjection();
 assertValidOperatorWorkProjection(projection);
 
 const groups = groupOperatorTasks(projection);
-const orderedGroups: Array<{
-  id: OperatorWorkLane;
-  label: string;
-}> = [
-  {
-    id: "foreground",
-    label: "foreground",
-  },
-  {
-    id: "background",
-    label: "background",
-  },
-  {
-    id: "waiting",
-    label: "waiting",
-  },
-  {
-    id: "recently_completed",
-    label: "recently completed",
-  },
-];
-
-const projectionFreshness = projection.task_states.every(
-  (task) => task.freshness === "fresh",
-)
-  ? "fresh"
-  : "stale";
+const view = Astro.url.searchParams.get("view") ?? "now";
+const allRows = (
+  ["foreground", "background", "waiting", "recently_completed"] as const
+).flatMap((lane) => groups[lane].map((task) => ({ ...task, lane })));
+const visibleRows =
+  view === "history"
+    ? allRows.filter((task) => task.lane === "recently_completed")
+    : view === "projects"
+      ? [...allRows].sort((a, b) =>
+          a.project_label.localeCompare(b.project_label),
+        )
+      : allRows;
 const displayTime = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -61,69 +45,46 @@ const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
 <AdminLayout title="work" hideHeader>
   <main class="operator-page operator-work-page" data-work-now>
     <header class="operator-page-header">
-      <div>
-        <p class="operator-eyebrow">execution ledger</p>
-        <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
-          Work
-        </h1>
-      </div>
-      <div class="operator-header-actions">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
         {
-          import.meta.env.DEV && (
-            <span class="operator-candidate-status">
-              AP Structural · candidate
-            </span>
-          )
+          view === "projects"
+            ? "Projects"
+            : view === "history"
+              ? "Work history"
+              : "Currently working"
         }
-        <span class={`operator-freshness is-${projectionFreshness}`}>
-          <span aria-hidden="true"></span>
-          {projectionFreshness}
-        </span>
-        <a class="operator-search-link" href="/knowledge">
-          search
-          <kbd>⌘K</kbd>
-        </a>
-      </div>
+      </h1>
+      <span>{visibleRows.length} visible</span>
     </header>
 
-    <section class="operator-ledger" aria-label="current execution">
+    <nav class="quiet-view-tabs" aria-label="work views">
+      <a
+        href="/work?view=now"
+        aria-current={view === "now" ? "page" : undefined}
+      >
+        now
+      </a>
+      <a
+        href="/work?view=projects"
+        aria-current={view === "projects" ? "page" : undefined}
+      >
+        projects
+      </a>
+      <a
+        href="/work?view=history"
+        aria-current={view === "history" ? "page" : undefined}
+      >
+        history
+      </a>
+    </nav>
+
+    <section class="operator-ledger" aria-label="current work">
       {
-        orderedGroups.map((group) => (
-          <section
-            class={`operator-ledger-group is-${group.id}`}
-            id={group.id}
-            data-work-group={group.id}
-          >
-            <header>
-              <h2>{group.label}</h2>
-              <span>{groups[group.id].length}</span>
-            </header>
-            {groups[group.id].length === 0 ? (
-              <p class="operator-empty">clear</p>
-            ) : (
-              <div class="operator-table-scroll">
-                <table class="operator-work-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">work</th>
-                      <th scope="col">state</th>
-                      <th scope="col">now</th>
-                      <th scope="col">observed</th>
-                      <th scope="col">
-                        <span class="sr-only">actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {groups[group.id].map((task) => (
-                      <OperatorTaskRow task={task} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        ))
+        visibleRows.length > 0 ? (
+          <OperatorWorkTable rows={visibleRows} client:load />
+        ) : (
+          <p class="quiet-empty-state">Nothing here yet.</p>
+        )
       }
     </section>
 
@@ -253,15 +214,17 @@ const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
       const inspectorRows = JSON.parse(data.textContent || "{}");
       const inspector = document.querySelector("[data-operator-inspector]");
       if (!(inspector instanceof HTMLElement)) return;
+      let inspectorOpener = null;
 
       const setText = (selector, value) => {
         const node = inspector.querySelector(selector);
         if (node) node.textContent = value || "none";
       };
 
-      const openInspector = (taskId) => {
+      const openInspector = (taskId, opener) => {
         const task = inspectorRows[taskId];
         if (!task) return;
+        inspectorOpener = opener instanceof HTMLElement ? opener : null;
 
         setText(
           "[data-inspector-provider]",
@@ -308,26 +271,54 @@ const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
         if (close instanceof HTMLElement) close.focus();
       };
 
+      const closeInspector = () => {
+        inspector.hidden = true;
+        delete document.body.dataset.inspectorOpen;
+        inspectorOpener?.focus();
+        inspectorOpener = null;
+      };
+
       document.addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
 
         const trigger = target.closest("[data-inspect-task]");
         if (trigger instanceof HTMLElement) {
-          openInspector(trigger.dataset.inspectTask);
+          openInspector(trigger.dataset.inspectTask, trigger);
           return;
         }
 
         if (target.closest("[data-close-inspector]")) {
-          inspector.hidden = true;
-          delete document.body.dataset.inspectorOpen;
+          closeInspector();
         }
       });
 
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !inspector.hidden) {
-          inspector.hidden = true;
-          delete document.body.dataset.inspectorOpen;
+          closeInspector();
+          return;
+        }
+        if (event.key === "Tab" && !inspector.hidden) {
+          const focusable = [
+            ...inspector.querySelectorAll(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ].filter(
+            (node) =>
+              node instanceof HTMLElement &&
+              node.offsetParent !== null &&
+              !node.classList.contains("operator-inspector-backdrop"),
+          );
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
         }
       });
 
@@ -338,7 +329,7 @@ const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
             candidate.primary_entity_ref === entity ||
             candidate.entity_refs.includes(entity),
         );
-        if (task) openInspector(task.task_id);
+        if (task) openInspector(task.task_id, null);
       }
     })();
   </script>

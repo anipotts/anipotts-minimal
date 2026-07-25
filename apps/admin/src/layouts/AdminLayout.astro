@@ -4,6 +4,7 @@ import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
 import "../styles/admin.css";
 import { AdminShell } from "../components/astryx/AdminShell";
+import { AdminCommandPalette } from "../components/astryx/AdminCommandPalette";
 import { navItems, routeTitle } from "../data/admin";
 import candidateFaviconDark from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-dark.svg?url";
 import candidateFaviconLight from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-light.svg?url";
@@ -23,7 +24,7 @@ if (import.meta.env.DEV) {
     )
     .replace("../fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.ttf", ttfUrl)
     .concat(
-      '\n.operator-page-header h1.ap-structural-candidate { font-family: "AP Structural", "Urbanist", sans-serif; }\n',
+      '\n.operator-page-header h1.ap-structural-candidate, .quiet-page-header h1.ap-structural-candidate { font-family: "AP Structural", "Urbanist", sans-serif; }\n',
     );
 }
 
@@ -156,6 +157,15 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
     >
       <slot />
     </AdminShell>
+    {
+      chrome === "admin" && (
+        <AdminCommandPalette
+          client:load
+          navItems={navItems}
+          showTrigger={false}
+        />
+      )
+    }
     <script is:inline>
       (() => {
         const root = document.documentElement;
@@ -187,6 +197,40 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
         }
 
         syncToggleLabels();
+
+        for (const trigger of document.querySelectorAll(
+          "[data-admin-search-trigger]",
+        )) {
+          trigger.addEventListener("click", () => {
+            document.dispatchEvent(new CustomEvent("admin:search"));
+          });
+        }
+
+        for (const group of document.querySelectorAll(
+          "[data-admin-nav-group]",
+        )) {
+          if (!(group instanceof HTMLDetailsElement)) continue;
+          const key = `admin-nav:${group.dataset.adminNavGroup}`;
+          const routeContainsSelection = Boolean(
+            group.querySelector('[aria-current="page"]'),
+          );
+          if (routeContainsSelection) {
+            group.open = true;
+          } else {
+            try {
+              group.open = localStorage.getItem(key) === "expanded";
+            } catch {
+              group.open = false;
+            }
+          }
+          group.addEventListener("toggle", () => {
+            try {
+              localStorage.setItem(key, group.open ? "expanded" : "collapsed");
+            } catch {
+              // The group remains usable for this page session.
+            }
+          });
+        }
       })();
     </script>
   </body>

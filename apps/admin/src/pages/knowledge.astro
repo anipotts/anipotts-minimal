@@ -3,231 +3,151 @@ import AdminLayout from "../layouts/AdminLayout.astro";
 import { readAdminKnowledge } from "../data/knowledge";
 
 const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB);
-const domains = ["work", "content", "life", "fleet", "system"] as const;
-const freshnessCounts = Object.fromEntries(
-  ["fresh", "partial", "stale", "unknown", "unavailable"].map((state) => [
-    state,
-    knowledge.cards.filter((card) => card.freshness_state === state).length,
-  ]),
+const requestedKind = Astro.url.searchParams.get("kind") ?? "all";
+const filters = [
+  ["all", "all"],
+  ["people", "people"],
+  ["project", "projects"],
+  ["decision", "decisions"],
+  ["concept", "concepts"],
+  ["place", "places"],
+  ["system", "systems"],
+] as const;
+const normalizedKind = (kind: string) =>
+  kind === "person" || kind === "people" ? "people" : kind;
+const cards = knowledge.cards.filter(
+  (card) =>
+    requestedKind === "all" || normalizedKind(card.kind) === requestedKind,
 );
 const humanize = (value: string) => value.replaceAll("_", " ");
+const displayTime = (value?: string | null) =>
+  value
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(value))
+    : "unknown";
 ---
 
-<AdminLayout
-  title="knowledge"
-  deck="The predictable map to canonical life, work, content, and system truth. Cards stay small; source evidence stays where it belongs."
->
-  <section class="meta-strip" aria-label="knowledge catalog state">
-    <span>{knowledge.cards.length} cards</span>
-    <span>{knowledge.source_mode} projection</span>
-    <span>{freshnessCounts.fresh} fresh</span>
-    <span>{freshnessCounts.partial} partial</span>
-    <span>{freshnessCounts.unknown} unknown</span>
-    <span>{freshnessCounts.stale} stale</span>
-  </section>
+<AdminLayout title="knowledge" hideHeader>
+  <main class="quiet-page quiet-knowledge-page">
+    <header class="quiet-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Knowledge
+      </h1>
+      <span data-knowledge-count>{cards.length} results</span>
+    </header>
 
-  <section class="table-card knowledge-contract">
-    <div class="section-head">
-      <div>
-        <p>card → bounded proof → canonical source</p>
-        <h2>retrieval contract</h2>
-      </div>
-      <span
-        >read only / {knowledge.contract.default_context_budget_tokens} token default</span
-      >
-    </div>
-    <dl class="knowledge-contract-grid">
-      <div>
-        <dt>before asking Ani</dt>
-        <dd>query cards, then retrieve current source proof</dd>
-      </div>
-      <div>
-        <dt>attention boundary</dt>
-        <dd>knowledge never becomes Inbox without a real action</dd>
-      </div>
-      <div>
-        <dt>closed tier</dt>
-        <dd>values never enter the index</dd>
-      </div>
-      <div>
-        <dt>stale result</dt>
-        <dd>return the locator and freshness, then verify</dd>
-      </div>
-    </dl>
-  </section>
+    <label class="quiet-page-search">
+      <span class="sr-only">search knowledge</span>
+      <input
+        type="search"
+        placeholder="Search current context"
+        autocomplete="off"
+        data-knowledge-search
+      />
+    </label>
 
-  <section
-    class="table-card knowledge-search"
-    aria-labelledby="knowledge-title"
-  >
-    <div class="section-head">
-      <div>
-        <p>
-          people, projects, decisions, concepts, places, moments, and systems
-        </p>
-        <h2 id="knowledge-title">find canonical context</h2>
-      </div>
-      <span data-knowledge-count>{knowledge.cards.length} visible</span>
-    </div>
-    <div class="knowledge-search-controls">
-      <label>
-        <span>search</span>
-        <input
-          type="search"
-          placeholder="what do you need context on?"
-          autocomplete="off"
-          data-knowledge-search
-        />
-      </label>
-      <div class="knowledge-domain-filter" aria-label="knowledge domain filter">
-        <button type="button" class="is-active" data-knowledge-domain="all">
-          all
-        </button>
-        {
-          domains.map((domain) => (
-            <button type="button" data-knowledge-domain={domain}>
-              {domain}
-            </button>
-          ))
-        }
-      </div>
-    </div>
-
-    <div class="knowledge-card-list" data-knowledge-list>
+    <nav class="quiet-view-tabs" aria-label="knowledge filters">
       {
-        knowledge.cards.map((card) => {
+        filters.map(([kind, label]) => (
+          <a
+            href={kind === "all" ? "/knowledge" : `/knowledge?kind=${kind}`}
+            aria-current={requestedKind === kind ? "page" : undefined}
+          >
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <section class="quiet-result-list" aria-label="knowledge results">
+      {
+        cards.map((card) => {
           const searchText = [
             card.title,
             card.summary,
-            card.entity_ref,
             card.domain,
             card.kind,
             card.source_system,
-            card.source_locator,
-            card.canonical_host,
-            card.canonical_path ?? "",
-            ...card.proof_refs,
-            ...card.lineage_refs,
           ]
             .join(" ")
             .toLowerCase();
           return (
             <article
-              class={`knowledge-card freshness-${card.freshness_state}`}
+              class="quiet-result-row"
               data-knowledge-card
-              data-domain={card.domain}
               data-search-text={searchText}
+              id={`card-${card.card_id}`}
             >
-              <div class="knowledge-card-main">
-                <p>
-                  {card.domain} / {humanize(card.kind)} / {card.source_system}
-                </p>
-                <h3>{card.title}</h3>
-                <span>{card.summary}</span>
-                <div class="knowledge-retrieval">
-                  <small>retrieve</small>
-                  <strong>{card.retrieval_instructions}</strong>
-                </div>
+              <div class="quiet-result-kind">
+                <span>{humanize(card.kind)}</span>
+                <small>{card.source_system}</small>
               </div>
-              <dl>
-                <div>
-                  <dt>host</dt>
-                  <dd>{card.canonical_host}</dd>
-                </div>
-                <div>
-                  <dt>freshness</dt>
-                  <dd>{humanize(card.freshness_state)}</dd>
-                </div>
-                <div>
-                  <dt>access</dt>
-                  <dd>{humanize(card.reveal_policy)}</dd>
-                </div>
-                <div>
-                  <dt>budget</dt>
-                  <dd>{card.context_budget_tokens} tokens</dd>
-                </div>
-              </dl>
-              <div class="knowledge-card-actions">
-                <a
-                  class="button ghost"
-                  href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
-                >
-                  card json
-                </a>
-                <code>{card.source_locator}</code>
+              <div class="quiet-result-copy">
+                <h2>{card.title}</h2>
+                <p>{card.summary}</p>
               </div>
-              <details>
-                <summary>proof and lineage</summary>
-                <p>
-                  {[...card.proof_refs, ...card.lineage_refs].join(" · ") ||
-                    "no proof reference recorded"}
-                </p>
-              </details>
+              <div class="quiet-result-freshness">
+                <span>{humanize(card.freshness_state)}</span>
+                <time datetime={card.observed_at ?? undefined}>
+                  {displayTime(card.observed_at)}
+                </time>
+              </div>
+              <a
+                class="quiet-row-link"
+                href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
+                aria-label={`inspect ${card.title}`}
+              >
+                inspect
+              </a>
             </article>
           );
         })
       }
-      <p class="knowledge-empty" data-knowledge-empty hidden>
-        no indexed card matches this query.
+      <p class="quiet-empty-state" data-knowledge-empty hidden>
+        No current result matches.
       </p>
-    </div>
-  </section>
+    </section>
 
-  {
-    knowledge.errors.length > 0 && (
-      <section class="table-card knowledge-warning">
-        <div class="section-head">
-          <div>
-            <p>adapter state</p>
-            <h2>live catalog unavailable</h2>
-          </div>
-          <span>fixture review remains read only</span>
-        </div>
-        <p>{knowledge.errors.join(" · ")}</p>
-      </section>
-    )
-  }
+    {
+      knowledge.errors.length > 0 && (
+        <aside class="quiet-inline-notice">
+          Some sources are unavailable. Details are in System.
+        </aside>
+      )
+    }
+  </main>
 
   <script is:inline>
     (() => {
-      let domain = "all";
-      let query = "";
+      const input = document.querySelector("[data-knowledge-search]");
+      if (!(input instanceof HTMLInputElement)) return;
       const apply = () => {
+        const terms = input.value
+          .trim()
+          .toLowerCase()
+          .split(/\s+/)
+          .filter(Boolean);
         let visible = 0;
         for (const card of document.querySelectorAll("[data-knowledge-card]")) {
-          const domainMatches =
-            domain === "all" || card.getAttribute("data-domain") === domain;
-          const text = card.getAttribute("data-search-text") ?? "";
-          const terms = query.split(/\s+/).filter(Boolean);
-          const queryMatches = terms.every((term) => text.includes(term));
-          card.hidden = !(domainMatches && queryMatches);
+          const text = card.getAttribute("data-search-text") || "";
+          card.hidden = !terms.every((term) => text.includes(term));
           if (!card.hidden) visible += 1;
         }
         const count = document.querySelector("[data-knowledge-count]");
-        if (count) count.textContent = `${visible} visible`;
+        if (count) count.textContent = `${visible} results`;
         const empty = document.querySelector("[data-knowledge-empty]");
         if (empty) empty.hidden = visible !== 0;
       };
+      input.addEventListener("input", apply);
 
-      document
-        .querySelector("[data-knowledge-search]")
-        ?.addEventListener("input", (event) => {
-          query = event.target.value.trim().toLowerCase();
-          apply();
-        });
-
-      for (const button of document.querySelectorAll(
-        "[data-knowledge-domain]",
-      )) {
-        button.addEventListener("click", () => {
-          domain = button.getAttribute("data-knowledge-domain") ?? "all";
-          for (const candidate of document.querySelectorAll(
-            "[data-knowledge-domain]",
-          )) {
-            candidate.classList.toggle("is-active", candidate === button);
-          }
-          apply();
-        });
+      const cardId = new URLSearchParams(location.search).get("card");
+      if (cardId) {
+        document
+          .querySelector(`#card-${CSS.escape(cardId)}`)
+          ?.scrollIntoView({ block: "center" });
       }
     })();
   </script>

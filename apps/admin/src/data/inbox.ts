@@ -13,7 +13,7 @@ import {
   type AdminControlDatabase,
   type AdminInboxItem as AdminControlInboxItem,
 } from "@anipotts/lib/admin-control";
-import { carouselPosts, carouselSummary } from "./carousels";
+import { carouselPosts, carouselSeries, carouselSummary } from "./carousels";
 import { loadRuntimeOverlayResponse } from "./runtime";
 
 type BoundAdminControlDatabase = Exclude<
@@ -77,6 +77,7 @@ const CLOSED_STATUSES = new Set([
   "resolved",
   "verified",
 ]);
+const STATIC_SOURCE_OBSERVED_AT = "1970-01-01T00:00:00.000Z";
 
 export async function readAdminInbox(
   db: AdminInboxDb | null | undefined,
@@ -95,7 +96,12 @@ export async function readAdminInbox(
       .filter((item) => isOpenProjectionItem(item))
       .map((item) => inboxItemFromProjection(item, now)),
     ...proof
-      .filter((entry) => entry.status !== "verified")
+      .filter(
+        (entry) =>
+          entry.status !== "verified" &&
+          !entry.title.toLowerCase().includes("d1 read failed") &&
+          !entry.summary.toLowerCase().includes("d1_error"),
+      )
       .map<AdminInboxItem>((entry) => ({
         id: entry.id,
         entity_id: entityIdFor(`proof:${entry.id}`),
@@ -113,7 +119,7 @@ export async function readAdminInbox(
         next_action: entry.next_safe_action,
         copy_text: entry.next_safe_action,
         proof: entry.evidence_uri,
-        updated_at: now,
+        updated_at: STATIC_SOURCE_OBSERVED_AT,
       })),
     ...operations.operations
       .filter((operation) =>
@@ -121,7 +127,6 @@ export async function readAdminInbox(
           operation.status,
         ),
       )
-      .slice(0, 8)
       .map<AdminInboxItem>((operation) => {
         const nextAction =
           operation.status === "blocked"
@@ -210,7 +215,6 @@ export async function readAdminInbox(
       }),
     ...newsletterDrafts
       .filter((draft) => draft.status !== "ready_for_review")
-      .slice(0, 4)
       .map<AdminInboxItem>((draft) => ({
         id: draft.id,
         entity_id: entityIdFor(`newsletter:${draft.id}`),
@@ -228,11 +232,10 @@ export async function readAdminInbox(
         next_action: draft.pipeline.next_action,
         copy_text: draft.pipeline.next_action,
         proof: draft.source_fixture,
-        updated_at: now,
+        updated_at: STATIC_SOURCE_OBSERVED_AT,
       })),
     ...carouselPosts
       .filter((post) => post.staleCount > 0 || post.soundStatus !== "approved")
-      .slice(0, 4)
       .map<AdminInboxItem>((post) => {
         const nextAction =
           carouselSummary.staleExports > 0
@@ -256,64 +259,15 @@ export async function readAdminInbox(
           next_action: nextAction,
           copy_text: nextAction,
           proof: "media carousel handoff manifest",
-          updated_at: now,
+          updated_at:
+            carouselSeries.generatedAt === "unknown"
+              ? STATIC_SOURCE_OBSERVED_AT
+              : carouselSeries.generatedAt,
         };
       }),
   ];
 
-  if (control.errors.length > 0) {
-    items.push({
-      id: "admin-control.read-unavailable",
-      entity_id: entityIdFor("admin-control:read-unavailable"),
-      dedupe_key: "admin-control:read-unavailable",
-      source: "system",
-      owner: "chief/site",
-      action_kind: "verify",
-      title: "admin projection read is partial",
-      summary: `${control.errors.length} projection sources could not return live D1 state.`,
-      status: "read unavailable",
-      risk: "medium",
-      category: "system",
-      timeframe: "today",
-      href: "/api/admin/projections",
-      next_action:
-        "inspect projection errors without substituting fixture work",
-      copy_text: "inspect projection errors without substituting fixture work",
-      proof: `${control.errors.length} projection read errors`,
-      updated_at: now,
-    });
-  }
-
-  if (pageContent.mode !== "ready") {
-    items.push({
-      id: "content.page-content.unavailable",
-      entity_id: entityIdFor("content:page-content:unavailable"),
-      dedupe_key: "content:page-content:unavailable",
-      source: "content",
-      owner: "chief/site",
-      action_kind: "verify",
-      title: "page_content read unavailable",
-      summary:
-        pageContent.mode === "read_failed"
-          ? pageContent.error
-          : "D1 binding is missing in this runtime.",
-      status: normalizeStatus(pageContent.mode),
-      risk: "medium",
-      category: "content",
-      timeframe: "today",
-      href: "/content",
-      next_action:
-        "fix DB binding or local runtime before editing public content",
-      copy_text:
-        "fix DB binding or local runtime before editing public content",
-      proof: "D1 page_content",
-      updated_at: now,
-    });
-  }
-
-  const sorted = dedupeInboxItems(items).sort(
-    (a, b) => score(b) - score(a) || b.updated_at.localeCompare(a.updated_at),
-  );
+  const sorted = rankInboxItems(items);
 
   return {
     generated_at: now,
@@ -412,10 +366,21 @@ function normalizeStatus(status: string): string {
     .replaceAll("_", " ");
 }
 
-function dedupeInboxItems(items: AdminInboxItem[]): AdminInboxItem[] {
+export function rankInboxItems(items: AdminInboxItem[]): AdminInboxItem[] {
   const unique = new Map<string, AdminInboxItem>();
-  for (const item of items) unique.set(item.dedupe_key, item);
-  return [...unique.values()];
+  for (const item of items) {
+    const requiredAction = `${item.entity_id}:${item.action_kind}`;
+    const existing = unique.get(requiredAction);
+    if (!existing || item.updated_at > existing.updated_at) {
+      unique.set(requiredAction, item);
+    }
+  }
+  return [...unique.values()].sort(
+    (a, b) =>
+      score(b) - score(a) ||
+      b.updated_at.localeCompare(a.updated_at) ||
+      a.id.localeCompare(b.id),
+  );
 }
 
 function score(item: AdminInboxItem): number {

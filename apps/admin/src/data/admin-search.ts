@@ -1,0 +1,44 @@
+export type AdminSearchDomain =
+  | "navigation"
+  | "inbox"
+  | "work"
+  | "content"
+  | "life"
+  | "people"
+  | "system";
+
+export type AdminSearchResult = {
+  id: string;
+  label: string;
+  domain: AdminSearchDomain;
+  kind: string;
+  currentFact: string;
+  source: string;
+  freshness: string;
+  href: string;
+  keywords: string[];
+};
+
+export function searchAdminResults(
+  rows: AdminSearchResult[],
+  query: string,
+): AdminSearchResult[] {
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return rows.slice(0, 12);
+
+  return rows
+    .filter((row) => {
+      const haystack = [
+        row.label,
+        row.domain,
+        row.kind,
+        row.currentFact,
+        row.source,
+        ...row.keywords,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return terms.every((term) => haystack.includes(term));
+    })
+    .slice(0, 24);
+}

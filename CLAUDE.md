@@ -188,3 +188,14 @@ work. Avoid generic startup copy, guru tone, unsupported hype, rhetorical
 questions, fake vulnerability, and exactly-three-item cadence.
 
 No em dashes in human-facing copy. Never use `git add .` or `git add -A`.
+
+## admin interface
+
+- Use `@phosphor-icons/react` as the only generic icon source in `apps/admin`.
+  Default to regular weight and use icons only when they improve recognition.
+- Provider identity uses localized approved source marks or explicit text
+  labels. Generic icons do not stand in for provider brands or encode state.
+- Every icon-only control needs a tooltip, an accessible label, visible focus,
+  and a target of at least 36px on desktop or 44px on mobile.
+- Do not use emoji, hand-drawn provider marks, or scattered inline SVGs in the
+  admin interface.

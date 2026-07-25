@@ -10,6 +10,7 @@ type Props = {
 };
 
 const { item, index, linkedTask, domainHref } = Astro.props;
+const hasObservedTime = !item.updated_at.startsWith("1970-01-01");
 const displayTime = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -23,6 +24,8 @@ const displayTime = (value: string) =>
   class={`operator-attention-row risk-${item.risk}`}
   data-attention-id={item.id}
   data-entity-id={item.entity_id}
+  data-attention-status={item.status}
+  data-attention-updated={item.updated_at}
 >
   <span class="operator-attention-rank">
     {String(index + 1).padStart(2, "0")}
@@ -44,7 +47,13 @@ const displayTime = (value: string) =>
           : item.timeframe
       }
     </span>
-    <time datetime={item.updated_at}>{displayTime(item.updated_at)}</time>
+    {
+      hasObservedTime ? (
+        <time datetime={item.updated_at}>{displayTime(item.updated_at)}</time>
+      ) : (
+        <span>source time unknown</span>
+      )
+    }
   </div>
   <a
     class="operator-primary-action"

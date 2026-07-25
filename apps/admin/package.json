@@ -25,6 +25,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@fontsource/geist-sans": "^5.2.5",
     "@fontsource/urbanist": "^5.2.7",
+    "@phosphor-icons/react": "^2.1.10",
     "@simplewebauthn/browser": "13.3.0",
     "@simplewebauthn/server": "13.3.2",
     "@stylexjs/stylex": "^0.18.3",

@@ -92,6 +92,12 @@ export const ADMIN_ROUTES = [
   },
   { route: "/fleet", file: "apps/admin/src/pages/fleet.astro", nav: true },
   {
+    route: "/system",
+    file: "apps/admin/src/pages/system.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/mutations",
     file: "apps/admin/src/pages/mutations.astro",
     nav: true,
@@ -148,6 +154,9 @@ export const PUBLIC_UNSMOKED_ROUTE_FILES = [
   "apps/admin/src/pages/api/admin/passkey/register-verify.ts",
   "apps/admin/src/pages/api/admin/passkey/revoke-current.ts",
   "apps/admin/src/pages/api/admin/passkey/status.ts",
+  "apps/admin/src/pages/api/admin/password/login.ts",
+  "apps/admin/src/pages/api/admin/password/logout.ts",
+  "apps/admin/src/pages/api/admin/password/status.ts",
 ];
 
 export const ADMIN_PROTECTED_SMOKE_ROUTES = ADMIN_ROUTES.filter(

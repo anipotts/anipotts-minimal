@@ -1,75 +1,90 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { readAdminKnowledge } from "../../data/knowledge";
+import { readAdminInbox } from "../../data/inbox";
 
-const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB, "", {
-  domain: "life",
-  limit: 6,
-});
-const areas = [
-  {
-    href: "/life/health",
-    label: "health",
-    state: "status only",
-    detail:
-      "Shows source freshness and retrieval boundaries without generating tasks from vitals.",
-  },
-  {
-    href: "/life/aesthetics",
-    label: "aesthetics",
-    state: "clean shell",
-    detail:
-      "Future home for wardrobe, outfits, looks, references, and personal style.",
-  },
-];
+const [knowledge, inbox] = await Promise.all([
+  readAdminKnowledge(Astro.locals.runtime?.env.DB, "", {
+    domain: "life",
+    limit: 8,
+  }),
+  readAdminInbox(Astro.locals.runtime?.env.DB),
+]);
+const lifeAttention = inbox.items.filter((item) => item.category === "life");
+const recent = knowledge.bundle.cards.slice(0, 5);
 ---
 
-<AdminLayout
-  title="life"
-  deck="A quiet overview of personal areas. Anything requiring action appears once in the global Inbox."
->
-  <section class="meta-strip" aria-label="life overview state">
-    <span>{areas.length} areas</span>
-    <span>{knowledge.bundle.cards.length} indexed references</span>
-    <span>no separate inbox</span>
-    <span>private sources stay local</span>
-  </section>
+<AdminLayout title="life" hideHeader>
+  <main class="quiet-page quiet-life-page">
+    <header class="quiet-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Life
+      </h1>
+      <span>{lifeAttention.length} need attention</span>
+    </header>
 
-  <section class="life-area-grid" aria-label="life areas">
-    {
-      areas.map((area) => (
-        <a class="life-area" href={area.href}>
-          <p>{area.state}</p>
-          <h2>{area.label}</h2>
-          <span>{area.detail}</span>
-        </a>
-      ))
-    }
-  </section>
-
-  <section class="table-card life-reference-panel">
-    <div class="section-head">
-      <div>
-        <p>bounded pointers only</p>
-        <h2>life knowledge</h2>
-      </div>
-      <a href="/knowledge">search all knowledge</a>
-    </div>
-    <div class="life-reference-list">
+    <section class="quiet-life-today" aria-labelledby="today-heading">
+      <header>
+        <h2 id="today-heading">Today</h2>
+        <time datetime={new Date().toISOString()}>
+          {
+            new Intl.DateTimeFormat("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            }).format(new Date())
+          }
+        </time>
+      </header>
       {
-        knowledge.bundle.cards.map((card) => (
-          <article>
-            <div>
-              <p>
-                {card.kind} / {card.freshness_state}
-              </p>
-              <h3>{card.title}</h3>
-            </div>
-            <span>{card.summary}</span>
-            <code>{card.source_locator}</code>
-          </article>
-        ))
+        lifeAttention.length > 0 ? (
+          <div class="quiet-life-attention">
+            {lifeAttention.map((item) => (
+              <a href={`/?item=${encodeURIComponent(item.id)}`}>
+                <strong>{item.title}</strong>
+                <span>{item.next_action}</span>
+                <small>{item.timeframe}</small>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p class="quiet-empty-state">Nothing in Life needs a decision.</p>
+        )
       }
-    </div>
-  </section>
+    </section>
+
+    <section class="quiet-life-areas" aria-label="life areas">
+      <a href="/life/health">
+        <strong>Health</strong>
+        <span>status and source freshness</span>
+      </a>
+      <a href="/life/aesthetics">
+        <strong>Aesthetics</strong>
+        <span>style, wardrobe, and references</span>
+      </a>
+      <a href="/knowledge?kind=people">
+        <strong>People</strong>
+        <span>current relationships and commitments</span>
+      </a>
+    </section>
+
+    <section class="quiet-life-updates" aria-labelledby="changes-heading">
+      <header>
+        <h2 id="changes-heading">Recent changes</h2>
+        <a href="/knowledge">search knowledge</a>
+      </header>
+      <div>
+        {
+          recent.map((card) => (
+            <article>
+              <span>{card.kind.replaceAll("_", " ")}</span>
+              <h3>{card.title}</h3>
+              <p>{card.summary}</p>
+              <small>{card.freshness_state}</small>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </main>
 </AdminLayout>
