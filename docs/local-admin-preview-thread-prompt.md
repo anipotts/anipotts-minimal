@@ -35,7 +35,7 @@ pnpm admin:preview:ensure
 Open the in-app browser to:
 
 ```text
-http://127.0.0.1:4311/
+http://localhost:4311/
 ```
 
 Local auth notes:
@@ -67,7 +67,7 @@ Local D1 notes:
 Fast workflow:
 
 1. make the smallest visible admin edit.
-2. inspect it in the in-app browser at `127.0.0.1:4311`.
+2. inspect it in the in-app browser at `localhost:4311`.
 3. run the narrow check:
 
 ```bash

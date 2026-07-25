@@ -29,7 +29,7 @@ assert.equal(
 );
 
 for (const marker of [
-  'const DEFAULT_HOST = "127.0.0.1"',
+  'const DEFAULT_HOST = "localhost"',
   "const DEFAULT_PORT = 4311",
   "processMatches(metadata)",
   "no process was stopped",
@@ -58,7 +58,7 @@ for (const source of [agentGuide, previewGuide]) {
     "local preview guidance must use the durable ensure command",
   );
   assert.ok(
-    source.includes("http://127.0.0.1:4311/"),
+    source.includes("http://localhost:4311/"),
     "local preview guidance must name the canonical review URL",
   );
 }

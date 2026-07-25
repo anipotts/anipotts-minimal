@@ -135,7 +135,7 @@ pnpm validate
 
 ## local admin preview
 
-The canonical local review URL is `http://127.0.0.1:4311/`.
+The canonical local review URL is `http://localhost:4311/`.
 
 Start or reuse the durable preview with:
 

@@ -20,7 +20,7 @@ const ADMIN_ROOT = join(REPO_ROOT, "apps/admin");
 const STATE_ROOT = join(REPO_ROOT, ".local/admin-preview");
 const METADATA_PATH = join(STATE_ROOT, "process.json");
 const LOG_PATH = join(STATE_ROOT, "server.log");
-const DEFAULT_HOST = "127.0.0.1";
+const DEFAULT_HOST = "localhost";
 const DEFAULT_PORT = 4311;
 const START_TIMEOUT_MS = 20_000;
 
