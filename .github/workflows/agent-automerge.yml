@@ -27,24 +27,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Wait for required checks
+      - name: Wait for CI
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          count=0
-          for _ in $(seq 1 30); do
-            count="$(gh pr checks "$PR_URL" --required --json name --jq 'length' 2>/dev/null || echo 0)"
-            if [ "$count" -gt 0 ]; then
-              break
-            fi
-            sleep 10
+          for _ in $(seq 1 60); do
+            bucket="$(
+              gh pr checks "$PR_URL" \
+                --json name,bucket \
+                --jq '.[] | select(.name == "Build, lint, typecheck, test") | .bucket' \
+                2>/dev/null | head -n 1
+            )"
+            case "$bucket" in
+              pass)
+                exit 0
+                ;;
+              fail|cancel)
+                echo "CI did not pass"
+                exit 1
+                ;;
+              "")
+                echo "waiting for CI to register"
+                ;;
+              *)
+                echo "CI is ${bucket}"
+                ;;
+            esac
+            sleep 15
           done
-          if [ "$count" -eq 0 ]; then
-            echo "required checks were not registered"
-            exit 1
-          fi
-          gh pr checks "$PR_URL" --required --watch --fail-fast --interval 15
+          echo "CI did not finish in time"
+          exit 1
 
       - name: Compute deploy targets
         id: targets

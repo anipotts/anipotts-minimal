@@ -46,6 +46,12 @@ assert.equal(
   false,
   "automerge must not dispatch a duplicate deploy after the main push",
 );
+for (const checkName of ["Build, lint, typecheck, test", "Security Review"]) {
+  assert.ok(
+    autoMergeWorkflow.includes(checkName),
+    `automerge must wait for ${checkName}`,
+  );
+}
 
 for (const file of workflowFiles) {
   const body = readFileSync(join(WORKFLOW_DIR, file), "utf8");
