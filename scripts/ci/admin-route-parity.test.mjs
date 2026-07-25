@@ -17,11 +17,19 @@ const homeSource = readFileSync(
   "apps/admin/src/components/AdminHome.astro",
   "utf8",
 );
+const attentionRowSource = readFileSync(
+  "apps/admin/src/components/AttentionRow.astro",
+  "utf8",
+);
 const knowledgeSource = readFileSync(
   "apps/admin/src/pages/knowledge.astro",
   "utf8",
 );
 const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const operatorWorkSource = readFileSync(
+  "apps/admin/src/data/operator-work.ts",
+  "utf8",
+);
 const lifeSource = readFileSync(
   "apps/admin/src/pages/life/index.astro",
   "utf8",
@@ -39,6 +47,10 @@ const lifecycleSource = readFileSync(
   "utf8",
 );
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
+const accessPolicySource = readFileSync(
+  "apps/admin/src/lib/admin-access-policy.ts",
+  "utf8",
+);
 const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
   "utf8",
@@ -55,12 +67,20 @@ const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
 const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
-const publicPaths = extractStringList(middlewareSource, "PUBLIC_PATHS");
+const publicPaths = extractStringList(accessPolicySource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
-  middlewareSource,
+  accessPolicySource,
   "PUBLIC_PASSKEY_API_PATHS",
 );
-const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
+const publicPrefixes = extractStringList(accessPolicySource, "PUBLIC_PREFIXES");
+const devLoopbackOrigins = extractStringList(
+  accessPolicySource,
+  "DEV_LOOPBACK_ORIGINS",
+);
+const devLoopbackPreviewPaths = extractStringList(
+  accessPolicySource,
+  "DEV_LOOPBACK_PREVIEW_PATHS",
+);
 const retiredActionQueueFiles = [
   "apps/admin/src/pages/needs-ani.astro",
   "apps/admin/src/data/needs.ts",
@@ -91,6 +111,15 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/status",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
+assert.deepEqual(devLoopbackOrigins, [
+  "http://127.0.0.1:4311",
+  "http://localhost:4311",
+]);
+assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
+assert.ok(
+  middlewareSource.includes("isDev: import.meta.env.DEV"),
+  "loopback preview must remain gated by Astro development mode",
+);
 
 const classifiedFiles = new Set([
   ...ADMIN_ROUTES.map((route) => route.file),
@@ -139,8 +168,9 @@ for (const route of ADMIN_ROUTES) {
   }
 
   if (route.nav) {
+    const navHref = route.route === "/work" ? "/work?view=now" : route.route;
     assert.ok(
-      navSource.includes(`href: "${route.route}"`),
+      navSource.includes(`href: "${navHref}"`),
       `${route.route} missing from admin nav`,
     );
   }
@@ -203,23 +233,21 @@ assert.equal(
 );
 
 for (const marker of [
-  'id: "work"',
-  'id: "content"',
-  'id: "life"',
-  'id: "fleet"',
-  'id: "system"',
-  "data-copy-text",
-  "data-attention-id",
-  "data-entity-id",
   "data-astro-rerun",
-  "adminHomeBound",
-  'target.closest("[data-copy-text]")',
-  "what needs attention",
+  "data-attention-projection",
+  "ranked actions",
+  "being handled",
+  "/work?view=now",
   "inbox-category-filter",
-  "refresh on open",
-  "waiting / gated",
+  "later and waiting",
 ]) {
   assert.ok(homeSource.includes(marker), `admin home missing marker ${marker}`);
+}
+for (const marker of ["data-attention-id", "data-entity-id"]) {
+  assert.ok(
+    attentionRowSource.includes(marker),
+    `admin attention row missing marker ${marker}`,
+  );
 }
 
 for (const marker of [
@@ -236,13 +264,28 @@ for (const marker of [
 }
 
 for (const marker of [
-  "Native runtime state stays separate",
-  "current work",
-  "source lineage",
-  "loose chats",
-  "preserved and collapsed",
+  "data-work-now",
+  "data-work-group={group.id}",
+  "foreground",
+  "background",
+  "recently completed",
+  "data-inspect-task",
+  "loose conversations",
+  "preserved",
 ]) {
   assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
+}
+for (const marker of [
+  "019f7fb8-69b7-7791-8e67-87c87acfae02",
+  "019f95c5-be35-7991-811c-371611daa94b",
+  "019f99d2-90a1-7761-8582-17b7037c748b",
+  "searchable_history_disposition",
+  "OPERATOR_WORK_FIXTURE_SHA256",
+]) {
+  assert.ok(
+    operatorWorkSource.includes(marker),
+    `operator work fixture missing marker ${marker}`,
+  );
 }
 
 for (const marker of [
@@ -261,18 +304,16 @@ assert.ok(
   "aesthetics must remain a clean data boundary",
 );
 
-for (const marker of [
+for (const removedNarration of [
   "source → entity → outcome → attention → history",
-  "data-lifecycle-search",
-  "data-archive-candidate",
-  "data-propose-archive",
-  "data-confirm-archive",
-  "data-restore-archive",
-  "admin projection only",
-  "ChatGPT conversation",
-  "Codex task",
+  "adapter writes and native archive actions are disconnected",
+  "sanitized metadata, lineage, proofs, freshness, and receipts",
 ]) {
-  assert.ok(homeSource.includes(marker), `admin lifecycle missing ${marker}`);
+  assert.equal(
+    homeSource.includes(removedNarration),
+    false,
+    `admin home must demote ${removedNarration}`,
+  );
 }
 
 for (const marker of [

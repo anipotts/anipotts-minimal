@@ -14,6 +14,9 @@ pnpm-lock.yaml
 # remove or archive it.
 apps/admin-solid/
 
+# immutable Brand candidate packet; source hashes must remain byte-for-byte exact.
+apps/admin/src/assets/ap-structural-candidate/
+
 # content collection bodies are data, not code. the markdown -> d1 sync
 # depends on byte fidelity, so no formatter ever touches them.
 apps/www/src/content/

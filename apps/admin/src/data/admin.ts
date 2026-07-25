@@ -47,11 +47,11 @@ export const navItems: NavItem[] = [
     description: "canonical context cards and retrieval proof",
   },
   {
-    href: "/work",
+    href: "/work?view=now",
     label: "work",
-    status: "lineage",
+    status: "now",
     group: "work",
-    description: "projects, tasks, loose chats, and outcomes",
+    description: "current execution, waiting, proof, and lineage",
   },
   {
     href: "/content",

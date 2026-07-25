@@ -1,642 +1,203 @@
 ---
-import {
-  evaluateArchiveCandidate,
-  searchWorkLifecycle,
-} from "@anipotts/lib/admin-control";
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { readAdminInbox } from "../data/inbox";
-import { readAdminWorkLifecycle } from "../data/work-lifecycle";
+import { SourceMark } from "./SourceMark";
+import AttentionRow from "./AttentionRow.astro";
+import { readAdminInbox, type AdminInboxItem } from "../data/inbox";
+import { readOperatorWorkProjection } from "../data/operator-work";
 
-const [inbox, lifecycle] = await Promise.all([
+const [inbox, work] = await Promise.all([
   readAdminInbox(Astro.locals.runtime?.env.DB),
-  readAdminWorkLifecycle(),
+  Promise.resolve(readOperatorWorkProjection()),
 ]);
-const categories = [
-  {
-    id: "work",
-    label: "work",
-    detail: "projects, jobs, business, payments, tasks, and decisions",
-  },
-  {
-    id: "content",
-    label: "content",
-    detail: "site, writing, newsletter, brand, social, and carousel work",
-  },
-  {
-    id: "life",
-    label: "life",
-    detail: "health, people, schedule, aesthetics, and personal decisions",
-  },
-  {
-    id: "fleet",
-    label: "fleet",
-    detail: "machines, repositories, runtimes, services, and capabilities",
-  },
-  {
-    id: "system",
-    label: "system",
-    detail: "infra, fleet, repos, deploys, proof, and gated operations",
-  },
-] as const;
 
-const sections = categories.map((category) => ({
-  ...category,
-  items: inbox.items.filter((item) => item.category === category.id),
-}));
+const categories = ["work", "content", "life", "fleet", "system"] as const;
 const requestedCategory = Astro.url.searchParams.get("category");
 const selectedCategory = categories.find(
-  (category) => category.id === requestedCategory,
+  (category) => category === requestedCategory,
 );
-const visibleSections = selectedCategory
-  ? sections.filter((section) => section.id === selectedCategory.id)
-  : sections;
-const lifecycleSearchResults = searchWorkLifecycle(lifecycle, "", 20);
-const lifecycleEntityIds = new Set(
-  lifecycleSearchResults.map((result) => result.entity_id),
+const visibleItems = selectedCategory
+  ? inbox.items.filter((item) => item.category === selectedCategory)
+  : inbox.items;
+const topItems = visibleItems.slice(0, 4);
+const remainingItems = visibleItems.slice(4);
+const beingHandled = work.task_states.filter(
+  (task) =>
+    task.operator_state === "working" || task.operator_state === "review",
 );
-const attentionSearchResults = inbox.items
-  .filter((item) => !lifecycleEntityIds.has(item.entity_id))
-  .map((item) => ({
-    entity_id: item.entity_id,
-    title: item.title,
-    summary: item.summary,
-    lifecycle: "open" as const,
-    owner: item.owner,
-    surfaces: [item.source],
-    source_count: 1,
-    reconciliation_states: [inbox.mode === "ready" ? "fresh" : "partial"],
-    import_states: ["updated"],
-    source_locators: [item.href],
-    lineage_refs: [item.dedupe_key],
-    proof_refs: [item.proof],
-    outcome_summaries: [],
-    history_summaries: [],
-    receipt_ids: [],
-    updated_at: item.updated_at,
-    score: 0,
-  }));
-const searchResults = [
-  ...lifecycleSearchResults,
-  ...attentionSearchResults,
-].sort((left, right) => right.updated_at.localeCompare(left.updated_at));
-const archiveCandidates = lifecycle.entities
-  .filter((entity) => entity.lifecycle === "completed")
-  .map((entity) => ({
-    entity,
-    candidate: evaluateArchiveCandidate(lifecycle, entity.entity_id),
-  }))
-  .sort((left, right) => {
-    const rank = { high: 0, medium: 1, low: 2 } as const;
-    return (
-      rank[left.candidate.confidence] - rank[right.candidate.confidence] ||
-      left.entity.title.localeCompare(right.entity.title)
-    );
-  });
 
-const countByTimeframe = (timeframe: string) =>
-  inbox.items.filter((item) => item.timeframe === timeframe).length;
+const displayTime = (value: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
 const humanize = (value: string) => value.replaceAll("_", " ");
+const domainHref = (item: AdminInboxItem) => {
+  if (item.category === "work") {
+    return `/work?view=now&entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "content") {
+    return `/content?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "life") {
+    return `/life?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "fleet") {
+    return `/fleet?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  return item.href.startsWith("/") ? item.href : "/proof";
+};
+const linkedTaskFor = (item: AdminInboxItem) =>
+  work.task_states.find(
+    (task) =>
+      task.attention_ref === item.id ||
+      task.primary_entity_ref === item.entity_id ||
+      task.entity_refs.includes(item.entity_id),
+  );
 ---
 
-<AdminLayout
-  title="inbox"
-  deck="One current attention projection. Conversations stay evidence, while completed work remains searchable and reversible."
->
-  <section class="meta-strip" aria-label="admin home source state">
-    <span>{inbox.counts.total} attention items</span>
-    <span>{countByTimeframe("now")} now</span>
-    <span>{countByTimeframe("today")} today</span>
-    <span>{countByTimeframe("waiting / gated")} waiting / gated</span>
-    <span>{lifecycle.entities.length} work entities</span>
-    <span>{lifecycle.source_mode} lifecycle seam</span>
-  </section>
-
-  <section class="table-card inbox-intro">
-    <div class="section-head">
+<AdminLayout title="inbox" hideHeader>
+  <main class="operator-page operator-inbox-page">
+    <header class="operator-page-header">
       <div>
-        <p>source → entity → outcome → attention → history</p>
-        <h2>what needs attention</h2>
+        <p class="operator-eyebrow">attention</p>
+        <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+          Inbox
+        </h1>
       </div>
-      <span>{inbox.mode} / read only</span>
-    </div>
-    <div class="inbox-intro-copy">
-      <p>
-        The home view combines only real human attention across work, content,
-        life, fleet, and system. Related conversations resolve to one work
-        entity. Knowledge cards remain outside the queue. Copy controls do not
-        send, approve, publish, or continue a task.
-      </p>
-      <div class="inbox-monitoring-status">
-        <small>monitoring</small>
-        <strong>refresh on open</strong>
-        <span>adapter writes and native archive actions are disconnected</span>
+      <div class="operator-header-actions">
+        <span class={`operator-freshness is-${inbox.mode}`}>
+          <span aria-hidden="true"></span>
+          {inbox.mode}
+        </span>
+        <a class="operator-search-link" href="/knowledge">
+          search
+          <kbd>⌘K</kbd>
+        </a>
       </div>
+    </header>
+
+    <div class="operator-inbox-summary" aria-label="attention summary">
+      <strong>{inbox.counts.total}</strong>
+      <span>open</span>
+      <span>{inbox.counts.high} urgent</span>
+      <time datetime={inbox.generated_at}>
+        checked {displayTime(inbox.generated_at)}
+      </time>
     </div>
+
     <nav
-      class="inbox-category-filter"
-      aria-label="filter attention by category"
+      class="operator-segmented-filter inbox-category-filter"
+      aria-label="filter attention by domain"
     >
       <a
-        class:list={[!selectedCategory && "is-active"]}
         href="/"
+        class:list={[!selectedCategory && "is-active"]}
         aria-current={!selectedCategory ? "page" : undefined}>all</a
       >
       {
         categories.map((category) => (
           <a
-            class:list={[selectedCategory?.id === category.id && "is-active"]}
-            href={`/?category=${category.id}`}
-            aria-current={
-              selectedCategory?.id === category.id ? "page" : undefined
-            }
+            href={`/?category=${category}`}
+            class:list={[selectedCategory === category && "is-active"]}
+            aria-current={selectedCategory === category ? "page" : undefined}
           >
-            {category.label}
+            {category}
           </a>
         ))
       }
     </nav>
-  </section>
 
-  <section
-    class="table-card lifecycle-search"
-    aria-labelledby="history-search-title"
-  >
-    <div class="section-head">
-      <div>
-        <p>sanitized metadata, lineage, proofs, freshness, and receipts</p>
-        <h2 id="history-search-title">search work and history</h2>
+    <section
+      class="operator-attention"
+      aria-labelledby="attention-title"
+      data-attention-projection
+    >
+      <div class="operator-section-heading">
+        <div>
+          <h2 id="attention-title">
+            {selectedCategory ? humanize(selectedCategory) : "ranked actions"}
+          </h2>
+        </div>
+        <span>{visibleItems.length}</span>
       </div>
-      <span data-search-count>{searchResults.length} entities</span>
-    </div>
-    <div class="lifecycle-search-control">
-      <label for="work-history-search">search across surfaces</label>
-      <input
-        id="work-history-search"
-        type="search"
-        placeholder="project, task, source, proof, or receipt"
-        autocomplete="off"
-        data-lifecycle-search
-      />
-      <small>
-        raw prompts, transcripts, recipients, attachments, provider payloads,
-        health data, and credentials are excluded.
-      </small>
-    </div>
-    <div class="lifecycle-search-results" data-lifecycle-results>
-      {
-        searchResults.map((result) => {
-          const searchText = [
-            result.title,
-            result.summary,
-            result.owner,
-            result.lifecycle,
-            ...result.surfaces,
-            ...result.reconciliation_states,
-            ...result.source_locators,
-            ...result.lineage_refs,
-            ...result.proof_refs,
-            ...result.outcome_summaries,
-            ...result.history_summaries,
-            ...result.receipt_ids,
-          ]
-            .join(" ")
-            .toLowerCase();
-          return (
-            <article
-              class="lifecycle-result"
-              id={`work-${result.entity_id}`}
-              data-lifecycle-result
-              data-search-text={searchText}
-              data-entity-id={result.entity_id}
-            >
-              <div>
-                <p>
-                  {result.surfaces.map(humanize).join(" + ")} / {result.owner}
-                </p>
-                <h3>{result.title}</h3>
-                <span>{result.summary}</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>lifecycle</dt>
-                  <dd data-entity-lifecycle>{result.lifecycle}</dd>
-                </div>
-                <div>
-                  <dt>sources</dt>
-                  <dd>{result.source_count}</dd>
-                </div>
-                <div>
-                  <dt>reconciliation</dt>
-                  <dd>{result.reconciliation_states.join(", ")}</dd>
-                </div>
-                <div>
-                  <dt>receipts</dt>
-                  <dd data-entity-receipts>
-                    {result.receipt_ids.length || "none"}
-                  </dd>
-                </div>
-              </dl>
-              <details>
-                <summary>lineage and proof</summary>
-                <p>
-                  {[...result.lineage_refs, ...result.proof_refs].join(" · ") ||
-                    "no proof reference recorded"}
-                </p>
-              </details>
-            </article>
-          );
-        })
-      }
-      <p class="lifecycle-search-empty" data-search-empty hidden>
-        no sanitized entity matches this search.
-      </p>
-    </div>
-  </section>
 
-  <div class="inbox-category-grid" data-attention-projection>
-    {
-      visibleSections.map((section) => (
-        <section class="table-card inbox-category" id={section.id}>
-          <div class="section-head">
-            <div>
-              <p>{section.detail}</p>
-              <h2>{section.label}</h2>
-            </div>
-            <span>{section.items.length} open</span>
-          </div>
-          <div class="record-list inbox-list">
-            {section.items.length === 0 ? (
-              <article class="record-row inbox-empty-row">
-                <div>
-                  <p>clear</p>
-                  <h3>nothing blocking this lane</h3>
-                </div>
-              </article>
-            ) : (
-              section.items.map((item) => (
-                <article
-                  class={`record-row inbox-row risk-${item.risk}`}
-                  data-attention-id={item.id}
-                  data-entity-id={item.entity_id}
-                >
-                  <div class="inbox-card-copy">
-                    <p>
-                      {item.timeframe} / {item.source} / {item.owner} /{" "}
-                      {item.status}
-                    </p>
-                    <h3>{item.title}</h3>
-                    <span>{item.summary}</span>
-                    <div class="inbox-next-action">
-                      <small>next action</small>
-                      <strong>{item.next_action}</strong>
-                    </div>
-                    <div class="inbox-card-actions">
-                      {item.copy_text && (
-                        <button
-                          type="button"
-                          class="button secondary inbox-copy-button"
-                          data-copy-text={item.copy_text}
-                        >
-                          {["approve", "decide"].includes(item.action_kind)
-                            ? "copy approval"
-                            : "copy next action"}
-                        </button>
-                      )}
-                      <a class="button ghost" href={item.href}>
-                        open source
-                      </a>
-                      <a class="button ghost" href={`/#work-${item.entity_id}`}>
-                        resolve entity
-                      </a>
-                      <span data-copy-status aria-live="polite" />
-                    </div>
-                  </div>
-                  <details class="inbox-proof-details">
-                    <summary>proof and identity</summary>
-                    <dl>
-                      <div>
-                        <dt>entity</dt>
-                        <dd>{item.entity_id}</dd>
-                      </div>
-                      <div>
-                        <dt>proof</dt>
-                        <dd>{item.proof}</dd>
-                      </div>
-                      <div>
-                        <dt>updated</dt>
-                        <dd>{item.updated_at}</dd>
-                      </div>
-                    </dl>
-                  </details>
-                </article>
-              ))
-            )}
-          </div>
-        </section>
-      ))
-    }
-  </div>
-
-  <section
-    class="table-card archive-review"
-    aria-labelledby="archive-review-title"
-  >
-    <div class="section-head">
-      <div>
-        <p>admin projection only / batch cap 20 / no delete</p>
-        <h2 id="archive-review-title">review archive candidates</h2>
-      </div>
-      <span>suggest, then confirm</span>
-    </div>
-    <div class="archive-candidate-list">
-      {
-        archiveCandidates.map(({ entity, candidate }) => (
-          <label
-            class={`archive-candidate confidence-${candidate.confidence}`}
-            data-archive-candidate
-            data-entity-id={entity.entity_id}
-            data-candidate-hash={candidate.candidate_hash}
-          >
-            <input
-              type="checkbox"
-              value={entity.entity_id}
-              checked={candidate.selected_by_default}
-              disabled={!candidate.eligible}
-              data-archive-select
+      <ol class="operator-attention-list">
+        {
+          topItems.map((item, index) => (
+            <AttentionRow
+              item={item}
+              index={index}
+              linkedTask={linkedTaskFor(item)}
+              domainHref={domainHref(item)}
             />
-            <span>
-              <strong>{entity.title}</strong>
-              <small>{candidate.reasons.join(" · ")}</small>
-            </span>
-            <em>{candidate.confidence}</em>
-          </label>
-        ))
-      }
-    </div>
-    <div class="archive-actions">
-      <button type="button" class="button secondary" data-propose-archive>
-        review selected proposal
-      </button>
-      <span data-archive-status aria-live="polite">
-        high confidence is selected. medium is visible but unselected. low is
-        ineligible.
-      </span>
-    </div>
-    <div class="archive-proposal" data-archive-proposal hidden>
-      <div>
-        <small>proposal binding</small>
-        <strong data-proposal-id></strong>
-        <code data-proposal-hash></code>
-        <p data-proposal-entities></p>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="operator-handled" aria-labelledby="being-handled-title">
+      <div class="operator-section-heading">
+        <div>
+          <h2 id="being-handled-title">being handled</h2>
+        </div>
+        <a href="/work?view=now">open Work</a>
       </div>
-      <button type="button" class="button" data-confirm-archive>
-        confirm admin projection archive
-      </button>
-      <small>
-        this records local projection state only. it cannot archive a native
-        ChatGPT conversation or Codex task.
-      </small>
-    </div>
-    <div class="archive-receipts" data-archive-receipts>
-      <p data-receipts-empty>no local review receipts in this page session.</p>
-    </div>
-  </section>
+      <div class="operator-handled-strip">
+        {
+          beingHandled.map((task) => (
+            <a
+              href={`/work?view=now#task-${task.task_id}`}
+              class="operator-handled-item"
+            >
+              <SourceMark provider={task.provider} compact />
+              <div>
+                <strong>{task.canonical_title}</strong>
+                <span>{task.bounded_goal}</span>
+              </div>
+              <time datetime={task.last_observed_at}>
+                {displayTime(task.last_observed_at)}
+              </time>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    {
+      remainingItems.length > 0 && (
+        <details class="operator-attention-more">
+          <summary>
+            <span>later and waiting</span>
+            <strong>{remainingItems.length}</strong>
+          </summary>
+          <ol class="operator-attention-list is-secondary">
+            {remainingItems.map((item, index) => (
+              <AttentionRow
+                item={item}
+                index={index + topItems.length}
+                linkedTask={linkedTaskFor(item)}
+                domainHref={domainHref(item)}
+              />
+            ))}
+          </ol>
+        </details>
+      )
+    }
+  </main>
 
   <script is:inline data-astro-rerun>
     (() => {
-      if (document.documentElement.dataset.adminHomeBound === "true") return;
-      document.documentElement.dataset.adminHomeBound = "true";
-
-      const writeClipboard = async (value) => {
-        if (!navigator.clipboard?.writeText)
-          throw new Error("copy unavailable");
-        await navigator.clipboard.writeText(value);
-      };
-
-      const fnv1a = (value) => {
-        let hash = 0x811c9dc5;
-        for (let index = 0; index < value.length; index += 1) {
-          hash ^= value.charCodeAt(index);
-          hash = Math.imul(hash, 0x01000193);
-        }
-        return `fnv1a-${(hash >>> 0).toString(16).padStart(8, "0")}`;
-      };
-
-      const selectedArchiveBinding = () => {
-        const selected = [
-          ...document.querySelectorAll(
-            "[data-archive-select]:checked:not(:disabled)",
-          ),
-        ]
-          .map((input) => input.value)
-          .sort();
-        const hashes = selected.map((entityId) =>
-          document
-            .querySelector(
-              `[data-archive-candidate][data-entity-id="${entityId}"]`,
-            )
-            ?.getAttribute("data-candidate-hash"),
-        );
-        return {
-          entityIds: selected,
-          candidateHash: fnv1a(JSON.stringify(hashes)),
-        };
-      };
-
-      const appendReceipt = ({
-        receiptId,
-        action,
-        entityIds,
-        proofRefs,
-        restorationOf,
-      }) => {
-        const board = document.querySelector("[data-archive-receipts]");
-        if (!board) return;
-        board.querySelector("[data-receipts-empty]")?.remove();
-        const receipt = document.createElement("article");
-        receipt.className = "archive-receipt";
-        receipt.dataset.receiptId = receiptId;
-        receipt.dataset.entityIds = JSON.stringify(entityIds);
-        const details = document.createElement("div");
-        const label = document.createElement("p");
-        label.textContent = `${action} receipt / local review`;
-        const id = document.createElement("strong");
-        id.textContent = receiptId;
-        const entities = document.createElement("span");
-        entities.textContent = entityIds.join(", ");
-        const proofs = document.createElement("small");
-        proofs.textContent = proofRefs.join(" · ");
-        details.append(label, id, entities, proofs);
-        if (restorationOf) {
-          const restoration = document.createElement("small");
-          restoration.textContent = `restores ${restorationOf}`;
-          details.append(restoration);
-        }
-        receipt.append(details);
-        if (action === "archive") {
-          const restore = document.createElement("button");
-          restore.type = "button";
-          restore.className = "button ghost";
-          restore.dataset.restoreArchive = "";
-          restore.textContent = "restore projection";
-          receipt.append(restore);
-        }
-        board.prepend(receipt);
-      };
-
-      document.addEventListener("input", (event) => {
-        const input = event.target;
-        if (!(input instanceof HTMLInputElement)) return;
-        if (!input.matches("[data-lifecycle-search]")) return;
-        const terms = input.value
-          .trim()
-          .toLowerCase()
-          .split(/\s+/)
-          .filter(Boolean);
-        let visible = 0;
-        for (const result of document.querySelectorAll(
-          "[data-lifecycle-result]",
-        )) {
-          const text = result.getAttribute("data-search-text") ?? "";
-          const matches = terms.every((term) => text.includes(term));
-          result.hidden = !matches;
-          if (matches) visible += 1;
-        }
-        const count = document.querySelector("[data-search-count]");
-        if (count)
-          count.textContent = `${visible} ${visible === 1 ? "entity" : "entities"}`;
-        const empty = document.querySelector("[data-search-empty]");
-        if (empty) empty.hidden = visible !== 0;
-      });
-
-      document.addEventListener("click", async (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-
-        const copyButton = target.closest("[data-copy-text]");
-        if (copyButton instanceof HTMLButtonElement) {
-          const status =
-            copyButton.parentElement?.querySelector("[data-copy-status]");
-          try {
-            await writeClipboard(
-              copyButton.getAttribute("data-copy-text") ?? "",
-            );
-            if (status) status.textContent = "copied";
-          } catch {
-            if (status) status.textContent = "copy failed";
-          }
-          return;
-        }
-
-        if (target.closest("[data-propose-archive]")) {
-          const binding = selectedArchiveBinding();
-          const status = document.querySelector("[data-archive-status]");
-          if (binding.entityIds.length === 0) {
-            if (status)
-              status.textContent =
-                "select an eligible high-confidence candidate.";
-            return;
-          }
-          if (binding.entityIds.length > 20) {
-            if (status)
-              status.textContent =
-                "split this review into deterministic batches of 20.";
-            return;
-          }
-          const proposal = document.querySelector("[data-archive-proposal]");
-          if (!(proposal instanceof HTMLElement)) return;
-          const proposalId = `archive-local-${binding.candidateHash}`;
-          proposal.dataset.proposalId = proposalId;
-          proposal.dataset.candidateHash = binding.candidateHash;
-          proposal.dataset.entityIds = JSON.stringify(binding.entityIds);
-          const proposalIdNode = proposal.querySelector("[data-proposal-id]");
-          const proposalHashNode = proposal.querySelector(
-            "[data-proposal-hash]",
-          );
-          const proposalEntitiesNode = proposal.querySelector(
-            "[data-proposal-entities]",
-          );
-          if (proposalIdNode) proposalIdNode.textContent = proposalId;
-          if (proposalHashNode)
-            proposalHashNode.textContent = binding.candidateHash;
-          if (proposalEntitiesNode)
-            proposalEntitiesNode.textContent = binding.entityIds.join(", ");
-          proposal.hidden = false;
-          if (status)
-            status.textContent = "proposal ready for exact confirmation.";
-          return;
-        }
-
-        if (target.closest("[data-confirm-archive]")) {
-          const proposal = document.querySelector("[data-archive-proposal]");
-          const status = document.querySelector("[data-archive-status]");
-          if (!(proposal instanceof HTMLElement)) return;
-          const binding = selectedArchiveBinding();
-          const expectedIds = JSON.parse(proposal.dataset.entityIds ?? "[]");
-          if (
-            binding.candidateHash !== proposal.dataset.candidateHash ||
-            JSON.stringify(binding.entityIds) !== JSON.stringify(expectedIds)
-          ) {
-            if (status)
-              status.textContent =
-                "selection changed. review a new proposal before confirming.";
-            return;
-          }
-          const confirmedAt = new Date().toISOString();
-          const receiptId = `receipt-${proposal.dataset.proposalId}-${confirmedAt}`;
-          for (const entityId of binding.entityIds) {
-            const row = document.querySelector(
-              `[data-lifecycle-result][data-entity-id="${entityId}"]`,
-            );
-            const lifecycle = row?.querySelector("[data-entity-lifecycle]");
-            if (lifecycle) lifecycle.textContent = "archived";
-          }
-          appendReceipt({
-            receiptId,
-            action: "archive",
-            entityIds: binding.entityIds,
-            proofRefs: [
-              `admin-projection://${proposal.dataset.proposalId}`,
-              proposal.dataset.candidateHash,
-            ],
-            restorationOf: null,
-          });
-          proposal.hidden = true;
-          if (status)
-            status.textContent =
-              "admin projection archived locally. native sources are unchanged.";
-          return;
-        }
-
-        const restoreButton = target.closest("[data-restore-archive]");
-        if (restoreButton) {
-          const archiveReceipt = restoreButton.closest("[data-receipt-id]");
-          if (!(archiveReceipt instanceof HTMLElement)) return;
-          const entityIds = JSON.parse(
-            archiveReceipt.dataset.entityIds ?? "[]",
-          );
-          for (const entityId of entityIds) {
-            const row = document.querySelector(
-              `[data-lifecycle-result][data-entity-id="${entityId}"]`,
-            );
-            const lifecycle = row?.querySelector("[data-entity-lifecycle]");
-            if (lifecycle) lifecycle.textContent = "completed";
-          }
-          const restoredAt = new Date().toISOString();
-          appendReceipt({
-            receiptId: `receipt-restore-${restoredAt}`,
-            action: "restore",
-            entityIds,
-            proofRefs: [archiveReceipt.dataset.receiptId],
-            restorationOf: archiveReceipt.dataset.receiptId,
-          });
-          restoreButton.remove();
-          const status = document.querySelector("[data-archive-status]");
-          if (status)
-            status.textContent =
-              "same entity and source ids restored in the admin projection.";
-        }
-      });
+      const itemId = new URLSearchParams(location.search).get("item");
+      if (!itemId) return;
+      const item = document.querySelector(
+        `[data-attention-id="${CSS.escape(itemId)}"]`,
+      );
+      if (item instanceof HTMLElement) {
+        item.dataset.linked = "true";
+        item.scrollIntoView({ block: "center" });
+      }
     })();
   </script>
 </AdminLayout>

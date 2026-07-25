@@ -78,6 +78,9 @@ importers:
       '@fontsource/geist-sans':
         specifier: ^5.2.5
         version: 5.2.5
+      '@fontsource/urbanist':
+        specifier: ^5.2.7
+        version: 5.2.7
       '@simplewebauthn/browser':
         specifier: 13.3.0
         version: 13.3.0

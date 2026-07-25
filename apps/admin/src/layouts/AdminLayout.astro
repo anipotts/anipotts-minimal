@@ -5,6 +5,27 @@ import "@astryxdesign/theme-neutral/theme.css";
 import "../styles/admin.css";
 import { AdminShell } from "../components/astryx/AdminShell";
 import { navItems, routeTitle } from "../data/admin";
+import candidateFaviconDark from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-dark.svg?url";
+import candidateFaviconLight from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-light.svg?url";
+
+let candidateStyles: string | undefined;
+if (import.meta.env.DEV) {
+  const [{ default: rawStyles }, { default: woff2Url }, { default: ttfUrl }] =
+    await Promise.all([
+      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/css/ap-structural.css?raw"),
+      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.woff2?url"),
+      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.ttf?url"),
+    ]);
+  candidateStyles = rawStyles
+    .replace(
+      "../fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.woff2",
+      woff2Url,
+    )
+    .replace("../fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.ttf", ttfUrl)
+    .concat(
+      '\n.operator-page-header h1.ap-structural-candidate { font-family: "AP Structural", "Urbanist", sans-serif; }\n',
+    );
+}
 
 type Props = {
   title?: string;
@@ -65,6 +86,31 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
       sizes="180x180"
       href="/apple-touch-icon.png?v=20260717a"
     />
+    {
+      import.meta.env.DEV && (
+        <>
+          <style
+            is:inline
+            data-font-candidate="ap-structural"
+            set:html={candidateStyles}
+          />
+          <link
+            rel="icon"
+            href={candidateFaviconLight}
+            type="image/svg+xml"
+            media="(prefers-color-scheme: light)"
+            data-font-candidate="ap-structural"
+          />
+          <link
+            rel="icon"
+            href={candidateFaviconDark}
+            type="image/svg+xml"
+            media="(prefers-color-scheme: dark)"
+            data-font-candidate="ap-structural"
+          />
+        </>
+      )
+    }
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"

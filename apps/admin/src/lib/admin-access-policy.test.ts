@@ -1,0 +1,102 @@
+import { describe, expect, test } from "vitest";
+import {
+  decideAdminAccess,
+  isDevLoopbackPreviewRequest,
+} from "./admin-access-policy";
+
+const local = (path: string, origin = "http://localhost:4311") =>
+  new URL(path, origin);
+
+describe("admin access policy", () => {
+  test.each(["/", "/inbox", "/work?view=now"])(
+    "allows the read-only development preview for %s",
+    (path) => {
+      expect(
+        isDevLoopbackPreviewRequest({
+          isDev: true,
+          method: "GET",
+          url: local(path),
+        }),
+      ).toBe(true);
+    },
+  );
+
+  test("accepts the exact numeric loopback preview origin", () => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "HEAD",
+        url: local("/inbox", "http://127.0.0.1:4311"),
+      }),
+    ).toBe(true);
+  });
+
+  test.each([
+    {
+      name: "production",
+      isDev: false,
+      method: "GET",
+      url: local("/inbox"),
+    },
+    {
+      name: "write method",
+      isDev: true,
+      method: "POST",
+      url: local("/work"),
+    },
+    {
+      name: "protected api",
+      isDev: true,
+      method: "GET",
+      url: local("/api/admin/inbox"),
+    },
+    {
+      name: "non-loopback host",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "https://admin.anipotts.com"),
+    },
+    {
+      name: "wrong port",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "http://localhost:4321"),
+    },
+    {
+      name: "unapproved page",
+      isDev: true,
+      method: "GET",
+      url: local("/content"),
+    },
+  ])("does not bypass passkey for $name", ({ isDev, method, url }) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev,
+        method,
+        url,
+      }),
+    ).toBe(false);
+  });
+
+  test("requires passkey for an unauthenticated production admin route", () => {
+    expect(
+      decideAdminAccess({
+        isDev: false,
+        method: "GET",
+        url: new URL("https://admin.anipotts.com/inbox"),
+        hasSession: false,
+      }),
+    ).toBe("passkey-required");
+  });
+
+  test("keeps authenticated production access intact", () => {
+    expect(
+      decideAdminAccess({
+        isDev: false,
+        method: "GET",
+        url: new URL("https://admin.anipotts.com/work?view=now"),
+        hasSession: true,
+      }),
+    ).toBe("session");
+  });
+});

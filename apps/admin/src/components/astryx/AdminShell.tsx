@@ -1,13 +1,11 @@
 import React, { type ReactNode } from "react";
 import { AppShell } from "@astryxdesign/core/AppShell";
-import { Badge } from "@astryxdesign/core/Badge";
 import {
   SideNav,
   SideNavHeading,
   SideNavItem,
   SideNavSection,
 } from "@astryxdesign/core/SideNav";
-import { StatusDot } from "@astryxdesign/core/StatusDot";
 import type { NavItem } from "../../data/admin";
 
 type AdminShellProps = {
@@ -23,7 +21,7 @@ type AdminShellProps = {
 const MOBILE_NAV_HREFS = new Set([
   "/",
   "/knowledge",
-  "/work",
+  "/work?view=now",
   "/content",
   "/life",
   "/fleet",
@@ -47,17 +45,10 @@ export function AdminShell({
     );
   }
 
-  const groups = [
-    ["home", navItems.filter((item) => item.group === "home")],
-    ["work", navItems.filter((item) => item.group === "work")],
-    ["content", navItems.filter((item) => item.group === "content")],
-    ["life", navItems.filter((item) => item.group === "life")],
-    ["fleet", navItems.filter((item) => item.group === "fleet")],
-    ["system", navItems.filter((item) => item.group === "system")],
-  ] as const;
-  const mobileItems = navItems.filter((item) =>
+  const primaryItems = navItems.filter((item) =>
     MOBILE_NAV_HREFS.has(item.href),
   );
+  const mobileItems = primaryItems;
 
   const sideNav = (
     <SideNav
@@ -77,29 +68,17 @@ export function AdminShell({
           <ThemeToggle />
         </div>
       }
-      footer={
-        <div className="admin-nav-footer">
-          <div className="admin-nav-footer-row">
-            <StatusDot variant="warning" label="Access outer guard active" />
-            <span>Access on</span>
-          </div>
-          <p>remove only after app-native passkey proof is ready.</p>
-        </div>
-      }
     >
-      {groups.map(([title, items]) => (
-        <SideNavSection key={title} title={title}>
-          {items.map((item) => (
-            <SideNavItem
-              key={item.href}
-              href={item.href}
-              label={item.label}
-              isSelected={isActive(currentRoute, item.href)}
-              endContent={<Badge label={item.status} variant="neutral" />}
-            />
-          ))}
-        </SideNavSection>
-      ))}
+      <SideNavSection title="navigate">
+        {primaryItems.map((item) => (
+          <SideNavItem
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            isSelected={isActive(currentRoute, item.href)}
+          />
+        ))}
+      </SideNavSection>
     </SideNav>
   );
 

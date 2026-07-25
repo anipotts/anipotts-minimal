@@ -1,6 +1,6 @@
 # admin operator console design review
 
-status: awaiting Ani's visual selection
+status: approved direction implemented as a fixture-backed local prototype
 
 date: 2026-07-23
 
@@ -46,8 +46,12 @@ The untouched image-generation outputs remain under the Codex generated-image
 store. The tracked files were scaled to the requested `1440 x 1024` review
 frame and exported as JPEG to keep the design packet reviewable in git.
 
-No direction has been selected. Do not begin the fixture prototype until Ani
-chooses one or requests a combined revision.
+Ani approved the operator-console direction. The local Inbox and Work prototype
+now uses the compact priority-ledger shell, native Work execution table, shared
+entity inspector, and one Inbox attention projection.
+
+Browser proof and review limits are recorded in
+[`../../../design-qa.md`](../../../design-qa.md).
 
 ## closed gates
 

@@ -1,161 +1,345 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { readAdminWorkLifecycle } from "../data/work-lifecycle";
+import { SourceMark } from "../components/SourceMark";
+import OperatorTaskRow from "../components/OperatorTaskRow.astro";
+import {
+  assertValidOperatorWorkProjection,
+  groupOperatorTasks,
+  readOperatorWorkProjection,
+  type OperatorWorkLane,
+} from "../data/operator-work";
 
-const lifecycle = await readAdminWorkLifecycle();
-const openEntities = lifecycle.entities.filter(
-  (entity) => entity.lifecycle === "open",
+if (!Astro.url.searchParams.has("view")) {
+  return Astro.redirect("/work?view=now", 302);
+}
+
+const projection = readOperatorWorkProjection();
+assertValidOperatorWorkProjection(projection);
+
+const groups = groupOperatorTasks(projection);
+const orderedGroups: Array<{
+  id: OperatorWorkLane;
+  label: string;
+}> = [
+  {
+    id: "foreground",
+    label: "foreground",
+  },
+  {
+    id: "background",
+    label: "background",
+  },
+  {
+    id: "waiting",
+    label: "waiting",
+  },
+  {
+    id: "recently_completed",
+    label: "recently completed",
+  },
+];
+
+const projectionFreshness = projection.task_states.every(
+  (task) => task.freshness === "fresh",
+)
+  ? "fresh"
+  : "stale";
+const displayTime = (value: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+
+const inspectorRows = Object.fromEntries(
+  projection.task_states.map((task) => [task.task_id, task]),
 );
-const historicalEntities = lifecycle.entities.filter(
-  (entity) => entity.lifecycle !== "open",
-);
-const linkedSourceIds = new Set(
-  lifecycle.entities.flatMap((entity) => entity.source_ids),
-);
-const looseSources = lifecycle.sources.filter(
-  (source) => !linkedSourceIds.has(source.source_id),
-);
-const humanize = (value: string) => value.replaceAll("_", " ");
-const sourcesFor = (sourceIds: string[]) =>
-  lifecycle.sources.filter((source) => sourceIds.includes(source.source_id));
-const outcomesFor = (entityId: string) =>
-  lifecycle.outcomes.filter((outcome) => outcome.entity_id === entityId);
-const historyFor = (entityId: string) =>
-  lifecycle.history.filter((entry) => entry.entity_id === entityId);
+const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
 ---
 
-<AdminLayout
-  title="work"
-  deck="Projects, tasks, source conversations, outcomes, and lineage. Native runtime state stays separate from durable lifecycle state."
->
-  <section class="meta-strip" aria-label="work lifecycle state">
-    <span>{openEntities.length} current</span>
-    <span>{historicalEntities.length} historical</span>
-    <span>{lifecycle.sources.length} source records</span>
-    <span>{looseSources.length} loose chats</span>
-    <span>{lifecycle.source_mode}</span>
-    <span>{lifecycle.adapter_version}</span>
-  </section>
-
-  <section class="table-card work-current" aria-labelledby="work-current-title">
-    <div class="section-head">
+<AdminLayout title="work" hideHeader>
+  <main class="operator-page operator-work-page" data-work-now>
+    <header class="operator-page-header">
       <div>
-        <p>one entity / many source surfaces</p>
-        <h2 id="work-current-title">current work</h2>
+        <p class="operator-eyebrow">execution ledger</p>
+        <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+          Work
+        </h1>
       </div>
-      <span>read only</span>
-    </div>
-    <div class="work-entity-list">
-      {
-        openEntities.map((entity) => {
-          const sources = sourcesFor(entity.source_ids);
-          const outcomes = outcomesFor(entity.entity_id);
-          const history = historyFor(entity.entity_id);
-          return (
-            <article class="work-entity">
-              <div class="work-entity-main">
-                <p>
-                  {entity.kind} / {entity.lifecycle} / {entity.owner}
-                </p>
-                <h3>{entity.title}</h3>
-                <span>{entity.summary}</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>lifecycle</dt>
-                  <dd>{entity.lifecycle}</dd>
-                </div>
-                <div>
-                  <dt>owner state</dt>
-                  <dd>{humanize(entity.owner_state)}</dd>
-                </div>
-                <div>
-                  <dt>source records</dt>
-                  <dd>{sources.length}</dd>
-                </div>
-                <div>
-                  <dt>attention</dt>
-                  <dd>{entity.attention_ids.length}</dd>
-                </div>
-              </dl>
-              <div class="work-source-lineage" aria-label="source lineage">
-                {sources.map((source) => (
-                  <div>
-                    <span>{source.surface}</span>
-                    <strong>{source.title}</strong>
-                    <small>
-                      runtime {humanize(source.native_runtime)} / lifecycle{" "}
-                      {humanize(source.native_status)}
-                    </small>
-                    <code>{source.locator}</code>
-                  </div>
-                ))}
-              </div>
-              <details>
-                <summary>
-                  {outcomes.length} outcomes / {history.length} history entries
-                </summary>
-                <div class="work-proof-list">
-                  {[...outcomes, ...history].map((item) => (
-                    <p>{item.summary}</p>
-                  ))}
-                  {outcomes.length === 0 && history.length === 0 && (
-                    <p>no outcome or history receipt recorded yet.</p>
-                  )}
-                </div>
-              </details>
-            </article>
-          );
-        })
-      }
-    </div>
-  </section>
-
-  <section class="table-card work-loose-chats">
-    <details>
-      <summary>
-        <span>loose chats</span>
-        <strong>{looseSources.length} preserved and collapsed</strong>
-      </summary>
-      <div class="work-loose-list">
+      <div class="operator-header-actions">
         {
-          looseSources.map((source) => (
-            <article>
-              <p>
-                {source.surface} / {humanize(source.reconciliation_state)}
-              </p>
-              <h3>{source.title}</h3>
-              <span>{source.summary}</span>
-              <code>{source.locator}</code>
-            </article>
-          ))
+          import.meta.env.DEV && (
+            <span class="operator-candidate-status">
+              AP Structural · candidate
+            </span>
+          )
         }
+        <span class={`operator-freshness is-${projectionFreshness}`}>
+          <span aria-hidden="true"></span>
+          {projectionFreshness}
+        </span>
+        <a class="operator-search-link" href="/knowledge">
+          search
+          <kbd>⌘K</kbd>
+        </a>
       </div>
-    </details>
-  </section>
+    </header>
 
-  <section class="table-card work-history">
-    <div class="section-head">
-      <div>
-        <p>searchable history</p>
-        <h2>completed and preserved</h2>
-      </div>
-      <span>{historicalEntities.length} entities</span>
-    </div>
-    <div class="work-history-list">
+    <section class="operator-ledger" aria-label="current execution">
       {
-        historicalEntities.map((entity) => (
-          <details>
-            <summary>
-              <span>
-                {entity.kind} / {entity.lifecycle}
-              </span>
-              <strong>{entity.title}</strong>
-            </summary>
-            <p>{entity.summary}</p>
-          </details>
+        orderedGroups.map((group) => (
+          <section
+            class={`operator-ledger-group is-${group.id}`}
+            id={group.id}
+            data-work-group={group.id}
+          >
+            <header>
+              <h2>{group.label}</h2>
+              <span>{groups[group.id].length}</span>
+            </header>
+            {groups[group.id].length === 0 ? (
+              <p class="operator-empty">clear</p>
+            ) : (
+              <div class="operator-table-scroll">
+                <table class="operator-work-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">work</th>
+                      <th scope="col">state</th>
+                      <th scope="col">now</th>
+                      <th scope="col">observed</th>
+                      <th scope="col">
+                        <span class="sr-only">actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groups[group.id].map((task) => (
+                      <OperatorTaskRow task={task} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         ))
       }
-    </div>
-  </section>
+    </section>
+
+    <details class="operator-loose-sources">
+      <summary>
+        <span>loose conversations</span>
+        <strong>{projection.source_states.length} preserved</strong>
+      </summary>
+      {
+        projection.source_states.map((source) => (
+          <div class="operator-loose-source">
+            <SourceMark provider={source.provider} />
+            <div>
+              <strong>{source.canonical_title}</strong>
+              <span>
+                collapsed · observed {displayTime(source.last_observed_at)}
+              </span>
+            </div>
+            <code>{source.native_ref}</code>
+          </div>
+        ))
+      }
+    </details>
+
+    <aside
+      class="operator-inspector"
+      aria-labelledby="operator-inspector-title"
+      data-operator-inspector
+      hidden
+    >
+      <button
+        class="operator-inspector-backdrop"
+        type="button"
+        aria-label="close task details"
+        data-close-inspector></button>
+      <div class="operator-inspector-panel">
+        <header>
+          <div>
+            <p data-inspector-provider></p>
+            <h2 id="operator-inspector-title" data-inspector-title></h2>
+          </div>
+          <button
+            type="button"
+            class="operator-icon-button"
+            aria-label="close task details"
+            data-close-inspector>close</button
+          >
+        </header>
+        <div class="operator-inspector-summary">
+          <div>
+            <span>goal</span>
+            <strong data-inspector-goal></strong>
+          </div>
+          <div>
+            <span>next</span>
+            <strong data-inspector-next></strong>
+          </div>
+          <div>
+            <span>proof owed</span>
+            <strong data-inspector-proof-owed></strong>
+          </div>
+        </div>
+        <dl class="operator-inspector-grid">
+          <div>
+            <dt>project</dt>
+            <dd data-inspector-project></dd>
+          </div>
+          <div>
+            <dt>owner</dt>
+            <dd data-inspector-owner></dd>
+          </div>
+          <div>
+            <dt>host</dt>
+            <dd data-inspector-host></dd>
+          </div>
+          <div>
+            <dt>states</dt>
+            <dd data-inspector-states></dd>
+          </div>
+          <div>
+            <dt>last observation</dt>
+            <dd data-inspector-observed></dd>
+          </div>
+          <div>
+            <dt>reconciled</dt>
+            <dd data-inspector-reconciled></dd>
+          </div>
+          <div>
+            <dt>surface</dt>
+            <dd><a data-inspector-surface>open</a></dd>
+          </div>
+          <div>
+            <dt>attention</dt>
+            <dd data-inspector-attention></dd>
+          </div>
+          <div class="is-wide">
+            <dt>repo / worktree</dt>
+            <dd data-inspector-worktree></dd>
+          </div>
+          <div class="is-wide">
+            <dt>source</dt>
+            <dd data-inspector-source></dd>
+          </div>
+          <div class="is-wide">
+            <dt>lineage</dt>
+            <dd data-inspector-lineage></dd>
+          </div>
+          <div class="is-wide">
+            <dt>proof</dt>
+            <dd data-inspector-proof></dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </main>
+
+  <script
+    is:inline
+    type="application/json"
+    id="operator-work-inspector-data"
+    set:html={inspectorJson}
+  />
+  <script is:inline>
+    (() => {
+      const data = document.querySelector("#operator-work-inspector-data");
+      if (!(data instanceof HTMLScriptElement)) return;
+      const inspectorRows = JSON.parse(data.textContent || "{}");
+      const inspector = document.querySelector("[data-operator-inspector]");
+      if (!(inspector instanceof HTMLElement)) return;
+
+      const setText = (selector, value) => {
+        const node = inspector.querySelector(selector);
+        if (node) node.textContent = value || "none";
+      };
+
+      const openInspector = (taskId) => {
+        const task = inspectorRows[taskId];
+        if (!task) return;
+
+        setText(
+          "[data-inspector-provider]",
+          `${task.provider} · ${task.task_id}`,
+        );
+        setText("[data-inspector-title]", task.canonical_title);
+        setText("[data-inspector-goal]", task.bounded_goal);
+        setText("[data-inspector-next]", task.next_action);
+        setText("[data-inspector-proof-owed]", task.proof_owed);
+        setText("[data-inspector-project]", task.project_label);
+        setText("[data-inspector-owner]", task.owner);
+        setText("[data-inspector-host]", `${task.host} · ${task.machine_role}`);
+        setText(
+          "[data-inspector-states]",
+          `${task.runtime_state} runtime · ${task.operator_state} operator · ${task.lifecycle} lifecycle · ${task.freshness}`,
+        );
+        setText("[data-inspector-observed]", task.last_observed_at);
+        setText("[data-inspector-reconciled]", task.reconciled_at);
+        setText("[data-inspector-attention]", task.attention_ref);
+        setText(
+          "[data-inspector-worktree]",
+          `${task.repo} · ${task.worktree || task.cwd}`,
+        );
+        setText(
+          "[data-inspector-source]",
+          [task.native_ref, task.source_ref].filter(Boolean).join(" · "),
+        );
+        setText("[data-inspector-lineage]", task.lineage_refs.join(" · "));
+        setText("[data-inspector-proof]", task.proof_refs.join(" · "));
+
+        const surface = inspector.querySelector("[data-inspector-surface]");
+        if (surface instanceof HTMLAnchorElement) {
+          surface.textContent = task.relevant_surface;
+          surface.href = task.relevant_surface.endsWith("/inbox")
+            ? "/inbox"
+            : "/work?view=now";
+        }
+
+        inspector.hidden = false;
+        document.body.dataset.inspectorOpen = "true";
+        const close = inspector.querySelector(
+          ".operator-inspector-panel [data-close-inspector]",
+        );
+        if (close instanceof HTMLElement) close.focus();
+      };
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const trigger = target.closest("[data-inspect-task]");
+        if (trigger instanceof HTMLElement) {
+          openInspector(trigger.dataset.inspectTask);
+          return;
+        }
+
+        if (target.closest("[data-close-inspector]")) {
+          inspector.hidden = true;
+          delete document.body.dataset.inspectorOpen;
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !inspector.hidden) {
+          inspector.hidden = true;
+          delete document.body.dataset.inspectorOpen;
+        }
+      });
+
+      const entity = new URLSearchParams(location.search).get("entity");
+      if (entity) {
+        const task = Object.values(inspectorRows).find(
+          (candidate) =>
+            candidate.primary_entity_ref === entity ||
+            candidate.entity_refs.includes(entity),
+        );
+        if (task) openInspector(task.task_id);
+      }
+    })();
+  </script>
 </AdminLayout>
