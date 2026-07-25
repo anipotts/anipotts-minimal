@@ -10,7 +10,7 @@
     "test:cli": "bun run scripts/test-link-vault.ts"
   },
   "dependencies": {
-    "hono": "^4.12.18"
+    "hono": "^4.12.32"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260518.1",
