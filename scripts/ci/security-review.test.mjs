@@ -68,6 +68,22 @@ const fakeFiles = new Map([
 `,
   ],
   ["drizzle/migrations/0100_public_metadata.sql", publicSqlMetadataAssignment],
+  [
+    "packages/content/src/admin/runtime.ts",
+    "  secret_" + "values_included: value.secret_values_included,\n",
+  ],
+  [
+    "packages/lib/src/admin-control/fixtures.ts",
+    "  auth_" + 'model: "cloudflare-access-service-token-per-machine",\n',
+  ],
+  [
+    "packages/lib/src/admin-control/types.ts",
+    "  au" + "th: AdminControlAuthContract;\n",
+  ],
+  [
+    "packages/lib/src/admin-control/unsafe.ts",
+    "  au" + 'th: "abcdefghijklmnopqrstuvwxyz123456";\n',
+  ],
 ]);
 
 function readFake(file) {
@@ -81,6 +97,10 @@ const findings = reviewFiles(
     "drizzle/migrations/0099_drop.sql",
     ".github/workflows/deploy.yml",
     "packages/content/src/admin/operations.ts",
+    "packages/content/src/admin/runtime.ts",
+    "packages/lib/src/admin-control/fixtures.ts",
+    "packages/lib/src/admin-control/types.ts",
+    "packages/lib/src/admin-control/unsafe.ts",
     "drizzle/migrations/0100_public_metadata.sql",
     "docs/archive/old.md",
   ],
@@ -90,6 +110,7 @@ const findings = reviewFiles(
 assert.deepEqual(findings.map((finding) => finding.rule).sort(), [
   "anthropic-api-key",
   "drop-table",
+  "inline-secret-assignment",
   "inline-secret-assignment",
   "openai-or-similar-key",
 ]);
