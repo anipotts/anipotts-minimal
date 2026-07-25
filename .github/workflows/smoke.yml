@@ -28,15 +28,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
+
       - name: Smoke public site
         if: inputs.target == 'www'
         run: |
           set -euo pipefail
-          for path in / /newsletter /newsletter/archive /making /orchestrating /projects /projects/chainedchat /projects/claude-code-tips /projects/imessage-mcp /projects/nyu-purity-test /projects/options-pricing-sensitivity /projects/pgi-research-platform /projects/quantercise /projects/quantercise-extension /projects/saeshify /writing /writing/i-built-a-monitor-for-my-claude-code-sessions /writing/saturdays-are-for-claude-code /writing/search-will-be-dead-by-2030 /writing/stop-ending-your-day-with-fix-the-bug; do
+          routes_file="$RUNNER_TEMP/public-routes.txt"
+          node scripts/ci/public-route-inventory.mjs > "$routes_file"
+          while IFS= read -r path; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"
             echo "https://anipotts.com${path} -> ${code}"
             test "$code" = "200"
-          done
+          done < "$routes_file"
           echo "commit_sha=${{ inputs.commit_sha }}"
 
       - name: Smoke admin unauthenticated block
