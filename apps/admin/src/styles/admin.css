@@ -339,10 +339,9 @@
 .operator-attention-row {
   position: relative;
   display: grid;
-  grid-template-columns: 34px minmax(150px, 0.9fr) minmax(
-      260px,
-      1.55fr
-    ) 140px 40px;
+  grid-template-columns:
+    34px minmax(150px, 0.9fr) minmax(260px, 1.55fr)
+    140px 40px;
   min-height: 76px;
   align-items: center;
   gap: 16px;
@@ -935,10 +934,9 @@
   }
 
   .operator-attention-row {
-    grid-template-columns: 28px minmax(130px, 0.75fr) minmax(
-        220px,
-        1.5fr
-      ) 116px 40px;
+    grid-template-columns:
+      28px minmax(130px, 0.75fr) minmax(220px, 1.5fr)
+      116px 40px;
     gap: 12px;
   }
 
@@ -5787,12 +5785,13 @@ html[data-astryx-theme="neutral"] .button.ghost {
   letter-spacing: -0.05em;
 }
 
-.operator-source-mark[data-provider="codex"] .operator-source-glyph {
-  border-radius: 50%;
-}
-
-.operator-source-mark[data-provider="claude"] .operator-source-glyph {
-  border-radius: 4px;
+.operator-source-logo {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 5px;
+  object-fit: contain;
 }
 
 .operator-source-label {

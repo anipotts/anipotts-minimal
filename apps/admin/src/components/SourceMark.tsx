@@ -1,3 +1,8 @@
+import React from "react";
+import chatgptMark from "../assets/provider-marks/chatgpt.png";
+import claudeMark from "../assets/provider-marks/claude.svg";
+import codexMark from "../assets/provider-marks/codex.png";
+
 type Props = {
   provider: "codex" | "claude" | "github" | "handoff" | "chatgpt";
   compact?: boolean;
@@ -12,11 +17,20 @@ const providerLabels: Record<Props["provider"], string> = {
 };
 
 const providerGlyphs: Record<Props["provider"], string> = {
-  codex: "CX",
-  claude: "CL",
   github: "GH",
   handoff: "HO",
-  chatgpt: "GPT",
+  codex: "",
+  claude: "",
+  chatgpt: "",
+};
+
+const assetUrl = (asset: string | ImageMetadata) =>
+  typeof asset === "string" ? asset : asset.src;
+
+const providerMarks: Partial<Record<Props["provider"], string>> = {
+  codex: assetUrl(codexMark),
+  claude: assetUrl(claudeMark),
+  chatgpt: assetUrl(chatgptMark),
 };
 
 export function SourceMark({ provider, compact = false }: Props) {
@@ -29,9 +43,18 @@ export function SourceMark({ provider, compact = false }: Props) {
       aria-label={`${label} source`}
       title={`${label} source`}
     >
-      <span className="operator-source-glyph" aria-hidden="true">
-        {providerGlyphs[provider]}
-      </span>
+      {providerMarks[provider] ? (
+        <img
+          className="operator-source-logo"
+          src={providerMarks[provider]}
+          alt=""
+          aria-hidden="true"
+        />
+      ) : (
+        <span className="operator-source-glyph" aria-hidden="true">
+          {providerGlyphs[provider]}
+        </span>
+      )}
       <span className="operator-source-label">{label}</span>
       {!compact && <span className="sr-only"> provider</span>}
     </span>
