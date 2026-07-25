@@ -22,10 +22,11 @@ const METADATA_PATH = join(STATE_ROOT, "process.json");
 const LOG_PATH = join(STATE_ROOT, "server.log");
 const DEFAULT_HOST = "localhost";
 const DEFAULT_PORT = 4311;
+const HEALTH_PATH = "/api/health";
 const START_TIMEOUT_MS = 20_000;
 
 const action = process.argv[2] ?? "ensure";
-const host = process.env.ADMIN_PREVIEW_HOST ?? DEFAULT_HOST;
+const host = DEFAULT_HOST;
 const port = parsePort(process.env.ADMIN_PREVIEW_PORT ?? String(DEFAULT_PORT));
 const origin = `http://${host}:${port}`;
 
@@ -68,6 +69,7 @@ async function ensurePreview() {
   }
 
   const logFd = openSync(LOG_PATH, "a", 0o600);
+  chmodSync(LOG_PATH, 0o600);
   const child = spawn(
     "pnpm",
     ["exec", "astro", "dev", "--host", host, "--port", String(port)],
@@ -212,11 +214,18 @@ function processIsRunning(pid) {
 
 async function probeHealth() {
   try {
-    const response = await fetch(origin, {
+    const response = await fetch(`${origin}${HEALTH_PATH}`, {
       redirect: "manual",
       signal: AbortSignal.timeout(1_500),
     });
-    return { ok: response.status >= 200 && response.status < 500 };
+    if (response.status !== 200) return { ok: false };
+    const payload = await response.json();
+    return {
+      ok:
+        payload?.ok === true &&
+        payload?.app === "admin-astro" &&
+        payload?.target === "admin.anipotts.com",
+    };
   } catch {
     return { ok: false };
   }

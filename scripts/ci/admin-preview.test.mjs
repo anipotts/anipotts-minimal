@@ -31,6 +31,9 @@ assert.equal(
 for (const marker of [
   'const DEFAULT_HOST = "localhost"',
   "const DEFAULT_PORT = 4311",
+  'const HEALTH_PATH = "/api/health"',
+  'payload?.app === "admin-astro"',
+  'payload?.target === "admin.anipotts.com"',
   "processMatches(metadata)",
   "no process was stopped",
   'process.kill(-metadata.pid, "SIGTERM")',
@@ -41,6 +44,12 @@ for (const marker of [
     `preview manager missing ${marker}`,
   );
 }
+
+assert.equal(
+  previewSource.includes("ADMIN_PREVIEW_HOST"),
+  false,
+  "preview manager must stay bound to canonical loopback",
+);
 
 assert.ok(
   passkeySource.includes("isLoopbackDevOrigin"),
