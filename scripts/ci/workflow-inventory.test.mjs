@@ -25,10 +25,26 @@ const workflowFiles = readdirSync(WORKFLOW_DIR)
   .filter((file) => file.endsWith(".yml") || file.endsWith(".yaml"))
   .sort();
 
+const autoMergeWorkflow = readFileSync(
+  join(WORKFLOW_DIR, "agent-automerge.yml"),
+  "utf8",
+);
+const deployWorkflow = readFileSync(join(WORKFLOW_DIR, "deploy.yml"), "utf8");
+
 assert.deepEqual(
   workflowFiles,
   ALLOWED_WORKFLOWS,
   "workflow inventory drifted from the approved CI/CD set",
+);
+
+assert.ok(
+  deployWorkflow.includes("push:\n    branches: [main]"),
+  "deploy workflow must promote path-filtered changes from merged main",
+);
+assert.equal(
+  autoMergeWorkflow.includes("gh workflow run deploy.yml"),
+  false,
+  "automerge must not dispatch a duplicate deploy after the main push",
 );
 
 for (const file of workflowFiles) {

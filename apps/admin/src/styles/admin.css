@@ -79,26 +79,37 @@
   padding: 12px 8px 8px;
 }
 
-.admin-mark,
-.admin-mobile-brand img {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 6px;
+.admin-brand-lockup,
+.admin-mobile-brand {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-dark-blue);
+  text-decoration: none;
 }
 
-.admin-mark img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.admin-brand-lockup span,
+.admin-mobile-brand span {
+  color: inherit;
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  line-height: 1;
 }
 
-.admin-mobile-brand img {
+.admin-brand-mark {
+  display: block;
   width: 28px;
   height: 28px;
-  object-fit: cover;
+  flex: 0 0 28px;
+  fill: currentColor;
+}
+
+html[data-theme="dark"] .admin-brand-lockup,
+html[data-theme="dark"] .admin-mobile-brand {
+  color: var(--brand-blue);
 }
 
 .admin-global-search {
@@ -918,6 +929,218 @@
   font-size: 13px;
 }
 
+.quiet-fleet-map-section,
+.quiet-known-places {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.quiet-fleet-map-section > header,
+.quiet-known-places > header,
+.quiet-fleet-map-section > footer {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quiet-fleet-map-section h2,
+.quiet-known-places h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+.quiet-fleet-map-section > header span,
+.quiet-fleet-map-section > footer,
+.quiet-known-places > header span {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.quiet-fleet-map-section > footer {
+  align-items: start;
+}
+
+.quiet-fleet-map-section > footer a {
+  flex: none;
+  color: var(--color-text);
+  font-weight: 650;
+}
+
+.quiet-fleet-map {
+  position: relative;
+  min-height: 390px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px),
+    radial-gradient(
+      circle at 50% 62%,
+      var(--color-accent-muted),
+      transparent 48%
+    ),
+    var(--color-background-surface);
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto,
+    auto;
+}
+
+.quiet-map-orbit {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 34%, transparent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.quiet-map-orbit.orbit-one {
+  width: 230px;
+  height: 230px;
+}
+
+.quiet-map-orbit.orbit-two {
+  width: 430px;
+  height: 430px;
+  opacity: 0.45;
+}
+
+.quiet-map-link {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 62%;
+  width: 1px;
+  height: 130px;
+  background: color-mix(in srgb, var(--color-accent) 52%, transparent);
+  transform-origin: bottom;
+}
+
+.quiet-map-link.link-pro {
+  transform: translateY(-100%) rotate(-48deg);
+}
+
+.quiet-map-link.link-mini {
+  transform: translateY(-100%) rotate(48deg);
+}
+
+.quiet-map-viewer,
+.quiet-map-machine {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-background) 92%, transparent);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 7%);
+  backdrop-filter: blur(12px);
+}
+
+.quiet-map-viewer {
+  left: 50%;
+  top: 62%;
+  min-width: 118px;
+  gap: 1px;
+  padding: 12px 14px;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.quiet-map-viewer > span {
+  position: absolute;
+  top: -5px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-background);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 6px var(--color-accent-muted);
+}
+
+.quiet-map-viewer strong,
+.quiet-map-machine strong {
+  color: var(--color-text);
+}
+
+.quiet-map-viewer small,
+.quiet-map-machine small,
+.quiet-map-machine > span:last-child {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.quiet-map-machine {
+  min-width: 154px;
+  gap: 2px;
+  padding: 12px 14px 12px 30px;
+}
+
+.quiet-map-machine.is-pro {
+  top: 50px;
+  left: 13%;
+}
+
+.quiet-map-machine.is-mini {
+  top: 50px;
+  right: 13%;
+}
+
+.quiet-map-machine.is-current {
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 58%,
+    var(--color-border)
+  );
+}
+
+.quiet-map-machine .quiet-machine-state {
+  position: absolute;
+  top: 16px;
+  left: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-subtle);
+}
+
+.quiet-map-machine .quiet-machine-state.is-live {
+  background: var(--color-success);
+}
+
+.quiet-map-machine .quiet-machine-state.is-stale {
+  background: var(--color-warning);
+}
+
+.quiet-known-places > div {
+  display: grid;
+  border-top: 1px solid var(--color-border);
+}
+
+.quiet-known-places article {
+  display: grid;
+  grid-template-columns: 100px minmax(140px, 0.65fr) minmax(240px, 1.4fr) auto;
+  gap: 16px;
+  align-items: center;
+  min-height: 64px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quiet-known-places article span,
+.quiet-known-places article time,
+.quiet-known-places article p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
 .quiet-source-updated {
   animation: quiet-source-update 160ms ease;
 }
@@ -1215,6 +1438,44 @@
 
   .quiet-fleet-matrix [role="row"] {
     min-width: 640px;
+  }
+
+  .quiet-fleet-map {
+    min-height: 440px;
+  }
+
+  .quiet-map-orbit.orbit-two {
+    width: 340px;
+    height: 340px;
+  }
+
+  .quiet-map-link {
+    height: 150px;
+  }
+
+  .quiet-map-machine {
+    min-width: 132px;
+    padding-right: 10px;
+  }
+
+  .quiet-map-machine.is-pro {
+    top: 48px;
+    left: 14px;
+  }
+
+  .quiet-map-machine.is-mini {
+    top: 48px;
+    right: 14px;
+  }
+
+  .quiet-known-places article {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 12px;
+    padding: 12px 0;
+  }
+
+  .quiet-known-places article p {
+    grid-column: 1 / -1;
   }
 
   .quiet-system-timeline li {
@@ -4141,24 +4402,6 @@ html[data-astryx-theme="neutral"] a {
 
 .admin-nav-header .admin-theme-toggle {
   justify-self: start;
-}
-
-.admin-mark {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border: 0;
-  border-radius: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.admin-mark img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 
 .admin-nav-footer {

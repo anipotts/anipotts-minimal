@@ -8,6 +8,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/knowledge/locations",
+    file: "apps/admin/src/pages/knowledge/locations.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/work",
     file: "apps/admin/src/pages/work.astro",
     nav: true,

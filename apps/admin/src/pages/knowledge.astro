@@ -39,16 +39,6 @@ const displayTime = (value?: string | null) =>
       <span data-knowledge-count>{cards.length} results</span>
     </header>
 
-    <label class="quiet-page-search">
-      <span class="sr-only">search knowledge</span>
-      <input
-        type="search"
-        placeholder="Search current context"
-        autocomplete="off"
-        data-knowledge-search
-      />
-    </label>
-
     <nav class="quiet-view-tabs" aria-label="knowledge filters">
       {
         filters.map(([kind, label]) => (
@@ -65,20 +55,10 @@ const displayTime = (value?: string | null) =>
     <section class="quiet-result-list" aria-label="knowledge results">
       {
         cards.map((card) => {
-          const searchText = [
-            card.title,
-            card.summary,
-            card.domain,
-            card.kind,
-            card.source_system,
-          ]
-            .join(" ")
-            .toLowerCase();
           return (
             <article
               class="quiet-result-row"
               data-knowledge-card
-              data-search-text={searchText}
               id={`card-${card.card_id}`}
             >
               <div class="quiet-result-kind">
@@ -106,7 +86,7 @@ const displayTime = (value?: string | null) =>
           );
         })
       }
-      <p class="quiet-empty-state" data-knowledge-empty hidden>
+      <p class="quiet-empty-state" hidden={cards.length > 0}>
         No current result matches.
       </p>
     </section>
@@ -122,27 +102,6 @@ const displayTime = (value?: string | null) =>
 
   <script is:inline>
     (() => {
-      const input = document.querySelector("[data-knowledge-search]");
-      if (!(input instanceof HTMLInputElement)) return;
-      const apply = () => {
-        const terms = input.value
-          .trim()
-          .toLowerCase()
-          .split(/\s+/)
-          .filter(Boolean);
-        let visible = 0;
-        for (const card of document.querySelectorAll("[data-knowledge-card]")) {
-          const text = card.getAttribute("data-search-text") || "";
-          card.hidden = !terms.every((term) => text.includes(term));
-          if (!card.hidden) visible += 1;
-        }
-        const count = document.querySelector("[data-knowledge-count]");
-        if (count) count.textContent = `${visible} results`;
-        const empty = document.querySelector("[data-knowledge-empty]");
-        if (empty) empty.hidden = visible !== 0;
-      };
-      input.addEventListener("input", apply);
-
       const cardId = new URLSearchParams(location.search).get("card");
       if (cardId) {
         document

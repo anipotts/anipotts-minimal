@@ -5,7 +5,6 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
-  actions: write
   checks: read
   contents: write
   pull-requests: write
@@ -102,27 +101,3 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: gh pr merge --merge --delete-branch "$PR_URL"
-
-      - name: Dispatch deploy
-        if: >
-          steps.targets.outputs.www == 'true' ||
-          steps.targets.outputs.admin == 'true' ||
-          steps.targets.outputs.admin_solid == 'true' ||
-          steps.targets.outputs.ingest == 'true' ||
-          steps.targets.outputs.newsletter == 'true' ||
-          steps.targets.outputs.state == 'true' ||
-          steps.targets.outputs.weekly_email == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          gh workflow run deploy.yml \
-            --repo "$GH_REPO" \
-            --ref main \
-            -f www=${{ steps.targets.outputs.www }} \
-            -f admin=${{ steps.targets.outputs.admin }} \
-            -f admin_solid=${{ steps.targets.outputs.admin_solid }} \
-            -f ingest=${{ steps.targets.outputs.ingest }} \
-            -f newsletter=${{ steps.targets.outputs.newsletter }} \
-            -f state=${{ steps.targets.outputs.state }} \
-            -f weekly_email=${{ steps.targets.outputs.weekly_email }}

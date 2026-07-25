@@ -25,6 +25,10 @@ const knowledgeSource = readFileSync(
   "apps/admin/src/pages/knowledge.astro",
   "utf8",
 );
+const locationsSource = readFileSync(
+  "apps/admin/src/pages/knowledge/locations.astro",
+  "utf8",
+);
 const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
 const operatorWorkSource = readFileSync(
   "apps/admin/src/data/operator-work.ts",
@@ -253,15 +257,30 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
   );
 }
 
-for (const marker of [
-  "data-knowledge-search",
-  "data-knowledge-card",
-  "/knowledge?kind=",
-  "Search current context",
-]) {
+for (const marker of ["data-knowledge-card", "/knowledge?kind="]) {
   assert.ok(
     knowledgeSource.includes(marker),
     `admin knowledge missing marker ${marker}`,
+  );
+}
+assert.equal(
+  knowledgeSource.includes("data-knowledge-search"),
+  false,
+  "Knowledge must use the one global search instead of a local search category",
+);
+assert.ok(
+  navSource.includes('href: "/knowledge/locations"'),
+  "Knowledge must expose the source-backed Locations view",
+);
+for (const marker of [
+  "Fleet map",
+  "viewing from",
+  "runtime.machine",
+  "Known places",
+]) {
+  assert.ok(
+    locationsSource.includes(marker),
+    `admin locations missing marker ${marker}`,
   );
 }
 

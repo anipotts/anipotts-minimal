@@ -10,6 +10,7 @@ export type NavItem = {
     | "content"
     | "life"
     | "knowledge"
+    | "locations"
     | "search"
     | "system"
     | "fleet"
@@ -204,6 +205,15 @@ export const navItems: NavItem[] = [
     group: "knowledge",
     description: "people and current relationships",
     icon: "search",
+    parent: "knowledge",
+  },
+  {
+    href: "/knowledge/locations",
+    label: "locations",
+    status: "map",
+    group: "knowledge",
+    description: "fleet topology and known places",
+    icon: "locations",
     parent: "knowledge",
   },
   {
