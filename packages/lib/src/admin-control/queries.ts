@@ -13,6 +13,7 @@ import {
   type AdminEventEnvelope,
   type AdminFleetStatus,
   type AdminInboxItem,
+  type AdminKnowledgeCard,
   type AdminPieceState,
   type AdminServiceRegistryViewItem,
 } from "./types";
@@ -69,6 +70,7 @@ export async function loadAdminControlSnapshot(
     deployStates,
     capabilityStates,
     serviceRegistryView,
+    knowledgeCards,
   ] = await Promise.all([
     readAdminEvents(db),
     readInboxItems(db),
@@ -77,6 +79,7 @@ export async function loadAdminControlSnapshot(
     readDeployStates(db),
     readCapabilityStates(db),
     readServiceRegistryView(db),
+    readKnowledgeCards(db),
   ]);
 
   const reads = [
@@ -87,6 +90,7 @@ export async function loadAdminControlSnapshot(
     deployStates,
     capabilityStates,
     serviceRegistryView,
+    knowledgeCards,
   ];
 
   const projections: AdminControlProjections = {
@@ -96,6 +100,7 @@ export async function loadAdminControlSnapshot(
     deploy_states: deployStates.rows,
     capability_states: capabilityStates.rows,
     service_registry_view: serviceRegistryView.rows,
+    knowledge_cards: knowledgeCards.rows,
   };
 
   return {
@@ -151,8 +156,9 @@ async function readInboxItems(
   return readRows(
     db,
     "admin_inbox_items",
-    `SELECT item_id, dedupe_key, event_refs, source, account, title, summary,
-            href, status, urgency, owner, action_kind, expires_at, last_seen_at
+    `SELECT item_id, dedupe_key, event_refs, domain, entity_ref, attention_kind,
+            source, account, title, summary, href, status, urgency, owner,
+            action_kind, expires_at, last_seen_at
        FROM admin_inbox_items
       ORDER BY
         CASE urgency
@@ -167,6 +173,11 @@ async function readInboxItems(
       item_id: asString(row.item_id),
       dedupe_key: asString(row.dedupe_key),
       event_refs: parseStringArray(row.event_refs),
+      domain: asString(row.domain) as AdminInboxItem["domain"],
+      entity_ref: asString(row.entity_ref),
+      attention_kind: asString(
+        row.attention_kind,
+      ) as AdminInboxItem["attention_kind"],
       source: asString(row.source),
       account: nullableString(row.account),
       title: asString(row.title),
@@ -301,6 +312,61 @@ async function readServiceRegistryView(
       status: asString(row.status),
       updated_at: nullableString(row.updated_at),
       event_refs: [],
+    }),
+  );
+}
+
+async function readKnowledgeCards(
+  db: AdminControlDatabase,
+): Promise<ReadResult<AdminKnowledgeCard>> {
+  return readRows(
+    db,
+    "admin_knowledge_cards",
+    `SELECT card_id, entity_ref, domain, kind, title, summary, source_system,
+            source_locator, source_native_id, canonical_host, canonical_path,
+            sensitivity, reveal_policy, freshness_state, observed_at,
+            stale_after_seconds, content_hash, proof_refs, lineage_refs,
+            related_card_ids, retrieval_instructions, context_budget_tokens,
+            event_refs, indexed_at
+       FROM admin_knowledge_cards
+      ORDER BY domain ASC, title ASC`,
+    fixtureProjections.knowledge_cards,
+    (row) => ({
+      card_id: asString(row.card_id),
+      entity_ref: asString(row.entity_ref),
+      domain: asString(row.domain) as AdminKnowledgeCard["domain"],
+      kind: asString(row.kind) as AdminKnowledgeCard["kind"],
+      title: asString(row.title),
+      summary: asString(row.summary),
+      source_system: asString(row.source_system),
+      source_locator: asString(row.source_locator),
+      source_native_id: nullableString(row.source_native_id),
+      canonical_host: asString(
+        row.canonical_host,
+      ) as AdminKnowledgeCard["canonical_host"],
+      canonical_path: nullableString(row.canonical_path),
+      sensitivity: asString(
+        row.sensitivity,
+      ) as AdminKnowledgeCard["sensitivity"],
+      reveal_policy: asString(
+        row.reveal_policy,
+      ) as AdminKnowledgeCard["reveal_policy"],
+      freshness_state: asString(
+        row.freshness_state,
+      ) as AdminKnowledgeCard["freshness_state"],
+      observed_at: nullableString(row.observed_at),
+      stale_after_seconds:
+        row.stale_after_seconds == null
+          ? null
+          : toNumber(row.stale_after_seconds, 0),
+      content_hash: asString(row.content_hash),
+      proof_refs: parseStringArray(row.proof_refs),
+      lineage_refs: parseStringArray(row.lineage_refs),
+      related_card_ids: parseStringArray(row.related_card_ids),
+      retrieval_instructions: asString(row.retrieval_instructions),
+      context_budget_tokens: toNumber(row.context_budget_tokens, 200),
+      event_refs: parseStringArray(row.event_refs),
+      indexed_at: asString(row.indexed_at),
     }),
   );
 }

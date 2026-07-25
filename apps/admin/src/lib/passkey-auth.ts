@@ -30,11 +30,14 @@ const CHALLENGE_MAX_AGE_MS = 10 * 60 * 1000;
 const PRODUCTION_RP_ID = "admin.anipotts.com";
 const RP_NAME = "anipotts admin";
 const EXPECTED_ORIGIN = "https://admin.anipotts.com";
-const LOCAL_ORIGIN = "http://localhost:3001";
 const USER_ID = "ani";
 const USER_NAME = "ani@admin.anipotts.com";
 const USER_DISPLAY_NAME = "Ani";
 const ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
+const accessJwksByIssuer = new Map<
+  string,
+  ReturnType<typeof createRemoteJWKSet>
+>();
 
 type D1Result<T = unknown> = {
   results?: T[];
@@ -88,7 +91,7 @@ type SessionRow = {
   revoked_at: string | null;
 };
 
-type AccessIdentity = {
+export type AccessIdentity = {
   verified: boolean;
   hint: string | null;
 };
@@ -157,7 +160,7 @@ export async function getPasskeyStatus(
   context: PasskeyContext,
 ): Promise<PasskeyStatus> {
   const db = dbFromContext(context);
-  const accessIdentity = await resolveAccessIdentity(context);
+  const accessIdentity = await verifyAccessIdentity(context);
   if (!db) {
     const auditEvents = emptyPasskeyAuditEvents();
     const blockers = passkeyAccessRemovalBlockers({
@@ -814,21 +817,21 @@ function parseTransports(raw: string): AuthenticatorTransportFuture[] {
 
 function expectedOrigin(context: PasskeyContext): string {
   const origin = context.request.headers.get("origin");
-  if (origin === LOCAL_ORIGIN && import.meta.env.DEV) return LOCAL_ORIGIN;
+  if (isLoopbackDevOrigin(origin)) return origin;
   return EXPECTED_ORIGIN;
 }
 
 function expectedRpId(context: PasskeyContext): string {
-  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+  if (isLoopbackDevOrigin(context.url.origin)) {
     return context.url.hostname;
   }
   return PRODUCTION_RP_ID;
 }
 
-async function resolveAccessIdentity(
-  context: PasskeyContext,
+export async function verifyAccessIdentity(
+  context: Pick<PasskeyContext, "request" | "url" | "locals">,
 ): Promise<AccessIdentity> {
-  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+  if (isLoopbackDevOrigin(context.url.origin)) {
     return { verified: true, hint: "local-dev" };
   }
 
@@ -845,7 +848,7 @@ async function resolveAccessIdentity(
 
   try {
     const issuer = teamDomain.replace(/\/$/, "");
-    const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
+    const jwks = accessJwks(issuer);
     const { payload } = await jwtVerify(cfJwt, jwks, {
       issuer,
       audience,
@@ -858,6 +861,14 @@ async function resolveAccessIdentity(
   } catch {
     return { verified: false, hint: null };
   }
+}
+
+function accessJwks(issuer: string): ReturnType<typeof createRemoteJWKSet> {
+  const cached = accessJwksByIssuer.get(issuer);
+  if (cached) return cached;
+  const jwks = createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`));
+  accessJwksByIssuer.set(issuer, jwks);
+  return jwks;
 }
 
 function maskEmail(email: string): string {
@@ -891,7 +902,20 @@ function expiredSessionCookie(context: PasskeyContext): string {
 }
 
 function usesSecureCookie(context: PasskeyContext): boolean {
-  return !(context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV);
+  return !isLoopbackDevOrigin(context.url.origin);
+}
+
+function isLoopbackDevOrigin(origin: string | null): origin is string {
+  if (!origin || !import.meta.env.DEV) return false;
+  try {
+    const url = new URL(origin);
+    return (
+      url.protocol === "http:" &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+    );
+  } catch {
+    return false;
+  }
 }
 
 async function recordAudit(

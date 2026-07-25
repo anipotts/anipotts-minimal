@@ -97,6 +97,7 @@ type PageContentRow = {
 
 type DraftOperationRow = {
   operation_id: string;
+  kind: string;
   surface: string;
   route: string;
   source_ref: string;
@@ -105,6 +106,8 @@ type DraftOperationRow = {
   status: string;
   risk_level: string;
   authority_state: string;
+  allowed_actions: string;
+  forbidden_actions: string;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -118,6 +121,23 @@ type DraftOperationRow = {
   updated_by?: string | null;
   published_from_operation_id?: string | null;
 };
+
+export type PublishableDraftContract = Pick<
+  DraftOperationRow,
+  | "operation_id"
+  | "kind"
+  | "surface"
+  | "route"
+  | "status"
+  | "authority_state"
+  | "allowed_actions"
+  | "forbidden_actions"
+  | "page_key"
+  | "slug"
+  | "title"
+  | "visibility"
+  | "published_from_operation_id"
+>;
 
 type PublishEventRow = {
   id: string;
@@ -366,6 +386,8 @@ export async function publishEditorDraft(
 
   const payload = parseEditorPayload(draft.proposed_value);
   if (!payload) throw statusError(400, "draft_payload_invalid");
+  const contractError = publishableDraftError(draft, payload);
+  if (contractError) throw statusError(409, contractError);
   if (payload.visibility !== "published") {
     throw statusError(409, "only_published_visibility_can_publish");
   }
@@ -486,7 +508,9 @@ export async function publishEditorDraft(
            reviewer_note = ?,
            updated_by = ?,
            published_from_operation_id = ?
-       WHERE operation_id = ?`,
+       WHERE operation_id = ?
+         AND status = 'draft'
+         AND published_from_operation_id IS NULL`,
       )
       .bind(
         "published",
@@ -515,6 +539,41 @@ export async function publishEditorDraft(
     publish_event_id: eventId,
     public_route: routeForPayload(payload),
   };
+}
+
+export function publishableDraftError(
+  draft: PublishableDraftContract,
+  payload: ContentEditorPayload,
+): string | null {
+  if (draft.published_from_operation_id || draft.status === "published") {
+    return "draft_already_published";
+  }
+
+  const allowedActions = parseStringArray(draft.allowed_actions);
+  const forbiddenActions = parseStringArray(draft.forbidden_actions);
+  if (
+    draft.status !== "draft" ||
+    draft.kind !== "content_draft" ||
+    draft.surface !== "public_site" ||
+    draft.authority_state !== "passkey_owner_draft_saved_no_public_change" ||
+    !allowedActions.includes("publish_with_proof") ||
+    forbiddenActions.includes("publish") ||
+    forbiddenActions.includes("write_page_content")
+  ) {
+    return "draft_not_publishable";
+  }
+
+  if (
+    draft.page_key !== payload.page_key ||
+    draft.slug !== payload.slug ||
+    draft.title !== payload.title ||
+    draft.visibility !== payload.visibility ||
+    draft.route !== routeForPayload(payload)
+  ) {
+    return "draft_contract_mismatch";
+  }
+
+  return null;
 }
 
 async function validatePayloadForSave(
@@ -952,6 +1011,16 @@ function parseVersionHistory(value: string | null): unknown[] {
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseStringArray(value: string): string[] {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item): item is string => typeof item === "string");
   } catch {
     return [];
   }

@@ -4,6 +4,37 @@ export type AdminControlSourceMode = "d1" | "fixture" | "mixed";
 
 export type AdminEventPrivacy = "public" | "internal" | "private" | "sensitive";
 
+export type KnowledgeDomain = "work" | "content" | "life" | "fleet" | "system";
+
+export type KnowledgeCardKind =
+  | "person"
+  | "project"
+  | "place"
+  | "moment"
+  | "decision"
+  | "concept"
+  | "system"
+  | "reference";
+
+export type KnowledgeSensitivity =
+  | "open"
+  | "restricted"
+  | "intimate"
+  | "closed";
+
+export type KnowledgeRevealPolicy =
+  | "summary"
+  | "pointer_only"
+  | "human_present"
+  | "never_index";
+
+export type KnowledgeFreshnessState =
+  | "fresh"
+  | "stale"
+  | "partial"
+  | "unavailable"
+  | "unknown";
+
 export interface AdminEventEnvelope {
   schema_version: number;
   event_id: string;
@@ -31,10 +62,23 @@ export type InboxActionKind =
   | "open"
   | "none";
 
+export type AdminInboxDomain = "work" | "content" | "life" | "fleet" | "system";
+
+export type AdminAttentionKind =
+  | "review"
+  | "approval"
+  | "decision"
+  | "deadline"
+  | "error"
+  | "verification";
+
 export interface AdminInboxItem {
   item_id: string;
   dedupe_key: string;
   event_refs: string[];
+  domain: AdminInboxDomain;
+  entity_ref: string;
+  attention_kind: AdminAttentionKind;
   source: string;
   account: string | null;
   title: string;
@@ -124,6 +168,48 @@ export interface AdminServiceRegistryViewItem {
   event_refs: string[];
 }
 
+export interface AdminKnowledgeCard {
+  card_id: string;
+  entity_ref: string;
+  domain: KnowledgeDomain;
+  kind: KnowledgeCardKind;
+  title: string;
+  summary: string;
+  source_system: string;
+  source_locator: string;
+  source_native_id: string | null;
+  canonical_host: "ap-pro" | "ap-mini" | "cloud" | "provider" | "none";
+  canonical_path: string | null;
+  sensitivity: KnowledgeSensitivity;
+  reveal_policy: KnowledgeRevealPolicy;
+  freshness_state: KnowledgeFreshnessState;
+  observed_at: string | null;
+  stale_after_seconds: number | null;
+  content_hash: string;
+  proof_refs: string[];
+  lineage_refs: string[];
+  related_card_ids: string[];
+  retrieval_instructions: string;
+  context_budget_tokens: number;
+  event_refs: string[];
+  indexed_at: string;
+}
+
+export interface AdminKnowledgeRetrievalContract {
+  query_before_asking: true;
+  default_result_limit: number;
+  max_result_limit: number;
+  default_context_budget_tokens: number;
+  escalation_order: [
+    "index_card",
+    "bounded_summary_and_proof",
+    "canonical_source",
+  ];
+  stale_behavior: string;
+  closed_tier_behavior: "never_index_values";
+  inbox_behavior: "knowledge_is_not_attention";
+}
+
 export interface AdminControlRetention {
   event_store: "d1";
   payload_store: "r2";
@@ -158,6 +244,8 @@ export interface AdminControlContracts {
   };
   piece_states: PieceStateName[];
   legal_piece_cycles: string[];
+  knowledge_card_fields: (keyof AdminKnowledgeCard)[];
+  knowledge_retrieval: AdminKnowledgeRetrievalContract;
 }
 
 export interface AdminControlProjections {
@@ -167,6 +255,7 @@ export interface AdminControlProjections {
   deploy_states: AdminDeployState[];
   capability_states: AdminCapabilityState[];
   service_registry_view: AdminServiceRegistryViewItem[];
+  knowledge_cards: AdminKnowledgeCard[];
 }
 
 export interface AdminControlSnapshot {

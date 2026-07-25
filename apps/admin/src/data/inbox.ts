@@ -13,7 +13,7 @@ import {
   type AdminControlDatabase,
   type AdminInboxItem as AdminControlInboxItem,
 } from "@anipotts/lib/admin-control";
-import { carouselPosts, carouselSummary } from "./carousels";
+import { carouselPosts, carouselSeries, carouselSummary } from "./carousels";
 import { loadRuntimeOverlayResponse } from "./runtime";
 
 type BoundAdminControlDatabase = Exclude<
@@ -26,7 +26,12 @@ type AdminInboxDb = ContentInventoryD1Database &
   ProofD1Database &
   BoundAdminControlDatabase;
 
-export type AdminInboxCategory = "health" | "content" | "income" | "system";
+export type AdminInboxCategory =
+  | "work"
+  | "content"
+  | "life"
+  | "fleet"
+  | "system";
 export type AdminInboxTimeframe =
   | "now"
   | "today"
@@ -35,6 +40,7 @@ export type AdminInboxTimeframe =
 
 export type AdminInboxItem = {
   id: string;
+  entity_id: string;
   dedupe_key: string;
   source: string;
   owner: string;
@@ -71,6 +77,7 @@ const CLOSED_STATUSES = new Set([
   "resolved",
   "verified",
 ]);
+const STATIC_SOURCE_OBSERVED_AT = "1970-01-01T00:00:00.000Z";
 
 export async function readAdminInbox(
   db: AdminInboxDb | null | undefined,
@@ -89,24 +96,30 @@ export async function readAdminInbox(
       .filter((item) => isOpenProjectionItem(item))
       .map((item) => inboxItemFromProjection(item, now)),
     ...proof
-      .filter((entry) => entry.status !== "verified")
+      .filter(
+        (entry) =>
+          entry.status !== "verified" &&
+          !entry.title.toLowerCase().includes("d1 read failed") &&
+          !entry.summary.toLowerCase().includes("d1_error"),
+      )
       .map<AdminInboxItem>((entry) => ({
         id: entry.id,
+        entity_id: entityIdFor(`proof:${entry.id}`),
         dedupe_key: `proof:${entry.id}`,
         source: entry.kind === "auth" ? "auth" : "deploy",
-        owner: "site/admin",
+        owner: "chief/site",
         action_kind: "verify",
         title: entry.title,
         summary: entry.summary,
         status: normalizeStatus(entry.status),
         risk: entry.status === "blocked" ? "high" : "medium",
-        category: "system",
+        category: "fleet",
         timeframe: entry.status === "blocked" ? "waiting / gated" : "now",
         href: entry.kind === "auth" ? "/proof" : "/deploys",
         next_action: entry.next_safe_action,
         copy_text: entry.next_safe_action,
         proof: entry.evidence_uri,
-        updated_at: now,
+        updated_at: STATIC_SOURCE_OBSERVED_AT,
       })),
     ...operations.operations
       .filter((operation) =>
@@ -114,7 +127,6 @@ export async function readAdminInbox(
           operation.status,
         ),
       )
-      .slice(0, 8)
       .map<AdminInboxItem>((operation) => {
         const nextAction =
           operation.status === "blocked"
@@ -123,6 +135,7 @@ export async function readAdminInbox(
 
         return {
           id: operation.operation_id,
+          entity_id: entityIdFor(`content-operation:${operation.operation_id}`),
           dedupe_key: `content-operation:${operation.operation_id}`,
           source: "content",
           owner: operation.created_by,
@@ -152,6 +165,7 @@ export async function readAdminInbox(
       )
       .map<AdminInboxItem>((overlay) => ({
         id: overlay.repo_state_id,
+        entity_id: entityIdFor(`fleet:${overlay.repo_state_id}`),
         dedupe_key: `fleet:${overlay.repo_state_id}`,
         source: "fleet",
         owner: "chief/infra",
@@ -180,6 +194,7 @@ export async function readAdminInbox(
 
         return {
           id: item.item_id,
+          entity_id: item.entity_ref,
           dedupe_key: item.dedupe_key,
           source: "gmail",
           owner: item.owner,
@@ -188,9 +203,9 @@ export async function readAdminInbox(
           summary: item.summary,
           status: normalizeStatus(item.status),
           risk: riskForUrgency(item.urgency),
-          category: "income",
+          category: item.domain === "work" ? "work" : "system",
           timeframe: timeframeForProjection(item),
-          href: item.href ?? "/inbox?category=income",
+          href: item.href ?? "/?category=work",
           next_action: nextAction,
           copy_text: item.action_kind === "none" ? undefined : nextAction,
           proof: item.event_refs.join(", ") || item.dedupe_key,
@@ -200,9 +215,9 @@ export async function readAdminInbox(
       }),
     ...newsletterDrafts
       .filter((draft) => draft.status !== "ready_for_review")
-      .slice(0, 4)
       .map<AdminInboxItem>((draft) => ({
         id: draft.id,
+        entity_id: entityIdFor(`newsletter:${draft.id}`),
         dedupe_key: `newsletter:${draft.id}`,
         source: "newsletter",
         owner: "chief/site",
@@ -217,11 +232,10 @@ export async function readAdminInbox(
         next_action: draft.pipeline.next_action,
         copy_text: draft.pipeline.next_action,
         proof: draft.source_fixture,
-        updated_at: now,
+        updated_at: STATIC_SOURCE_OBSERVED_AT,
       })),
     ...carouselPosts
       .filter((post) => post.staleCount > 0 || post.soundStatus !== "approved")
-      .slice(0, 4)
       .map<AdminInboxItem>((post) => {
         const nextAction =
           carouselSummary.staleExports > 0
@@ -230,6 +244,7 @@ export async function readAdminInbox(
 
         return {
           id: post.id,
+          entity_id: entityIdFor(`carousel:${post.id}`),
           dedupe_key: `carousel:${post.id}`,
           source: "carousel",
           owner: "media/carousels",
@@ -244,62 +259,15 @@ export async function readAdminInbox(
           next_action: nextAction,
           copy_text: nextAction,
           proof: "media carousel handoff manifest",
-          updated_at: now,
+          updated_at:
+            carouselSeries.generatedAt === "unknown"
+              ? STATIC_SOURCE_OBSERVED_AT
+              : carouselSeries.generatedAt,
         };
       }),
   ];
 
-  if (control.errors.length > 0) {
-    items.push({
-      id: "admin-control.read-unavailable",
-      dedupe_key: "admin-control:read-unavailable",
-      source: "system",
-      owner: "site/admin",
-      action_kind: "verify",
-      title: "admin projection read is partial",
-      summary: `${control.errors.length} projection sources could not return live D1 state.`,
-      status: "read unavailable",
-      risk: "medium",
-      category: "system",
-      timeframe: "today",
-      href: "/api/admin/projections",
-      next_action:
-        "inspect projection errors without substituting fixture work",
-      copy_text: "inspect projection errors without substituting fixture work",
-      proof: `${control.errors.length} projection read errors`,
-      updated_at: now,
-    });
-  }
-
-  if (pageContent.mode !== "ready") {
-    items.push({
-      id: "content.page-content.unavailable",
-      dedupe_key: "content:page-content:unavailable",
-      source: "content",
-      owner: "chief/site",
-      action_kind: "verify",
-      title: "page_content read unavailable",
-      summary:
-        pageContent.mode === "read_failed"
-          ? pageContent.error
-          : "D1 binding is missing in this runtime.",
-      status: normalizeStatus(pageContent.mode),
-      risk: "medium",
-      category: "content",
-      timeframe: "today",
-      href: "/content",
-      next_action:
-        "fix DB binding or local runtime before editing public content",
-      copy_text:
-        "fix DB binding or local runtime before editing public content",
-      proof: "D1 page_content",
-      updated_at: now,
-    });
-  }
-
-  const sorted = dedupeInboxItems(items).sort(
-    (a, b) => score(b) - score(a) || b.updated_at.localeCompare(a.updated_at),
-  );
+  const sorted = rankInboxItems(items);
 
   return {
     generated_at: now,
@@ -320,7 +288,9 @@ export async function readAdminInbox(
   };
 }
 
-function isOpenProjectionItem(item: AdminControlInboxItem): boolean {
+function isOpenProjectionItem(
+  item: Pick<AdminControlInboxItem, "action_kind" | "status">,
+): boolean {
   return item.action_kind !== "none" && !CLOSED_STATUSES.has(item.status);
 }
 
@@ -328,10 +298,11 @@ function inboxItemFromProjection(
   item: AdminControlInboxItem,
   now: string,
 ): AdminInboxItem {
-  const category = categoryForProjection(item);
+  const category = item.domain;
 
   return {
     id: item.item_id,
+    entity_id: item.entity_ref,
     dedupe_key: item.dedupe_key,
     source: item.source,
     owner: item.owner,
@@ -342,42 +313,11 @@ function inboxItemFromProjection(
     risk: riskForUrgency(item.urgency),
     category,
     timeframe: timeframeForProjection(item),
-    href: item.href ?? `/inbox?category=${category}`,
+    href: item.href ?? `/?category=${category}`,
     next_action: nextActionForProjection(item),
     proof: item.event_refs.join(", ") || item.dedupe_key,
     updated_at: item.last_seen_at ?? item.expires_at ?? now,
   };
-}
-
-function categoryForProjection(
-  item: AdminControlInboxItem,
-): AdminInboxCategory {
-  const ref = [item.source, item.owner, item.account, item.title]
-    .filter(Boolean)
-    .join(":")
-    .toLowerCase();
-
-  if (ref.includes("health") || ref.includes("vitals")) return "health";
-  if (
-    ref.includes("business") ||
-    ref.includes("jobs") ||
-    ref.includes("income") ||
-    ref.includes("payment") ||
-    ref.includes("gmail")
-  ) {
-    return "income";
-  }
-  if (
-    ref.includes("brand") ||
-    ref.includes("site") ||
-    ref.includes("content") ||
-    ref.includes("newsletter") ||
-    ref.includes("media") ||
-    ref.includes("carousel")
-  ) {
-    return "content";
-  }
-  return "system";
 }
 
 function timeframeForProjection(
@@ -426,10 +366,21 @@ function normalizeStatus(status: string): string {
     .replaceAll("_", " ");
 }
 
-function dedupeInboxItems(items: AdminInboxItem[]): AdminInboxItem[] {
+export function rankInboxItems(items: AdminInboxItem[]): AdminInboxItem[] {
   const unique = new Map<string, AdminInboxItem>();
-  for (const item of items) unique.set(item.dedupe_key, item);
-  return [...unique.values()];
+  for (const item of items) {
+    const requiredAction = `${item.entity_id}:${item.action_kind}`;
+    const existing = unique.get(requiredAction);
+    if (!existing || item.updated_at > existing.updated_at) {
+      unique.set(requiredAction, item);
+    }
+  }
+  return [...unique.values()].sort(
+    (a, b) =>
+      score(b) - score(a) ||
+      b.updated_at.localeCompare(a.updated_at) ||
+      a.id.localeCompare(b.id),
+  );
 }
 
 function score(item: AdminInboxItem): number {
@@ -440,4 +391,11 @@ function score(item: AdminInboxItem): number {
   const timeframe =
     item.timeframe === "now" ? 4 : item.timeframe === "today" ? 2 : 0;
   return risk + action + timeframe;
+}
+
+function entityIdFor(dedupeKey: string): string {
+  return `entity-${dedupeKey
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 }

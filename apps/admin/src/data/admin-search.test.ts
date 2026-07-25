@@ -1,0 +1,53 @@
+import { describe, expect, it } from "vitest";
+import { navItems } from "./admin";
+import { searchAdminResults, type AdminSearchResult } from "./admin-search";
+
+const rows: AdminSearchResult[] = [
+  {
+    id: "person:ani",
+    label: "Ani Potts",
+    domain: "people",
+    kind: "person",
+    currentFact: "owner of the current work",
+    source: "brain",
+    freshness: "2026-07-25T12:00:00.000Z",
+    href: "/knowledge?kind=people",
+    keywords: ["owner"],
+  },
+  {
+    id: "work:site",
+    label: "chief/site",
+    domain: "work",
+    kind: "working",
+    currentFact: "finish the quiet admin console",
+    source: "codex",
+    freshness: "2026-07-25T12:00:00.000Z",
+    href: "/work?view=now",
+    keywords: ["admin"],
+  },
+];
+
+describe("admin search and navigation", () => {
+  it("matches every query term across sanitized result fields", () => {
+    expect(searchAdminResults(rows, "quiet codex")).toEqual([rows[1]]);
+    expect(searchAdminResults(rows, "Ani owner")).toEqual([rows[0]]);
+    expect(searchAdminResults(rows, "transcript recipient attachment")).toEqual(
+      [],
+    );
+  });
+
+  it("keeps Inbox pinned and Fleet nested under System", () => {
+    expect(navItems[0]).toMatchObject({ href: "/", group: "home" });
+    expect(navItems.find((item) => item.href === "/fleet")).toMatchObject({
+      group: "system",
+      parent: "system",
+    });
+    expect(navItems.find((item) => item.href === "/system")).toBeDefined();
+    expect(
+      navItems.find((item) => item.href === "/knowledge?kind=people"),
+    ).toMatchObject({ group: "knowledge", parent: "knowledge" });
+    expect(
+      navItems.find((item) => item.href === "/knowledge/locations"),
+    ).toMatchObject({ group: "knowledge", parent: "knowledge" });
+  });
+});

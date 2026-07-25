@@ -1,313 +1,101 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import {
-  contentInventory,
-  contentInventorySource,
-  readPageContentInventoryStore,
-} from "../../data/content";
-import {
-  sourceContentRecords,
-  sourceContentSummary,
-} from "../../data/source-content";
+import { readPageContentInventoryStore } from "../../data/content";
+import { sourceContentRecords } from "../../data/source-content";
+import { carouselPosts } from "../../data/carousels";
 
-const surfaces = [
-  "homepage",
-  "projects",
-  "writing",
-  "newsletter",
-  "orchestrating",
-] as const;
-const contentWorkflow = [
-  {
-    href: "/content",
-    label: "inventory",
-    detail: "source refs and current fields",
-  },
-  {
-    href: "/content/edit/new",
-    label: "edit",
-    detail: "new writing opens in the focused editor",
-    primary: true,
-  },
-  {
-    href: "/content/preview",
-    label: "preview",
-    detail: "draft render queue",
-  },
-  {
-    href: "/content/drafts",
-    label: "drafts",
-    detail: "saved draft operations",
-  },
-  {
-    href: "/content/carousels",
-    label: "carousels",
-    detail: "review media handoff assets",
-  },
-  {
-    href: "/content/operations",
-    label: "history",
-    detail: "operation and publish trail",
-  },
-];
 const pageContentState = await readPageContentInventoryStore(
   Astro.locals.runtime?.env.DB,
 );
+const stageFor = (status: string) =>
+  status === "published" ? "published" : status.replaceAll("_", " ");
 ---
 
-<AdminLayout
-  title="content inventory"
-  deck="Current editable public-site surfaces and their source refs. Existing rows open in the D1 editor; new writing starts as a private draft."
->
-  <section class="meta-strip" aria-label="content inventory source">
-    <span>{contentInventory.length} rows</span>
-    <span>{pageContentState.row_count} page_content</span>
-    <span>{pageContentState.published_count} published</span>
-    <span>{pageContentState.mode}</span>
-    <span>{contentInventorySource.mode}</span>
-    <span>{contentInventorySource.source_doc}</span>
-    <span>{sourceContentSummary.visible_projects} visible projects</span>
-    <span>{sourceContentSummary.published_writing} published writing</span>
-  </section>
+<AdminLayout title="content" hideHeader>
+  <main class="quiet-page quiet-content-page">
+    <header class="quiet-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Content
+      </h1>
+      <a class="quiet-primary-action" href="/content/edit/new">new piece</a>
+    </header>
 
-  <nav class="content-action-strip" aria-label="content workflow">
-    {
-      contentWorkflow.map((item) => (
-        <a
-          class:list={["workflow-action", item.primary && "primary"]}
-          href={item.href}
+    <nav class="quiet-view-tabs" aria-label="content views">
+      <a href="/content" aria-current="page">library</a>
+      <a href="/content/review">review</a>
+      <a href="/content/drafts">drafts</a>
+      <a href="/content/carousels">carousels</a>
+      <a href="/newsletter">newsletter</a>
+    </nav>
+
+    <section class="quiet-content-section" aria-labelledby="writing-heading">
+      <header>
+        <h2 id="writing-heading">Writing</h2>
+        <span>{sourceContentRecords.length + pageContentState.rows.length}</span
         >
-          <strong>{item.label}</strong>
-          <span>{item.detail}</span>
-        </a>
-      ))
-    }
-  </nav>
-
-  <section class="table-card">
-    <div class="section-head">
-      <div>
-        <p>d1 page_content</p>
-        <h2>{pageContentState.row_count} records</h2>
-      </div>
-      <span>draft and publish editor</span>
-    </div>
-    <div class="record-list">
-      {
-        pageContentState.rows.length === 0 ? (
-          <article class="record-row">
-            <div>
-              <p>{pageContentState.mode}</p>
-              <h3>No published page_content rows are visible yet.</h3>
-            </div>
-            <dl>
-              <div>
-                <dt>source</dt>
-                <dd>D1 page_content</dd>
-              </div>
-              <div>
-                <dt>next</dt>
-                <dd>
-                  seed stable public copy before enabling any save or publish
-                  path
-                </dd>
-              </div>
-            </dl>
-          </article>
-        ) : (
+      </header>
+      <div class="quiet-editorial-list">
+        {
           pageContentState.rows.map((row) => (
-            <article class="record-row">
+            <article>
               <div>
-                <p>
-                  {row.page_key} / v{row.version} /{" "}
-                  {row.published ? "published" : "draft"}
-                </p>
+                <span>{row.page_key}</span>
                 <h3>{row.summary}</h3>
               </div>
-              <dl>
-                <div>
-                  <dt>source</dt>
-                  <dd>{row.source_ref}</dd>
-                </div>
-                <div>
-                  <dt>fields</dt>
-                  <dd>{row.field_count}</dd>
-                </div>
-                <div>
-                  <dt>source-backed</dt>
-                  <dd>{row.source_backed_fields.length}</dd>
-                </div>
-                <div>
-                  <dt>updated</dt>
-                  <dd>{row.updated_at || "unknown"}</dd>
-                </div>
-                <div>
-                  <dt>write state</dt>
-                  <dd>save draft to D1; publish selected draft with proof</dd>
-                </div>
-              </dl>
-              <div class="inline-actions">
-                <a
-                  class="button secondary"
-                  href={`/content/edit/${encodeURIComponent(row.page_key)}`}
-                >
-                  open editor
+              <span>{row.published ? "published" : "draft"}</span>
+              <time datetime={row.updated_at || undefined}>
+                {row.updated_at || "not observed"}
+              </time>
+              <div class="quiet-row-actions">
+                <a href={`/content/edit/${encodeURIComponent(row.page_key)}`}>
+                  edit
                 </a>
-                <a class="button secondary" href="/content/operations">
-                  history
-                </a>
+                <a href="/content/preview">preview</a>
               </div>
-              <div class="field-grid" aria-label={`${row.page_key} d1 fields`}>
-                {row.fields.slice(0, 16).map((field) => (
-                  <div class="field-chip">
-                    <span>{field.path}</span>
-                    <strong>{field.value}</strong>
-                    <small>{field.kind}</small>
-                  </div>
-                ))}
-                {row.fields.length > 16 && (
-                  <div class="field-chip muted-chip">
-                    <span>more</span>
-                    <strong>{row.fields.length - 16} fields hidden</strong>
-                    <small>truncated</small>
-                  </div>
-                )}
-              </div>
-              {row.source_backed_fields.length > 0 && (
-                <div class="field-gap">
-                  <span>source-backed until schema exists</span>
-                  <p>{row.source_backed_fields.join(", ")}</p>
-                </div>
-              )}
             </article>
           ))
-        )
-      }
-    </div>
-  </section>
-
-  <section class="table-card operation-card">
-    <div class="section-head">
-      <div>
-        <p>source content collections</p>
-        <h2>
-          {sourceContentSummary.projects} projects / {
-            sourceContentSummary.writing
-          }
-          writing
-        </h2>
+        }
+        {
+          sourceContentRecords.map((record) => (
+            <article>
+              <div>
+                <span>{record.surface}</span>
+                <h3>{record.title}</h3>
+              </div>
+              <span>{stageFor(record.status)}</span>
+              <span>{record.body_words} words</span>
+              <div class="quiet-row-actions">
+                <a href={record.route}>view</a>
+                <a href="/content/review">review</a>
+              </div>
+            </article>
+          ))
+        }
       </div>
-      <span>bundled read only</span>
-    </div>
-    <div class="record-list">
-      {
-        sourceContentRecords.map((record) => (
-          <article class="record-row">
-            <div>
-              <p>
-                {record.surface} / {record.status} / {record.body_words} words
-              </p>
-              <h3>{record.title}</h3>
-            </div>
-            <dl>
-              <div>
-                <dt>route</dt>
-                <dd>{record.route}</dd>
-              </div>
-              <div>
-                <dt>source</dt>
-                <dd>{record.source_ref}</dd>
-              </div>
-              <div>
-                <dt>summary</dt>
-                <dd>{record.summary}</dd>
-              </div>
-              <div>
-                <dt>body state</dt>
-                <dd>{record.body_state}</dd>
-              </div>
-              <div>
-                <dt>sections</dt>
-                <dd>{record.body_section_count}</dd>
-              </div>
-              <div>
-                <dt>next</dt>
-                <dd>{record.next_safe_action}</dd>
-              </div>
-            </dl>
-            <div class="body-preview">
-              <span>markdown body preview</span>
-              <p>{record.body_preview}</p>
-            </div>
-            <div class="field-grid" aria-label={`${record.slug} source fields`}>
-              {record.fields.slice(0, 14).map((field) => (
-                <div class="field-chip">
-                  <span>{field.path}</span>
-                  <strong>{field.value}</strong>
-                  <small>{field.kind}</small>
-                </div>
-              ))}
-              {record.fields.length > 14 && (
-                <div class="field-chip muted-chip">
-                  <span>more</span>
-                  <strong>{record.fields.length - 14} fields hidden</strong>
-                  <small>truncated</small>
-                </div>
+    </section>
+
+    <section class="quiet-content-section" aria-labelledby="media-heading">
+      <header>
+        <h2 id="media-heading">Media</h2>
+        <a href="/content/carousels">open carousels</a>
+      </header>
+      <div class="quiet-media-rail">
+        {
+          carouselPosts.slice(0, 6).map((post) => (
+            <a href={`/content/carousels#${post.id}`}>
+              {post.phoneMockInstagram ? (
+                <img src={post.phoneMockInstagram} alt="" loading="lazy" />
+              ) : (
+                <span class="quiet-media-empty" aria-hidden="true" />
               )}
-            </div>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-
-  <div class="surface-grid">
-    {
-      surfaces.map((surface) => {
-        const rows = contentInventory.filter((row) => row.surface === surface);
-
-        return (
-          <section class="table-card">
-            <div class="section-head">
-              <div>
-                <p>{surface}</p>
-                <h2>{rows.length} fields</h2>
-              </div>
-              <span>
-                {rows.filter((row) => row.editability === "ready").length} ready
-              </span>
-            </div>
-            <div class="record-list">
-              {rows.map((row) => (
-                <article class="record-row">
-                  <div>
-                    <p>{row.title}</p>
-                    <h3>{row.current_value}</h3>
-                  </div>
-                  <dl>
-                    <div>
-                      <dt>source</dt>
-                      <dd>{row.source_ref}</dd>
-                    </div>
-                    <div>
-                      <dt>editability</dt>
-                      <dd>{row.editability}</dd>
-                    </div>
-                    <div>
-                      <dt>risk</dt>
-                      <dd>{row.risk_level}</dd>
-                    </div>
-                    <div>
-                      <dt>next</dt>
-                      <dd>{row.next_safe_action}</dd>
-                    </div>
-                  </dl>
-                </article>
-              ))}
-            </div>
-          </section>
-        );
-      })
-    }
-  </div>
+              <strong>{post.title}</strong>
+              <small>
+                {post.slideCount} slides · {stageFor(post.status)}
+              </small>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </main>
 </AdminLayout>

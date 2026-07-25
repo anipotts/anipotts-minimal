@@ -1,6 +1,42 @@
 export const ADMIN_ROUTES = [
-  { route: "/", file: "apps/admin/src/pages/index.astro", nav: false },
-  { route: "/inbox", file: "apps/admin/src/pages/inbox.astro", nav: true },
+  { route: "/", file: "apps/admin/src/pages/index.astro", nav: true },
+  { route: "/inbox", file: "apps/admin/src/pages/inbox.astro", nav: false },
+  {
+    route: "/knowledge",
+    file: "apps/admin/src/pages/knowledge.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/knowledge/locations",
+    file: "apps/admin/src/pages/knowledge/locations.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/work",
+    file: "apps/admin/src/pages/work.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life",
+    file: "apps/admin/src/pages/life/index.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life/health",
+    file: "apps/admin/src/pages/life/health.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
+    route: "/life/aesthetics",
+    file: "apps/admin/src/pages/life/aesthetics.astro",
+    nav: true,
+    smoke: false,
+  },
   {
     route: "/auth/passkey",
     file: "apps/admin/src/pages/auth/passkey.astro",
@@ -62,6 +98,12 @@ export const ADMIN_ROUTES = [
   },
   { route: "/fleet", file: "apps/admin/src/pages/fleet.astro", nav: true },
   {
+    route: "/system",
+    file: "apps/admin/src/pages/system.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/mutations",
     file: "apps/admin/src/pages/mutations.astro",
     nav: true,
@@ -90,6 +132,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/api/admin/knowledge",
+    file: "apps/admin/src/pages/api/admin/knowledge.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
     route: "/api/admin/content/draft-operation",
     file: "apps/admin/src/pages/api/admin/content/draft-operation.ts",
     nav: false,
@@ -112,6 +160,9 @@ export const PUBLIC_UNSMOKED_ROUTE_FILES = [
   "apps/admin/src/pages/api/admin/passkey/register-verify.ts",
   "apps/admin/src/pages/api/admin/passkey/revoke-current.ts",
   "apps/admin/src/pages/api/admin/passkey/status.ts",
+  "apps/admin/src/pages/api/admin/password/login.ts",
+  "apps/admin/src/pages/api/admin/password/logout.ts",
+  "apps/admin/src/pages/api/admin/password/status.ts",
 ];
 
 export const ADMIN_PROTECTED_SMOKE_ROUTES = ADMIN_ROUTES.filter(

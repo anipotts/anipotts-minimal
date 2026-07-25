@@ -1,0 +1,336 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { SourceMark } from "../components/SourceMark";
+import { OperatorWorkTable } from "../components/astryx/OperatorWorkTable";
+import {
+  assertValidOperatorWorkProjection,
+  groupOperatorTasks,
+  readOperatorWorkProjection,
+} from "../data/operator-work";
+
+if (!Astro.url.searchParams.has("view")) {
+  return Astro.redirect("/work?view=now", 302);
+}
+
+const projection = readOperatorWorkProjection();
+assertValidOperatorWorkProjection(projection);
+
+const groups = groupOperatorTasks(projection);
+const view = Astro.url.searchParams.get("view") ?? "now";
+const allRows = (
+  ["foreground", "background", "waiting", "recently_completed"] as const
+).flatMap((lane) => groups[lane].map((task) => ({ ...task, lane })));
+const visibleRows =
+  view === "history"
+    ? allRows.filter((task) => task.lane === "recently_completed")
+    : view === "projects"
+      ? [...allRows].sort((a, b) =>
+          a.project_label.localeCompare(b.project_label),
+        )
+      : allRows;
+const displayTime = (value: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+
+const inspectorRows = Object.fromEntries(
+  projection.task_states.map((task) => [task.task_id, task]),
+);
+const inspectorJson = JSON.stringify(inspectorRows).replaceAll("<", "\\u003c");
+---
+
+<AdminLayout title="work" hideHeader>
+  <main class="operator-page operator-work-page" data-work-now>
+    <header class="operator-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        {
+          view === "projects"
+            ? "Projects"
+            : view === "history"
+              ? "Work history"
+              : "Currently working"
+        }
+      </h1>
+      <span>{visibleRows.length} visible</span>
+    </header>
+
+    <nav class="quiet-view-tabs" aria-label="work views">
+      <a
+        href="/work?view=now"
+        aria-current={view === "now" ? "page" : undefined}
+      >
+        now
+      </a>
+      <a
+        href="/work?view=projects"
+        aria-current={view === "projects" ? "page" : undefined}
+      >
+        projects
+      </a>
+      <a
+        href="/work?view=history"
+        aria-current={view === "history" ? "page" : undefined}
+      >
+        history
+      </a>
+    </nav>
+
+    <section class="operator-ledger" aria-label="current work">
+      {
+        visibleRows.length > 0 ? (
+          <OperatorWorkTable rows={visibleRows} client:load />
+        ) : (
+          <p class="quiet-empty-state">Nothing here yet.</p>
+        )
+      }
+    </section>
+
+    <details class="operator-loose-sources">
+      <summary>
+        <span>loose conversations</span>
+        <strong>{projection.source_states.length} preserved</strong>
+      </summary>
+      {
+        projection.source_states.map((source) => (
+          <div class="operator-loose-source">
+            <SourceMark provider={source.provider} />
+            <div>
+              <strong>{source.canonical_title}</strong>
+              <span>
+                collapsed · observed {displayTime(source.last_observed_at)}
+              </span>
+            </div>
+            <code>{source.native_ref}</code>
+          </div>
+        ))
+      }
+    </details>
+
+    <aside
+      class="operator-inspector"
+      aria-labelledby="operator-inspector-title"
+      data-operator-inspector
+      hidden
+    >
+      <button
+        class="operator-inspector-backdrop"
+        type="button"
+        aria-label="close task details"
+        data-close-inspector></button>
+      <div class="operator-inspector-panel">
+        <header>
+          <div>
+            <p data-inspector-provider></p>
+            <h2 id="operator-inspector-title" data-inspector-title></h2>
+          </div>
+          <button
+            type="button"
+            class="operator-icon-button"
+            aria-label="close task details"
+            data-close-inspector>close</button
+          >
+        </header>
+        <div class="operator-inspector-summary">
+          <div>
+            <span>goal</span>
+            <strong data-inspector-goal></strong>
+          </div>
+          <div>
+            <span>next</span>
+            <strong data-inspector-next></strong>
+          </div>
+          <div>
+            <span>proof owed</span>
+            <strong data-inspector-proof-owed></strong>
+          </div>
+        </div>
+        <dl class="operator-inspector-grid">
+          <div>
+            <dt>project</dt>
+            <dd data-inspector-project></dd>
+          </div>
+          <div>
+            <dt>owner</dt>
+            <dd data-inspector-owner></dd>
+          </div>
+          <div>
+            <dt>host</dt>
+            <dd data-inspector-host></dd>
+          </div>
+          <div>
+            <dt>states</dt>
+            <dd data-inspector-states></dd>
+          </div>
+          <div>
+            <dt>last observation</dt>
+            <dd data-inspector-observed></dd>
+          </div>
+          <div>
+            <dt>reconciled</dt>
+            <dd data-inspector-reconciled></dd>
+          </div>
+          <div>
+            <dt>surface</dt>
+            <dd><a data-inspector-surface>open</a></dd>
+          </div>
+          <div>
+            <dt>attention</dt>
+            <dd data-inspector-attention></dd>
+          </div>
+          <div class="is-wide">
+            <dt>repo / worktree</dt>
+            <dd data-inspector-worktree></dd>
+          </div>
+          <div class="is-wide">
+            <dt>source</dt>
+            <dd data-inspector-source></dd>
+          </div>
+          <div class="is-wide">
+            <dt>lineage</dt>
+            <dd data-inspector-lineage></dd>
+          </div>
+          <div class="is-wide">
+            <dt>proof</dt>
+            <dd data-inspector-proof></dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </main>
+
+  <script
+    is:inline
+    type="application/json"
+    id="operator-work-inspector-data"
+    set:html={inspectorJson}
+  />
+  <script is:inline>
+    (() => {
+      const data = document.querySelector("#operator-work-inspector-data");
+      if (!(data instanceof HTMLScriptElement)) return;
+      const inspectorRows = JSON.parse(data.textContent || "{}");
+      const inspector = document.querySelector("[data-operator-inspector]");
+      if (!(inspector instanceof HTMLElement)) return;
+      let inspectorOpener = null;
+
+      const setText = (selector, value) => {
+        const node = inspector.querySelector(selector);
+        if (node) node.textContent = value || "none";
+      };
+
+      const openInspector = (taskId, opener) => {
+        const task = inspectorRows[taskId];
+        if (!task) return;
+        inspectorOpener = opener instanceof HTMLElement ? opener : null;
+
+        setText(
+          "[data-inspector-provider]",
+          `${task.provider} · ${task.task_id}`,
+        );
+        setText("[data-inspector-title]", task.canonical_title);
+        setText("[data-inspector-goal]", task.bounded_goal);
+        setText("[data-inspector-next]", task.next_action);
+        setText("[data-inspector-proof-owed]", task.proof_owed);
+        setText("[data-inspector-project]", task.project_label);
+        setText("[data-inspector-owner]", task.owner);
+        setText("[data-inspector-host]", `${task.host} · ${task.machine_role}`);
+        setText(
+          "[data-inspector-states]",
+          `${task.runtime_state} runtime · ${task.operator_state} operator · ${task.lifecycle} lifecycle · ${task.freshness}`,
+        );
+        setText("[data-inspector-observed]", task.last_observed_at);
+        setText("[data-inspector-reconciled]", task.reconciled_at);
+        setText("[data-inspector-attention]", task.attention_ref);
+        setText(
+          "[data-inspector-worktree]",
+          `${task.repo} · ${task.worktree || task.cwd}`,
+        );
+        setText(
+          "[data-inspector-source]",
+          [task.native_ref, task.source_ref].filter(Boolean).join(" · "),
+        );
+        setText("[data-inspector-lineage]", task.lineage_refs.join(" · "));
+        setText("[data-inspector-proof]", task.proof_refs.join(" · "));
+
+        const surface = inspector.querySelector("[data-inspector-surface]");
+        if (surface instanceof HTMLAnchorElement) {
+          surface.textContent = task.relevant_surface;
+          surface.href = task.relevant_surface.endsWith("/inbox")
+            ? "/inbox"
+            : "/work?view=now";
+        }
+
+        inspector.hidden = false;
+        document.body.dataset.inspectorOpen = "true";
+        const close = inspector.querySelector(
+          ".operator-inspector-panel [data-close-inspector]",
+        );
+        if (close instanceof HTMLElement) close.focus();
+      };
+
+      const closeInspector = () => {
+        inspector.hidden = true;
+        delete document.body.dataset.inspectorOpen;
+        inspectorOpener?.focus();
+        inspectorOpener = null;
+      };
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const trigger = target.closest("[data-inspect-task]");
+        if (trigger instanceof HTMLElement) {
+          openInspector(trigger.dataset.inspectTask, trigger);
+          return;
+        }
+
+        if (target.closest("[data-close-inspector]")) {
+          closeInspector();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !inspector.hidden) {
+          closeInspector();
+          return;
+        }
+        if (event.key === "Tab" && !inspector.hidden) {
+          const focusable = [
+            ...inspector.querySelectorAll(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ].filter(
+            (node) =>
+              node instanceof HTMLElement &&
+              node.offsetParent !== null &&
+              !node.classList.contains("operator-inspector-backdrop"),
+          );
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      const entity = new URLSearchParams(location.search).get("entity");
+      if (entity) {
+        const task = Object.values(inspectorRows).find(
+          (candidate) =>
+            candidate.primary_entity_ref === entity ||
+            candidate.entity_refs.includes(entity),
+        );
+        if (task) openInspector(task.task_id, null);
+      }
+    })();
+  </script>
+</AdminLayout>

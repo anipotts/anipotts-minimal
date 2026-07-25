@@ -1,0 +1,303 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { SourceMark } from "./SourceMark";
+import AttentionRow from "./AttentionRow.astro";
+import { readAdminInbox, type AdminInboxItem } from "../data/inbox";
+import { readOperatorWorkProjection } from "../data/operator-work";
+import { operatorTaskDisplay } from "../data/operator-work-view";
+
+const [inbox, work] = await Promise.all([
+  readAdminInbox(Astro.locals.runtime?.env.DB),
+  Promise.resolve(readOperatorWorkProjection()),
+]);
+
+const categories = ["work", "content", "life", "system"] as const;
+const requestedCategory = Astro.url.searchParams.get("category");
+const requestedView = Astro.url.searchParams.get("view");
+const selectedCategory = categories.find(
+  (category) => category === requestedCategory,
+);
+const visibleItems = inbox.items.filter((item) => {
+  const categoryMatches =
+    !selectedCategory ||
+    item.category === selectedCategory ||
+    (selectedCategory === "system" && item.category === "fleet");
+  const viewMatches =
+    requestedView === "urgent"
+      ? item.risk === "high"
+      : requestedView === "waiting"
+        ? item.timeframe.includes("waiting") || item.status.includes("waiting")
+        : true;
+  return categoryMatches && viewMatches;
+});
+const topItems = visibleItems.slice(0, 4);
+const remainingItems = visibleItems.slice(4);
+const beingHandled = work.task_states.filter(
+  (task) =>
+    task.operator_state === "working" || task.operator_state === "review",
+);
+
+const displayTime = (value: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+const humanize = (value: string) => value.replaceAll("_", " ");
+const domainHref = (item: AdminInboxItem) => {
+  if (item.category === "work") {
+    return `/work?view=now&entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "content") {
+    return `/content?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "life") {
+    return `/life?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  if (item.category === "fleet") {
+    return `/fleet?entity=${encodeURIComponent(item.entity_id)}`;
+  }
+  return item.href.startsWith("/") ? item.href : "/proof";
+};
+const linkedTaskFor = (item: AdminInboxItem) =>
+  work.task_states.find(
+    (task) =>
+      task.attention_ref === item.id ||
+      task.primary_entity_ref === item.entity_id ||
+      task.entity_refs.includes(item.entity_id),
+  );
+---
+
+<AdminLayout title="inbox" hideHeader>
+  <main class="operator-page operator-inbox-page">
+    <header class="operator-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Inbox
+      </h1>
+      <div class="operator-header-summary">
+        <strong>{inbox.counts.total} open</strong>
+        <span>·</span>
+        <span>{inbox.counts.high} urgent</span>
+        <time datetime={inbox.generated_at}>
+          checked {displayTime(inbox.generated_at)}
+        </time>
+      </div>
+    </header>
+
+    <nav
+      class="operator-segmented-filter inbox-category-filter"
+      aria-label="filter attention"
+    >
+      <a
+        href="/"
+        class:list={[!selectedCategory && !requestedView && "is-active"]}
+        aria-current={!selectedCategory && !requestedView ? "page" : undefined}
+        >all</a
+      >
+      <a
+        href="/?view=urgent"
+        class:list={[requestedView === "urgent" && "is-active"]}
+        aria-current={requestedView === "urgent" ? "page" : undefined}>urgent</a
+      >
+      <a
+        href="/?view=waiting"
+        class:list={[requestedView === "waiting" && "is-active"]}
+        aria-current={requestedView === "waiting" ? "page" : undefined}
+        >waiting</a
+      >
+      {
+        categories.map((category) => (
+          <a
+            href={`/?category=${category}`}
+            class:list={[selectedCategory === category && "is-active"]}
+            aria-current={selectedCategory === category ? "page" : undefined}
+          >
+            {category}
+          </a>
+        ))
+      }
+    </nav>
+
+    <section
+      class="operator-attention"
+      aria-labelledby="attention-title"
+      data-attention-projection
+    >
+      <div class="operator-section-heading">
+        <div>
+          <h2 id="attention-title">
+            {
+              selectedCategory
+                ? humanize(selectedCategory)
+                : requestedView
+                  ? humanize(requestedView)
+                  : "needs you"
+            }
+          </h2>
+        </div>
+        <span>{visibleItems.length}</span>
+      </div>
+
+      <ol class="operator-attention-list">
+        {
+          topItems.map((item, index) => (
+            <AttentionRow
+              item={item}
+              index={index}
+              linkedTask={linkedTaskFor(item)}
+              domainHref={domainHref(item)}
+            />
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="operator-handled" aria-labelledby="being-handled-title">
+      <div class="operator-section-heading">
+        <div>
+          <h2 id="being-handled-title">being handled</h2>
+        </div>
+        <a href="/work?view=now">open Work</a>
+      </div>
+      <div class="operator-handled-strip">
+        {
+          beingHandled.map((task) => (
+            <a
+              href={`/work?view=now#task-${task.task_id}`}
+              class="operator-handled-item"
+            >
+              <SourceMark provider={task.provider} compact />
+              <div>
+                <strong>{task.canonical_title}</strong>
+                <span>{operatorTaskDisplay(task).bounded_goal}</span>
+              </div>
+              <time datetime={task.last_observed_at}>
+                {displayTime(task.last_observed_at)}
+              </time>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    {
+      remainingItems.length > 0 && (
+        <section
+          class="operator-attention operator-attention-rest"
+          aria-labelledby="remaining-attention-title"
+        >
+          <div class="operator-section-heading">
+            <h2 id="remaining-attention-title">everything else</h2>
+            <span>{remainingItems.length}</span>
+          </div>
+          <ol class="operator-attention-list is-secondary">
+            {remainingItems.map((item, index) => (
+              <AttentionRow
+                item={item}
+                index={index + topItems.length}
+                linkedTask={linkedTaskFor(item)}
+                domainHref={domainHref(item)}
+              />
+            ))}
+          </ol>
+        </section>
+      )
+    }
+    <p class="sr-only" aria-live="polite" data-admin-live-status></p>
+  </main>
+
+  <script is:inline data-astro-rerun>
+    (() => {
+      const itemId = new URLSearchParams(location.search).get("item");
+      if (itemId) {
+        const item = document.querySelector(
+          `[data-attention-id="${CSS.escape(itemId)}"]`,
+        );
+        if (item instanceof HTMLElement) {
+          item.dataset.linked = "true";
+          item.scrollIntoView({ block: "center" });
+        }
+      }
+
+      const currentItems = [
+        ...document.querySelectorAll("[data-attention-id]"),
+      ];
+      let currentInboxSignature = JSON.stringify(
+        currentItems.map((node) => [
+          node.getAttribute("data-attention-id"),
+          node.getAttribute("data-attention-status"),
+          node.getAttribute("data-attention-updated"),
+        ]),
+      );
+      let currentRuntimeSignature = null;
+      const refresh = async () => {
+        if (document.hidden) return;
+        try {
+          const [inboxResponse, runtimeResponse] = await Promise.all([
+            fetch("/api/admin/inbox", {
+              headers: { accept: "application/json" },
+            }),
+            fetch("/api/admin/runtime-feed", {
+              headers: { accept: "application/json" },
+            }),
+          ]);
+          if (!inboxResponse.ok || !runtimeResponse.ok) return;
+          const [inboxPayload, runtimePayload] = await Promise.all([
+            inboxResponse.json(),
+            runtimeResponse.json(),
+          ]);
+          const nextInboxSignature = JSON.stringify(
+            Array.isArray(inboxPayload.items)
+              ? inboxPayload.items.map((entry) => [
+                  entry.id,
+                  entry.status,
+                  entry.updated_at,
+                ])
+              : [],
+          );
+          const nextRuntimeSignature = JSON.stringify(
+            Array.isArray(runtimePayload.overlays)
+              ? runtimePayload.overlays.map((entry) => [
+                  entry.repo_state_id,
+                  entry.branch,
+                  entry.ahead,
+                  entry.behind,
+                  entry.dirty_tracked_count,
+                  entry.untracked_count,
+                  entry.git_available,
+                ])
+              : [],
+          );
+          const inboxChanged = nextInboxSignature !== currentInboxSignature;
+          const runtimeChanged =
+            currentRuntimeSignature !== null &&
+            nextRuntimeSignature !== currentRuntimeSignature;
+          if (inboxChanged || runtimeChanged) {
+            sessionStorage.setItem("admin:inbox-updated", "true");
+            location.reload();
+          }
+          currentInboxSignature = nextInboxSignature;
+          currentRuntimeSignature = nextRuntimeSignature;
+        } catch {
+          // The current source-backed view remains intact while disconnected.
+        }
+      };
+      const interval = window.setInterval(refresh, 10_000);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) refresh();
+      });
+      window.addEventListener("pagehide", () => clearInterval(interval), {
+        once: true,
+      });
+      if (sessionStorage.getItem("admin:inbox-updated") === "true") {
+        sessionStorage.removeItem("admin:inbox-updated");
+        document
+          .querySelector("[data-attention-projection]")
+          ?.classList.add("quiet-source-updated");
+        const live = document.querySelector("[data-admin-live-status]");
+        if (live) live.textContent = "Inbox updated from current sources.";
+      }
+    })();
+  </script>
+</AdminLayout>

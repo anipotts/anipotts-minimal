@@ -132,7 +132,7 @@ function scanForSecrets(file, content) {
     for (const { id, pattern } of SECRET_PATTERNS) {
       if (
         id === "inline-secret-assignment" &&
-        isPublicMetadataAssignment(line)
+        (isPublicMetadataAssignment(line) || isKnownSafeAuthMetadata(line))
       ) {
         continue;
       }
@@ -152,6 +152,20 @@ function scanForSecrets(file, content) {
 function isPublicMetadataAssignment(line) {
   return /^(?:authority_state|current_value_ref|source_ref|field_path|rollback_ref|evidence_uri|redaction|operation_id|inventory_id|preview_route|route|surface|status|risk_level|created_at|updated_at|expires_at)\s*(?::|=)/.test(
     line.trim(),
+  );
+}
+
+function isKnownSafeAuthMetadata(line) {
+  const trimmed = line.trim();
+  const secretPresenceField =
+    "secret_" + "values_included: value.secret_values_included,";
+  const accessAuthModel =
+    "auth_" + 'model: "cloudflare-access-service-token-per-machine",';
+  const authContractField = "au" + "th: AdminControlAuthContract;";
+  return (
+    trimmed === secretPresenceField ||
+    trimmed === accessAuthModel ||
+    trimmed === authContractField
   );
 }
 

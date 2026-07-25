@@ -1,0 +1,113 @@
+---
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { readAdminKnowledge } from "../data/knowledge";
+
+const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB);
+const requestedKind = Astro.url.searchParams.get("kind") ?? "all";
+const filters = [
+  ["all", "all"],
+  ["people", "people"],
+  ["project", "projects"],
+  ["decision", "decisions"],
+  ["concept", "concepts"],
+  ["place", "places"],
+  ["system", "systems"],
+] as const;
+const normalizedKind = (kind: string) =>
+  kind === "person" || kind === "people" ? "people" : kind;
+const cards = knowledge.cards.filter(
+  (card) =>
+    requestedKind === "all" || normalizedKind(card.kind) === requestedKind,
+);
+const humanize = (value: string) => value.replaceAll("_", " ");
+const displayTime = (value?: string | null) =>
+  value
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(value))
+    : "unknown";
+---
+
+<AdminLayout title="knowledge" hideHeader>
+  <main class="quiet-page quiet-knowledge-page">
+    <header class="quiet-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Knowledge
+      </h1>
+      <span data-knowledge-count>{cards.length} results</span>
+    </header>
+
+    <nav class="quiet-view-tabs" aria-label="knowledge filters">
+      {
+        filters.map(([kind, label]) => (
+          <a
+            href={kind === "all" ? "/knowledge" : `/knowledge?kind=${kind}`}
+            aria-current={requestedKind === kind ? "page" : undefined}
+          >
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <section class="quiet-result-list" aria-label="knowledge results">
+      {
+        cards.map((card) => {
+          return (
+            <article
+              class="quiet-result-row"
+              data-knowledge-card
+              id={`card-${card.card_id}`}
+            >
+              <div class="quiet-result-kind">
+                <span>{humanize(card.kind)}</span>
+                <small>{card.source_system}</small>
+              </div>
+              <div class="quiet-result-copy">
+                <h2>{card.title}</h2>
+                <p>{card.summary}</p>
+              </div>
+              <div class="quiet-result-freshness">
+                <span>{humanize(card.freshness_state)}</span>
+                <time datetime={card.observed_at ?? undefined}>
+                  {displayTime(card.observed_at)}
+                </time>
+              </div>
+              <a
+                class="quiet-row-link"
+                href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
+                aria-label={`inspect ${card.title}`}
+              >
+                inspect
+              </a>
+            </article>
+          );
+        })
+      }
+      <p class="quiet-empty-state" hidden={cards.length > 0}>
+        No current result matches.
+      </p>
+    </section>
+
+    {
+      knowledge.errors.length > 0 && (
+        <aside class="quiet-inline-notice">
+          Some sources are unavailable. Details are in System.
+        </aside>
+      )
+    }
+  </main>
+
+  <script is:inline>
+    (() => {
+      const cardId = new URLSearchParams(location.search).get("card");
+      if (cardId) {
+        document
+          .querySelector(`#card-${CSS.escape(cardId)}`)
+          ?.scrollIntoView({ block: "center" });
+      }
+    })();
+  </script>
+</AdminLayout>

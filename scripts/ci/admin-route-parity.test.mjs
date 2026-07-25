@@ -13,7 +13,48 @@ const navSource = readFileSync("apps/admin/src/data/admin.ts", "utf8");
 const inboxDataSource = readFileSync("apps/admin/src/data/inbox.ts", "utf8");
 const inboxSource = readFileSync("apps/admin/src/pages/inbox.astro", "utf8");
 const rootSource = readFileSync("apps/admin/src/pages/index.astro", "utf8");
+const homeSource = readFileSync(
+  "apps/admin/src/components/AdminHome.astro",
+  "utf8",
+);
+const attentionRowSource = readFileSync(
+  "apps/admin/src/components/AttentionRow.astro",
+  "utf8",
+);
+const knowledgeSource = readFileSync(
+  "apps/admin/src/pages/knowledge.astro",
+  "utf8",
+);
+const locationsSource = readFileSync(
+  "apps/admin/src/pages/knowledge/locations.astro",
+  "utf8",
+);
+const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const operatorWorkSource = readFileSync(
+  "apps/admin/src/data/operator-work.ts",
+  "utf8",
+);
+const lifeSource = readFileSync(
+  "apps/admin/src/pages/life/index.astro",
+  "utf8",
+);
+const healthSource = readFileSync(
+  "apps/admin/src/pages/life/health.astro",
+  "utf8",
+);
+const aestheticsSource = readFileSync(
+  "apps/admin/src/pages/life/aesthetics.astro",
+  "utf8",
+);
+const lifecycleSource = readFileSync(
+  "packages/lib/src/admin-control/work-lifecycle.ts",
+  "utf8",
+);
 const middlewareSource = readFileSync("apps/admin/src/middleware.ts", "utf8");
+const accessPolicySource = readFileSync(
+  "apps/admin/src/lib/admin-access-policy.ts",
+  "utf8",
+);
 const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
   "utf8",
@@ -30,12 +71,20 @@ const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
 const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
-const publicPaths = extractStringList(middlewareSource, "PUBLIC_PATHS");
+const publicPaths = extractStringList(accessPolicySource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
-  middlewareSource,
+  accessPolicySource,
   "PUBLIC_PASSKEY_API_PATHS",
 );
-const publicPrefixes = extractStringList(middlewareSource, "PUBLIC_PREFIXES");
+const publicPrefixes = extractStringList(accessPolicySource, "PUBLIC_PREFIXES");
+const devLoopbackOrigins = extractStringList(
+  accessPolicySource,
+  "DEV_LOOPBACK_ORIGINS",
+);
+const devLoopbackPreviewPaths = extractStringList(
+  accessPolicySource,
+  "DEV_LOOPBACK_PREVIEW_PATHS",
+);
 const retiredActionQueueFiles = [
   "apps/admin/src/pages/needs-ani.astro",
   "apps/admin/src/data/needs.ts",
@@ -64,8 +113,20 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/passkey/register-verify",
   "/api/admin/passkey/revoke-current",
   "/api/admin/passkey/status",
+  "/api/admin/password/login",
+  "/api/admin/password/logout",
+  "/api/admin/password/status",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
+assert.deepEqual(devLoopbackOrigins, [
+  "http://127.0.0.1:4311",
+  "http://localhost:4311",
+]);
+assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
+assert.ok(
+  middlewareSource.includes("isDev: import.meta.env.DEV"),
+  "loopback preview must remain gated by Astro development mode",
+);
 
 const classifiedFiles = new Set([
   ...ADMIN_ROUTES.map((route) => route.file),
@@ -114,8 +175,9 @@ for (const route of ADMIN_ROUTES) {
   }
 
   if (route.nav) {
+    const navHref = route.route === "/work" ? "/work?view=now" : route.route;
     assert.ok(
-      navSource.includes(`href: "${route.route}"`),
+      navSource.includes(`href: "${navHref}"`),
       `${route.route} missing from admin nav`,
     );
   }
@@ -142,8 +204,21 @@ assert.equal(
   "admin nav must expose one primary inbox entry",
 );
 assert.ok(
-  rootSource.includes('return Astro.redirect("/inbox", 302)'),
-  "admin root must redirect to the canonical inbox",
+  rootSource.includes('import AdminHome from "../components/AdminHome.astro"'),
+  "admin root must render the canonical home projection",
+);
+assert.ok(
+  inboxSource.includes('import AdminHome from "../components/AdminHome.astro"'),
+  "/inbox must render the same canonical home projection",
+);
+assert.equal(
+  inboxSource,
+  rootSource,
+  "/ and /inbox must resolve the identical attention component",
+);
+assert.ok(
+  navSource.includes('href: "/",\n    label: "inbox"'),
+  "admin inbox navigation must use the canonical root URL",
 );
 for (const file of retiredActionQueueFiles) {
   assert.equal(existsSync(file), false, `${file} must stay retired`);
@@ -165,26 +240,124 @@ assert.equal(
 );
 
 for (const marker of [
-  'id: "health"',
-  'id: "content"',
-  'id: "income"',
-  'id: "system"',
-  "data-copy-text",
   "data-astro-rerun",
-  "inboxCopyBound",
-  'target.closest("[data-copy-text]")',
-  "action queue",
+  "data-attention-projection",
+  "needs you",
+  "being handled",
+  "/work?view=now",
   "inbox-category-filter",
-  "recurring monitor not connected",
-  "waiting / gated",
+  "everything else",
 ]) {
-  assert.ok(inboxSource.includes(marker), `/inbox missing marker ${marker}`);
+  assert.ok(homeSource.includes(marker), `admin home missing marker ${marker}`);
+}
+for (const marker of ["data-attention-id", "data-entity-id"]) {
+  assert.ok(
+    attentionRowSource.includes(marker),
+    `admin attention row missing marker ${marker}`,
+  );
+}
+
+for (const marker of ["data-knowledge-card", "/knowledge?kind="]) {
+  assert.ok(
+    knowledgeSource.includes(marker),
+    `admin knowledge missing marker ${marker}`,
+  );
+}
+assert.equal(
+  knowledgeSource.includes("data-knowledge-search"),
+  false,
+  "Knowledge must use the one global search instead of a local search category",
+);
+assert.ok(
+  navSource.includes('href: "/knowledge/locations"'),
+  "Knowledge must expose the source-backed Locations view",
+);
+for (const marker of [
+  "Fleet map",
+  "viewing from",
+  "runtime.machine",
+  "Known places",
+]) {
+  assert.ok(
+    locationsSource.includes(marker),
+    `admin locations missing marker ${marker}`,
+  );
+}
+
+for (const marker of [
+  "data-work-now",
+  "Currently working",
+  "OperatorWorkTable",
+  "view=projects",
+  "view=history",
+  "data-inspect-task",
+  "loose conversations",
+  "preserved",
+]) {
+  assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
+}
+for (const marker of [
+  "019f7fb8-69b7-7791-8e67-87c87acfae02",
+  "019f95c5-be35-7991-811c-371611daa94b",
+  "019f99d2-90a1-7761-8582-17b7037c748b",
+  "searchable_history_disposition",
+  "OPERATOR_WORK_FIXTURE_SHA256",
+]) {
+  assert.ok(
+    operatorWorkSource.includes(marker),
+    `operator work fixture missing marker ${marker}`,
+  );
+}
+
+for (const marker of [
+  "Today",
+  "Recent changes",
+  "/knowledge?kind=people",
+  "/life/health",
+  "/life/aesthetics",
+]) {
+  assert.ok(lifeSource.includes(marker), `admin life missing marker ${marker}`);
+}
+assert.ok(
+  healthSource.includes("does not infer tasks"),
+  "health must remain status only",
+);
+assert.ok(
+  aestheticsSource.includes("No wardrobe automation or image ingestion"),
+  "aesthetics must remain a clean data boundary",
+);
+
+for (const removedNarration of [
+  "source → entity → outcome → attention → history",
+  "adapter writes and native archive actions are disconnected",
+  "sanitized metadata, lineage, proofs, freshness, and receipts",
+]) {
+  assert.equal(
+    homeSource.includes(removedNarration),
+    false,
+    `admin home must demote ${removedNarration}`,
+  );
+}
+
+for (const marker of [
+  "sourceIdentityKey",
+  "upsertSourceImport",
+  "evaluateArchiveCandidate",
+  "createArchiveProposalBatches",
+  "confirmArchiveProposal",
+  "restoreArchiveReceipt",
+  "MAX_ARCHIVE_BATCH_SIZE = 20",
+]) {
+  assert.ok(
+    lifecycleSource.includes(marker),
+    `lifecycle seam missing ${marker}`,
+  );
 }
 
 for (const marker of [
   "loadAdminControlSnapshot",
   "control.projections.inbox_items",
-  "dedupeInboxItems",
+  "rankInboxItems",
   "copy_text",
 ]) {
   assert.ok(
@@ -198,7 +371,7 @@ assert.equal(
   "admin inbox must not import the retired static action queue",
 );
 assert.equal(
-  inboxSource.includes("needs ani"),
+  homeSource.includes("needs ani"),
   false,
   "canonical inbox must not expose the retired queue label",
 );

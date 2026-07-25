@@ -2,8 +2,31 @@ export type NavItem = {
   href: string;
   label: string;
   status: string;
-  group: "life" | "content" | "income" | "system";
+  group: "home" | "work" | "content" | "life" | "knowledge" | "system";
   description: string;
+  icon:
+    | "inbox"
+    | "work"
+    | "content"
+    | "life"
+    | "knowledge"
+    | "locations"
+    | "search"
+    | "system"
+    | "fleet"
+    | "deploy"
+    | "repo"
+    | "proof"
+    | "handoff"
+    | "edit"
+    | "review"
+    | "draft"
+    | "media"
+    | "newsletter"
+    | "health"
+    | "aesthetics";
+  parent?: string;
+  mobile?: boolean;
 };
 
 export type DashboardCard = {
@@ -33,18 +56,40 @@ export type DeployRow = {
 
 export const navItems: NavItem[] = [
   {
-    href: "/inbox",
+    href: "/",
     label: "inbox",
     status: "queue",
-    group: "life",
+    group: "home",
     description: "what needs attention and what can move next",
+    icon: "inbox",
+    mobile: true,
   },
   {
-    href: "/inbox?category=health",
-    label: "health",
-    status: "queue",
-    group: "life",
-    description: "diet, vices, metrics, and health decisions",
+    href: "/work?view=now",
+    label: "work",
+    status: "now",
+    group: "work",
+    description: "current execution, waiting, proof, and lineage",
+    icon: "work",
+    mobile: true,
+  },
+  {
+    href: "/work?view=projects",
+    label: "projects",
+    status: "view",
+    group: "work",
+    description: "work grouped by project",
+    icon: "repo",
+    parent: "work",
+  },
+  {
+    href: "/work?view=history",
+    label: "history",
+    status: "view",
+    group: "work",
+    description: "recently completed and preserved work",
+    icon: "handoff",
+    parent: "work",
   },
   {
     href: "/content",
@@ -52,20 +97,26 @@ export const navItems: NavItem[] = [
     status: "D1",
     group: "content",
     description: "pieces, drafts, exports",
+    icon: "content",
+    mobile: true,
   },
   {
     href: "/content/edit/new",
-    label: "writing editor",
+    label: "new",
     status: "editor",
     group: "content",
     description: "write and publish content",
+    icon: "edit",
+    parent: "content",
   },
   {
     href: "/content/review",
-    label: "review queue",
+    label: "review",
     status: "content",
     group: "content",
     description: "proposed copy and review state",
+    icon: "review",
+    parent: "content",
   },
   {
     href: "/content/carousels",
@@ -73,6 +124,8 @@ export const navItems: NavItem[] = [
     status: "media",
     group: "content",
     description: "carousel sets and export review",
+    icon: "media",
+    parent: "content",
   },
   {
     href: "/content/preview",
@@ -80,6 +133,8 @@ export const navItems: NavItem[] = [
     status: "content",
     group: "content",
     description: "draft preview surfaces",
+    icon: "review",
+    parent: "content",
   },
   {
     href: "/content/drafts",
@@ -87,13 +142,17 @@ export const navItems: NavItem[] = [
     status: "content",
     group: "content",
     description: "saved draft operations and publish state",
+    icon: "draft",
+    parent: "content",
   },
   {
     href: "/content/operations",
-    label: "operations",
+    label: "history",
     status: "content",
     group: "content",
     description: "draft operation metadata",
+    icon: "handoff",
+    parent: "content",
   },
   {
     href: "/newsletter",
@@ -101,20 +160,69 @@ export const navItems: NavItem[] = [
     status: "retained",
     group: "content",
     description: "issue preview without sends",
+    icon: "newsletter",
+    parent: "content",
   },
   {
-    href: "/inbox?category=income",
-    label: "income",
-    status: "queue",
-    group: "income",
-    description: "business, jobs, payments, and follow-up",
+    href: "/life",
+    label: "life",
+    status: "status",
+    group: "life",
+    description: "quiet personal overview",
+    icon: "life",
+    mobile: true,
   },
   {
-    href: "/inbox?category=system",
+    href: "/life/health",
+    label: "health",
+    status: "status",
+    group: "life",
+    description: "status-only health visibility",
+    icon: "health",
+    parent: "life",
+  },
+  {
+    href: "/life/aesthetics",
+    label: "aesthetics",
+    status: "shell",
+    group: "life",
+    description: "wardrobe, outfits, looks, and references",
+    icon: "aesthetics",
+    parent: "life",
+  },
+  {
+    href: "/knowledge",
+    label: "knowledge",
+    status: "index",
+    group: "knowledge",
+    description: "current context and source proof",
+    icon: "knowledge",
+  },
+  {
+    href: "/knowledge?kind=people",
+    label: "people",
+    status: "index",
+    group: "knowledge",
+    description: "people and current relationships",
+    icon: "search",
+    parent: "knowledge",
+  },
+  {
+    href: "/knowledge/locations",
+    label: "locations",
+    status: "map",
+    group: "knowledge",
+    description: "fleet topology and known places",
+    icon: "locations",
+    parent: "knowledge",
+  },
+  {
+    href: "/system",
     label: "system",
-    status: "queue",
+    status: "status",
     group: "system",
-    description: "infra, fleet, repos, deploys, and proof",
+    description: "machines, deploys, proof, and governance",
+    icon: "system",
   },
   {
     href: "/fleet",
@@ -122,13 +230,17 @@ export const navItems: NavItem[] = [
     status: "runtime",
     group: "system",
     description: "machines, repo state, current work",
+    icon: "fleet",
+    parent: "system",
   },
   {
     href: "/proof",
-    label: "proof and auth",
+    label: "proof",
     status: "passkeys",
     group: "system",
     description: "auth, proof, and blocked checks",
+    icon: "proof",
+    parent: "system",
   },
   {
     href: "/deploys",
@@ -136,13 +248,17 @@ export const navItems: NavItem[] = [
     status: "scoped",
     group: "system",
     description: "target map and deploy proof",
+    icon: "deploy",
+    parent: "system",
   },
   {
     href: "/repos",
-    label: "repos",
+    label: "repositories",
     status: "details",
     group: "system",
     description: "dirty state and branch drift",
+    icon: "repo",
+    parent: "system",
   },
   {
     href: "/handoffs",
@@ -150,6 +266,8 @@ export const navItems: NavItem[] = [
     status: "details",
     group: "system",
     description: "handoff freshness and absorption",
+    icon: "handoff",
+    parent: "system",
   },
   {
     href: "/mutations",
@@ -157,13 +275,17 @@ export const navItems: NavItem[] = [
     status: "gated",
     group: "system",
     description: "proposed, approved, running, verified",
+    icon: "review",
+    parent: "system",
   },
   {
     href: "/ops/destructive",
-    label: "destructive ops",
+    label: "gates",
     status: "gated",
     group: "system",
     description: "delete, dns, auth, deploy, secrets",
+    icon: "proof",
+    parent: "system",
   },
 ];
 
@@ -356,7 +478,7 @@ export const fleetRows: QueueRow[] = [
   {
     title: "ap-mini",
     owner: "runtime host",
-    status: "state plane candidate",
+    status: "runtime host",
     evidence: "workers/state and Infra runtime feed",
   },
 ];
