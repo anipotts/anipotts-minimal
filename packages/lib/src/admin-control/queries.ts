@@ -156,8 +156,9 @@ async function readInboxItems(
   return readRows(
     db,
     "admin_inbox_items",
-    `SELECT item_id, dedupe_key, event_refs, source, account, title, summary,
-            href, status, urgency, owner, action_kind, expires_at, last_seen_at
+    `SELECT item_id, dedupe_key, event_refs, domain, entity_ref, attention_kind,
+            source, account, title, summary, href, status, urgency, owner,
+            action_kind, expires_at, last_seen_at
        FROM admin_inbox_items
       ORDER BY
         CASE urgency
@@ -172,6 +173,11 @@ async function readInboxItems(
       item_id: asString(row.item_id),
       dedupe_key: asString(row.dedupe_key),
       event_refs: parseStringArray(row.event_refs),
+      domain: asString(row.domain) as AdminInboxItem["domain"],
+      entity_ref: asString(row.entity_ref),
+      attention_kind: asString(
+        row.attention_kind,
+      ) as AdminInboxItem["attention_kind"],
       source: asString(row.source),
       account: nullableString(row.account),
       title: asString(row.title),

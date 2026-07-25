@@ -945,6 +945,9 @@ export const adminInboxItems = sqliteTable(
     item_id: text("item_id").primaryKey(),
     dedupe_key: text("dedupe_key").notNull().unique(),
     event_refs: text("event_refs").notNull().default("[]"),
+    domain: text("domain").notNull().default("system"),
+    entity_ref: text("entity_ref").notNull().default(""),
+    attention_kind: text("attention_kind").notNull().default("review"),
     source: text("source").notNull(),
     account: text("account"),
     title: text("title").notNull(),
@@ -960,6 +963,12 @@ export const adminInboxItems = sqliteTable(
   },
   (table) => [
     index("idx_admin_inbox_status_urgency").on(table.status, table.urgency),
+    index("idx_admin_inbox_domain_status").on(
+      table.domain,
+      table.status,
+      table.urgency,
+    ),
+    index("idx_admin_inbox_entity").on(table.entity_ref, table.updated_at),
     index("idx_admin_inbox_source").on(table.source, table.updated_at),
     index("idx_admin_inbox_expires").on(table.expires_at),
   ],

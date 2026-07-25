@@ -62,10 +62,23 @@ export type InboxActionKind =
   | "open"
   | "none";
 
+export type AdminInboxDomain = "work" | "content" | "life" | "fleet" | "system";
+
+export type AdminAttentionKind =
+  | "review"
+  | "approval"
+  | "decision"
+  | "deadline"
+  | "error"
+  | "verification";
+
 export interface AdminInboxItem {
   item_id: string;
   dedupe_key: string;
   event_refs: string[];
+  domain: AdminInboxDomain;
+  entity_ref: string;
+  attention_kind: AdminAttentionKind;
   source: string;
   account: string | null;
   title: string;

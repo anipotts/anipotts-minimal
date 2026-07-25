@@ -6,3 +6,4 @@ export * from "./sent-mail";
 export * from "./knowledge";
 export * from "./work-lifecycle";
 export * from "./work-lifecycle-fixtures";
+export * from "./inbox-write";

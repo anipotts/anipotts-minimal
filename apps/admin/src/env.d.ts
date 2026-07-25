@@ -9,6 +9,9 @@ type D1PreparedStatement = {
 
 type D1Database = {
   prepare(query: string): D1PreparedStatement;
+  batch(
+    statements: D1PreparedStatement[],
+  ): Promise<Array<{ results?: unknown[]; success?: boolean; meta?: unknown }>>;
 };
 
 type Runtime = import("@astrojs/cloudflare").Runtime<{

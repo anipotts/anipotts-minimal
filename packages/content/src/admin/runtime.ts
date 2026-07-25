@@ -59,6 +59,9 @@ export type RuntimeAdminInboxItem = {
   item_id: string;
   dedupe_key: string;
   event_refs: string[];
+  domain: string;
+  entity_ref: string;
+  attention_kind: string;
   source: string;
   account: string | null;
   title: string;
@@ -306,6 +309,13 @@ function adminInboxItemFromJson(value: unknown): RuntimeAdminInboxItem | null {
     item_id: value.item_id,
     dedupe_key: value.dedupe_key,
     event_refs: stringArrayFromJson(value.event_refs),
+    domain: isString(value.domain) ? value.domain : "work",
+    entity_ref: isString(value.entity_ref)
+      ? value.entity_ref
+      : value.dedupe_key,
+    attention_kind: isString(value.attention_kind)
+      ? value.attention_kind
+      : attentionKindFromAction(value.action_kind),
     source: value.source,
     account: stringOrNull(value.account),
     title: value.title,
@@ -318,6 +328,21 @@ function adminInboxItemFromJson(value: unknown): RuntimeAdminInboxItem | null {
     expires_at: stringOrNull(value.expires_at),
     last_seen_at: stringOrNull(value.last_seen_at),
   };
+}
+
+function attentionKindFromAction(action: string): string {
+  switch (action) {
+    case "approve":
+      return "approval";
+    case "decide":
+      return "decision";
+    case "deadline":
+      return "deadline";
+    case "verify":
+      return "verification";
+    default:
+      return "review";
+  }
 }
 
 function adminFleetStatusFromJson(value: unknown): RuntimeAdminFleetStatus[] {

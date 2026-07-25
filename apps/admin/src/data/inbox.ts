@@ -189,7 +189,7 @@ export async function readAdminInbox(
 
         return {
           id: item.item_id,
-          entity_id: entityIdFor(item.dedupe_key),
+          entity_id: item.entity_ref,
           dedupe_key: item.dedupe_key,
           source: "gmail",
           owner: item.owner,
@@ -198,7 +198,7 @@ export async function readAdminInbox(
           summary: item.summary,
           status: normalizeStatus(item.status),
           risk: riskForUrgency(item.urgency),
-          category: "work",
+          category: item.domain === "work" ? "work" : "system",
           timeframe: timeframeForProjection(item),
           href: item.href ?? "/?category=work",
           next_action: nextAction,
@@ -334,7 +334,9 @@ export async function readAdminInbox(
   };
 }
 
-function isOpenProjectionItem(item: AdminControlInboxItem): boolean {
+function isOpenProjectionItem(
+  item: Pick<AdminControlInboxItem, "action_kind" | "status">,
+): boolean {
   return item.action_kind !== "none" && !CLOSED_STATUSES.has(item.status);
 }
 
@@ -342,11 +344,11 @@ function inboxItemFromProjection(
   item: AdminControlInboxItem,
   now: string,
 ): AdminInboxItem {
-  const category = categoryForProjection(item);
+  const category = item.domain;
 
   return {
     id: item.item_id,
-    entity_id: entityIdFor(item.dedupe_key),
+    entity_id: item.entity_ref,
     dedupe_key: item.dedupe_key,
     source: item.source,
     owner: item.owner,
@@ -362,45 +364,6 @@ function inboxItemFromProjection(
     proof: item.event_refs.join(", ") || item.dedupe_key,
     updated_at: item.last_seen_at ?? item.expires_at ?? now,
   };
-}
-
-function categoryForProjection(
-  item: AdminControlInboxItem,
-): AdminInboxCategory {
-  const ref = [item.source, item.owner, item.account, item.title]
-    .filter(Boolean)
-    .join(":")
-    .toLowerCase();
-
-  if (ref.includes("health") || ref.includes("vitals")) return "life";
-  if (
-    ref.includes("business") ||
-    ref.includes("jobs") ||
-    ref.includes("income") ||
-    ref.includes("payment") ||
-    ref.includes("gmail")
-  ) {
-    return "work";
-  }
-  if (
-    ref.includes("brand") ||
-    ref.includes("site") ||
-    ref.includes("content") ||
-    ref.includes("newsletter") ||
-    ref.includes("media") ||
-    ref.includes("carousel")
-  ) {
-    return "content";
-  }
-  if (
-    ref.includes("fleet") ||
-    ref.includes("infra") ||
-    ref.includes("machine") ||
-    ref.includes("runtime")
-  ) {
-    return "fleet";
-  }
-  return "system";
 }
 
 function timeframeForProjection(
