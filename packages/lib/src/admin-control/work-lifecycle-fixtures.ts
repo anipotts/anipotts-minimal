@@ -217,7 +217,7 @@ export const fixtureWorkLifecycle: WorkLifecycleSnapshot = {
       summary:
         "one current attention projection with searchable, reversible history.",
       lifecycle: "open",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       owner_state: "current",
       contradiction_refs: [],
       source_ids: [
@@ -253,7 +253,7 @@ export const fixtureWorkLifecycle: WorkLifecycleSnapshot = {
       summary:
         "preserved branches and handoffs remain evidence after consolidation.",
       lifecycle: "completed",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       owner_state: "current",
       contradiction_refs: [],
       source_ids: ["source-retired-topology-handoff"],
@@ -268,7 +268,7 @@ export const fixtureWorkLifecycle: WorkLifecycleSnapshot = {
       title: "legacy local index review",
       summary: "completed inventory with an unavailable latest reconciliation.",
       lifecycle: "completed",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       owner_state: "current",
       contradiction_refs: [],
       source_ids: ["source-unavailable-legacy-index"],
@@ -284,7 +284,7 @@ export const fixtureWorkLifecycle: WorkLifecycleSnapshot = {
       summary:
         "completion evidence is retained while reconciliation disagrees.",
       lifecycle: "completed",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       owner_state: "current",
       contradiction_refs: ["reconcile:contradiction"],
       source_ids: ["source-conflicting-archive-record"],
@@ -328,7 +328,7 @@ export const fixtureWorkLifecycle: WorkLifecycleSnapshot = {
       attention_kind: "review",
       status: "current",
       reason: "review the exact local slice before any migration or deploy.",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       source_ids: [
         "source-codex-admin-home",
         "source-chatgpt-lifecycle-export",

@@ -113,7 +113,7 @@ describe("work lifecycle", () => {
       kind: "reference",
       title: "promoted source",
       summary: "one sanitized source promoted into one entity.",
-      owner: "chief/anipotts.com",
+      owner: "chief/site",
       source_ids: [detachedSource.source_id],
       actor: "ani",
       recorded_at: LATER,

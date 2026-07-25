@@ -608,7 +608,7 @@ export const fixtureKnowledgeCards: AdminKnowledgeCard[] = [
     stale_after_seconds: 3600,
     content_hash: "registry:brand-content",
     proof_refs: ["local:/Users/anipotts/Brand", "local:/Users/anipotts/Media"],
-    lineage_refs: ["chief/brand", "writing/anipotts.com"],
+    lineage_refs: ["chief/brand", "site/writing"],
     related_card_ids: ["knowledge-admin-life-inbox"],
     retrieval_instructions:
       "Retrieve the exact deal, piece, source asset, sent proof, acknowledgement, or platform locator. Do not treat exports or previews as publishing proof.",
