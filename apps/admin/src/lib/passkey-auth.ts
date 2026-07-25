@@ -30,7 +30,6 @@ const CHALLENGE_MAX_AGE_MS = 10 * 60 * 1000;
 const PRODUCTION_RP_ID = "admin.anipotts.com";
 const RP_NAME = "anipotts admin";
 const EXPECTED_ORIGIN = "https://admin.anipotts.com";
-const LOCAL_ORIGIN = "http://localhost:3001";
 const USER_ID = "ani";
 const USER_NAME = "ani@admin.anipotts.com";
 const USER_DISPLAY_NAME = "Ani";
@@ -814,12 +813,12 @@ function parseTransports(raw: string): AuthenticatorTransportFuture[] {
 
 function expectedOrigin(context: PasskeyContext): string {
   const origin = context.request.headers.get("origin");
-  if (origin === LOCAL_ORIGIN && import.meta.env.DEV) return LOCAL_ORIGIN;
+  if (isLoopbackDevOrigin(origin)) return origin;
   return EXPECTED_ORIGIN;
 }
 
 function expectedRpId(context: PasskeyContext): string {
-  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+  if (isLoopbackDevOrigin(context.url.origin)) {
     return context.url.hostname;
   }
   return PRODUCTION_RP_ID;
@@ -828,7 +827,7 @@ function expectedRpId(context: PasskeyContext): string {
 async function resolveAccessIdentity(
   context: PasskeyContext,
 ): Promise<AccessIdentity> {
-  if (context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV) {
+  if (isLoopbackDevOrigin(context.url.origin)) {
     return { verified: true, hint: "local-dev" };
   }
 
@@ -891,7 +890,20 @@ function expiredSessionCookie(context: PasskeyContext): string {
 }
 
 function usesSecureCookie(context: PasskeyContext): boolean {
-  return !(context.url.origin === LOCAL_ORIGIN && import.meta.env.DEV);
+  return !isLoopbackDevOrigin(context.url.origin);
+}
+
+function isLoopbackDevOrigin(origin: string | null): origin is string {
+  if (!origin || !import.meta.env.DEV) return false;
+  try {
+    const url = new URL(origin);
+    return (
+      url.protocol === "http:" &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+    );
+  } catch {
+    return false;
+  }
 }
 
 async function recordAudit(
