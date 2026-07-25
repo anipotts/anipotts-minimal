@@ -1,4 +1,4 @@
-# Dependabot config: minimize PR noise, batch updates, hand off to auto-merge.
+# Dependabot config: minimize PR noise and batch scheduled updates.
 #
 # Strategy:
 #   - npm: weekly Monday morning, grouped by update-type. Security updates still
@@ -6,9 +6,9 @@
 #   - github-actions: monthly, low traffic.
 #   - open-pull-requests-limit caps the queue so a quiet week doesn't pile up.
 #
-# Auto-merge (.github/workflows/dependabot-automerge.yml) handles patches and
-# security advisories without human review once CI passes. Minor + major
-# updates wait for manual review.
+# Dependency PRs follow the normal CI and Security Review path, then require
+# manual review and merge. Agent auto-merge is limited to non-draft PRs from
+# codex/, claude/, or worktree/ branches.
 
 version: 2
 updates:
