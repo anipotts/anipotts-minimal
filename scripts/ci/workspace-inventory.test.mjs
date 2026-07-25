@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { classifiedWorkers } from "./workspace-inventory-parser.test.mjs";
 
 const EXPECTED_APPS = ["admin", "admin-solid", "www"];
 const EXPECTED_PACKAGES = ["config", "content", "lib", "styles", "types"];
@@ -69,12 +70,11 @@ assert.equal(
 );
 
 const workerInventory = readFileSync("docs/worker-inventory.md", "utf8");
-for (const worker of EXPECTED_WORKERS) {
-  assert.ok(
-    workerInventory.includes(`workers/${worker}`),
-    `docs/worker-inventory.md must classify workers/${worker}`,
-  );
-}
+assert.deepEqual(
+  classifiedWorkers(workerInventory),
+  EXPECTED_WORKERS.map((worker) => `workers/${worker}`),
+  "docs/worker-inventory.md retained workers must match workspace workers",
+);
 
 function packageDirs(root) {
   return readdirSync(root, { withFileTypes: true })
