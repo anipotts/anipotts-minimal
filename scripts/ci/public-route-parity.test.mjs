@@ -1,125 +1,83 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-
-const PUBLIC_ROUTES = [
-  { route: "/", file: "apps/www/src/pages/index.astro" },
-  { route: "/newsletter", file: "apps/www/src/pages/newsletter.astro" },
-  {
-    route: "/newsletter/archive",
-    file: "apps/www/src/pages/newsletter/archive.astro",
-  },
-  { route: "/making", file: "apps/www/src/pages/making.astro" },
-  { route: "/orchestrating", file: "apps/www/src/pages/orchestrating.astro" },
-  { route: "/projects", file: "apps/www/src/pages/projects/index.astro" },
-  {
-    route: "/projects/chainedchat",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/claude-code-tips",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/imessage-mcp",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/nyu-purity-test",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/options-pricing-sensitivity",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/pgi-research-platform",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/quantercise",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/quantercise-extension",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/saeshify",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  { route: "/writing", file: "apps/www/src/pages/writing/index.astro" },
-  {
-    route: "/writing/i-built-a-monitor-for-my-claude-code-sessions",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/saturdays-are-for-claude-code",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/search-will-be-dead-by-2030",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/stop-ending-your-day-with-fix-the-bug",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-];
+import { readFileSync } from "node:fs";
+import { PUBLIC_SMOKE_ROUTES } from "./public-route-inventory.mjs";
 
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
 const contentProof = readFileSync("scripts/admin/content-proof.mjs", "utf8");
-
-const expected = PUBLIC_ROUTES.map((item) => item.route).sort();
-const deploySmokeRoutes = extractRoutesFromStep(
+const deploySmokeStep = extractSection(
   deployWorkflow,
-  "Smoke www routes",
+  "      - name: Smoke www routes",
+  "\n  deploy-admin:",
 );
-const manualSmokeRoutes = extractRoutesFromStep(
+const manualSmokeStep = extractSection(
   smokeWorkflow,
-  "Smoke public site",
+  "      - name: Smoke public site",
+  "\n      - name: Smoke admin unauthenticated block",
 );
-const contentProofRoutes = extractConstList(contentProof, "PUBLIC_ROUTES");
 
-for (const { route, file } of PUBLIC_ROUTES) {
-  assert.ok(existsSync(file), `${route} missing route file ${file}`);
+assert.equal(PUBLIC_SMOKE_ROUTES.length, 20);
+
+for (const [sourceName, source] of [
+  ["deploy.yml", deployWorkflow],
+  ["smoke.yml", smokeWorkflow],
+]) {
+  assert.ok(
+    source.includes("node scripts/ci/public-route-inventory.mjs"),
+    `${sourceName} must load the shared public route inventory`,
+  );
+  assert.ok(
+    source.includes("while IFS= read -r path; do"),
+    `${sourceName} must read one inventory route per line`,
+  );
+  assert.ok(
+    source.includes('"https://anipotts.com${path}"'),
+    `${sourceName} must quote the public route path`,
+  );
 }
 
-assert.deepEqual(
-  deploySmokeRoutes,
-  expected,
-  "deploy.yml public smoke routes must match the stable public route proof set",
+assert.ok(
+  contentProof.includes(
+    'import { PUBLIC_SMOKE_ROUTES } from "../ci/public-route-inventory.mjs";',
+  ),
+  "content-proof must import shared public smoke routes",
+);
+assert.ok(
+  contentProof.includes("const PUBLIC_ROUTES = PUBLIC_SMOKE_ROUTES;"),
+  "content-proof must probe the shared public smoke route set",
 );
 
-assert.deepEqual(
-  manualSmokeRoutes,
-  expected,
-  "smoke.yml public smoke routes must match the stable public route proof set",
-);
+assert.ok(deploySmokeStep.includes("curl -sS"));
+assert.equal(deploySmokeStep.match(/curl -sS/g)?.length, 1);
+assert.equal(deploySmokeStep.includes("curl -I"), false);
+assert.ok(deploySmokeStep.includes("for _ in $(seq 1 6); do"));
+assert.ok(deploySmokeStep.includes("sleep 10"));
+assert.ok(manualSmokeStep.includes("curl -sS"));
+assert.equal(manualSmokeStep.match(/curl -sS/g)?.length, 1);
+assert.equal(manualSmokeStep.includes("curl -I"), false);
+assert.equal(manualSmokeStep.includes("seq 1 6"), false);
+assert.equal(manualSmokeStep.includes("sleep 10"), false);
 
-assert.deepEqual(
-  contentProofRoutes,
-  expected,
-  "content-proof public route probes must match the stable public route proof set",
-);
-
-function extractRoutesFromStep(source, stepName) {
-  const stepStart = source.indexOf(`name: ${stepName}`);
-  assert.notEqual(stepStart, -1, `missing workflow step ${stepName}`);
-  const fromStep = source.slice(stepStart);
-  const match = fromStep.match(/for path in ([^;]+); do/);
-  assert.ok(match, `${stepName} must use an explicit public route loop`);
-  return match[1]
-    .trim()
-    .split(/\s+/)
-    .filter((route) => route.startsWith("/"))
-    .sort();
+for (const marker of [
+  'method: "HEAD"',
+  "runD1(`",
+  "publishedEventRoutes",
+  "UNPUBLISHED_PUBLIC_ROUTES",
+  "publishedEventRouteChecks",
+  "unpublishedPublicRouteChecks",
+]) {
+  assert.ok(
+    contentProof.includes(marker),
+    `content-proof must retain ${marker}`,
+  );
 }
 
-function extractConstList(source, name) {
-  const match = source.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\];`));
-  assert.ok(match, `missing const list ${name}`);
-  return [...match[1].matchAll(/"([^"]+)"/g)].map((item) => item[1]).sort();
+function extractSection(source, startMarker, endMarker) {
+  const start = source.indexOf(startMarker);
+  assert.notEqual(start, -1, `missing ${startMarker.trim()}`);
+  const end = source.indexOf(endMarker, start);
+  assert.notEqual(end, -1, `missing ${endMarker.trim()}`);
+  return source.slice(start, end);
 }
