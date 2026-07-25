@@ -29,22 +29,32 @@ cd /Users/anipotts/Code/projects/anipotts-com
 git status --short --branch
 git pull --ff-only origin main
 pnpm install --frozen-lockfile
-pnpm --dir apps/admin dev --host 127.0.0.1 --port 3001
+pnpm admin:preview:ensure
 ```
 
 Open the in-app browser to:
 
 ```text
-http://localhost:3001/
+http://127.0.0.1:4311/
 ```
 
 Local auth notes:
 
 - Cloudflare Access is not in front of localhost.
-- local passkey origin is `http://localhost:3001`.
+- loopback development origins are accepted only while Astro is in dev mode.
 - production passkeys are origin-bound and may not work on localhost.
 - if needed, register a local-only passkey in the dev D1 state.
 - do not remove or change production Cloudflare Access from this thread.
+
+Preview lifecycle:
+
+- `pnpm admin:preview:ensure` starts or reuses the canonical preview.
+- `pnpm admin:preview:status` proves whether it is healthy.
+- leave the preview running while Ani is reviewing it.
+- use `pnpm admin:preview:stop` only when Ani explicitly ends the feedback
+  loop.
+- the manager will not stop an unrecognized process or replace an unrelated
+  listener on port 4311.
 
 Local D1 notes:
 
@@ -57,7 +67,7 @@ Local D1 notes:
 Fast workflow:
 
 1. make the smallest visible admin edit.
-2. inspect it in the in-app browser at `localhost:3001`.
+2. inspect it in the in-app browser at `127.0.0.1:4311`.
 3. run the narrow check:
 
 ```bash
@@ -99,14 +109,6 @@ Handoff back to chief/site with:
 
 ## current chief/site consolidation
 
-- current canonical site thread: `chief/site`
-  (`019eebe2-e344-7213-810b-9469b8fe4d1e`), pinned.
-- archived old editor thread:
-  `019f1439-24d1-7c22-a6d1-e75019a985db`.
-- left alone:
-  `Redesign orchestrating page`
-  (`019f1438-ed64-7362-9582-d87a17bbc08a`).
-- requested media handoff from:
-  `media/carousels`
-  (`019f0a8a-0c11-7891-893a-6d3f64e75050`).
-- closed superseded draft PR #233 without deleting its branch.
+The canonical task is always named `chief/site`. Resolve its live task ID from
+Codex instead of copying a historical ID into this prompt. Preserve its
+lineage, and hand verified local work back to that task.

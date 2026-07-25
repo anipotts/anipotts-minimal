@@ -48,6 +48,7 @@ playground*.html
 .codex/*
 !.codex/environments/
 !.codex/environments/environment.toml
+.local/
 HANDOFF.md
 
 # Agent/research docs (never commit)

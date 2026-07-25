@@ -133,6 +133,25 @@ pnpm turbo build --filter=@anipotts/admin-solid...
 pnpm validate
 ```
 
+## local admin preview
+
+The canonical local review URL is `http://127.0.0.1:4311/`.
+
+Start or reuse the durable preview with:
+
+```bash
+pnpm admin:preview:ensure
+```
+
+Check it with `pnpm admin:preview:status`. Stop it only when Ani explicitly
+ends the feedback loop, using `pnpm admin:preview:stop`. Do not start an ad hoc
+Astro process on a different port for admin review, and do not stop the managed
+preview merely because an individual Codex task is ending.
+
+The manager records only local process metadata and logs under ignored
+`.local/admin-preview/`. It refuses to stop an unrecognized process or replace
+an unrelated listener on port 4311.
+
 `pnpm validate` mirrors the local PR gate: workspace/deploy/admin/public/path
 invariants, content platform invariants, workflow/security guards, formatting,
 and full build/lint/typecheck/test.
