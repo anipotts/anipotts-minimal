@@ -37,7 +37,21 @@ const stageFor = (status: string) =>
       <div class="quiet-editorial-list">
         {
           pageContentState.rows.map((row) => (
-            <article>
+            <article
+              data-admin-focus-record={JSON.stringify({
+                id: row.page_key,
+                kind: "content",
+                title: row.summary,
+                currentFact: row.published
+                  ? "published"
+                  : "saved as a private draft",
+                status: row.published ? "published" : "draft",
+                updatedAt: row.updated_at || undefined,
+                source: "admin",
+                href: `/content/edit/${encodeURIComponent(row.page_key)}`,
+                proof: row.page_key,
+              })}
+            >
               <div>
                 <span>{row.page_key}</span>
                 <h3>{row.summary}</h3>
@@ -57,7 +71,18 @@ const stageFor = (status: string) =>
         }
         {
           sourceContentRecords.map((record) => (
-            <article>
+            <article
+              data-admin-focus-record={JSON.stringify({
+                id: record.route,
+                kind: record.surface,
+                title: record.title,
+                currentFact: `${record.body_words} words`,
+                status: stageFor(record.status),
+                source: "source content",
+                href: record.route,
+                proof: record.route,
+              })}
+            >
               <div>
                 <span>{record.surface}</span>
                 <h3>{record.title}</h3>
@@ -82,7 +107,19 @@ const stageFor = (status: string) =>
       <div class="quiet-media-rail">
         {
           carouselPosts.slice(0, 6).map((post) => (
-            <a href={`/content/carousels#${post.id}`}>
+            <a
+              href={`/content/carousels#${post.id}`}
+              data-admin-focus-record={JSON.stringify({
+                id: post.id,
+                kind: "carousel",
+                title: post.title,
+                currentFact: `${post.slideCount} slides`,
+                status: stageFor(post.status),
+                source: "content",
+                href: `/content/carousels#${post.id}`,
+                proof: post.id,
+              })}
+            >
               {post.phoneMockInstagram ? (
                 <img src={post.phoneMockInstagram} alt="" loading="lazy" />
               ) : (

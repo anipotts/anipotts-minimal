@@ -75,13 +75,24 @@ const displayTime = (value?: string | null) =>
                   {displayTime(card.observed_at)}
                 </time>
               </div>
-              <a
+              <button
+                type="button"
                 class="quiet-row-link"
-                href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
+                data-admin-focus-record={JSON.stringify({
+                  id: card.card_id,
+                  kind: humanize(card.kind),
+                  title: card.title,
+                  currentFact: card.summary,
+                  status: humanize(card.freshness_state),
+                  updatedAt: card.observed_at ?? undefined,
+                  source: card.source_system,
+                  href: `/knowledge?card=${encodeURIComponent(card.card_id)}`,
+                  proof: card.entity_ref,
+                })}
                 aria-label={`inspect ${card.title}`}
               >
                 inspect
-              </a>
+              </button>
             </article>
           );
         })

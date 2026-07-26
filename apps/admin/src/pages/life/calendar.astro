@@ -1,0 +1,40 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { LifeCalendar } from "../../components/astryx/LifeCalendar";
+import { readAdminInbox } from "../../data/inbox";
+
+const inbox = await readAdminInbox(Astro.locals.runtime?.env.DB);
+const lifeAttention = inbox.items
+  .filter((item) => item.category === "life")
+  .map((item) => ({
+    id: item.id,
+    title: item.title,
+    currentFact: item.summary,
+    nextAction: item.next_action,
+    owner: item.owner,
+    status: item.status,
+    updatedAt: item.updated_at.startsWith("1970-01-01")
+      ? undefined
+      : item.updated_at,
+    source: item.source,
+    href: item.href,
+    proof: item.proof,
+  }));
+---
+
+<AdminLayout title="calendar" hideHeader>
+  <main class="quiet-page quiet-calendar-page">
+    <header class="quiet-page-header">
+      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+        Calendar
+      </h1>
+      <span>verified events only</span>
+    </header>
+
+    <LifeCalendar
+      client:load
+      attention={lifeAttention}
+      sourceAvailable={false}
+    />
+  </main>
+</AdminLayout>

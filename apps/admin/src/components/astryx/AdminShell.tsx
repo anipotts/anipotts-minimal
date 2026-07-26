@@ -1,13 +1,17 @@
-import React, { type ReactNode } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import { AppShell } from "@astryxdesign/core/AppShell";
+import { IconButton } from "@astryxdesign/core/IconButton";
 import {
   SideNav,
-  SideNavCollapseButton,
   SideNavItem,
   SideNavSection,
 } from "@astryxdesign/core/SideNav";
 import {
+  ArrowSquareOutIcon,
   CaretDownIcon,
+  CaretDoubleLeftIcon,
+  CaretDoubleRightIcon,
+  ClockIcon,
   MagnifyingGlassIcon,
   MoonIcon,
   SunIcon,
@@ -45,6 +49,44 @@ export function AdminShell({
   navItems,
   title,
 }: AdminShellProps) {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  useEffect(() => {
+    try {
+      setIsSidebarCollapsed(
+        localStorage.getItem("admin-sidebar:v1") === "collapsed",
+      );
+      const saved = JSON.parse(
+        localStorage.getItem("admin-nav-groups:v1") ?? "[]",
+      );
+      const next = new Set<string>(
+        Array.isArray(saved)
+          ? saved.filter((value): value is string => typeof value === "string")
+          : [],
+      );
+      for (const group of GROUPS) {
+        const parent = navItems.find(
+          (item) => item.group === group.id && !item.parent,
+        );
+        if (parent && isGroupActive(currentRoute, parent)) {
+          next.add(group.id);
+        }
+      }
+      setExpandedGroups(next);
+    } catch {
+      const active = GROUPS.filter((group) => {
+        const parent = navItems.find(
+          (item) => item.group === group.id && !item.parent,
+        );
+        return parent ? isGroupActive(currentRoute, parent) : false;
+      }).map((group) => group.id);
+      setExpandedGroups(new Set(active));
+    }
+  }, [currentRoute, navItems]);
+
   if (chrome === "auth") {
     return (
       <main className="admin-auth-frame">
@@ -56,13 +98,59 @@ export function AdminShell({
   const inbox = navItems.find((item) => item.group === "home");
   const mobileItems = navItems.filter((item) => item.mobile);
 
+  const setSidebarCollapsed = (next: boolean) => {
+    setIsSidebarCollapsed(next);
+    try {
+      localStorage.setItem("admin-sidebar:v1", next ? "collapsed" : "expanded");
+    } catch {
+      // The visible control still works for this page session.
+    }
+  };
+
+  const setGroupExpanded = (group: string, next: boolean) => {
+    setExpandedGroups((current) => {
+      const updated = new Set(current);
+      if (next) updated.add(group);
+      else updated.delete(group);
+      try {
+        localStorage.setItem(
+          "admin-nav-groups:v1",
+          JSON.stringify([...updated]),
+        );
+      } catch {
+        // Group expansion remains usable for this page session.
+      }
+      return updated;
+    });
+  };
+
   const sideNav = (
     <SideNav
-      className="admin-side-nav"
-      collapsible={{ hasButton: false }}
+      className={`admin-side-nav${isSidebarCollapsed ? " is-hidden" : ""}`}
+      aria-hidden={isSidebarCollapsed}
+      inert={isSidebarCollapsed}
+      style={{ width: isSidebarCollapsed ? 0 : undefined }}
       header={
         <div className="admin-nav-header">
-          <AdminBrand />
+          <div className="admin-nav-brand-row">
+            <AdminBrand />
+            <div className="admin-nav-header-actions">
+              <IconButton
+                label="collapse sidebar"
+                tooltip="collapse"
+                variant="ghost"
+                size="lg"
+                icon={
+                  <CaretDoubleLeftIcon
+                    size={17}
+                    weight="regular"
+                    aria-hidden="true"
+                  />
+                }
+                onClick={() => setSidebarCollapsed(true)}
+              />
+            </div>
+          </div>
           <button
             type="button"
             className="admin-global-search"
@@ -79,10 +167,13 @@ export function AdminShell({
           </button>
         </div>
       }
-      footerIcons={
-        <div className="admin-nav-utilities">
+      footer={
+        <div className="admin-nav-bottom">
+          <a href="https://anipotts.com" aria-label="open anipotts.com">
+            <span>anipotts.com</span>
+            <ArrowSquareOutIcon size={16} weight="regular" aria-hidden="true" />
+          </a>
           <ThemeToggle />
-          <SideNavCollapseButton />
         </div>
       }
     >
@@ -106,6 +197,8 @@ export function AdminShell({
               item={parent}
               currentRoute={currentRoute}
               collapsible={children.length > 0}
+              isExpanded={expandedGroups.has(group.id)}
+              onExpandedChange={(next) => setGroupExpanded(group.id, next)}
             >
               {children.map((item) => (
                 <NavEntry
@@ -125,6 +218,21 @@ export function AdminShell({
     <div className="admin-astryx-root">
       <header className="admin-mobile-topbar">
         <AdminBrand mobile />
+        <IconButton
+          className="admin-mobile-focus"
+          label="open focus"
+          tooltip="focus"
+          variant="ghost"
+          size="lg"
+          icon={<ClockIcon size={20} weight="regular" aria-hidden="true" />}
+          onClick={() =>
+            document.dispatchEvent(
+              new CustomEvent("admin:focus", {
+                detail: { mode: "overview" },
+              }),
+            )
+          }
+        />
         <button
           type="button"
           className="admin-mobile-search"
@@ -154,6 +262,17 @@ export function AdminShell({
                   {item.label}
                 </a>
               ))}
+            <div className="admin-mobile-menu-utilities">
+              <a href="https://anipotts.com">
+                anipotts.com
+                <ArrowSquareOutIcon
+                  size={16}
+                  weight="regular"
+                  aria-hidden="true"
+                />
+              </a>
+              <ThemeToggle />
+            </div>
           </nav>
         </details>
       </header>
@@ -197,7 +316,28 @@ export function AdminShell({
         mobileNav={false}
         sideNav={sideNav}
       >
-        <div className="admin-page-frame">
+        <div
+          className={`admin-page-frame${
+            isSidebarCollapsed ? " has-collapsed-sidebar" : ""
+          }`}
+        >
+          {isSidebarCollapsed ? (
+            <IconButton
+              className="admin-sidebar-reopen"
+              label="expand sidebar"
+              tooltip="expand"
+              variant="secondary"
+              size="lg"
+              icon={
+                <CaretDoubleRightIcon
+                  size={18}
+                  weight="regular"
+                  aria-hidden="true"
+                />
+              }
+              onClick={() => setSidebarCollapsed(false)}
+            />
+          ) : null}
           {!hideHeader && (
             <header className="page-header">
               <h1>{title}</h1>
@@ -207,6 +347,21 @@ export function AdminShell({
           <div className="admin-page-content">{children}</div>
         </div>
       </AppShell>
+      <IconButton
+        className="admin-focus-edge"
+        label="open focus"
+        tooltip="focus"
+        variant="secondary"
+        size="lg"
+        icon={<ClockIcon size={18} weight="regular" aria-hidden="true" />}
+        onClick={() =>
+          document.dispatchEvent(
+            new CustomEvent("admin:focus", {
+              detail: { mode: "overview" },
+            }),
+          )
+        }
+      />
     </div>
   );
 }
@@ -215,11 +370,15 @@ function NavEntry({
   item,
   currentRoute,
   collapsible = false,
+  isExpanded = false,
+  onExpandedChange,
   children,
 }: {
   item: NavItem;
   currentRoute: string;
   collapsible?: boolean;
+  isExpanded?: boolean;
+  onExpandedChange?: (next: boolean) => void;
   children?: ReactNode;
 }) {
   const Icon = iconForNav[item.icon];
@@ -236,7 +395,10 @@ function NavEntry({
       <details
         className="admin-nav-group"
         data-admin-nav-group={item.group}
-        open={groupIsActive}
+        open={groupIsActive || isExpanded}
+        onToggle={(event) =>
+          onExpandedChange?.(event.currentTarget.open || groupIsActive)
+        }
       >
         <summary>
           <Icon size={18} weight="regular" aria-hidden="true" />
@@ -263,8 +425,16 @@ function NavEntry({
     <SideNavItem
       href={item.href}
       label={item.label}
-      icon={<Icon size={18} weight="regular" aria-hidden="true" />}
-      selectedIcon={<Icon size={18} weight="fill" aria-hidden="true" />}
+      icon={
+        item.parent ? undefined : (
+          <Icon size={18} weight="regular" aria-hidden="true" />
+        )
+      }
+      selectedIcon={
+        item.parent ? undefined : (
+          <Icon size={18} weight="fill" aria-hidden="true" />
+        )
+      }
       isSelected={isActive(currentRoute, item.href)}
       collapsible={false}
     >
@@ -299,14 +469,34 @@ function AdminBrand({ mobile = false }: { mobile?: boolean }) {
 }
 
 function ThemeToggle() {
+  const [theme, setThemeState] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    setThemeState(
+      document.documentElement.dataset.theme === "dark" ? "dark" : "light",
+    );
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    setThemeState(next);
+    try {
+      localStorage.setItem("admin-theme:v1", next);
+    } catch {
+      // The theme remains usable for this page session.
+    }
+  };
+
   return (
     <button
       type="button"
       className="admin-theme-toggle"
       data-theme-toggle=""
       aria-label="switch color theme"
-      aria-pressed={false}
+      aria-pressed={theme === "dark"}
       title="switch color theme"
+      onClick={toggleTheme}
     >
       <SunIcon
         className="admin-theme-icon is-light"
@@ -319,7 +509,7 @@ function ThemeToggle() {
         aria-hidden="true"
       />
       <span className="sr-only" data-theme-label>
-        switch color theme
+        {theme === "dark" ? "light mode" : "dark mode"}
       </span>
     </button>
   );

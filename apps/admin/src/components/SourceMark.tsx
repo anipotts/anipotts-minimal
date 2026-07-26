@@ -1,7 +1,7 @@
 import React from "react";
 import chatgptMark from "../assets/provider-marks/chatgpt.png";
 import claudeMark from "../assets/provider-marks/claude.svg";
-import codexMark from "../assets/provider-marks/codex.png";
+import codexMark from "../assets/provider-marks/codex.svg";
 
 type Props = {
   provider: "codex" | "claude" | "github" | "handoff" | "chatgpt";
@@ -38,7 +38,7 @@ export function SourceMark({ provider, compact = false }: Props) {
 
   return (
     <span
-      className="operator-source-mark"
+      className={`operator-source-mark${compact ? " is-compact" : ""}`}
       data-provider={provider}
       aria-label={`${label} source`}
       title={`${label} source`}
@@ -55,8 +55,12 @@ export function SourceMark({ provider, compact = false }: Props) {
           {providerGlyphs[provider]}
         </span>
       )}
-      <span className="operator-source-label">{label}</span>
-      {!compact && <span className="sr-only"> provider</span>}
+      {!compact && (
+        <>
+          <span className="operator-source-label">{label}</span>
+          <span className="sr-only"> provider</span>
+        </>
+      )}
     </span>
   );
 }

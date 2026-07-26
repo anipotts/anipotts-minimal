@@ -5,7 +5,12 @@ import "@astryxdesign/theme-neutral/theme.css";
 import "../styles/admin.css";
 import { AdminShell } from "../components/astryx/AdminShell";
 import { AdminCommandPalette } from "../components/astryx/AdminCommandPalette";
+import { AdminFocusRail } from "../components/astryx/AdminFocusRail";
 import { navItems, routeTitle } from "../data/admin";
+import {
+  isOperatorWorkProjectionCurrent,
+  readOperatorWorkProjection,
+} from "../data/operator-work";
 import candidateFaviconDark from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-dark.svg?url";
 import candidateFaviconLight from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-light.svg?url";
 
@@ -43,6 +48,28 @@ const {
 } = Astro.props;
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
 const currentRoute = `${currentPath}${Astro.url.search}`;
+const focusWorkProjection =
+  chrome === "admin" ? readOperatorWorkProjection() : null;
+const hasCurrentFocusWork =
+  focusWorkProjection !== null &&
+  isOperatorWorkProjectionCurrent(focusWorkProjection);
+const activeFocusWork =
+  hasCurrentFocusWork && focusWorkProjection
+    ? focusWorkProjection.task_states
+        .filter(
+          (task) =>
+            task.operator_state === "working" ||
+            task.operator_state === "review",
+        )
+        .map((task) => ({
+          id: task.task_id,
+          provider: task.provider,
+          title: task.canonical_title,
+          goal: task.bounded_goal,
+          state: task.operator_state,
+          updatedAt: task.last_observed_at,
+        }))
+    : [];
 ---
 
 <!doctype html>
@@ -148,6 +175,7 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
   </head>
   <body>
     <AdminShell
+      client:load
       chrome={chrome}
       currentRoute={currentRoute}
       deck={deck}
@@ -159,76 +187,27 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
     </AdminShell>
     {
       chrome === "admin" && (
-        <AdminCommandPalette
-          client:load
-          navItems={navItems}
-          showTrigger={false}
-        />
+        <>
+          <AdminCommandPalette
+            client:load
+            navItems={navItems}
+            showTrigger={false}
+          />
+          <AdminFocusRail
+            client:load
+            activeWork={activeFocusWork}
+            hasCurrentWork={hasCurrentFocusWork}
+          />
+        </>
       )
     }
     <script is:inline>
       (() => {
-        const root = document.documentElement;
-        const toggles = document.querySelectorAll("[data-theme-toggle]");
-
-        const syncToggleLabels = () => {
-          const isDark = root.dataset.theme === "dark";
-          for (const toggle of toggles) {
-            toggle.setAttribute("aria-pressed", String(isDark));
-            const label = toggle.querySelector("[data-theme-label]");
-            if (label) label.textContent = isDark ? "light mode" : "dark mode";
-          }
-        };
-
-        const setTheme = (theme) => {
-          root.dataset.theme = theme;
-          try {
-            localStorage.setItem("admin-theme:v1", theme);
-          } catch {
-            // The visible toggle still works for this page session.
-          }
-          syncToggleLabels();
-        };
-
-        for (const toggle of toggles) {
-          toggle.addEventListener("click", () => {
-            setTheme(root.dataset.theme === "dark" ? "light" : "dark");
-          });
-        }
-
-        syncToggleLabels();
-
         for (const trigger of document.querySelectorAll(
           "[data-admin-search-trigger]",
         )) {
           trigger.addEventListener("click", () => {
             document.dispatchEvent(new CustomEvent("admin:search"));
-          });
-        }
-
-        for (const group of document.querySelectorAll(
-          "[data-admin-nav-group]",
-        )) {
-          if (!(group instanceof HTMLDetailsElement)) continue;
-          const key = `admin-nav:${group.dataset.adminNavGroup}`;
-          const routeContainsSelection = Boolean(
-            group.querySelector('[aria-current="page"]'),
-          );
-          if (routeContainsSelection) {
-            group.open = true;
-          } else {
-            try {
-              group.open = localStorage.getItem(key) === "expanded";
-            } catch {
-              group.open = false;
-            }
-          }
-          group.addEventListener("toggle", () => {
-            try {
-              localStorage.setItem(key, group.open ? "expanded" : "collapsed");
-            } catch {
-              // The group remains usable for this page session.
-            }
           });
         }
       })();

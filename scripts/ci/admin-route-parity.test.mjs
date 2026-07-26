@@ -18,7 +18,7 @@ const homeSource = readFileSync(
   "utf8",
 );
 const attentionRowSource = readFileSync(
-  "apps/admin/src/components/AttentionRow.astro",
+  "apps/admin/src/components/astryx/InboxActionList.tsx",
   "utf8",
 );
 const knowledgeSource = readFileSync(
@@ -30,12 +30,20 @@ const locationsSource = readFileSync(
   "utf8",
 );
 const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const workTableSource = readFileSync(
+  "apps/admin/src/components/astryx/OperatorWorkTable.tsx",
+  "utf8",
+);
 const operatorWorkSource = readFileSync(
   "apps/admin/src/data/operator-work.ts",
   "utf8",
 );
 const lifeSource = readFileSync(
   "apps/admin/src/pages/life/index.astro",
+  "utf8",
+);
+const calendarSource = readFileSync(
+  "apps/admin/src/pages/life/calendar.astro",
   "utf8",
 );
 const healthSource = readFileSync(
@@ -290,12 +298,15 @@ for (const marker of [
   "OperatorWorkTable",
   "view=projects",
   "view=history",
-  "data-inspect-task",
   "loose conversations",
   "preserved",
 ]) {
   assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
 }
+assert.ok(
+  workTableSource.includes("data-admin-focus-record"),
+  "admin Work must open the shared focus rail",
+);
 for (const marker of [
   "019f7fb8-69b7-7791-8e67-87c87acfae02",
   "019f95c5-be35-7991-811c-371611daa94b",
@@ -313,10 +324,21 @@ for (const marker of [
   "Today",
   "Recent changes",
   "/knowledge?kind=people",
+  "/life/calendar",
   "/life/health",
   "/life/aesthetics",
 ]) {
   assert.ok(lifeSource.includes(marker), `admin life missing marker ${marker}`);
+}
+for (const marker of [
+  "LifeCalendar",
+  "verified events only",
+  "sourceAvailable={false}",
+]) {
+  assert.ok(
+    calendarSource.includes(marker),
+    `admin calendar missing marker ${marker}`,
+  );
 }
 assert.ok(
   healthSource.includes("does not infer tasks"),

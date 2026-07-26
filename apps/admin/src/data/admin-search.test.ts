@@ -49,5 +49,12 @@ describe("admin search and navigation", () => {
     expect(
       navItems.find((item) => item.href === "/knowledge/locations"),
     ).toMatchObject({ group: "knowledge", parent: "knowledge" });
+    expect(
+      navItems.find((item) => item.href === "/life/calendar"),
+    ).toMatchObject({ group: "life", parent: "life" });
+    expect(
+      navItems.find((item) => item.href === "/knowledge?kind=search"),
+    ).toBeUndefined();
+    expect(navItems.find((item) => item.href === "/mutations")).toBeUndefined();
   });
 });

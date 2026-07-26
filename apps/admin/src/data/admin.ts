@@ -11,6 +11,7 @@ export type NavItem = {
     | "life"
     | "knowledge"
     | "locations"
+    | "calendar"
     | "search"
     | "system"
     | "fleet"
@@ -101,15 +102,6 @@ export const navItems: NavItem[] = [
     mobile: true,
   },
   {
-    href: "/content/edit/new",
-    label: "new",
-    status: "editor",
-    group: "content",
-    description: "write and publish content",
-    icon: "edit",
-    parent: "content",
-  },
-  {
     href: "/content/review",
     label: "review",
     status: "content",
@@ -128,30 +120,12 @@ export const navItems: NavItem[] = [
     parent: "content",
   },
   {
-    href: "/content/preview",
-    label: "preview",
-    status: "content",
-    group: "content",
-    description: "draft preview surfaces",
-    icon: "review",
-    parent: "content",
-  },
-  {
     href: "/content/drafts",
     label: "drafts",
     status: "content",
     group: "content",
     description: "saved draft operations and publish state",
     icon: "draft",
-    parent: "content",
-  },
-  {
-    href: "/content/operations",
-    label: "history",
-    status: "content",
-    group: "content",
-    description: "draft operation metadata",
-    icon: "handoff",
     parent: "content",
   },
   {
@@ -171,6 +145,15 @@ export const navItems: NavItem[] = [
     description: "quiet personal overview",
     icon: "life",
     mobile: true,
+  },
+  {
+    href: "/life/calendar",
+    label: "calendar",
+    status: "schedule",
+    group: "life",
+    description: "verified schedule and dated commitments",
+    icon: "calendar",
+    parent: "life",
   },
   {
     href: "/life/health",
@@ -234,15 +217,6 @@ export const navItems: NavItem[] = [
     parent: "system",
   },
   {
-    href: "/proof",
-    label: "proof",
-    status: "passkeys",
-    group: "system",
-    description: "auth, proof, and blocked checks",
-    icon: "proof",
-    parent: "system",
-  },
-  {
     href: "/deploys",
     label: "deploys",
     status: "scoped",
@@ -261,30 +235,21 @@ export const navItems: NavItem[] = [
     parent: "system",
   },
   {
+    href: "/proof",
+    label: "proof",
+    status: "passkeys",
+    group: "system",
+    description: "auth, proof, and blocked checks",
+    icon: "proof",
+    parent: "system",
+  },
+  {
     href: "/handoffs",
     label: "handoffs",
     status: "details",
     group: "system",
     description: "handoff freshness and absorption",
     icon: "handoff",
-    parent: "system",
-  },
-  {
-    href: "/mutations",
-    label: "mutations",
-    status: "gated",
-    group: "system",
-    description: "proposed, approved, running, verified",
-    icon: "review",
-    parent: "system",
-  },
-  {
-    href: "/ops/destructive",
-    label: "gates",
-    status: "gated",
-    group: "system",
-    description: "delete, dns, auth, deploy, secrets",
-    icon: "proof",
     parent: "system",
   },
 ];

@@ -26,6 +26,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/life/calendar",
+    file: "apps/admin/src/pages/life/calendar.astro",
+    nav: true,
+    smoke: false,
+  },
+  {
     route: "/life/health",
     file: "apps/admin/src/pages/life/health.astro",
     nav: true,
@@ -71,12 +77,12 @@ export const ADMIN_ROUTES = [
   {
     route: "/content/preview",
     file: "apps/admin/src/pages/content/preview.astro",
-    nav: true,
+    nav: false,
   },
   {
     route: "/content/operations",
     file: "apps/admin/src/pages/content/operations.astro",
-    nav: true,
+    nav: false,
   },
   {
     route: "/newsletter",
@@ -106,12 +112,12 @@ export const ADMIN_ROUTES = [
   {
     route: "/mutations",
     file: "apps/admin/src/pages/mutations.astro",
-    nav: true,
+    nav: false,
   },
   {
     route: "/ops/destructive",
     file: "apps/admin/src/pages/ops/destructive.astro",
-    nav: true,
+    nav: false,
   },
   {
     route: "/api/admin/runtime-feed",

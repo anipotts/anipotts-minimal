@@ -1,9 +1,12 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
-import { SourceMark } from "./SourceMark";
-import AttentionRow from "./AttentionRow.astro";
+import { HandledActivityList } from "./astryx/HandledActivityList";
+import { InboxActionList } from "./astryx/InboxActionList";
 import { readAdminInbox, type AdminInboxItem } from "../data/inbox";
-import { readOperatorWorkProjection } from "../data/operator-work";
+import {
+  isOperatorWorkProjectionCurrent,
+  readOperatorWorkProjection,
+} from "../data/operator-work";
 import { operatorTaskDisplay } from "../data/operator-work-view";
 
 const [inbox, work] = await Promise.all([
@@ -32,10 +35,13 @@ const visibleItems = inbox.items.filter((item) => {
 });
 const topItems = visibleItems.slice(0, 4);
 const remainingItems = visibleItems.slice(4);
-const beingHandled = work.task_states.filter(
-  (task) =>
-    task.operator_state === "working" || task.operator_state === "review",
-);
+const hasCurrentWorkState = isOperatorWorkProjectionCurrent(work);
+const beingHandled = hasCurrentWorkState
+  ? work.task_states.filter(
+      (task) =>
+        task.operator_state === "working" || task.operator_state === "review",
+    )
+  : [];
 
 const displayTime = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -139,46 +145,55 @@ const linkedTaskFor = (item: AdminInboxItem) =>
         <span>{visibleItems.length}</span>
       </div>
 
-      <ol class="operator-attention-list">
-        {
-          topItems.map((item, index) => (
-            <AttentionRow
-              item={item}
-              index={index}
-              linkedTask={linkedTaskFor(item)}
-              domainHref={domainHref(item)}
-            />
-          ))
-        }
-      </ol>
+      <InboxActionList
+        client:load
+        rows={topItems.map((item, index) => {
+          const task = linkedTaskFor(item);
+          return {
+            item,
+            index,
+            domainHref: domainHref(item),
+            linkedState: task?.operator_state,
+            linkedHost: task?.host,
+          };
+        })}
+      />
     </section>
 
     <section class="operator-handled" aria-labelledby="being-handled-title">
       <div class="operator-section-heading">
         <div>
-          <h2 id="being-handled-title">being handled</h2>
+          <h2 id="being-handled-title">
+            {hasCurrentWorkState ? "being handled" : "agent activity"}
+          </h2>
         </div>
         <a href="/work?view=now">open Work</a>
       </div>
-      <div class="operator-handled-strip">
-        {
-          beingHandled.map((task) => (
-            <a
-              href={`/work?view=now#task-${task.task_id}`}
-              class="operator-handled-item"
-            >
-              <SourceMark provider={task.provider} compact />
-              <div>
-                <strong>{task.canonical_title}</strong>
-                <span>{operatorTaskDisplay(task).bounded_goal}</span>
-              </div>
-              <time datetime={task.last_observed_at}>
-                {displayTime(task.last_observed_at)}
-              </time>
-            </a>
-          ))
-        }
-      </div>
+      {
+        hasCurrentWorkState ? (
+          <HandledActivityList
+            client:load
+            tasks={beingHandled.map((task) => ({
+              id: task.task_id,
+              provider: task.provider,
+              title: task.canonical_title,
+              goal: operatorTaskDisplay(task).bounded_goal,
+              nextAction: operatorTaskDisplay(task).next_action,
+              state: task.operator_state,
+              updatedAt: task.last_observed_at,
+              owner: task.owner,
+              href: `/work?view=now#task-${task.task_id}`,
+              source: task.source_ref,
+              proof: task.proof_refs.join(" · "),
+            }))}
+          />
+        ) : (
+          <div class="operator-handled-unavailable">
+            <span>live agent activity unavailable</span>
+            <a href="/work?view=now">view last verified work</a>
+          </div>
+        )
+      }
     </section>
 
     {
@@ -191,16 +206,20 @@ const linkedTaskFor = (item: AdminInboxItem) =>
             <h2 id="remaining-attention-title">everything else</h2>
             <span>{remainingItems.length}</span>
           </div>
-          <ol class="operator-attention-list is-secondary">
-            {remainingItems.map((item, index) => (
-              <AttentionRow
-                item={item}
-                index={index + topItems.length}
-                linkedTask={linkedTaskFor(item)}
-                domainHref={domainHref(item)}
-              />
-            ))}
-          </ol>
+          <InboxActionList
+            client:load
+            secondary
+            rows={remainingItems.map((item, index) => {
+              const task = linkedTaskFor(item);
+              return {
+                item,
+                index: index + topItems.length,
+                domainHref: domainHref(item),
+                linkedState: task?.operator_state,
+                linkedHost: task?.host,
+              };
+            })}
+          />
         </section>
       )
     }

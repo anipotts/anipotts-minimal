@@ -39,7 +39,18 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
     <section class="quiet-machine-grid" aria-label="machines">
       {
         machines.map((machine) => (
-          <article>
+          <article
+            data-admin-focus-record={JSON.stringify({
+              id: machine.name,
+              kind: "machine",
+              title: machine.name,
+              currentFact: machine.role,
+              status: machine.state,
+              source: "runtime",
+              href: `/fleet?entity=${encodeURIComponent(machine.name)}`,
+              proof: `${machine.repos.length} repository observations`,
+            })}
+          >
             <header>
               <h2>{machine.name}</h2>
               <span class={`quiet-machine-state is-${machine.state}`}>
@@ -86,7 +97,19 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
               <span role="columnheader">impact</span>
             </div>
             {runtime.overlays.map((row) => (
-              <div role="row">
+              <div
+                role="row"
+                data-admin-focus-record={JSON.stringify({
+                  id: `${row.machine}:${row.repo}`,
+                  kind: "repository",
+                  title: row.repo,
+                  currentFact: row.deploy_impact,
+                  status: runtime.available ? "current" : "stale",
+                  source: "runtime",
+                  href: `/repos?entity=${encodeURIComponent(row.repo)}`,
+                  proof: `${row.branch || "unknown branch"} on ${row.machine}`,
+                })}
+              >
                 <strong role="cell">{row.repo}</strong>
                 <span role="cell">{row.machine}</span>
                 <span role="cell">{row.branch || "unknown"}</span>

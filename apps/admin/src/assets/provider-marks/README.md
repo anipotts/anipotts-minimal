@@ -4,10 +4,13 @@ Localized provider identity assets for the admin source-mark component.
 
 ## Sources
 
-- `codex.png`: resized from the official Codex macOS app resource
-  `icon-codex-dark-color.png`, bundle `com.openai.codex` version
-  `26.721.41059` build `5848`. Source SHA-256:
-  `69fb4384e161be8a20dcb94a9ac34aea4fbfaeb67514110a71e7b0732eccb0fc`.
+- `codex.svg`: OpenAI Codex vector from the Brandlogos.net reference Ani
+  selected for this private admin interface. Source SHA-256:
+  `29af8ea64e630bc4b80fb1efbd2755177993a20d6617ec994d39313ae52e7793`.
+  The localized copy adds only an accessible `<title>` and has SHA-256
+  `f691af4f2ea1f57c07f558100c3e00bb85908d7a894bf77f44d1ed8ef239ee75`.
+  Source:
+  `https://files.brandlogos.net/svg/KCGf0r4L58/OpenAI_Codex-logo-brandlogos-25a8d1.svg`.
 - `chatgpt.png`: resized from the official Codex macOS app resource
   `icon-chatgpt.png` in the same signed OpenAI bundle. Source SHA-256:
   `3453947a9ce2709b7ec51c0559c7eb976e4ac53b232b607d1d81b0d1d1048b61`.
@@ -21,5 +24,5 @@ Anthropic press kit:
 OpenAI brand guidance:
 `https://openai.com/brand/`
 
-The PNG marks are resized only. Do not recolor, redraw, or encode runtime state
-with provider marks.
+Raster marks are resized only. Vector geometry is preserved. Do not recolor,
+redraw, or encode runtime state with provider marks.

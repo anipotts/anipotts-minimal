@@ -54,6 +54,10 @@ const recent = knowledge.bundle.cards.slice(0, 5);
     </section>
 
     <section class="quiet-life-areas" aria-label="life areas">
+      <a href="/life/calendar">
+        <strong>Calendar</strong>
+        <span>verified schedule and dated commitments</span>
+      </a>
       <a href="/life/health">
         <strong>Health</strong>
         <span>status and source freshness</span>
@@ -76,7 +80,19 @@ const recent = knowledge.bundle.cards.slice(0, 5);
       <div>
         {
           recent.map((card) => (
-            <article>
+            <article
+              data-admin-focus-record={JSON.stringify({
+                id: card.card_id,
+                kind: card.kind,
+                title: card.title,
+                currentFact: card.summary,
+                status: card.freshness_state,
+                updatedAt: card.observed_at ?? undefined,
+                source: card.source_system,
+                href: `/knowledge?card=${encodeURIComponent(card.card_id)}`,
+                proof: card.entity_ref,
+              })}
+            >
               <span>{card.kind.replaceAll("_", " ")}</span>
               <h3>{card.title}</h3>
               <p>{card.summary}</p>

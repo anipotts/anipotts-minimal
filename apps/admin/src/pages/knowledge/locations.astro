@@ -2,6 +2,11 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { readAdminKnowledge } from "../../data/knowledge";
 import { loadRuntimeOverlayResponse } from "../../data/runtime";
+import {
+  DesktopTowerIcon,
+  HardDrivesIcon,
+  NavigationArrowIcon,
+} from "@phosphor-icons/react";
 
 const [runtime, knowledge] = await Promise.all([
   loadRuntimeOverlayResponse(),
@@ -39,44 +44,52 @@ const displayTime = (value?: string | null) =>
       <span>viewing from {viewer}</span>
     </header>
 
-    <section class="quiet-fleet-map-section" aria-labelledby="fleet-map-title">
+    <section class="quiet-location-overview" aria-labelledby="fleet-map-title">
       <header>
         <h2 id="fleet-map-title">Fleet map</h2>
         <span>{runtime.available ? "current" : "last known"}</span>
       </header>
-      <div
-        class="quiet-fleet-map"
-        data-viewer={viewer}
-        aria-label={`fleet topology viewed from ${viewer}`}
-      >
-        <span class="quiet-map-orbit orbit-one" aria-hidden="true"></span>
-        <span class="quiet-map-orbit orbit-two" aria-hidden="true"></span>
-        <span class="quiet-map-link link-pro" aria-hidden="true"></span>
-        <span class="quiet-map-link link-mini" aria-hidden="true"></span>
-        <div class="quiet-map-viewer">
-          <span></span>
+      <div class="quiet-location-viewer">
+        <NavigationArrowIcon size={20} weight="fill" aria-hidden="true" />
+        <div>
           <strong>{viewer}</strong>
-          <small>you are here</small>
+          <span>viewing from this device</span>
         </div>
+      </div>
+      <div class="quiet-location-machines" aria-label="fleet topology">
         {
-          machines.map((machine, index) => (
+          machines.map((machine) => (
             <article
               class:list={[
-                "quiet-map-machine",
-                index === 0 ? "is-pro" : "is-mini",
+                "quiet-location-machine",
                 machine.current && "is-current",
               ]}
+              data-admin-focus-record={JSON.stringify({
+                id: machine.name,
+                kind: "machine",
+                title: machine.name,
+                currentFact: machine.role,
+                status: machine.state,
+                source: "runtime",
+                href: `/fleet?entity=${encodeURIComponent(machine.name)}`,
+                proof: `${machine.repos} repository observations`,
+              })}
             >
-              <span
-                class={`quiet-machine-state is-${machine.state}`}
-                aria-hidden="true"
-              />
-              <strong>{machine.name}</strong>
-              <small>{machine.role}</small>
-              <span>
-                {machine.repos > 0
-                  ? `${machine.repos} repositories`
-                  : machine.state}
+              {machine.name === "ap-pro" ? (
+                <DesktopTowerIcon
+                  size={22}
+                  weight="regular"
+                  aria-hidden="true"
+                />
+              ) : (
+                <HardDrivesIcon size={22} weight="regular" aria-hidden="true" />
+              )}
+              <div>
+                <strong>{machine.name}</strong>
+                <small>{machine.role}</small>
+              </div>
+              <span class={`quiet-machine-state is-${machine.state}`}>
+                {machine.state}
               </span>
             </article>
           ))
@@ -84,8 +97,7 @@ const displayTime = (value?: string | null) =>
       </div>
       <footer>
         <span>
-          topology only. physical location stays private until a trusted source
-          provides it.
+          physical location stays private until a trusted source provides it
         </span>
         <a href="/fleet">open Fleet</a>
       </footer>

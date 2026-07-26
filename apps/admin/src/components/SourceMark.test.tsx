@@ -23,4 +23,15 @@ describe("SourceMark", () => {
     expect(markup).toContain(">GH<");
     expect(markup).toContain('aria-label="GitHub source"');
   });
+
+  it("keeps compact provider marks accessible without visible provider text", () => {
+    const markup = renderToStaticMarkup(
+      <SourceMark provider="codex" compact />,
+    );
+
+    expect(markup).toContain("<img");
+    expect(markup).toContain('aria-label="Codex source"');
+    expect(markup).not.toContain("operator-source-label");
+    expect(markup).not.toContain(">Codex<");
+  });
 });

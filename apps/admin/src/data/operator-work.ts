@@ -415,6 +415,27 @@ export function readOperatorWorkProjection(): OperatorWorkProjection {
   return structuredClone(operatorWorkFixture);
 }
 
+export function isOperatorWorkProjectionCurrent(
+  projection: OperatorWorkProjection,
+  now = Date.now(),
+): boolean {
+  if (
+    String(projection.live_replacement_gate) ===
+      "closed_pending_parity_proof_and_ani_approval" ||
+    String(projection.mode).includes("fixture")
+  ) {
+    return false;
+  }
+
+  const observedAt = Date.parse(projection.reconciled_at);
+  const age = now - observedAt;
+  return (
+    Number.isFinite(observedAt) &&
+    age >= 0 &&
+    age <= projection.freshness_policy.fresh_for_seconds * 1000
+  );
+}
+
 export function laneForOperatorTask(task: OperatorTaskState): OperatorWorkLane {
   if (task.operator_state === "completed") return "recently_completed";
   if (task.operator_state === "waiting" || task.operator_state === "blocked") {

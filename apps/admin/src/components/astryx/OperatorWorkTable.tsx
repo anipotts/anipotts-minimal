@@ -12,6 +12,7 @@ import type {
   OperatorWorkLane,
 } from "../../data/operator-work";
 import { operatorTaskDisplay } from "../../data/operator-work-view";
+import type { AdminFocusRecord } from "./AdminFocusRail";
 
 type WorkRow = OperatorTaskState &
   Record<string, unknown> & {
@@ -20,6 +21,7 @@ type WorkRow = OperatorTaskState &
 
 type Props = {
   rows: WorkRow[];
+  isCurrent: boolean;
 };
 
 const laneLabel: Record<OperatorWorkLane, string> = {
@@ -37,7 +39,27 @@ const displayTime = (value: string) =>
     minute: "2-digit",
   }).format(new Date(value));
 
-export function OperatorWorkTable({ rows }: Props) {
+const focusRecord = (row: WorkRow, isCurrent: boolean): AdminFocusRecord => ({
+  id: row.task_id,
+  kind: "work",
+  title: row.canonical_title,
+  currentFact: operatorTaskDisplay(row).bounded_goal,
+  nextAction: operatorTaskDisplay(row).next_action,
+  owner: row.owner,
+  status: isCurrent
+    ? `${row.operator_state} · ${row.runtime_state}`
+    : `last verified ${row.operator_state}`,
+  updatedAt: row.last_observed_at,
+  source: row.provider,
+  href: row.attention_ref
+    ? `/?item=${encodeURIComponent(row.attention_ref)}`
+    : "/work?view=now",
+  proof: [row.proof_owed, ...row.proof_refs, row.native_ref, row.source_ref]
+    .filter(Boolean)
+    .join(" · "),
+});
+
+export function OperatorWorkTable({ rows, isCurrent }: Props) {
   const columns = useMemo<Array<TableColumn<WorkRow>>>(
     () => [
       {
@@ -61,12 +83,16 @@ export function OperatorWorkTable({ rows }: Props) {
         renderCell: (row) => (
           <div className="quiet-work-state">
             <span
-              className={`quiet-state-dot is-${row.operator_state}`}
+              className={`quiet-state-dot is-${isCurrent ? row.operator_state : "unknown"}`}
               aria-hidden="true"
             />
             <span>
-              <strong>{laneLabel[row.lane]}</strong>
-              <small>{row.runtime_state}</small>
+              <strong>
+                {isCurrent ? laneLabel[row.lane] : "last verified"}
+              </strong>
+              <small>
+                {isCurrent ? row.runtime_state : row.operator_state}
+              </small>
             </span>
           </div>
         ),
@@ -116,7 +142,9 @@ export function OperatorWorkTable({ rows }: Props) {
             <button
               className="quiet-icon-action"
               type="button"
-              data-inspect-task={row.task_id}
+              data-admin-focus-record={JSON.stringify(
+                focusRecord(row, isCurrent),
+              )}
               aria-label={`inspect ${row.canonical_title}`}
               title="inspect"
             >
@@ -126,7 +154,7 @@ export function OperatorWorkTable({ rows }: Props) {
         ),
       },
     ],
-    [],
+    [isCurrent],
   );
 
   return (
@@ -149,8 +177,10 @@ export function OperatorWorkTable({ rows }: Props) {
             <header>
               <SourceMark provider={row.provider} compact />
               <strong>{row.canonical_title}</strong>
-              <span className={`quiet-state-dot is-${row.operator_state}`} />
-              <span>{laneLabel[row.lane]}</span>
+              <span
+                className={`quiet-state-dot is-${isCurrent ? row.operator_state : "unknown"}`}
+              />
+              <span>{isCurrent ? laneLabel[row.lane] : "last verified"}</span>
             </header>
             <p>{operatorTaskDisplay(row).bounded_goal}</p>
             <small>{operatorTaskDisplay(row).next_action}</small>
@@ -160,7 +190,9 @@ export function OperatorWorkTable({ rows }: Props) {
               </time>
               <button
                 type="button"
-                data-inspect-task={row.task_id}
+                data-admin-focus-record={JSON.stringify(
+                  focusRecord(row, isCurrent),
+                )}
                 aria-label={`inspect ${row.canonical_title}`}
               >
                 inspect

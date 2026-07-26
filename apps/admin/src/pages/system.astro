@@ -55,7 +55,19 @@ const destinations = [
     <section class="quiet-system-index" aria-label="system areas">
       {
         destinations.map((item) => (
-          <a href={item.href}>
+          <a
+            href={item.href}
+            data-admin-focus-record={JSON.stringify({
+              id: item.href,
+              kind: "system",
+              title: item.title,
+              currentFact: item.fact,
+              status: runtime.available ? "current" : "source unavailable",
+              source: "admin",
+              href: item.href,
+              proof: item.fact,
+            })}
+          >
             <strong>{item.title}</strong>
             <span>{item.fact}</span>
           </a>

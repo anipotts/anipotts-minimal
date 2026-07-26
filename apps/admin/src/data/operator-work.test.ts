@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertValidOperatorWorkProjection,
   groupOperatorTasks,
+  isOperatorWorkProjectionCurrent,
   operatorWorkFixture,
 } from "./operator-work";
 
@@ -33,6 +34,10 @@ describe("operator work projection", () => {
     expect(Object.values(groups).map((rows) => rows.length)).toEqual([
       1, 1, 1, 0,
     ]);
+  });
+
+  it("never presents the tracked fixture as current activity", () => {
+    expect(isOperatorWorkProjectionCurrent(operatorWorkFixture)).toBe(false);
   });
 
   it("has one handoff lineage and one collapsed loose chat", () => {
