@@ -1,0 +1,12 @@
+name = "anipotts-state-control-test"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+main = "src/test-harness.ts"
+
+[[durable_objects.bindings]]
+name = "COMMAND_RELAY"
+class_name = "CommandRelay"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["CommandRelay"]

@@ -53,3 +53,28 @@ export type {
   SiteSettingsMap,
 } from "./cms";
 export { projectRowToProject } from "./cms";
+
+// Control-plane contract
+export {
+  CONTROL_COMMAND_KINDS,
+  CONTROL_PLANE_CONTRACT_VERSION,
+} from "./control-plane";
+export type {
+  ControlAuthority,
+  ControlCommandKind,
+  ControlCommandRecord,
+  ControlCommandState,
+  ControlCommandSubmission,
+  ControlCommandTarget,
+  ControlOutcome,
+  ControlPlaneSnapshot,
+  ControlProof,
+  DeviceFailedEnvelope,
+  DeviceStartedEnvelope,
+  DeviceSucceededEnvelope,
+  DeviceToRelayEnvelope,
+  RelayAcceptedEnvelope,
+  RelayCommandEnvelope,
+  RelaySnapshotEnvelope,
+  RelayToDeviceEnvelope,
+} from "./control-plane";

@@ -3,6 +3,7 @@ import AdminLayout from "../layouts/AdminLayout.astro";
 import { SourceMark } from "./SourceMark";
 import AttentionRow from "./AttentionRow.astro";
 import ActivationGraph from "./ActivationGraph.astro";
+import ControlPlaneReceipt from "./ControlPlaneReceipt.astro";
 import { readAdminInbox, type AdminInboxItem } from "../data/inbox";
 import { readOperatorWorkProjection } from "../data/operator-work";
 import { operatorTaskDisplay } from "../data/operator-work-view";
@@ -167,6 +168,8 @@ const linkedTaskFor = (item: AdminInboxItem) =>
         }
       </ol>
     </section>
+
+    <ControlPlaneReceipt />
 
     <section class="operator-handled" aria-labelledby="being-handled-title">
       <div class="operator-section-heading">

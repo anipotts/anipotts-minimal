@@ -20,5 +20,10 @@
     "noEmit": true
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts"],
-  "exclude": ["node_modules", ".wrangler"]
+  "exclude": [
+    "node_modules",
+    ".wrangler",
+    "src/**/*.test.ts",
+    "scripts/test-control-plane.ts"
+  ]
 }
