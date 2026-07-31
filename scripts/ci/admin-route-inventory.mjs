@@ -133,6 +133,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/api/admin/control-plane",
+    file: "apps/admin/src/pages/api/admin/control-plane.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
     route: "/api/admin/projections",
     file: "apps/admin/src/pages/api/admin/projections.ts",
     nav: false,
