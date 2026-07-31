@@ -11,6 +11,9 @@ import { ControlPlaneRunner } from "../../../packages/control-plane-runner/src/r
 
 const root = mkdtempSync(join(tmpdir(), "control-plane-integration-"));
 const stateRoot = join(root, "mini-state");
+const privateKeyPath = join(stateRoot, "device-private.jwk");
+const journalPath = join(stateRoot, "journal.sqlite");
+const identity = await provisionDeviceIdentity(privateKeyPath);
 const port = 18_799;
 const baseUrl = `http://127.0.0.1:${port}`;
 const worker = Bun.spawn(
@@ -25,6 +28,8 @@ const worker = Bun.spawn(
     String(port),
     "--persist-to",
     join(root, "wrangler"),
+    "--var",
+    `CONTROL_PLANE_DEVICE_PUBLIC_JWK:${JSON.stringify(identity.publicJwk)}`,
   ],
   {
     cwd: resolve(import.meta.dir, ".."),
@@ -64,9 +69,6 @@ try {
   if (!accepted.ok)
     throw new Error(`command submit failed: ${accepted.status}`);
 
-  const privateKeyPath = join(stateRoot, "device-private.jwk");
-  const journalPath = join(stateRoot, "journal.sqlite");
-  await provisionDeviceIdentity(privateKeyPath);
   const runner = new ControlPlaneRunner({
     relayUrl: `ws://127.0.0.1:${port}/connect`,
     journalPath,
