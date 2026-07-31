@@ -18,6 +18,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
 <script>
   import { startRegistration } from "@simplewebauthn/browser";
   import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
+  import { adminMutationFetch } from "../../../lib/admin-client-auth";
 
   type RegistrationEnvelope = {
     options: PublicKeyCredentialCreationOptionsJSON;
@@ -58,9 +59,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
   async function postJson<T>(path: string, body?: unknown): Promise<T> {
     const headers = new Headers({ accept: "application/json" });
     if (body !== undefined) headers.set("content-type", "application/json");
-    const response = await fetch(path, {
+    const response = await adminMutationFetch(path, {
       method: "POST",
-      credentials: "same-origin",
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
     });

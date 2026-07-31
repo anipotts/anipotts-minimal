@@ -104,8 +104,7 @@ CREATE TABLE IF NOT EXISTS admin_invites (
   approved_at TEXT,
   approved_by_user_id TEXT,
   revoked_at TEXT,
-  FOREIGN KEY (invited_by_user_id) REFERENCES admin_users(id),
-  FOREIGN KEY (pending_user_id) REFERENCES admin_users(id)
+  FOREIGN KEY (invited_by_user_id) REFERENCES admin_users(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_admin_invites_token_active

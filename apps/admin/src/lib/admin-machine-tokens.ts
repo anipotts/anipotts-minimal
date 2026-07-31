@@ -111,21 +111,54 @@ export async function rotateMcpToken(
   if (!previous) {
     throw adminJson({ error: "machine_token_not_found" }, { status: 404 });
   }
-  const created = await insertMcpToken(db, {
-    userId: principal.userId,
-    sessionId: principal.sessionId,
-    name: previous.name,
-  });
+  if (!db.batch) {
+    throw adminJson({ error: "machine_token_batch_required" }, { status: 503 });
+  }
+  const created = await generateMcpToken();
   const rotatedAt = nowIso();
-  await db
-    .prepare(
-      `UPDATE admin_machine_tokens
+  const results = await db.batch([
+    db
+      .prepare(
+        `INSERT INTO admin_machine_tokens
+          (id, user_id, name, token_hash, token_hint, scopes,
+           created_by_session_id, created_at, expires_at)
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
+         FROM admin_machine_tokens
+         WHERE id = ? AND user_id = ? AND revoked_at IS NULL`,
+      )
+      .bind(
+        created.id,
+        principal.userId,
+        previous.name,
+        created.tokenHash,
+        created.token.slice(-8),
+        JSON.stringify([MCP_READ_SCOPE]),
+        principal.sessionId,
+        created.createdAt,
+        created.expiresAt,
+        previous.id,
+        principal.userId,
+      ),
+    db
+      .prepare(
+        `UPDATE admin_machine_tokens
        SET rotated_at = ?, rotated_to_token_id = ?, revoked_at = ?,
            revoked_by_session_id = ?
        WHERE id = ? AND revoked_at IS NULL`,
-    )
-    .bind(rotatedAt, created.id, rotatedAt, principal.sessionId, previous.id)
-    .run();
+      )
+      .bind(rotatedAt, created.id, rotatedAt, principal.sessionId, previous.id),
+  ]);
+  if (results.some((result) => resultChanges(result) !== 1)) {
+    await db
+      .prepare(
+        `UPDATE admin_machine_tokens
+         SET revoked_at = ?, revoked_by_session_id = ?
+         WHERE id = ? AND revoked_at IS NULL`,
+      )
+      .bind(nowIso(), principal.sessionId, created.id)
+      .run();
+    throw adminJson({ error: "machine_token_rotation_raced" }, { status: 409 });
+  }
   await recordAdminAudit(db, {
     eventType: "admin.machine_token.rotated",
     userId: principal.userId,
@@ -197,12 +230,7 @@ async function insertMcpToken(
   db: AdminD1Database,
   input: { userId: string; sessionId: string; name: string },
 ): Promise<{ token: string; id: string; expiresAt: string }> {
-  const token = `apmcp_${randomToken(32)}`;
-  const id = crypto.randomUUID();
-  const createdAt = nowIso();
-  const expiresAt = new Date(
-    Date.now() + MCP_TOKEN_SECONDS * 1000,
-  ).toISOString();
+  const created = await generateMcpToken();
   await db
     .prepare(
       `INSERT INTO admin_machine_tokens
@@ -211,18 +239,34 @@ async function insertMcpToken(
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
-      id,
+      created.id,
       input.userId,
       input.name,
-      await hashToken(token),
-      token.slice(-8),
+      created.tokenHash,
+      created.token.slice(-8),
       JSON.stringify([MCP_READ_SCOPE]),
       input.sessionId,
-      createdAt,
-      expiresAt,
+      created.createdAt,
+      created.expiresAt,
     )
     .run();
-  return { token, id, expiresAt };
+  return created;
+}
+
+async function generateMcpToken(): Promise<{
+  token: string;
+  tokenHash: string;
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+}> {
+  const token = `apmcp_${randomToken(32)}`;
+  const id = crypto.randomUUID();
+  const createdAt = nowIso();
+  const expiresAt = new Date(
+    Date.now() + MCP_TOKEN_SECONDS * 1000,
+  ).toISOString();
+  return { token, tokenHash: await hashToken(token), id, createdAt, expiresAt };
 }
 
 function cleanTokenName(value: unknown): string | null {
@@ -252,6 +296,6 @@ async function requestIpHash(request: Request): Promise<string> {
 
 function resultChanges(result: { meta?: unknown }): number {
   return Number(
-    (result.meta as { changes?: number } | undefined)?.changes ?? 1,
+    (result.meta as { changes?: number } | undefined)?.changes ?? 0,
   );
 }
