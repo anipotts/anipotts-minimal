@@ -242,6 +242,8 @@ assert.equal(
 for (const marker of [
   "data-astro-rerun",
   "data-attention-projection",
+  "ActivationGraph",
+  "buildActivationGraph",
   "needs you",
   "being handled",
   "/work?view=now",
@@ -371,9 +373,9 @@ assert.equal(
   "admin inbox must not import the retired static action queue",
 );
 assert.equal(
-  homeSource.includes("needs ani"),
+  homeSource.includes("/needs-ani"),
   false,
-  "canonical inbox must not expose the retired queue label",
+  "canonical inbox must not restore the retired needs-Ani route",
 );
 
 for (const marker of [
