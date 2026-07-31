@@ -1225,10 +1225,12 @@ html[data-theme="dark"] .admin-mobile-brand {
     width: min(280px, calc(100vw - 16px));
     max-height: min(70vh, 560px);
     overflow-y: auto;
+    overscroll-behavior: contain;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 6px;
-    background: var(--color-background);
+    background: var(--color-background-body);
+    color: var(--color-text-primary);
     box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
   }
 
@@ -1240,7 +1242,7 @@ html[data-theme="dark"] .admin-mobile-brand {
   }
 
   .admin-mobile-menu nav a[aria-current="page"] {
-    background: var(--color-surface-raised);
+    background: var(--color-background-muted);
   }
 
   .admin-mobile-nav {
