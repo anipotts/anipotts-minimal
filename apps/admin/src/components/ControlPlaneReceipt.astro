@@ -103,19 +103,49 @@ const displayTime = (value: string) =>
       button.disabled = true;
       if (live) live.textContent = "Sending one proof command to ap-mini.";
       try {
+        const sessionResponse = await fetch("/api/admin/auth/session", {
+          cache: "no-store",
+          headers: { accept: "application/json" },
+        });
+        const session = await sessionResponse.json();
+        if (!sessionResponse.ok || !session?.authenticated) {
+          location.assign(
+            `/auth?next=${encodeURIComponent(location.pathname + location.search)}`,
+          );
+          return;
+        }
+        if (typeof session.csrf_token !== "string" || !session.csrf_token) {
+          throw new Error("session did not provide a csrf token");
+        }
         const idempotencyStorageKey = "admin:control-plane:idempotency";
         const idempotencyKey =
           sessionStorage.getItem(idempotencyStorageKey) ?? crypto.randomUUID();
         sessionStorage.setItem(idempotencyStorageKey, idempotencyKey);
         const response = await fetch("/api/admin/control-plane", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            accept: "application/json",
+            "content-type": "application/json",
+            "x-admin-csrf": session.csrf_token,
+          },
           body: JSON.stringify({
             idempotency_key: idempotencyKey,
             reason: "verify the admin to ap-mini durable execution round trip",
           }),
         });
-        if (!response.ok) throw new Error("command was not accepted");
+        if (!response.ok) {
+          const error = await response.json().catch(() => null);
+          if (
+            response.status === 403 &&
+            error?.error === "fresh_passkey_required"
+          ) {
+            location.assign(
+              `/auth?stepup=1&next=${encodeURIComponent(location.pathname + location.search)}`,
+            );
+            return;
+          }
+          throw new Error(error?.error ?? "command was not accepted");
+        }
         const acceptedCommand = await response.json();
         const commandId = acceptedCommand?.command_id;
         if (!commandId) throw new Error("relay omitted the command identity");

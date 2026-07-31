@@ -3,15 +3,14 @@ import {
   readControlPlane,
   submitControlPlaneProof,
 } from "../../../data/control-plane";
-import {
-  assertSameOriginRequest,
-  statusError,
-} from "../../../lib/content-draft-operation";
-import { getPasskeyActor } from "../../../lib/passkey-auth";
+import { requireAdminMutation } from "../../../lib/admin-auth";
+import { statusError } from "../../../lib/content-draft-operation";
 
 export const GET: APIRoute = async (context) => {
   try {
-    await getPasskeyActor(context);
+    if (!context.locals.adminPrincipal && !import.meta.env.DEV) {
+      throw statusError(401, "admin_session_required");
+    }
     const state = await readControlPlane(
       context.locals.runtime?.env.COMMAND_RELAY,
       8,
@@ -31,7 +30,7 @@ export const GET: APIRoute = async (context) => {
 
 export const POST: APIRoute = async (context) => {
   try {
-    assertSameOriginRequest(context.request, context.url);
+    const principal = await requireAdminMutation(context, "control:execute");
     const contentType = context.request.headers.get("content-type") ?? "";
     if (!contentType.toLowerCase().includes("application/json")) {
       throw statusError(415, "json_required");
@@ -42,7 +41,6 @@ export const POST: APIRoute = async (context) => {
     if (Number.isFinite(contentLength) && contentLength > 2_048) {
       throw statusError(413, "control_command_too_large");
     }
-    const actor = await getPasskeyActor(context);
     const body = (await context.request.json()) as {
       idempotency_key?: unknown;
       reason?: unknown;
@@ -56,7 +54,7 @@ export const POST: APIRoute = async (context) => {
     const command = await submitControlPlaneProof(
       context.locals.runtime?.env.COMMAND_RELAY,
       {
-        actorId: actor.id,
+        actorId: principal.userId,
         idempotencyKey: body.idempotency_key,
         reason: body.reason,
       },
