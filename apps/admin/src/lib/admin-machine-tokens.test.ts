@@ -134,11 +134,7 @@ type StatementRecord = {
   values: unknown[];
 };
 
-function fakeDatabase(batchResults: Array<{ meta: { changes: number } }>): {
-  db: AdminD1Database;
-  batch: ReturnType<typeof vi.fn>;
-  statements: StatementRecord[];
-} {
+function fakeDatabase(batchResults: Array<{ meta: { changes: number } }>) {
   const statements: StatementRecord[] = [];
   const batch = vi.fn(async () => batchResults);
   const db: AdminD1Database = {
