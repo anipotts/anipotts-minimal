@@ -169,6 +169,7 @@ const displayTime = (value: string) =>
             return;
           }
           if (["failed", "expired"].includes(command?.state)) {
+            sessionStorage.removeItem(idempotencyStorageKey);
             throw new Error(`command ${command.state}`);
           }
         }

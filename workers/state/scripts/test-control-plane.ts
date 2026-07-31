@@ -68,6 +68,15 @@ try {
   });
   if (!accepted.ok)
     throw new Error(`command submit failed: ${accepted.status}`);
+  const duplicate = await fetch(`${baseUrl}/commands`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ...command, command_id: crypto.randomUUID() }),
+  });
+  const duplicateRecord = (await duplicate.json()) as { command_id?: string };
+  if (!duplicate.ok || duplicateRecord.command_id !== command.command_id) {
+    throw new Error("relay did not preserve idempotent command identity");
+  }
 
   const runner = new ControlPlaneRunner({
     relayUrl: `ws://127.0.0.1:${port}/connect`,
