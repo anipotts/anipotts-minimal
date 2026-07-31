@@ -92,41 +92,35 @@ const displayTime = (value: string) =>
   <p class="sr-only" aria-live="polite" data-control-plane-live></p>
 </section>
 
-<script is:inline data-astro-rerun>
-  (() => {
-    const root = document.querySelector("[data-control-plane-receipt]");
-    const button = root?.querySelector("[data-control-plane-submit]");
-    const live = root?.querySelector("[data-control-plane-live]");
-    if (!(button instanceof HTMLButtonElement) || !root) return;
+<script>
+  import type { ControlCommandRecord } from "@anipotts/types";
+  import {
+    AdminClientAuthError,
+    adminMutationFetch,
+    adminStepUpPath,
+  } from "../lib/admin-client-auth";
 
+  const root = document.querySelector<HTMLElement>(
+    "[data-control-plane-receipt]",
+  );
+  const button = root?.querySelector<HTMLButtonElement>(
+    "[data-control-plane-submit]",
+  );
+  const live = root?.querySelector<HTMLElement>("[data-control-plane-live]");
+
+  if (button && root) {
     button.addEventListener("click", async () => {
       button.disabled = true;
       if (live) live.textContent = "Sending one proof command to ap-mini.";
       try {
-        const sessionResponse = await fetch("/api/admin/auth/session", {
-          cache: "no-store",
-          headers: { accept: "application/json" },
-        });
-        const session = await sessionResponse.json();
-        if (!sessionResponse.ok || !session?.authenticated) {
-          location.assign(
-            `/auth?next=${encodeURIComponent(location.pathname + location.search)}`,
-          );
-          return;
-        }
-        if (typeof session.csrf_token !== "string" || !session.csrf_token) {
-          throw new Error("session did not provide a csrf token");
-        }
         const idempotencyStorageKey = "admin:control-plane:idempotency";
         const idempotencyKey =
           sessionStorage.getItem(idempotencyStorageKey) ?? crypto.randomUUID();
         sessionStorage.setItem(idempotencyStorageKey, idempotencyKey);
-        const response = await fetch("/api/admin/control-plane", {
+        const response = await adminMutationFetch("/api/admin/control-plane", {
           method: "POST",
           headers: {
-            accept: "application/json",
             "content-type": "application/json",
-            "x-admin-csrf": session.csrf_token,
           },
           body: JSON.stringify({
             idempotency_key: idempotencyKey,
@@ -139,9 +133,7 @@ const displayTime = (value: string) =>
             response.status === 403 &&
             error?.error === "fresh_passkey_required"
           ) {
-            location.assign(
-              `/auth?stepup=1&next=${encodeURIComponent(location.pathname + location.search)}`,
-            );
+            location.assign(adminStepUpPath());
             return;
           }
           throw new Error(error?.error ?? "command was not accepted");
@@ -160,7 +152,7 @@ const displayTime = (value: string) =>
           if (!snapshot.ok) continue;
           const payload = await snapshot.json();
           const command = payload?.snapshot?.commands?.find(
-            (entry) => entry.command_id === commandId,
+            (entry: ControlCommandRecord) => entry.command_id === commandId,
           );
           if (command?.state === "succeeded" && command?.proof) {
             sessionStorage.removeItem(idempotencyStorageKey);
@@ -175,6 +167,12 @@ const displayTime = (value: string) =>
         }
         throw new Error("proof acknowledgement timed out");
       } catch (error) {
+        if (error instanceof AdminClientAuthError && error.status === 401) {
+          location.assign(
+            `/auth?next=${encodeURIComponent(location.pathname + location.search)}`,
+          );
+          return;
+        }
         if (live) {
           live.textContent =
             error instanceof Error
@@ -184,5 +182,5 @@ const displayTime = (value: string) =>
         button.disabled = false;
       }
     });
-  })();
+  }
 </script>
