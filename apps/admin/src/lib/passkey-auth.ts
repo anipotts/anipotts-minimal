@@ -21,40 +21,42 @@ import {
   type PasskeyProofItem,
   type RequiredPasskeyAuditEvent,
 } from "@anipotts/content/admin";
+import {
+  ADMIN_SESSION_COOKIE,
+  adminDb,
+  adminJson,
+  adminSessionCookie,
+  applyAdminSetCookies,
+  assertExactOrigin,
+  createAdminSession,
+  expiredAdminSessionCookies,
+  nowIso,
+  recordAdminAudit,
+  requireAdminDb,
+  requireAdminMutation,
+  requireAdminSessionAction,
+  resolveAdminSession,
+  revokeAdminSession,
+  type AdminAuthContext,
+  type AdminD1Database,
+  type AdminPrincipal,
+} from "./admin-auth";
 
-export const PASSKEY_SESSION_COOKIE = "admin_passkey_session";
+export const PASSKEY_SESSION_COOKIE = ADMIN_SESSION_COOKIE;
 
-const SESSION_DAYS = 30;
-const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60;
 const CHALLENGE_MAX_AGE_MS = 10 * 60 * 1000;
 const PRODUCTION_RP_ID = "admin.anipotts.com";
 const RP_NAME = "anipotts admin";
 const EXPECTED_ORIGIN = "https://admin.anipotts.com";
-const USER_ID = "ani";
-const USER_NAME = "ani@admin.anipotts.com";
-const USER_DISPLAY_NAME = "Ani";
+const OWNER_USER_ID = "ani";
+const OWNER_USER_NAME = "ani@admin.anipotts.com";
+const OWNER_DISPLAY_NAME = "Ani";
 const ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
+const PASSKEY_HINTS = ["client-device", "hybrid", "security-key"] as const;
 const accessJwksByIssuer = new Map<
   string,
   ReturnType<typeof createRemoteJWKSet>
 >();
-
-type D1Result<T = unknown> = {
-  results?: T[];
-  success?: boolean;
-  meta?: unknown;
-};
-
-type D1PreparedStatement = {
-  bind(...values: unknown[]): D1PreparedStatement;
-  first<T = unknown>(): Promise<T | null>;
-  run(): Promise<D1Result>;
-  all<T = unknown>(): Promise<D1Result<T>>;
-};
-
-export type D1Database = {
-  prepare(query: string): D1PreparedStatement;
-};
 
 type CredentialRow = {
   id: string;
@@ -70,30 +72,26 @@ type CredentialRow = {
   revoked_at: string | null;
 };
 
-type ChallengePurpose = "registration" | "authentication";
+export type ChallengePurpose =
+  | "registration"
+  | "authentication"
+  | "invite_registration"
+  | "recovery_registration";
 
-type ChallengeRow = {
+export type ChallengeRow = {
   id: string;
   purpose: ChallengePurpose;
   challenge: string;
   credential_id: string | null;
+  user_id: string | null;
+  session_id: string | null;
+  invite_id: string | null;
+  recovery_session_id: string | null;
+  request_origin: string | null;
+  metadata: string;
   created_at: string;
   expires_at: string;
   used_at: string | null;
-};
-
-type SessionRow = {
-  id: string;
-  token_hash: string;
-  credential_id: string;
-  created_at: string;
-  expires_at: string;
-  revoked_at: string | null;
-};
-
-export type AccessIdentity = {
-  verified: boolean;
-  hint: string | null;
 };
 
 type PasskeyAuditEventRow = {
@@ -101,14 +99,29 @@ type PasskeyAuditEventRow = {
   count: number;
 };
 
-export type PasskeyContext = {
-  request: Request;
-  url: URL;
-  locals: App.Locals;
-  cookies: {
-    get(name: string): { value: string } | undefined;
-  };
+type UserRow = {
+  id: string;
+  display_name: string;
+  role: "owner" | "operator" | "viewer";
+  status: "pending" | "active" | "revoked";
 };
+
+type RegistrationEnvelope = {
+  challenge_id?: unknown;
+  credential?: unknown;
+};
+
+type AuthenticationEnvelope = {
+  challenge_id?: unknown;
+  credential?: unknown;
+};
+
+export type AccessIdentity = {
+  verified: boolean;
+  hint: string | null;
+};
+
+export type PasskeyContext = AdminAuthContext;
 
 export type PasskeyStatus = {
   available: boolean;
@@ -135,22 +148,37 @@ export type PasskeyActor = {
   credential_id_hint: string | null;
 };
 
+export type BeginRegistrationInput = {
+  purpose: Exclude<ChallengePurpose, "authentication">;
+  userId: string;
+  userName: string;
+  displayName: string;
+  sessionId?: string | null;
+  inviteId?: string | null;
+  recoverySessionId?: string | null;
+  metadata?: Record<string, unknown>;
+};
+
+export type VerifiedRegistration = {
+  challenge: ChallengeRow;
+  credential: WebAuthnCredential;
+  credentialDeviceType: string;
+  credentialBackedUp: boolean;
+  transports: AuthenticatorTransportFuture[];
+};
+
 export function json(data: unknown, init?: ResponseInit): Response {
-  return Response.json(data, {
-    ...init,
-    headers: {
-      "cache-control": "no-store",
-      ...(init?.headers ?? {}),
-    },
-  });
+  return adminJson(data, init);
 }
 
 export function handlePasskeyError(error: unknown): Response {
   if (error instanceof Response) return error;
-  return json(
+  return adminJson(
     {
       error: "passkey_request_failed",
-      detail: error instanceof Error ? error.message : "unknown error",
+      ...(import.meta.env.DEV && error instanceof Error
+        ? { detail: error.message }
+        : {}),
     },
     { status: 400 },
   );
@@ -159,116 +187,65 @@ export function handlePasskeyError(error: unknown): Response {
 export async function getPasskeyStatus(
   context: PasskeyContext,
 ): Promise<PasskeyStatus> {
-  const db = dbFromContext(context);
+  const db = adminDb(context);
   const accessIdentity = await verifyAccessIdentity(context);
-  if (!db) {
-    const auditEvents = emptyPasskeyAuditEvents();
+  if (!db) return missingDbStatus(context, accessIdentity);
+
+  try {
+    const credentialCount = await countActiveCredentials(db);
+    const auditCount = await countAuditEvents(db);
+    const auditEvents = await readRequiredAuditEvents(db);
+    const resolved = await resolveAdminSession(context);
+    const hasSession = Boolean(
+      resolved.principal && !resolved.principal.restriction,
+    );
+    const canRegister =
+      resolved.principal?.role === "owner" ||
+      (credentialCount === 0 && accessIdentity.verified);
     const blockers = passkeyAccessRemovalBlockers({
-      credentialCount: 0,
-      hasSession: false,
+      credentialCount,
+      hasSession,
       auditEvents,
     });
+
     return {
-      available: false,
-      mode: "missing_db",
-      credential_count: 0,
-      audit_count: 0,
-      has_session: false,
-      can_register: false,
+      available: true,
+      mode: "ready",
+      credential_count: credentialCount,
+      audit_count: auditCount,
+      has_session: hasSession,
+      can_register: canRegister,
       access_identity_present: accessIdentity.verified,
       access_identity_hint: accessIdentity.hint,
       expected_origin: EXPECTED_ORIGIN,
       expected_rp_id: expectedRpId(context),
       current_origin: context.url.origin,
       audit_events: auditEvents,
-      proof_items: buildPasskeyProofItems(0, false, auditEvents),
+      proof_items: buildPasskeyProofItems(
+        credentialCount,
+        hasSession,
+        auditEvents,
+      ),
       access_removal_blockers: blockers,
-      ready_for_access_removal: false,
-      next_safe_action:
-        "deploy with DB binding and apply migration before enrollment",
+      ready_for_access_removal: blockers.length === 0,
+      next_safe_action: nextPasskeyStatusAction({
+        hasSession,
+        credentialCount,
+        accessIdentityVerified: accessIdentity.verified,
+      }),
     };
-  }
-
-  let credentialCount = 0;
-  let auditCount = 0;
-  let auditEvents = emptyPasskeyAuditEvents();
-  let session: SessionRow | null = null;
-  try {
-    credentialCount = await countActiveCredentials(db);
-    auditCount = await countAuditEvents(db);
-    auditEvents = await readRequiredAuditEvents(db);
-    session = await getSession(context, db);
   } catch (error) {
-    if (!isMissingPasskeyTable(error)) throw error;
-    const missingAuditEvents = emptyPasskeyAuditEvents();
-    const blockers = passkeyAccessRemovalBlockers({
-      credentialCount: 0,
-      hasSession: false,
-      auditEvents: missingAuditEvents,
-    });
-    return {
-      available: false,
-      mode: "missing_db",
-      credential_count: 0,
-      audit_count: 0,
-      has_session: false,
-      can_register: false,
-      access_identity_present: accessIdentity.verified,
-      access_identity_hint: accessIdentity.hint,
-      expected_origin: EXPECTED_ORIGIN,
-      expected_rp_id: expectedRpId(context),
-      current_origin: context.url.origin,
-      audit_events: missingAuditEvents,
-      proof_items: buildPasskeyProofItems(0, false, missingAuditEvents),
-      access_removal_blockers: blockers,
-      ready_for_access_removal: false,
-      next_safe_action:
-        "apply drizzle/migrations/0006_admin_passkeys.sql before enrollment",
-    };
+    if (!isMissingAuthTable(error)) throw error;
+    return missingDbStatus(context, accessIdentity);
   }
-  const canRegister =
-    Boolean(session) || (credentialCount === 0 && accessIdentity.verified);
-  const blockers = passkeyAccessRemovalBlockers({
-    credentialCount,
-    hasSession: Boolean(session),
-    auditEvents,
-  });
-
-  return {
-    available: true,
-    mode: "ready",
-    credential_count: credentialCount,
-    audit_count: auditCount,
-    has_session: Boolean(session),
-    can_register: canRegister,
-    access_identity_present: accessIdentity.verified,
-    access_identity_hint: accessIdentity.hint,
-    expected_origin: EXPECTED_ORIGIN,
-    expected_rp_id: expectedRpId(context),
-    current_origin: context.url.origin,
-    audit_events: auditEvents,
-    proof_items: buildPasskeyProofItems(
-      credentialCount,
-      Boolean(session),
-      auditEvents,
-    ),
-    access_removal_blockers: blockers,
-    ready_for_access_removal: blockers.length === 0,
-    next_safe_action: nextPasskeyStatusAction({
-      hasSession: Boolean(session),
-      credentialCount,
-      accessIdentityVerified: accessIdentity.verified,
-    }),
-  };
 }
 
 export async function hasActivePasskeySession(
   context: PasskeyContext,
 ): Promise<boolean> {
-  const db = dbFromContext(context);
-  if (!db) return false;
   try {
-    return Boolean(await getSession(context, db));
+    const resolved = await resolveAdminSession(context);
+    return Boolean(resolved.principal && !resolved.principal.restriction);
   } catch {
     return false;
   }
@@ -277,217 +254,211 @@ export async function hasActivePasskeySession(
 export async function getPasskeyActor(
   context: PasskeyContext,
 ): Promise<PasskeyActor> {
-  const db = dbFromContext(context);
-  if (!db) {
-    return {
-      id: USER_ID,
-      display_name: USER_DISPLAY_NAME,
-      credential_id_hint: null,
-    };
-  }
-
-  const session = await getSession(context, db);
-  if (!session) {
-    throw json(
+  const principal =
+    context.locals.adminPrincipal ??
+    (await resolveAdminSession(context)).principal;
+  if (!principal || principal.restriction) {
+    throw adminJson(
       {
         error: "passkey_session_required",
-        next_safe_action: "authenticate before saving or publishing content",
+        next_safe_action: "authenticate before changing admin state",
       },
       { status: 403 },
     );
   }
-
-  return {
-    id: USER_ID,
-    display_name: USER_DISPLAY_NAME,
-    credential_id_hint: credentialHint(session.credential_id),
-  };
+  return actorFromPrincipal(principal);
 }
 
 export async function registrationOptions(
   context: PasskeyContext,
 ): Promise<Response> {
-  const db = requiredDb(context);
-  const status = await getPasskeyStatus(context);
-  if (!status.can_register) {
-    return json(
-      {
-        error: "registration_not_allowed",
-        next_safe_action:
-          "authenticate first or register while Cloudflare Access identity is present",
-      },
-      { status: 403 },
-    );
+  assertExactOrigin(context.request, context.url);
+  const db = requireAdminDb(context);
+  const resolved = await resolveAdminSession(context);
+  let principal = resolved.principal;
+
+  if (principal) {
+    principal = await requireAdminMutation(context, "identity:manage");
+  } else {
+    const credentialCount = await countActiveCredentials(db);
+    const accessIdentity = await verifyAccessIdentity(context);
+    if (credentialCount > 0 || !accessIdentity.verified) {
+      throw adminJson({ error: "registration_not_allowed" }, { status: 403 });
+    }
+    await ensureOwnerUser(db);
   }
 
-  const credentials = await listActiveCredentials(db);
-  const rpID = expectedRpId(context);
-  const options = await generateRegistrationOptions({
-    rpName: RP_NAME,
-    rpID,
-    userID: new TextEncoder().encode(USER_ID),
-    userName: USER_NAME,
-    userDisplayName: USER_DISPLAY_NAME,
-    attestationType: "none",
-    authenticatorSelection: {
-      authenticatorAttachment: "platform",
-      residentKey: "preferred",
-      userVerification: "required",
-    },
-    excludeCredentials: credentials.map((credential) => ({
-      id: credential.credential_id,
-      transports: parseTransports(credential.transports),
-    })),
-    timeout: 90_000,
-  });
-
-  await storeChallenge(db, "registration", options.challenge);
-  return json(options);
+  return adminJson(
+    await beginPasskeyRegistration(context, {
+      purpose: "registration",
+      userId: principal?.userId ?? OWNER_USER_ID,
+      userName: OWNER_USER_NAME,
+      displayName: principal?.displayName ?? OWNER_DISPLAY_NAME,
+      sessionId: principal?.sessionId ?? null,
+    }),
+  );
 }
 
 export async function verifyRegistration(
   context: PasskeyContext,
 ): Promise<Response> {
-  const db = requiredDb(context);
-  const body = (await context.request.json()) as RegistrationResponseJSON;
-  const challenge = await consumeChallenge(db, "registration");
-  const result = await verifyRegistrationResponse({
-    response: body,
-    expectedChallenge: challenge.challenge,
-    expectedOrigin: expectedOrigin(context),
-    expectedRPID: expectedRpId(context),
-    requireUserVerification: true,
-  });
-
-  if (!result.verified) {
-    return json(
-      { verified: false, error: "registration_verification_failed" },
-      { status: 400 },
-    );
+  assertExactOrigin(context.request, context.url);
+  const db = requireAdminDb(context);
+  const verified = await verifyPasskeyRegistration(context, "registration");
+  const existingPrincipal =
+    context.locals.adminPrincipal ??
+    (await resolveAdminSession(context)).principal;
+  if (verified.challenge.session_id) {
+    const principal = await requireAdminMutation(context, "identity:manage");
+    if (principal.sessionId !== verified.challenge.session_id) {
+      throw adminJson({ error: "challenge_session_mismatch" }, { status: 403 });
+    }
+  } else {
+    const accessIdentity = await verifyAccessIdentity(context);
+    if (!accessIdentity.verified || (await countActiveCredentials(db)) > 0) {
+      throw adminJson({ error: "registration_not_allowed" }, { status: 403 });
+    }
+    await ensureOwnerUser(db);
   }
 
-  const info = result.registrationInfo;
-  await db
-    .prepare(
-      `INSERT INTO admin_passkey_credentials
-        (id, user_id, credential_id, public_key, counter, transports, device_type, backed_up, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(credential_id) DO UPDATE SET
-        user_id = excluded.user_id,
-        public_key = excluded.public_key,
-        counter = excluded.counter,
-        transports = excluded.transports,
-        device_type = excluded.device_type,
-        backed_up = excluded.backed_up,
-        last_used_at = NULL,
-        revoked_at = NULL,
-        updated_at = excluded.updated_at`,
-    )
-    .bind(
-      randomId(),
-      USER_ID,
-      info.credential.id,
-      bytesToBase64Url(info.credential.publicKey),
-      info.credential.counter,
-      JSON.stringify(body.response.transports ?? []),
-      info.credentialDeviceType,
-      info.credentialBackedUp ? 1 : 0,
-      nowIso(),
-      nowIso(),
-    )
-    .run();
-  await recordAudit(
-    db,
-    "passkey.credential.registered",
-    info.credential.id,
-    "registered platform passkey for admin",
-  );
-
-  return json({
-    verified: true,
-    next_safe_action: "use authenticate to create an app-native session",
+  const userId = verified.challenge.user_id ?? OWNER_USER_ID;
+  await insertPasskeyCredential(db, {
+    userId,
+    verified,
+    createdBySessionId: existingPrincipal?.sessionId ?? null,
   });
+
+  const created = await createAdminSession(db, {
+    userId,
+    credentialId: verified.credential.id,
+    authMethod: "passkey",
+    stepUpAt: nowIso(),
+  });
+  await recordAdminAudit(db, {
+    eventType: "passkey.credential.registered",
+    userId,
+    sessionId: created.sessionId,
+    credentialId: verified.credential.id,
+    summary: "registered discoverable admin passkey",
+  });
+  await recordAdminAudit(db, {
+    eventType: "passkey.session.created",
+    userId,
+    sessionId: created.sessionId,
+    credentialId: verified.credential.id,
+    summary: "created unified admin session after passkey registration",
+  });
+
+  return applyAdminSetCookies(
+    adminJson({
+      verified: true,
+      csrf_token: created.csrfToken,
+      next_safe_action: "passkey session active",
+    }),
+    [
+      adminSessionCookie(created.token),
+      ...expiredAdminSessionCookies().slice(1),
+    ],
+  );
 }
 
 export async function authenticationOptions(
   context: PasskeyContext,
 ): Promise<Response> {
-  const db = requiredDb(context);
-  const credentials = await listActiveCredentials(db);
-  if (credentials.length === 0) {
-    const revokedCredentials = await countRevokedCredentials(db);
-    if (revokedCredentials > 0) {
-      await recordAudit(
-        db,
-        "passkey.authentication.denied",
-        null,
-        "denied authentication because all registered passkeys are revoked",
-      );
+  assertExactOrigin(context.request, context.url);
+  const db = requireAdminDb(context);
+  if ((await countActiveCredentials(db)) === 0) {
+    if ((await countRevokedCredentials(db)) > 0) {
+      await recordAdminAudit(db, {
+        eventType: "passkey.authentication.denied",
+        outcome: "denied",
+        summary: "denied authentication because all credentials are revoked",
+      });
     }
-    return json(
-      {
-        error: "no_credentials",
-        next_safe_action: "register the first passkey behind Cloudflare Access",
-      },
-      { status: 409 },
-    );
+    throw adminJson({ error: "no_credentials" }, { status: 409 });
   }
 
-  const options = await generateAuthenticationOptions({
+  const generatedOptions = await generateAuthenticationOptions({
     rpID: expectedRpId(context),
-    allowCredentials: credentials.map((credential) => ({
-      id: credential.credential_id,
-      transports: parseTransports(credential.transports),
-    })),
     userVerification: "required",
     timeout: 90_000,
   });
-
-  await storeChallenge(db, "authentication", options.challenge);
-  return json(options);
+  const options = { ...generatedOptions, hints: [...PASSKEY_HINTS] };
+  const challengeId = await storeChallenge(context, {
+    purpose: "authentication",
+    challenge: options.challenge,
+  });
+  return adminJson({ options, challenge_id: challengeId });
 }
 
 export async function verifyAuthentication(
   context: PasskeyContext,
 ): Promise<Response> {
-  const db = requiredDb(context);
-  const body = (await context.request.json()) as AuthenticationResponseJSON;
-  const credential = await findCredential(db, body.id);
+  assertExactOrigin(context.request, context.url);
+  const db = requireAdminDb(context);
+  const envelope = await readAuthenticationEnvelope(context.request);
+  const credential = await findActiveCredential(db, envelope.credential.id);
   if (!credential) {
-    await recordAudit(
-      db,
-      "passkey.authentication.denied",
-      null,
-      "denied authentication for missing or revoked credential",
-    );
-    return json(
-      { verified: false, error: "credential_not_found" },
-      { status: 404 },
-    );
+    await recordAdminAudit(db, {
+      eventType: "passkey.authentication.denied",
+      outcome: "denied",
+      credentialId: envelope.credential.id,
+      summary: "denied missing or revoked passkey credential",
+    });
+    throw adminJson({ error: "credential_not_found" }, { status: 404 });
   }
 
-  const challenge = await consumeChallenge(db, "authentication");
-  const result = await verifyAuthenticationResponse({
-    response: body,
-    expectedChallenge: challenge.challenge,
-    expectedOrigin: expectedOrigin(context),
-    expectedRPID: expectedRpId(context),
-    credential: toWebAuthnCredential(credential),
-    requireUserVerification: true,
-  });
-
+  const challenge = await consumeChallenge(
+    db,
+    "authentication",
+    envelope.challengeId,
+  );
+  let result: Awaited<ReturnType<typeof verifyAuthenticationResponse>>;
+  try {
+    result = await verifyAuthenticationResponse({
+      response: envelope.credential,
+      expectedChallenge: challenge.challenge,
+      expectedOrigin: expectedOrigin(context),
+      expectedRPID: expectedRpId(context),
+      credential: toWebAuthnCredential(credential),
+      requireUserVerification: true,
+    });
+  } catch {
+    await recordAdminAudit(db, {
+      eventType: "passkey.authentication.denied",
+      outcome: "denied",
+      userId: credential.user_id,
+      credentialId: credential.credential_id,
+      summary: "denied passkey assertion verification",
+    });
+    throw adminJson(
+      { error: "authentication_verification_failed" },
+      { status: 400 },
+    );
+  }
   if (!result.verified) {
-    return json(
-      { verified: false, error: "authentication_verification_failed" },
+    await recordAdminAudit(db, {
+      eventType: "passkey.authentication.denied",
+      outcome: "denied",
+      userId: credential.user_id,
+      credentialId: credential.credential_id,
+      summary: "denied unverified passkey assertion",
+    });
+    throw adminJson(
+      { error: "authentication_verification_failed" },
       { status: 400 },
     );
   }
 
+  const user = await activeUser(db, credential.user_id);
+  if (!user) {
+    throw adminJson({ error: "user_not_active" }, { status: 403 });
+  }
   await db
     .prepare(
       `UPDATE admin_passkey_credentials
        SET counter = ?, device_type = ?, backed_up = ?, last_used_at = ?, updated_at = ?
-       WHERE credential_id = ?`,
+       WHERE credential_id = ? AND revoked_at IS NULL`,
     )
     .bind(
       result.authenticationInfo.newCounter,
@@ -499,181 +470,492 @@ export async function verifyAuthentication(
     )
     .run();
 
-  const token = randomToken();
-  const tokenHash = await hashToken(token);
-  const expires = new Date(
-    Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
-  ).toISOString();
-  await db
-    .prepare(
-      `INSERT INTO admin_passkey_sessions
-        (id, token_hash, credential_id, created_at, expires_at, last_seen_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      randomId(),
-      tokenHash,
-      credential.credential_id,
-      nowIso(),
-      expires,
-      nowIso(),
-    )
-    .run();
-  await recordAudit(
-    db,
-    "passkey.session.created",
-    credential.credential_id,
-    "created app-native admin session",
-  );
+  const created = await createAdminSession(db, {
+    userId: user.id,
+    credentialId: credential.credential_id,
+    authMethod: "passkey",
+    stepUpAt: nowIso(),
+  });
+  await recordAdminAudit(db, {
+    eventType: "passkey.authentication.verified",
+    userId: user.id,
+    sessionId: created.sessionId,
+    credentialId: credential.credential_id,
+    summary: "verified discoverable passkey assertion",
+  });
+  await recordAdminAudit(db, {
+    eventType: "passkey.session.created",
+    userId: user.id,
+    sessionId: created.sessionId,
+    credentialId: credential.credential_id,
+    summary: "created unified admin session",
+  });
 
-  return json(
-    {
+  return applyAdminSetCookies(
+    adminJson({
       verified: true,
+      role: user.role,
+      csrf_token: created.csrfToken,
       next_safe_action: "passkey session active",
-    },
-    { headers: { "set-cookie": sessionCookie(context, token) } },
+    }),
+    [
+      adminSessionCookie(created.token),
+      ...expiredAdminSessionCookies().slice(1),
+    ],
   );
 }
 
 export async function logout(context: PasskeyContext): Promise<Response> {
-  const db = dbFromContext(context);
-  const token = context.cookies.get(PASSKEY_SESSION_COOKIE)?.value;
-  if (db && token) {
-    const session = await getSession(context, db);
-    const tokenHash = await hashToken(token);
-    await db
-      .prepare(
-        `UPDATE admin_passkey_sessions
-         SET revoked_at = ?, updated_at = ?
-         WHERE token_hash = ? AND revoked_at IS NULL`,
-      )
-      .bind(nowIso(), nowIso(), tokenHash)
-      .run();
-    await recordAudit(
-      db,
-      "passkey.session.revoked",
-      session?.credential_id ?? null,
-      session ? "revoked app-native admin session" : "logout without session",
-    );
-  }
-
-  return json(
-    { ok: true, next_safe_action: "passkey session cleared" },
-    { headers: { "set-cookie": expiredSessionCookie(context) } },
+  const principal = await requireAdminSessionAction(context);
+  const db = requireAdminDb(context);
+  await revokeAdminSession(db, principal.sessionId, "logout");
+  await recordAdminAudit(db, {
+    eventType: "passkey.session.revoked",
+    userId: principal.userId,
+    sessionId: principal.sessionId,
+    credentialId: principal.credentialId,
+    summary: "revoked unified admin session on logout",
+  });
+  return applyAdminSetCookies(
+    adminJson({ ok: true, next_safe_action: "session cleared" }),
+    expiredAdminSessionCookies(),
   );
 }
 
 export async function revokeCurrentCredential(
   context: PasskeyContext,
 ): Promise<Response> {
-  const db = requiredDb(context);
-  const session = await getSession(context, db);
-  if (!session) {
-    return json(
-      {
-        error: "session_required",
-        next_safe_action:
-          "authenticate with a passkey before revoking the current credential",
-      },
-      { status: 403 },
+  const principal = await requireAdminMutation(context, "identity:manage");
+  const db = requireAdminDb(context);
+  if (!principal.credentialId) {
+    throw adminJson({ error: "credential_session_required" }, { status: 409 });
+  }
+  const activeCount = await countUserActiveCredentials(db, principal.userId);
+  if (activeCount <= 1) {
+    throw adminJson(
+      { error: "last_credential_cannot_be_revoked" },
+      { status: 409 },
     );
   }
 
   await db
     .prepare(
       `UPDATE admin_passkey_credentials
-       SET revoked_at = ?, updated_at = ?
+       SET revoked_at = ?, revocation_reason = 'owner_requested', updated_at = ?
+       WHERE credential_id = ? AND user_id = ? AND revoked_at IS NULL`,
+    )
+    .bind(nowIso(), nowIso(), principal.credentialId, principal.userId)
+    .run();
+  await db
+    .prepare(
+      `UPDATE admin_sessions
+       SET revoked_at = ?, revoked_reason = 'credential_revoked', updated_at = ?
        WHERE credential_id = ? AND revoked_at IS NULL`,
     )
-    .bind(nowIso(), nowIso(), session.credential_id)
+    .bind(nowIso(), nowIso(), principal.credentialId)
     .run();
+  await recordAdminAudit(db, {
+    eventType: "passkey.credential.revoked",
+    userId: principal.userId,
+    sessionId: principal.sessionId,
+    credentialId: principal.credentialId,
+    summary: "revoked one admin passkey credential",
+  });
+  await recordAdminAudit(db, {
+    eventType: "passkey.session.revoked",
+    userId: principal.userId,
+    sessionId: principal.sessionId,
+    credentialId: principal.credentialId,
+    summary: "revoked sessions bound to revoked passkey",
+  });
+
+  return applyAdminSetCookies(
+    adminJson({ ok: true, next_safe_action: "sign in with another passkey" }),
+    expiredAdminSessionCookies(),
+  );
+}
+
+export async function beginPasskeyRegistration(
+  context: PasskeyContext,
+  input: BeginRegistrationInput,
+): Promise<{ options: unknown; challenge_id: string }> {
+  const db = requireAdminDb(context);
+  const credentials = await listCredentialsForUser(db, input.userId);
+  const generatedOptions = await generateRegistrationOptions({
+    rpName: RP_NAME,
+    rpID: expectedRpId(context),
+    userID: new TextEncoder().encode(input.userId),
+    userName: input.userName,
+    userDisplayName: input.displayName,
+    attestationType: "none",
+    authenticatorSelection: {
+      residentKey: "required",
+      userVerification: "required",
+    },
+    excludeCredentials: credentials.map((credential) => ({
+      id: credential.credential_id,
+      transports: parseTransports(credential.transports),
+    })),
+    timeout: 90_000,
+  });
+  const options = { ...generatedOptions, hints: [...PASSKEY_HINTS] };
+  const challengeId = await storeChallenge(context, {
+    purpose: input.purpose,
+    challenge: options.challenge,
+    userId: input.userId,
+    sessionId: input.sessionId ?? null,
+    inviteId: input.inviteId ?? null,
+    recoverySessionId: input.recoverySessionId ?? null,
+    metadata: input.metadata,
+  });
+  return { options, challenge_id: challengeId };
+}
+
+export async function verifyPasskeyRegistration(
+  context: PasskeyContext,
+  purpose: Exclude<ChallengePurpose, "authentication">,
+): Promise<VerifiedRegistration> {
+  const db = requireAdminDb(context);
+  const envelope = await readRegistrationEnvelope(context.request);
+  const challenge = await consumeChallenge(db, purpose, envelope.challengeId);
+  let result: Awaited<ReturnType<typeof verifyRegistrationResponse>>;
+  try {
+    result = await verifyRegistrationResponse({
+      response: envelope.credential,
+      expectedChallenge: challenge.challenge,
+      expectedOrigin: expectedOrigin(context),
+      expectedRPID: expectedRpId(context),
+      requireUserVerification: true,
+    });
+  } catch {
+    throw adminJson(
+      { error: "registration_verification_failed" },
+      { status: 400 },
+    );
+  }
+  if (!result.verified || !result.registrationInfo) {
+    throw adminJson(
+      { error: "registration_verification_failed" },
+      { status: 400 },
+    );
+  }
+  return {
+    challenge,
+    credential: result.registrationInfo.credential,
+    credentialDeviceType: result.registrationInfo.credentialDeviceType,
+    credentialBackedUp: result.registrationInfo.credentialBackedUp,
+    transports: envelope.credential.response.transports ?? [],
+  };
+}
+
+export async function insertPasskeyCredential(
+  db: AdminD1Database,
+  input: {
+    userId: string;
+    verified: VerifiedRegistration;
+    createdBySessionId?: string | null;
+    label?: string | null;
+  },
+): Promise<void> {
+  const existing = await db
+    .prepare(
+      `SELECT credential_id FROM admin_passkey_credentials
+       WHERE credential_id = ? LIMIT 1`,
+    )
+    .bind(input.verified.credential.id)
+    .first<{ credential_id: string }>();
+  if (existing) {
+    throw adminJson(
+      { error: "credential_already_registered" },
+      { status: 409 },
+    );
+  }
 
   await db
     .prepare(
-      `UPDATE admin_passkey_sessions
-       SET revoked_at = ?, updated_at = ?
-       WHERE credential_id = ? AND revoked_at IS NULL`,
+      `INSERT INTO admin_passkey_credentials
+        (id, user_id, credential_id, public_key, counter, transports,
+         device_type, backed_up, created_at, updated_at, label,
+         created_by_session_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(nowIso(), nowIso(), session.credential_id)
+    .bind(
+      crypto.randomUUID(),
+      input.userId,
+      input.verified.credential.id,
+      bytesToBase64Url(input.verified.credential.publicKey),
+      input.verified.credential.counter,
+      JSON.stringify(input.verified.transports),
+      input.verified.credentialDeviceType,
+      input.verified.credentialBackedUp ? 1 : 0,
+      nowIso(),
+      nowIso(),
+      input.label ?? null,
+      input.createdBySessionId ?? null,
+    )
     .run();
-
-  await recordAudit(
-    db,
-    "passkey.credential.revoked",
-    session.credential_id,
-    "revoked current admin passkey for denial proof",
-  );
-  await recordAudit(
-    db,
-    "passkey.session.revoked",
-    session.credential_id,
-    "revoked app-native admin session during credential revocation",
-  );
-
-  return json(
-    {
-      ok: true,
-      next_safe_action:
-        "attempt authenticate to record denial, then register a replacement passkey while Cloudflare Access remains active",
-    },
-    { headers: { "set-cookie": expiredSessionCookie(context) } },
-  );
 }
 
-export function dbFromContext(context: PasskeyContext): D1Database | null {
-  return context.locals.runtime?.env.DB ?? null;
-}
-
-function requiredDb(context: PasskeyContext): D1Database {
-  const db = dbFromContext(context);
-  if (!db) {
-    throw json(
-      {
-        error: "db_binding_missing",
-        next_safe_action:
-          "deploy with DB binding and apply migration before enrollment",
-      },
-      { status: 503 },
-    );
+export async function consumeChallenge(
+  db: AdminD1Database,
+  purpose: ChallengePurpose,
+  challengeId: string,
+): Promise<ChallengeRow> {
+  const row = await db
+    .prepare(
+      `SELECT * FROM admin_passkey_challenges
+       WHERE id = ? AND purpose = ? AND used_at IS NULL AND expires_at > ?
+       LIMIT 1`,
+    )
+    .bind(challengeId, purpose, nowIso())
+    .first<ChallengeRow>();
+  if (!row) {
+    throw adminJson({ error: "challenge_missing_or_expired" }, { status: 400 });
   }
-  return db;
+
+  const update = await db
+    .prepare(
+      `UPDATE admin_passkey_challenges
+       SET used_at = ?
+       WHERE id = ? AND used_at IS NULL AND expires_at > ?`,
+    )
+    .bind(nowIso(), row.id, nowIso())
+    .run();
+  const changes = Number(
+    (update.meta as { changes?: number } | undefined)?.changes ?? 1,
+  );
+  if (changes !== 1) {
+    throw adminJson({ error: "challenge_already_used" }, { status: 409 });
+  }
+  return row;
 }
 
-async function listActiveCredentials(db: D1Database): Promise<CredentialRow[]> {
+export async function verifyAccessIdentity(
+  context: Pick<PasskeyContext, "request" | "url" | "locals">,
+): Promise<AccessIdentity> {
+  if (isLoopbackDevOrigin(context.url.origin)) {
+    return { verified: true, hint: "local-dev" };
+  }
+
+  const teamDomain = context.locals.runtime?.env.ACCESS_TEAM_DOMAIN;
+  const audience = context.locals.runtime?.env.ACCESS_POLICY_AUD;
+  if (!teamDomain || !audience) return { verified: false, hint: null };
+
+  const cfJwt = context.request.headers.get(ACCESS_JWT_HEADER);
+  if (!cfJwt) return { verified: false, hint: null };
+
+  try {
+    const issuer = teamDomain.replace(/\/$/, "");
+    const jwks = accessJwks(issuer);
+    const { payload } = await jwtVerify(cfJwt, jwks, { issuer, audience });
+    const email = typeof payload.email === "string" ? payload.email : null;
+    if (!email) return { verified: false, hint: null };
+    return { verified: true, hint: maskEmail(email) };
+  } catch {
+    return { verified: false, hint: null };
+  }
+}
+
+function missingDbStatus(
+  context: PasskeyContext,
+  accessIdentity: AccessIdentity,
+): PasskeyStatus {
+  const auditEvents = emptyPasskeyAuditEvents();
+  const blockers = passkeyAccessRemovalBlockers({
+    credentialCount: 0,
+    hasSession: false,
+    auditEvents,
+  });
+  return {
+    available: false,
+    mode: "missing_db",
+    credential_count: 0,
+    audit_count: 0,
+    has_session: false,
+    can_register: false,
+    access_identity_present: accessIdentity.verified,
+    access_identity_hint: accessIdentity.hint,
+    expected_origin: EXPECTED_ORIGIN,
+    expected_rp_id: expectedRpId(context),
+    current_origin: context.url.origin,
+    audit_events: auditEvents,
+    proof_items: buildPasskeyProofItems(0, false, auditEvents),
+    access_removal_blockers: blockers,
+    ready_for_access_removal: false,
+    next_safe_action: "apply the additive admin auth migration behind Access",
+  };
+}
+
+async function storeChallenge(
+  context: PasskeyContext,
+  input: {
+    purpose: ChallengePurpose;
+    challenge: string;
+    userId?: string | null;
+    sessionId?: string | null;
+    inviteId?: string | null;
+    recoverySessionId?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<string> {
+  const db = requireAdminDb(context);
+  const id = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + CHALLENGE_MAX_AGE_MS).toISOString();
+  await db
+    .prepare(
+      `INSERT INTO admin_passkey_challenges
+        (id, purpose, challenge, user_id, session_id, invite_id,
+         recovery_session_id, request_origin, metadata, created_at, expires_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      id,
+      input.purpose,
+      input.challenge,
+      input.userId ?? null,
+      input.sessionId ?? null,
+      input.inviteId ?? null,
+      input.recoverySessionId ?? null,
+      context.url.origin,
+      JSON.stringify(input.metadata ?? {}),
+      nowIso(),
+      expiresAt,
+    )
+    .run();
+  return id;
+}
+
+async function readRegistrationEnvelope(request: Request): Promise<{
+  challengeId: string;
+  credential: RegistrationResponseJSON;
+}> {
+  const body = (await request
+    .json()
+    .catch(() => null)) as RegistrationEnvelope | null;
+  if (
+    !body ||
+    typeof body.challenge_id !== "string" ||
+    !body.challenge_id ||
+    !body.credential ||
+    typeof body.credential !== "object"
+  ) {
+    throw adminJson({ error: "invalid_registration_body" }, { status: 400 });
+  }
+  return {
+    challengeId: body.challenge_id,
+    credential: body.credential as RegistrationResponseJSON,
+  };
+}
+
+async function readAuthenticationEnvelope(request: Request): Promise<{
+  challengeId: string;
+  credential: AuthenticationResponseJSON;
+}> {
+  const body = (await request
+    .json()
+    .catch(() => null)) as AuthenticationEnvelope | null;
+  if (
+    !body ||
+    typeof body.challenge_id !== "string" ||
+    !body.challenge_id ||
+    !body.credential ||
+    typeof body.credential !== "object"
+  ) {
+    throw adminJson({ error: "invalid_authentication_body" }, { status: 400 });
+  }
+  return {
+    challengeId: body.challenge_id,
+    credential: body.credential as AuthenticationResponseJSON,
+  };
+}
+
+async function ensureOwnerUser(db: AdminD1Database): Promise<void> {
+  await db
+    .prepare(
+      `INSERT OR IGNORE INTO admin_users
+        (id, display_name, role, status, created_at, updated_at, approved_at)
+       VALUES (?, ?, 'owner', 'active', ?, ?, ?)`,
+    )
+    .bind(OWNER_USER_ID, OWNER_DISPLAY_NAME, nowIso(), nowIso(), nowIso())
+    .run();
+}
+
+async function activeUser(
+  db: AdminD1Database,
+  userId: string,
+): Promise<UserRow | null> {
+  return db
+    .prepare(
+      `SELECT id, display_name, role, status FROM admin_users
+       WHERE id = ? AND status = 'active' LIMIT 1`,
+    )
+    .bind(userId)
+    .first<UserRow>();
+}
+
+async function listCredentialsForUser(
+  db: AdminD1Database,
+  userId: string,
+): Promise<CredentialRow[]> {
   const result = await db
     .prepare(
       `SELECT * FROM admin_passkey_credentials
-       WHERE user_id = ? AND revoked_at IS NULL
+       WHERE user_id = ?
        ORDER BY created_at ASC`,
     )
-    .bind(USER_ID)
+    .bind(userId)
     .all<CredentialRow>();
   return result.results ?? [];
 }
 
-async function countActiveCredentials(db: D1Database): Promise<number> {
+async function findActiveCredential(
+  db: AdminD1Database,
+  credentialId: string,
+): Promise<CredentialRow | null> {
+  return db
+    .prepare(
+      `SELECT * FROM admin_passkey_credentials
+       WHERE credential_id = ? AND revoked_at IS NULL LIMIT 1`,
+    )
+    .bind(credentialId)
+    .first<CredentialRow>();
+}
+
+async function countActiveCredentials(db: AdminD1Database): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) AS count FROM admin_passkey_credentials
+       WHERE revoked_at IS NULL`,
+    )
+    .first<{ count: number }>();
+  return Number(row?.count ?? 0);
+}
+
+async function countUserActiveCredentials(
+  db: AdminD1Database,
+  userId: string,
+): Promise<number> {
   const row = await db
     .prepare(
       `SELECT COUNT(*) AS count FROM admin_passkey_credentials
        WHERE user_id = ? AND revoked_at IS NULL`,
     )
-    .bind(USER_ID)
+    .bind(userId)
     .first<{ count: number }>();
   return Number(row?.count ?? 0);
 }
 
-async function countRevokedCredentials(db: D1Database): Promise<number> {
+async function countRevokedCredentials(db: AdminD1Database): Promise<number> {
   const row = await db
     .prepare(
       `SELECT COUNT(*) AS count FROM admin_passkey_credentials
-       WHERE user_id = ? AND revoked_at IS NOT NULL`,
+       WHERE revoked_at IS NOT NULL`,
     )
-    .bind(USER_ID)
     .first<{ count: number }>();
   return Number(row?.count ?? 0);
 }
 
-async function countAuditEvents(db: D1Database): Promise<number> {
+async function countAuditEvents(db: AdminD1Database): Promise<number> {
   const row = await db
     .prepare(`SELECT COUNT(*) AS count FROM admin_passkey_audit`)
     .first<{ count: number }>();
@@ -681,7 +963,7 @@ async function countAuditEvents(db: D1Database): Promise<number> {
 }
 
 async function readRequiredAuditEvents(
-  db: D1Database,
+  db: AdminD1Database,
 ): Promise<PasskeyAuditEvents> {
   const eventCounts = emptyPasskeyAuditEvents();
   const placeholders = REQUIRED_PASSKEY_AUDIT_EVENTS.map(() => "?").join(", ");
@@ -694,100 +976,23 @@ async function readRequiredAuditEvents(
     )
     .bind(...REQUIRED_PASSKEY_AUDIT_EVENTS)
     .all<PasskeyAuditEventRow>();
-
   for (const row of result.results ?? []) {
     const eventType = row.event_type as RequiredPasskeyAuditEvent;
     if (REQUIRED_PASSKEY_AUDIT_EVENTS.includes(eventType)) {
       eventCounts[eventType] = Number(row.count ?? 0);
     }
   }
-
   return eventCounts;
 }
 
-async function findCredential(
-  db: D1Database,
-  credentialId: string,
-): Promise<CredentialRow | null> {
-  return db
-    .prepare(
-      `SELECT * FROM admin_passkey_credentials
-       WHERE credential_id = ? AND revoked_at IS NULL`,
-    )
-    .bind(credentialId)
-    .first<CredentialRow>();
-}
-
-async function storeChallenge(
-  db: D1Database,
-  purpose: ChallengePurpose,
-  challenge: string,
-): Promise<void> {
-  const expiresAt = new Date(Date.now() + CHALLENGE_MAX_AGE_MS).toISOString();
-  await db
-    .prepare(
-      `INSERT INTO admin_passkey_challenges
-        (id, purpose, challenge, created_at, expires_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-    .bind(randomId(), purpose, challenge, nowIso(), expiresAt)
-    .run();
-}
-
-async function consumeChallenge(
-  db: D1Database,
-  purpose: ChallengePurpose,
-): Promise<ChallengeRow> {
-  const row = await db
-    .prepare(
-      `SELECT * FROM admin_passkey_challenges
-       WHERE purpose = ? AND used_at IS NULL AND expires_at > ?
-       ORDER BY created_at DESC
-       LIMIT 1`,
-    )
-    .bind(purpose, nowIso())
-    .first<ChallengeRow>();
-
-  if (!row) {
-    throw json({ error: "challenge_missing_or_expired" }, { status: 400 });
-  }
-
-  await db
-    .prepare(
-      `UPDATE admin_passkey_challenges
-       SET used_at = ?
-       WHERE id = ? AND used_at IS NULL`,
-    )
-    .bind(nowIso(), row.id)
-    .run();
-  return row;
-}
-
-async function getSession(
-  context: PasskeyContext,
-  db: D1Database,
-): Promise<SessionRow | null> {
-  const token = context.cookies.get(PASSKEY_SESSION_COOKIE)?.value;
-  if (!token) return null;
-  const tokenHash = await hashToken(token);
-  const row = await db
-    .prepare(
-      `SELECT * FROM admin_passkey_sessions
-       WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?
-       LIMIT 1`,
-    )
-    .bind(tokenHash, nowIso())
-    .first<SessionRow>();
-  if (!row) return null;
-  await db
-    .prepare(
-      `UPDATE admin_passkey_sessions
-       SET last_seen_at = ?, updated_at = ?
-       WHERE id = ?`,
-    )
-    .bind(nowIso(), nowIso(), row.id)
-    .run();
-  return row;
+function actorFromPrincipal(principal: AdminPrincipal): PasskeyActor {
+  return {
+    id: principal.userId,
+    display_name: principal.displayName,
+    credential_id_hint: principal.credentialId
+      ? principal.credentialId.slice(-8)
+      : null,
+  };
 }
 
 function toWebAuthnCredential(row: CredentialRow): WebAuthnCredential {
@@ -797,10 +1002,6 @@ function toWebAuthnCredential(row: CredentialRow): WebAuthnCredential {
     counter: row.counter,
     transports: parseTransports(row.transports),
   };
-}
-
-function credentialHint(credentialId: string): string {
-  return credentialId.slice(-8);
 }
 
 function parseTransports(raw: string): AuthenticatorTransportFuture[] {
@@ -816,51 +1017,15 @@ function parseTransports(raw: string): AuthenticatorTransportFuture[] {
 }
 
 function expectedOrigin(context: PasskeyContext): string {
-  const origin = context.request.headers.get("origin");
-  if (isLoopbackDevOrigin(origin)) return origin;
-  return EXPECTED_ORIGIN;
+  return isLoopbackDevOrigin(context.url.origin)
+    ? context.url.origin
+    : EXPECTED_ORIGIN;
 }
 
 function expectedRpId(context: PasskeyContext): string {
-  if (isLoopbackDevOrigin(context.url.origin)) {
-    return context.url.hostname;
-  }
-  return PRODUCTION_RP_ID;
-}
-
-export async function verifyAccessIdentity(
-  context: Pick<PasskeyContext, "request" | "url" | "locals">,
-): Promise<AccessIdentity> {
-  if (isLoopbackDevOrigin(context.url.origin)) {
-    return { verified: true, hint: "local-dev" };
-  }
-
-  const teamDomain = context.locals.runtime?.env.ACCESS_TEAM_DOMAIN;
-  const audience = context.locals.runtime?.env.ACCESS_POLICY_AUD;
-  if (!teamDomain || !audience) {
-    return { verified: false, hint: null };
-  }
-
-  const cfJwt = context.request.headers.get(ACCESS_JWT_HEADER);
-  if (!cfJwt) {
-    return { verified: false, hint: null };
-  }
-
-  try {
-    const issuer = teamDomain.replace(/\/$/, "");
-    const jwks = accessJwks(issuer);
-    const { payload } = await jwtVerify(cfJwt, jwks, {
-      issuer,
-      audience,
-    });
-    const email = typeof payload.email === "string" ? payload.email : null;
-    if (!email) {
-      return { verified: false, hint: null };
-    }
-    return { verified: true, hint: maskEmail(email) };
-  } catch {
-    return { verified: false, hint: null };
-  }
+  return isLoopbackDevOrigin(context.url.origin)
+    ? context.url.hostname
+    : PRODUCTION_RP_ID;
 }
 
 function accessJwks(issuer: string): ReturnType<typeof createRemoteJWKSet> {
@@ -877,36 +1042,8 @@ function maskEmail(email: string): string {
   return `${name.slice(0, 2)}***@${domain}`;
 }
 
-function sessionCookie(context: PasskeyContext, token: string): string {
-  const attributes = [
-    `${PASSKEY_SESSION_COOKIE}=${token}`,
-    "Path=/",
-    `Max-Age=${SESSION_MAX_AGE_SECONDS}`,
-    "HttpOnly",
-    "SameSite=Lax",
-  ];
-  if (usesSecureCookie(context)) attributes.splice(4, 0, "Secure");
-  return attributes.join("; ");
-}
-
-function expiredSessionCookie(context: PasskeyContext): string {
-  const attributes = [
-    `${PASSKEY_SESSION_COOKIE}=`,
-    "Path=/",
-    "Max-Age=0",
-    "HttpOnly",
-    "SameSite=Lax",
-  ];
-  if (usesSecureCookie(context)) attributes.splice(4, 0, "Secure");
-  return attributes.join("; ");
-}
-
-function usesSecureCookie(context: PasskeyContext): boolean {
-  return !isLoopbackDevOrigin(context.url.origin);
-}
-
-function isLoopbackDevOrigin(origin: string | null): origin is string {
-  if (!origin || !import.meta.env.DEV) return false;
+function isLoopbackDevOrigin(origin: string): boolean {
+  if (!import.meta.env.DEV) return false;
   try {
     const url = new URL(origin);
     return (
@@ -916,36 +1053,6 @@ function isLoopbackDevOrigin(origin: string | null): origin is string {
   } catch {
     return false;
   }
-}
-
-async function recordAudit(
-  db: D1Database,
-  eventType: string,
-  credentialId: string | null,
-  summary: string,
-): Promise<void> {
-  await db
-    .prepare(
-      `INSERT INTO admin_passkey_audit
-        (id, event_type, credential_id, summary, created_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-    .bind(randomId(), eventType, credentialId, summary, nowIso())
-    .run();
-}
-
-function randomId(): string {
-  return crypto.randomUUID();
-}
-
-function randomToken(): string {
-  return bytesToBase64Url(crypto.getRandomValues(new Uint8Array(32)));
-}
-
-async function hashToken(token: string): Promise<string> {
-  const bytes = new TextEncoder().encode(token);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return bytesToHex(new Uint8Array(digest));
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
@@ -968,18 +1075,12 @@ function base64UrlToBytes(value: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
-function bytesToHex(bytes: Uint8Array): string {
-  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function nowIso(): string {
-  return new Date().toISOString();
-}
-
-function isMissingPasskeyTable(error: unknown): boolean {
+function isMissingAuthTable(error: unknown): boolean {
   return (
     error instanceof Error &&
-    error.message.includes("admin_passkey_") &&
-    error.message.includes("no such table")
+    error.message.includes("no such table") &&
+    (error.message.includes("admin_passkey_") ||
+      error.message.includes("admin_users") ||
+      error.message.includes("admin_sessions"))
   );
 }

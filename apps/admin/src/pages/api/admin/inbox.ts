@@ -4,11 +4,8 @@ import {
   writeAdminInboxAttention,
 } from "@anipotts/lib/admin-control";
 import { readAdminInbox } from "../../../data/inbox";
-import {
-  assertSameOriginRequest,
-  statusError,
-} from "../../../lib/content-draft-operation";
-import { getPasskeyActor } from "../../../lib/passkey-auth";
+import { statusError } from "../../../lib/content-draft-operation";
+import { requireAdminMutation } from "../../../lib/admin-auth";
 
 export const GET: APIRoute = async (context) => {
   const inbox = await readAdminInbox(context.locals.runtime?.env.DB);
@@ -19,8 +16,6 @@ export const GET: APIRoute = async (context) => {
 
 export const POST: APIRoute = async (context) => {
   try {
-    assertSameOriginRequest(context.request, context.url);
-
     const db = context.locals.runtime?.env.DB;
     if (!db) throw statusError(503, "db_binding_missing");
 
@@ -29,12 +24,12 @@ export const POST: APIRoute = async (context) => {
       throw statusError(415, "json_required");
     }
 
-    const actor = await getPasskeyActor(context);
+    const actor = await requireAdminMutation(context, "action:stage");
     const body: unknown = await context.request.json();
     const result = await writeAdminInboxAttention(
       db,
       body,
-      `passkey:${actor.id}`,
+      `passkey:${actor.userId}`,
     );
     return Response.json(result, {
       headers: { "cache-control": "no-store" },

@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { assertSameOriginRequest } from "../../../../lib/content-draft-operation";
 import {
   publishEditorDraft,
   saveEditorDraft,
@@ -7,12 +6,10 @@ import {
   type ContentEditorPublishInput,
   type ContentEditorSaveInput,
 } from "../../../../lib/content-editor";
-import { getPasskeyActor } from "../../../../lib/passkey-auth";
+import { requireAdminMutation } from "../../../../lib/admin-auth";
 
 export const POST: APIRoute = async (context) => {
   try {
-    assertSameOriginRequest(context.request, context.url);
-
     const db = context.locals.runtime?.env.DB;
     if (!db) throw statusError(503, "db_binding_missing");
 
@@ -24,7 +21,15 @@ export const POST: APIRoute = async (context) => {
     const body = (await context.request.json()) as
       | ContentEditorSaveInput
       | ContentEditorPublishInput;
-    const actor = await getPasskeyActor(context);
+    const principal = await requireAdminMutation(
+      context,
+      body.action === "publish" ? "content:publish" : "draft:save",
+    );
+    const actor = {
+      id: principal.userId,
+      display_name: principal.displayName,
+      credential_id_hint: principal.credentialId?.slice(-8) ?? null,
+    };
 
     if (body.action === "save_draft") {
       return Response.json(await saveEditorDraft(db, body, actor), {

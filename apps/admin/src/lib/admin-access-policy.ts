@@ -1,5 +1,8 @@
 const PUBLIC_PATHS = new Set([
+  "/auth",
   "/auth/passkey",
+  "/auth/invite",
+  "/auth/recover",
   "/api/health",
   "/api/mcp",
   "/favicon.svg",
@@ -13,6 +16,7 @@ const PUBLIC_PATHS = new Set([
 ]);
 
 const PUBLIC_PASSKEY_API_PATHS = new Set([
+  "/api/admin/auth/session",
   "/api/admin/passkey/login-options",
   "/api/admin/passkey/login-verify",
   "/api/admin/passkey/logout",
@@ -23,6 +27,14 @@ const PUBLIC_PASSKEY_API_PATHS = new Set([
   "/api/admin/password/login",
   "/api/admin/password/logout",
   "/api/admin/password/status",
+  "/api/admin/device/start",
+  "/api/admin/device/status",
+  "/api/admin/device/claim",
+  "/api/admin/invites/status",
+  "/api/admin/invites/register-options",
+  "/api/admin/invites/register-verify",
+  "/api/admin/recovery/google/start",
+  "/api/admin/recovery/google/callback",
 ]);
 
 const PUBLIC_PREFIXES = ["/_astro/", "/assets/"];
