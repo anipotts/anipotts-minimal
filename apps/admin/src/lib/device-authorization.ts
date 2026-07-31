@@ -4,6 +4,7 @@ import {
   applyAdminSetCookies,
   assertExactOrigin,
   createAdminSession,
+  hasAdminCapability,
   hashToken,
   nowIso,
   randomToken,
@@ -95,6 +96,45 @@ export async function readDeviceAuthorization(
   return adminJson({
     request_id: row.id,
     state: deviceAuthorizationState(row),
+    requesting_device: row.requesting_device,
+    requested_at: row.requested_at,
+    expires_at: row.expires_at,
+  });
+}
+
+export async function reviewDeviceAuthorization(
+  context: AdminAuthContext,
+): Promise<Response> {
+  const principal = context.locals.adminPrincipal;
+  if (!principal) {
+    throw adminJson({ error: "admin_session_required" }, { status: 401 });
+  }
+  if (
+    principal.restriction ||
+    !hasAdminCapability(principal.role, "admin:read")
+  ) {
+    throw adminJson({ error: "role_denied" }, { status: 403 });
+  }
+
+  const db = requireAdminDb(context);
+  const requestId = context.url.searchParams.get("request_id") ?? "";
+  const row = await db
+    .prepare(
+      `SELECT * FROM admin_device_authorizations
+       WHERE id = ? LIMIT 1`,
+    )
+    .bind(requestId)
+    .first<DeviceAuthorizationRow>();
+  if (!row) {
+    throw adminJson({ error: "device_request_not_found" }, { status: 404 });
+  }
+  const state = deviceAuthorizationState(row);
+  if (state === "expired") {
+    throw adminJson({ error: "device_request_expired" }, { status: 410 });
+  }
+  return adminJson({
+    request_id: row.id,
+    state,
     requesting_device: row.requesting_device,
     requested_at: row.requested_at,
     expires_at: row.expires_at,

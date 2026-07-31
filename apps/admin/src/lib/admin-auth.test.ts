@@ -28,6 +28,10 @@ describe("admin auth policy", () => {
     expect(sanitizeAdminReturnPath("/\\example.com/control")).toBe("/");
     expect(sanitizeAdminReturnPath("/auth?next=%2Fcontent")).toBe("/");
     expect(sanitizeAdminReturnPath("/auth/passkey")).toBe("/");
+    expect(sanitizeAdminReturnPath("/auth/recover")).toBe("/");
+    expect(sanitizeAdminReturnPath("/auth/device/opaque-request")).toBe(
+      "/auth/device/opaque-request",
+    );
   });
 
   it("enforces exact origin on mutations", () => {
@@ -151,6 +155,7 @@ describe("admin auth policy", () => {
     expect(header).toContain("HttpOnly");
     expect(header).toContain("SameSite=Lax");
     expect(header).toContain("Max-Age=2592000");
+    expect(adminSessionCookie("recovery", 600)).toContain("Max-Age=600");
   });
 
   it("requires a session-bound csrf token on every mutation", async () => {

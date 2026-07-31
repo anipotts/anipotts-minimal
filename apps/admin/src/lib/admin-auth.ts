@@ -223,7 +223,7 @@ export async function resolveAdminSession(
     userId: legacy.user_id,
     credentialId: legacy.credential_id,
     authMethod: "legacy_passkey",
-    stepUpAt: nowIso(),
+    stepUpAt: null,
   });
   await revokeLegacySession(db, legacy.id);
   setCookies.push(adminSessionCookie(created.token));
@@ -241,7 +241,7 @@ export async function resolveAdminSession(
       role: "owner",
       sessionId: created.sessionId,
       authMethod: "legacy_passkey",
-      stepUpAt: nowIso(),
+      stepUpAt: null,
       restriction: null,
       displayName: "Ani",
       credentialId: legacy.credential_id,
@@ -411,8 +411,11 @@ export async function revokeAllUserAccess(
     .run();
 }
 
-export function adminSessionCookie(token: string): string {
-  return cookie(ADMIN_SESSION_COOKIE, token, ADMIN_SESSION_ABSOLUTE_SECONDS);
+export function adminSessionCookie(
+  token: string,
+  maxAgeSeconds = ADMIN_SESSION_ABSOLUTE_SECONDS,
+): string {
+  return cookie(ADMIN_SESSION_COOKIE, token, maxAgeSeconds);
 }
 
 export function expiredAdminSessionCookies(): string[] {

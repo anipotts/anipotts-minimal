@@ -41,6 +41,7 @@ import {
   type AdminD1Database,
   type AdminPrincipal,
 } from "./admin-auth";
+import { notifyAdminSecurityEvent } from "./security-notifications";
 
 export const PASSKEY_SESSION_COOKIE = ADMIN_SESSION_COOKIE;
 
@@ -348,6 +349,12 @@ export async function verifyRegistration(
     credentialId: verified.credential.id,
     summary: "created unified admin session after passkey registration",
   });
+  await notifyAdminSecurityEvent(context, {
+    db,
+    userId,
+    eventType: "passkey_registered",
+    summary: "a new admin passkey was registered",
+  });
 
   return applyAdminSetCookies(
     adminJson({
@@ -567,6 +574,12 @@ export async function revokeCurrentCredential(
     sessionId: principal.sessionId,
     credentialId: principal.credentialId,
     summary: "revoked sessions bound to revoked passkey",
+  });
+  await notifyAdminSecurityEvent(context, {
+    db,
+    userId: principal.userId,
+    eventType: "passkey_revoked",
+    summary: "an admin passkey was revoked",
   });
 
   return applyAdminSetCookies(

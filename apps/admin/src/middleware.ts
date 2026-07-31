@@ -29,7 +29,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (
       context.url.pathname === "/auth" &&
       resolved.principal &&
-      !resolved.principal.restriction
+      !resolved.principal.restriction &&
+      context.url.searchParams.get("stepup") !== "1"
     ) {
       const destination = sanitizeAdminReturnPath(
         context.url.searchParams.get("next"),

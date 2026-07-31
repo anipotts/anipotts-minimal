@@ -16,6 +16,7 @@ import {
   insertPasskeyCredential,
   verifyPasskeyRegistration,
 } from "./passkey-auth";
+import { notifyAdminSecurityEvent } from "./security-notifications";
 
 export const ADMIN_INVITE_SECONDS = 30 * 60;
 
@@ -200,6 +201,12 @@ export async function verifyInviteRegistration(
     credentialId: verified.credential.id,
     summary: "enrolled invited passkey pending owner approval",
     metadata: { invite_id: invite.id, role: invite.role },
+  });
+  await notifyAdminSecurityEvent(context, {
+    db,
+    userId: invite.pending_user_id,
+    eventType: "invited_passkey_enrolled",
+    summary: "an invited admin passkey was enrolled and awaits approval",
   });
 
   return adminJson({ ok: true, state: "pending_owner_approval" });

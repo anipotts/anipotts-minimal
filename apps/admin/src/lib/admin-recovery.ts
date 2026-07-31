@@ -203,12 +203,14 @@ export async function finishGoogleRecovery(
     summary: "verified owner Google subject into restricted recovery session",
   });
 
-  const response = Response.redirect(
-    new URL("/auth/recover/passkey", context.url.origin),
-    303,
-  );
+  const response = new Response(null, {
+    status: 303,
+    headers: {
+      location: new URL("/auth/recover/passkey", context.url.origin).href,
+    },
+  });
   return applyAdminSetCookies(response, [
-    adminSessionCookie(created.token),
+    adminSessionCookie(created.token, ADMIN_RECOVERY_SESSION_SECONDS),
     expiredRecoveryVerifierCookie(),
   ]);
 }
