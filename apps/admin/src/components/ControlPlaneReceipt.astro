@@ -54,7 +54,9 @@ const displayTime = (value: string) =>
           {
             latest
               ? `${latest.state} · ${latest.kind}`
-              : (state.error ?? "ready for the first proof command")
+              : state.available
+                ? "ready for the first proof command"
+                : "local relay unavailable in this preview"
           }
         </span>
       </div>

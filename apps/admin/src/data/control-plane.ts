@@ -35,10 +35,8 @@ export async function readControlPlane(
       error: null,
       snapshot: await namespace.getByName(DEVICE_ID).getSnapshot(limit),
     };
-  } catch (error) {
-    return unavailable(
-      error instanceof Error ? error.message : "relay_snapshot_failed",
-    );
+  } catch {
+    return unavailable("relay_snapshot_failed");
   }
 }
 

@@ -36,4 +36,20 @@ describe("control-plane admin contract", () => {
     expect(state.snapshot.device_connected).toBe(false);
     expect(state.snapshot.commands).toEqual([]);
   });
+
+  it("does not expose relay implementation errors", async () => {
+    const state = await readControlPlane({
+      getByName: () => ({
+        submitCommand: vi.fn(),
+        getSnapshot: vi
+          .fn()
+          .mockRejectedValue(
+            new Error("Cannot access Durable Object RPC between dev sessions"),
+          ),
+      }),
+    });
+
+    expect(state.available).toBe(false);
+    expect(state.error).toBe("relay_snapshot_failed");
+  });
 });
