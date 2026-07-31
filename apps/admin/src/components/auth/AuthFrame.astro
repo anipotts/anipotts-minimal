@@ -1,4 +1,6 @@
 ---
+import apMarkDark from "../../assets/ap-mark-dark-blue.svg?url";
+
 type Props = {
   title: string;
   subtitle: string;
@@ -10,7 +12,12 @@ const { title, subtitle, eyebrow } = Astro.props;
 
 <div class="passkey-entry">
   <aside class="passkey-entry__rail" aria-label="anipotts admin">
-    <span class="passkey-entry__mark" aria-hidden="true">ap</span>
+    <img
+      class="passkey-entry__mark"
+      src={apMarkDark}
+      alt=""
+      aria-hidden="true"
+    />
   </aside>
 
   <section class="passkey-entry__main" aria-labelledby="auth-title">
@@ -65,11 +72,11 @@ const { title, subtitle, eyebrow } = Astro.props;
   }
 
   .passkey-entry__mark {
-    color: #ffffff;
-    font-size: 31px;
-    font-weight: 720;
-    letter-spacing: -0.075em;
-    line-height: 1;
+    display: block;
+    width: 33px;
+    height: auto;
+    margin-top: 7px;
+    filter: brightness(0) invert(1);
   }
 
   .passkey-entry__main {
@@ -301,7 +308,8 @@ const { title, subtitle, eyebrow } = Astro.props;
     }
 
     .passkey-entry__mark {
-      font-size: 26px;
+      width: 29px;
+      margin-top: 0;
     }
 
     .passkey-entry__main {
