@@ -672,25 +672,46 @@ export async function insertPasskeyCredential(
 ): Promise<void> {
   const existing = await db
     .prepare(
-      `SELECT credential_id FROM admin_passkey_credentials
+      `SELECT credential_id, user_id, revoked_at FROM admin_passkey_credentials
        WHERE credential_id = ? LIMIT 1`,
     )
     .bind(input.verified.credential.id)
-    .first<{ credential_id: string }>();
-  if (existing) {
+    .first<{
+      credential_id: string;
+      user_id: string;
+      revoked_at: string | null;
+    }>();
+  if (
+    existing &&
+    (existing.user_id !== input.userId || existing.revoked_at === null)
+  ) {
     throw adminJson(
       { error: "credential_already_registered" },
       { status: 409 },
     );
   }
 
-  await db
+  const inserted = await db
     .prepare(
       `INSERT INTO admin_passkey_credentials
         (id, user_id, credential_id, public_key, counter, transports,
          device_type, backed_up, created_at, updated_at, label,
          created_by_session_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(credential_id) DO UPDATE SET
+         public_key = excluded.public_key,
+         counter = excluded.counter,
+         transports = excluded.transports,
+         device_type = excluded.device_type,
+         backed_up = excluded.backed_up,
+         last_used_at = NULL,
+         revoked_at = NULL,
+         revocation_reason = NULL,
+         updated_at = excluded.updated_at,
+         label = excluded.label,
+         created_by_session_id = excluded.created_by_session_id
+       WHERE admin_passkey_credentials.user_id = excluded.user_id
+         AND admin_passkey_credentials.revoked_at IS NOT NULL`,
     )
     .bind(
       crypto.randomUUID(),
@@ -707,6 +728,15 @@ export async function insertPasskeyCredential(
       input.createdBySessionId ?? null,
     )
     .run();
+  const changes = Number(
+    (inserted.meta as { changes?: number } | undefined)?.changes ?? 1,
+  );
+  if (changes !== 1) {
+    throw adminJson(
+      { error: "credential_registration_conflict" },
+      { status: 409 },
+    );
+  }
 }
 
 export async function consumeChallenge(
@@ -913,7 +943,7 @@ async function listCredentialsForUser(
   const result = await db
     .prepare(
       `SELECT * FROM admin_passkey_credentials
-       WHERE user_id = ?
+       WHERE user_id = ? AND revoked_at IS NULL
        ORDER BY created_at ASC`,
     )
     .bind(userId)

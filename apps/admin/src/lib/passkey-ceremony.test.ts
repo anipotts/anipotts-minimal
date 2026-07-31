@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   authenticationOptions,
   consumeChallenge,
+  insertPasskeyCredential,
   registrationOptions,
   verifyAuthentication,
   type ChallengeRow,
@@ -91,7 +92,66 @@ describe("passkey ceremonies", () => {
     });
     expect(db.auditEvents).toContain("passkey.authentication.denied");
   });
+
+  it("reactivates only the same user's revoked credential", async () => {
+    const revoked = credentialRow("credential-1", "2026-07-31T15:30:00.000Z");
+    const db = new CeremonyDb({ activeCount: 0, activeCredential: revoked });
+    await expect(
+      insertPasskeyCredential(db, {
+        userId: "ani",
+        verified: verifiedRegistration(db, "credential-1"),
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  it("rejects an active or cross-user credential collision", async () => {
+    const active = credentialRow("credential-1");
+    await expect(
+      insertPasskeyCredential(
+        new CeremonyDb({ activeCount: 1, activeCredential: active }),
+        {
+          userId: "ani",
+          verified: verifiedRegistration(
+            new CeremonyDb({ activeCount: 1 }),
+            "credential-1",
+          ),
+        },
+      ),
+    ).rejects.toBeInstanceOf(Response);
+
+    const crossUser = {
+      ...active,
+      user_id: "member-1",
+      revoked_at: "2026-07-31T15:30:00.000Z",
+    };
+    await expect(
+      insertPasskeyCredential(
+        new CeremonyDb({ activeCount: 0, activeCredential: crossUser }),
+        {
+          userId: "ani",
+          verified: verifiedRegistration(
+            new CeremonyDb({ activeCount: 0 }),
+            "credential-1",
+          ),
+        },
+      ),
+    ).rejects.toBeInstanceOf(Response);
+  });
 });
+
+function verifiedRegistration(db: CeremonyDb, credentialId: string) {
+  return {
+    challenge: db.addChallenge("registration"),
+    credential: {
+      id: credentialId,
+      publicKey: new Uint8Array([1, 2, 3]),
+      counter: 0,
+    },
+    credentialDeviceType: "singleDevice" as const,
+    credentialBackedUp: false,
+    transports: [],
+  };
+}
 
 function context(db: AdminD1Database, body?: string) {
   const url = new URL("http://localhost:4311/api/admin/passkey/login-options");
@@ -128,7 +188,7 @@ function authenticationBody(credentialId: string, challengeId = "challenge-1") {
   });
 }
 
-function credentialRow(credentialId: string) {
+function credentialRow(credentialId: string, revokedAt: string | null = null) {
   return {
     id: "credential-row-1",
     user_id: "ani",
@@ -140,7 +200,7 @@ function credentialRow(credentialId: string) {
     backed_up: 0,
     created_at: "2026-07-31T15:00:00.000Z",
     last_used_at: null,
-    revoked_at: null,
+    revoked_at: revokedAt,
   };
 }
 
