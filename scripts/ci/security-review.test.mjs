@@ -84,6 +84,14 @@ const fakeFiles = new Map([
     "packages/lib/src/admin-control/unsafe.ts",
     "  au" + 'th: "abcdefghijklmnopqrstuvwxyz123456";\n',
   ],
+  [
+    "apps/admin/src/pages/auth/invite-safe.astro",
+    'const inviteCode = Astro.url.searchParams.get("token") ?? "";\n',
+  ],
+  [
+    "workers/state/src/control-plane-safe.ts",
+    "const lane = submission.authority.lane;\n  authority: lane,\n",
+  ],
 ]);
 
 function readFake(file) {
@@ -101,6 +109,8 @@ const findings = reviewFiles(
     "packages/lib/src/admin-control/fixtures.ts",
     "packages/lib/src/admin-control/types.ts",
     "packages/lib/src/admin-control/unsafe.ts",
+    "apps/admin/src/pages/auth/invite-safe.astro",
+    "workers/state/src/control-plane-safe.ts",
     "drizzle/migrations/0100_public_metadata.sql",
     "docs/archive/old.md",
   ],

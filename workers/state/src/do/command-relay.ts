@@ -142,12 +142,13 @@ export class CommandRelay extends DurableObject<Bindings> {
       now,
       now,
     );
+    const lane = submission.authority.lane;
     this.appendRelayEvent({
       eventId: crypto.randomUUID(),
       commandId: submission.command_id,
       kind: "relay.command.queued",
       actor: submission.authority.actor_id,
-      authority: submission.authority.lane,
+      authority: lane,
       reason: submission.reason,
       payload: { kind: submission.kind, target: submission.target },
       recordedAt: now,

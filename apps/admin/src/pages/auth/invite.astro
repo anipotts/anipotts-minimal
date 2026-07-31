@@ -2,7 +2,7 @@
 import AuthFrame from "../../components/auth/AuthFrame.astro";
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
-const token = Astro.url.searchParams.get("token") ?? "";
+const inviteCode = Astro.url.searchParams.get("token") ?? "";
 ---
 
 <AdminLayout title="join admin" chrome="auth" hideHeader>
@@ -10,7 +10,7 @@ const token = Astro.url.searchParams.get("token") ?? "";
     title="join admin"
     subtitle="create a passkey to finish your invitation."
   >
-    <div id="invite-flow" data-token={token}>
+    <div id="invite-flow" data-token={inviteCode}>
       <section class="auth-state" data-invite-state="loading">
         <p class="auth-detail" aria-live="polite">checking invitation</p>
       </section>
