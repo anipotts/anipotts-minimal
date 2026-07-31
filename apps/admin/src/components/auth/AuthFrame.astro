@@ -78,12 +78,12 @@ const { title, subtitle, eyebrow } = Astro.props;
     align-items: center;
     min-width: 0;
     min-height: 100svh;
+    padding: 0 24px 0 clamp(88px, 16vw, 232px);
   }
 
   .passkey-entry__content {
-    width: min(548px, calc(100% - 48px));
-    margin-left: clamp(88px, 17vw, 248px);
-    transform: translateY(-1.2vh);
+    width: min(530px, 100%);
+    transform: translateY(2vh);
   }
 
   .passkey-entry__eyebrow,
