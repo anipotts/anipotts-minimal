@@ -2,20 +2,52 @@ name: CI
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, labeled]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  classify:
+    name: Classify release
+    runs-on: ubuntu-latest
+    outputs:
+      approval_required: ${{ steps.release.outputs.approval_required }}
+      d1_changed: ${{ steps.release.outputs.d1_changed }}
+      migration_risk: ${{ steps.release.outputs.migration_risk }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Classify exact pull request head
+        id: release
+        run: |
+          set -euo pipefail
+          files="$RUNNER_TEMP/release-files.txt"
+          git fetch --no-tags --prune origin "${{ github.event.pull_request.base.ref }}"
+          git diff --name-status "origin/${{ github.event.pull_request.base.ref }}"...HEAD > "$files"
+          node scripts/ci/release-policy.mjs "$files" "${{ github.event.pull_request.head.sha }}" | tee "$GITHUB_OUTPUT"
+
   ci:
     name: Build, lint, typecheck, test
+    needs: [classify]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -58,15 +90,84 @@ jobs:
       - name: Validate security review rules
         run: pnpm test:security-review
 
+      - name: Validate release policy
+        run: pnpm test:release-policy
+
       - name: Validate formatting
         run: pnpm format:check
 
       - name: Validate affected packages
         env:
-          TURBO_SCM_BASE: origin/${{ github.base_ref }}
+          TURBO_SCM_BASE: origin/${{ github.event.pull_request.base.ref }}
           TURBO_SCM_HEAD: HEAD
         run: |
           pnpm turbo build --affected --output-logs=errors-only
           pnpm turbo lint --affected --output-logs=errors-only
           pnpm turbo typecheck --affected --output-logs=errors-only
           pnpm turbo test --affected --output-logs=errors-only
+
+  migration-preflight:
+    name: Migration Preflight
+    needs: [classify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.5.2"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify immutable migration inventory
+        run: node scripts/ci/migration-policy.mjs
+
+      - name: Prove additive migration replay locally
+        run: pnpm test:migration-local
+
+      - name: Report remote promotion gate
+        if: needs.classify.outputs.d1_changed == 'true'
+        run: |
+          echo "migration_risk=${{ needs.classify.outputs.migration_risk }}"
+          echo "remote migration promotion remains gated by the verified bootstrap receipt"
+
+  promotion-policy:
+    name: Promotion Policy
+    needs: [classify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Accept automatic release class
+        if: needs.classify.outputs.approval_required != 'true'
+        run: echo "release is eligible for automatic promotion"
+
+      - name: Require exact owner approval for protected release class
+        if: needs.classify.outputs.approval_required == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          reviews="$RUNNER_TEMP/reviews.json"
+          comments="$RUNNER_TEMP/comments.json"
+          evidence="$RUNNER_TEMP/approval-evidence.json"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews" --paginate > "$reviews"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate > "$comments"
+          node -e 'const fs=require("fs"); fs.writeFileSync(process.argv[3], JSON.stringify({reviews:JSON.parse(fs.readFileSync(process.argv[1])),comments:JSON.parse(fs.readFileSync(process.argv[2]))}))' "$reviews" "$comments" "$evidence"
+          node scripts/ci/current-sha-approval.mjs "$evidence" "$HEAD_SHA" anipotts

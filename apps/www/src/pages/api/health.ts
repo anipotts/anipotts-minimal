@@ -24,6 +24,9 @@ export const GET: APIRoute = async ({ locals }) => {
     ok: d1 === "connected",
     d1,
     tables_ok: tablesOk,
+    release_sha: import.meta.env.PUBLIC_RELEASE_SHA || "dev",
+    schema_version:
+      import.meta.env.PUBLIC_RELEASE_SCHEMA_VERSION || "0042-unverified",
     ts: new Date().toISOString(),
   });
 };

@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "owner": {
+    "binding": "DB",
+    "database_name": "anipotts-db",
+    "wrangler_config": "apps/admin/wrangler.toml",
+    "migrations_dir": "drizzle/migrations"
+  },
+  "bootstrap": {
+    "status": "pending_explicit_approval",
+    "baseline_through": "0042_admin_inbox_attention_contract.sql",
+    "automatic_remote_apply": false,
+    "captured_at": "2026-08-05T14:25:00Z",
+    "wrangler_version": "4.92.0",
+    "schema_fingerprint": "sha256:8ffd0dacff04904a34b40b2be4436c0121ac56a8f8f68c660c16237fac5a43f4",
+    "schema_objects": {
+      "tables": 55,
+      "indexes": 74,
+      "triggers": 6
+    },
+    "rows_written": 0,
+    "note": "Read-only sqlite_master fingerprint. Remote export is unavailable because production contains FTS5 virtual tables. No ledger was created and no migration was applied."
+  },
+  "historical": [
+    [
+      "0001_service_registry.sql",
+      "d9054a75428a8e7e657cfcd9f4ed63871ea32b70703304e938ccfa43b64a554f"
+    ],
+    [
+      "0002_brands_emails.sql",
+      "2ccbdd65aee361ad62b0343198db6a7158ce8e03012f57dd61f78adad5634c84"
+    ],
+    [
+      "0003_reconcile.sql",
+      "dd6d900f505dee70befe9d8057531f8dde87c29d5170861efe5c55dd752b70f4"
+    ],
+    [
+      "0004_drop_dead_tables.sql",
+      "08935c3b6d937cd74d8ec3e37d2499df836ca59b43d2b73dfeddaa63a031f66c"
+    ],
+    [
+      "0005_newsletter_system.sql",
+      "d46c2b809d01a90ab4681a7a333cf7232d5d5cef5e354a16ba1222318c6f2ef9"
+    ],
+    [
+      "0006_admin_passkeys.sql",
+      "00300800ead446b35c920b1bbc4b9c6cf18356340a9653eb9d0eec221ac76c11"
+    ],
+    [
+      "0007_content_operations.sql",
+      "119526dce7c32174fb12515f511d20b6766ed1e6611e10ebb4a1f5993499612f"
+    ],
+    [
+      "0008_seed_content_draft_operations.sql",
+      "9b61b2ed9648d4bd53abf66b6f9a068d2e9f8d91629f3b57dd0c34e7f592a6e5"
+    ],
+    [
+      "0009_seed_newsletter_page_content.sql",
+      "1bee0f8a45c34b8f1edd8b1581569751a606bc259c918a533eeec1ad5cb89146"
+    ],
+    [
+      "0010_seed_home_page_content.sql",
+      "c6662b31493901b00a1d8e94bcc77b662a25ffa642844a8d0d3e8d2be3db7b93"
+    ],
+    [
+      "0011_seed_source_content_review_operations.sql",
+      "a5bd5a87306f71f623a513a7f1211056a10bf15b2488907459c8244fa0ac9e17"
+    ],
+    [
+      "0012_admin_proof_events.sql",
+      "df9f884dd6b4e8647e2482d61449e9d1b4dbe5a492796f4c39bff69908021727"
+    ],
+    [
+      "0013_seed_homepage_proof_cards.sql",
+      "fefdd2e7c40a6dcf67519452c8021e61c6adee59cec14519136c40452935fa12"
+    ],
+    [
+      "0014_seed_homepage_making_slugs.sql",
+      "2a9bd240989c4796c3329316b96d14b49bbb0551acc146a9c9bbc12f8dc00a8b"
+    ],
+    [
+      "0015_seed_homepage_writing_slugs.sql",
+      "c233195167e37a459640a02aace9ef072b88093f148bd4a37be5cbe167b9b5ab"
+    ],
+    [
+      "0016_seed_homepage_rich_summary.sql",
+      "ce0f0a76d9bb819427d2cfe052a2a36ec47db55e094dc963d5c64fdd1fa854e2"
+    ],
+    [
+      "0017_seed_homepage_mentions.sql",
+      "da67a3ac1ab5210f1675bb469ba45c9b3229ac8a0601f36da38457f284dd184c"
+    ],
+    [
+      "0018_update_homepage_operation_source_refs.sql",
+      "bd4bd4ea536545704fc9846e4b546a69bcfcb29d30c3b3a1bf4f1a71eeb5c91e"
+    ],
+    [
+      "0019_seed_homepage_intro_subheading.sql",
+      "c7641bea24fb0ac9c7d074ebed659fb22e74a7d2b20ddbdb997f953618f9c608"
+    ],
+    [
+      "0020_refresh_admin_proof_events.sql",
+      "6052be2e15fb07903b73ccefaf603b9083abebee7f574ee283d7f637f183f80e"
+    ],
+    [
+      "0021_seed_homepage_about_section.sql",
+      "e5c6943d501e4cf33bd162b621fae7159795f4020bf63a3cf3a4ff3b35324855"
+    ],
+    [
+      "0022_seed_writing_index_page_content.sql",
+      "c6ededcb20be6b56e42ad2bcd71c07c9e40ab7b888f21aad3eb212646876f327"
+    ],
+    [
+      "0023_seed_making_index_page_content.sql",
+      "9fb990acdc0d559cf29ff101b4ec14aa2ce04a15d12fae2510b653fa2f949d27"
+    ],
+    [
+      "0024_seed_projects_index_page_content.sql",
+      "822a27d98e6bcc4781f801476dc2a1bfe4890baf570f01dded07addaf738a034"
+    ],
+    [
+      "0025_seed_newsletter_archive_page_content.sql",
+      "49611a240cf7f675a1ec8740559ae55a8580e9382c7a6edb46a9fca192469a94"
+    ],
+    [
+      "0026_seed_newsletter_archive_cta_content.sql",
+      "a26eaade4bc198452e7a57bd3526029f14da3c13b1c10d2b16ee46921c5605db"
+    ],
+    [
+      "0027_seed_orchestrating_page_content.sql",
+      "aa8cf37a7fc635cc85060bbf62c248f4166242a1642d60cc47d3ee563538465b"
+    ],
+    [
+      "0028_seed_listing_content_review_operations.sql",
+      "c7eaf765acd9dc69a2d833cf62f3b9345f0e11a477a52e8c30a16d14cc2aa218"
+    ],
+    [
+      "0029_update_public_content_contract_source_refs.sql",
+      "f8487a44c520991dbc98201b11ed0cec38692b2438b0c4456d94be080c85a523"
+    ],
+    [
+      "0030_expand_orchestrating_page_content.sql",
+      "ddcd8b7b3aa0fbbb5f637df266c9a60583256a6d29e14f5871ec6b5834fc8739"
+    ],
+    [
+      "0031_seed_detail_page_content.sql",
+      "3c26db8d45b27ca44b43343b3e36d8b144361e6381a13f2488828921e98acaaf"
+    ],
+    [
+      "0032_seed_remaining_detail_page_content.sql",
+      "f234f319421850c5cd159b6540bbd474e05a4ff3fa0b6ee4f2c0b5d7e1ced5c9"
+    ],
+    [
+      "0033_refresh_draft_operation_save_metadata.sql",
+      "f5878455649108af219ea940886af69de66a6713cf0a4f380c88265c54ca8f93"
+    ],
+    [
+      "0034_seed_content_draft_save_proof.sql",
+      "7c05804ea99744e7b588776d5369ba64755c92731cf5dfe7b0ea5a0b5973a992"
+    ],
+    [
+      "0035_seed_making_bucket_copy.sql",
+      "0c22e83d7823142dda309f08c4ae4cec849b301030ccf64cdfc6578632285320"
+    ],
+    [
+      "0036_content_editor_hardening.sql",
+      "f652483d35ba7e6a940d80947b1ac0fa478ec82375e0067fe5dd350d9331c390"
+    ],
+    [
+      "0037_admin_event_core.sql",
+      "84dba94f0dfb6544f4f557401f107f7d268f38f19247219ae6b5791068db3e1d"
+    ],
+    [
+      "0040_reorder_homepage_rich_summary.sql",
+      "1aef9e7ad6d2f4b7fa9439d8c5ba9d8a66efa2084c626f65c6ec50cd79b2ea2c"
+    ],
+    [
+      "0041_admin_knowledge_cards.sql",
+      "200956a4e96d88e575bf8110cb964708b10ee933baf4f2e2ef3ca1568e3a71e0"
+    ],
+    [
+      "0042_admin_inbox_attention_contract.sql",
+      "34ba441a1921d0a5265695236ec73abead8665475cb6c3d9ada5dc78e30a48ed"
+    ]
+  ],
+  "migrations": []
+}

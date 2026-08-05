@@ -2,22 +2,7 @@ name: Security Review
 
 on:
   pull_request:
-    paths:
-      - ".github/workflows/**"
-      - "apps/admin/src/middleware.ts"
-      - "apps/admin/src/lib/passkey-auth.ts"
-      - "apps/admin/src/pages/api/**"
-      - "apps/admin/src/pages/auth/**"
-      - "apps/admin-solid/src/lib/**"
-      - "apps/admin-solid/src/routes/api/**"
-      - "drizzle/migrations/**"
-      - "packages/lib/**"
-      - "scripts/**"
-      - "workers/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "turbo.json"
+    types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
   contents: read

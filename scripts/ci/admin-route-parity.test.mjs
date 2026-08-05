@@ -69,8 +69,16 @@ const contentEditorSource = readFileSync(
 );
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
-const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
-const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
+assert.ok(
+  deployWorkflow.includes("scripts/ci/release-smoke.mjs --target admin"),
+  "deploy workflow must use the shared admin smoke implementation",
+);
+assert.ok(
+  smokeWorkflow.includes("scripts/ci/release-smoke.mjs --target admin"),
+  "manual smoke must use the shared admin smoke implementation",
+);
+const deploySmokeRoutes = new Set(ADMIN_PROTECTED_SMOKE_ROUTES);
+const manualSmokeRoutes = new Set(ADMIN_PROTECTED_SMOKE_ROUTES);
 const publicPaths = extractStringList(accessPolicySource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
   accessPolicySource,
@@ -402,14 +410,6 @@ for (const marker of [
   assert.ok(
     contentEditorSource.includes(marker),
     `/content/edit/:pageKey missing draft editor marker ${marker}`,
-  );
-}
-
-function extractShellForRoutes(source) {
-  return new Set(
-    [...source.matchAll(/for path in ([^;]+); do/g)]
-      .flatMap((match) => match[1].trim().split(/\s+/))
-      .filter((route) => route.startsWith("/")),
   );
 }
 

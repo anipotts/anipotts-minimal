@@ -3,10 +3,14 @@ name: Agent Auto-Merge
 on:
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+  issue_comment:
+    types: [created]
 
 permissions:
-  checks: read
   contents: write
+  issues: write
   pull-requests: write
 
 concurrency:
@@ -14,9 +18,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  approval-refresh:
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'anipotts' &&
+      github.event.comment.author_association == 'OWNER' &&
+      startsWith(github.event.comment.body, '/approve-release ')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-run policy for exact owner approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .head.sha)"
+          test "$COMMENT_BODY" = "/approve-release ${head_sha}"
+          gh label create release-approved --color 1D76DB --description "exact-SHA release approval" --force
+          gh pr edit "$PR_NUMBER" --remove-label release-approved 2>/dev/null || true
+          gh pr edit "$PR_NUMBER" --add-label release-approved
+
   automerge:
     if: >
+      github.event_name != 'issue_comment' &&
       !github.event.pull_request.draft &&
+      github.event.pull_request.base.ref == 'main' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       (
         startsWith(github.event.pull_request.head.ref, 'codex/') ||
@@ -25,92 +53,9 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Wait for CI
+      - name: Enable native auto-merge for exact head
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-        run: |
-          for _ in $(seq 1 60); do
-            bucket="$(
-              gh pr checks "$PR_URL" \
-                --json name,bucket \
-                --jq '.[] | select(.name == "Build, lint, typecheck, test") | .bucket' \
-                2>/dev/null | head -n 1
-            )"
-            case "$bucket" in
-              pass)
-                exit 0
-                ;;
-              fail|cancel)
-                echo "CI did not pass"
-                exit 1
-                ;;
-              "")
-                echo "waiting for CI to register"
-                ;;
-              *)
-                echo "CI is ${bucket}"
-                ;;
-            esac
-            sleep 15
-          done
-          echo "CI did not finish in time"
-          exit 1
-
-      - name: Compute deploy targets
-        id: targets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: |
-          files="$RUNNER_TEMP/pr-files.txt"
-          targets="$RUNNER_TEMP/deploy-targets.txt"
-          pr_number="${PR_URL##*/}"
-          gh api "repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files" \
-            --paginate \
-            --jq '.[].filename' > "$files"
-
-          node scripts/ci/compute-deploy-targets.mjs "$files" | tee "$targets"
-          cat "$targets" >> "$GITHUB_OUTPUT"
-          node scripts/ci/security-review.mjs --required "$files" >> "$GITHUB_OUTPUT"
-
-      - name: Wait for security review
-        if: steps.targets.outputs.security_review == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: |
-          for _ in $(seq 1 40); do
-            bucket="$(
-              gh pr checks "$PR_URL" \
-                --json name,bucket \
-                --jq '.[] | select(.name == "Security Review") | .bucket' \
-                2>/dev/null | head -n 1
-            )"
-            case "$bucket" in
-              pass)
-                exit 0
-                ;;
-              fail|cancel)
-                echo "Security Review did not pass"
-                exit 1
-                ;;
-              "")
-                echo "waiting for Security Review to register"
-                ;;
-              *)
-                echo "Security Review is ${bucket}"
-                ;;
-            esac
-            sleep 15
-          done
-          echo "Security Review did not finish in time"
-          exit 1
-
-      - name: Merge PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr merge --merge --delete-branch "$PR_URL"
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: gh pr merge --auto --merge --delete-branch --match-head-commit "$HEAD_SHA" "$PR_URL"
