@@ -21,6 +21,14 @@ const attentionRowSource = readFileSync(
   "apps/admin/src/components/AttentionRow.astro",
   "utf8",
 );
+const semanticInspectorSource = readFileSync(
+  "apps/admin/src/components/SemanticInspector.astro",
+  "utf8",
+);
+const semanticReferenceSource = readFileSync(
+  "apps/admin/src/data/semantic-reference.ts",
+  "utf8",
+);
 const knowledgeSource = readFileSync(
   "apps/admin/src/pages/knowledge.astro",
   "utf8",
@@ -273,6 +281,52 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
   assert.ok(
     attentionRowSource.includes(marker),
     `admin attention row missing marker ${marker}`,
+  );
+}
+for (const marker of [
+  'import "../styles/admin-canvas.css"',
+  "SemanticInspector",
+  "semanticReferences",
+  "inbox.source",
+]) {
+  assert.ok(
+    homeSource.includes(marker),
+    `canonical admin canvas missing semantic marker ${marker}`,
+  );
+}
+for (const marker of [
+  "item.references.owner",
+  "item.references.source_time",
+  "item.references.proof",
+  "item.references.action",
+]) {
+  assert.ok(
+    attentionRowSource.includes(marker),
+    `admin attention card missing typed reference ${marker}`,
+  );
+}
+for (const marker of [
+  "calendar_event",
+  "source_time",
+  "providerDestination",
+  "isSafeProviderHref",
+  "source not checked",
+  "checked · no value found",
+]) {
+  assert.ok(
+    semanticReferenceSource.includes(marker),
+    `semantic reference contract missing marker ${marker}`,
+  );
+}
+for (const marker of [
+  "data-semantic-inspector",
+  "data-semantic-inspector-panel",
+  "showModal",
+  "data-semantic-close",
+]) {
+  assert.ok(
+    semanticInspectorSource.includes(marker),
+    `semantic inspector missing marker ${marker}`,
   );
 }
 

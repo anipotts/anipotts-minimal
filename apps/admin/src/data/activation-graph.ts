@@ -3,6 +3,14 @@ import type {
   OperatorTaskState,
   OperatorWorkProjection,
 } from "./operator-work";
+import {
+  buildOperatorTaskSemanticReferences,
+  defineKnownReference,
+  inspectorDestination,
+  internalDestination,
+  semanticReferenceId,
+  type SemanticReference,
+} from "./semantic-reference";
 
 export const OPERATIONAL_PROJECTIONS = [
   "ready",
@@ -27,6 +35,7 @@ export type ActivationLane = {
   href: string;
   basis: string;
   source_state: "current" | "stale" | "partial";
+  reference: SemanticReference<"route">;
 };
 
 export type ActivationGraphNode = {
@@ -35,8 +44,8 @@ export type ActivationGraphNode = {
   label: string;
   title: string;
   detail: string;
-  href: string | null;
-  source: string;
+  reference: SemanticReference;
+  source_reference: SemanticReference;
 };
 
 export type ActivationGraphConnection = {
@@ -51,8 +60,10 @@ export type ActivationGraphProjection = {
   work_source_state: "current" | "stale";
   work_last_verified_at: string;
   foreground: AdminInboxItem | null;
+  foreground_reference: SemanticReference | null;
   foreground_reason: string;
   lanes: ActivationLane[];
+  sources: SemanticReference<"source">[];
   nodes: ActivationGraphNode[];
   connections: ActivationGraphConnection[];
 };
@@ -76,10 +87,18 @@ export function buildActivationGraph(
     work_source_state: workSourceState,
     work_last_verified_at: work.generated_at,
     foreground,
+    foreground_reference: foreground?.references.entity ?? null,
     foreground_reason: foreground
       ? `${foreground.risk} priority · ${foreground.timeframe} · ${foreground.next_action}`
       : "No current attention item is available from the connected sources.",
-    lanes: buildActivationLanes(inbox.items, work.task_states, workSourceState),
+    lanes: buildActivationLanes(
+      inbox.items,
+      work.task_states,
+      inbox.source,
+      workSourceState,
+      inbox.generated_at,
+    ),
+    sources: [inbox.source, buildWorkSourceReference(work, workSourceState)],
     nodes: foreground ? buildGraphNodes(foreground, linkedTask) : [],
     connections: foreground
       ? [
@@ -119,9 +138,16 @@ export function itemMatchesOperationalProjection(
 function buildActivationLanes(
   items: AdminInboxItem[],
   tasks: OperatorTaskState[],
+  inboxSource: SemanticReference<"source">,
   workSourceState: "current" | "stale",
+  checkedAt: string,
 ): ActivationLane[] {
-  const inboxSourceState = "current" as const;
+  const inboxSourceState: ActivationLane["source_state"] =
+    inboxSource.source_state === "verified"
+      ? "current"
+      : inboxSource.source_state === "unknown"
+        ? "partial"
+        : "stale";
   const workLaneSourceState = workSourceState;
 
   return [
@@ -135,6 +161,7 @@ function buildActivationLanes(
       basis:
         "actionable without a waiting, blocking, or personal-authority signal",
       source_state: inboxSourceState,
+      reference: activationLaneReference("ready", "/?view=ready", checkedAt),
     },
     {
       key: "running",
@@ -148,6 +175,11 @@ function buildActivationLanes(
       href: "/work?view=now",
       basis: "operator work projection",
       source_state: workLaneSourceState,
+      reference: activationLaneReference(
+        "running",
+        "/work?view=now",
+        checkedAt,
+      ),
     },
     {
       key: "waiting",
@@ -162,8 +194,15 @@ function buildActivationLanes(
         ).length,
       href: "/?view=waiting",
       basis: "time, response, or another condition must change",
-      source_state:
-        workLaneSourceState === "stale" ? "stale" : inboxSourceState,
+      source_state: combineProjectionSourceStates(
+        workLaneSourceState,
+        inboxSourceState,
+      ),
+      reference: activationLaneReference(
+        "waiting",
+        "/?view=waiting",
+        checkedAt,
+      ),
     },
     {
       key: "blocked",
@@ -178,8 +217,15 @@ function buildActivationLanes(
         ).length,
       href: "/?view=blocked",
       basis: "an actionable constraint or resolver is identified",
-      source_state:
-        workLaneSourceState === "stale" ? "stale" : inboxSourceState,
+      source_state: combineProjectionSourceStates(
+        workLaneSourceState,
+        inboxSourceState,
+      ),
+      reference: activationLaneReference(
+        "blocked",
+        "/?view=blocked",
+        checkedAt,
+      ),
     },
     {
       key: "needs-ani",
@@ -190,6 +236,11 @@ function buildActivationLanes(
       href: "/?view=needs-ani",
       basis: "Ani's authority, decision, or presence is explicitly signaled",
       source_state: inboxSourceState,
+      reference: activationLaneReference(
+        "needs-ani",
+        "/?view=needs-ani",
+        checkedAt,
+      ),
     },
     {
       key: "recently-completed",
@@ -201,14 +252,31 @@ function buildActivationLanes(
       href: "/work?view=history",
       basis: "operator work projection",
       source_state: workLaneSourceState,
+      reference: activationLaneReference(
+        "recently-completed",
+        "/work?view=history",
+        checkedAt,
+      ),
     },
   ];
+}
+
+function combineProjectionSourceStates(
+  left: ActivationLane["source_state"],
+  right: ActivationLane["source_state"],
+): ActivationLane["source_state"] {
+  if (left === "partial" || right === "partial") return "partial";
+  if (left === "stale" || right === "stale") return "stale";
+  return "current";
 }
 
 function buildGraphNodes(
   item: AdminInboxItem,
   linkedTask?: OperatorTaskState,
 ): ActivationGraphNode[] {
+  const taskReferences = linkedTask
+    ? buildOperatorTaskSemanticReferences(linkedTask, "stale")
+    : null;
   return [
     {
       id: `world:${item.entity_id}`,
@@ -216,8 +284,8 @@ function buildGraphNodes(
       label: "entity",
       title: item.title,
       detail: item.summary,
-      href: item.href,
-      source: item.source,
+      reference: item.references.entity,
+      source_reference: item.references.source,
     },
     {
       id: `obligation:${item.id}`,
@@ -225,8 +293,8 @@ function buildGraphNodes(
       label: item.timeframe,
       title: item.next_action,
       detail: `${item.status} · ${item.risk} priority`,
-      href: item.href,
-      source: item.dedupe_key,
+      reference: item.references.deadline ?? item.references.action,
+      source_reference: item.references.deadline ?? item.references.source_time,
     },
     {
       id: `execution:${linkedTask?.task_id ?? item.owner}`,
@@ -236,8 +304,8 @@ function buildGraphNodes(
       detail:
         linkedTask?.bounded_goal ??
         `Resolver recorded as ${item.owner}; required-party detail is not yet modeled.`,
-      href: linkedTask ? "/work?view=now" : item.href,
-      source: linkedTask?.source_ref ?? item.source,
+      reference: taskReferences?.task ?? item.references.owner,
+      source_reference: taskReferences?.source_time ?? item.references.source,
     },
     {
       id: `trajectory:${item.id}`,
@@ -245,8 +313,8 @@ function buildGraphNodes(
       label: "verification",
       title: linkedTask?.proof_owed ?? "Proof pointer retained",
       detail: `Trajectory is not normalized yet. Evidence pointer: ${item.proof}`,
-      href: linkedTask ? "/work?view=now" : item.href,
-      source: linkedTask?.proof_refs.join(", ") || item.proof,
+      reference: taskReferences?.proof ?? item.references.proof,
+      source_reference: taskReferences?.proof ?? item.references.proof,
     },
   ];
 }
@@ -290,10 +358,82 @@ function isWorkProjectionCurrent(
   work: OperatorWorkProjection,
   now: Date,
 ): boolean {
+  if (work.mode === "tracked_fixture") return false;
   const generatedAt = Date.parse(work.generated_at);
   if (!Number.isFinite(generatedAt)) return false;
   const ageSeconds = (now.getTime() - generatedAt) / 1000;
   return (
     ageSeconds >= 0 && ageSeconds <= work.freshness_policy.fresh_for_seconds
   );
+}
+
+function activationLaneReference(
+  lane: OperationalProjection,
+  href: string,
+  checkedAt: string,
+): SemanticReference<"route"> {
+  return defineKnownReference({
+    id: semanticReferenceId("activation-lane", lane),
+    kind: "route",
+    label: `${lane.replaceAll("-", " ")} projection`,
+    value: href,
+    summary: "This route opens a derived operational projection.",
+    source_state: "verified",
+    checked_at: checkedAt,
+    authority: { kind: "internal", label: "admin route registry" },
+    provenance: {
+      source: "activation_graph",
+      source_ref: `operational-projection:${lane}`,
+      method: "projection",
+      evidence_refs: [],
+    },
+    confidence: {
+      level: "high",
+      explanation: "The typed activation projection supplied this route.",
+    },
+    sensitivity: "internal",
+    validity: { valid_from: checkedAt, valid_until: null },
+    retrieval_policy: {
+      mode: "open_internal",
+      refresh_href: null,
+      explanation: "Open the declared overlapping operational projection.",
+    },
+    destination: internalDestination(href, "open operational projection"),
+  });
+}
+
+function buildWorkSourceReference(
+  work: OperatorWorkProjection,
+  state: "current" | "stale",
+): SemanticReference<"source"> {
+  return defineKnownReference({
+    id: "operator-work:source",
+    kind: "source",
+    label: "work source",
+    value: "tracked operator work fixture",
+    summary:
+      "The operator work projection is a retained fixture and cannot establish live activity.",
+    source_state: state === "current" ? "verified" : "stale",
+    checked_at: work.reconciled_at,
+    authority: { kind: "recorded", label: "operator work fixture" },
+    provenance: {
+      source: work.projection_id,
+      source_ref: work.projection_id,
+      method: "fixture",
+      evidence_refs: [work.projection_id],
+    },
+    confidence: {
+      level: "medium",
+      explanation:
+        "The fixture preserves prior observations but does not prove current runtime state.",
+    },
+    sensitivity: "internal",
+    validity: { valid_from: work.generated_at, valid_until: null },
+    retrieval_policy: {
+      mode: "inspect",
+      refresh_href: null,
+      explanation: "Inspect the fixture boundary and last reconciliation time.",
+    },
+    destination: inspectorDestination("inspect work source"),
+  });
 }

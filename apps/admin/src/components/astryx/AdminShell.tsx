@@ -267,7 +267,7 @@ function NavEntry({
       href={item.href}
       label={item.label}
       icon={<Icon size={18} weight="regular" aria-hidden="true" />}
-      selectedIcon={<Icon size={18} weight="fill" aria-hidden="true" />}
+      selectedIcon={<Icon size={18} weight="regular" aria-hidden="true" />}
       isSelected={isActive(currentRoute, item.href)}
       collapsible={false}
     >
