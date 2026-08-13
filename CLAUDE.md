@@ -187,6 +187,11 @@ Public copy should sound like Ani: direct, specific, terse, and grounded in real
 work. Avoid generic startup copy, guru tone, unsupported hype, rhetorical
 questions, fake vulnerability, and exactly-three-item cadence.
 
+Public copy states the claim directly. Avoid litotes, negative definitions,
+reversal frames, and staccato negation. Exact quotations, safety instructions,
+and literal technical constraints keep their necessary wording and context.
+`pnpm test:public-copy` enforces the evergreen public surfaces.
+
 No em dashes in human-facing copy. Never use `git add .` or `git add -A`.
 
 ## admin interface

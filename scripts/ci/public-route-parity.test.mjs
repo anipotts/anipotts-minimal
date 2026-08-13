@@ -18,7 +18,7 @@ const manualSmokeStep = extractSection(
   "\n      - name: Smoke admin unauthenticated block",
 );
 
-assert.equal(PUBLIC_SMOKE_ROUTES.length, 20);
+assert.equal(PUBLIC_SMOKE_ROUTES.length, 22);
 
 for (const [sourceName, source] of [
   ["deploy.yml", deployWorkflow],

@@ -55,9 +55,25 @@ const writingEntries = (await publishedWriting())
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
 const summaryText = homepageSummaryText(cmsHome);
+const profileLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  mainEntity: {
+    "@type": "Person",
+    name: "Ani Potts",
+    url: "https://anipotts.com",
+    jobTitle: "agent systems + product",
+    sameAs: [
+      "https://github.com/anipotts",
+      "https://www.linkedin.com/in/anipotts",
+      "https://x.com/anipottsbuilds",
+      "https://news.anipotts.com",
+    ],
+  },
+};
 ---
 
-<Shell title="ani potts" description={summaryText} path="/">
+<Shell title="ani potts" description={summaryText} path="/" jsonLd={profileLd}>
   <section data-rise>
     <h1 class="home-hero">
       {heading}.

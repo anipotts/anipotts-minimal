@@ -28,7 +28,7 @@ export const GET: APIRoute = async (context) => {
     { path: "/making", priority: 0.9 },
     { path: "/projects", priority: 0.8 },
     { path: "/writing", priority: 0.85 },
-    { path: "/orchestrating", priority: 0.9 },
+    { path: "/systems", priority: 0.9 },
     ...writingEntries.map((t) => ({
       path: `/writing/${writingSlug(t)}`,
       priority: 0.65,

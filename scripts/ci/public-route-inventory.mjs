@@ -11,7 +11,8 @@ const inventory = [
     file: "apps/www/src/pages/newsletter/archive.astro",
   },
   { route: "/making", file: "apps/www/src/pages/making.astro" },
-  { route: "/orchestrating", file: "apps/www/src/pages/orchestrating.astro" },
+  { route: "/systems", file: "apps/www/src/pages/systems.astro" },
+  { route: "/links", file: "apps/www/src/pages/links.astro" },
   { route: "/projects", file: "apps/www/src/pages/projects/index.astro" },
   {
     route: "/projects/chainedchat",
@@ -50,6 +51,10 @@ const inventory = [
     file: "apps/www/src/pages/projects/[slug].astro",
   },
   { route: "/writing", file: "apps/www/src/pages/writing/index.astro" },
+  {
+    route: "/writing/awareness-is-alpha",
+    file: "apps/www/src/pages/writing/[slug].astro",
+  },
   {
     route: "/writing/i-built-a-monitor-for-my-claude-code-sessions",
     file: "apps/www/src/pages/writing/[slug].astro",

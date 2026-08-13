@@ -10,7 +10,8 @@ interface Props {
   description: string;
   path: string;
   ogType?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  robots?: string;
   mood?: "drowsy" | "alert" | "jittery" | "calm";
   canonicalUrl?: string;
 }
@@ -23,26 +24,20 @@ const {
   jsonLd,
   mood = "calm",
   canonicalUrl,
+  robots,
 } = Astro.props;
 const canonical =
   canonicalUrl ?? `${siteConfig.url}${path === "/" ? "" : path}`;
 const fullTitle = path === "/" ? "ani potts" : `${title} / ani potts`;
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 
-const personLd = {
+const siteLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: siteConfig.name,
-  alternateName: siteConfig.fullName,
+  "@type": "WebSite",
+  name: "ani potts",
   url: siteConfig.url,
-  jobTitle: siteConfig.title,
-  email: siteConfig.email,
-  sameAs: [
-    "https://github.com/anipotts",
-    "https://www.linkedin.com/in/anipotts",
-    "https://x.com/anipottsbuilds",
-  ],
 };
+const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
@@ -52,6 +47,7 @@ const personLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
     <link rel="canonical" href={canonical} />
     <link
       rel="icon"
@@ -131,16 +127,16 @@ const personLd = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(personLd)}
+      set:html={JSON.stringify(siteLd)}
     />
     {
-      jsonLd && (
+      jsonLdItems.map((item) => (
         <script
           is:inline
           type="application/ld+json"
-          set:html={JSON.stringify(jsonLd)}
+          set:html={JSON.stringify(item)}
         />
-      )
+      ))
     }
     {
       posthogKey && (

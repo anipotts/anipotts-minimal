@@ -16,7 +16,7 @@ const {
   ctaLabel = "subscribe",
   footerText = "",
   successMessage = "subscribed. check your inbox.",
-  errorMessage = "could not subscribe. try again in a minute.",
+  errorMessage = "try again in a minute.",
 } = Astro.props;
 ---
 
@@ -219,8 +219,7 @@ const {
         window.posthog?.capture?.("newsletter_subscribed");
       } catch {
         status.textContent =
-          form.dataset.errorMessage ??
-          "could not subscribe. try again in a minute.";
+          form.dataset.errorMessage ?? "try again in a minute.";
       }
     });
   }

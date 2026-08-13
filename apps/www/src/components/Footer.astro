@@ -2,10 +2,13 @@
 import { Icon } from "astro-icon/components";
 ---
 
-<footer class="frame foot">
-  <a href="mailto:contact@anipotts.com" class="quiet-link mono"
-    >contact@anipotts.com</a
-  >
+<footer id="contact" class="frame foot">
+  <div class="contact-copy">
+    <span>have a project, question, or useful overlap?</span>
+    <a href="mailto:contact@anipotts.com" class="quiet-link mono"
+      >contact@anipotts.com</a
+    >
+  </div>
   <span class="glyphs">
     <a
       href="https://github.com/anipotts"
@@ -57,6 +60,11 @@ import { Icon } from "astro-icon/components";
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: var(--s-2);
+  }
+
+  .contact-copy {
+    display: grid;
+    gap: 0.35rem;
   }
 
   .glyph {

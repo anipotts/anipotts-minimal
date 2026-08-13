@@ -1,9 +1,8 @@
 export const siteConfig = {
   name: "Ani Potts",
-  fullName: "Anirudh Pottammal",
-  title: "Software Engineer",
+  title: "agent systems + product",
   location: "NYC",
-  bio: "ani potts. previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit.",
+  bio: "i build with agents and write about the systems that keep the work coherent.",
   shortBio: "ani potts, nyc",
   url: "https://anipotts.com",
   domain: "anipotts.com",
@@ -16,7 +15,8 @@ export const siteConfig = {
 } as const;
 
 export const navItems = [
-  { name: "writing", path: "/writing" },
   { name: "making", path: "/making" },
-  { name: "orchestrating", path: "/orchestrating" },
+  { name: "writing", path: "/writing" },
+  { name: "systems", path: "/systems" },
+  { name: "contact", path: "/#contact" },
 ] as const;

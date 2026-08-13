@@ -6,6 +6,7 @@ export {
   DEFAULT_NEWSLETTER_CONTENT,
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
   DEFAULT_ORCHESTRATING_CONTENT,
+  DEFAULT_SYSTEMS_CONTENT,
   DEFAULT_PROJECTS_INDEX_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
   HOME_SECTION_ORDER,
@@ -20,11 +21,13 @@ export {
   normalizeCmsWriting,
   normalizeNewsletterContent,
   normalizeOrchestratingPageContent,
+  normalizeSystemsPageContent,
   validateListingPageContent,
   validateCmsProject,
   validateCmsWriting,
   validateNewsletterContent,
   validateOrchestratingPageContent,
+  validateSystemsPageContent,
 } from "./editor.js";
 export {
   homepageSummaryText,
@@ -32,6 +35,7 @@ export {
   validateHomepageContent,
 } from "./homepage.js";
 export { parseMarkdownBlocks } from "./markdown.js";
+export { analyzePublicCopy } from "./public-copy.js";
 
 export type {
   CmsWritingContent,
@@ -45,7 +49,13 @@ export type {
   ListingPageContent,
   OrchestratingPageContent,
   OrchestratingSectionLabels,
+  SystemsLinkCard,
+  SystemsPageContent,
+  SystemsPrinciple,
   ThoughtSummary,
   WritingSummary,
+  PublicCopyContext,
+  PublicCopyFinding,
+  PublicCopyRule,
 } from "@anipotts/types";
 export type { InlineSegment, MarkdownBlock } from "./markdown.js";
