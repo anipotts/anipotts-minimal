@@ -9,6 +9,7 @@ import {
   inferredDeadlineReference,
   inspectorDestination,
   internalDestination,
+  internalRecordReference,
   providerDestination,
   renderSemanticReference,
 } from "./semantic-reference";
@@ -16,6 +17,48 @@ import {
 const checkedAt = "2026-08-05T14:00:00.000Z";
 
 describe("typed semantic references", () => {
+  it("keeps internal records in the shared inspector", () => {
+    const reference = internalRecordReference({
+      id: "system:fleet",
+      kind: "route",
+      label: "Fleet",
+      value: "Fleet",
+      summary: "Two machine records.",
+      source: "admin system index",
+      source_ref: "/fleet",
+      checked_at: checkedAt,
+      source_state: "verified",
+    });
+
+    expect(renderSemanticReference(reference)).toMatchObject({
+      element: "button",
+      href: null,
+      action_label: "inspect details",
+      state_label: "verified source",
+      authority_label: "admin source record",
+    });
+  });
+
+  it("does not promote a stale internal record to current truth", () => {
+    const reference = internalRecordReference({
+      id: "work:chief-site",
+      kind: "task",
+      label: "chief/site",
+      value: "chief/site",
+      summary: "Last recorded work state.",
+      source: "work projection",
+      source_ref: "task:chief-site",
+      source_state: "stale",
+    });
+
+    expect(renderSemanticReference(reference)).toMatchObject({
+      element: "button",
+      state_label: "last verified",
+    });
+    expect(reference.checked_at).toBeNull();
+    expect(reference.confidence.level).toBe("medium");
+  });
+
   it("opens only an explicit canonical Google Calendar event", () => {
     const reference = googleCalendarEventReference({
       id: "calendar:event:verified-demo",

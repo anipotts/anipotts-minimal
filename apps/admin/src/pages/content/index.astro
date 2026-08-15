@@ -1,14 +1,46 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import SemanticInspector from "../../components/SemanticInspector.astro";
+import SemanticReference from "../../components/SemanticReference.astro";
 import { readPageContentInventoryStore } from "../../data/content";
 import { sourceContentRecords } from "../../data/source-content";
 import { carouselPosts } from "../../data/carousels";
+import {
+  internalRecordReference,
+  type SemanticReference as SemanticReferenceModel,
+} from "../../data/semantic-reference";
 
 const pageContentState = await readPageContentInventoryStore(
   Astro.locals.runtime?.env.DB,
 );
 const stageFor = (status: string) =>
   status === "published" ? "published" : status.replaceAll("_", " ");
+const pageReferences = pageContentState.rows.map((row) =>
+  internalRecordReference({
+    id: row.id,
+    kind: "graph_entity",
+    label: row.page_key,
+    value: row.page_key,
+    summary: row.summary,
+    source: "page_content",
+    source_ref: row.source_ref,
+    checked_at: row.updated_at || null,
+    source_state: row.updated_at ? "verified" : "unknown",
+  }),
+);
+const sourceReferences = sourceContentRecords.map((record) =>
+  internalRecordReference({
+    id: record.id,
+    kind: "graph_entity",
+    label: record.title,
+    value: record.title,
+    summary: record.summary,
+    source: "tracked content",
+    source_ref: record.source_ref,
+    source_state: "stale",
+  }),
+);
+const contentReferences = [...pageReferences, ...sourceReferences];
 ---
 
 <AdminLayout title="content" hideHeader>
@@ -36,7 +68,7 @@ const stageFor = (status: string) =>
       </header>
       <div class="quiet-editorial-list">
         {
-          pageContentState.rows.map((row) => (
+          pageContentState.rows.map((row, index) => (
             <article>
               <div>
                 <span>{row.page_key}</span>
@@ -47,6 +79,11 @@ const stageFor = (status: string) =>
                 {row.updated_at || "not observed"}
               </time>
               <div class="quiet-row-actions">
+                <SemanticReference
+                  reference={pageReferences[index]!}
+                  variant="action"
+                  label="details"
+                />
                 <a href={`/content/edit/${encodeURIComponent(row.page_key)}`}>
                   edit
                 </a>
@@ -56,7 +93,7 @@ const stageFor = (status: string) =>
           ))
         }
         {
-          sourceContentRecords.map((record) => (
+          sourceContentRecords.map((record, index) => (
             <article>
               <div>
                 <span>{record.surface}</span>
@@ -65,6 +102,11 @@ const stageFor = (status: string) =>
               <span>{stageFor(record.status)}</span>
               <span>{record.body_words} words</span>
               <div class="quiet-row-actions">
+                <SemanticReference
+                  reference={sourceReferences[index]!}
+                  variant="action"
+                  label="details"
+                />
                 <a href={record.route}>view</a>
                 <a href="/content/review">review</a>
               </div>
@@ -97,5 +139,8 @@ const stageFor = (status: string) =>
         }
       </div>
     </section>
+    <SemanticInspector
+      references={contentReferences as SemanticReferenceModel[]}
+    />
   </main>
 </AdminLayout>

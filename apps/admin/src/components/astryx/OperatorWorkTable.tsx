@@ -16,6 +16,8 @@ import { operatorTaskDisplay } from "../../data/operator-work-view";
 type WorkRow = OperatorTaskState &
   Record<string, unknown> & {
     lane: OperatorWorkLane;
+    semantic_reference_id: string;
+    source_state: "verified" | "stale";
   };
 
 type Props = {
@@ -36,6 +38,12 @@ const displayTime = (value: string) =>
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
+
+const stateLabel = (row: WorkRow) =>
+  row.source_state === "verified" ? laneLabel[row.lane] : "last verified";
+
+const stateClass = (row: WorkRow) =>
+  row.source_state === "verified" ? row.operator_state : "unknown";
 
 export function OperatorWorkTable({ rows }: Props) {
   const columns = useMemo<Array<TableColumn<WorkRow>>>(
@@ -61,12 +69,16 @@ export function OperatorWorkTable({ rows }: Props) {
         renderCell: (row) => (
           <div className="quiet-work-state">
             <span
-              className={`quiet-state-dot is-${row.operator_state}`}
+              className={`quiet-state-dot is-${stateClass(row)}`}
               aria-hidden="true"
             />
             <span>
-              <strong>{laneLabel[row.lane]}</strong>
-              <small>{row.runtime_state}</small>
+              <strong>{stateLabel(row)}</strong>
+              <small>
+                {row.source_state === "verified"
+                  ? row.runtime_state
+                  : "source stale"}
+              </small>
             </span>
           </div>
         ),
@@ -116,7 +128,7 @@ export function OperatorWorkTable({ rows }: Props) {
             <button
               className="quiet-icon-action"
               type="button"
-              data-inspect-task={row.task_id}
+              data-semantic-open={row.semantic_reference_id}
               aria-label={`inspect ${row.canonical_title}`}
               title="inspect"
             >
@@ -149,8 +161,8 @@ export function OperatorWorkTable({ rows }: Props) {
             <header>
               <SourceMark provider={row.provider} compact />
               <strong>{row.canonical_title}</strong>
-              <span className={`quiet-state-dot is-${row.operator_state}`} />
-              <span>{laneLabel[row.lane]}</span>
+              <span className={`quiet-state-dot is-${stateClass(row)}`} />
+              <span>{stateLabel(row)}</span>
             </header>
             <p>{operatorTaskDisplay(row).bounded_goal}</p>
             <small>{operatorTaskDisplay(row).next_action}</small>
@@ -160,7 +172,7 @@ export function OperatorWorkTable({ rows }: Props) {
               </time>
               <button
                 type="button"
-                data-inspect-task={row.task_id}
+                data-semantic-open={row.semantic_reference_id}
                 aria-label={`inspect ${row.canonical_title}`}
               >
                 inspect

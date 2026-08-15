@@ -988,7 +988,7 @@
   text-decoration: none;
 }
 
-.admin-canvas .semantic-reference {
+.semantic-reference {
   display: inline-flex;
   width: fit-content;
   max-width: 100%;
@@ -1005,18 +1005,18 @@
   cursor: pointer;
 }
 
-.admin-canvas .semantic-reference > svg {
+.semantic-reference > svg {
   flex: 0 0 auto;
 }
 
-.admin-canvas .semantic-reference > span {
+.semantic-reference > span {
   overflow: hidden;
   min-width: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.admin-canvas .semantic-reference > small {
+.semantic-reference > small {
   flex: 0 0 auto;
   color: inherit;
   font-family: var(--sans);
@@ -1025,7 +1025,7 @@
   white-space: nowrap;
 }
 
-.admin-canvas .semantic-reference.is-compact {
+.semantic-reference.is-compact {
   min-height: 32px;
   border-radius: 9px;
   padding: 0 8px;
@@ -1035,14 +1035,14 @@
   font-weight: 520;
 }
 
-.admin-canvas .semantic-reference.is-value {
+.semantic-reference.is-value {
   min-height: 34px;
   color: var(--canvas-ink) !important;
   font-size: 13px;
   font-weight: 680;
 }
 
-.admin-canvas .semantic-reference.is-action {
+.semantic-reference.is-action {
   min-height: var(--canvas-control);
   flex: 0 0 auto;
   justify-content: center;
@@ -1057,8 +1057,8 @@
   white-space: nowrap;
 }
 
-.admin-canvas .semantic-reference.is-action:hover,
-.admin-canvas .semantic-reference.is-compact:hover {
+.semantic-reference.is-action:hover,
+.semantic-reference.is-compact:hover {
   border-color: color-mix(
     in srgb,
     var(--canvas-accent) 55%,
@@ -1067,25 +1067,25 @@
   color: var(--canvas-ink) !important;
 }
 
-.admin-canvas .semantic-reference.is-action:hover {
+.semantic-reference.is-action:hover {
   background: var(--canvas-blue-soft);
 }
 
-.admin-canvas .semantic-reference.state-verified > svg {
+.semantic-reference.state-verified > svg {
   color: var(--color-success, #2e8b57);
 }
 
-.admin-canvas .semantic-reference.state-stale > svg,
-.admin-canvas .semantic-reference.state-unchecked > svg {
+.semantic-reference.state-stale > svg,
+.semantic-reference.state-unchecked > svg {
   color: var(--color-warning, #a57513);
 }
 
-.admin-canvas .semantic-reference.state-absent > svg,
-.admin-canvas .semantic-reference.state-unknown > svg {
+.semantic-reference.state-absent > svg,
+.semantic-reference.state-unknown > svg {
   color: var(--color-error, #c2413b);
 }
 
-.admin-canvas .semantic-reference.is-action > svg {
+.semantic-reference.is-action > svg {
   color: var(--canvas-accent);
 }
 
@@ -1103,7 +1103,7 @@
   animation: canvas-source-update 800ms ease-out;
 }
 
-.admin-canvas .semantic-inspector {
+.semantic-inspector {
   position: fixed;
   inset: 0;
   width: min(520px, 100%);
@@ -1122,40 +1122,40 @@
   overscroll-behavior: contain;
 }
 
-.admin-canvas .semantic-inspector::backdrop {
+.semantic-inspector::backdrop {
   background: color-mix(in srgb, var(--canvas-ink) 38%, transparent);
   backdrop-filter: blur(2px);
 }
 
-.admin-canvas .semantic-inspector-sheet {
+.semantic-inspector-sheet {
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.admin-canvas .semantic-inspector section {
+.semantic-inspector section {
   min-height: 100%;
   padding: 24px;
 }
 
-.admin-canvas .semantic-inspector section[hidden] {
+.semantic-inspector section[hidden] {
   display: none;
 }
 
-.admin-canvas .semantic-inspector-header {
+.semantic-inspector-header {
   display: flex;
   align-items: start;
   justify-content: space-between;
   gap: 20px;
 }
 
-.admin-canvas .semantic-inspector-heading {
+.semantic-inspector-heading {
   display: grid;
   min-width: 0;
   gap: 8px;
 }
 
-.admin-canvas .semantic-inspector-kind {
+.semantic-inspector-kind {
   display: inline-flex;
   width: fit-content;
   align-items: center;
@@ -1167,7 +1167,7 @@
   text-transform: uppercase;
 }
 
-.admin-canvas .semantic-inspector-heading h2 {
+.semantic-inspector-heading h2 {
   overflow-wrap: anywhere;
   margin: 0;
   color: var(--canvas-ink);
@@ -1177,14 +1177,14 @@
   line-height: 1.08;
 }
 
-.admin-canvas .semantic-inspector-heading p {
+.semantic-inspector-heading p {
   margin: 0;
   color: var(--canvas-muted);
   font-size: 12px;
   line-height: 1.45;
 }
 
-.admin-canvas .semantic-inspector-close {
+.semantic-inspector-close {
   display: inline-grid;
   width: 40px;
   height: 40px;
@@ -1197,14 +1197,14 @@
   cursor: pointer;
 }
 
-.admin-canvas .semantic-inspector-facts {
+.semantic-inspector-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 28px;
 }
 
-.admin-canvas .semantic-inspector-facts article {
+.semantic-inspector-facts article {
   display: flex;
   min-width: 0;
   align-items: flex-start;
@@ -1215,14 +1215,14 @@
   color: var(--canvas-muted);
 }
 
-.admin-canvas .semantic-inspector-facts article > span {
+.semantic-inspector-facts article > span {
   display: grid;
   min-width: 0;
   gap: 3px;
 }
 
-.admin-canvas .semantic-inspector-facts small,
-.admin-canvas .semantic-inspector-grid dt {
+.semantic-inspector-facts small,
+.semantic-inspector-grid dt {
   color: var(--canvas-muted);
   font-size: 9px;
   font-weight: 700;
@@ -1230,32 +1230,32 @@
   text-transform: uppercase;
 }
 
-.admin-canvas .semantic-inspector-facts strong {
+.semantic-inspector-facts strong {
   color: var(--canvas-ink);
   font-size: 12px;
   font-weight: 650;
   line-height: 1.4;
 }
 
-.admin-canvas .semantic-inspector-grid {
+.semantic-inspector-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 18px 0 0;
 }
 
-.admin-canvas .semantic-inspector-grid > div {
+.semantic-inspector-grid > div {
   min-width: 0;
   border-radius: 12px;
   padding: 13px 14px;
   background: var(--canvas-soft);
 }
 
-.admin-canvas .semantic-inspector-grid > .is-wide {
+.semantic-inspector-grid > .is-wide {
   grid-column: 1 / -1;
 }
 
-.admin-canvas .semantic-inspector-grid dd {
+.semantic-inspector-grid dd {
   overflow-wrap: anywhere;
   margin: 5px 0 0;
   color: var(--canvas-ink);
@@ -1264,7 +1264,7 @@
   line-height: 1.5;
 }
 
-.admin-canvas .semantic-inspector-actions {
+.semantic-inspector-actions {
   position: sticky;
   bottom: 0;
   display: flex;
@@ -1282,8 +1282,8 @@
   backdrop-filter: blur(12px);
 }
 
-.admin-canvas .semantic-inspector-actions a,
-.admin-canvas .semantic-inspector-actions button {
+.semantic-inspector-actions a,
+.semantic-inspector-actions button {
   display: inline-flex;
   min-height: 40px;
   align-items: center;
@@ -1301,7 +1301,7 @@
   cursor: pointer;
 }
 
-.admin-canvas .semantic-inspector-actions .is-primary {
+.semantic-inspector-actions .is-primary {
   border-color: var(--canvas-ink);
   background: var(--canvas-ink);
   color: var(--color-background, #ffffff) !important;
@@ -1534,12 +1534,12 @@ body[data-semantic-inspector-open="true"] {
     min-width: 132px;
   }
 
-  .admin-canvas .semantic-reference.is-compact,
-  .admin-canvas .semantic-reference.is-value {
+  .semantic-reference.is-compact,
+  .semantic-reference.is-value {
     min-height: 44px;
   }
 
-  .admin-canvas .semantic-inspector {
+  .semantic-inspector {
     inset: auto 0 0;
     width: 100%;
     height: min(82dvh, 760px);
@@ -1551,36 +1551,36 @@ body[data-semantic-inspector-open="true"] {
       color-mix(in srgb, var(--canvas-ink) 20%, transparent);
   }
 
-  .admin-canvas .semantic-inspector section {
+  .semantic-inspector section {
     padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
   }
 
-  .admin-canvas .semantic-inspector-heading h2 {
+  .semantic-inspector-heading h2 {
     font-size: 23px;
   }
 
-  .admin-canvas .semantic-inspector-close {
+  .semantic-inspector-close {
     width: 44px;
     height: 44px;
     flex-basis: 44px;
   }
 
-  .admin-canvas .semantic-inspector-facts,
-  .admin-canvas .semantic-inspector-grid {
+  .semantic-inspector-facts,
+  .semantic-inspector-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .admin-canvas .semantic-inspector-grid > .is-wide {
+  .semantic-inspector-grid > .is-wide {
     grid-column: 1;
   }
 
-  .admin-canvas .semantic-inspector-actions {
+  .semantic-inspector-actions {
     margin: 20px -16px calc(-16px - env(safe-area-inset-bottom));
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   }
 
-  .admin-canvas .semantic-inspector-actions a,
-  .admin-canvas .semantic-inspector-actions button {
+  .semantic-inspector-actions a,
+  .semantic-inspector-actions button {
     min-height: 44px;
   }
 }

@@ -1,6 +1,12 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
+import SemanticInspector from "../components/SemanticInspector.astro";
+import SemanticReference from "../components/SemanticReference.astro";
 import { readAdminKnowledge } from "../data/knowledge";
+import {
+  internalRecordReference,
+  type SemanticReference as SemanticReferenceModel,
+} from "../data/semantic-reference";
 
 const knowledge = await readAdminKnowledge(Astro.locals.runtime?.env.DB);
 const requestedKind = Astro.url.searchParams.get("kind") ?? "all";
@@ -28,6 +34,29 @@ const displayTime = (value?: string | null) =>
         year: "numeric",
       }).format(new Date(value))
     : "unknown";
+const references = cards.map((card) =>
+  internalRecordReference({
+    id: card.card_id,
+    kind: card.kind === "person" ? "person" : "graph_entity",
+    label: card.title,
+    value: card.title,
+    summary: card.summary,
+    source: card.source_system,
+    source_ref: card.source_locator,
+    checked_at: card.observed_at,
+    source_state:
+      card.freshness_state === "fresh"
+        ? "verified"
+        : card.freshness_state === "stale"
+          ? "stale"
+          : "unknown",
+    sensitivity: card.sensitivity === "open" ? "internal" : "private",
+    evidence_refs: card.proof_refs,
+  }),
+);
+const referenceByCard = new Map(
+  cards.map((card, index) => [card.card_id, references[index]!]),
+);
 ---
 
 <AdminLayout title="knowledge" hideHeader>
@@ -75,13 +104,12 @@ const displayTime = (value?: string | null) =>
                   {displayTime(card.observed_at)}
                 </time>
               </div>
-              <a
+              <SemanticReference
+                reference={referenceByCard.get(card.card_id)!}
+                variant="action"
+                label="details"
                 class="quiet-row-link"
-                href={`/api/admin/knowledge?card_id=${encodeURIComponent(card.card_id)}`}
-                aria-label={`inspect ${card.title}`}
-              >
-                inspect
-              </a>
+              />
             </article>
           );
         })
@@ -98,6 +126,7 @@ const displayTime = (value?: string | null) =>
         </aside>
       )
     }
+    <SemanticInspector references={references as SemanticReferenceModel[]} />
   </main>
 
   <script is:inline>

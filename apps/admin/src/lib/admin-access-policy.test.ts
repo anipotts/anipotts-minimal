@@ -39,18 +39,25 @@ describe("admin access policy", () => {
     expect(isPublicAdminPath(path)).toBe(false);
   });
 
-  test.each(["/", "/inbox", "/work?view=now"])(
-    "allows the read-only development preview for %s",
-    (path) => {
-      expect(
-        isDevLoopbackPreviewRequest({
-          isDev: true,
-          method: "GET",
-          url: local(path),
-        }),
-      ).toBe(true);
-    },
-  );
+  test.each([
+    "/",
+    "/inbox",
+    "/work?view=now",
+    "/content",
+    "/knowledge",
+    "/life",
+    "/system",
+    "/fleet",
+    "/proof",
+  ])("allows the read-only development preview for %s", (path) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local(path),
+      }),
+    ).toBe(true);
+  });
 
   test("accepts the exact numeric loopback preview origin", () => {
     expect(
@@ -94,10 +101,10 @@ describe("admin access policy", () => {
       url: local("/inbox", "http://localhost:4321"),
     },
     {
-      name: "unapproved page",
+      name: "unapproved auth operation",
       isDev: true,
       method: "GET",
-      url: local("/content"),
+      url: local("/auth/device/opaque-request"),
     },
   ])("does not bypass native auth for $name", ({ isDev, method, url }) => {
     expect(

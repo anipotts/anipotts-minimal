@@ -233,6 +233,79 @@ export function noDestination(reason: string) {
   return { type: "none", reason } as const;
 }
 
+export function internalRecordReference<
+  K extends SemanticReferenceKind,
+>(input: {
+  id: string;
+  kind: K;
+  label: string;
+  value: string | null;
+  summary: string;
+  source: string;
+  source_ref: string;
+  checked_at?: string | null;
+  source_state?: "verified" | "stale" | "unchecked" | "absent" | "unknown";
+  sensitivity?: SemanticSensitivity;
+  confidence?: SemanticConfidence;
+  evidence_refs?: string[];
+}): SemanticReference<K> {
+  const sourceState = input.source_state ?? "stale";
+  const checkedAt = input.checked_at ?? null;
+  const authority = { kind: "internal" as const, label: "admin source record" };
+  const provenance = {
+    source: input.source,
+    source_ref: input.source_ref,
+    method: "projection" as const,
+    evidence_refs: input.evidence_refs ?? [],
+  };
+  const confidence = {
+    level: input.confidence ?? (sourceState === "verified" ? "high" : "medium"),
+    explanation:
+      sourceState === "verified"
+        ? "The current read-only source returned this record."
+        : "This is the last recorded value and needs a fresh source observation.",
+  };
+  const common = {
+    id: semanticReferenceId(input.id, input.kind),
+    kind: input.kind,
+    label: input.label,
+    summary: input.summary,
+    checked_at: checkedAt,
+    authority,
+    provenance,
+    confidence,
+    sensitivity: input.sensitivity ?? ("internal" as const),
+    validity: { valid_from: checkedAt, valid_until: null },
+    retrieval_policy: {
+      mode: "inspect" as const,
+      refresh_href: null,
+      explanation:
+        "Inspect the source state and evidence without leaving this page.",
+    },
+    destination: inspectorDestination("inspect details"),
+  };
+
+  if (
+    input.value !== null &&
+    (sourceState === "verified" || sourceState === "stale")
+  ) {
+    return defineKnownReference({
+      ...common,
+      value: input.value,
+      source_state: sourceState,
+    }) as SemanticReference<K>;
+  }
+
+  return defineMissingReference({
+    ...common,
+    value: null,
+    source_state:
+      sourceState === "verified" || sourceState === "stale"
+        ? "unknown"
+        : sourceState,
+  }) as SemanticReference<K>;
+}
+
 export function renderSemanticReference(
   reference: SemanticReference,
 ): SemanticReferenceRenderDescriptor {

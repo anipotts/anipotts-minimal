@@ -42,7 +42,30 @@ const DEV_LOOPBACK_ORIGINS = new Set([
   "http://localhost:4311",
   "http://127.0.0.1:4311",
 ]);
-const DEV_LOOPBACK_PREVIEW_PATHS = new Set(["/", "/inbox", "/work"]);
+const DEV_LOOPBACK_PREVIEW_PATHS = new Set([
+  "/",
+  "/inbox",
+  "/work",
+  "/content",
+  "/content/carousels",
+  "/content/drafts",
+  "/content/operations",
+  "/content/preview",
+  "/content/review",
+  "/deploys",
+  "/fleet",
+  "/handoffs",
+  "/knowledge",
+  "/knowledge/locations",
+  "/life",
+  "/life/aesthetics",
+  "/life/health",
+  "/mutations",
+  "/newsletter",
+  "/proof",
+  "/repos",
+  "/system",
+]);
 
 type AdminAccessInput = {
   isDev: boolean;

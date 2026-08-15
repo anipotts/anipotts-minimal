@@ -1,7 +1,13 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import SemanticInspector from "../../components/SemanticInspector.astro";
+import SemanticReference from "../../components/SemanticReference.astro";
 import { readAdminKnowledge } from "../../data/knowledge";
 import { readAdminInbox } from "../../data/inbox";
+import {
+  internalRecordReference,
+  type SemanticReference as SemanticReferenceModel,
+} from "../../data/semantic-reference";
 
 const [knowledge, inbox] = await Promise.all([
   readAdminKnowledge(Astro.locals.runtime?.env.DB, "", {
@@ -12,6 +18,26 @@ const [knowledge, inbox] = await Promise.all([
 ]);
 const lifeAttention = inbox.items.filter((item) => item.category === "life");
 const recent = knowledge.bundle.cards.slice(0, 5);
+const recentReferences = recent.map((card) =>
+  internalRecordReference({
+    id: card.card_id,
+    kind: card.kind === "person" ? "person" : "graph_entity",
+    label: card.title,
+    value: card.title,
+    summary: card.summary,
+    source: card.source_system,
+    source_ref: card.source_locator,
+    checked_at: card.observed_at,
+    source_state:
+      card.freshness_state === "fresh"
+        ? "verified"
+        : card.freshness_state === "stale"
+          ? "stale"
+          : "unknown",
+    sensitivity: "private",
+    evidence_refs: card.proof_refs,
+  }),
+);
 ---
 
 <AdminLayout title="life" hideHeader>
@@ -75,16 +101,24 @@ const recent = knowledge.bundle.cards.slice(0, 5);
       </header>
       <div>
         {
-          recent.map((card) => (
+          recent.map((card, index) => (
             <article>
               <span>{card.kind.replaceAll("_", " ")}</span>
               <h3>{card.title}</h3>
               <p>{card.summary}</p>
               <small>{card.freshness_state}</small>
+              <SemanticReference
+                reference={recentReferences[index]!}
+                variant="action"
+                label="details"
+              />
             </article>
           ))
         }
       </div>
     </section>
+    <SemanticInspector
+      references={recentReferences as SemanticReferenceModel[]}
+    />
   </main>
 </AdminLayout>
