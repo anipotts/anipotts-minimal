@@ -343,29 +343,29 @@ describe("homepage cms validation", () => {
     });
   });
 
-  it("rejects excessive paragraph length", () => {
+  it("rejects excessive homepage summary length", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,
       sections: {
         ...DEFAULT_HOMEPAGE_CONTENT.sections,
-        about: {
-          ...DEFAULT_HOMEPAGE_CONTENT.sections.about,
-          paragraphs: ["x".repeat(1201)],
+        intro: {
+          ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
+          subheading: "x".repeat(501),
         },
       },
     });
 
     expect(validateHomepageContent(content)).toEqual({
       ok: false,
-      error: "About paragraph is too long",
+      error: "Homepage summary is too long",
     });
   });
 
-  it("derives plain homepage summary text from rich summary mentions", () => {
+  it("derives the current plain homepage summary", () => {
     const content = normalizeHomepageContent(DEFAULT_HOMEPAGE_CONTENT);
 
     expect(homepageSummaryText(content)).toBe(
-      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. every now and then i post about what i'm doing with claude code and codex.",
+      "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
     );
   });
 

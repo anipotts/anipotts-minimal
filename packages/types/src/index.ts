@@ -47,11 +47,19 @@ export type {
   OrchestratingLoopCard,
   OrchestratingPageContent,
   OrchestratingSectionLabels,
+  SystemsLinkCard,
+  SystemsPageContent,
+  SystemsPrinciple,
   FooterContent,
   ProjectRow,
   SocialLinkRow,
   SiteSettingsMap,
 } from "./cms";
+export type {
+  PublicCopyContext,
+  PublicCopyFinding,
+  PublicCopyRule,
+} from "./public-copy";
 export { projectRowToProject } from "./cms";
 
 // Control-plane contract

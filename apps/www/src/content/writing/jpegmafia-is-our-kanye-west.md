@@ -21,7 +21,7 @@ JPEGMAFIA reminds me of that builder pattern
 For software this usually translates to:
 
 1. Ship with strong opinionated defaults
-2. Use feedback to adjust surfaces, not core principles
-3. Keep a clear model for quality so growth does not flatten identity
+2. Use feedback to adjust surfaces while core principles stay stable
+3. Keep a clear model for quality so growth preserves identity
 
 Consensus can improve distribution, but it rarely creates a category-defining product

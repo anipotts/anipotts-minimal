@@ -1,0 +1,70 @@
+---
+import Shell from "../layouts/Shell.astro";
+
+const links = [
+  { label: "making", href: "/making" },
+  { label: "writing", href: "/writing" },
+  { label: "systems", href: "/systems" },
+  { label: "email", href: "mailto:contact@anipotts.com" },
+  { label: "github", href: "https://github.com/anipotts" },
+  { label: "linkedin", href: "https://www.linkedin.com/in/anipotts" },
+  { label: "x", href: "https://x.com/anipottsbuilds" },
+  { label: "newsletter", href: "https://news.anipotts.com" },
+];
+---
+
+<Shell
+  title="links"
+  description="useful links for ani potts."
+  path="/links"
+  robots="noindex,follow"
+>
+  <section data-rise class="links-page">
+    <p class="mono">ani potts</p>
+    <h1>links</h1>
+    <nav aria-label="profile links">
+      {
+        links.map((link) => (
+          <a href={link.href}>
+            {link.label}
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+</Shell>
+
+<style>
+  .links-page {
+    display: grid;
+    gap: var(--s-4);
+    max-width: 38rem;
+    padding-block: var(--s-5);
+  }
+  .links-page p,
+  .links-page h1 {
+    margin: 0;
+  }
+  .links-page h1 {
+    font-size: clamp(3rem, 10vw, 6rem);
+  }
+  nav {
+    display: grid;
+    gap: var(--s-2);
+  }
+  nav a {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--s-3);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
+    text-decoration: none;
+  }
+  nav a:hover,
+  nav a:focus-visible {
+    border-color: var(--interactive);
+    color: var(--interactive);
+  }
+</style>

@@ -8,10 +8,10 @@ export const projects: Project[] = [
     subtitle: "Quant interview prep for Jane Street, Citadel, Two Sigma.",
     description:
       "400+ problems with Python code editor, KaTeX math rendering, instant grading, and gamification. Next.js 15, React 19, Postgres (Aurora to Neon migration), Lambda for sandboxed execution.",
-    year: "2024-",
+    year: "2024",
     category: "product",
     role: "Founder and Engineer",
-    duration: "Ongoing",
+    duration: "Launched 2024",
     tags: [
       "Next.js 15",
       "TypeScript",
@@ -39,7 +39,7 @@ export const projects: Project[] = [
     role: "Creator",
     duration: "Winter 2026",
     tags: ["Chrome Extension", "JavaScript", "Manifest V3"],
-    status: "live",
+    status: "archived",
     icon: "chrome",
     links: {
       repo: "https://github.com/anipotts/quantercise-mental-math-extension",

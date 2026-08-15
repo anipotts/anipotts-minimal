@@ -9,8 +9,8 @@ import {
   validatePublicRouteInventory,
 } from "./public-route-inventory.mjs";
 
-assert.equal(PUBLIC_ROUTE_INVENTORY.length, 20);
-assert.equal(PUBLIC_SMOKE_ROUTES.length, 20);
+assert.equal(PUBLIC_ROUTE_INVENTORY.length, 22);
+assert.equal(PUBLIC_SMOKE_ROUTES.length, 22);
 assert.deepEqual(
   PUBLIC_SMOKE_ROUTES,
   PUBLIC_ROUTE_INVENTORY.map((record) => record.route),
@@ -35,7 +35,7 @@ assert.equal(
   PUBLIC_ROUTE_INVENTORY.filter(
     (record) => record.file === "apps/www/src/pages/writing/[slug].astro",
   ).length,
-  4,
+  5,
 );
 
 const cli = spawnSync(

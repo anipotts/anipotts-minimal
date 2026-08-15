@@ -5,7 +5,7 @@ export type ContentSurface =
   | "projects"
   | "writing"
   | "newsletter"
-  | "orchestrating";
+  | "systems";
 export type ContentEditability = "ready" | "needs_schema" | "needs_owner";
 
 export type ContentInventoryItem = {
@@ -200,21 +200,6 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.homepage.summary.source"],
   },
   {
-    id: "homepage.about",
-    surface: "homepage",
-    title: "about section",
-    source_ref:
-      "D1 page_content:home.sections.about seeded by drizzle/migrations/0021_seed_homepage_about_section.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
-    current_value:
-      "The homepage about label and paragraphs are structured page_content when present.",
-    editability: "ready",
-    risk_level: "medium",
-    next_safe_action:
-      "Preview about copy changes before any save path edits the home content record.",
-    required_authority: [],
-    proof_ids: ["content.homepage.about.page-content"],
-  },
-  {
     id: "homepage.mentions",
     surface: "homepage",
     title: "homepage mention metadata",
@@ -400,16 +385,16 @@ export const contentInventory: ContentInventoryItem[] = [
   {
     id: "writing.claude_stats_link",
     surface: "writing",
-    title: "orchestrating stats link",
+    title: "systems essay link",
     source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
     current_value:
-      "The writing post now links to /orchestrating instead of the legacy /claude path.",
+      "The writing post links to /systems as the canonical agent-method route.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
       "Keep this as the canonical route unless the public navigation changes again.",
     required_authority: [],
-    proof_ids: ["content.writing.orchestrating-link.current"],
+    proof_ids: ["content.writing.systems-link.current"],
   },
   {
     id: "newsletter.subscribe_copy",
@@ -460,19 +445,19 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.newsletter.backfill.plan"],
   },
   {
-    id: "orchestrating.hero_copy",
-    surface: "orchestrating",
-    title: "orchestrating page copy",
+    id: "systems.hero_copy",
+    surface: "systems",
+    title: "systems page copy",
     source_ref:
-      "D1 page_content:orchestrating seeded by drizzle/migrations/0027_seed_orchestrating_page_content.sql and expanded by drizzle/migrations/0030_expand_orchestrating_page_content.sql, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
+      "D1 page_content:systems seeded by drizzle/migrations/0044_public_identity_systems.sql, fallback @anipotts/content/public DEFAULT_SYSTEMS_CONTENT",
     current_value:
-      "The /orchestrating title, meta description, section labels, hero, live-session panel, loop cards, and public-tool cards use structured page_content when present.",
+      "The /systems title, description, hero, operating principles, featured writing, and public tools use structured page_content when present.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview orchestrating hero changes before any save path edits the page content record because this page describes live operator machinery.",
+      "Preview systems copy changes before any save path edits the page content record.",
     required_authority: [],
-    proof_ids: ["content.orchestrating.hero.page-content"],
+    proof_ids: ["content.systems.hero.page-content"],
   },
 ];
 
@@ -594,10 +579,6 @@ function sourceBackedFields(
     gaps.push("proof_cards");
   }
 
-  if (!hasNestedField(content, ["sections", "about", "paragraphs"])) {
-    gaps.push("sections.about.paragraphs");
-  }
-
   if (!hasNestedField(content, ["sections", "past_work", "project_slugs"])) {
     gaps.push("sections.past_work.project_slugs");
   }
@@ -648,7 +629,7 @@ function summarizePageContent(
     pageKey === "making" ||
     pageKey === "projects" ||
     pageKey === "newsletter_archive" ||
-    pageKey === "orchestrating"
+    pageKey === "systems"
   ) {
     return compactSummary([
       ["title", content.hero_title ?? content.title],
@@ -706,7 +687,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:
-      "previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture. now i write about coding agent workflows and the systems around them.",
+      "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
     preview_route: "/",
     authority_state: "preview_only_no_write",
     required_approval_ids: [],
@@ -749,14 +730,13 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     current_value:
       "You can see all of this on [my Claude stats page](/claude).",
     proposed_value:
-      "You can see the broader agent workflow on [my orchestrating page](/orchestrating).",
+      "You can see the broader agent method on [my systems page](/systems).",
     preview_route: "/writing/saturdays-are-for-claude-code",
     authority_state: "public_site_safe_lane_absorbed",
     required_approval_ids: [],
-    proof_ids: ["content.writing.orchestrating-link.current"],
+    proof_ids: ["content.writing.systems-link.current"],
     blocked_actions: ["deploy without checks"],
-    next_safe_action:
-      "Keep the absorbed /orchestrating link as the canonical public-site route.",
+    next_safe_action: "Keep /systems as the canonical public-site route.",
   },
   {
     id: "preview.newsletter.copy-source",

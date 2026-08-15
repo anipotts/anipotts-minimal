@@ -1,7 +1,7 @@
 ---
 slug: search-will-be-dead-by-2030
 title: search will be dead by 2030
-summary: search does not disappear. the main interface collapses into agents, memory, retrieval, and synthesis.
+summary: search becomes infrastructure while agents, memory, retrieval, and synthesis become the interface.
 tags: [ai, search, product]
 status: published
 published_at: 2026-01-31
@@ -15,16 +15,12 @@ What changes first:
 
 - query boxes become fallback UX
 - ranking systems become orchestration systems
-- links become evidence, not destination
+- links become evidence for synthesized answers
 
-The winners are not "better search engines"
-
-The winners are systems that combine:
+The winning systems combine:
 
 - persistent user context
 - retrieval quality under uncertainty
 - trustworthy synthesis
 
-Search is not dead as infrastructure
-
-Search is dead as a primary interaction model
+Search becomes infrastructure. Agents become the primary interaction model.
