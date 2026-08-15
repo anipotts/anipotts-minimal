@@ -17,6 +17,7 @@ import {
   type AdminAuthContext,
   type AdminPrincipal,
 } from "./admin-auth";
+import { requirePublicAllocationBudget } from "./admin-public-rate-limit";
 import {
   beginPasskeyRegistration,
   insertPasskeyCredential,
@@ -72,6 +73,7 @@ export async function startGoogleRecovery(
       { status: 503 },
     );
   }
+  await requirePublicAllocationBudget(db, context.request, "recovery");
 
   const state = randomToken(32);
   const verifier = randomToken(48);

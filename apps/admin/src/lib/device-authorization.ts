@@ -13,7 +13,9 @@ import {
   requireAdminMutation,
   type AdminAuthContext,
   type AdminD1Database,
+  type AdminPrincipal,
 } from "./admin-auth";
+import { requirePublicAllocationBudget } from "./admin-public-rate-limit";
 
 export const DEVICE_AUTHORIZATION_SECONDS = 5 * 60;
 export const DEVICE_VERIFIER_COOKIE = "__Host-admin_device_verifier";
@@ -27,6 +29,7 @@ type DeviceAuthorizationRow = {
   expires_at: string;
   approved_by_user_id: string | null;
   approved_by_session_id: string | null;
+  approved_by_credential_id: string | null;
   approved_at: string | null;
   denied_at: string | null;
   claimed_at: string | null;
@@ -45,6 +48,7 @@ export async function startDeviceAuthorization(
 ): Promise<Response> {
   assertExactOrigin(context.request, context.url);
   const db = requireAdminDb(context);
+  await requirePublicAllocationBudget(db, context.request, "device");
   const requestId = randomToken(24);
   const verifier = randomToken(32);
   const requestedAt = nowIso();
@@ -145,6 +149,7 @@ export async function approveDeviceAuthorization(
   context: AdminAuthContext,
 ): Promise<Response> {
   const principal = await requireAdminMutation(context, "admin:read");
+  requirePasskeyApprovalProvenance(principal);
   const db = requireAdminDb(context);
   const body = (await context.request.json().catch(() => null)) as {
     request_id?: unknown;
@@ -174,14 +179,22 @@ export async function approveDeviceAuthorization(
   const result = await db
     .prepare(
       `UPDATE admin_device_authorizations
-       SET approved_by_user_id = ?, approved_by_session_id = ?, approved_at = ?
+       SET approved_by_user_id = ?, approved_by_session_id = ?,
+           approved_by_credential_id = ?, approved_at = ?
        WHERE id = ?
          AND approved_at IS NULL
          AND denied_at IS NULL
          AND claimed_at IS NULL
          AND expires_at > ?`,
     )
-    .bind(principal.userId, principal.sessionId, approvedAt, row.id, approvedAt)
+    .bind(
+      principal.userId,
+      principal.sessionId,
+      principal.credentialId,
+      approvedAt,
+      row.id,
+      approvedAt,
+    )
     .run();
   if (resultChanges(result) !== 1) {
     throw adminJson({ error: "device_request_raced" }, { status: 409 });
@@ -219,7 +232,7 @@ export async function claimDeviceAuthorization(
   if (deviceAuthorizationState(row) !== "approved" || !row.approved_at) {
     throw adminJson({ error: "device_request_not_approved" }, { status: 409 });
   }
-  if (!row.approved_by_user_id) {
+  if (!row.approved_by_user_id || !row.approved_by_credential_id) {
     throw adminJson({ error: "device_request_invalid" }, { status: 409 });
   }
 
@@ -245,8 +258,10 @@ export async function claimDeviceAuthorization(
 
   const created = await createAdminSession(db, {
     userId: row.approved_by_user_id,
+    credentialId: row.approved_by_credential_id,
     authMethod: "device_approval",
     stepUpAt: row.approved_at,
+    requireActiveCredential: true,
   });
   await db
     .prepare(
@@ -259,6 +274,7 @@ export async function claimDeviceAuthorization(
     eventType: "admin.device.claimed",
     userId: row.approved_by_user_id,
     sessionId: created.sessionId,
+    credentialId: row.approved_by_credential_id,
     summary: "claimed approved cross-device admin session with verifier",
     metadata: { request_id: row.id },
   });
@@ -271,6 +287,14 @@ export async function claimDeviceAuthorization(
     }),
     [adminSessionCookie(created.token), expiredDeviceVerifierCookie()],
   );
+}
+
+export function requirePasskeyApprovalProvenance(
+  principal: Pick<AdminPrincipal, "authMethod" | "credentialId">,
+): void {
+  if (principal.authMethod !== "passkey" || !principal.credentialId) {
+    throw adminJson({ error: "passkey_approval_required" }, { status: 403 });
+  }
 }
 
 export function deviceAuthorizationState(

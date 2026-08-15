@@ -1,5 +1,6 @@
 import {
   adminJson,
+  applyAdminSetCookies,
   assertExactOrigin,
   hashToken,
   nowIso,
@@ -19,6 +20,7 @@ import {
 import { notifyAdminSecurityEvent } from "./security-notifications";
 
 export const ADMIN_INVITE_SECONDS = 30 * 60;
+export const ADMIN_INVITE_COOKIE = "__Host-admin_invite";
 
 type InviteRole = Exclude<AdminRole, "owner">;
 
@@ -89,7 +91,7 @@ export async function inviteStatus(
   context: AdminAuthContext,
 ): Promise<Response> {
   const db = requireAdminDb(context);
-  const token = context.url.searchParams.get("token") ?? "";
+  const token = inviteToken(context);
   const invite = await inviteByToken(db, token);
   if (!invite) {
     throw adminJson({ error: "invite_not_found" }, { status: 404 });
@@ -107,17 +109,17 @@ export async function inviteRegistrationOptions(
   assertExactOrigin(context.request, context.url);
   const db = requireAdminDb(context);
   const body = (await context.request.json().catch(() => null)) as {
-    token?: unknown;
     display_name?: unknown;
   } | null;
-  if (!body || typeof body.token !== "string" || !body.token) {
+  const token = inviteToken(context);
+  if (!token) {
     throw adminJson({ error: "invite_token_required" }, { status: 400 });
   }
-  const invite = await inviteByToken(db, body.token);
+  const invite = await inviteByToken(db, token);
   if (!invite || inviteState(invite) !== "ready") {
     throw adminJson({ error: "invite_expired_or_used" }, { status: 410 });
   }
-  const displayName = cleanDisplayName(body.display_name);
+  const displayName = cleanDisplayName(body?.display_name);
   const pendingUserId = invite.pending_user_id ?? `member-${invite.id}`;
   if (!invite.pending_user_id) {
     await db
@@ -209,7 +211,25 @@ export async function verifyInviteRegistration(
     summary: "an invited admin passkey was enrolled and awaits approval",
   });
 
-  return adminJson({ ok: true, state: "pending_owner_approval" });
+  return applyAdminSetCookies(
+    adminJson({ ok: true, state: "pending_owner_approval" }),
+    [expiredInviteCookie()],
+  );
+}
+
+function inviteToken(context: AdminAuthContext): string {
+  return context.cookies.get(ADMIN_INVITE_COOKIE)?.value ?? "";
+}
+
+function expiredInviteCookie(): string {
+  return [
+    `${ADMIN_INVITE_COOKIE}=`,
+    "Path=/",
+    "Max-Age=0",
+    "Secure",
+    "HttpOnly",
+    "SameSite=Lax",
+  ].join("; ");
 }
 
 export async function approveAdminMember(

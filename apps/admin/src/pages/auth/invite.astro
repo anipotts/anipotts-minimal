@@ -1,8 +1,26 @@
 ---
 import AuthFrame from "../../components/auth/AuthFrame.astro";
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import {
+  ADMIN_INVITE_COOKIE,
+  ADMIN_INVITE_SECONDS,
+} from "../../lib/admin-invites";
 
 const inviteCode = Astro.url.searchParams.get("token") ?? "";
+Astro.response.headers.set("Cache-Control", "private, no-store");
+Astro.response.headers.set("Referrer-Policy", "no-referrer");
+if (inviteCode) {
+  if (inviteCode.length <= 256) {
+    Astro.cookies.set(ADMIN_INVITE_COOKIE, inviteCode, {
+      path: "/",
+      maxAge: ADMIN_INVITE_SECONDS,
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+    });
+  }
+  return Astro.redirect("/auth/invite", 303);
+}
 ---
 
 <AdminLayout title="join admin" chrome="auth" hideHeader>
@@ -10,7 +28,7 @@ const inviteCode = Astro.url.searchParams.get("token") ?? "";
     title="join admin"
     subtitle="create a passkey to finish your invitation."
   >
-    <div id="invite-flow" data-token={inviteCode}>
+    <div id="invite-flow">
       <section class="auth-state" data-invite-state="loading">
         <p class="auth-detail" aria-live="polite">checking invitation</p>
       </section>
@@ -75,8 +93,6 @@ const inviteCode = Astro.url.searchParams.get("token") ?? "";
     challenge_id: string;
   };
 
-  const flow = document.querySelector<HTMLElement>("#invite-flow");
-  const token = flow?.dataset.token ?? "";
   const title = document.querySelector<HTMLElement>("[data-auth-title]");
   const subtitle = document.querySelector<HTMLElement>("[data-auth-subtitle]");
   const form = document.querySelector<HTMLFormElement>("#invite-form");
@@ -95,15 +111,9 @@ const inviteCode = Astro.url.searchParams.get("token") ?? "";
   void loadInvite();
 
   async function loadInvite() {
-    if (!token) {
-      setState("expired");
-      return;
-    }
     setState("loading");
     try {
-      const status = await getJson<InviteStatus>(
-        `/api/admin/invites/status?token=${encodeURIComponent(token)}`,
-      );
+      const status = await getJson<InviteStatus>("/api/admin/invites/status");
       if (status.state === "ready") {
         setText(subtitle, `create a passkey to join as ${status.role}.`);
         setState("ready");
@@ -127,7 +137,7 @@ const inviteCode = Astro.url.searchParams.get("token") ?? "";
     try {
       const envelope = await postJson<RegistrationEnvelope>(
         "/api/admin/invites/register-options",
-        { token, display_name: nameInput.value },
+        { display_name: nameInput.value },
       );
       const credential = await startRegistration({
         optionsJSON: envelope.options,

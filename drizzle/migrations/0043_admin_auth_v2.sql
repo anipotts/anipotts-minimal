@@ -122,11 +122,14 @@ CREATE TABLE IF NOT EXISTS admin_device_authorizations (
   expires_at TEXT NOT NULL,
   approved_by_user_id TEXT,
   approved_by_session_id TEXT,
+  approved_by_credential_id TEXT,
   approved_at TEXT,
   denied_at TEXT,
   claimed_at TEXT,
   claimed_session_id TEXT,
   FOREIGN KEY (approved_by_user_id) REFERENCES admin_users(id),
+  FOREIGN KEY (approved_by_credential_id)
+    REFERENCES admin_passkey_credentials(credential_id),
   FOREIGN KEY (claimed_session_id) REFERENCES admin_sessions(id)
 );
 

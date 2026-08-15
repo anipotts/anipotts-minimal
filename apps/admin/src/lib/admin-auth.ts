@@ -259,6 +259,7 @@ export async function createAdminSession(
     stepUpAt?: string | null;
     restriction?: AdminSessionRestriction;
     lifetimeSeconds?: number;
+    requireActiveCredential?: boolean;
   },
 ): Promise<CreatedAdminSession> {
   const token = randomToken();
@@ -271,27 +272,48 @@ export async function createAdminSession(
   );
   const expiresAt = new Date(Date.now() + lifetimeSeconds * 1000).toISOString();
 
-  await db
-    .prepare(
-      `INSERT INTO admin_sessions
+  const insertSql = input.requireActiveCredential
+    ? `INSERT INTO admin_sessions
         (id, user_id, token_hash, credential_id, auth_method, restriction,
          created_at, expires_at, last_seen_at, step_up_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      sessionId,
-      input.userId,
-      tokenHash,
-      input.credentialId ?? null,
-      input.authMethod,
-      input.restriction ?? null,
-      createdAt,
-      expiresAt,
-      createdAt,
-      input.stepUpAt ?? null,
-      createdAt,
-    )
+       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+       WHERE EXISTS (
+         SELECT 1 FROM admin_passkey_credentials
+         WHERE credential_id = ? AND user_id = ? AND revoked_at IS NULL
+       )`
+    : `INSERT INTO admin_sessions
+        (id, user_id, token_hash, credential_id, auth_method, restriction,
+         created_at, expires_at, last_seen_at, step_up_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const values = [
+    sessionId,
+    input.userId,
+    tokenHash,
+    input.credentialId ?? null,
+    input.authMethod,
+    input.restriction ?? null,
+    createdAt,
+    expiresAt,
+    createdAt,
+    input.stepUpAt ?? null,
+    createdAt,
+  ];
+  if (input.requireActiveCredential) {
+    if (!input.credentialId) {
+      throw adminJson(
+        { error: "credential_session_required" },
+        { status: 409 },
+      );
+    }
+    values.push(input.credentialId, input.userId);
+  }
+  const inserted = await db
+    .prepare(insertSql)
+    .bind(...values)
     .run();
+  if (input.requireActiveCredential && resultChanges(inserted) !== 1) {
+    throw adminJson({ error: "credential_not_active" }, { status: 409 });
+  }
 
   return {
     token,
@@ -299,6 +321,12 @@ export async function createAdminSession(
     expiresAt,
     csrfToken: await csrfTokenForSessionToken(token),
   };
+}
+
+function resultChanges(result: { meta?: unknown }): number {
+  return Number(
+    (result.meta as { changes?: number } | undefined)?.changes ?? 0,
+  );
 }
 
 export async function requireAdminMutation(

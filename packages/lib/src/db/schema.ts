@@ -888,6 +888,7 @@ export const adminDeviceAuthorizations = sqliteTable(
     expires_at: text("expires_at").notNull(),
     approved_by_user_id: text("approved_by_user_id"),
     approved_by_session_id: text("approved_by_session_id"),
+    approved_by_credential_id: text("approved_by_credential_id"),
     approved_at: text("approved_at"),
     denied_at: text("denied_at"),
     claimed_at: text("claimed_at"),
