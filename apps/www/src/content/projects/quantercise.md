@@ -2,10 +2,10 @@
 title: quantercise
 subtitle: quant interview practice with 400+ problems, instant grading, and sandboxed python.
 description: Built from my own interview-prep workflow, Quantercise combines 400+ quant problems, instant grading, a browser-based Python editor, math rendering, progress tracking, and payments in one focused practice loop.
-year: "2024-"
+year: "2024"
 category: product
 role: Founder and Engineer
-duration: Ongoing
+duration: Launched 2024
 status: live
 featured: true
 sort_order: 100

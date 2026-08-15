@@ -415,8 +415,8 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     slug: "quantercise",
     title: "quantercise",
     status: "live",
-    year: "2024-",
-    range: "Ongoing",
+    year: "2024",
+    range: "Launched 2024",
     tags: ["next.js", "typescript", "postgres", "drizzle", "stripe", "python"],
     summary:
       "quant interview practice with 400+ problems, instant grading, and sandboxed python.",
@@ -476,7 +476,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   {
     slug: "quantercise-extension",
     title: "mental math extension",
-    status: "live",
+    status: "archived",
     year: "2026",
     range: "Winter 2026",
     tags: ["chrome extension", "javascript", "manifest v3"],

@@ -6,7 +6,7 @@ year: "2026"
 category: product
 role: Creator
 duration: Winter 2026
-status: live
+status: archived
 sort_order: 90
 icon: google-chrome-logo
 link_repo: https://github.com/anipotts/quantercise-mental-math-extension

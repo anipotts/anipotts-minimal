@@ -59,6 +59,10 @@ INSERT OR REPLACE INTO page_content (
 UPDATE page_content
 SET content = json_set(
       content,
+      '$.year',
+      '2024',
+      '$.range',
+      'Launched 2024',
       '$.summary',
       'quant interview practice with 400+ problems, instant grading, and sandboxed python.',
       '$.body',
@@ -142,6 +146,8 @@ WHERE page_key = 'project:imessage-mcp';
 UPDATE page_content
 SET content = json_set(
       content,
+      '$.status',
+      'archived',
       '$.body',
       'Built a self-contained Chrome extension for keyboard-driven mental math practice. Includes sound feedback, progress tracking, and Manifest V3 packaging. Everything runs in the browser.'
     ),
