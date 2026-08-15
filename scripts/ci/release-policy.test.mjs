@@ -123,6 +123,41 @@ assert.throws(
   /invalid schema_fingerprint_after/,
 );
 
+const pendingFingerprintManifest = {
+  ...safeManifest,
+  migrations: [
+    {
+      ...safeManifest.migrations[0],
+      schema_fingerprint_before: "pending_bootstrap",
+      schema_fingerprint_after: "pending_bootstrap",
+    },
+  ],
+};
+assert.doesNotThrow(() =>
+  classifyRelease([`A\tdrizzle/migrations/${safeFile}`], {
+    ...base,
+    manifest: pendingFingerprintManifest,
+    files: [safeFile],
+    readFile: () => safeSql,
+  }),
+);
+assert.throws(
+  () =>
+    classifyRelease([`A\tdrizzle/migrations/${safeFile}`], {
+      ...base,
+      manifest: {
+        ...pendingFingerprintManifest,
+        bootstrap: {
+          ...pendingFingerprintManifest.bootstrap,
+          status: "verified",
+        },
+      },
+      files: [safeFile],
+      readFile: () => safeSql,
+    }),
+  /must pin schema fingerprints after bootstrap verification/,
+);
+
 assert.equal(
   classifySql("CREATE TABLE IF NOT EXISTS canary (id TEXT PRIMARY KEY);"),
   "automatic",

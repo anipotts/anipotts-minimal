@@ -183,5 +183,67 @@
       "34ba441a1921d0a5265695236ec73abead8665475cb6c3d9ada5dc78e30a48ed"
     ]
   ],
-  "migrations": []
+  "migrations": [
+    {
+      "file": "0043_admin_auth_v2.sql",
+      "checksum": "sha256:c19e5b0d2a68021d91f8c5879fde3b9a8804fdbe9e46abffc56652b97fc5b125",
+      "risk": "approval",
+      "consumers": ["admin"],
+      "preconditions": [
+        {
+          "sql": "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('admin_users','admin_sessions','admin_invites','admin_device_authorizations','admin_external_identities','admin_recovery_requests','admin_machine_tokens','admin_security_notifications')) AS auth_tables, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_credentials') WHERE name IN ('label','created_by_session_id','revocation_reason')) AS credential_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_challenges') WHERE name IN ('user_id','session_id','invite_id','recovery_session_id','request_origin','metadata')) AS challenge_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_audit') WHERE name IN ('user_id','session_id','outcome','metadata')) AS audit_columns",
+          "expected": {
+            "auth_tables": 0,
+            "credential_columns": 0,
+            "challenge_columns": 0,
+            "audit_columns": 0
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "sql": "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('admin_users','admin_sessions','admin_invites','admin_device_authorizations','admin_external_identities','admin_recovery_requests','admin_machine_tokens','admin_security_notifications')) AS auth_tables, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_credentials') WHERE name IN ('label','created_by_session_id','revocation_reason')) AS credential_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_challenges') WHERE name IN ('user_id','session_id','invite_id','recovery_session_id','request_origin','metadata')) AS challenge_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_audit') WHERE name IN ('user_id','session_id','outcome','metadata')) AS audit_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_device_authorizations') WHERE name = 'approved_by_credential_id') AS approval_credential_columns",
+          "expected": {
+            "auth_tables": 8,
+            "credential_columns": 3,
+            "challenge_columns": 6,
+            "audit_columns": 4,
+            "approval_credential_columns": 1
+          }
+        }
+      ],
+      "rollback": "Keep Cloudflare Access active and the prior Admin deployment available. If application proof fails, roll back the Worker only and preserve the additive auth tables for a forward fix. Do not drop auth history automatically.",
+      "schema_fingerprint_before": "sha256:8ffd0dacff04904a34b40b2be4436c0121ac56a8f8f68c660c16237fac5a43f4",
+      "schema_fingerprint_after": "pending_bootstrap"
+    },
+    {
+      "file": "0044_public_identity_systems.sql",
+      "checksum": "sha256:6f11a4f7f2652ddda72e3ba07866fc66b3440e5c8cbda4e46c0ee7594375bf45",
+      "risk": "approval",
+      "consumers": ["admin", "www"],
+      "preconditions": [
+        {
+          "sql": "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'admin_users') AS auth_predecessor, (SELECT COUNT(*) FROM page_content WHERE page_key = 'home' AND json_valid(content)) AS home_rows, (SELECT COUNT(*) FROM page_content WHERE page_key IN ('project:quantercise','writing:saturdays-are-for-claude-code','writing:i-built-a-monitor-for-my-claude-code-sessions','writing:stop-ending-your-day-with-fix-the-bug','writing:search-will-be-dead-by-2030','project:imessage-mcp','project:quantercise-extension','project:chainedchat') AND json_valid(content)) AS source_rows",
+          "expected": {
+            "auth_predecessor": 1,
+            "home_rows": 1,
+            "source_rows": 8
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "sql": "SELECT (SELECT COUNT(*) FROM page_content WHERE page_key = 'systems' AND published = 1 AND json_valid(content)) AS systems_rows, (SELECT json_extract(content, '$.status') FROM page_content WHERE page_key = 'project:quantercise-extension') AS extension_status, (SELECT json_extract(content, '$.year') FROM page_content WHERE page_key = 'project:quantercise') AS quantercise_year",
+          "expected": {
+            "systems_rows": 1,
+            "extension_status": "archived",
+            "quantercise_year": "2024"
+          }
+        }
+      ],
+      "rollback": "Restore the previous page_content versions from version_history with a separately reviewed forward migration. Do not automatically overwrite production content or restore D1.",
+      "schema_fingerprint_before": "pending_bootstrap",
+      "schema_fingerprint_after": "pending_bootstrap"
+    }
+  ]
 }

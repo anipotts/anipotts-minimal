@@ -77,7 +77,7 @@ export function verifyManifest(options = {}) {
   return manifest;
 }
 
-function validateNewRecord(record, sql, file) {
+function validateNewRecord(record, sql, file, bootstrap) {
   for (const field of [
     "checksum",
     "risk",
@@ -95,11 +95,25 @@ function validateNewRecord(record, sql, file) {
   if (record.checksum !== `sha256:${sha256(sql)}`) {
     throw new Error(`${file} checksum does not match its manifest record`);
   }
+  if (
+    bootstrap.status === "verified" &&
+    [
+      record.schema_fingerprint_before,
+      record.schema_fingerprint_after,
+    ].includes("pending_bootstrap")
+  ) {
+    throw new Error(
+      `${file} must pin schema fingerprints after bootstrap verification`,
+    );
+  }
   for (const field of [
     "schema_fingerprint_before",
     "schema_fingerprint_after",
   ]) {
-    if (!/^sha256:[0-9a-f]{64}$/.test(record[field])) {
+    const value = record[field];
+    const pendingBootstrap =
+      bootstrap.status !== "verified" && value === "pending_bootstrap";
+    if (!pendingBootstrap && !/^sha256:[0-9a-f]{64}$/.test(value)) {
       throw new Error(`${file} has an invalid ${field}`);
     }
   }
@@ -159,7 +173,12 @@ export function inspectMigrationChanges(paths, options = {}) {
       throw new Error(`historical migration cannot be changed: ${file}`);
     }
     const sql = readFile(join(MIGRATION_DIR, file), "utf8");
-    const record = validateNewRecord(records.get(file), sql, file);
+    const record = validateNewRecord(
+      records.get(file),
+      sql,
+      file,
+      manifest.bootstrap,
+    );
     if (record.risk === "approval") risk = "approval";
     record.consumers.forEach((consumer) => consumers.add(consumer));
     reasons.push(`${file}: ${record.risk}`);
