@@ -62,6 +62,13 @@ for (const checkName of [
     `ci.yml must report required check ${checkName}`,
   );
 }
+for (const workflow of [ciWorkflow, deployWorkflow]) {
+  assert.ok(
+    workflow.includes("uses: oven-sh/setup-bun@v2") &&
+      workflow.includes('bun-version: "1.3.4"'),
+    "full validation workflows must install the pinned Bun runtime",
+  );
+}
 assert.ok(
   securityWorkflow.includes("name: Security Review"),
   "security-review.yml must report the required security check",
