@@ -1,0 +1,21 @@
+{
+  "name": "@anipotts/control-plane-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "anipotts-control-plane": "./src/cli.ts"
+  },
+  "scripts": {
+    "build": "bun build src/cli.ts --target=bun --outdir=dist",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@anipotts/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.23",
+    "typescript": "^5"
+  }
+}

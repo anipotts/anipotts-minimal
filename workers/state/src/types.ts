@@ -35,6 +35,8 @@ export type CodeStatsEvent =
 export type Bindings = {
   LINK_VAULT: DurableObjectNamespace;
   CODE_STATS: DurableObjectNamespace;
+  COMMAND_RELAY: DurableObjectNamespace;
   ALLOWED_ORIGINS: string;
   STATE_PUBLISH_KEY?: string;
+  CONTROL_PLANE_DEVICE_PUBLIC_JWK?: string;
 };

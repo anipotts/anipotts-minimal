@@ -21,6 +21,14 @@ const attentionRowSource = readFileSync(
   "apps/admin/src/components/AttentionRow.astro",
   "utf8",
 );
+const semanticInspectorSource = readFileSync(
+  "apps/admin/src/components/SemanticInspector.astro",
+  "utf8",
+);
+const semanticReferenceSource = readFileSync(
+  "apps/admin/src/data/semantic-reference.ts",
+  "utf8",
+);
 const knowledgeSource = readFileSync(
   "apps/admin/src/pages/knowledge.astro",
   "utf8",
@@ -59,8 +67,9 @@ const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
   "utf8",
 );
-const passkeySource = readFileSync(
-  "apps/admin/src/pages/auth/passkey.astro",
+const authSource = readFileSync("apps/admin/src/pages/auth.astro", "utf8");
+const passkeyRedirectSource = readFileSync(
+  "apps/admin/src/pages/auth/passkey.ts",
   "utf8",
 );
 const contentEditorSource = readFileSync(
@@ -104,7 +113,10 @@ assert.deepEqual(publicPaths, [
   "/api/health",
   "/api/mcp",
   "/apple-touch-icon.png",
+  "/auth",
+  "/auth/invite",
   "/auth/passkey",
+  "/auth/recover",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
   "/favicon-dark-32.png",
@@ -114,6 +126,13 @@ assert.deepEqual(publicPaths, [
   "/favicon.svg",
 ]);
 assert.deepEqual(publicPasskeyApiPaths, [
+  "/api/admin/auth/session",
+  "/api/admin/device/claim",
+  "/api/admin/device/start",
+  "/api/admin/device/status",
+  "/api/admin/invites/register-options",
+  "/api/admin/invites/register-verify",
+  "/api/admin/invites/status",
   "/api/admin/passkey/login-options",
   "/api/admin/passkey/login-verify",
   "/api/admin/passkey/logout",
@@ -124,6 +143,8 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/password/login",
   "/api/admin/password/logout",
   "/api/admin/password/status",
+  "/api/admin/recovery/google/callback",
+  "/api/admin/recovery/google/start",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 assert.deepEqual(devLoopbackOrigins, [
@@ -134,6 +155,10 @@ assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
 assert.ok(
   middlewareSource.includes("isDev: import.meta.env.DEV"),
   "loopback preview must remain gated by Astro development mode",
+);
+assert.ok(
+  middlewareSource.includes('searchParams.get("stepup") !== "1"'),
+  "fresh passkey step-up must remain reachable from an active session",
 );
 
 const classifiedFiles = new Set([
@@ -266,6 +291,52 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
     `admin attention row missing marker ${marker}`,
   );
 }
+for (const marker of [
+  'import "../styles/admin-canvas.css"',
+  "SemanticInspector",
+  "semanticReferences",
+  "inbox.source",
+]) {
+  assert.ok(
+    homeSource.includes(marker),
+    `canonical admin canvas missing semantic marker ${marker}`,
+  );
+}
+for (const marker of [
+  "item.references.owner",
+  "item.references.source_time",
+  "item.references.proof",
+  "item.references.action",
+]) {
+  assert.ok(
+    attentionRowSource.includes(marker),
+    `admin attention card missing typed reference ${marker}`,
+  );
+}
+for (const marker of [
+  "calendar_event",
+  "source_time",
+  "providerDestination",
+  "isSafeProviderHref",
+  "source not checked",
+  "checked · no value found",
+]) {
+  assert.ok(
+    semanticReferenceSource.includes(marker),
+    `semantic reference contract missing marker ${marker}`,
+  );
+}
+for (const marker of [
+  "data-semantic-inspector",
+  "data-semantic-inspector-panel",
+  "showModal",
+  "data-semantic-close",
+]) {
+  assert.ok(
+    semanticInspectorSource.includes(marker),
+    `semantic inspector missing marker ${marker}`,
+  );
+}
 
 for (const marker of ["data-knowledge-card", "/knowledge?kind="]) {
   assert.ok(
@@ -387,16 +458,29 @@ assert.equal(
 );
 
 for (const marker of [
-  "Access removal runbook",
-  "passkey-runbook",
-  "passkey-return-path",
+  "continue with passkey",
+  "use phone",
+  "recover access",
+  'data-auth-state="phone"',
+  'data-auth-state="invite"',
+  'data-auth-state="pending"',
+  'data-auth-state="error"',
+  'data-auth-state="expired"',
   "sanitizeAdminReturnPath",
-  "buildRunbookSteps",
-  "ready_for_access_removal",
 ]) {
   assert.ok(
-    passkeySource.includes(marker),
-    `/auth/passkey missing proof runbook marker ${marker}`,
+    authSource.includes(marker),
+    `/auth missing passkey-first marker ${marker}`,
+  );
+}
+for (const marker of [
+  "sanitizeAdminReturnPath",
+  "context.redirect",
+  "encodeURIComponent",
+]) {
+  assert.ok(
+    passkeyRedirectSource.includes(marker),
+    `/auth/passkey compatibility redirect missing ${marker}`,
   );
 }
 

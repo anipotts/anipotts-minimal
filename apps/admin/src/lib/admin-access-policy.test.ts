@@ -10,11 +10,33 @@ const local = (path: string, origin = "http://localhost:4311") =>
 
 describe("admin access policy", () => {
   test.each([
+    "/auth",
+    "/auth/invite",
+    "/auth/passkey",
+    "/auth/recover",
+    "/api/admin/auth/session",
+    "/api/admin/device/start",
+    "/api/admin/device/status",
+    "/api/admin/device/claim",
+    "/api/admin/invites/status",
+    "/api/admin/recovery/google/start",
     "/api/admin/password/status",
     "/api/admin/password/login",
     "/api/admin/password/logout",
-  ])("exposes only the password authentication endpoint %s", (path) => {
+    "/api/mcp",
+  ])("keeps the signed-out auth boundary public for %s", (path) => {
     expect(isPublicAdminPath(path)).toBe(true);
+  });
+
+  test.each([
+    "/auth/device/opaque-request",
+    "/auth/recover/passkey",
+    "/api/admin/device/approve",
+    "/api/admin/device/review",
+    "/api/admin/members/invite",
+    "/api/admin/recovery/passkey/options",
+  ])("keeps authenticated auth operations protected for %s", (path) => {
+    expect(isPublicAdminPath(path)).toBe(false);
   });
 
   test.each(["/", "/inbox", "/work?view=now"])(

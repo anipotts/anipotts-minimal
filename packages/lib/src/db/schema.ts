@@ -707,6 +707,9 @@ export const adminPasskeyCredentials = sqliteTable(
     updated_at: text("updated_at").notNull(),
     last_used_at: text("last_used_at"),
     revoked_at: text("revoked_at"),
+    label: text("label"),
+    created_by_session_id: text("created_by_session_id"),
+    revocation_reason: text("revocation_reason"),
   },
   (table) => [
     index("idx_admin_passkey_credentials_user_active").on(
@@ -727,6 +730,12 @@ export const adminPasskeyChallenges = sqliteTable(
     created_at: text("created_at").notNull(),
     expires_at: text("expires_at").notNull(),
     used_at: text("used_at"),
+    user_id: text("user_id"),
+    session_id: text("session_id"),
+    invite_id: text("invite_id"),
+    recovery_session_id: text("recovery_session_id"),
+    request_origin: text("request_origin"),
+    metadata: text("metadata").notNull().default("{}"),
   },
   (table) => [
     index("idx_admin_passkey_challenges_lookup").on(
@@ -768,13 +777,219 @@ export const adminPasskeyAudit = sqliteTable(
   {
     id: text("id").primaryKey(),
     event_type: text("event_type").notNull(),
+    user_id: text("user_id"),
+    session_id: text("session_id"),
     credential_id: text("credential_id"),
+    outcome: text("outcome").notNull().default("completed"),
     summary: text("summary").notNull(),
+    metadata: text("metadata").notNull().default("{}"),
     created_at: text("created_at").notNull(),
   },
   (table) => [
     index("idx_admin_passkey_audit_type_created").on(
       table.event_type,
+      table.created_at,
+    ),
+  ],
+);
+
+export const adminUsers = sqliteTable(
+  "admin_users",
+  {
+    id: text("id").primaryKey(),
+    display_name: text("display_name").notNull(),
+    role: text("role").notNull(),
+    status: text("status").notNull().default("pending"),
+    created_by_user_id: text("created_by_user_id"),
+    approved_by_user_id: text("approved_by_user_id"),
+    created_at: text("created_at").notNull(),
+    updated_at: text("updated_at").notNull(),
+    approved_at: text("approved_at"),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_users_role_status").on(table.role, table.status),
+  ],
+);
+
+export const adminSessions = sqliteTable(
+  "admin_sessions",
+  {
+    id: text("id").primaryKey(),
+    user_id: text("user_id").notNull(),
+    token_hash: text("token_hash").notNull().unique(),
+    credential_id: text("credential_id"),
+    auth_method: text("auth_method").notNull(),
+    restriction: text("restriction"),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    last_seen_at: text("last_seen_at").notNull(),
+    step_up_at: text("step_up_at"),
+    revoked_at: text("revoked_at"),
+    revoked_reason: text("revoked_reason"),
+    updated_at: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_admin_sessions_token_active").on(
+      table.token_hash,
+      table.revoked_at,
+      table.expires_at,
+    ),
+    index("idx_admin_sessions_user_active").on(
+      table.user_id,
+      table.revoked_at,
+      table.expires_at,
+    ),
+    index("idx_admin_sessions_last_seen").on(
+      table.last_seen_at,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminInvites = sqliteTable(
+  "admin_invites",
+  {
+    id: text("id").primaryKey(),
+    token_hash: text("token_hash").notNull().unique(),
+    role: text("role").notNull(),
+    invited_by_user_id: text("invited_by_user_id").notNull(),
+    pending_user_id: text("pending_user_id"),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    used_at: text("used_at"),
+    approved_at: text("approved_at"),
+    approved_by_user_id: text("approved_by_user_id"),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_invites_token_active").on(
+      table.token_hash,
+      table.used_at,
+      table.revoked_at,
+      table.expires_at,
+    ),
+    index("idx_admin_invites_pending").on(
+      table.pending_user_id,
+      table.approved_at,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminDeviceAuthorizations = sqliteTable(
+  "admin_device_authorizations",
+  {
+    id: text("id").primaryKey(),
+    verifier_hash: text("verifier_hash").notNull(),
+    requesting_device: text("requesting_device").notNull(),
+    requested_origin: text("requested_origin").notNull(),
+    requested_at: text("requested_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    approved_by_user_id: text("approved_by_user_id"),
+    approved_by_session_id: text("approved_by_session_id"),
+    approved_at: text("approved_at"),
+    denied_at: text("denied_at"),
+    claimed_at: text("claimed_at"),
+    claimed_session_id: text("claimed_session_id"),
+  },
+  (table) => [
+    index("idx_admin_device_authorizations_active").on(
+      table.id,
+      table.expires_at,
+      table.approved_at,
+      table.claimed_at,
+    ),
+  ],
+);
+
+export const adminExternalIdentities = sqliteTable(
+  "admin_external_identities",
+  {
+    id: text("id").primaryKey(),
+    user_id: text("user_id").notNull(),
+    provider: text("provider").notNull(),
+    subject_hash: text("subject_hash").notNull(),
+    created_at: text("created_at").notNull(),
+    verified_at: text("verified_at").notNull(),
+    revoked_at: text("revoked_at"),
+  },
+  (table) => [
+    index("idx_admin_external_identities_user").on(
+      table.user_id,
+      table.provider,
+      table.revoked_at,
+    ),
+  ],
+);
+
+export const adminRecoveryRequests = sqliteTable(
+  "admin_recovery_requests",
+  {
+    id: text("id").primaryKey(),
+    state_hash: text("state_hash").notNull().unique(),
+    verifier_hash: text("verifier_hash").notNull(),
+    nonce_hash: text("nonce_hash").notNull(),
+    redirect_uri: text("redirect_uri").notNull(),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    used_at: text("used_at"),
+  },
+  (table) => [
+    index("idx_admin_recovery_requests_active").on(
+      table.state_hash,
+      table.used_at,
+      table.expires_at,
+    ),
+  ],
+);
+
+export const adminMachineTokens = sqliteTable(
+  "admin_machine_tokens",
+  {
+    id: text("id").primaryKey(),
+    user_id: text("user_id").notNull(),
+    name: text("name").notNull(),
+    token_hash: text("token_hash").notNull().unique(),
+    token_hint: text("token_hint").notNull(),
+    scopes: text("scopes").notNull().default("[]"),
+    created_by_session_id: text("created_by_session_id").notNull(),
+    created_at: text("created_at").notNull(),
+    expires_at: text("expires_at").notNull(),
+    last_used_at: text("last_used_at"),
+    last_used_ip_hash: text("last_used_ip_hash"),
+    rotated_at: text("rotated_at"),
+    rotated_to_token_id: text("rotated_to_token_id"),
+    revoked_at: text("revoked_at"),
+    revoked_by_session_id: text("revoked_by_session_id"),
+  },
+  (table) => [
+    index("idx_admin_machine_tokens_active").on(
+      table.token_hash,
+      table.revoked_at,
+      table.expires_at,
+    ),
+    index("idx_admin_machine_tokens_user").on(table.user_id, table.revoked_at),
+  ],
+);
+
+export const adminSecurityNotifications = sqliteTable(
+  "admin_security_notifications",
+  {
+    id: text("id").primaryKey(),
+    event_type: text("event_type").notNull(),
+    user_id: text("user_id").notNull(),
+    summary: text("summary").notNull(),
+    created_at: text("created_at").notNull(),
+    sent_at: text("sent_at"),
+    provider_message_id: text("provider_message_id"),
+    failed_at: text("failed_at"),
+    failure_code: text("failure_code"),
+  },
+  (table) => [
+    index("idx_admin_security_notifications_pending").on(
+      table.sent_at,
+      table.failed_at,
       table.created_at,
     ),
   ],

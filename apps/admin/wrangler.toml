@@ -28,3 +28,10 @@ ACCESS_POLICY_AUD = "ca3ea64cba714dee7d50eae63f62b18d6c2aeeecc0fc16ec0335ed0aa86
 binding = "DB"
 database_name = "anipotts-db"
 database_id = "a8aadf73-bbf4-447c-97db-cb3e50b4e26f"
+
+# Internal capability binding. The relay class is exported by anipotts-state;
+# command submission never traverses a public HTTP route.
+[[durable_objects.bindings]]
+name = "COMMAND_RELAY"
+class_name = "CommandRelay"
+script_name = "anipotts-state"

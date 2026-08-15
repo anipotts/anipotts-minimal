@@ -1,37 +1,17 @@
 import { describe, expect, it } from "vitest";
-import type { AdminInboxItem, AdminInboxReadState } from "./inbox";
 import {
   buildActivationGraph,
   itemMatchesOperationalProjection,
 } from "./activation-graph";
+import {
+  testInboxItem as item,
+  testInboxReadState as inbox,
+} from "./inbox.test-fixtures";
 import { operatorWorkFixture } from "./operator-work";
-
-const item = (
-  values: Partial<AdminInboxItem> & Pick<AdminInboxItem, "id" | "entity_id">,
-): AdminInboxItem => ({
-  dedupe_key: values.id,
-  source: "test",
-  owner: "chief/site",
-  action_kind: "open",
-  title: values.id,
-  summary: "source-backed summary",
-  status: "open",
-  risk: "medium",
-  category: "work",
-  timeframe: "today",
-  href: "/work",
-  next_action: "take the next bounded action",
-  proof: "proof:test",
-  updated_at: "2026-07-31T12:00:00.000Z",
-  ...values,
-});
-
-const inbox = (items: AdminInboxItem[]): AdminInboxReadState => ({
-  generated_at: "2026-07-31T12:00:00.000Z",
-  mode: "ready",
-  counts: { total: items.length, high: 0, medium: items.length, low: 0 },
-  items,
-});
+import {
+  defineMissingReference,
+  inspectorDestination,
+} from "./semantic-reference";
 
 describe("activation graph projection", () => {
   it("uses the ranked attention head as a suggestion and keeps four graph layers", () => {
@@ -97,6 +77,53 @@ describe("activation graph projection", () => {
     expect(projection.work_source_state).toBe("stale");
     expect(
       projection.lanes.find((lane) => lane.key === "running")?.source_state,
+    ).toBe("stale");
+  });
+
+  it("does not call Inbox-derived lanes current when providers were not checked", () => {
+    const readState = inbox([
+      item({ id: "fixture", entity_id: "entity:fixture" }),
+    ]);
+    readState.source = defineMissingReference({
+      id: "test-inbox:unchecked-source",
+      kind: "source",
+      label: "source state",
+      value: null,
+      summary: "The provider was not checked.",
+      source_state: "unchecked",
+      checked_at: null,
+      authority: { kind: "none", label: "source authority unavailable" },
+      provenance: {
+        source: "test",
+        source_ref: "test:unchecked-source",
+        method: "fixture",
+        evidence_refs: [],
+      },
+      confidence: {
+        level: "unknown",
+        explanation: "No provider read occurred.",
+      },
+      sensitivity: "internal",
+      validity: { valid_from: null, valid_until: null },
+      retrieval_policy: {
+        mode: "refresh_then_inspect",
+        refresh_href: "/",
+        explanation: "Refresh or inspect source coverage.",
+      },
+      destination: inspectorDestination("inspect source coverage"),
+    });
+
+    const projection = buildActivationGraph(
+      readState,
+      operatorWorkFixture,
+      new Date("2026-07-31T12:00:00.000Z"),
+    );
+
+    expect(
+      projection.lanes.find((lane) => lane.key === "ready")?.source_state,
+    ).toBe("stale");
+    expect(
+      projection.lanes.find((lane) => lane.key === "needs-ani")?.source_state,
     ).toBe("stale");
   });
 });

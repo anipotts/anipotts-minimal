@@ -7,6 +7,10 @@ import type {
   ContentEditorPayload,
   ContentEditorState,
 } from "../../lib/content-editor";
+import {
+  adminMutationFetch,
+  adminStepUpPath,
+} from "../../lib/admin-client-auth";
 
 type EditorResponse = {
   ok?: boolean;
@@ -405,13 +409,17 @@ function initialPayload(payload: ContentEditorPayload, isNew: boolean) {
 async function postEditor(
   body: Record<string, unknown>,
 ): Promise<EditorResponse> {
-  const response = await fetch("/api/admin/content/editor", {
+  const response = await adminMutationFetch("/api/admin/content/editor", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
   const data = (await response.json()) as EditorResponse;
   if (!response.ok) {
+    if (data.error === "fresh_passkey_required") {
+      window.location.assign(adminStepUpPath());
+      throw new Error("fresh passkey required");
+    }
     throw new Error(data.error ?? "content editor request failed");
   }
   return data;

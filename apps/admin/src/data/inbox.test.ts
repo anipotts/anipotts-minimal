@@ -1,27 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { rankInboxItems, type AdminInboxItem } from "./inbox";
-
-const item = (
-  values: Partial<AdminInboxItem> & Pick<AdminInboxItem, "id" | "entity_id">,
-): AdminInboxItem => ({
-  dedupe_key: values.dedupe_key ?? values.id,
-  source: "test",
-  owner: "ani",
-  action_kind: "review",
-  title: values.id,
-  summary: "bounded summary",
-  status: "open",
-  risk: "medium",
-  category: "work",
-  timeframe: "today",
-  href: "/work",
-  next_action: "review the source",
-  proof: "proof:test",
-  updated_at: "2026-07-25T12:00:00.000Z",
-  ...values,
-  id: values.id,
-  entity_id: values.entity_id,
-});
+import { rankInboxItems } from "./inbox";
+import { testInboxItem as item } from "./inbox.test-fixtures";
 
 describe("Inbox ranking", () => {
   it("keeps every unresolved action reachable in stable priority order", () => {
