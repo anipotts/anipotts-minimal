@@ -8,6 +8,8 @@ const ADMIN_WRITE_PROBES = [
   "/api/admin/passkey/register-options",
 ];
 
+const ADMIN_PUBLIC_AUTH_ROUTES = ["/auth/passkey"];
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -116,6 +118,20 @@ export async function smokeRelease(options) {
         },
       );
       checks.push({ path, status: response.status });
+    }
+    for (const path of ADMIN_PUBLIC_AUTH_ROUTES) {
+      const response = await requestWithRetry(
+        `${baseUrl}${path}`,
+        { redirect: "manual" },
+        {
+          attempts: 6,
+          delayMs: 10_000,
+          fetchImpl,
+          accept: (candidate) =>
+            [200, 302, 401, 403].includes(candidate.status),
+        },
+      );
+      checks.push({ path, status: response.status, auth_boundary: true });
     }
   } else if (target === "admin" && mode === "authenticated") {
     const headers = authenticatedHeaders(env);
