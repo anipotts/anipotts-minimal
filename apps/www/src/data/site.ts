@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Ani Potts",
-  title: "agent systems + product",
+  title: "builder and writer working with agents",
   location: "NYC",
   bio: "i build with agents and write about the systems that keep the work coherent.",
   shortBio: "ani potts, nyc",

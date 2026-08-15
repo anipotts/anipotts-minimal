@@ -355,10 +355,10 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
 export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
   title: "systems",
   description:
-    "the operating system behind how ani works with agents: clear targets, durable context, visible proof, and real stopping conditions.",
+    "how ani works with agents: clear targets, durable context, visible proof, and real stopping conditions.",
   hero_title: "systems",
   hero_summary:
-    "the machinery behind how i work: a clear target, durable context, visible proof, and a real stopping condition.",
+    "how i work with agents: one clear target, durable context, visible proof, and a real stopping condition.",
   principles_label: "the loop",
   principles: [
     {
