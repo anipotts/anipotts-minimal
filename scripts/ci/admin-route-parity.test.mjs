@@ -17,6 +17,10 @@ const homeSource = readFileSync(
   "apps/admin/src/components/AdminHome.astro",
   "utf8",
 );
+const layoutSource = readFileSync(
+  "apps/admin/src/layouts/AdminLayout.astro",
+  "utf8",
+);
 const attentionRowSource = readFileSync(
   "apps/admin/src/components/AttentionRow.astro",
   "utf8",
@@ -38,6 +42,10 @@ const locationsSource = readFileSync(
   "utf8",
 );
 const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const operatorWorkTableSource = readFileSync(
+  "apps/admin/src/components/astryx/OperatorWorkTable.tsx",
+  "utf8",
+);
 const operatorWorkSource = readFileSync(
   "apps/admin/src/data/operator-work.ts",
   "utf8",
@@ -151,7 +159,30 @@ assert.deepEqual(devLoopbackOrigins, [
   "http://127.0.0.1:4311",
   "http://localhost:4311",
 ]);
-assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
+assert.deepEqual(devLoopbackPreviewPaths, [
+  "/",
+  "/content",
+  "/content/carousels",
+  "/content/drafts",
+  "/content/operations",
+  "/content/preview",
+  "/content/review",
+  "/deploys",
+  "/fleet",
+  "/handoffs",
+  "/inbox",
+  "/knowledge",
+  "/knowledge/locations",
+  "/life",
+  "/life/aesthetics",
+  "/life/health",
+  "/mutations",
+  "/newsletter",
+  "/proof",
+  "/repos",
+  "/system",
+  "/work",
+]);
 assert.ok(
   middlewareSource.includes("isDev: import.meta.env.DEV"),
   "loopback preview must remain gated by Astro development mode",
@@ -291,8 +322,11 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
     `admin attention row missing marker ${marker}`,
   );
 }
+assert.ok(
+  layoutSource.includes('import "../styles/admin-canvas.css"'),
+  "shared admin layout must load the canonical canvas styles",
+);
 for (const marker of [
-  'import "../styles/admin-canvas.css"',
   "SemanticInspector",
   "semanticReferences",
   "inbox.source",
@@ -368,15 +402,19 @@ for (const marker of [
 for (const marker of [
   "data-work-now",
   "Currently working",
+  "Last verified work",
   "OperatorWorkTable",
   "view=projects",
   "view=history",
-  "data-inspect-task",
   "loose conversations",
   "preserved",
 ]) {
   assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
 }
+assert.ok(
+  operatorWorkTableSource.includes("data-semantic-open"),
+  "admin work table must use the shared semantic inspector",
+);
 for (const marker of [
   "019f7fb8-69b7-7791-8e67-87c87acfae02",
   "019f95c5-be35-7991-811c-371611daa94b",
