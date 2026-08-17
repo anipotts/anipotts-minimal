@@ -35,8 +35,8 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astryxdesign/cli": "^0.1.4",
+    "@astrojs/check": "^0.9.10",
+    "@astryxdesign/cli": "^0.4.0",
     "@types/react": "^19",
     "@types/react-dom": "^19.2.3",
     "typescript": "^5",
