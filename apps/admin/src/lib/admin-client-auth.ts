@@ -3,10 +3,7 @@ export type AdminClientPrincipal = {
   role: "owner" | "operator" | "viewer";
   sessionId: string;
   authMethod:
-    | "passkey"
-    | "device_approval"
-    | "google_recovery"
-    | "legacy_passkey";
+    "passkey" | "device_approval" | "google_recovery" | "legacy_passkey";
   stepUpAt: string | null;
   restriction: "recovery" | null;
   displayName: string;
@@ -38,9 +35,7 @@ export async function getAdminCsrfToken(): Promise<string> {
     headers: { accept: "application/json" },
   });
   const data = (await response.json().catch(() => null)) as
-    | AdminSessionEnvelope
-    | { error?: string }
-    | null;
+    AdminSessionEnvelope | { error?: string } | null;
   if (
     !response.ok ||
     !data ||

@@ -1,25 +1,12 @@
 // Content types
 export type ContentType = "video" | "article" | "thread" | "tip";
 export type SeriesType =
-  | "tip"
-  | "news"
-  | "tutorial"
-  | "essay"
-  | "behind-the-scenes";
+  "tip" | "news" | "tutorial" | "essay" | "behind-the-scenes";
 export type ContentStatus =
-  | "idea"
-  | "draft"
-  | "ready"
-  | "atomized"
-  | "published";
+  "idea" | "draft" | "ready" | "atomized" | "published";
 export type VoiceMode = "spicy" | "casual" | "professional";
 export type ArtifactType =
-  | "gist"
-  | "repo"
-  | "screenshot"
-  | "screen-recording"
-  | "diff"
-  | "live-demo";
+  "gist" | "repo" | "screenshot" | "screen-recording" | "diff" | "live-demo";
 export type Platform =
   | "twitter"
   | "linkedin"

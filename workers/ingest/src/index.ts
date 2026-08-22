@@ -8,12 +8,7 @@ interface Env {
 }
 
 type Category =
-  | "ops"
-  | "code"
-  | "analytics"
-  | "business"
-  | "rollup"
-  | "brands_email";
+  "ops" | "code" | "analytics" | "business" | "rollup" | "brands_email";
 
 const CATEGORY_TABLE: Record<Category, string> = {
   ops: "ops_snapshots",

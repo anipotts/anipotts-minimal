@@ -4,12 +4,7 @@ export const CONTROL_COMMAND_KINDS = ["system.prove_round_trip"] as const;
 
 export type ControlCommandKind = (typeof CONTROL_COMMAND_KINDS)[number];
 export type ControlCommandState =
-  | "queued"
-  | "delivered"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "expired";
+  "queued" | "delivered" | "running" | "succeeded" | "failed" | "expired";
 
 export type ControlAuthority = {
   actor_id: string;
@@ -119,11 +114,7 @@ export type DeviceFailedEnvelope = {
 };
 
 export type RelayToDeviceEnvelope =
-  | RelayCommandEnvelope
-  | RelaySnapshotEnvelope
-  | RelayAcceptedEnvelope;
+  RelayCommandEnvelope | RelaySnapshotEnvelope | RelayAcceptedEnvelope;
 
 export type DeviceToRelayEnvelope =
-  | DeviceStartedEnvelope
-  | DeviceSucceededEnvelope
-  | DeviceFailedEnvelope;
+  DeviceStartedEnvelope | DeviceSucceededEnvelope | DeviceFailedEnvelope;

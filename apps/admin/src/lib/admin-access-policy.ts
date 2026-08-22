@@ -79,10 +79,7 @@ type AdminAccessInput = {
 };
 
 export type AdminAccessDecision =
-  | "public"
-  | "dev-loopback-preview"
-  | "session"
-  | "passkey-required";
+  "public" | "dev-loopback-preview" | "session" | "passkey-required";
 
 export function decideAdminAccess({
   isDev,

@@ -1,9 +1,5 @@
 export type PublicCopyContext =
-  | "evergreen"
-  | "historical"
-  | "quotation"
-  | "safety"
-  | "technical";
+  "evergreen" | "historical" | "quotation" | "safety" | "technical";
 
 export type PublicCopyRule =
   | "litotes"

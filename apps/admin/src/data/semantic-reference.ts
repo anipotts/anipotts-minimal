@@ -22,34 +22,16 @@ export const SEMANTIC_REFERENCE_KINDS = [
 
 export type SemanticReferenceKind = (typeof SEMANTIC_REFERENCE_KINDS)[number];
 export type SemanticSourceState =
-  | "verified"
-  | "stale"
-  | "unchecked"
-  | "absent"
-  | "unknown";
+  "verified" | "stale" | "unchecked" | "absent" | "unknown";
 export type SemanticConfidence = "high" | "medium" | "low" | "unknown";
 export type SemanticSensitivity =
-  | "public"
-  | "internal"
-  | "private"
-  | "sensitive"
-  | "restricted";
+  "public" | "internal" | "private" | "sensitive" | "restricted";
 export type SemanticAuthorityKind =
-  | "provider"
-  | "internal"
-  | "recorded"
-  | "none";
+  "provider" | "internal" | "recorded" | "none";
 export type SemanticProvenanceMethod =
-  | "provider"
-  | "projection"
-  | "fixture"
-  | "manual"
-  | "inference";
+  "provider" | "projection" | "fixture" | "manual" | "inference";
 export type SemanticProvider =
-  | "google_calendar"
-  | "github"
-  | "gmail"
-  | "google_drive";
+  "google_calendar" | "github" | "gmail" | "google_drive";
 
 export type SemanticDestination =
   | {

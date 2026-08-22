@@ -47,10 +47,7 @@ type AdminPrincipal = {
   role: "owner" | "operator" | "viewer";
   sessionId: string;
   authMethod:
-    | "passkey"
-    | "device_approval"
-    | "google_recovery"
-    | "legacy_passkey";
+    "passkey" | "device_approval" | "google_recovery" | "legacy_passkey";
   stepUpAt: string | null;
   restriction: "recovery" | null;
   displayName: string;

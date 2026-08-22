@@ -2,11 +2,7 @@ export const RUNTIME_FEED_PATH =
   "/Users/anipotts/Infra/state/runtime/admin/admin-feed.current.json";
 
 export type RuntimeDeployImpact =
-  | "none"
-  | "local_only"
-  | "preview"
-  | "production"
-  | "unknown";
+  "none" | "local_only" | "preview" | "production" | "unknown";
 
 export type RuntimeOverlayMode = "local_dev" | "disabled" | "missing" | "error";
 

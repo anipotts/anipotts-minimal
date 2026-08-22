@@ -1,11 +1,7 @@
 export type RiskLevel = "low" | "medium" | "high";
 
 export type ContentSurface =
-  | "homepage"
-  | "projects"
-  | "writing"
-  | "newsletter"
-  | "systems";
+  "homepage" | "projects" | "writing" | "newsletter" | "systems";
 export type ContentEditability = "ready" | "needs_schema" | "needs_owner";
 
 export type ContentInventoryItem = {
@@ -22,10 +18,7 @@ export type ContentInventoryItem = {
 };
 
 export type ContentPreviewStatus =
-  | "draft"
-  | "preview"
-  | "needs approval"
-  | "blocked";
+  "draft" | "preview" | "needs approval" | "blocked";
 
 export type ContentPreviewItem = {
   id: string;

@@ -19,8 +19,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     const body = (await context.request.json()) as
-      | ContentEditorSaveInput
-      | ContentEditorPublishInput;
+      ContentEditorSaveInput | ContentEditorPublishInput;
     const principal = await requireAdminMutation(
       context,
       body.action === "publish" ? "content:publish" : "draft:save",

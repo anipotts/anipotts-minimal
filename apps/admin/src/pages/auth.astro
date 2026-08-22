@@ -445,8 +445,7 @@ const initialCopy = stateCopy[initialState] ?? stateCopy.direct;
 
   async function responseJson<T>(response: Response): Promise<T> {
     const data = (await response.json().catch(() => null)) as
-      | (T & { error?: string; detail?: string })
-      | null;
+      (T & { error?: string; detail?: string }) | null;
     if (!response.ok || !data) {
       throw new AuthApiError(
         response.status,
