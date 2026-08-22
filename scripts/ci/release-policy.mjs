@@ -2,8 +2,17 @@
 
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
-import { computeDeployTargets } from "./compute-deploy-targets.mjs";
 import { inspectMigrationChanges } from "./migration-policy.mjs";
+
+export const DEPLOY_TARGETS = [
+  "www",
+  "admin",
+  "admin_solid",
+  "ingest",
+  "newsletter",
+  "state",
+  "weekly_email",
+];
 
 const APPROVAL_PATHS = [
   /^\.github\/workflows\//,
@@ -36,13 +45,54 @@ function parseChange(line) {
   return { status, path: parts.at(-1) };
 }
 
-function isIgnored(path) {
+export function isReleaseIgnored(path) {
   return (
     path.endsWith(".md") ||
     path.startsWith("docs/") ||
     path.startsWith(".github/ISSUE_TEMPLATE/") ||
     path === "LICENSE"
   );
+}
+
+export function computeDeployTargets(paths) {
+  const targets = Object.fromEntries(
+    DEPLOY_TARGETS.map((target) => [target, false]),
+  );
+
+  for (const path of paths) {
+    if (!path || isReleaseIgnored(path)) continue;
+    const isAdminControlLib = path.startsWith(
+      "packages/lib/src/admin-control/",
+    );
+
+    if (
+      path.startsWith("apps/www/") ||
+      (path.startsWith("packages/lib/") && !isAdminControlLib) ||
+      path.startsWith("packages/content/src/public/") ||
+      path === "packages/content/package.json" ||
+      path === "packages/content/src/index.ts" ||
+      path.startsWith("packages/brand/") ||
+      path.startsWith("packages/types/")
+    ) {
+      targets.www = true;
+    }
+
+    if (
+      path.startsWith("apps/admin/") ||
+      path.startsWith("packages/content/") ||
+      isAdminControlLib
+    ) {
+      targets.admin = true;
+    }
+
+    for (const worker of ["ingest", "newsletter", "state", "weekly-email"]) {
+      if (path.startsWith(`workers/${worker}/`)) {
+        targets[worker.replace("-", "_")] = true;
+      }
+    }
+  }
+
+  return targets;
 }
 
 function routeContractChanged(change) {
@@ -65,7 +115,7 @@ export function classifyRelease(changeLines, options = {}) {
   let risk = migration.risk;
 
   for (const change of changes) {
-    if (isIgnored(change.path)) continue;
+    if (isReleaseIgnored(change.path)) continue;
     if (APPROVAL_PATHS.some((pattern) => pattern.test(change.path))) {
       risk = "approval";
       reasons.push(`protected surface: ${change.path}`);
@@ -83,7 +133,7 @@ export function classifyRelease(changeLines, options = {}) {
   }
 
   const hasDeployTarget = Object.values(deployTargets).some(Boolean);
-  const docsOnly = changes.length > 0 && paths.every(isIgnored);
+  const docsOnly = changes.length > 0 && paths.every(isReleaseIgnored);
   if (risk === "none" && hasDeployTarget) risk = "automatic";
   if (risk === "none" && !docsOnly && paths.length > 0) risk = "automatic";
 
