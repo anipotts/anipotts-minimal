@@ -69,7 +69,7 @@ export function buildEvidenceQuery(files = DATA_HISTORY_MIGRATIONS) {
     CASE WHEN EXISTS (
       SELECT 1 FROM content_draft_operations
       WHERE kind = 'content_draft'
-        AND authority_state = 'passkey_draft_save_no_publish'
+        AND authority_state LIKE 'passkey_draft_save_no_publish'
         AND json_extract(metadata, '$.draft_save_path') = '/api/admin/content/draft-operation'
         AND json_extract(metadata, '$.write_scope') = 'draft_operation_only'
     ) THEN 1 ELSE 0 END
