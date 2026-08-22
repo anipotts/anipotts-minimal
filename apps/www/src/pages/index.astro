@@ -169,21 +169,21 @@ const profileLd = {
   .hero-line {
     display: grid;
     max-width: none;
-    gap: 0.3rem;
-    line-height: 1.58;
+    row-gap: 0.72em;
+    line-height: 1.52;
     text-wrap: pretty;
   }
 
-  .hero-sentence {
+  .hero-line :global(.hero-sentence) {
     display: block;
     max-width: none;
   }
 
-  .hero-break {
+  .hero-line :global(.hero-break) {
     display: none;
   }
 
-  .mention-cluster {
+  .hero-line :global(.mention-cluster) {
     display: inline-flex;
     align-items: baseline;
     flex-wrap: wrap;
@@ -192,19 +192,19 @@ const profileLd = {
     white-space: normal;
   }
 
-  .mention-cluster :global(.inline-mention) {
+  .hero-line :global(.mention-cluster .inline-mention) {
     transform: translateY(0.04em);
   }
 
-  .brand-parens {
+  .hero-line :global(.brand-parens) {
     display: inline-flex;
     align-items: baseline;
     gap: 0.08em;
     white-space: nowrap;
   }
 
-  .brand-parens > span,
-  .brand-parens :global(.inline-mention) {
+  .hero-line :global(.brand-parens > span),
+  .hero-line :global(.brand-parens .inline-mention) {
     font-size: inherit;
   }
 
@@ -314,28 +314,23 @@ const profileLd = {
     }
 
     .hero-line {
-      gap: 0.55rem;
       font-size: clamp(1rem, 3.9vw, 1.12rem);
       line-height: 1.5;
     }
 
-    .hero-break {
-      display: block;
-    }
-
-    .hero-sentence {
+    .hero-line :global(.hero-sentence) {
       min-width: 0;
       max-width: 32rem;
       overflow-wrap: anywhere;
     }
 
-    .mention-cluster {
+    .hero-line :global(.mention-cluster) {
       display: inline;
       min-width: 0;
       white-space: normal;
     }
 
-    .brand-parens {
+    .hero-line :global(.brand-parens) {
       white-space: normal;
     }
 
