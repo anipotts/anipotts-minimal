@@ -55,7 +55,6 @@ assert.equal(
 for (const checkName of [
   "Build, lint, typecheck, test",
   "Migration Preflight",
-  "Promotion Policy",
 ]) {
   assert.ok(
     ciWorkflow.includes(`name: ${checkName}`),
@@ -79,38 +78,44 @@ assert.equal(
   "required security review must run for every pull request",
 );
 assert.ok(
-  autoMergeWorkflow.includes("gh pr merge --auto --merge --delete-branch"),
-  "agent automerge must use GitHub native auto-merge",
+  autoMergeWorkflow.includes("name: Agent Merge Readiness"),
+  "the retained workflow must describe merge readiness without merging",
 );
 assert.ok(
-  autoMergeWorkflow.includes("--match-head-commit"),
-  "agent automerge must bind the exact pull request head",
+  autoMergeWorkflow.includes("contents: read") &&
+    autoMergeWorkflow.includes("pull-requests: read"),
+  "merge readiness must use read-only repository permissions",
 );
 for (const guard of [
   "!github.event.pull_request.draft",
   "github.event.pull_request.base.ref == 'main'",
   "github.event.pull_request.head.repo.full_name == github.repository",
 ]) {
-  assert.ok(autoMergeWorkflow.includes(guard), `automerge is missing ${guard}`);
+  assert.ok(
+    autoMergeWorkflow.includes(guard),
+    `merge readiness is missing ${guard}`,
+  );
 }
 assert.equal(
-  /sleep\s+\d+|gh pr checks|Wait for CI/.test(autoMergeWorkflow),
+  /gh\s+pr\s+merge|gh\s+pr\s+edit|gh\s+label\s+create|contents:\s*write|pull-requests:\s*write|issues:\s*write/.test(
+    autoMergeWorkflow,
+  ),
   false,
-  "agent automerge must not poll status checks",
+  "merge readiness must not mutate pull requests, labels, or shared history",
 );
-assert.ok(
-  ciWorkflow.includes("pull_request_review:") &&
-    ciWorkflow.includes("types: [submitted, dismissed]") &&
-    ciWorkflow.includes("ready_for_review, labeled"),
-  "promotion policy must re-evaluate on reviews, draft readiness, and approval labels",
-);
-assert.ok(
-  autoMergeWorkflow.includes("issue_comment:") &&
-    autoMergeWorkflow.includes(
-      'test "$COMMENT_BODY" = "/approve-release ${head_sha}"',
-    ),
-  "exact owner approval comments must refresh the policy check",
-);
+for (const forbiddenCeremony of [
+  "/approve-release",
+  "release-approved",
+  "issue_comment:",
+  "pull_request_review:",
+  "Promotion Policy",
+]) {
+  assert.equal(
+    `${autoMergeWorkflow}\n${ciWorkflow}`.includes(forbiddenCeremony),
+    false,
+    `workflow approval ceremony must not include ${forbiddenCeremony}`,
+  );
+}
 assert.ok(
   deployWorkflow.includes("group: production-release"),
   "production releases must share one serialized concurrency group",
