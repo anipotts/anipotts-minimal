@@ -43,6 +43,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19.2.4",
     "typescript": "^5",
-    "vitest": "^1.6.0"
+    "vitest": "^4.1.11"
   }
 }
