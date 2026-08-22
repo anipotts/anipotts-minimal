@@ -1,9 +1,11 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { Bindings } from "./types";
+import { verifyDeviceHandshake } from "./control-plane-auth";
 
 export { LinkVault } from "./do/link-vault";
 export { CodeStats } from "./do/code-stats";
+export { CommandRelay } from "./do/command-relay";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -22,7 +24,7 @@ app.use("*", async (c, next) => {
 app.get("/", (c) =>
   c.json({
     service: "anipotts-state",
-    durableObjects: ["LinkVault", "CodeStats"],
+    durableObjects: ["LinkVault", "CodeStats", "CommandRelay"],
     endpoints: {
       links: {
         list: "GET /api/links",
@@ -34,6 +36,10 @@ app.get("/", (c) =>
         list: "GET /api/commits",
         publish: "POST /api/commits (bearer auth)",
         subscribe: "GET /api/commits/ws",
+      },
+      control: {
+        connect: "GET /api/control/devices/ap-mini/connect (signed websocket)",
+        commands: "internal Durable Object RPC only",
       },
     },
   }),
@@ -49,6 +55,14 @@ function linkVaultStub(env: Bindings): DurableObjectStub {
 function codeStatsStub(env: Bindings): DurableObjectStub {
   const id = env.CODE_STATS.idFromName("default");
   return env.CODE_STATS.get(id);
+}
+
+type CommandRelayStub = DurableObjectStub & {
+  consumeHandshakeNonce(nonce: string, deviceId: string): Promise<boolean>;
+};
+
+function commandRelayStub(env: Bindings, deviceId: string): CommandRelayStub {
+  return env.COMMAND_RELAY.getByName(deviceId) as CommandRelayStub;
 }
 
 function requirePublishKey(c: {
@@ -139,6 +153,30 @@ app.get("/api/commits/ws", async (c) => {
   }
   const stub = codeStatsStub(c.env);
   return stub.fetch(c.req.raw);
+});
+
+app.get("/api/control/devices/:deviceId/connect", async (c) => {
+  if (c.req.header("upgrade")?.toLowerCase() !== "websocket") {
+    return c.text("expected websocket upgrade", 426);
+  }
+  const deviceId = c.req.param("deviceId");
+  const handshake = await verifyDeviceHandshake(
+    c.req.raw,
+    deviceId,
+    c.env.CONTROL_PLANE_DEVICE_PUBLIC_JWK,
+  );
+  if (!handshake) return c.json({ error: "unauthorized_device" }, 401);
+
+  const stub = commandRelayStub(c.env, deviceId);
+  const fresh = await stub.consumeHandshakeNonce(
+    handshake.nonce,
+    handshake.deviceId,
+  );
+  if (!fresh) return c.json({ error: "replayed_device_handshake" }, 409);
+
+  const headers = new Headers(c.req.raw.headers);
+  headers.set("x-control-device-verified", handshake.deviceId);
+  return stub.fetch(new Request(c.req.raw, { headers }));
 });
 
 export default app;

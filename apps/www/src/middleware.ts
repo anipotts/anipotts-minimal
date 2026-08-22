@@ -4,16 +4,15 @@ import { defineMiddleware } from "astro:middleware";
 const REDIRECTS: Record<string, string> = {
   "/shipping": "/making",
   "/running": "/making",
-  "/connect": "/orchestrating",
-  "/lab": "/orchestrating",
-  "/links": "/orchestrating",
-  "/dev": "/orchestrating",
-  "/updates": "/orchestrating",
-  "/metrics": "/orchestrating#status",
-  "/status": "/orchestrating#systems",
+  "/connect": "/systems",
+  "/lab": "/systems",
+  "/dev": "/systems",
+  "/updates": "/systems",
+  "/metrics": "/systems",
+  "/status": "/systems",
   "/docs": "/",
   "/work": "/making",
-  "/labs": "/orchestrating",
+  "/labs": "/systems",
 };
 
 const NEWS_HOST = "news.anipotts.com";
@@ -23,7 +22,8 @@ const NEWS_HOST = "news.anipotts.com";
  *  ever shared keeps resolving. */
 const RENAMES: Record<string, string> = {
   "/thoughts": "/writing",
-  "/claude": "/orchestrating",
+  "/claude": "/systems",
+  "/orchestrating": "/systems",
 };
 
 const SECURITY_HEADERS: Record<string, string> = {

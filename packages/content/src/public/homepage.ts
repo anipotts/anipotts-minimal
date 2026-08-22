@@ -309,6 +309,11 @@ function normalizeMention(
     fallback?.logoShape,
     ["square", "wide", "mark", "large"],
   );
+  mention.presentation = normalizeMentionOption(
+    source.presentation,
+    fallback?.presentation,
+    ["brand", "facet"],
+  );
 
   return mention;
 }
@@ -629,7 +634,7 @@ export function validateHomepageContent(content: HomepageContent): {
   ok: boolean;
   error?: string;
 } {
-  const { intro, about, past_work, latest_thoughts } = content.sections;
+  const { intro, past_work, latest_thoughts } = content.sections;
 
   const introError =
     validateSectionLabel(intro, "Homepage label") ??
@@ -653,20 +658,6 @@ export function validateHomepageContent(content: HomepageContent): {
     collectRichSummaryMentionKeys(intro.rich_summary),
   );
   if (mentionError) return { ok: false, error: mentionError };
-
-  const aboutError = validateSectionLabel(about, "About label");
-  if (aboutError) return { ok: false, error: aboutError };
-
-  const paragraphs = about.paragraphs ?? [];
-  if (about.visible && paragraphs.filter(Boolean).length === 0) {
-    return { ok: false, error: "About needs at least one paragraph" };
-  }
-  const longParagraph = paragraphs.find(
-    (paragraph) => paragraph.length > HOMEPAGE_FIELD_LIMITS.paragraph,
-  );
-  if (longParagraph) {
-    return { ok: false, error: "About paragraph is too long" };
-  }
 
   const workError =
     validateSectionLabel(past_work, "Work label") ??
@@ -707,10 +698,6 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
       intro: normalizeSection(
         source.sections?.intro,
         DEFAULT_HOMEPAGE_CONTENT.sections.intro,
-      ),
-      about: normalizeSection(
-        source.sections?.about,
-        DEFAULT_HOMEPAGE_CONTENT.sections.about,
       ),
       past_work: normalizeSection(
         source.sections?.past_work,

@@ -1,7 +1,7 @@
 ---
 title: imessage mcp
 subtitle: local-first mcp over imessage search and stats.
-description: Built a macOS MCP server that lets local agents query iMessage history without writing to chat.db. Supports conversation search, contact stats, streaks, and local-only analytics. Published on npm as a small local-first tool.
+description: Built a read-only macOS MCP server for local iMessage search, contact stats, streaks, and private on-device analytics. Published on npm as a small local-first tool.
 year: "2025-"
 category: ai
 role: Creator

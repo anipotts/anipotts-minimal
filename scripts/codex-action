@@ -52,6 +52,15 @@ case "${1:-}" in
     require_tool pnpm
     exec pnpm turbo dev --filter=@anipotts/admin
     ;;
+  local-dev)
+    pnpm_cmd dev:local:ensure
+    ;;
+  local-status)
+    pnpm_cmd dev:local:status
+    ;;
+  local-stop)
+    pnpm_cmd dev:local:stop
+    ;;
   check-www)
     pnpm_cmd turbo build --filter=@anipotts/www...
     pnpm_cmd turbo typecheck --filter=@anipotts/www...
@@ -88,7 +97,7 @@ case "${1:-}" in
     done
     ;;
   *)
-    echo "usage: $0 {setup|www-dev|admin-dev|check-www|check-all|pr-status|watch-pr|deploys|smoke-live}" >&2
+    echo "usage: $0 {setup|www-dev|admin-dev|local-dev|local-status|local-stop|check-www|check-all|pr-status|watch-pr|deploys|smoke-live}" >&2
     exit 2
     ;;
 esac

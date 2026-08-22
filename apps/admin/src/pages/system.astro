@@ -1,8 +1,14 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
+import SemanticInspector from "../components/SemanticInspector.astro";
+import SemanticReference from "../components/SemanticReference.astro";
 import { deployRows, handoffRows, mutationRows, repoRows } from "../data/admin";
 import { countProofEntries, readProofEntries } from "../data/proof";
 import { loadRuntimeOverlayResponse } from "../data/runtime";
+import {
+  internalRecordReference,
+  type SemanticReference as SemanticReferenceModel,
+} from "../data/semantic-reference";
 
 const [proofEntries, runtime] = await Promise.all([
   readProofEntries(Astro.locals.runtime?.env.DB),
@@ -41,6 +47,19 @@ const destinations = [
     fact: `${mutationRows.length} controlled actions`,
   },
 ];
+const destinationReferences = destinations.map((item) =>
+  internalRecordReference({
+    id: item.href,
+    kind: "route",
+    label: item.title,
+    value: item.title,
+    summary: item.fact,
+    source: "admin system index",
+    source_ref: item.href,
+    checked_at: runtime.generated_at,
+    source_state: runtime.available ? "verified" : "unknown",
+  }),
+);
 ---
 
 <AdminLayout title="system" hideHeader>
@@ -54,11 +73,18 @@ const destinations = [
 
     <section class="quiet-system-index" aria-label="system areas">
       {
-        destinations.map((item) => (
-          <a href={item.href}>
-            <strong>{item.title}</strong>
-            <span>{item.fact}</span>
-          </a>
+        destinations.map((item, index) => (
+          <article>
+            <a href={item.href}>
+              <strong>{item.title}</strong>
+              <span>{item.fact}</span>
+            </a>
+            <SemanticReference
+              reference={destinationReferences[index]!}
+              variant="action"
+              label="details"
+            />
+          </article>
         ))
       }
     </section>
@@ -118,5 +144,8 @@ const destinations = [
         </article>
       </div>
     </section>
+    <SemanticInspector
+      references={destinationReferences as SemanticReferenceModel[]}
+    />
   </main>
 </AdminLayout>

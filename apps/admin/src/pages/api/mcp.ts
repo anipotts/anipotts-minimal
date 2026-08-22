@@ -4,7 +4,7 @@ import {
   loadAdminControlSnapshot,
   type McpJsonRpcRequest,
 } from "@anipotts/lib/admin-control";
-import { verifyAccessIdentity } from "../../lib/passkey-auth";
+import { requireMcpReadToken } from "../../lib/admin-machine-tokens";
 
 type EndpointContext = {
   locals: App.Locals;
@@ -15,7 +15,7 @@ type EndpointContext = {
 const PRIVATE_HEADERS = {
   "cache-control": "private, no-store",
   pragma: "no-cache",
-  vary: "cf-access-jwt-assertion",
+  vary: "authorization",
 };
 
 export async function GET(context: EndpointContext) {
@@ -60,14 +60,14 @@ export async function POST(context: EndpointContext) {
 async function requireMcpAccess(
   context: EndpointContext,
 ): Promise<Response | null> {
-  const identity = await verifyAccessIdentity(context);
-  if (identity.verified) return null;
-
-  return Response.json(
-    {
-      error: "verified cloudflare access identity required",
-      mode: "read-only mcp",
-    },
-    { status: 401, headers: PRIVATE_HEADERS },
-  );
+  try {
+    await requireMcpReadToken(context);
+    return null;
+  } catch (error) {
+    if (error instanceof Response) return error;
+    return Response.json(
+      { error: "mcp_bearer_token_required", mode: "read-only mcp" },
+      { status: 401, headers: PRIVATE_HEADERS },
+    );
+  }
 }

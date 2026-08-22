@@ -11,9 +11,14 @@ on:
         options: ["www", "admin"]
       commit_sha:
         description: "commit sha expected to be deployed"
-        required: false
-        default: ""
+        required: true
         type: string
+      mode:
+        description: "admin smoke mode"
+        required: true
+        default: "unauthenticated"
+        type: choice
+        options: ["unauthenticated", "authenticated"]
 
 permissions:
   contents: read
@@ -26,34 +31,19 @@ jobs:
   smoke:
     name: Smoke ${{ inputs.target }}
     runs-on: ubuntu-latest
+    environment: Production
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Smoke public site
         if: inputs.target == 'www'
-        run: |
-          set -euo pipefail
-          routes_file="$RUNNER_TEMP/public-routes.txt"
-          node scripts/ci/public-route-inventory.mjs > "$routes_file"
-          while IFS= read -r path; do
-            code="$(curl -sS -o /dev/null -w '%{http_code}' "https://anipotts.com${path}")"
-            echo "https://anipotts.com${path} -> ${code}"
-            test "$code" = "200"
-          done < "$routes_file"
-          echo "commit_sha=${{ inputs.commit_sha }}"
+        run: node scripts/ci/release-smoke.mjs --target www --base-url https://anipotts.com --expected-sha "${{ inputs.commit_sha }}"
 
-      - name: Smoke admin unauthenticated block
+      - name: Smoke admin
         if: inputs.target == 'admin'
-        run: |
-          set -euo pipefail
-          for path in /auth/passkey / /inbox /content /content/review /content/drafts /content/edit/home /api/admin/content/draft-operation /content/preview /content/operations /newsletter /newsletter/first-thing-agents-need-control-plane /proof /deploys /repos /handoffs /fleet /mutations /ops/destructive; do
-            code="$(curl -sS -o /dev/null -w '%{http_code}' "https://admin.anipotts.com${path}")"
-            echo "https://admin.anipotts.com${path} -> ${code}"
-            case "$path:$code" in
-              /auth/passkey:200|/auth/passkey:302|/auth/passkey:401|/auth/passkey:403) ;;
-              *:302|*:401|*:403) ;;
-              *) exit 1;;
-            esac
-          done
-          echo "commit_sha=${{ inputs.commit_sha }}"
+        run: node scripts/ci/release-smoke.mjs --target admin --mode "${{ inputs.mode }}" --base-url https://admin.anipotts.com --expected-sha "${{ inputs.commit_sha }}"
+        env:
+          ADMIN_CI_ACCESS_CLIENT_ID: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_SECRET: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_SECRET }}
+          ADMIN_CI_READ_TOKEN: ${{ secrets.ADMIN_CI_READ_TOKEN }}

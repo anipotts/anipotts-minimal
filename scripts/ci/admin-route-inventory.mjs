@@ -38,9 +38,16 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
-    route: "/auth/passkey",
-    file: "apps/admin/src/pages/auth/passkey.astro",
+    route: "/auth/device/:requestId",
+    file: "apps/admin/src/pages/auth/device/[requestId].astro",
     nav: false,
+    smoke: false,
+  },
+  {
+    route: "/auth/recover/passkey",
+    file: "apps/admin/src/pages/auth/recover/passkey.astro",
+    nav: false,
+    smoke: false,
   },
   {
     route: "/content",
@@ -126,6 +133,12 @@ export const ADMIN_ROUTES = [
     smoke: false,
   },
   {
+    route: "/api/admin/control-plane",
+    file: "apps/admin/src/pages/api/admin/control-plane.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
     route: "/api/admin/projections",
     file: "apps/admin/src/pages/api/admin/projections.ts",
     nav: false,
@@ -148,11 +161,82 @@ export const ADMIN_ROUTES = [
     nav: false,
     smoke: false,
   },
+  {
+    route: "/api/admin/device/approve",
+    file: "apps/admin/src/pages/api/admin/device/approve.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/device/review",
+    file: "apps/admin/src/pages/api/admin/device/review.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/machine-tokens/create",
+    file: "apps/admin/src/pages/api/admin/machine-tokens/create.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/machine-tokens/revoke",
+    file: "apps/admin/src/pages/api/admin/machine-tokens/revoke.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/machine-tokens/rotate",
+    file: "apps/admin/src/pages/api/admin/machine-tokens/rotate.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/members/approve",
+    file: "apps/admin/src/pages/api/admin/members/approve.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/members/invite",
+    file: "apps/admin/src/pages/api/admin/members/invite.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/recovery/google/bootstrap",
+    file: "apps/admin/src/pages/api/admin/recovery/google/bootstrap.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/recovery/passkey/options",
+    file: "apps/admin/src/pages/api/admin/recovery/passkey/options.ts",
+    nav: false,
+    smoke: false,
+  },
+  {
+    route: "/api/admin/recovery/passkey/verify",
+    file: "apps/admin/src/pages/api/admin/recovery/passkey/verify.ts",
+    nav: false,
+    smoke: false,
+  },
 ];
 
 export const PUBLIC_UNSMOKED_ROUTE_FILES = [
+  "apps/admin/src/pages/auth.astro",
+  "apps/admin/src/pages/auth/invite.astro",
+  "apps/admin/src/pages/auth/passkey.ts",
+  "apps/admin/src/pages/auth/recover.astro",
   "apps/admin/src/pages/api/health.ts",
   "apps/admin/src/pages/api/mcp.ts",
+  "apps/admin/src/pages/api/admin/auth/session.ts",
+  "apps/admin/src/pages/api/admin/device/claim.ts",
+  "apps/admin/src/pages/api/admin/device/start.ts",
+  "apps/admin/src/pages/api/admin/device/status.ts",
+  "apps/admin/src/pages/api/admin/invites/register-options.ts",
+  "apps/admin/src/pages/api/admin/invites/register-verify.ts",
+  "apps/admin/src/pages/api/admin/invites/status.ts",
   "apps/admin/src/pages/api/admin/passkey/login-options.ts",
   "apps/admin/src/pages/api/admin/passkey/login-verify.ts",
   "apps/admin/src/pages/api/admin/passkey/logout.ts",
@@ -163,6 +247,8 @@ export const PUBLIC_UNSMOKED_ROUTE_FILES = [
   "apps/admin/src/pages/api/admin/password/login.ts",
   "apps/admin/src/pages/api/admin/password/logout.ts",
   "apps/admin/src/pages/api/admin/password/status.ts",
+  "apps/admin/src/pages/api/admin/recovery/google/callback.ts",
+  "apps/admin/src/pages/api/admin/recovery/google/start.ts",
 ];
 
 export const ADMIN_PROTECTED_SMOKE_ROUTES = ADMIN_ROUTES.filter(

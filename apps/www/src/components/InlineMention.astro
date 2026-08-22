@@ -14,6 +14,7 @@ interface Props {
   badgeAlt?: string;
   suffix?: string;
   wrap?: boolean;
+  presentation?: "brand" | "facet";
 }
 
 const {
@@ -29,11 +30,17 @@ const {
   badgeAlt,
   suffix,
   wrap = false,
+  presentation = "brand",
 } = Astro.props;
 const Tag = href ? "a" : "span";
+const external = Boolean(href && !href.startsWith("/"));
 const hasVisual = Boolean(logoSrc || icon || mark);
 const accessibleLabel = logoAlt ? `${logoAlt}: ${label}` : label;
-const mentionClass = ["inline-mention", wrap ? "inline-mention-wrap" : ""]
+const mentionClass = [
+  "inline-mention",
+  wrap ? "inline-mention-wrap" : "",
+  presentation === "facet" ? "inline-mention-facet" : "",
+]
   .filter(Boolean)
   .join(" ");
 const markClass = [
@@ -51,8 +58,8 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
 <Tag
   href={href}
   class={mentionClass}
-  target={href ? "_blank" : undefined}
-  rel={href ? "noopener noreferrer" : undefined}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
   aria-label={accessibleLabel}
 >
   {
@@ -121,6 +128,26 @@ const logoClass = ["logo", logoTone === "white" ? "logo-white" : ""]
 
   a.inline-mention:hover .text {
     text-decoration-color: var(--interactive);
+  }
+
+  a.inline-mention-facet .text {
+    text-decoration-color: transparent;
+    background: linear-gradient(var(--interactive), var(--interactive)) 0 100% /
+      0 0.08em no-repeat;
+    transition:
+      background-size 0.18s ease,
+      color 0.18s ease;
+  }
+
+  a.inline-mention-facet:hover .text,
+  a.inline-mention-facet:focus-visible .text {
+    background-size: 100% 0.08em;
+  }
+
+  @media (hover: none) {
+    a.inline-mention-facet .text {
+      text-decoration-color: var(--border-strong);
+    }
   }
 
   .brand-mark {

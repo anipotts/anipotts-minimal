@@ -6,7 +6,14 @@ import { join } from "node:path";
 import { classifiedWorkers } from "./workspace-inventory-parser.test.mjs";
 
 const EXPECTED_APPS = ["admin", "admin-solid", "www"];
-const EXPECTED_PACKAGES = ["config", "content", "lib", "styles", "types"];
+const EXPECTED_PACKAGES = [
+  "config",
+  "content",
+  "control-plane-runner",
+  "lib",
+  "styles",
+  "types",
+];
 const EXPECTED_WORKERS = ["ingest", "newsletter", "state", "weekly-email"];
 const EXPECTED_WORKSPACE_GLOBS = ['"apps/*"', '"packages/*"', '"workers/*"'];
 const FORBIDDEN_PATHS = [

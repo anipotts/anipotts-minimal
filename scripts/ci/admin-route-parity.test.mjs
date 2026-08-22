@@ -17,8 +17,20 @@ const homeSource = readFileSync(
   "apps/admin/src/components/AdminHome.astro",
   "utf8",
 );
+const layoutSource = readFileSync(
+  "apps/admin/src/layouts/AdminLayout.astro",
+  "utf8",
+);
 const attentionRowSource = readFileSync(
   "apps/admin/src/components/AttentionRow.astro",
+  "utf8",
+);
+const semanticInspectorSource = readFileSync(
+  "apps/admin/src/components/SemanticInspector.astro",
+  "utf8",
+);
+const semanticReferenceSource = readFileSync(
+  "apps/admin/src/data/semantic-reference.ts",
   "utf8",
 );
 const knowledgeSource = readFileSync(
@@ -30,6 +42,10 @@ const locationsSource = readFileSync(
   "utf8",
 );
 const workSource = readFileSync("apps/admin/src/pages/work.astro", "utf8");
+const operatorWorkTableSource = readFileSync(
+  "apps/admin/src/components/astryx/OperatorWorkTable.tsx",
+  "utf8",
+);
 const operatorWorkSource = readFileSync(
   "apps/admin/src/data/operator-work.ts",
   "utf8",
@@ -59,8 +75,9 @@ const passkeyProofSource = readFileSync(
   "scripts/admin/passkey-proof.mjs",
   "utf8",
 );
-const passkeySource = readFileSync(
-  "apps/admin/src/pages/auth/passkey.astro",
+const authSource = readFileSync("apps/admin/src/pages/auth.astro", "utf8");
+const passkeyRedirectSource = readFileSync(
+  "apps/admin/src/pages/auth/passkey.ts",
   "utf8",
 );
 const contentEditorSource = readFileSync(
@@ -69,8 +86,16 @@ const contentEditorSource = readFileSync(
 );
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 const smokeWorkflow = readFileSync(".github/workflows/smoke.yml", "utf8");
-const deploySmokeRoutes = extractShellForRoutes(deployWorkflow);
-const manualSmokeRoutes = extractShellForRoutes(smokeWorkflow);
+assert.ok(
+  deployWorkflow.includes("scripts/ci/release-smoke.mjs --target admin"),
+  "deploy workflow must use the shared admin smoke implementation",
+);
+assert.ok(
+  smokeWorkflow.includes("scripts/ci/release-smoke.mjs --target admin"),
+  "manual smoke must use the shared admin smoke implementation",
+);
+const deploySmokeRoutes = new Set(ADMIN_PROTECTED_SMOKE_ROUTES);
+const manualSmokeRoutes = new Set(ADMIN_PROTECTED_SMOKE_ROUTES);
 const publicPaths = extractStringList(accessPolicySource, "PUBLIC_PATHS");
 const publicPasskeyApiPaths = extractStringList(
   accessPolicySource,
@@ -85,6 +110,14 @@ const devLoopbackPreviewPaths = extractStringList(
   accessPolicySource,
   "DEV_LOOPBACK_PREVIEW_PATHS",
 );
+const devPreviewAssetPaths = extractStringList(
+  accessPolicySource,
+  "DEV_PREVIEW_ASSET_PATHS",
+);
+const devPreviewAssetPrefixes = extractStringList(
+  accessPolicySource,
+  "DEV_PREVIEW_ASSET_PREFIXES",
+);
 const retiredActionQueueFiles = [
   "apps/admin/src/pages/needs-ani.astro",
   "apps/admin/src/data/needs.ts",
@@ -96,7 +129,10 @@ assert.deepEqual(publicPaths, [
   "/api/health",
   "/api/mcp",
   "/apple-touch-icon.png",
+  "/auth",
+  "/auth/invite",
   "/auth/passkey",
+  "/auth/recover",
   "/favicon-16x16.png",
   "/favicon-32x32.png",
   "/favicon-dark-32.png",
@@ -106,6 +142,13 @@ assert.deepEqual(publicPaths, [
   "/favicon.svg",
 ]);
 assert.deepEqual(publicPasskeyApiPaths, [
+  "/api/admin/auth/session",
+  "/api/admin/device/claim",
+  "/api/admin/device/start",
+  "/api/admin/device/status",
+  "/api/admin/invites/register-options",
+  "/api/admin/invites/register-verify",
+  "/api/admin/invites/status",
   "/api/admin/passkey/login-options",
   "/api/admin/passkey/login-verify",
   "/api/admin/passkey/logout",
@@ -116,16 +159,58 @@ assert.deepEqual(publicPasskeyApiPaths, [
   "/api/admin/password/login",
   "/api/admin/password/logout",
   "/api/admin/password/status",
+  "/api/admin/recovery/google/callback",
+  "/api/admin/recovery/google/start",
 ]);
 assert.deepEqual(publicPrefixes, ["/_astro/", "/assets/"]);
 assert.deepEqual(devLoopbackOrigins, [
   "http://127.0.0.1:4311",
   "http://localhost:4311",
 ]);
-assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
+assert.deepEqual(devLoopbackPreviewPaths, [
+  "/",
+  "/content",
+  "/content/carousels",
+  "/content/drafts",
+  "/content/operations",
+  "/content/preview",
+  "/content/review",
+  "/deploys",
+  "/fleet",
+  "/handoffs",
+  "/inbox",
+  "/knowledge",
+  "/knowledge/locations",
+  "/life",
+  "/life/aesthetics",
+  "/life/health",
+  "/mutations",
+  "/newsletter",
+  "/proof",
+  "/repos",
+  "/system",
+  "/work",
+]);
+assert.deepEqual(devPreviewAssetPaths, ["/@react-refresh"]);
+assert.deepEqual(devPreviewAssetPrefixes, ["/@id/", "/@vite/", "/src/"]);
+assert.match(
+  accessPolicySource,
+  /DEV_PORTLESS_HOST_PATTERN[\s\S]*admin\\\.anipotts\\\.localhost/,
+  "Portless preview must match only the exact Admin localhost suffix",
+);
+assert.ok(
+  accessPolicySource.includes(
+    'url.protocol === "http:" && url.port === "1355"',
+  ),
+  "rootless Portless preview must stay pinned to HTTP port 1355",
+);
 assert.ok(
   middlewareSource.includes("isDev: import.meta.env.DEV"),
   "loopback preview must remain gated by Astro development mode",
+);
+assert.ok(
+  middlewareSource.includes('searchParams.get("stepup") !== "1"'),
+  "fresh passkey step-up must remain reachable from an active session",
 );
 
 const classifiedFiles = new Set([
@@ -258,6 +343,55 @@ for (const marker of ["data-attention-id", "data-entity-id"]) {
     `admin attention row missing marker ${marker}`,
   );
 }
+assert.ok(
+  layoutSource.includes('import "../styles/admin-canvas.css"'),
+  "shared admin layout must load the canonical canvas styles",
+);
+for (const marker of [
+  "SemanticInspector",
+  "semanticReferences",
+  "inbox.source",
+]) {
+  assert.ok(
+    homeSource.includes(marker),
+    `canonical admin canvas missing semantic marker ${marker}`,
+  );
+}
+for (const marker of [
+  "item.references.owner",
+  "item.references.source_time",
+  "item.references.proof",
+  "item.references.action",
+]) {
+  assert.ok(
+    attentionRowSource.includes(marker),
+    `admin attention card missing typed reference ${marker}`,
+  );
+}
+for (const marker of [
+  "calendar_event",
+  "source_time",
+  "providerDestination",
+  "isSafeProviderHref",
+  "source not checked",
+  "checked · no value found",
+]) {
+  assert.ok(
+    semanticReferenceSource.includes(marker),
+    `semantic reference contract missing marker ${marker}`,
+  );
+}
+for (const marker of [
+  "data-semantic-inspector",
+  "data-semantic-inspector-panel",
+  "showModal",
+  "data-semantic-close",
+]) {
+  assert.ok(
+    semanticInspectorSource.includes(marker),
+    `semantic inspector missing marker ${marker}`,
+  );
+}
 
 for (const marker of ["data-knowledge-card", "/knowledge?kind="]) {
   assert.ok(
@@ -289,15 +423,19 @@ for (const marker of [
 for (const marker of [
   "data-work-now",
   "Currently working",
+  "Last verified work",
   "OperatorWorkTable",
   "view=projects",
   "view=history",
-  "data-inspect-task",
   "loose conversations",
   "preserved",
 ]) {
   assert.ok(workSource.includes(marker), `admin work missing marker ${marker}`);
 }
+assert.ok(
+  operatorWorkTableSource.includes("data-semantic-open"),
+  "admin work table must use the shared semantic inspector",
+);
 for (const marker of [
   "019f7fb8-69b7-7791-8e67-87c87acfae02",
   "019f95c5-be35-7991-811c-371611daa94b",
@@ -379,16 +517,29 @@ assert.equal(
 );
 
 for (const marker of [
-  "Access removal runbook",
-  "passkey-runbook",
-  "passkey-return-path",
+  "continue with passkey",
+  "use phone",
+  "recover access",
+  'data-auth-state="phone"',
+  'data-auth-state="invite"',
+  'data-auth-state="pending"',
+  'data-auth-state="error"',
+  'data-auth-state="expired"',
   "sanitizeAdminReturnPath",
-  "buildRunbookSteps",
-  "ready_for_access_removal",
 ]) {
   assert.ok(
-    passkeySource.includes(marker),
-    `/auth/passkey missing proof runbook marker ${marker}`,
+    authSource.includes(marker),
+    `/auth missing passkey-first marker ${marker}`,
+  );
+}
+for (const marker of [
+  "sanitizeAdminReturnPath",
+  "context.redirect",
+  "encodeURIComponent",
+]) {
+  assert.ok(
+    passkeyRedirectSource.includes(marker),
+    `/auth/passkey compatibility redirect missing ${marker}`,
   );
 }
 
@@ -402,14 +553,6 @@ for (const marker of [
   assert.ok(
     contentEditorSource.includes(marker),
     `/content/edit/:pageKey missing draft editor marker ${marker}`,
-  );
-}
-
-function extractShellForRoutes(source) {
-  return new Set(
-    [...source.matchAll(/for path in ([^;]+); do/g)]
-      .flatMap((match) => match[1].trim().split(/\s+/))
-      .filter((route) => route.startsWith("/")),
   );
 }
 

@@ -77,16 +77,17 @@ export interface HomepageMention {
   logoShape?: "square" | "wide" | "mark" | "large";
   badgeSrc?: string;
   badgeAlt?: string;
+  presentation?: "brand" | "facet";
 }
 
 export interface HomepageContent {
   sections: {
     intro: HomepageSection;
-    about: HomepageSection;
+    about?: HomepageSection;
     past_work: HomepageSection;
     latest_thoughts: HomepageSection;
   };
-  section_order: ("intro" | "about" | "past_work" | "latest_thoughts")[];
+  section_order: ("intro" | "past_work" | "latest_thoughts")[];
   proof_cards: HomepageProofCard[];
   mentions: Record<string, HomepageMention>;
 }
@@ -209,6 +210,31 @@ export interface OrchestratingLinkCard {
   title: string;
   href: string;
   detail: string;
+}
+
+export interface SystemsPrinciple {
+  label: string;
+  title: string;
+  detail: string;
+}
+
+export interface SystemsLinkCard {
+  title: string;
+  href: string;
+  detail: string;
+}
+
+export interface SystemsPageContent {
+  title: string;
+  description: string;
+  hero_title: string;
+  hero_summary: string;
+  principles_label: string;
+  principles: SystemsPrinciple[];
+  writing_label: string;
+  featured_writing: SystemsLinkCard;
+  tools_label: string;
+  public_tools: SystemsLinkCard[];
 }
 
 export interface CmsEditorSnapshot {

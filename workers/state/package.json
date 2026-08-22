@@ -7,9 +7,12 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:control": "bun run scripts/test-control-plane.ts",
     "test:cli": "bun run scripts/test-link-vault.ts"
   },
   "dependencies": {
+    "@anipotts/types": "workspace:*",
     "hono": "^4.12.18"
   },
   "devDependencies": {

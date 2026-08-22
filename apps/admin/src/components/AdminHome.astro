@@ -3,6 +3,15 @@ import AdminLayout from "../layouts/AdminLayout.astro";
 import { SourceMark } from "./SourceMark";
 import AttentionRow from "./AttentionRow.astro";
 import ActivationGraph from "./ActivationGraph.astro";
+import ControlPlaneReceipt from "./ControlPlaneReceipt.astro";
+import SemanticInspector from "./SemanticInspector.astro";
+import SemanticReference from "./SemanticReference.astro";
+import {
+  ArrowsClockwiseIcon,
+  ClockIcon,
+  EyeIcon,
+  StopIcon,
+} from "./admin-icons";
 import { readAdminInbox, type AdminInboxItem } from "../data/inbox";
 import { readOperatorWorkProjection } from "../data/operator-work";
 import { operatorTaskDisplay } from "../data/operator-work-view";
@@ -12,6 +21,12 @@ import {
   OPERATIONAL_PROJECTIONS,
   type OperationalProjection,
 } from "../data/activation-graph";
+import {
+  buildOperatorTaskSemanticReferences,
+  semanticStateLabel,
+  type OperatorTaskSemanticReferences,
+  type SemanticReference as SemanticReferenceModel,
+} from "../data/semantic-reference";
 
 const [inbox, work] = await Promise.all([
   readAdminInbox(Astro.locals.runtime?.env.DB),
@@ -46,6 +61,14 @@ const beingHandled = work.task_states.filter(
   (task) =>
     task.operator_state === "working" || task.operator_state === "review",
 );
+const workReferencesAreCurrent = activation.work_source_state === "current";
+const workReferenceState = workReferencesAreCurrent ? "verified" : "stale";
+const taskReferences = new Map(
+  work.task_states.map((task) => [
+    task.task_id,
+    buildOperatorTaskSemanticReferences(task, workReferenceState),
+  ]),
+);
 
 const displayTime = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -55,21 +78,6 @@ const displayTime = (value: string) =>
     minute: "2-digit",
   }).format(new Date(value));
 const humanize = (value: string) => value.replaceAll("_", " ");
-const domainHref = (item: AdminInboxItem) => {
-  if (item.category === "work") {
-    return `/work?view=now&entity=${encodeURIComponent(item.entity_id)}`;
-  }
-  if (item.category === "content") {
-    return `/content?entity=${encodeURIComponent(item.entity_id)}`;
-  }
-  if (item.category === "life") {
-    return `/life?entity=${encodeURIComponent(item.entity_id)}`;
-  }
-  if (item.category === "fleet") {
-    return `/fleet?entity=${encodeURIComponent(item.entity_id)}`;
-  }
-  return item.href.startsWith("/") ? item.href : "/proof";
-};
 const linkedTaskFor = (item: AdminInboxItem) =>
   work.task_states.find(
     (task) =>
@@ -77,21 +85,78 @@ const linkedTaskFor = (item: AdminInboxItem) =>
       task.primary_entity_ref === item.entity_id ||
       task.entity_refs.includes(item.entity_id),
   );
+const linkedTaskReferencesFor = (
+  item: AdminInboxItem,
+): OperatorTaskSemanticReferences | undefined => {
+  const task = linkedTaskFor(item);
+  return task ? taskReferences.get(task.task_id) : undefined;
+};
+const itemSemanticReferences = (item: AdminInboxItem) =>
+  Object.values(item.references).filter(
+    (reference) => reference !== null,
+  ) as SemanticReferenceModel[];
+const taskSemanticReferences = (references: OperatorTaskSemanticReferences) =>
+  Object.values(references) as SemanticReferenceModel[];
+const semanticReferences: SemanticReferenceModel[] = [
+  inbox.source,
+  ...activation.sources,
+  ...activation.lanes.map((lane) => lane.reference),
+  ...(activation.foreground_reference ? [activation.foreground_reference] : []),
+  ...activation.nodes.flatMap((node) => [
+    node.reference,
+    node.source_reference,
+  ]),
+  ...visibleItems.flatMap(itemSemanticReferences),
+  ...[...taskReferences.values()].flatMap(taskSemanticReferences),
+];
+const attentionTitle = selectedCategory
+  ? humanize(selectedCategory)
+  : requestedView
+    ? humanize(requestedView)
+    : "needs you";
+const handledTitle = workReferencesAreCurrent
+  ? "being handled"
+  : "last verified work";
 ---
 
 <AdminLayout title="inbox" hideHeader>
-  <main class="operator-page operator-inbox-page">
-    <header class="operator-page-header">
-      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
-        Inbox
-      </h1>
-      <div class="operator-header-summary">
-        <strong>{inbox.counts.total} open</strong>
-        <span>·</span>
-        <span>{inbox.counts.high} urgent</span>
-        <time datetime={inbox.generated_at}>
+  <main class="operator-page operator-inbox-page admin-canvas">
+    <header class="operator-page-header admin-canvas-header">
+      <div>
+        <p class="operator-eyebrow">current attention</p>
+        <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
+          Inbox
+        </h1>
+      </div>
+      <div class="admin-canvas-summary" aria-label="inbox source summary">
+        <span>
+          <EyeIcon size={18} weight="regular" aria-hidden="true" />
+          <strong>{inbox.counts.total}</strong>
+          open
+        </span>
+        <span class:list={[inbox.counts.high > 0 && "is-urgent"]}>
+          <StopIcon size={18} weight="regular" aria-hidden="true" />
+          <strong>{inbox.counts.high}</strong>
+          urgent
+        </span>
+        <span>
+          <ClockIcon size={18} weight="regular" aria-hidden="true" />
           checked {displayTime(inbox.generated_at)}
-        </time>
+        </span>
+        <SemanticReference
+          reference={inbox.source}
+          variant="compact"
+          label={semanticStateLabel(inbox.source.source_state)}
+        />
+        <button
+          type="button"
+          class="admin-canvas-refresh is-icon-only"
+          data-canvas-refresh
+          aria-label="refresh current read-only sources"
+          title="refresh current read-only sources"
+        >
+          <ArrowsClockwiseIcon size={20} weight="regular" aria-hidden="true" />
+        </button>
       </div>
     </header>
 
@@ -141,17 +206,10 @@ const linkedTaskFor = (item: AdminInboxItem) =>
     >
       <div class="operator-section-heading">
         <div>
-          <h2 id="attention-title">
-            {
-              selectedCategory
-                ? humanize(selectedCategory)
-                : requestedView
-                  ? humanize(requestedView)
-                  : "needs you"
-            }
-          </h2>
+          <p>foreground decisions</p>
+          <h2 id="attention-title">{attentionTitle}</h2>
         </div>
-        <span>{visibleItems.length}</span>
+        <span>{visibleItems.length} visible</span>
       </div>
 
       <ol class="operator-attention-list">
@@ -160,38 +218,56 @@ const linkedTaskFor = (item: AdminInboxItem) =>
             <AttentionRow
               item={item}
               index={index}
-              linkedTask={linkedTaskFor(item)}
-              domainHref={domainHref(item)}
+              linkedTaskReferences={linkedTaskReferencesFor(item)}
             />
           ))
         }
       </ol>
     </section>
 
+    <ControlPlaneReceipt />
+
     <section class="operator-handled" aria-labelledby="being-handled-title">
       <div class="operator-section-heading">
         <div>
-          <h2 id="being-handled-title">being handled</h2>
+          <p>
+            {
+              workReferencesAreCurrent
+                ? "current execution"
+                : "stale projection"
+            }
+          </p>
+          <h2 id="being-handled-title">{handledTitle}</h2>
         </div>
         <a href="/work?view=now">open Work</a>
       </div>
       <div class="operator-handled-strip">
         {
-          beingHandled.map((task) => (
-            <a
-              href={`/work?view=now#task-${task.task_id}`}
-              class="operator-handled-item"
-            >
-              <SourceMark provider={task.provider} compact />
-              <div>
-                <strong>{task.canonical_title}</strong>
-                <span>{operatorTaskDisplay(task).bounded_goal}</span>
-              </div>
-              <time datetime={task.last_observed_at}>
-                {displayTime(task.last_observed_at)}
-              </time>
-            </a>
-          ))
+          beingHandled.map((task) => {
+            const references = taskReferences.get(task.task_id)!;
+            return (
+              <article class="operator-handled-item">
+                <SourceMark provider={task.provider} compact />
+                <div>
+                  <SemanticReference
+                    reference={references.task}
+                    variant="value"
+                  />
+                  <span>{operatorTaskDisplay(task).bounded_goal}</span>
+                </div>
+                <div class="operator-handled-proof">
+                  <SemanticReference
+                    reference={references.source_time}
+                    variant="compact"
+                  />
+                  <SemanticReference
+                    reference={references.proof}
+                    variant="compact"
+                  />
+                </div>
+              </article>
+            );
+          })
         }
       </div>
     </section>
@@ -203,22 +279,26 @@ const linkedTaskFor = (item: AdminInboxItem) =>
           aria-labelledby="remaining-attention-title"
         >
           <div class="operator-section-heading">
-            <h2 id="remaining-attention-title">everything else</h2>
-            <span>{remainingItems.length}</span>
+            <div>
+              <p>lower in the same projection</p>
+              <h2 id="remaining-attention-title">everything else</h2>
+            </div>
+            <span>{remainingItems.length} visible</span>
           </div>
           <ol class="operator-attention-list is-secondary">
             {remainingItems.map((item, index) => (
               <AttentionRow
                 item={item}
                 index={index + topItems.length}
-                linkedTask={linkedTaskFor(item)}
-                domainHref={domainHref(item)}
+                linkedTaskReferences={linkedTaskReferencesFor(item)}
               />
             ))}
           </ol>
         </section>
       )
     }
+
+    <SemanticInspector references={semanticReferences} />
     <p class="sr-only" aria-live="polite" data-admin-live-status></p>
   </main>
 
@@ -234,6 +314,9 @@ const linkedTaskFor = (item: AdminInboxItem) =>
           item.scrollIntoView({ block: "center" });
         }
       }
+
+      const manualRefresh = document.querySelector("[data-canvas-refresh]");
+      manualRefresh?.addEventListener("click", () => location.reload());
 
       const currentItems = [
         ...document.querySelectorAll("[data-attention-id]"),

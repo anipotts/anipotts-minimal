@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "production_promotion": "held_canary_required",
+  "automatic_migrations": "held_bootstrap_required",
+  "authenticated_admin_smoke": "held_identity_required",
+  "automatic_app_rollback": "held_canary_required",
+  "required_checks": [
+    "Build, lint, typecheck, test",
+    "Security Review",
+    "Migration Preflight",
+    "Promotion Policy"
+  ]
+}

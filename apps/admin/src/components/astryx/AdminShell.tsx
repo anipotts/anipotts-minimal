@@ -137,10 +137,13 @@ export function AdminShell({
           <MagnifyingGlassIcon size={20} aria-hidden="true" />
         </button>
         <details className="admin-mobile-menu">
-          <summary aria-label="open navigation">
+          <summary
+            aria-controls="admin-mobile-menu-panel"
+            aria-label="toggle navigation"
+          >
             <CaretDownIcon size={20} aria-hidden="true" />
           </summary>
-          <nav aria-label="all admin destinations">
+          <nav id="admin-mobile-menu-panel" aria-label="all admin destinations">
             {navItems
               .filter((item) => !item.mobile && item.href !== "/mutations")
               .map((item) => (
@@ -264,7 +267,7 @@ function NavEntry({
       href={item.href}
       label={item.label}
       icon={<Icon size={18} weight="regular" aria-hidden="true" />}
-      selectedIcon={<Icon size={18} weight="fill" aria-hidden="true" />}
+      selectedIcon={<Icon size={18} weight="regular" aria-hidden="true" />}
       isSelected={isActive(currentRoute, item.href)}
       collapsible={false}
     >

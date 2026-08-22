@@ -1,6 +1,12 @@
 ---
 import AdminLayout from "../layouts/AdminLayout.astro";
+import SemanticInspector from "../components/SemanticInspector.astro";
+import SemanticReference from "../components/SemanticReference.astro";
 import { loadRuntimeOverlayResponse } from "../data/runtime";
+import {
+  internalRecordReference,
+  type SemanticReference as SemanticReferenceModel,
+} from "../data/semantic-reference";
 
 const runtime = await loadRuntimeOverlayResponse();
 const machines = ["ap-pro", "ap-mini"].map((name) => {
@@ -19,6 +25,33 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
       .length,
   };
 });
+const machineReferences = machines.map((machine) =>
+  internalRecordReference({
+    id: machine.name,
+    kind: "graph_entity",
+    label: machine.name,
+    value: machine.name,
+    summary: `${machine.role}. ${machine.repos.length || "no"} repository observations.`,
+    source: "runtime feed",
+    source_ref: `runtime:${machine.name}`,
+    checked_at: runtime.generated_at,
+    source_state: runtime.available ? "verified" : "unknown",
+  }),
+);
+const repoReferences = runtime.overlays.map((row) =>
+  internalRecordReference({
+    id: `${row.machine}:${row.repo}`,
+    kind: "repository",
+    label: row.repo,
+    value: row.repo,
+    summary: `${row.branch || "unknown branch"}. ${row.deploy_impact}.`,
+    source: "runtime feed",
+    source_ref: `runtime:${row.machine}:${row.repo}`,
+    checked_at: runtime.generated_at,
+    source_state: runtime.available ? "verified" : "unknown",
+  }),
+);
+const fleetReferences = [...machineReferences, ...repoReferences];
 ---
 
 <AdminLayout title="fleet" hideHeader>
@@ -38,7 +71,7 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
 
     <section class="quiet-machine-grid" aria-label="machines">
       {
-        machines.map((machine) => (
+        machines.map((machine, index) => (
           <article>
             <header>
               <h2>{machine.name}</h2>
@@ -65,6 +98,11 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
                 <dd>see Work</dd>
               </div>
             </dl>
+            <SemanticReference
+              reference={machineReferences[index]!}
+              variant="action"
+              label="details"
+            />
           </article>
         ))
       }
@@ -84,8 +122,11 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
               <span role="columnheader">branch</span>
               <span role="columnheader">pressure</span>
               <span role="columnheader">impact</span>
+              <span role="columnheader" class="sr-only">
+                details
+              </span>
             </div>
-            {runtime.overlays.map((row) => (
+            {runtime.overlays.map((row, index) => (
               <div role="row">
                 <strong role="cell">{row.repo}</strong>
                 <span role="cell">{row.machine}</span>
@@ -94,6 +135,13 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
                   {(row.dirty_tracked_count ?? 0) + (row.untracked_count ?? 0)}
                 </span>
                 <span role="cell">{row.deploy_impact}</span>
+                <span role="cell">
+                  <SemanticReference
+                    reference={repoReferences[index]!}
+                    variant="action"
+                    label="details"
+                  />
+                </span>
               </div>
             ))}
           </div>
@@ -112,5 +160,8 @@ const machines = ["ap-pro", "ap-mini"].map((name) => {
         </aside>
       )
     }
+    <SemanticInspector
+      references={fleetReferences as SemanticReferenceModel[]}
+    />
   </main>
 </AdminLayout>

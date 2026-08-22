@@ -1,0 +1,144 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { setDB } from "@anipotts/lib/db";
+import type { D1Database } from "@anipotts/lib/db";
+import { fetchPageContent } from "@anipotts/lib/cms";
+import { normalizeSystemsPageContent } from "@anipotts/content/public";
+
+export const prerender = false;
+
+setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
+const page = await fetchPageContent("systems");
+const content = normalizeSystemsPageContent(page?.content);
+---
+
+<Shell title={content.title} description={content.description} path="/systems">
+  <article data-rise class="systems-page">
+    <header class="hero">
+      <p class="mono kicker">operating method</p>
+      <h1>{content.hero_title}</h1>
+      <p>{content.hero_summary}</p>
+    </header>
+
+    <section class="stack">
+      <h2 class="section-label">{content.principles_label}</h2>
+      <div class="principle-grid">
+        {
+          content.principles.map((principle) => (
+            <article class="principle">
+              <span class="mono">{principle.label}</span>
+              <h3>{principle.title}</h3>
+              <p>{principle.detail}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="stack">
+      <h2 class="section-label">{content.writing_label}</h2>
+      <a class="feature" href={content.featured_writing.href}>
+        <strong>{content.featured_writing.title}</strong>
+        <span>{content.featured_writing.detail}</span>
+      </a>
+    </section>
+
+    <section class="stack">
+      <h2 class="section-label">{content.tools_label}</h2>
+      <div class="tool-grid">
+        {
+          content.public_tools.map((tool) => (
+            <a
+              class="feature"
+              href={tool.href}
+              target={tool.href.startsWith("/") ? undefined : "_blank"}
+              rel={
+                tool.href.startsWith("/") ? undefined : "noopener noreferrer"
+              }
+            >
+              <strong>{tool.title}</strong>
+              <span>{tool.detail}</span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </article>
+</Shell>
+
+<style>
+  .systems-page,
+  .hero,
+  .stack,
+  .feature,
+  .principle {
+    display: grid;
+  }
+  .systems-page {
+    gap: var(--s-8);
+  }
+  .hero {
+    gap: var(--s-3);
+    padding-block: var(--s-5) var(--s-7);
+    max-width: 54rem;
+  }
+  .hero h1 {
+    margin: 0;
+    font-size: clamp(3rem, 12vw, 7rem);
+    line-height: 0.9;
+  }
+  .hero p:last-child {
+    margin: 0;
+    max-width: 46rem;
+    font-size: 1.25rem;
+    line-height: 1.55;
+  }
+  .kicker,
+  .principle span {
+    color: var(--ink-muted);
+  }
+  .stack {
+    gap: var(--s-4);
+  }
+  .principle-grid,
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+  .principle,
+  .feature {
+    gap: var(--s-2);
+    padding: var(--s-4);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+  }
+  .principle h3,
+  .principle p,
+  .feature {
+    margin: 0;
+  }
+  .principle p,
+  .feature span {
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+  .feature {
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+  .feature:hover,
+  .feature:focus-visible {
+    border-color: var(--interactive);
+    transform: translateY(-2px);
+  }
+  @media (max-width: 680px) {
+    .principle-grid,
+    .tool-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

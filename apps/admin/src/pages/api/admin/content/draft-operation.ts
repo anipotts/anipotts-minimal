@@ -1,14 +1,14 @@
 import type { APIRoute } from "astro";
 import {
-  assertSameOriginRequest,
   saveDraftOperation,
   statusError,
   type DraftOperationSaveInput,
 } from "../../../../lib/content-draft-operation";
+import { requireAdminMutation } from "../../../../lib/admin-auth";
 
 export const POST: APIRoute = async (context) => {
   try {
-    assertSameOriginRequest(context.request, context.url);
+    await requireAdminMutation(context, "draft:save");
 
     const db = context.locals.runtime?.env.DB;
     if (!db) {

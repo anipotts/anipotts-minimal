@@ -45,19 +45,19 @@ the same PR checks and scoped deploy logic as other changes.
 ## current standing authority
 
 Ani approved these standing lanes on 2026-06-27.
-Ani removed the normal branch-protection/PR gate on 2026-06-30 for faster solo
-iteration. For the lanes below, prefer direct verified commits to `main` when
-the worktree is clean, the diff is scoped, and local checks pass. Use a branch
-or PR only when the change is risky, unclear, blocked by GitHub permissions, or
-Ani asks for review.
+Ani approved a hybrid release train on 2026-08-05. Deployable files move through
+same-repository pull requests so required checks, release classification, and
+native auto-merge can protect production. Docs-only work may still use the
+admin bypass and commit directly to `main` after its narrow checks pass.
 
 ### admin lane
 
 For admin UI, feed, content review, auth staging, and operator-dashboard work:
 
-- commit verified scoped changes directly to `main` when safe
-- deploy only the affected admin target
-- record deploy run, skipped targets, and route proof
+- use a same-repository pull request for deployable files
+- let native auto-merge promote the PR only after every required check passes
+- deploy only the affected admin target after release gates are enabled
+- record deploy run, skipped targets, route proof, and exact release SHA
 
 `apps/admin-solid` is legacy rollback. Keep it only until the Astro admin
 cutover and passkey proof are complete, then archive or remove it. It is not a
@@ -72,9 +72,10 @@ auth rollout, and Cloudflare Access removal after passkey proof.
 For `apps/www` copy, layout, static content, accessibility, route, and
 presentation work:
 
-- commit verified scoped changes directly to `main` when safe
-- deploy `www=true` only
-- record deploy run and route proof
+- use a same-repository pull request for deployable files
+- let native auto-merge promote the PR only after every required check passes
+- deploy `www=true` only after release gates are enabled
+- record deploy run, route proof, and exact release SHA
 
 ### docs lane
 
@@ -135,6 +136,18 @@ pnpm validate
 
 ## local admin preview
 
+For the complete named local development entrypoint, use:
+
+```bash
+pnpm dev:local:ensure
+pnpm dev:local:status
+```
+
+This serves the public site at `http://anipotts.localhost:1355/` and Admin at
+`http://admin.anipotts.localhost:1355/`. It is pinned, rootless, loopback-only,
+and worktree-aware. See `docs/local-development.md` for lifecycle and safety
+details.
+
 The canonical local review URL is `http://localhost:4311/`.
 
 Start or reuse the durable preview with:
@@ -186,6 +199,11 @@ See `docs/platform-architecture.md` for the current inventory and cleanup map.
 Public copy should sound like Ani: direct, specific, terse, and grounded in real
 work. Avoid generic startup copy, guru tone, unsupported hype, rhetorical
 questions, fake vulnerability, and exactly-three-item cadence.
+
+Public copy states the claim directly. Avoid litotes, negative definitions,
+reversal frames, and staccato negation. Exact quotations, safety instructions,
+and literal technical constraints keep their necessary wording and context.
+`pnpm test:public-copy` enforces the evergreen public surfaces.
 
 No em dashes in human-facing copy. Never use `git add .` or `git add -A`.
 

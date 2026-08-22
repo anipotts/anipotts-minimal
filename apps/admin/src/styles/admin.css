@@ -616,7 +616,7 @@ html[data-theme="dark"] .admin-mobile-brand {
 
 .quiet-editorial-row,
 .quiet-editorial-list > article {
-  grid-template-columns: minmax(220px, 1.3fr) 110px 110px 110px 100px;
+  grid-template-columns: minmax(220px, 1.3fr) 110px 110px minmax(190px, auto);
 }
 
 .quiet-result-row > *,
@@ -718,17 +718,29 @@ html[data-theme="dark"] .admin-mobile-brand {
   border-top: 1px solid var(--color-border);
 }
 
-.quiet-system-index > a {
+.quiet-system-index > article {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
   min-height: 68px;
-  gap: 4px;
   border-bottom: 1px solid var(--color-border);
   padding: 12px;
+}
+
+.quiet-system-index > article:nth-child(odd) {
+  border-right: 1px solid var(--color-border);
+}
+
+.quiet-system-index > article > a {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
   color: inherit;
 }
 
-.quiet-system-index > a:nth-child(odd) {
-  border-right: 1px solid var(--color-border);
+.quiet-system-index > article > .semantic-reference {
+  flex: none;
 }
 
 .quiet-system-index span {
@@ -863,7 +875,7 @@ html[data-theme="dark"] .admin-mobile-brand {
 
 .quiet-fleet-matrix [role="row"] {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1.2fr 0.7fr 0.8fr;
+  grid-template-columns: 1.2fr 0.8fr 1.2fr 0.7fr 0.8fr 44px;
   gap: 12px;
   border-bottom: 1px solid var(--color-border);
   padding: 10px 0;
@@ -1225,10 +1237,12 @@ html[data-theme="dark"] .admin-mobile-brand {
     width: min(280px, calc(100vw - 16px));
     max-height: min(70vh, 560px);
     overflow-y: auto;
+    overscroll-behavior: contain;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 6px;
-    background: var(--color-background);
+    background: var(--color-background-body);
+    color: var(--color-text-primary);
     box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
   }
 
@@ -1240,7 +1254,7 @@ html[data-theme="dark"] .admin-mobile-brand {
   }
 
   .admin-mobile-menu nav a[aria-current="page"] {
-    background: var(--color-surface-raised);
+    background: var(--color-background-muted);
   }
 
   .admin-mobile-nav {
@@ -1423,7 +1437,7 @@ html[data-theme="dark"] .admin-mobile-brand {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .quiet-system-index > a:nth-child(odd) {
+  .quiet-system-index > article:nth-child(odd) {
     border-right: 0;
   }
 

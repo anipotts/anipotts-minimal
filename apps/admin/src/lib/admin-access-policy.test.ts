@@ -10,25 +10,54 @@ const local = (path: string, origin = "http://localhost:4311") =>
 
 describe("admin access policy", () => {
   test.each([
+    "/auth",
+    "/auth/invite",
+    "/auth/passkey",
+    "/auth/recover",
+    "/api/admin/auth/session",
+    "/api/admin/device/start",
+    "/api/admin/device/status",
+    "/api/admin/device/claim",
+    "/api/admin/invites/status",
+    "/api/admin/recovery/google/start",
     "/api/admin/password/status",
     "/api/admin/password/login",
     "/api/admin/password/logout",
-  ])("exposes only the password authentication endpoint %s", (path) => {
+    "/api/mcp",
+  ])("keeps the signed-out auth boundary public for %s", (path) => {
     expect(isPublicAdminPath(path)).toBe(true);
   });
 
-  test.each(["/", "/inbox", "/work?view=now"])(
-    "allows the read-only development preview for %s",
-    (path) => {
-      expect(
-        isDevLoopbackPreviewRequest({
-          isDev: true,
-          method: "GET",
-          url: local(path),
-        }),
-      ).toBe(true);
-    },
-  );
+  test.each([
+    "/auth/device/opaque-request",
+    "/auth/recover/passkey",
+    "/api/admin/device/approve",
+    "/api/admin/device/review",
+    "/api/admin/members/invite",
+    "/api/admin/recovery/passkey/options",
+  ])("keeps authenticated auth operations protected for %s", (path) => {
+    expect(isPublicAdminPath(path)).toBe(false);
+  });
+
+  test.each([
+    "/",
+    "/inbox",
+    "/work?view=now",
+    "/content",
+    "/knowledge",
+    "/life",
+    "/system",
+    "/fleet",
+    "/proof",
+  ])("allows the read-only development preview for %s", (path) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local(path),
+      }),
+    ).toBe(true);
+  });
 
   test("accepts the exact numeric loopback preview origin", () => {
     expect(
@@ -36,6 +65,35 @@ describe("admin access policy", () => {
         isDev: true,
         method: "HEAD",
         url: local("/inbox", "http://127.0.0.1:4311"),
+      }),
+    ).toBe(true);
+  });
+
+  test.each([
+    "http://admin.anipotts.localhost:1355",
+    "http://portless-local-2026-08-21.admin.anipotts.localhost:1355",
+    "https://admin.anipotts.localhost",
+  ])("accepts an exact Portless development origin %s", (origin) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local("/inbox", origin),
+      }),
+    ).toBe(true);
+  });
+
+  test.each([
+    "/@vite/client",
+    "/@id/react",
+    "/@react-refresh",
+    "/src/components/astryx/AdminCommandPalette.tsx",
+  ])("allows a read-only Vite development asset %s", (path) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local(path, "http://admin.anipotts.localhost:1355"),
       }),
     ).toBe(true);
   });
@@ -60,6 +118,15 @@ describe("admin access policy", () => {
       url: local("/api/admin/inbox"),
     },
     {
+      name: "write to Vite path",
+      isDev: true,
+      method: "POST",
+      url: local(
+        "/src/components/astryx/AdminCommandPalette.tsx",
+        "http://admin.anipotts.localhost:1355",
+      ),
+    },
+    {
       name: "non-loopback host",
       isDev: true,
       method: "GET",
@@ -72,10 +139,37 @@ describe("admin access policy", () => {
       url: local("/inbox", "http://localhost:4321"),
     },
     {
+      name: "unapproved auth operation",
+      isDev: true,
+      method: "GET",
+      url: local("/auth/device/opaque-request"),
+    },
+    {
+      name: "wrong Portless port",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "http://admin.anipotts.localhost:4311"),
+    },
+    {
+      name: "lookalike Portless host",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "http://admin.anipotts.localhost.example:1355"),
+    },
+    {
+      name: "nested Portless subdomain",
+      isDev: true,
+      method: "GET",
+      url: local(
+        "/inbox",
+        "http://nested.branch.admin.anipotts.localhost:1355",
+      ),
+    },
+    {
       name: "unapproved page",
       isDev: true,
       method: "GET",
-      url: local("/content"),
+      url: local("/content/editor/unsupported"),
     },
   ])("does not bypass native auth for $name", ({ isDev, method, url }) => {
     expect(

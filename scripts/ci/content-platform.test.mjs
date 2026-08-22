@@ -79,20 +79,21 @@ const homepageSummary =
 assert.equal(homepageSummary.length, 2);
 assert.deepEqual(homepageSummary[0], {
   segments: [
-    {
-      kind: "text",
-      text: "every now and then i post about what i'm doing with claude code and codex, as featured on ",
-    },
-    { kind: "mention", key: "businessInsider", suffix: "." },
+    { kind: "text", text: "i " },
+    { kind: "mention", key: "build" },
+    { kind: "text", text: " with " },
+    { kind: "mention", key: "agents" },
+    { kind: "text", text: " and " },
+    { kind: "mention", key: "write" },
+    { kind: "text", text: " about the " },
+    { kind: "mention", key: "systems" },
+    { kind: "text", text: " that keep the work coherent." },
   ],
 });
-assert.equal(homepageSummary[1]?.segments[0]?.kind, "text");
-assert.equal(
-  homepageSummary[1]?.segments[0]?.kind === "text"
-    ? homepageSummary[1].segments[0].text
-    : "",
-  "previously worked on real-time agent i/o at ",
-);
+assert.deepEqual(homepageSummary[1]?.segments[0], {
+  kind: "mention",
+  key: "businessInsider",
+});
 
 assert.deepEqual(
   REQUIRED_PASSKEY_AUDIT_EVENTS,

@@ -6,11 +6,13 @@ import type {
   ListingPageContent,
   NewsletterContent,
   OrchestratingPageContent,
+  SystemsPageContent,
 } from "@anipotts/types";
 import {
   CMS_TEXT_LIMITS,
   DEFAULT_NEWSLETTER_CONTENT,
   DEFAULT_ORCHESTRATING_CONTENT,
+  DEFAULT_SYSTEMS_CONTENT,
   DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults.js";
 
@@ -628,6 +630,120 @@ export function normalizeOrchestratingPageContent(
     loop_cards: normalizeOrchestratingLoopCards(source.loop_cards),
     public_tools: normalizeOrchestratingLinkCards(source.public_tools),
   };
+}
+
+export function normalizeSystemsPageContent(
+  content: unknown,
+): SystemsPageContent {
+  const source =
+    content && typeof content === "object"
+      ? (content as Record<string, unknown>)
+      : {};
+  const principles = Array.isArray(source.principles)
+    ? source.principles
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => ({
+          label: coerceString(item.label, "").trim(),
+          title: coerceString(item.title, "").trim(),
+          detail: coerceString(item.detail, "").trim(),
+        }))
+        .filter((item) => item.label && item.title && item.detail)
+        .slice(0, 8)
+    : DEFAULT_SYSTEMS_CONTENT.principles;
+  const tools = Array.isArray(source.public_tools)
+    ? source.public_tools
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => ({
+          title: coerceString(item.title, "").trim(),
+          href: coerceString(item.href, "").trim(),
+          detail: coerceString(item.detail, "").trim(),
+        }))
+        .filter((item) => item.title && item.href && item.detail)
+        .slice(0, 8)
+    : DEFAULT_SYSTEMS_CONTENT.public_tools;
+  const featured =
+    source.featured_writing && typeof source.featured_writing === "object"
+      ? (source.featured_writing as Record<string, unknown>)
+      : {};
+
+  return {
+    title: coerceString(source.title, DEFAULT_SYSTEMS_CONTENT.title).trim(),
+    description: coerceString(
+      source.description,
+      DEFAULT_SYSTEMS_CONTENT.description,
+    ).trim(),
+    hero_title: coerceString(
+      source.hero_title,
+      DEFAULT_SYSTEMS_CONTENT.hero_title,
+    ).trim(),
+    hero_summary: coerceString(
+      source.hero_summary,
+      DEFAULT_SYSTEMS_CONTENT.hero_summary,
+    ).trim(),
+    principles_label: coerceString(
+      source.principles_label,
+      DEFAULT_SYSTEMS_CONTENT.principles_label,
+    ).trim(),
+    principles: principles.length
+      ? principles
+      : DEFAULT_SYSTEMS_CONTENT.principles,
+    writing_label: coerceString(
+      source.writing_label,
+      DEFAULT_SYSTEMS_CONTENT.writing_label,
+    ).trim(),
+    featured_writing: {
+      title: coerceString(
+        featured.title,
+        DEFAULT_SYSTEMS_CONTENT.featured_writing.title,
+      ).trim(),
+      href: coerceString(
+        featured.href,
+        DEFAULT_SYSTEMS_CONTENT.featured_writing.href,
+      ).trim(),
+      detail: coerceString(
+        featured.detail,
+        DEFAULT_SYSTEMS_CONTENT.featured_writing.detail,
+      ).trim(),
+    },
+    tools_label: coerceString(
+      source.tools_label,
+      DEFAULT_SYSTEMS_CONTENT.tools_label,
+    ).trim(),
+    public_tools: tools.length ? tools : DEFAULT_SYSTEMS_CONTENT.public_tools,
+  };
+}
+
+export function validateSystemsPageContent(content: SystemsPageContent): {
+  ok: boolean;
+  error?: string;
+} {
+  const baseFields = [
+    [content.title, "Systems title"],
+    [content.description, "Systems description"],
+    [content.hero_title, "Systems hero title"],
+    [content.hero_summary, "Systems hero summary"],
+    [content.principles_label, "Systems principles label"],
+    [content.writing_label, "Systems writing label"],
+    [content.tools_label, "Systems tools label"],
+  ] as const;
+  for (const [value, label] of baseFields) {
+    const error = validateCmsString(value, label, CMS_TEXT_LIMITS.summary);
+    if (error) return { ok: false, error };
+  }
+  if (content.principles.length === 0) {
+    return { ok: false, error: "Systems principles are required" };
+  }
+  const links = [content.featured_writing, ...content.public_tools];
+  for (const link of links) {
+    if (!link.title || !link.detail || !isSafeCmsUrl(link.href)) {
+      return { ok: false, error: "Systems links need safe, complete content" };
+    }
+  }
+  return { ok: true };
 }
 
 function normalizeOrchestratingSectionLabels(
