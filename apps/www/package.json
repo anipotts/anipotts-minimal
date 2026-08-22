@@ -14,12 +14,10 @@
   "dependencies": {
     "@anipotts/content": "workspace:*",
     "@anipotts/lib": "workspace:*",
-    "@anipotts/styles": "workspace:*",
+    "@anipotts/brand": "workspace:*",
     "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/rss": "^4.0.19",
     "@fontsource-variable/instrument-sans": "^5.2.8",
-    "@fontsource/geist-sans": "^5.2.5",
-    "@fontsource/urbanist": "^5.2.7",
     "astro": "^5.16.0",
     "astro-icon": "^1.1.5",
     "zod": "^3.24.2"

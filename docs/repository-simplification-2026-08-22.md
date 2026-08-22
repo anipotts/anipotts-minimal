@@ -4,25 +4,25 @@ status: implementation baseline, 2026-08-22
 
 ## ranked debt
 
-| area | user impact | developer impact | risk | deletion opportunity |
-| --- | --- | --- | --- | --- |
-| public content | high | high | medium | remove manually synchronized project, writing, page, admin, and seed copies |
-| brand system | high | high | low | replace app-local colors, font packets, marks, and motion rules with one package |
-| release and migration truth | high | high | high | remove duplicated target and gate decisions after receipt parity is proven |
-| runtime fixtures | medium | high | medium | move specimens out of production paths and expose honest provenance states |
-| admin-solid rollback app | low | medium | high | remove one application and its validation path after the retirement gate passes |
-| broad package boundaries | low | medium | medium | absorb exports that have no independent owner or consumer boundary |
+| area                        | user impact | developer impact | risk   | deletion opportunity                                                             |
+| --------------------------- | ----------- | ---------------- | ------ | -------------------------------------------------------------------------------- |
+| public content              | high        | high             | medium | remove manually synchronized project, writing, page, admin, and seed copies      |
+| brand system                | high        | high             | low    | replace app-local colors, font packets, marks, and motion rules with one package |
+| release and migration truth | high        | high             | high   | remove duplicated target and gate decisions after receipt parity is proven       |
+| runtime fixtures            | medium      | high             | medium | move specimens out of production paths and expose honest provenance states       |
+| admin-solid rollback app    | low         | medium           | high   | remove one application and its validation path after the retirement gate passes  |
+| broad package boundaries    | low         | medium           | medium | absorb exports that have no independent owner or consumer boundary               |
 
 ## canonical sources
 
-| concern | canonical source | generated or runtime projections |
-| --- | --- | --- |
-| public content | `content/public/**/*.md` | TypeScript defaults, validation inventory, Admin projection, additive D1 seed input |
-| brand | `packages/brand` | bundled app assets and semantic CSS variables |
-| release decision | typed output from `scripts/ci/release-policy.mjs` using `config/release-train.json` | CI checks, deploy targets, migration gate, deployment receipt |
-| migration ownership | `apps/admin/wrangler.toml` plus immutable `drizzle/migrations/manifest.json` | Wrangler ledger and production receipt |
-| local development | `pnpm dev:local:ensure|status|stop` | named loopback URLs; `localhost:4311` remains the Admin fallback |
-| runtime provenance | source-backed state with `live`, `stale`, `disconnected`, `unknown`, or `fixture_only` | Admin labels and inspectors |
+| concern             | canonical source                                                                       | generated or runtime projections                                                    |
+| ------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| public content      | `content/public/**/*.md`                                                               | TypeScript defaults, validation inventory, Admin projection, additive D1 seed input |
+| brand               | `packages/brand`                                                                       | bundled app assets and semantic CSS variables                                       |
+| release decision    | typed output from `scripts/ci/release-policy.mjs` using `config/release-train.json`    | CI checks, deploy targets, migration gate, deployment receipt                       |
+| migration ownership | `apps/admin/wrangler.toml` plus immutable `drizzle/migrations/manifest.json`           | Wrangler ledger and production receipt                                              |
+| local development   | `pnpm dev:local:ensure                                                                 | status                                                                              | stop` | named loopback URLs; `localhost:4311` remains the Admin fallback |
+| runtime provenance  | source-backed state with `live`, `stale`, `disconnected`, `unknown`, or `fixture_only` | Admin labels and inspectors                                                         |
 
 Published D1 `page_content` remains a versioned runtime override. It is not a
 second source-controlled copy. New source defaults and additive seed payloads

@@ -36,7 +36,7 @@ export function computeDeployTargets(files) {
       file.startsWith("packages/content/src/public/") ||
       file === "packages/content/package.json" ||
       file === "packages/content/src/index.ts" ||
-      file.startsWith("packages/styles/") ||
+      file.startsWith("packages/brand/") ||
       file.startsWith("packages/types/")
     ) {
       targets.www = true;

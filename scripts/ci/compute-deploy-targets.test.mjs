@@ -93,7 +93,7 @@ expectTargets(
 
 expectTargets(
   "shared runtime packages deploy www only",
-  ["packages/lib/src/cms/index.ts", "packages/styles/src/tokens.css"],
+  ["packages/lib/src/cms/index.ts", "packages/brand/src/tokens.css"],
   { www: true },
 );
 

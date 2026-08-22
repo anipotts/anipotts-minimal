@@ -65,9 +65,7 @@ const destinationReferences = destinations.map((item) =>
 <AdminLayout title="system" hideHeader>
   <main class="quiet-page quiet-system-page">
     <header class="quiet-page-header">
-      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
-        System
-      </h1>
+      <h1 class="brand-display">System</h1>
       <span>{runtime.available ? "current" : "source unavailable"}</span>
     </header>
 

@@ -7,27 +7,8 @@ import "../styles/admin-canvas.css";
 import { AdminShell } from "../components/astryx/AdminShell";
 import { AdminCommandPalette } from "../components/astryx/AdminCommandPalette";
 import { navItems, routeTitle } from "../data/admin";
-import candidateFaviconDark from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-dark.svg?url";
-import candidateFaviconLight from "../assets/ap-structural-candidate/v0.1.0-candidate.1/icons/favicon-light.svg?url";
-
-let candidateStyles: string | undefined;
-if (import.meta.env.DEV) {
-  const [{ default: rawStyles }, { default: woff2Url }, { default: ttfUrl }] =
-    await Promise.all([
-      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/css/ap-structural.css?raw"),
-      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.woff2?url"),
-      import("../assets/ap-structural-candidate/v0.1.0-candidate.1/fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.ttf?url"),
-    ]);
-  candidateStyles = rawStyles
-    .replace(
-      "../fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.woff2",
-      woff2Url,
-    )
-    .replace("../fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.ttf", ttfUrl)
-    .concat(
-      '\n.operator-page-header h1.ap-structural-candidate, .quiet-page-header h1.ap-structural-candidate { font-family: "AP Structural", "Urbanist", sans-serif; }\n',
-    );
-}
+import brandFaviconDark from "@anipotts/brand/ap-structural/icons/favicon-dark.svg?url";
+import brandFaviconLight from "@anipotts/brand/ap-structural/icons/favicon-light.svg?url";
 
 type Props = {
   title?: string;
@@ -88,31 +69,18 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
       sizes="180x180"
       href="/apple-touch-icon.png?v=20260717a"
     />
-    {
-      import.meta.env.DEV && (
-        <>
-          <style
-            is:inline
-            data-font-candidate="ap-structural"
-            set:html={candidateStyles}
-          />
-          <link
-            rel="icon"
-            href={candidateFaviconLight}
-            type="image/svg+xml"
-            media="(prefers-color-scheme: light)"
-            data-font-candidate="ap-structural"
-          />
-          <link
-            rel="icon"
-            href={candidateFaviconDark}
-            type="image/svg+xml"
-            media="(prefers-color-scheme: dark)"
-            data-font-candidate="ap-structural"
-          />
-        </>
-      )
-    }
+    <link
+      rel="icon"
+      href={brandFaviconLight}
+      type="image/svg+xml"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      href={brandFaviconDark}
+      type="image/svg+xml"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
@@ -121,7 +89,7 @@ const currentRoute = `${currentPath}${Astro.url.search}`;
     <meta
       name="theme-color"
       media="(prefers-color-scheme: dark)"
-      content="#11111b"
+      content="#0b1220"
     />
     <title>{title} | anipotts admin</title>
     <script is:inline>

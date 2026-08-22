@@ -7,11 +7,11 @@ import { classifiedWorkers } from "./workspace-inventory-parser.test.mjs";
 
 const EXPECTED_APPS = ["admin", "admin-solid", "www"];
 const EXPECTED_PACKAGES = [
+  "brand",
   "config",
   "content",
   "control-plane-runner",
   "lib",
-  "styles",
   "types",
 ];
 const EXPECTED_WORKERS = ["ingest", "newsletter", "state", "weekly-email"];
@@ -40,10 +40,6 @@ const FORBIDDEN_PATHS = [
   [
     "packages/services-platform/package.json",
     "services-platform package must stay removed from the workspace",
-  ],
-  [
-    "packages/brand/package.json",
-    "brand package must stay removed from the workspace",
   ],
 ];
 

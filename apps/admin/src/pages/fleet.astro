@@ -57,9 +57,7 @@ const fleetReferences = [...machineReferences, ...repoReferences];
 <AdminLayout title="fleet" hideHeader>
   <main class="quiet-page quiet-fleet-page">
     <header class="quiet-page-header">
-      <h1 class:list={[import.meta.env.DEV && "ap-structural-candidate"]}>
-        Fleet
-      </h1>
+      <h1 class="brand-display">Fleet</h1>
       <span>
         reconciled {
           runtime.generated_at

@@ -1,0 +1,12 @@
+{
+  "name": "@anipotts/brand",
+  "version": "0.2.0",
+  "private": true,
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./typography.css": "./src/typography.css",
+    "./motion.css": "./src/motion.css",
+    "./public.css": "./src/public.css",
+    "./ap-structural/*": "./ap-structural-v0.1.0-candidate.1/*"
+  }
+}
