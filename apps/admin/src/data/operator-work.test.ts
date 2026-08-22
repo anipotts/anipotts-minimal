@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { operatorWorkFixture } from "./dev-operator-work";
 import {
   assertValidOperatorWorkProjection,
   groupOperatorTasks,
-  operatorWorkFixture,
 } from "./operator-work";
 
 describe("operator work projection", () => {
