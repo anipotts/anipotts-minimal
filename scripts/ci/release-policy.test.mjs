@@ -20,6 +20,16 @@ assert.equal(
   classifyRelease(["M\tapps/admin/src/pages/inbox.astro"], base).risk,
   "automatic",
 );
+const adminSolidRelease = classifyRelease(
+  ["M\tapps/admin-solid/package.json"],
+  base,
+);
+assert.equal(adminSolidRelease.risk, "approval");
+assert.equal(adminSolidRelease.approval_required, true);
+assert.equal(adminSolidRelease.deploy_targets.admin_solid, false);
+assert.deepEqual(adminSolidRelease.reasons, [
+  "protected surface: apps/admin-solid/package.json",
+]);
 assert.equal(
   classifyRelease(["A\tapps/admin/src/pages/new-route.astro"], base).risk,
   "approval",
