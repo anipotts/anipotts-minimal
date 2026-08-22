@@ -99,10 +99,10 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.3.3",
     "portless": "0.15.5",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "turbo": "^2.9.14",
+    "turbo": "^2.10.11",
     "typescript": "^5.7.0",
-    "wrangler": "^4.92.0"
+    "wrangler": "^4.124.0"
   }
 }
