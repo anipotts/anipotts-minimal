@@ -136,6 +136,18 @@ pnpm validate
 
 ## local admin preview
 
+For the complete named local development entrypoint, use:
+
+```bash
+pnpm dev:local:ensure
+pnpm dev:local:status
+```
+
+This serves the public site at `http://anipotts.localhost:1355/` and Admin at
+`http://admin.anipotts.localhost:1355/`. It is pinned, rootless, loopback-only,
+and worktree-aware. See `docs/local-development.md` for lifecycle and safety
+details.
+
 The canonical local review URL is `http://localhost:4311/`.
 
 Start or reuse the durable preview with:

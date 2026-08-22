@@ -28,14 +28,19 @@ rm -rf apps/admin/.open-next apps/labs/.open-next
 '''
 
 [[actions]]
-name = "www dev"
+name = "local dev"
 icon = "run"
-command = "bash ./scripts/codex-action www-dev"
+command = "bash ./scripts/codex-action local-dev"
 
 [[actions]]
-name = "admin dev"
-icon = "run"
-command = "bash ./scripts/codex-action admin-dev"
+name = "local status"
+icon = "tool"
+command = "bash ./scripts/codex-action local-status"
+
+[[actions]]
+name = "local stop"
+icon = "tool"
+command = "bash ./scripts/codex-action local-stop"
 
 [[actions]]
 name = "check www"
