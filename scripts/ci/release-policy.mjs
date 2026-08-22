@@ -26,7 +26,7 @@ const KNOWN_SAFE_ROOTS = [
   /^config\//,
   /^drizzle\/migrations\//,
   /^\.github\/(?:ISSUE_TEMPLATE|CODEOWNERS)/,
-  /^(?:package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json)$/,
+  /^(?:\.nvmrc|package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json)$/,
 ];
 
 function parseChange(line) {
