@@ -58,7 +58,7 @@ deploy target coverage, and live version history.
 | `packages/content`              | public content contracts, admin inventory, previews, parsers, and drafts | keep, expand toward D1 adapters |
 | `packages/brand`                | marks, fonts, semantic tokens, type roles, and motion                    | keep                            |
 | `packages/types`                | shared generated types                                                   | keep                            |
-| `packages/config`               | shared TypeScript, Tailwind, and PostCSS config                          | keep minimal shared config      |
+| `config/typescript`             | shared compiler policy without a publishable package boundary            | keep as repository config       |
 | `packages/control-plane-runner` | outbound ap-mini relay client, local journal, and proof outbox           | keep local, capability-gated    |
 
 ## route parity target

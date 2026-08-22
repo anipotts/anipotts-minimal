@@ -8,7 +8,6 @@ import { classifiedWorkers } from "./workspace-inventory-parser.test.mjs";
 const EXPECTED_APPS = ["admin", "admin-solid", "www"];
 const EXPECTED_PACKAGES = [
   "brand",
-  "config",
   "content",
   "control-plane-runner",
   "lib",
