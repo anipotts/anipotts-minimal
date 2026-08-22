@@ -25,8 +25,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@cloudflare/workers-types": "^4.20250523.0",
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20260822.1",
     "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@iconify-json/ph": "^1.2.2",
     "typescript": "^5.8.3"
