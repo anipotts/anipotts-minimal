@@ -47,15 +47,15 @@ the same PR checks and scoped deploy logic as other changes.
 Ani approved these standing lanes on 2026-06-27.
 Ani approved a hybrid release train on 2026-08-05. Deployable files move through
 same-repository pull requests so required checks, release classification, and
-native auto-merge can protect production. Docs-only work may still use the
-admin bypass and commit directly to `main` after its narrow checks pass.
+an exact-head native merge can protect production. Docs-only work may still use
+the admin bypass and commit directly to `main` after its narrow checks pass.
 
 ### admin lane
 
 For admin UI, feed, content review, auth staging, and operator-dashboard work:
 
 - use a same-repository pull request for deployable files
-- let native auto-merge promote the PR only after every required check passes
+- merge the exact head through Codex only after every required check passes
 - deploy only the affected admin target after release gates are enabled
 - record deploy run, skipped targets, route proof, and exact release SHA
 
@@ -73,7 +73,7 @@ For `apps/www` copy, layout, static content, accessibility, route, and
 presentation work:
 
 - use a same-repository pull request for deployable files
-- let native auto-merge promote the PR only after every required check passes
+- merge the exact head through Codex only after every required check passes
 - deploy `www=true` only after release gates are enabled
 - record deploy run, route proof, and exact release SHA
 

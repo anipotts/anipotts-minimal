@@ -2,9 +2,7 @@ name: CI
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review, labeled]
-  pull_request_review:
-    types: [submitted, dismissed]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
   contents: read
@@ -146,33 +144,3 @@ jobs:
         run: |
           echo "migration_risk=${{ needs.classify.outputs.migration_risk }}"
           echo "remote migration promotion remains gated by the verified bootstrap receipt"
-
-  promotion-policy:
-    name: Promotion Policy
-    needs: [classify]
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Accept automatic release class
-        if: needs.classify.outputs.approval_required != 'true'
-        run: echo "release is eligible for automatic promotion"
-
-      - name: Require exact owner approval for protected release class
-        if: needs.classify.outputs.approval_required == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-          reviews="$RUNNER_TEMP/reviews.json"
-          comments="$RUNNER_TEMP/comments.json"
-          evidence="$RUNNER_TEMP/approval-evidence.json"
-          gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews" --paginate > "$reviews"
-          gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate > "$comments"
-          node -e 'const fs=require("fs"); fs.writeFileSync(process.argv[3], JSON.stringify({reviews:JSON.parse(fs.readFileSync(process.argv[1])),comments:JSON.parse(fs.readFileSync(process.argv[2]))}))' "$reviews" "$comments" "$evidence"
-          node scripts/ci/current-sha-approval.mjs "$evidence" "$HEAD_SHA" anipotts

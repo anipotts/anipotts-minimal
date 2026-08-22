@@ -9,7 +9,7 @@ const APPROVAL_PATHS = [
   /^\.github\/workflows\//,
   /^config\/release-train\.json$/,
   /^drizzle\/migrations\/manifest\.json$/,
-  /^scripts\/ci\/(?:branch-protection|current-sha-approval|d1-migration-conditions|d1-schema-fingerprint|migration-local-proof|migration-policy|release-policy|release-smoke|worker-version)\.mjs$/,
+  /^scripts\/ci\/(?:branch-protection|d1-migration-conditions|d1-schema-fingerprint|migration-local-proof|migration-policy|release-policy|release-smoke|worker-version)\.mjs$/,
   /^apps\/admin\/src\/middleware\.ts$/,
   /^apps\/admin\/src\/lib\/passkey-auth\.ts$/,
   /^apps\/admin\/src\/pages\/auth\//,

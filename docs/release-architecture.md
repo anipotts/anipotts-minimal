@@ -1,26 +1,26 @@
 # trustworthy releases
 
-The repository has one release classifier and five GitHub workflows. Safe code
-can move automatically after the checks pass. Protected changes need exact Ani
-approval for the current commit.
+The repository has one release classifier and five GitHub workflows. CI proves
+the current pull request head. Merging remains an explicit native Codex action
+bound to that same head.
 
 ## required checks
 
 - `Build, lint, typecheck, test`
 - `Security Review`
 - `Migration Preflight`
-- `Promotion Policy`
 
 `main` must be current before merge and unresolved review conversations must be
-closed. The one-person approval rule is replaced by release policy. Protected
-changes accept an owner review attached to the current commit or the exact PR
-comment `/approve-release <full-head-sha>`.
+closed. GitHub enforces all three checks for administrators too. The release
+classifier still identifies protected and unknown changes, but it does not ask
+for a duplicate comment, label, review, or receipt.
 
-Agent branches from this repository use GitHub native auto-merge with a merge
-commit. GitHub waits for branch protection instead of a polling loop. Docs-only
-changes may still use the administrator bypass. Deployable files use a PR.
-Manual deployment is limited to Ani, the exact supplied main SHA, and the main
-branch.
+The retained merge-readiness workflow is read-only. It never merges, edits a
+pull request, or creates an approval label. After the required checks pass, an
+agent uses one exact-head native merge command. This keeps normal work moving
+from chat while the consequential shared-history effect remains visible in the
+Codex approval surface. Deployable files use a PR. Manual deployment is limited
+to Ani, the exact supplied main SHA, and the main branch.
 
 ## release classes
 
@@ -88,7 +88,7 @@ foundation cannot deploy an app or apply a migration. Enable each gate only
 after its canary receipt exists:
 
 1. merge this foundation and install required branch checks
-2. prove native auto-merge with a harmless deployable PR
+2. prove the exact-head native merge path with a harmless deployable PR
 3. install and verify the read-only Admin identity
 4. approve and execute the one-time D1 ledger bootstrap
 5. run one additive migration canary

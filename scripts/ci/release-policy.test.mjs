@@ -2,7 +2,6 @@
 
 import assert from "node:assert/strict";
 import { protectionPayload, REQUIRED_CHECKS } from "./branch-protection.mjs";
-import { hasCurrentApproval } from "./current-sha-approval.mjs";
 import {
   parseD1SchemaResult,
   schemaFingerprint,
@@ -43,7 +42,7 @@ for (const protectedPath of [
   assert.equal(
     classifyRelease([`M\t${protectedPath}`], base).risk,
     "approval",
-    `${protectedPath} must require exact owner approval`,
+    `${protectedPath} must remain a protected release surface`,
   );
 }
 
@@ -170,46 +169,12 @@ assert.equal(classifySql("DELETE FROM canary;"), "approval");
 assert.equal(classifySql("UPDATE canary SET id = 'x';"), "approval");
 assert.equal(classifySql("VACUUM;"), "unknown");
 
-const reviews = [
-  {
-    user: { login: "anipotts" },
-    state: "APPROVED",
-    commit_id: "old",
-    submitted_at: "2026-08-05T10:00:00Z",
-  },
-  {
-    user: { login: "anipotts" },
-    state: "APPROVED",
-    commit_id: "current",
-    submitted_at: "2026-08-05T11:00:00Z",
-  },
-];
-assert.equal(hasCurrentApproval(reviews, "current", "anipotts"), true);
-assert.equal(hasCurrentApproval(reviews, "old", "anipotts"), false);
-assert.equal(
-  hasCurrentApproval(
-    {
-      reviews: [],
-      comments: [
-        {
-          user: { login: "anipotts" },
-          author_association: "OWNER",
-          body: "/approve-release current",
-        },
-      ],
-    },
-    "current",
-    "anipotts",
-  ),
-  true,
-);
-
 const protection = protectionPayload();
 assert.equal(protection.required_status_checks.strict, true);
 assert.deepEqual(protection.required_status_checks.contexts, REQUIRED_CHECKS);
 assert.equal(protection.required_pull_request_reviews, null);
 assert.equal(protection.required_conversation_resolution, true);
-assert.equal(protection.enforce_admins, false);
+assert.equal(protection.enforce_admins, true);
 
 assert.equal(
   selectedConditions(

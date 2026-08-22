@@ -1,61 +1,28 @@
-name: Agent Auto-Merge
+name: Agent Merge Readiness
 
 on:
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review]
-  pull_request_review:
-    types: [submitted, dismissed]
-  issue_comment:
-    types: [created]
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 concurrency:
-  group: agent-automerge-${{ github.event.pull_request.number }}
+  group: agent-merge-readiness-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
-  approval-refresh:
+  readiness:
     if: >
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request &&
-      github.event.comment.user.login == 'anipotts' &&
-      github.event.comment.author_association == 'OWNER' &&
-      startsWith(github.event.comment.body, '/approve-release ')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Re-run policy for exact owner approval
-        env:
-          GH_TOKEN: ${{ github.token }}
-          COMMENT_BODY: ${{ github.event.comment.body }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          set -euo pipefail
-          head_sha="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .head.sha)"
-          test "$COMMENT_BODY" = "/approve-release ${head_sha}"
-          gh label create release-approved --color 1D76DB --description "exact-SHA release approval" --force
-          gh pr edit "$PR_NUMBER" --remove-label release-approved 2>/dev/null || true
-          gh pr edit "$PR_NUMBER" --add-label release-approved
-
-  automerge:
-    if: >
-      github.event_name != 'issue_comment' &&
       !github.event.pull_request.draft &&
       github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      (
-        startsWith(github.event.pull_request.head.ref, 'codex/') ||
-        startsWith(github.event.pull_request.head.ref, 'claude/') ||
-        startsWith(github.event.pull_request.head.ref, 'worktree-')
-      )
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Enable native auto-merge for exact head
+      - name: Confirm native merge boundary
         env:
-          GH_TOKEN: ${{ github.token }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: gh pr merge --auto --merge --delete-branch --match-head-commit "$HEAD_SHA" "$PR_URL"
+        run: |
+          echo "head_sha=${HEAD_SHA}"
+          echo "CI owns technical gates; a native exact-head command owns the merge effect."

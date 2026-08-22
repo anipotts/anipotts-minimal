@@ -7,7 +7,6 @@
   "required_checks": [
     "Build, lint, typecheck, test",
     "Security Review",
-    "Migration Preflight",
-    "Promotion Policy"
+    "Migration Preflight"
   ]
 }
