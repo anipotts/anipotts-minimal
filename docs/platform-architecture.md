@@ -14,16 +14,16 @@ launchd templates must point at `/Users/anipotts`.
 
 ## target state
 
-| Surface        | Target                              | Status              | Next action                                           |
-| -------------- | ----------------------------------- | ------------------- | ----------------------------------------------------- |
-| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`           |
-| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access     |
-| current admin  | `apps/admin-solid`                  | manual rollback     | no auto-deploy; archive or delete after passkey proof |
-| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                             |
-| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                       |
-| workers        | `workers/*`                         | review individually | keep only production-required workers                 |
-| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables        |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated       |
+| Surface        | Target                              | Status              | Next action                                       |
+| -------------- | ----------------------------------- | ------------------- | ------------------------------------------------- |
+| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`       |
+| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access |
+| current admin  | `apps/admin-solid`                  | manual rollback     | satisfy the checked retirement contract           |
+| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                         |
+| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                   |
+| workers        | `workers/*`                         | review individually | keep only production-required workers             |
+| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables    |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated   |
 
 ## current inventory
 
@@ -66,6 +66,14 @@ deploy target coverage, and live version history.
 The Astro admin replacement covers these live admin-solid routes. Keep them
 covered while passkey proof and Access removal are completed, then remove
 `apps/admin-solid`:
+
+`config/admin-solid-retirement.json` is the machine-checked retirement gate.
+Removal requires durable proof for route parity, native authentication, mobile
+QA, a rollback rehearsal, production behavior, and an immutable recovery ref.
+`pnpm test:admin-solid-retirement` keeps the app present and excluded from
+automatic deployment until all six proofs pass. Once they pass, the contract
+requires a dated `admin-solid-recovery-YYYY-MM-DD` tag and requires the active
+rollback app to be absent.
 
 `pnpm test:admin-routes` enforces the route files, admin navigation, deploy
 smoke list, manual smoke list, passkey proof route set, and full admin page/API
