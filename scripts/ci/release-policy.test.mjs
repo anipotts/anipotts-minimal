@@ -20,6 +20,7 @@ assert.equal(
   classifyRelease(["M\tapps/admin/src/pages/inbox.astro"], base).risk,
   "automatic",
 );
+assert.equal(classifyRelease(["M\t.nvmrc"], base).risk, "automatic");
 const adminSolidRelease = classifyRelease(
   ["M\tapps/admin-solid/package.json"],
   base,
