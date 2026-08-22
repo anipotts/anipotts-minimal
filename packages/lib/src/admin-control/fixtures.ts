@@ -298,7 +298,7 @@ export const fixturePieceStates: AdminPieceState[] = [
     title: "first newsletter on agent control planes",
     state: "draft",
     channels: ["newsletter", "writing", "x-thread"],
-    source_refs: ["apps/www/src/content/writing"],
+    source_refs: ["content/public/writing"],
     updated_at: NOW,
   },
   {

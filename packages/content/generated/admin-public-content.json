@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "source_hash": "bc9520e91b49442bd48519969eba0cf56a3470e9ac739a7465cfa103a738a2ab",
+  "records": [
+    {
+      "entity_id": "public-page:home",
+      "kind": "page",
+      "title": "home",
+      "status": "source_controlled",
+      "route": "/",
+      "source_ref": "content/public/pages/home.md",
+      "source_hash": "ae026d68f81686d5dee100ec6a13ebb20c2ccb589f805811fee153cc6a1dfad5"
+    },
+    {
+      "entity_id": "public-page:making",
+      "kind": "page",
+      "title": "making",
+      "status": "source_controlled",
+      "route": "/making",
+      "source_ref": "content/public/pages/making.md",
+      "source_hash": "0f39baf327182292b0c12ca87e65cd72f417df4fc3a02b759f469f4c0cefbda2"
+    },
+    {
+      "entity_id": "public-page:newsletter",
+      "kind": "page",
+      "title": "notes from the build loop",
+      "status": "source_controlled",
+      "route": "/newsletter",
+      "source_ref": "content/public/pages/newsletter.md",
+      "source_hash": "0adbb5fb819a790e2d490dc048586b3528ff45bcfd0e49e6c03ed4378ae4ec72"
+    },
+    {
+      "entity_id": "public-page:newsletter_archive",
+      "kind": "page",
+      "title": "newsletter archive",
+      "status": "source_controlled",
+      "route": "/newsletter/archive",
+      "source_ref": "content/public/pages/newsletter_archive.md",
+      "source_hash": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e"
+    },
+    {
+      "entity_id": "public-page:orchestrating",
+      "kind": "page",
+      "title": "orchestrating",
+      "status": "source_controlled",
+      "route": "/orchestrating",
+      "source_ref": "content/public/pages/orchestrating.md",
+      "source_hash": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714"
+    },
+    {
+      "entity_id": "public-page:projects",
+      "kind": "page",
+      "title": "projects",
+      "status": "source_controlled",
+      "route": "/projects",
+      "source_ref": "content/public/pages/projects.md",
+      "source_hash": "3fbd16ec46c50a7556adc9b711ba0f3b08817a9cbf3dff4262c1a622529f5b48"
+    },
+    {
+      "entity_id": "public-page:systems",
+      "kind": "page",
+      "title": "systems",
+      "status": "source_controlled",
+      "route": "/systems",
+      "source_ref": "content/public/pages/systems.md",
+      "source_hash": "deb825ed62b42404873d37aa87aafbea9864579f327ffd211d041224d093a4b5"
+    },
+    {
+      "entity_id": "public-page:writing",
+      "kind": "page",
+      "title": "writing",
+      "status": "source_controlled",
+      "route": "/writing",
+      "source_ref": "content/public/pages/writing.md",
+      "source_hash": "dcca0f36c5f827a0c382ba1abedaa3f7f1cb85c57ab47f5bd5e42f75e3b15184"
+    },
+    {
+      "entity_id": "public-project:chainedchat",
+      "kind": "project",
+      "title": "chainedchat",
+      "status": "archived",
+      "route": "/projects/chainedchat",
+      "source_ref": "content/public/projects/chainedchat.md",
+      "source_hash": "433bbd8f5ccad506f92961d489019de4707149ca895e2a7ffd3516f96df2d9db"
+    },
+    {
+      "entity_id": "public-project:claude-code-tips",
+      "kind": "project",
+      "title": "claude code tips",
+      "status": "live",
+      "route": "/projects/claude-code-tips",
+      "source_ref": "content/public/projects/claude-code-tips.md",
+      "source_hash": "9262e1f5b02496d6c564a8e875c8de5e633725d7095a2924e5ea12e43ac2a037"
+    },
+    {
+      "entity_id": "public-project:habittracker-obh",
+      "kind": "project",
+      "title": "artist scouting dashboard",
+      "status": "live",
+      "route": "/projects/habittracker-obh",
+      "source_ref": "content/public/projects/habittracker-obh.md",
+      "source_hash": "ccb5b8f2b836bccfe9b83f5843a73bc6df16344502ddb0730fc24f0cf1351243"
+    },
+    {
+      "entity_id": "public-project:imessage-mcp",
+      "kind": "project",
+      "title": "imessage mcp",
+      "status": "live",
+      "route": "/projects/imessage-mcp",
+      "source_ref": "content/public/projects/imessage-mcp.md",
+      "source_hash": "581090facd434e5fb4db831a9a05fb249ad2532481c2a69bfd9bd7f2a22b3282"
+    },
+    {
+      "entity_id": "public-project:nyu-purity-test",
+      "kind": "project",
+      "title": "nyu purity test",
+      "status": "live",
+      "route": "/projects/nyu-purity-test",
+      "source_ref": "content/public/projects/nyu-purity-test.md",
+      "source_hash": "f2c70fd8e97a35aeb588a3eb4292cd551a8e0744ff68c1befda0fc05fcbeed13"
+    },
+    {
+      "entity_id": "public-project:options-pricing-sensitivity",
+      "kind": "project",
+      "title": "options pricing + sensitivity analysis",
+      "status": "live",
+      "route": "/projects/options-pricing-sensitivity",
+      "source_ref": "content/public/projects/options-pricing-sensitivity.md",
+      "source_hash": "210903dea652d0f596b31a45b4bb95091cd546da51a25ff360cc1d021e168e47"
+    },
+    {
+      "entity_id": "public-project:pgi-research-platform",
+      "kind": "project",
+      "title": "pgi research portal",
+      "status": "live",
+      "route": "/projects/pgi-research-platform",
+      "source_ref": "content/public/projects/pgi-research-platform.md",
+      "source_hash": "766138233794d648158d3ee332ade6636c3ee04c0036de36e40a17cd97e95b9b"
+    },
+    {
+      "entity_id": "public-project:quantercise-extension",
+      "kind": "project",
+      "title": "mental math extension",
+      "status": "archived",
+      "route": "/projects/quantercise-extension",
+      "source_ref": "content/public/projects/quantercise-extension.md",
+      "source_hash": "888a7d3d45df8431d045430b529e78f189ca8401918ee2eba1377fa861b1a656"
+    },
+    {
+      "entity_id": "public-project:quantercise",
+      "kind": "project",
+      "title": "quantercise",
+      "status": "live",
+      "route": "/projects/quantercise",
+      "source_ref": "content/public/projects/quantercise.md",
+      "source_hash": "321b34e188cf3c2612b74cb71477de4f88fa96f661f9a24071b1d2c02cfcab79"
+    },
+    {
+      "entity_id": "public-project:saeshify",
+      "kind": "project",
+      "title": "saeshify",
+      "status": "live",
+      "route": "/projects/saeshify",
+      "source_ref": "content/public/projects/saeshify.md",
+      "source_hash": "707744e7c812d341c7f8d134ebc8cbd929a17181669c10a94458db87cd1f4506"
+    },
+    {
+      "entity_id": "public-writing:awareness-is-alpha",
+      "kind": "writing",
+      "title": "awareness is alpha",
+      "status": "published",
+      "route": "/writing/awareness-is-alpha",
+      "source_ref": "content/public/writing/awareness-is-alpha.md",
+      "source_hash": "e9ab6503661215b2804b0e1cbd56200bff67cb089aba2fff32a779745c44de0f"
+    },
+    {
+      "entity_id": "public-writing:i-built-a-monitor-for-my-claude-code-sessions",
+      "kind": "writing",
+      "title": "i built a monitor for my claude code sessions",
+      "status": "published",
+      "route": "/writing/i-built-a-monitor-for-my-claude-code-sessions",
+      "source_ref": "content/public/writing/i-built-a-monitor-for-my-claude-code-sessions.md",
+      "source_hash": "c823d0927d46064c91a5a9911051a6711692be95731ce6b47fb543bde8a26ea3"
+    },
+    {
+      "entity_id": "public-writing:jpegmafia-is-our-kanye-west",
+      "kind": "writing",
+      "title": "jpegmafia is our kanye west",
+      "status": "draft",
+      "route": "/writing/jpegmafia-is-our-kanye-west",
+      "source_ref": "content/public/writing/jpegmafia-is-our-kanye-west.md",
+      "source_hash": "0ac6d41567dbf05edfb148636a34660446941d741b98d1fbb0c1ad6c3cae2361"
+    },
+    {
+      "entity_id": "public-writing:saturdays-are-for-claude-code",
+      "kind": "writing",
+      "title": "saturdays are for claude code",
+      "status": "published",
+      "route": "/writing/saturdays-are-for-claude-code",
+      "source_ref": "content/public/writing/saturdays-are-for-claude-code.md",
+      "source_hash": "a08ca0ac376e0ac5c5cf8007b1f82609529dd2dea7bd364612f31c9f5d40fa4e"
+    },
+    {
+      "entity_id": "public-writing:search-will-be-dead-by-2030",
+      "kind": "writing",
+      "title": "search will be dead by 2030",
+      "status": "published",
+      "route": "/writing/search-will-be-dead-by-2030",
+      "source_ref": "content/public/writing/search-will-be-dead-by-2030.md",
+      "source_hash": "08338b9111f25186ea952811e6500f4f6b5fa952ed75ee15f88950f9dbf52280"
+    },
+    {
+      "entity_id": "public-writing:stop-ending-your-day-with-fix-the-bug",
+      "kind": "writing",
+      "title": "stop ending your day with \"fix the bug\"",
+      "status": "published",
+      "route": "/writing/stop-ending-your-day-with-fix-the-bug",
+      "source_ref": "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
+      "source_hash": "b0402c7fb0a451854ca85d3544354cd4b4c9d105354a7ee5d92ab9bfc88294b4"
+    }
+  ]
+}

@@ -351,13 +351,13 @@ export const contentRows: QueueRow[] = [
     title: "projects",
     owner: "apps/www",
     status: "published D1 detail rows with source fallback",
-    evidence: "D1 page_content:project:* and apps/www/src/content/projects",
+    evidence: "D1 page_content:project:* and content/public/projects",
   },
   {
     title: "writing",
     owner: "apps/www",
     status: "published D1 detail rows with source fallback",
-    evidence: "D1 page_content:writing:* and apps/www/src/content/writing",
+    evidence: "D1 page_content:writing:* and content/public/writing",
   },
   {
     title: "newsletter",

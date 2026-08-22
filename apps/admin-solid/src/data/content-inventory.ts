@@ -107,7 +107,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.card_fields",
     surface: "projects",
     title: "project card fields",
-    source_ref: "apps/www/src/content/projects/*.md",
+    source_ref: "content/public/projects/*.md",
     current_value:
       "title, subtitle, description, year, category, role, duration, status, visibility, sort order, links, and tags.",
     editability: "ready",
@@ -121,7 +121,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.detail_body",
     surface: "projects",
     title: "project detail body",
-    source_ref: "apps/www/src/content/projects/*.md body",
+    source_ref: "content/public/projects/*.md body",
     current_value:
       "Project bodies plus optional technical and roadmap arrays drive detail pages where present.",
     editability: "ready",
@@ -149,7 +149,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.frontmatter",
     surface: "writing",
     title: "writing frontmatter",
-    source_ref: "apps/www/src/content/writing/*.md",
+    source_ref: "content/public/writing/*.md",
     current_value:
       "title, summary, tags, status, dates, content type, project, and artifact fields are already schema-backed.",
     editability: "ready",
@@ -163,7 +163,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.body",
     surface: "writing",
     title: "writing body",
-    source_ref: "apps/www/src/content/writing/*.md body",
+    source_ref: "content/public/writing/*.md body",
     current_value:
       "Published article bodies are markdown files in the Astro writing collection.",
     editability: "ready",
@@ -177,7 +177,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.claude_stats_link",
     surface: "writing",
     title: "orchestrating stats link",
-    source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    source_ref: "content/public/writing/saturdays-are-for-claude-code.md",
     current_value:
       "The writing post now links to /orchestrating instead of the legacy /claude path.",
     editability: "ready",
@@ -249,7 +249,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "normalize project card summary field",
     status: "draft",
     risk_level: "low",
-    source_ref: "apps/www/src/content/projects/*.md:subtitle",
+    source_ref: "content/public/projects/*.md:subtitle",
     current_value:
       "Project cards currently use subtitle plus description, with `summary` reserved for future editor wording.",
     proposed_value:
@@ -269,7 +269,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "replace stale claude stats link",
     status: "preview",
     risk_level: "low",
-    source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    source_ref: "content/public/writing/saturdays-are-for-claude-code.md",
     current_value:
       "You can see all of this on [my Claude stats page](/claude).",
     proposed_value:

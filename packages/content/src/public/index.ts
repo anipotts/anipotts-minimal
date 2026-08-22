@@ -12,6 +12,7 @@ export {
   HOME_SECTION_ORDER,
   HOMEPAGE_FIELD_LIMITS,
   CMS_TEXT_LIMITS,
+  PUBLIC_CONTENT_SOURCE_HASH,
 } from "./defaults.js";
 export {
   cmsProjectPageKey,

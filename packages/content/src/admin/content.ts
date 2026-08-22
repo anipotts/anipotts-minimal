@@ -109,7 +109,7 @@ export const contentInventorySource = {
   architecture_doc: "docs/admin-v2-architecture.md",
   mode: "read_only_static_plus_d1_page_content",
   generated_from:
-    "current tracked apps/www source files, D1 page_content rows, and @anipotts/content/public fallback contracts",
+    "canonical content/public source files, generated Admin projection, and versioned D1 page_content runtime overrides",
 };
 
 export async function readPageContentInventoryStore(
@@ -256,7 +256,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.card_fields",
     surface: "projects",
     title: "project card fields",
-    source_ref: "apps/www/src/content/projects/*.md",
+    source_ref: "content/public/projects/*.md",
     current_value:
       "title, subtitle, description, year, category, role, duration, status, visibility, sort order, links, and tags.",
     editability: "ready",
@@ -301,7 +301,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "projects",
     title: "project detail body",
     source_ref:
-      "D1 page_content:project:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback apps/www/src/content/projects/*.md body",
+      "D1 page_content:project:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback content/public/projects/*.md body",
     current_value:
       "Every tracked project detail record now has a structured page_content row. Visible rows publish to public routes; hidden rows remain available for admin review only.",
     editability: "ready",
@@ -315,24 +315,10 @@ export const contentInventory: ContentInventoryItem[] = [
     ],
   },
   {
-    id: "projects.duplicate_source",
-    surface: "projects",
-    title: "project source duplication",
-    source_ref: "docs/content-admin-editor-brief.md:open questions",
-    current_value:
-      "Markdown collections and package data have overlapping project facts that need a source-truth decision.",
-    editability: "needs_owner",
-    risk_level: "medium",
-    next_safe_action:
-      "Decide canonical project source before enabling writes that could split project state.",
-    required_authority: ["content.project-source.owner-decision"],
-    proof_ids: ["content.projects.source-truth.open-question"],
-  },
-  {
     id: "writing.frontmatter",
     surface: "writing",
     title: "writing frontmatter",
-    source_ref: "apps/www/src/content/writing/*.md",
+    source_ref: "content/public/writing/*.md",
     current_value:
       "title, summary, tags, status, dates, content type, project, and artifact fields are already schema-backed.",
     editability: "ready",
@@ -362,7 +348,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "writing",
     title: "writing body",
     source_ref:
-      "D1 page_content:writing:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback apps/www/src/content/writing/*.md body",
+      "D1 page_content:writing:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback content/public/writing/*.md body",
     current_value:
       "Every tracked writing detail record now has a structured page_content row. Published rows render on public routes; the draft row remains unpublished for admin review only.",
     editability: "ready",
@@ -379,7 +365,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.claude_stats_link",
     surface: "writing",
     title: "systems essay link",
-    source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    source_ref: "content/public/writing/saturdays-are-for-claude-code.md",
     current_value:
       "The writing post links to /systems as the canonical agent-method route.",
     editability: "ready",
@@ -699,7 +685,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "normalize project card summary field",
     status: "draft",
     risk_level: "low",
-    source_ref: "apps/www/src/content/projects/*.md:subtitle",
+    source_ref: "content/public/projects/*.md:subtitle",
     current_value:
       "Project cards currently use subtitle plus description, with `summary` reserved for future editor wording.",
     proposed_value:
@@ -719,7 +705,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "replace stale claude stats link",
     status: "preview",
     risk_level: "low",
-    source_ref: "apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    source_ref: "content/public/writing/saturdays-are-for-claude-code.md",
     current_value:
       "You can see all of this on [my Claude stats page](/claude).",
     proposed_value:

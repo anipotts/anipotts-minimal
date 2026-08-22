@@ -331,7 +331,7 @@ assert.equal(failedRuntime.error, "bad json");
 
 const sourceRecords = [
   ...recordsFromSourceModules("projects", {
-    "/repo/apps/www/src/content/projects/hidden-lab.md": `---
+    "/repo/content/public/projects/hidden-lab.md": `---
 title: Hidden Lab
 summary: Internal project page
 visible: false
@@ -340,7 +340,7 @@ sort_order: 2
 `,
   }),
   ...recordsFromSourceModules("writing", {
-    "/repo/apps/www/src/content/writing/control-plane.md": `---
+    "/repo/content/public/writing/control-plane.md": `---
 title: Control Plane
 summary: Agents need authority, proof, and state.
 status: published
@@ -369,10 +369,7 @@ const hiddenProject = sourceRecords.find(
 );
 assert.ok(hiddenProject, "hidden project source record must be parsed");
 assert.equal(hiddenProject.status, "hidden");
-assert.equal(
-  hiddenProject.source_ref,
-  "apps/www/src/content/projects/hidden-lab.md",
-);
+assert.equal(hiddenProject.source_ref, "content/public/projects/hidden-lab.md");
 assert.equal(hiddenProject.body_state, "frontmatter only");
 assert.equal(hiddenProject.body_preview, "no markdown body yet");
 

@@ -8,7 +8,7 @@ const phosphor = z
   .optional();
 
 const writing = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/writing" }),
+  loader: glob({ pattern: "*.md", base: "../../content/public/writing" }),
   schema: z
     .object({
       title: z.string(),
@@ -22,6 +22,7 @@ const writing = defineCollection({
       series_type: z.string().optional(),
       project: z.string().optional(),
       artifact_url: z.string().url().optional(),
+      artifact_label: z.string().max(80).optional(),
       artifact_type: z
         .enum(["repo", "gist", "demo", "screenshot", "recording"])
         .optional(),
@@ -35,7 +36,7 @@ const writing = defineCollection({
 });
 
 const projects = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/projects" }),
+  loader: glob({ pattern: "*.md", base: "../../content/public/projects" }),
   schema: z.object({
     title: z.string(),
     slug: z.string().optional(),

@@ -498,7 +498,7 @@ export const newsletterDrafts: NewsletterDraft[] = [
     },
     source_refs: [
       {
-        ref: "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+        ref: "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
         use: "existing post about specific prompts and next-day continuity",
       },
       {
@@ -525,7 +525,7 @@ export const newsletterDrafts: NewsletterDraft[] = [
       kind: "opening",
       body: "some days i do not want to write. that should not break the system. the system should still collect receipts, keep drafts warm, and leave me one clear next action.",
       source_refs: [
-        "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+        "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
       ],
       thread_beat:
         "low energy days need smaller writing tasks, not fake motivation.",
@@ -559,7 +559,7 @@ export const newsletterDrafts: NewsletterDraft[] = [
         label: "existing habit",
         body: "the same pattern already works for coding: a specific next prompt beats a vague todo. writing can use the same trick. end the day with the next draft action, not a hope that tomorrow feels easier.",
         source_refs: [
-          "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+          "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
         ],
         thread_beat:
           "a draft note is just an instruction for the next version of me.",
@@ -586,7 +586,7 @@ export const newsletterDrafts: NewsletterDraft[] = [
           "the existing writing post argues for specific next-session prompts",
         status: "source_backed",
         source_refs: [
-          "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+          "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
         ],
       },
       {

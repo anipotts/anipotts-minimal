@@ -33,13 +33,15 @@
     "admin:preview:stop": "node scripts/admin/admin-preview.mjs stop",
     "proof:admin-passkey": "node scripts/admin/passkey-proof.mjs",
     "proof:admin-content": "node scripts/admin/content-proof.mjs",
+    "content:generate": "node scripts/content/generate-public-content.mjs",
+    "content:check": "node scripts/content/generate-public-content.mjs --check",
     "update-claude-stats": "node scripts/claude/generate-claude-stats.mjs",
     "test:deploy-targets": "node scripts/ci/compute-deploy-targets.test.mjs",
     "test:admin-preview": "node scripts/ci/admin-preview.test.mjs",
     "test:portless-preview": "node scripts/ci/portless-preview.test.mjs",
     "test:brand": "node scripts/ci/brand-contract.test.mjs",
     "test:admin-routes": "node scripts/ci/admin-route-parity.test.mjs",
-    "test:content-platform": "pnpm --filter @anipotts/content build && node scripts/ci/content-platform.test.mjs",
+    "test:content-platform": "pnpm content:check && pnpm --filter @anipotts/content build && node scripts/ci/content-platform.test.mjs",
     "test:public-boundary": "node scripts/ci/public-app-boundary.test.mjs",
     "test:public-routes": "node scripts/ci/public-route-inventory.test.mjs && node scripts/ci/public-route-parity.test.mjs",
     "test:path-hygiene": "node scripts/ci/path-hygiene.test.mjs",
@@ -104,6 +106,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "turbo": "^2.10.11",
     "typescript": "^5.7.0",
-    "wrangler": "^4.125.0"
+    "wrangler": "^4.125.0",
+    "yaml": "2.8.2"
   }
 }
