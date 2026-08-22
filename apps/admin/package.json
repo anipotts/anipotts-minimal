@@ -20,8 +20,8 @@
     "@anipotts/types": "workspace:*",
     "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/react": "^6.0.4",
-    "@astryxdesign/core": "^0.1.4",
-    "@astryxdesign/theme-neutral": "^0.1.4",
+    "@astryxdesign/core": "^0.4.6",
+    "@astryxdesign/theme-neutral": "^0.4.6",
     "@fontsource-variable/instrument-sans": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@fontsource/geist-sans": "^5.2.5",
@@ -29,7 +29,7 @@
     "@phosphor-icons/react": "^2.1.10",
     "@simplewebauthn/browser": "13.3.0",
     "@simplewebauthn/server": "13.3.2",
-    "@stylexjs/stylex": "^0.18.3",
+    "@stylexjs/stylex": "^0.19.0",
     "astro": "^5.16.0",
     "jose": "^6.2.8",
     "qrcode": "^1.5.4",
@@ -38,10 +38,11 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astryxdesign/cli": "^0.1.4",
+    "@astryxdesign/cli": "^0.4.6",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19.2.4",
+    "gpt-tokenizer": "^3.4.0",
     "typescript": "^5",
     "vitest": "^4.1.11"
   }
