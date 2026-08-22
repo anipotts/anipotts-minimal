@@ -7,6 +7,7 @@ import { inspectMigrationChanges } from "./migration-policy.mjs";
 
 const APPROVAL_PATHS = [
   /^\.github\/workflows\//,
+  /^apps\/admin-solid\//,
   /^config\/release-train\.json$/,
   /^drizzle\/migrations\/manifest\.json$/,
   /^scripts\/ci\/(?:branch-protection|d1-migration-conditions|d1-schema-fingerprint|migration-local-proof|migration-policy|release-policy|release-smoke|worker-version)\.mjs$/,
