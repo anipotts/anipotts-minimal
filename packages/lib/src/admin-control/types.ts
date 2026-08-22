@@ -1,6 +1,7 @@
 export const ADMIN_EVENT_SCHEMA_VERSION = 1;
 
-export type AdminControlSourceMode = "d1" | "fixture" | "mixed";
+export type AdminControlSourceMode =
+  "d1" | "fixture" | "mixed" | "disconnected";
 
 export type AdminEventPrivacy = "public" | "internal" | "private" | "sensitive";
 
@@ -248,4 +249,9 @@ export interface AdminControlSnapshot {
   events: AdminEventEnvelope[];
   projections: AdminControlProjections;
   errors: string[];
+}
+
+export interface AdminControlFixtureData {
+  events: AdminEventEnvelope[];
+  projections: AdminControlProjections;
 }

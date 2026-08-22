@@ -73,7 +73,7 @@ const fakeFiles = new Map([
     "  secret_" + "values_included: value.secret_values_included,\n",
   ],
   [
-    "packages/lib/src/admin-control/fixtures.ts",
+    "packages/lib/src/admin-control/dev-fixtures.ts",
     "  auth_" + 'model: "cloudflare-access-service-token-per-machine",\n',
   ],
   [
@@ -106,7 +106,7 @@ const findings = reviewFiles(
     ".github/workflows/deploy.yml",
     "packages/content/src/admin/operations.ts",
     "packages/content/src/admin/runtime.ts",
-    "packages/lib/src/admin-control/fixtures.ts",
+    "packages/lib/src/admin-control/dev-fixtures.ts",
     "packages/lib/src/admin-control/types.ts",
     "packages/lib/src/admin-control/unsafe.ts",
     "apps/admin/src/pages/auth/invite-safe.astro",

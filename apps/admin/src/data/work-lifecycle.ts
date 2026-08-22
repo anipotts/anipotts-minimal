@@ -1,5 +1,4 @@
 import {
-  fixtureWorkLifecycle,
   loadWorkLifecycleSnapshot,
   type WorkLifecycleAdapter,
 } from "@anipotts/lib/admin-control";
@@ -7,5 +6,10 @@ import {
 export async function readAdminWorkLifecycle(
   adapter?: WorkLifecycleAdapter | null,
 ) {
-  return loadWorkLifecycleSnapshot(adapter, fixtureWorkLifecycle);
+  if (import.meta.env.DEV) {
+    const { fixtureWorkLifecycle } =
+      await import("@anipotts/lib/admin-control/dev-work-lifecycle-fixtures");
+    return loadWorkLifecycleSnapshot(adapter, fixtureWorkLifecycle);
+  }
+  return loadWorkLifecycleSnapshot(adapter);
 }

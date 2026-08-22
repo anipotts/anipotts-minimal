@@ -8,10 +8,14 @@ import {
   handleAdminMcpRequest,
   loadAdminControlSnapshot,
 } from "./index";
+import { adminControlFixtureData } from "./dev-fixtures";
 
 describe("admin-control", () => {
   it("loads fixture projections with schema version and event refs", async () => {
-    const snapshot = await loadAdminControlSnapshot(null);
+    const snapshot = await loadAdminControlSnapshot(
+      null,
+      adminControlFixtureData,
+    );
 
     expect(snapshot.schema_version).toBe(ADMIN_EVENT_SCHEMA_VERSION);
     expect(snapshot.source_mode).toBe("fixture");
@@ -27,7 +31,10 @@ describe("admin-control", () => {
   });
 
   it("keeps checkpoint out of the piece statechart", async () => {
-    const snapshot = await loadAdminControlSnapshot(null);
+    const snapshot = await loadAdminControlSnapshot(
+      null,
+      adminControlFixtureData,
+    );
 
     expect(snapshot.contracts.piece_states).not.toContain("checkpoint");
     expect(snapshot.contracts.legal_piece_cycles).toEqual([
@@ -57,6 +64,17 @@ describe("admin-control", () => {
     expect(snapshot.errors).toEqual([]);
   });
 
+  it("reports a missing production database as disconnected", async () => {
+    const snapshot = await loadAdminControlSnapshot(null);
+
+    expect(snapshot.source_mode).toBe("disconnected");
+    expect(snapshot.events).toEqual([]);
+    expect(snapshot.projections.inbox_items).toEqual([]);
+    expect(snapshot.errors).toContain(
+      "d1 unavailable; no development fixture was requested",
+    );
+  });
+
   it("reports production read failures without substituting fixture work", async () => {
     const db = {
       prepare: () => ({
@@ -79,7 +97,10 @@ describe("admin-control", () => {
   });
 
   it("exposes read-only mcp tools over the same projections", async () => {
-    const snapshot = await loadAdminControlSnapshot(null);
+    const snapshot = await loadAdminControlSnapshot(
+      null,
+      adminControlFixtureData,
+    );
     const manifest = adminMcpManifest(snapshot);
 
     expect(manifest.write_tools).toBe(
@@ -100,7 +121,10 @@ describe("admin-control", () => {
   });
 
   it("exposes bounded knowledge search and stable-card reads over mcp", async () => {
-    const snapshot = await loadAdminControlSnapshot(null);
+    const snapshot = await loadAdminControlSnapshot(
+      null,
+      adminControlFixtureData,
+    );
     const search = handleAdminMcpRequest(snapshot, {
       jsonrpc: "2.0",
       id: 2,
@@ -185,7 +209,10 @@ describe("admin-control", () => {
   });
 
   it("contains Ray-Ban sent proof but not the completed analytics obligation", async () => {
-    const snapshot = await loadAdminControlSnapshot(null);
+    const snapshot = await loadAdminControlSnapshot(
+      null,
+      adminControlFixtureData,
+    );
 
     expect(snapshot.events.map((event) => event.dedupe_key)).toContain(
       "gmail:sent:rayban-30-day-analytics-2026-07-08",

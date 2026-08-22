@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   assertValidKnowledgeCards,
   buildKnowledgeContextBundle,
-  fixtureKnowledgeCards,
   getKnowledgeCard,
   knowledgeRetrievalContract,
   searchKnowledgeCards,
   type AdminKnowledgeCard,
 } from "./index";
+import { fixtureKnowledgeCards } from "./dev-fixtures";
 
 describe("admin knowledge cards", () => {
   it("validates the bounded fixture catalog and retrieval contract", () => {
