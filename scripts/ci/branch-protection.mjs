@@ -6,7 +6,6 @@ export const REQUIRED_CHECKS = [
   "Build, lint, typecheck, test",
   "Security Review",
   "Migration Preflight",
-  "Promotion Policy",
 ];
 
 export function protectionPayload() {
@@ -15,7 +14,7 @@ export function protectionPayload() {
       strict: true,
       contexts: REQUIRED_CHECKS,
     },
-    enforce_admins: false,
+    enforce_admins: true,
     required_pull_request_reviews: null,
     restrictions: null,
     required_conversation_resolution: true,
