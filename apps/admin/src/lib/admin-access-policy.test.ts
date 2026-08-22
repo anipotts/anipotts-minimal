@@ -41,6 +41,35 @@ describe("admin access policy", () => {
   });
 
   test.each([
+    "http://admin.anipotts.localhost:1355",
+    "http://portless-local-2026-08-21.admin.anipotts.localhost:1355",
+    "https://admin.anipotts.localhost",
+  ])("accepts an exact Portless development origin %s", (origin) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local("/inbox", origin),
+      }),
+    ).toBe(true);
+  });
+
+  test.each([
+    "/@vite/client",
+    "/@id/react",
+    "/@react-refresh",
+    "/src/components/astryx/AdminCommandPalette.tsx",
+  ])("allows a read-only Vite development asset %s", (path) => {
+    expect(
+      isDevLoopbackPreviewRequest({
+        isDev: true,
+        method: "GET",
+        url: local(path, "http://admin.anipotts.localhost:1355"),
+      }),
+    ).toBe(true);
+  });
+
+  test.each([
     {
       name: "production",
       isDev: false,
@@ -60,6 +89,15 @@ describe("admin access policy", () => {
       url: local("/api/admin/inbox"),
     },
     {
+      name: "write to Vite path",
+      isDev: true,
+      method: "POST",
+      url: local(
+        "/src/components/astryx/AdminCommandPalette.tsx",
+        "http://admin.anipotts.localhost:1355",
+      ),
+    },
+    {
       name: "non-loopback host",
       isDev: true,
       method: "GET",
@@ -70,6 +108,27 @@ describe("admin access policy", () => {
       isDev: true,
       method: "GET",
       url: local("/inbox", "http://localhost:4321"),
+    },
+    {
+      name: "wrong Portless port",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "http://admin.anipotts.localhost:4311"),
+    },
+    {
+      name: "lookalike Portless host",
+      isDev: true,
+      method: "GET",
+      url: local("/inbox", "http://admin.anipotts.localhost.example:1355"),
+    },
+    {
+      name: "nested Portless subdomain",
+      isDev: true,
+      method: "GET",
+      url: local(
+        "/inbox",
+        "http://nested.branch.admin.anipotts.localhost:1355",
+      ),
     },
     {
       name: "unapproved page",

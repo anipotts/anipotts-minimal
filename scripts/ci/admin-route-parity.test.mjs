@@ -85,6 +85,14 @@ const devLoopbackPreviewPaths = extractStringList(
   accessPolicySource,
   "DEV_LOOPBACK_PREVIEW_PATHS",
 );
+const devPreviewAssetPaths = extractStringList(
+  accessPolicySource,
+  "DEV_PREVIEW_ASSET_PATHS",
+);
+const devPreviewAssetPrefixes = extractStringList(
+  accessPolicySource,
+  "DEV_PREVIEW_ASSET_PREFIXES",
+);
 const retiredActionQueueFiles = [
   "apps/admin/src/pages/needs-ani.astro",
   "apps/admin/src/data/needs.ts",
@@ -123,6 +131,19 @@ assert.deepEqual(devLoopbackOrigins, [
   "http://localhost:4311",
 ]);
 assert.deepEqual(devLoopbackPreviewPaths, ["/", "/inbox", "/work"]);
+assert.deepEqual(devPreviewAssetPaths, ["/@react-refresh"]);
+assert.deepEqual(devPreviewAssetPrefixes, ["/@id/", "/@vite/", "/src/"]);
+assert.match(
+  accessPolicySource,
+  /DEV_PORTLESS_HOST_PATTERN[\s\S]*admin\\\.anipotts\\\.localhost/,
+  "Portless preview must match only the exact Admin localhost suffix",
+);
+assert.ok(
+  accessPolicySource.includes(
+    'url.protocol === "http:" && url.port === "1355"',
+  ),
+  "rootless Portless preview must stay pinned to HTTP port 1355",
+);
 assert.ok(
   middlewareSource.includes("isDev: import.meta.env.DEV"),
   "loopback preview must remain gated by Astro development mode",

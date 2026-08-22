@@ -10,7 +10,7 @@ export default defineConfig({
   build: { format: "file" },
   vite: {
     server: {
-      allowedHosts: ["news.anipotts.com"],
+      allowedHosts: ["news.anipotts.com", ".anipotts.localhost"],
     },
   },
   adapter: cloudflare({

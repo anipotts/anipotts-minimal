@@ -31,6 +31,10 @@ const DEV_LOOPBACK_ORIGINS = new Set([
   "http://127.0.0.1:4311",
 ]);
 const DEV_LOOPBACK_PREVIEW_PATHS = new Set(["/", "/inbox", "/work"]);
+const DEV_PREVIEW_ASSET_PATHS = new Set(["/@react-refresh"]);
+const DEV_PREVIEW_ASSET_PREFIXES = ["/@id/", "/@vite/", "/src/"];
+const DEV_PORTLESS_HOST_PATTERN =
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)?admin\.anipotts\.localhost$/;
 
 type AdminAccessInput = {
   isDev: boolean;
@@ -67,8 +71,21 @@ export function isDevLoopbackPreviewRequest({
   return (
     isDev &&
     (method === "GET" || method === "HEAD") &&
-    DEV_LOOPBACK_ORIGINS.has(url.origin) &&
-    DEV_LOOPBACK_PREVIEW_PATHS.has(url.pathname)
+    isApprovedDevPreviewOrigin(url) &&
+    (DEV_LOOPBACK_PREVIEW_PATHS.has(url.pathname) ||
+      DEV_PREVIEW_ASSET_PATHS.has(url.pathname) ||
+      DEV_PREVIEW_ASSET_PREFIXES.some((prefix) =>
+        url.pathname.startsWith(prefix),
+      ))
+  );
+}
+
+function isApprovedDevPreviewOrigin(url: URL): boolean {
+  if (DEV_LOOPBACK_ORIGINS.has(url.origin)) return true;
+  if (!DEV_PORTLESS_HOST_PATTERN.test(url.hostname)) return false;
+  return (
+    (url.protocol === "http:" && url.port === "1355") ||
+    (url.protocol === "https:" && (url.port === "" || url.port === "443"))
   );
 }
 
