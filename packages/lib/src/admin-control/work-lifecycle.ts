@@ -2,28 +2,15 @@ export const WORK_LIFECYCLE_SCHEMA_VERSION = 1;
 export const MAX_ARCHIVE_BATCH_SIZE = 20;
 
 export type WorkSourceSurface =
-  | "chatgpt_export"
-  | "codex"
-  | "github"
-  | "apple_notes"
-  | "admin"
-  | "handoff";
+  "chatgpt_export" | "codex" | "github" | "apple_notes" | "admin" | "handoff";
 
 export type WorkReconciliationState =
-  | "fresh"
-  | "stale"
-  | "partial"
-  | "unavailable"
-  | "conflicting";
+  "fresh" | "stale" | "partial" | "unavailable" | "conflicting";
 
 export type WorkImportState = "created" | "updated" | "duplicate" | "failed";
 
 export type WorkNativeRuntime =
-  | "running"
-  | "idle"
-  | "blocked"
-  | "closed"
-  | "unknown";
+  "running" | "idle" | "blocked" | "closed" | "unknown";
 
 export type WorkEntityLifecycle = "open" | "completed" | "archived";
 export type WorkAttentionStatus = "current" | "cleared" | "archived";

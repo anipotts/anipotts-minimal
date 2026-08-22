@@ -81,11 +81,7 @@ if (inviteCode) {
   type InviteStatus = {
     role: "operator" | "viewer";
     state:
-      | "ready"
-      | "pending_owner_approval"
-      | "approved"
-      | "expired"
-      | "revoked";
+      "ready" | "pending_owner_approval" | "approved" | "expired" | "revoked";
   };
 
   type RegistrationEnvelope = {

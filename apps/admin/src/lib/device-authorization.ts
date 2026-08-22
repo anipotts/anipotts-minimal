@@ -37,11 +37,7 @@ type DeviceAuthorizationRow = {
 };
 
 export type DeviceAuthorizationState =
-  | "pending"
-  | "approved"
-  | "denied"
-  | "claimed"
-  | "expired";
+  "pending" | "approved" | "denied" | "claimed" | "expired";
 
 export async function startDeviceAuthorization(
   context: AdminAuthContext,

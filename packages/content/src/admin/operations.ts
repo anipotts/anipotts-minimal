@@ -1,9 +1,7 @@
 import type { RiskLevel } from "./content";
 
 export type ContentOperationKind =
-  | "content_record"
-  | "content_draft"
-  | "content_publish";
+  "content_record" | "content_draft" | "content_publish";
 
 export type ContentOperationStatus =
   | "draft"
@@ -112,9 +110,7 @@ export type ContentOperationReadState =
 
 export type ContentOperationTable = {
   table:
-    | "content_records"
-    | "content_draft_operations"
-    | "content_publish_events";
+    "content_records" | "content_draft_operations" | "content_publish_events";
   purpose: string;
   write_state: "schema_only" | "draft_save_only" | "publish_with_proof";
   blocked_actions: string[];

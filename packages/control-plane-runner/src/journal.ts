@@ -94,10 +94,9 @@ export class LocalJournal {
 
   acceptCommand(command: ControlCommandRecord): boolean {
     const existing = this.db
-      .query<
-        StoredCommand,
-        [string]
-      >("SELECT * FROM commands WHERE command_id = ? LIMIT 1")
+      .query<StoredCommand, [string]>(
+        "SELECT * FROM commands WHERE command_id = ? LIMIT 1",
+      )
       .get(command.command_id);
     if (existing) return false;
 
@@ -294,10 +293,9 @@ export class LocalJournal {
 
   private appendEventInternal(input: JournalEventInput): LocalJournalEvent {
     const previous = this.db
-      .query<
-        { event_hash: string },
-        []
-      >("SELECT event_hash FROM journal_events ORDER BY sequence DESC LIMIT 1")
+      .query<{ event_hash: string }, []>(
+        "SELECT event_hash FROM journal_events ORDER BY sequence DESC LIMIT 1",
+      )
       .get();
     const eventWithoutHash = {
       event_id: input.event_id ?? randomUUID(),

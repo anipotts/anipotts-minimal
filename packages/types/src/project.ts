@@ -1,10 +1,7 @@
 export type ProjectCategory = "ai" | "product" | "quant" | "music" | "other";
 export type ProjectStatus = "live" | "in-progress" | "coming-soon" | "archived";
 export type WorkPublishState =
-  | "publish_now"
-  | "placeholder"
-  | "improve_then_publish"
-  | "archive";
+  "publish_now" | "placeholder" | "improve_then_publish" | "archive";
 
 export interface DemoAsset {
   webm?: string;

@@ -1,11 +1,5 @@
 export type AdminSearchDomain =
-  | "navigation"
-  | "inbox"
-  | "work"
-  | "content"
-  | "life"
-  | "people"
-  | "system";
+  "navigation" | "inbox" | "work" | "content" | "life" | "people" | "system";
 
 export type AdminSearchResult = {
   id: string;

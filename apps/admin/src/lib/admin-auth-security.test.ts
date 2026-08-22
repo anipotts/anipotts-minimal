@@ -18,10 +18,10 @@ describe("admin auth security boundaries", () => {
       requirePasskeyApprovalProvenance(
         principal("device_approval", "credential-1"),
       ),
-    ).toThrowError(Response);
+    ).toThrow(Response);
     expect(() =>
       requirePasskeyApprovalProvenance(principal("passkey", null)),
-    ).toThrowError(Response);
+    ).toThrow(Response);
   });
 
   it("binds claimed sessions to an active approving credential", async () => {

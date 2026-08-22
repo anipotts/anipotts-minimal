@@ -29,9 +29,7 @@ export type RequiredPasskeyAuditEvent =
 export type PasskeyAuditEvents = Record<RequiredPasskeyAuditEvent, number>;
 
 export type PasskeyRouteBoundary =
-  | "cloudflare_access"
-  | "app_native_passkey"
-  | "unknown";
+  "cloudflare_access" | "app_native_passkey" | "unknown";
 
 export type PasskeyProofItem = {
   id: string;

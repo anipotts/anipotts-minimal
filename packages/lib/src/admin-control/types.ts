@@ -17,23 +17,13 @@ export type KnowledgeCardKind =
   | "reference";
 
 export type KnowledgeSensitivity =
-  | "open"
-  | "restricted"
-  | "intimate"
-  | "closed";
+  "open" | "restricted" | "intimate" | "closed";
 
 export type KnowledgeRevealPolicy =
-  | "summary"
-  | "pointer_only"
-  | "human_present"
-  | "never_index";
+  "summary" | "pointer_only" | "human_present" | "never_index";
 
 export type KnowledgeFreshnessState =
-  | "fresh"
-  | "stale"
-  | "partial"
-  | "unavailable"
-  | "unknown";
+  "fresh" | "stale" | "partial" | "unavailable" | "unknown";
 
 export interface AdminEventEnvelope {
   schema_version: number;
@@ -54,23 +44,12 @@ export interface AdminEventEnvelope {
 }
 
 export type InboxActionKind =
-  | "approve"
-  | "review"
-  | "verify"
-  | "decide"
-  | "deadline"
-  | "open"
-  | "none";
+  "approve" | "review" | "verify" | "decide" | "deadline" | "open" | "none";
 
 export type AdminInboxDomain = "work" | "content" | "life" | "fleet" | "system";
 
 export type AdminAttentionKind =
-  | "review"
-  | "approval"
-  | "decision"
-  | "deadline"
-  | "error"
-  | "verification";
+  "review" | "approval" | "decision" | "deadline" | "error" | "verification";
 
 export interface AdminInboxItem {
   item_id: string;

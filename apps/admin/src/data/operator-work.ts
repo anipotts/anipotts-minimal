@@ -17,10 +17,7 @@ export type OperatorState =
 export type OperatorLifecycleState = "open" | "completed" | "archived";
 export type OperatorFreshness = "fresh" | "stale" | "unknown";
 export type OperatorWorkLane =
-  | "foreground"
-  | "background"
-  | "waiting"
-  | "recently_completed";
+  "foreground" | "background" | "waiting" | "recently_completed";
 
 type OperatorWorkBase = {
   attention_ref: string | null;

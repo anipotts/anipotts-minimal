@@ -25,8 +25,7 @@ export class CodeStats extends DurableObject {
 
     if (url.pathname === "/commits" && request.method === "POST") {
       const payload = (await request.json()) as
-        | Partial<Commit>
-        | { commits: Partial<Commit>[] };
+        Partial<Commit> | { commits: Partial<Commit>[] };
 
       const incoming: Partial<Commit>[] = Array.isArray(
         (payload as { commits?: unknown }).commits,

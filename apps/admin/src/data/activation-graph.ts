@@ -23,10 +23,7 @@ export const OPERATIONAL_PROJECTIONS = [
 
 export type OperationalProjection = (typeof OPERATIONAL_PROJECTIONS)[number];
 export type ActivationGraphLayer =
-  | "world"
-  | "obligation"
-  | "execution"
-  | "trajectory";
+  "world" | "obligation" | "execution" | "trajectory";
 
 export type ActivationLane = {
   key: OperationalProjection;

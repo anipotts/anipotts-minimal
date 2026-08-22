@@ -39,16 +39,9 @@ type AdminInboxDb = ContentInventoryD1Database &
   BoundAdminControlDatabase;
 
 export type AdminInboxCategory =
-  | "work"
-  | "content"
-  | "life"
-  | "fleet"
-  | "system";
+  "work" | "content" | "life" | "fleet" | "system";
 export type AdminInboxTimeframe =
-  | "now"
-  | "today"
-  | "this week"
-  | "waiting / gated";
+  "now" | "today" | "this week" | "waiting / gated";
 
 export type AdminInboxItem = {
   id: string;
