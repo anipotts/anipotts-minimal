@@ -25,11 +25,12 @@ const manifest = {
   ],
 };
 const sql = buildBootstrapSql(manifest);
-assert.match(sql, /^BEGIN IMMEDIATE;/);
+assert.match(sql, /^-- D1 remote file ingestion is transactional\./);
+assert.doesNotMatch(sql, /^(?!\s*--)\s*(?:BEGIN|COMMIT)\b/im);
 assert.match(sql, /CREATE TABLE d1_migrations/);
 assert.match(sql, /VALUES \('0001_one\.sql'\)/);
 assert.match(sql, /VALUES \('0002_two''s\.sql'\)/);
-assert.match(sql, /COMMIT;\n$/);
+assert.match(sql, /VALUES \('0002_two''s\.sql'\);\n$/);
 assert.match(bootstrapSqlHash(sql), /^sha256:[0-9a-f]{64}$/);
 
 assert.deepEqual(
