@@ -39,9 +39,10 @@ module.
 
 ## D1 boundary
 
-`apps/admin` is the only intended migration owner. The historical SQL directory
-is not configured in Wrangler yet because production has no Wrangler ledger.
-Replaying those files would be unsafe.
+`apps/admin` is the only migration owner. Its D1 binding points at the governed
+repository migration directory, while remote application remains disabled
+because production has no verified Wrangler ledger. Replaying historical files
+would be unsafe.
 
 The manifest records immutable hashes for the 40 historical files and a
 read-only production schema fingerprint. The August 5 query observed 55 tables,
@@ -56,8 +57,8 @@ Remote migration promotion remains disabled until one approved bootstrap:
 3. capture a Time Travel bookmark
 4. create Wrangler's ledger with the pinned Wrangler schema
 5. record historical files only after their postconditions pass
-6. configure `migrations_dir` in the Admin binding
-7. store the receipt and enable automatic additive migration promotion
+6. verify the Admin binding still owns the exact migration directory
+7. store the receipt before enabling additive migration promotion
 
 Every future migration needs a checksum, risk, consumers, preconditions,
 postconditions, and rollback strategy. Recorded migration edits fail CI. The

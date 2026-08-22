@@ -21,7 +21,7 @@ status: implementation baseline, 2026-08-22
 | brand               | `packages/brand`                                                                       | bundled app assets and semantic CSS variables                                       |
 | release decision    | typed output from `scripts/ci/release-policy.mjs` using `config/release-train.json`    | CI checks, deploy targets, migration gate, deployment receipt                       |
 | migration ownership | `apps/admin/wrangler.toml` plus immutable `drizzle/migrations/manifest.json`           | Wrangler ledger and production receipt                                              |
-| local development   | `pnpm dev:local:ensure                                                                 | status                                                                              | stop` | named loopback URLs; `localhost:4311` remains the Admin fallback |
+| local development   | `pnpm dev:local:ensure`, `pnpm dev:local:status`, `pnpm dev:local:stop`                | named loopback URLs; `localhost:4311` remains the Admin fallback                    |
 | runtime provenance  | source-backed state with `live`, `stale`, `disconnected`, `unknown`, or `fixture_only` | Admin labels and inspectors                                                         |
 
 Published D1 `page_content` remains a versioned runtime override. It is not a
@@ -52,10 +52,17 @@ normal runtime data.
 
 ## implementation order
 
-1. repair and verify the production migration-ledger bootstrap without applying it.
-2. centralize brand source and semantic tokens.
-3. move public content to the canonical root and generate every source projection.
-4. relocate runtime fixtures and expose provenance states.
-5. build the restrained public UI layer, then redesign public routes.
-6. consolidate release receipts after classifier parity tests pass.
-7. execute production migration, deploy, auth, Access, and cleanup effects only through their exact gates.
+Completed locally:
+
+- brand source and semantic roles are centralized.
+- canonical public content generates source-controlled projections.
+- empty package boundaries are removed.
+- production Admin reads no longer substitute development fixtures.
+- deploy targeting and release risk use one classifier.
+
+Remaining order:
+
+1. build the restrained public UI layer, then redesign public routes.
+2. run full parity, privacy, accessibility, and browser proof.
+3. repair and verify the production migration-ledger bootstrap without applying it.
+4. execute migration, deploy, auth, Access, and cleanup effects only through their exact gates.
