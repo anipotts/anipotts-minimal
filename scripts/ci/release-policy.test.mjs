@@ -95,6 +95,18 @@ assert.equal(safeMigration.database_schema_version, "0043");
 assert.equal(safeMigration.migration_schema_before, `sha256:${"1".repeat(64)}`);
 assert.equal(safeMigration.migration_schema_after, `sha256:${"2".repeat(64)}`);
 
+const removedMigration = classifyRelease(
+  ["D\tdrizzle/migrations/0044_public_identity_systems.sql"],
+  base,
+);
+assert.equal(removedMigration.risk, "approval");
+assert.equal(removedMigration.d1_changed, true);
+assert.equal(removedMigration.migration_risk, "approval");
+assert.equal(removedMigration.remote_migration_allowed, false);
+assert.deepEqual(removedMigration.reasons, [
+  "0044_public_identity_systems.sql: removed migration",
+]);
+
 assert.throws(
   () =>
     classifyRelease([`A\tdrizzle/migrations/${safeFile}`], {

@@ -105,7 +105,27 @@ export function classifyRelease(changeLines, options = {}) {
   const changes = changeLines.filter(Boolean).map(parseChange);
   const paths = changes.map((change) => change.path);
   const deployTargets = computeDeployTargets(paths);
-  const migration = inspectMigrationChanges(paths, options);
+  const deletedMigrations = changes.filter(
+    (change) =>
+      change.status.startsWith("D") &&
+      /^drizzle\/migrations\/\d{4}_.+\.sql$/.test(change.path),
+  );
+  const migration = inspectMigrationChanges(
+    changes
+      .filter((change) => !deletedMigrations.includes(change))
+      .map((change) => change.path),
+    options,
+  );
+  if (deletedMigrations.length > 0) {
+    migration.changed = true;
+    migration.risk = "approval";
+    migration.remoteAllowed = false;
+    migration.reasons.push(
+      ...deletedMigrations.map(
+        (change) => `${basename(change.path)}: removed migration`,
+      ),
+    );
+  }
   for (const consumer of migration.consumers) {
     if (Object.hasOwn(deployTargets, consumer)) deployTargets[consumer] = true;
   }
