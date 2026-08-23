@@ -3,10 +3,5 @@
   "production_promotion": "enabled",
   "automatic_migrations": "held_bootstrap_required",
   "authenticated_admin_smoke": "held_identity_required",
-  "automatic_app_rollback": "enabled",
-  "required_checks": [
-    "Build, lint, typecheck, test",
-    "Security Review",
-    "Migration Preflight"
-  ]
+  "automatic_app_rollback": "enabled"
 }

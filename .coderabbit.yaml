@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  poem: false
+  in_progress_fortune: false
+  path_filters:
+    - "!**/pnpm-lock.yaml"
+    - "!**/dist/**"
+    - "!**/.local/**"
+    - "!docs/archive/**"
+    - "!packages/brand/public/fonts/**"
+    - "!packages/brand/public/marks/**"
+    - "!**/*.{png,jpg,jpeg,gif,webp,avif,woff,woff2,ttf}"
+    - "!drizzle/seeds/public-content.json"
+  path_instructions:
+    - path: "apps/admin/src/{middleware.ts,lib/passkey-auth.ts,pages/auth/**}"
+      instructions: |
+        Review authentication boundaries, challenge binding, cookie scope,
+        replay resistance, rate limits, and production fail-closed behavior.
+    - path: "drizzle/{migrations/**,meta/**}"
+      instructions: |
+        Review immutable migration ordering, destructive SQL, preconditions,
+        postconditions, consumer compatibility, and rollback safety.
+    - path: ".github/workflows/**"
+      instructions: |
+        Review permissions, untrusted interpolation, exact-SHA binding,
+        deployment targeting, secret handling, and duplicate release effects.
+    - path: "workers/**"
+      instructions: |
+        Review outbound effects, bindings, authentication, data exposure,
+        runtime compatibility, and rollback behavior.

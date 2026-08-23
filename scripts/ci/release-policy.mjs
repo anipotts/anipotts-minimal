@@ -14,6 +14,29 @@ export const DEPLOY_TARGETS = [
   "weekly_email",
 ];
 
+const MIGRATION_PREFLIGHT_PATHS = [
+  /^drizzle\/migrations\//,
+  /^drizzle\/meta\//,
+  /^drizzle\/README\.md$/,
+  /^apps\/admin\/wrangler\.toml$/,
+  /^scripts\/ci\/(?:d1-|migration-|site-migrations)/,
+];
+
+const CI_POLICY_PATHS = [
+  /^\.coderabbit\.yaml$/,
+  /^\.github\/workflows\//,
+  /^config\//,
+  /^scripts\/ci\//,
+  /^(?:package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json)$/,
+];
+
+const LOCAL_DEV_PATHS = [
+  /^\.codex\//,
+  /^\.nvmrc$/,
+  /^docs\/local-development\.md$/,
+  /^scripts\/(?:codex-action$|dev\/)/,
+];
+
 const APPROVAL_PATHS = [
   /^\.github\/workflows\//,
   /^apps\/admin-solid\//,
@@ -29,6 +52,7 @@ const APPROVAL_PATHS = [
 ];
 
 const KNOWN_SAFE_ROOTS = [
+  /^\.coderabbit\.yaml$/,
   /^apps\/(?:admin|www)\//,
   /^packages\//,
   /^content\/public\//,
@@ -165,8 +189,16 @@ export function classifyRelease(changeLines, options = {}) {
     release_id: `${sourceSha.slice(0, 12)}-${basename(options.eventName || "release")}`,
     source_sha: sourceSha,
     risk,
-    approval_required: risk === "approval" || risk === "unknown",
     docs_only: docsOnly,
+    migration_preflight_required: paths.some((path) =>
+      MIGRATION_PREFLIGHT_PATHS.some((pattern) => pattern.test(path)),
+    ),
+    ci_policy_changed: paths.some((path) =>
+      CI_POLICY_PATHS.some((pattern) => pattern.test(path)),
+    ),
+    local_dev_changed: paths.some((path) =>
+      LOCAL_DEV_PATHS.some((pattern) => pattern.test(path)),
+    ),
     deploy_targets: deployTargets,
     d1_changed: migration.changed,
     migration_risk: migration.risk,
@@ -190,9 +222,10 @@ export function githubOutputs(release) {
   const outputs = {
     release_id: release.release_id,
     source_sha: release.source_sha,
-    risk: release.risk,
-    approval_required: String(release.approval_required),
     docs_only: String(release.docs_only),
+    migration_preflight_required: String(release.migration_preflight_required),
+    ci_policy_changed: String(release.ci_policy_changed),
+    local_dev_changed: String(release.local_dev_changed),
     d1_changed: String(release.d1_changed),
     migration_risk: release.migration_risk,
     migration_consumers: release.migration_consumers.join(","),

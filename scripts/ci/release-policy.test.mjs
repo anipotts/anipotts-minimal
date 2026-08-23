@@ -42,7 +42,6 @@ const adminSolidRelease = classifyRelease(
   base,
 );
 assert.equal(adminSolidRelease.risk, "approval");
-assert.equal(adminSolidRelease.approval_required, true);
 assert.equal(adminSolidRelease.deploy_targets.admin_solid, false);
 assert.deepEqual(adminSolidRelease.reasons, [
   "protected surface: apps/admin-solid/package.json",
@@ -52,8 +51,17 @@ assert.equal(
   "approval",
 );
 assert.equal(
-  classifyRelease(["M\tapps/admin/src/pages/auth/passkey.astro"], base)
-    .approval_required,
+  classifyRelease(["M\tapps/admin/src/pages/auth/passkey.astro"], base).risk,
+  "approval",
+);
+assert.equal(
+  classifyRelease(["M\tapps/www/src/styles/global.css"], base)
+    .migration_preflight_required,
+  false,
+);
+assert.equal(
+  classifyRelease(["M\tapps/admin/wrangler.toml"], base)
+    .migration_preflight_required,
   true,
 );
 assert.equal(

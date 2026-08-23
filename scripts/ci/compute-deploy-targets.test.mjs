@@ -130,8 +130,8 @@ expectTargets(
 const deployWorkflow = readFileSync(".github/workflows/deploy.yml", "utf8");
 
 assert.ok(
-  deployWorkflow.includes("node scripts/ci/release-policy.mjs"),
-  "deploy.yml must use the release classifier that wraps shared targets",
+  deployWorkflow.includes("node scripts/ci/deployment-plan.mjs"),
+  "deploy.yml must use the live-aware deployment plan that wraps shared targets",
 );
 
 assert.equal(

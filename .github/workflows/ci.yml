@@ -18,9 +18,14 @@ jobs:
     name: Classify release
     runs-on: ubuntu-latest
     outputs:
-      approval_required: ${{ steps.release.outputs.approval_required }}
+      www: ${{ steps.release.outputs.www }}
+      admin: ${{ steps.release.outputs.admin }}
+      docs_only: ${{ steps.release.outputs.docs_only }}
       d1_changed: ${{ steps.release.outputs.d1_changed }}
       migration_risk: ${{ steps.release.outputs.migration_risk }}
+      migration_preflight_required: ${{ steps.release.outputs.migration_preflight_required }}
+      ci_policy_changed: ${{ steps.release.outputs.ci_policy_changed }}
+      local_dev_changed: ${{ steps.release.outputs.local_dev_changed }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -55,51 +60,37 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24.19.0"
           cache: "pnpm"
 
       - name: Setup Bun
+        if: github.event.pull_request.draft == false
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.4"
 
       - name: Install dependencies
+        if: github.event.pull_request.draft == false
         run: pnpm install --frozen-lockfile
 
-      - name: Validate workspace inventory
-        run: pnpm test:workspace
+      - name: Check draft diff
+        if: github.event.pull_request.draft == true
+        run: git diff --check "origin/${{ github.event.pull_request.base.ref }}"...HEAD
 
-      - name: Validate deploy target rules
-        run: pnpm test:deploy-targets
+      - name: Validate formatting and path hygiene
+        if: github.event.pull_request.draft == false
+        run: pnpm format:check && pnpm test:path-hygiene
 
-      - name: Validate admin route parity
-        run: pnpm test:admin-routes
+      - name: Validate CI and release policy
+        if: github.event.pull_request.draft == false && needs.classify.outputs.ci_policy_changed == 'true'
+        run: pnpm test:workspace && pnpm test:deploy-targets && pnpm test:workflows && pnpm test:security-review && pnpm test:release-policy && pnpm test:release-smoke
 
-      - name: Validate public app boundary
-        run: pnpm test:public-boundary
+      - name: Validate local development
+        if: github.event.pull_request.draft == false && needs.classify.outputs.local_dev_changed == 'true'
+        run: pnpm test:admin-preview && pnpm test:portless-preview
 
-      - name: Validate public route smoke parity
-        run: pnpm test:public-routes
-
-      - name: Validate active path hygiene
-        run: pnpm test:path-hygiene
-
-      - name: Validate content platform invariants
-        run: pnpm test:content-platform
-
-      - name: Validate workflow inventory
-        run: pnpm test:workflows
-
-      - name: Validate security review rules
-        run: pnpm test:security-review
-
-      - name: Validate release policy
-        run: pnpm test:release-policy
-
-      - name: Validate formatting
-        run: pnpm format:check
-
-      - name: Validate affected packages
+      - name: Validate affected packages once
+        if: github.event.pull_request.draft == false && needs.classify.outputs.docs_only != 'true'
         env:
           TURBO_SCM_BASE: origin/${{ github.event.pull_request.base.ref }}
           TURBO_SCM_HEAD: HEAD
@@ -109,38 +100,14 @@ jobs:
           pnpm turbo typecheck --affected --output-logs=errors-only
           pnpm turbo test --affected --output-logs=errors-only
 
-  migration-preflight:
-    name: Migration Preflight
-    needs: [classify]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Validate public contracts
+        if: github.event.pull_request.draft == false && needs.classify.outputs.www == 'true'
+        run: pnpm test:public-boundary && pnpm test:public-routes && pnpm test:public-copy:policy && pnpm content:check
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: "10.5.2"
+      - name: Validate Admin contracts
+        if: github.event.pull_request.draft == false && needs.classify.outputs.admin == 'true'
+        run: pnpm test:admin-routes && pnpm test:admin-fixture-boundary
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: "22"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Verify immutable migration inventory
-        run: node scripts/ci/migration-policy.mjs
-
-      - name: Prove additive migration replay locally
-        run: pnpm test:migration-local
-
-      - name: Report remote promotion gate
-        if: needs.classify.outputs.d1_changed == 'true'
-        run: |
-          echo "migration_risk=${{ needs.classify.outputs.migration_risk }}"
-          echo "remote migration promotion remains gated by the verified bootstrap receipt"
+      - name: Validate migration inventory and replay
+        if: github.event.pull_request.draft == false && needs.classify.outputs.migration_preflight_required == 'true'
+        run: pnpm test:d1-bootstrap && pnpm test:migration-local && pnpm test:site-migrations
