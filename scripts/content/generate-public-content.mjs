@@ -48,8 +48,16 @@ if (BOOTSTRAP) {
   await bootstrapPages();
 }
 
-const projects = markdownFiles(PROJECTS_ROOT).map(projectRecord);
-const writing = markdownFiles(WRITING_ROOT).map(writingRecord);
+const projectEntries = markdownFiles(PROJECTS_ROOT).map((file) => ({
+  content: projectRecord(file),
+  source: sourceRef(file),
+}));
+const writingEntries = markdownFiles(WRITING_ROOT).map((file) => ({
+  content: writingRecord(file),
+  source: sourceRef(file),
+}));
+const projects = projectEntries.map(({ content }) => content);
+const writing = writingEntries.map(({ content }) => content);
 const pages = Object.fromEntries(
   markdownFiles(PAGES_ROOT).map((file) => {
     const key = basename(file, ".md");
@@ -100,8 +108,12 @@ const adminProjection = {
       source_ref: `content/public/pages/${key}.md`,
       source_hash: sourceManifest[`content/public/pages/${key}.md`],
     })),
-    ...projects.map((content) => projectionRecord("project", content)),
-    ...writing.map((content) => projectionRecord("writing", content)),
+    ...projectEntries.map(({ content, source }) =>
+      projectionRecord("project", content, source),
+    ),
+    ...writingEntries.map(({ content, source }) =>
+      projectionRecord("writing", content, source),
+    ),
   ],
 };
 
@@ -113,21 +125,11 @@ const d1Seeds = {
     ...Object.entries(pages).map(([key, content]) =>
       seedRow(key, content, true, `content/public/pages/${key}.md`),
     ),
-    ...projects.map((content) =>
-      seedRow(
-        `project:${content.slug}`,
-        content,
-        content.visible,
-        `content/public/projects/${content.slug}.md`,
-      ),
+    ...projectEntries.map(({ content, source }) =>
+      seedRow(`project:${content.slug}`, content, content.visible, source),
     ),
-    ...writing.map((content) =>
-      seedRow(
-        `writing:${content.slug}`,
-        content,
-        content.visible,
-        `content/public/writing/${content.slug}.md`,
-      ),
+    ...writingEntries.map(({ content, source }) =>
+      seedRow(`writing:${content.slug}`, content, content.visible, source),
     ),
   ],
 };
@@ -248,8 +250,7 @@ function writingRecord(file) {
   };
 }
 
-function projectionRecord(kind, content) {
-  const source = `content/public/${kind === "project" ? "projects" : "writing"}/${content.slug}.md`;
+function projectionRecord(kind, content, source) {
   return {
     entity_id: `public-${kind}:${content.slug}`,
     kind,

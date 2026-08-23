@@ -2,7 +2,16 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import {
   buildPasskeyProofItems,
   countProofEntries,
@@ -261,6 +270,53 @@ assert.match(
   /content\/public\/pages\/newsletter_archive\.md/,
   "Admin newsletter inventory must reference the canonical filename",
 );
+
+const alternateSlugRoot = mkdtempSync(join(tmpdir(), "public-content-slug-"));
+try {
+  cpSync("content/public", join(alternateSlugRoot, "content/public"), {
+    recursive: true,
+  });
+  mkdirSync(join(alternateSlugRoot, "content/public/projects"), {
+    recursive: true,
+  });
+  writeFileSync(
+    join(alternateSlugRoot, "content/public/projects/source-name.md"),
+    `---\nslug: route-name\ntitle: Alternate route\nvisible: true\n---\nSource identity follows the file.\n`,
+  );
+  execFileSync(
+    process.execPath,
+    [resolve("scripts/content/generate-public-content.mjs")],
+    { cwd: alternateSlugRoot, stdio: "ignore" },
+  );
+  const alternateAdminProjection = JSON.parse(
+    readFileSync(
+      join(
+        alternateSlugRoot,
+        "packages/content/generated/admin-public-content.json",
+      ),
+      "utf8",
+    ),
+  );
+  const alternateSeed = JSON.parse(
+    readFileSync(
+      join(alternateSlugRoot, "drizzle/seeds/public-content.json"),
+      "utf8",
+    ),
+  );
+  const expectedSource = "content/public/projects/source-name.md";
+  const projected = alternateAdminProjection.records.find(
+    (record) => record.entity_id === "public-project:route-name",
+  );
+  const seeded = alternateSeed.rows.find(
+    (row) => row.page_key === "project:route-name",
+  );
+  assert.equal(projected.source_ref, expectedSource);
+  assert.match(projected.source_hash, /^[a-f0-9]{64}$/);
+  assert.equal(seeded.source_ref, expectedSource);
+  assert.equal(seeded.source_hash, projected.source_hash);
+} finally {
+  rmSync(alternateSlugRoot, { recursive: true, force: true });
+}
 assert.ok(
   contentEditorSource.includes("publish_batch_required"),
   "content editor publish must fail closed when D1 batch semantics are unavailable",
