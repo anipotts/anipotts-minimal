@@ -50,6 +50,10 @@ const operatorWorkSource = readFileSync(
   "apps/admin/src/data/operator-work.ts",
   "utf8",
 );
+const devOperatorWorkSource = readFileSync(
+  "apps/admin/src/data/dev-operator-work.ts",
+  "utf8",
+);
 const lifeSource = readFileSync(
   "apps/admin/src/pages/life/index.astro",
   "utf8",
@@ -444,7 +448,7 @@ for (const marker of [
   "OPERATOR_WORK_FIXTURE_SHA256",
 ]) {
   assert.ok(
-    operatorWorkSource.includes(marker),
+    devOperatorWorkSource.includes(marker),
     `operator work fixture missing marker ${marker}`,
   );
 }

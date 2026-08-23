@@ -2,6 +2,7 @@
 
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { computeDeployTargets } from "./release-policy.mjs";
 
 const CONTRACT_PATH = "config/admin-solid-retirement.json";
 const REQUIRED_PROOFS = [
@@ -82,13 +83,9 @@ if (allProofsPassed) {
   );
 }
 
-const deployTargets = readFileSync(
-  "scripts/ci/compute-deploy-targets.mjs",
-  "utf8",
-);
-assert.match(
-  deployTargets,
-  /apps\/admin-solid is retained as a temporary rollback surface only/u,
+assert.equal(
+  computeDeployTargets(["apps/admin-solid/src/routes/index.tsx"]).admin_solid,
+  false,
   "rollback app must remain excluded from automatic deploy selection",
 );
 

@@ -139,9 +139,9 @@ const outputs = new Map([
       parser: "typescript",
     }),
   ],
-  [VALIDATION_JSON, `${JSON.stringify(canonical, null, 2)}\n`],
-  [ADMIN_JSON, `${JSON.stringify(adminProjection, null, 2)}\n`],
-  [D1_JSON, `${JSON.stringify(d1Seeds, null, 2)}\n`],
+  [VALIDATION_JSON, await formatJson(canonical)],
+  [ADMIN_JSON, await formatJson(adminProjection)],
+  [D1_JSON, await formatJson(d1Seeds)],
 ]);
 
 let drift = false;
@@ -159,6 +159,10 @@ for (const [file, value] of outputs) {
 }
 
 if (drift) process.exitCode = 1;
+
+async function formatJson(value) {
+  return format(JSON.stringify(value), { parser: "json" });
+}
 
 async function bootstrapPages() {
   const defaults = await import(

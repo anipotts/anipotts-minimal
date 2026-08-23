@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "brand_version": "0.2.0",
+  "brand_version": "0.3.0",
   "status": "web-ready",
   "display_face": "AP Structural",
   "display_face_source_packet": "ap-structural-v0.1.0-candidate.1",
@@ -8,10 +8,12 @@
   "display_face_fallback": "Urbanist",
   "interface_face": "Instrument Sans",
   "semantic_colors": {
-    "dark_background": "#0b1220",
-    "elevated_surface": "#111b2e",
+    "light_background": "#61abea",
+    "light_text": "#ffffff",
+    "dark_background": "#080b10",
+    "elevated_surface": "#11151d",
     "action": "#61abea",
     "primary_text": "#f7faff",
-    "muted_text": "#aab6ca"
+    "muted_text": "#abb2be"
   }
 }

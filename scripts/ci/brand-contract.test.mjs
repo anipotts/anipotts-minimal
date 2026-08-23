@@ -28,11 +28,13 @@ assert.equal(release.status, "web-ready");
 assert.equal(release.display_face, "AP Structural");
 assert.equal(release.display_face_woff2_sha256, WOFF2_HASH);
 assert.deepEqual(release.semantic_colors, {
-  dark_background: "#0b1220",
-  elevated_surface: "#111b2e",
+  light_background: "#61abea",
+  light_text: "#ffffff",
+  dark_background: "#080b10",
+  elevated_surface: "#11151d",
   action: "#61abea",
   primary_text: "#f7faff",
-  muted_text: "#aab6ca",
+  muted_text: "#abb2be",
 });
 
 const tokens = readFileSync(join(ROOT, "src/tokens.css"), "utf8");
