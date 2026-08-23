@@ -137,6 +137,12 @@ assert.ok(
   deployWorkflow.includes("pnpm validate"),
   "deployment must revalidate the exact main SHA before mutation",
 );
+assert.ok(
+  deployWorkflow.includes(
+    'admin_enabled=${policy.authenticated_admin_smoke === "enabled"}',
+  ) && deployWorkflow.includes("needs.release.outputs.admin_enabled == 'true'"),
+  "Admin deployment must retain its independent authenticated smoke gate",
+);
 for (const manualGuard of [
   'test "${{ github.ref }}" = "refs/heads/main"',
   'test "${{ github.actor }}" = "anipotts"',
