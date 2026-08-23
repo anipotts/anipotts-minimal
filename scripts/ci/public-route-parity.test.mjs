@@ -38,9 +38,9 @@ assert.ok(
   "content-proof must probe the shared public smoke route set",
 );
 
-assert.ok(releaseSmoke.includes("attempts: 6"));
-assert.ok(releaseSmoke.includes("delayMs: 10_000"));
-assert.ok(releaseSmoke.includes("health.release_sha !== expectedSha"));
+assert.ok(releaseSmoke.includes("healthAttempts = 6"));
+assert.ok(releaseSmoke.includes("retryDelayMs = 10_000"));
+assert.ok(releaseSmoke.includes("health.release_sha === expectedSha"));
 
 for (const marker of [
   'method: "HEAD"',
