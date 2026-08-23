@@ -4,6 +4,17 @@
 
 :root {
   color-scheme: light;
+  --color-background: #f7faff;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #edf2f7;
+  --color-text: #0b1220;
+  --color-text-muted: #46566c;
+  --color-action: #25689f;
+  --color-action-ink: #ffffff;
+  --color-border: #d4dce7;
+  --color-border-strong: #8d9bad;
+  --color-focus: #25689f;
+  --color-accent-soft: #dcecf9;
   --mono: var(--sans);
   --p-h1: clamp(2rem, 4vw, 2.9rem);
   --p-h3: 1.25rem;

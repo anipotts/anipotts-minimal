@@ -30,6 +30,8 @@ assert.equal(release.display_face_woff2_sha256, WOFF2_HASH);
 assert.deepEqual(release.semantic_colors, {
   light_background: "#61abea",
   light_text: "#ffffff",
+  light_reading_surface: "#0b1220",
+  light_reading_surface_elevated: "#111b2e",
   dark_background: "#080b10",
   elevated_surface: "#11151d",
   action: "#61abea",
