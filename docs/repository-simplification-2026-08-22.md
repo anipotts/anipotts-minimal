@@ -24,9 +24,9 @@ status: implementation baseline, 2026-08-22
 | local development   | `pnpm dev:local:ensure`, `pnpm dev:local:status`, `pnpm dev:local:stop`                | named loopback URLs; `localhost:4311` remains the Admin fallback                    |
 | runtime provenance  | source-backed state with `live`, `stale`, `disconnected`, `unknown`, or `fixture_only` | Admin labels and inspectors                                                         |
 
-Published D1 `page_content` remains a versioned runtime override. It is not a
-second source-controlled copy. New source defaults and additive seed payloads
-must be generated from canonical public content.
+Published D1 `page_content` is retained draft and migration history. It does not
+override public routes. New projections and additive seed payloads are generated
+from canonical public content.
 
 ## package decisions
 

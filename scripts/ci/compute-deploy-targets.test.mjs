@@ -92,9 +92,21 @@ expectTargets(
 );
 
 expectTargets(
-  "shared runtime packages deploy www only",
-  ["packages/lib/src/cms/index.ts", "packages/brand/src/tokens.css"],
-  { www: true },
+  "brand changes deploy both visual consumers",
+  ["packages/brand/src/tokens.css"],
+  { www: true, admin: true },
+);
+
+expectTargets(
+  "lib changes deploy its remaining Admin consumer",
+  ["packages/lib/src/cms/index.ts"],
+  { admin: true },
+);
+
+expectTargets(
+  "shared type changes deploy direct runtime consumers",
+  ["packages/types/src/cms.ts"],
+  { admin: true, state: true },
 );
 
 expectTargets(

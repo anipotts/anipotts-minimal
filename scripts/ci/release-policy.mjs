@@ -61,18 +61,12 @@ export function computeDeployTargets(paths) {
 
   for (const path of paths) {
     if (!path || isReleaseIgnored(path)) continue;
-    const isAdminControlLib = path.startsWith(
-      "packages/lib/src/admin-control/",
-    );
-
     if (
       path.startsWith("apps/www/") ||
-      (path.startsWith("packages/lib/") && !isAdminControlLib) ||
       path.startsWith("packages/content/src/public/") ||
       path === "packages/content/package.json" ||
       path === "packages/content/src/index.ts" ||
-      path.startsWith("packages/brand/") ||
-      path.startsWith("packages/types/")
+      path.startsWith("packages/brand/")
     ) {
       targets.www = true;
     }
@@ -80,10 +74,14 @@ export function computeDeployTargets(paths) {
     if (
       path.startsWith("apps/admin/") ||
       path.startsWith("packages/content/") ||
-      isAdminControlLib
+      path.startsWith("packages/lib/") ||
+      path.startsWith("packages/brand/") ||
+      path.startsWith("packages/types/")
     ) {
       targets.admin = true;
     }
+
+    if (path.startsWith("packages/types/")) targets.state = true;
 
     for (const worker of ["ingest", "newsletter", "state", "weekly-email"]) {
       if (path.startsWith(`workers/${worker}/`)) {
