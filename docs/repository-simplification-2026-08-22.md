@@ -59,6 +59,8 @@ Completed locally:
 - empty package boundaries are removed.
 - production Admin reads no longer substitute development fixtures.
 - deploy targeting and release risk use one classifier.
+- the unapplied `0044` D1 content copy is removed because canonical repository
+  content now renders every public route.
 
 Remaining order:
 
