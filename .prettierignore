@@ -21,4 +21,4 @@ packages/brand/ap-structural-v0.1.0-candidate.1/
 
 # content collection bodies are data, not code. the markdown -> d1 sync
 # depends on byte fidelity, so no formatter ever touches them.
-apps/www/src/content/
+content/public/

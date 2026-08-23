@@ -388,7 +388,7 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "newsletter.archive_copy",
     surface: "newsletter",
     title: "newsletter archive copy",
-    source_ref: "content/public/pages/newsletter-archive.md",
+    source_ref: "content/public/pages/newsletter_archive.md",
     current_value:
       "The /newsletter/archive title, meta description, section label, and hero summary come from canonical content.",
     editability: "ready",

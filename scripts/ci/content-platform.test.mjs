@@ -230,6 +230,11 @@ const sourceContentModule = readFileSync(
   "apps/admin/src/data/source-content.ts",
   "utf8",
 );
+const prettierIgnore = readFileSync(".prettierignore", "utf8");
+const adminContentInventory = readFileSync(
+  "packages/content/src/admin/content.ts",
+  "utf8",
+);
 for (const surface of ["projects", "writing"]) {
   assert.ok(
     sourceContentModule.includes(`../../../../content/public/${surface}/*.md`),
@@ -240,6 +245,21 @@ assert.equal(
   sourceContentModule.includes("../../../www/src/content/"),
   false,
   "Admin must not read the removed public content collections",
+);
+assert.match(
+  prettierIgnore,
+  /^content\/public\/$/m,
+  "canonical public Markdown must remain byte-stable during formatting",
+);
+assert.doesNotMatch(
+  prettierIgnore,
+  /^apps\/www\/src\/content\/$/m,
+  "Prettier must not retain the removed public content path",
+);
+assert.match(
+  adminContentInventory,
+  /content\/public\/pages\/newsletter_archive\.md/,
+  "Admin newsletter inventory must reference the canonical filename",
 );
 assert.ok(
   contentEditorSource.includes("publish_batch_required"),
