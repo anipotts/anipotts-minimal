@@ -40,7 +40,9 @@ import {
 import {
   contentInventorySource as rootContentInventorySource,
   DEFAULT_HOMEPAGE_CONTENT,
+  normalizeHomepageContent,
   normalizeOrchestratingPageContent,
+  segmentHomepageSummaryParagraph,
   validateOrchestratingPageContent,
 } from "../../packages/content/dist/index.js";
 
@@ -85,9 +87,26 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
 
 assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.paragraphs, [
   "i build with agents and write about the systems that keep the work coherent.",
-  "business insider has covered how i work. previously, i worked on real-time agent i/o at structured ai and our bad habit.",
+  "business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
 ]);
+const homepageWithEmptyParagraphs = normalizeHomepageContent({
+  sections: {
+    intro: {
+      ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
+      paragraphs: ["", "   "],
+    },
+  },
+});
+assert.deepEqual(
+  homepageWithEmptyParagraphs.sections.intro.paragraphs,
+  DEFAULT_HOMEPAGE_CONTENT.sections.intro.paragraphs,
+  "empty homepage paragraph lists must fall back to canonical summary paragraphs",
+);
 assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.mention_keys, [
+  "build",
+  "agents",
+  "write",
+  "systems",
   "businessInsider",
   "structuredAi",
   "yCombinatorF25",
@@ -98,6 +117,72 @@ assert.equal(
   DEFAULT_HOMEPAGE_CONTENT.sections.intro.rich_summary,
   undefined,
   "canonical homepage content must not duplicate prose as rich segments",
+);
+
+const homepageMentionFixture = {
+  build: { label: "build", href: "/making" },
+  agent: { label: "agent", href: "/systems" },
+  agents: { label: "agents", href: "/systems" },
+  businessInsider: { label: "business insider", href: "/writing" },
+};
+assert.deepEqual(
+  segmentHomepageSummaryParagraph(
+    "İ Business Insider covers agents building.",
+    ["build", "agent", "agents", "businessInsider"],
+    homepageMentionFixture,
+  ),
+  [
+    { kind: "text", text: "İ " },
+    {
+      kind: "mention",
+      key: "businessInsider",
+      text: "Business Insider",
+    },
+    { kind: "text", text: " covers " },
+    { kind: "mention", key: "agents", text: "agents" },
+    { kind: "text", text: " building." },
+  ],
+  "homepage summary segmentation must preserve casing, longest matches, and word boundaries",
+);
+
+const homepageSource = readFileSync("apps/www/src/pages/index.astro", "utf8");
+const inlineMentionSource = readFileSync(
+  "apps/www/src/components/InlineMention.astro",
+  "utf8",
+);
+const writingIndexSource = readFileSync(
+  "apps/www/src/pages/writing/index.astro",
+  "utf8",
+);
+assert.ok(homepageSource.includes("<HomepageRichSummary"));
+assert.equal(
+  homepageSource.includes("HomepageContextRail"),
+  false,
+  "homepage context must remain embedded in the canonical intro prose",
+);
+assert.ok(
+  homepageSource.includes(".hero-sentence + .hero-sentence"),
+  "consecutive intro sentences must share one controlled text rhythm",
+);
+assert.ok(
+  inlineMentionSource.includes('width="24"') &&
+    inlineMentionSource.includes('height="24"'),
+  "inline brand images must reserve intrinsic space before loading",
+);
+assert.equal(
+  inlineMentionSource.includes("inline-flex"),
+  false,
+  "inline mentions must not reintroduce the replaced-element baseline bug",
+);
+assert.ok(
+  writingIndexSource.includes('id="writing-result-template"') &&
+    writingIndexSource.includes('class="card writing-card"'),
+  "writing search results must reuse the writing card contract",
+);
+assert.equal(
+  writingIndexSource.includes('row.className = "row-link"'),
+  false,
+  "writing search must not restore the legacy row presentation",
 );
 
 assert.deepEqual(

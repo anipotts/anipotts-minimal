@@ -56,16 +56,6 @@ body {
   overflow-x: clip;
 }
 
-:root:not([data-theme="dark"]) body {
-  background: var(--brand-action);
-}
-
-:root:not([data-theme="dark"]) :where(.nav, .page, .foot) {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-}
-
 ::selection {
   background: var(--ink);
   color: var(--interactive-ink);

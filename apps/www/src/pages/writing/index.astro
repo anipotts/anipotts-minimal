@@ -35,6 +35,7 @@ const copy = normalizeListingPageContent(
         id="writing-search"
         class="field search"
         type="search"
+        aria-label="search writing"
         placeholder={copy.search_placeholder ?? "search writing"}
         autocomplete="off"
       />
@@ -43,6 +44,16 @@ const copy = normalizeListingPageContent(
     <div class="list" id="writing-list">
       {writingEntries.map((item) => <WritingRow item={item} />)}
     </div>
+    <template id="writing-result-template">
+      <a class="card writing-card">
+        <span class="head">
+          <span class="title"></span>
+          <Icon name="ph:arrow-bend-right-up" class="affordance" />
+        </span>
+        <span class="sub"></span>
+        <span class="meta mono"><span class="search-date"></span></span>
+      </a>
+    </template>
   </section>
 </Shell>
 
@@ -104,6 +115,9 @@ const copy = normalizeListingPageContent(
   const input = document.getElementById("writing-search") as HTMLInputElement;
   const list = document.getElementById("writing-list")!;
   const count = document.getElementById("search-count")!;
+  const resultTemplate = document.getElementById(
+    "writing-result-template",
+  ) as HTMLTemplateElement;
   const original = list.innerHTML;
 
   let timer: ReturnType<typeof setTimeout>;
@@ -114,25 +128,16 @@ const copy = normalizeListingPageContent(
     summary: string;
     date: string;
   }) {
-    const row = document.createElement("a");
+    const row = resultTemplate.content.firstElementChild!.cloneNode(
+      true,
+    ) as HTMLAnchorElement;
     row.href = "/writing/" + encodeURIComponent(r.slug);
-    row.className = "row-link";
-
-    const title = document.createElement("span");
-    title.className = "row-title";
-    title.textContent = r.title;
-
-    const date = document.createElement("span");
-    date.className = "mono search-date";
-    date.textContent = r.date.slice(0, 10);
-
-    const summary = document.createElement("span");
-    summary.className = "search-summary";
-    summary.textContent = r.summary;
-
-    row.appendChild(title);
-    row.appendChild(date);
-    row.appendChild(summary);
+    row.querySelector<HTMLElement>(".title")!.textContent = r.title;
+    row.querySelector<HTMLElement>(".sub")!.textContent = r.summary;
+    row.querySelector<HTMLElement>(".search-date")!.textContent = r.date.slice(
+      0,
+      10,
+    );
     return row;
   }
 

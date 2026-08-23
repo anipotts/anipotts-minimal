@@ -184,7 +184,7 @@ export const contentInventory: ContentInventoryItem[] = [
     source_ref:
       "content/public/pages/home.md sections.intro.paragraphs, projected through @anipotts/content/public",
     current_value:
-      "Homepage intro copy uses two readable paragraphs followed by a separate context rail.",
+      "Homepage intro copy uses two readable sentences with structured mentions rendered inline.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -203,7 +203,7 @@ export const contentInventory: ContentInventoryItem[] = [
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview context label, link, and local logo-path edits before canonical public content changes.",
+      "Preview inline label, link, and local logo-path edits before canonical public content changes.",
     required_authority: [],
     proof_ids: ["content.homepage.mentions.page-content"],
   },

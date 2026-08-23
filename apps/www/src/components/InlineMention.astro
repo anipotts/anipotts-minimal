@@ -1,0 +1,176 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  label: string;
+  href?: string;
+  icon?: string;
+  mark?: string;
+  logoSrc?: string;
+  logoAlt?: string;
+  logoTone?: "native" | "white";
+  logoShape?: "square" | "wide" | "mark" | "large";
+  badgeSrc?: string;
+  badgeAlt?: string;
+  suffix?: string;
+  wrap?: boolean;
+}
+
+const {
+  label,
+  href,
+  icon,
+  mark,
+  logoSrc,
+  logoTone,
+  logoShape,
+  badgeSrc,
+  badgeAlt,
+  suffix,
+  wrap = false,
+} = Astro.props;
+const Tag = href ? "a" : "span";
+const external = Boolean(href && !href.startsWith("/"));
+const hasVisual = Boolean(logoSrc || icon || mark);
+---
+
+<Tag
+  href={href}
+  class:list={{ "inline-mention": true, "inline-mention-wrap": wrap }}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+>
+  {
+    hasVisual && (
+      <span
+        class:list={{
+          "brand-mark": true,
+          "brand-mark-wide": logoShape === "wide",
+        }}
+        aria-hidden="true"
+      >
+        {logoSrc && (
+          <img
+            src={logoSrc}
+            alt=""
+            class:list={{ logo: true, "logo-white": logoTone === "white" }}
+            loading="lazy"
+            decoding="async"
+            width="24"
+            height="24"
+          />
+        )}
+        {icon && <Icon name={icon} />}
+        {mark && <span class="mark">{mark}</span>}
+      </span>
+    )
+  }<span class="text">{label}{suffix}</span>{
+    badgeSrc && (
+      <span class="brand-mark badge" aria-hidden="true">
+        <img
+          src={badgeSrc}
+          alt={badgeAlt ?? ""}
+          class="logo"
+          loading="lazy"
+          decoding="async"
+          width="24"
+          height="24"
+        />
+      </span>
+    )
+  }
+</Tag>
+
+<style>
+  .inline-mention {
+    display: inline-grid;
+    grid-auto-flow: column;
+    align-items: baseline;
+    gap: 0.24em;
+    color: var(--ink);
+    line-height: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: baseline;
+  }
+
+  .inline-mention-wrap {
+    white-space: normal;
+  }
+
+  a.inline-mention .text {
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-decoration-thickness: 0.052em;
+    text-underline-offset: 0.2em;
+  }
+
+  a.inline-mention:hover,
+  a.inline-mention:focus-visible {
+    color: var(--interactive);
+  }
+
+  a.inline-mention:hover .text,
+  a.inline-mention:focus-visible .text {
+    text-decoration-color: currentColor;
+  }
+
+  .brand-mark {
+    position: relative;
+    display: inline-block;
+    width: 0.92em;
+    height: 0.92em;
+    align-self: center;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 0.19em;
+    background: color-mix(in srgb, var(--surface) 78%, var(--ink) 22%);
+    box-shadow: inset 0 0 0 1px var(--border);
+    line-height: 0;
+    vertical-align: -0.08em;
+    contain: size layout paint;
+  }
+
+  .brand-mark-wide {
+    width: 1.24em;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .brand-mark :global(svg),
+  .logo {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .logo-white {
+    filter: brightness(0) invert(1);
+  }
+
+  .mark {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.58em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .badge {
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inline-mention {
+      transition: none;
+    }
+  }
+</style>
