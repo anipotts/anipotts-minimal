@@ -25,6 +25,14 @@ assert.equal(canonicalContentRelease.risk, "automatic");
 assert.equal(canonicalContentRelease.deploy_targets.www, true);
 assert.equal(canonicalContentRelease.deploy_targets.admin, true);
 assert.equal(
+  classifyRelease(["M\tdrizzle/seeds/public-content.json"], base).risk,
+  "automatic",
+);
+assert.equal(
+  classifyRelease(["M\tdrizzle/seeds/unreviewed.json"], base).risk,
+  "unknown",
+);
+assert.equal(
   classifyRelease(["M\tapps/admin/src/pages/inbox.astro"], base).risk,
   "automatic",
 );

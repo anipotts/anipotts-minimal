@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "c1bd6a4e27172eecbbc1c79ec688c5c511abaad6206022a790cd0c28bb472067";
+  "d8ad0931a6c72802350ab4dfe92baf890894d88cb62d43b365854df0332e6665";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -22,9 +22,13 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
         "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
       paragraphs: [
         "i build with agents and write about the systems that keep the work coherent.",
-        "business insider has covered how i work. previously, i worked on real-time agent i/o at structured ai and our bad habit.",
+        "business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
       ],
       mention_keys: [
+        "build",
+        "agents",
+        "write",
+        "systems",
         "businessInsider",
         "structuredAi",
         "yCombinatorF25",

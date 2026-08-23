@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import { formatDate, writingSlug, type Writing } from "../lib/content";
 
 interface Props {
@@ -10,32 +11,70 @@ const slug = writingSlug(item);
 const { title, summary, published_at, tags } = item.data;
 ---
 
-<a href={`/writing/${slug}`} class="row-link">
-  <span class="row-title">{title}</span>
-  <span class="row-meta mono">
-    {published_at && <span>{formatDate(published_at)}</span>}
-    {tags.slice(0, 4).map((t) => <span>{t}</span>)}
+<a href={`/writing/${slug}`} class="card writing-card">
+  <span class="head">
+    <span class="title">{title}</span>
+    <Icon name="ph:arrow-bend-right-up" class="affordance" />
   </span>
-  <span class="row-dek">{summary}</span>
+  <span class="sub">{summary}</span>
+  <span class="meta mono">
+    {published_at && <span>{formatDate(published_at)}</span>}
+    {tags.slice(0, 4).map((t) => <span>{t.toLowerCase()}</span>)}
+  </span>
 </a>
 
-<style>
-  .row-link {
+<style is:global>
+  .writing-card {
     display: flex;
     flex-direction: column;
-    gap: var(--s-1);
+    gap: var(--s-2);
+    text-decoration: none;
+    transition: background 0.2s;
   }
 
-  .row-meta {
+  .writing-card:hover {
+    background: var(--accent-soft);
+  }
+
+  .writing-card .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .writing-card .title {
+    font-family: var(--display);
+    font-size: var(--p-h2);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    font-synthesis: none;
+  }
+
+  .writing-card .affordance {
+    color: var(--ink-muted);
+    flex-shrink: 0;
+    transition:
+      color 0.2s,
+      transform 0.2s;
+  }
+
+  .writing-card:hover .affordance {
+    color: var(--interactive);
+    transform: translate(0.14em, -0.14em);
+  }
+
+  .writing-card .sub {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+  }
+
+  .writing-card .meta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
+    color: var(--ink-muted);
     font-size: 0.8rem;
-    color: var(--ink-muted);
-  }
-
-  .row-dek {
-    color: var(--ink-muted);
-    font-size: var(--p-small);
   }
 </style>

@@ -33,8 +33,10 @@ export {
 export {
   homepageSummaryText,
   normalizeHomepageContent,
+  segmentHomepageSummaryParagraph,
   validateHomepageContent,
 } from "./homepage.js";
+export type { HomepageInlineSummarySegment } from "./homepage.js";
 export { parseMarkdownBlocks } from "./markdown.js";
 export { analyzePublicCopy } from "./public-copy.js";
 

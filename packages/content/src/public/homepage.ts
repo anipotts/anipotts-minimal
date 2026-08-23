@@ -13,6 +13,97 @@ import {
   HOME_SECTION_ORDER,
 } from "./defaults.js";
 
+export type HomepageInlineSummarySegment =
+  | { kind: "text"; text: string }
+  | { kind: "mention"; key: string; text: string; suffix?: string };
+
+const wordCharacter = /[\p{L}\p{N}_]/u;
+
+function escapeRegularExpression(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function findMention(
+  paragraph: string,
+  label: string,
+  cursor: number,
+): { index: number; length: number } | undefined {
+  const matcher = new RegExp(escapeRegularExpression(label), "giu");
+  matcher.lastIndex = cursor;
+  let match = matcher.exec(paragraph);
+
+  while (match) {
+    const index = match.index;
+    const matchedText = match[0];
+    const before = paragraph[index - 1];
+    const after = paragraph[index + matchedText.length];
+    const beginsWithWord = wordCharacter.test(matchedText[0] ?? "");
+    const endsWithWord = wordCharacter.test(matchedText.at(-1) ?? "");
+    const touchesWordBefore =
+      beginsWithWord && wordCharacter.test(before ?? "");
+    const touchesWordAfter = endsWithWord && wordCharacter.test(after ?? "");
+
+    if (!touchesWordBefore && !touchesWordAfter) {
+      return { index, length: matchedText.length };
+    }
+    match = matcher.exec(paragraph);
+  }
+
+  return undefined;
+}
+
+export function segmentHomepageSummaryParagraph(
+  paragraph: string,
+  mentionKeys: string[],
+  mentions: Record<string, HomepageMention>,
+): HomepageInlineSummarySegment[] {
+  const candidates = mentionKeys
+    .flatMap((key) => (mentions[key] ? [{ key, mention: mentions[key] }] : []))
+    .sort((a, b) => b.mention.label.length - a.mention.label.length);
+  const segments: HomepageInlineSummarySegment[] = [];
+  let cursor = 0;
+
+  while (cursor < paragraph.length) {
+    const next = candidates
+      .flatMap((candidate) => {
+        const match = findMention(paragraph, candidate.mention.label, cursor);
+        return match ? [{ ...candidate, ...match }] : [];
+      })
+      .sort(
+        (a, b) =>
+          a.index - b.index || b.mention.label.length - a.mention.label.length,
+      )[0];
+
+    if (!next) {
+      segments.push({ kind: "text", text: paragraph.slice(cursor) });
+      break;
+    }
+
+    if (next.index > cursor) {
+      segments.push({
+        kind: "text",
+        text: paragraph.slice(cursor, next.index),
+      });
+    }
+
+    const labelEnd = next.index + next.length;
+    const suffixMatch = paragraph.slice(labelEnd).match(/^[),.;:!?]+/);
+    const mentionSegment = {
+      kind: "mention" as const,
+      key: next.key,
+      text: paragraph.slice(next.index, labelEnd),
+    };
+    segments.push(
+      suffixMatch?.[0]
+        ? { ...mentionSegment, suffix: suffixMatch[0] }
+        : mentionSegment,
+    );
+    cursor = labelEnd + (suffixMatch?.[0].length ?? 0);
+  }
+
+  return segments;
+}
+
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === "string" ? value : fallback;
 }
@@ -67,9 +158,12 @@ function normalizeSection(
   }
 
   if (Array.isArray(source.paragraphs)) {
-    normalized.paragraphs = source.paragraphs
+    const paragraphs = source.paragraphs
       .filter((paragraph): paragraph is string => typeof paragraph === "string")
-      .map((paragraph) => paragraph.trim());
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+    normalized.paragraphs =
+      paragraphs.length > 0 ? paragraphs : fallback.paragraphs;
   } else if (fallback.paragraphs !== undefined) {
     normalized.paragraphs = fallback.paragraphs;
   }

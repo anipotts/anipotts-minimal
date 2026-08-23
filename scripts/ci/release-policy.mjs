@@ -32,6 +32,7 @@ const KNOWN_SAFE_ROOTS = [
   /^apps\/(?:admin|www)\//,
   /^packages\//,
   /^content\/public\//,
+  /^drizzle\/seeds\/public-content\.json$/,
   /^scripts\//,
   /^config\//,
   /^drizzle\/migrations\//,

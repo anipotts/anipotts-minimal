@@ -4,20 +4,21 @@
   --brand-dark-background: #080b10;
   --brand-elevated-surface: #11151d;
   --brand-action: #61abea;
+  --brand-light-surface-elevated: #6eb2ec;
   --brand-primary-text: #f7faff;
   --brand-muted-text: #abb2be;
 
   --color-background: var(--brand-action);
-  --color-surface: #0b1220;
-  --color-surface-elevated: #111b2e;
+  --color-surface: var(--brand-action);
+  --color-surface-elevated: var(--brand-light-surface-elevated);
   --color-text: #ffffff;
-  --color-text-muted: #cbd5e1;
-  --color-action: var(--brand-action);
-  --color-action-ink: #07111a;
-  --color-border: color-mix(in srgb, white 18%, transparent);
-  --color-border-strong: color-mix(in srgb, white 36%, transparent);
+  --color-text-muted: color-mix(in srgb, white 78%, transparent);
+  --color-action: #ffffff;
+  --color-action-ink: var(--brand-action);
+  --color-border: color-mix(in srgb, white 24%, transparent);
+  --color-border-strong: color-mix(in srgb, white 48%, transparent);
   --color-focus: #ffffff;
-  --color-accent-soft: color-mix(in srgb, var(--brand-action) 18%, transparent);
+  --color-accent-soft: color-mix(in srgb, white 14%, transparent);
 
   --space-1: 0.5rem;
   --space-2: 0.75rem;
