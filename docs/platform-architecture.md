@@ -175,7 +175,6 @@ Primary workflows:
 | --------------------- | -------------------------------------------------------- |
 | `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
 | `security-review.yml` | local static checks for sensitive path changes on PR     |
-| `agent-automerge.yml` | merge green agent PRs and dispatch exact deploy targets  |
 | `deploy.yml`          | deploy explicit targets only                             |
 | `smoke.yml`           | manual route proof for public and admin targets          |
 
@@ -195,9 +194,7 @@ Rules:
   workflow-dispatch only for rollback while passkey proof is incomplete.
 - `packages/lib` and `packages/brand` changes deploy `www` only because
   `apps/admin` does not depend on them.
-- `agent-automerge.yml` and `deploy.yml` both use
-  `scripts/ci/compute-deploy-targets.mjs`; target rules should not be duplicated
-  in workflow-local path filters.
+- `release-policy.mjs` owns target classification for CI and deployment.
 - `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
   `pnpm test:public-routes` keeps deploy smoke, manual smoke, and content proof
   aligned on the public route set: `/`, `/newsletter`, `/newsletter/archive`,

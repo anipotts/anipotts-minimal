@@ -1,6 +1,6 @@
 # trustworthy releases
 
-The repository has one release classifier and five GitHub workflows. CI proves
+The repository has one release classifier and four GitHub workflows. CI proves
 the current pull request head. Merging remains an explicit native Codex action
 bound to that same head.
 
@@ -8,19 +8,15 @@ bound to that same head.
 
 - `Build, lint, typecheck, test`
 - `Security Review`
-- `Migration Preflight`
 
 `main` must be current before merge and unresolved review conversations must be
-closed. GitHub enforces all three checks for administrators too. The release
+closed. GitHub enforces both checks for administrators too. The release
 classifier still identifies protected and unknown changes, but it does not ask
 for a duplicate comment, label, review, or receipt.
 
-The retained merge-readiness workflow is read-only. It never merges, edits a
-pull request, or creates an approval label. After the required checks pass, an
-agent uses one exact-head native merge command. This keeps normal work moving
-from chat while the consequential shared-history effect remains visible in the
-Codex approval surface. Deployable files use a PR. Manual deployment is limited
-to Ani, the exact supplied main SHA, and the main branch.
+After the required checks pass, an agent uses one exact-head native merge
+command. Deployable files use a PR. Manual deployment is limited to Ani, the
+exact supplied main SHA, and the main branch.
 
 ## release classes
 
@@ -33,9 +29,9 @@ new or removed routes, cron, queues, Durable Objects, outbound workers, secrets
 contracts, destructive SQL, data rewrites, and the release policy or migration
 manifest themselves. An unclassified path fails closed.
 
-The classifier emits affected targets, D1 impact, migration consumers, risk,
-approval need, release ID, and exact source SHA. CI and deployment use the same
-module.
+The classifier emits affected targets, D1 impact, migration consumers, release
+ID, and exact source SHA. GitHub owns branch checks, migration tooling owns D1
+safety, and native approval owns consequential effects.
 
 ## D1 boundary
 
@@ -67,11 +63,11 @@ be a no-op.
 
 ## production sequence
 
-Production releases queue in one concurrency group. They revalidate the exact
-`main` SHA, classify targets, block schema drift, capture a D1 bookmark when
-needed, apply eligible migrations, deploy affected consumers, and run the
-shared smoke implementation. Health responses must report the expected commit
-and schema version.
+Production releases queue in one concurrency group. They verify the exact
+`main` SHA, compare the desired source with each known deployed source, classify
+targets, apply eligible migrations when present, deploy affected consumers,
+and run the shared smoke implementation. Health responses report the expected
+commit and schema version. Deployment does not repeat the full PR suite.
 
 Application rollback is limited to releases without a migration. A failed
 migration release stops and keeps D1 unchanged after the failed file rollback.
