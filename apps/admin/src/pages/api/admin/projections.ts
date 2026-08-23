@@ -1,11 +1,8 @@
-import {
-  loadAdminControlSnapshot,
-  type AdminControlDatabase,
-} from "@anipotts/lib/admin-control";
+import { loadAdminControlSnapshot } from "@anipotts/lib/admin-control";
 
 export async function GET({ locals }: { locals: App.Locals }) {
   const snapshot = import.meta.env.DEV
-    ? await loadDevelopmentSnapshot(locals.runtime?.env.DB)
+    ? await loadDevelopmentSnapshot()
     : await loadAdminControlSnapshot(locals.runtime?.env.DB);
 
   return Response.json(snapshot, {
@@ -15,8 +12,8 @@ export async function GET({ locals }: { locals: App.Locals }) {
   });
 }
 
-async function loadDevelopmentSnapshot(db: AdminControlDatabase) {
+async function loadDevelopmentSnapshot() {
   const { adminControlFixtureData } =
     await import("@anipotts/lib/admin-control/dev-fixtures");
-  return loadAdminControlSnapshot(db, adminControlFixtureData);
+  return loadAdminControlSnapshot(null, adminControlFixtureData);
 }

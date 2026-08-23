@@ -40,6 +40,13 @@ for (const file of fixtureConsumers) {
     /await import\(/,
     `${relative(root, file)} must load development fixtures dynamically`,
   );
+  if (source.includes("loadAdminControlSnapshot")) {
+    assert.match(
+      source,
+      /loadAdminControlSnapshot\(null,\s*adminControlFixtureData\)/,
+      `${relative(root, file)} must not let a local D1 binding shadow explicit development fixtures`,
+    );
+  }
 }
 
 const runtimeOperatorWork = readFileSync(

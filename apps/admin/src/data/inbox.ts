@@ -472,7 +472,7 @@ async function loadControlSnapshot(db: AdminControlDatabase) {
   if (import.meta.env.DEV) {
     const { adminControlFixtureData } =
       await import("@anipotts/lib/admin-control/dev-fixtures");
-    return loadAdminControlSnapshot(db, adminControlFixtureData);
+    return loadAdminControlSnapshot(null, adminControlFixtureData);
   }
   return loadAdminControlSnapshot(db);
 }
