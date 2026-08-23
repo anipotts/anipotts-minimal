@@ -1,12 +1,9 @@
-import {
-  adminControlContracts,
-  fixtureEvents,
-  fixtureProjections,
-} from "./fixtures";
+import { adminControlContracts } from "./contracts";
 import {
   ADMIN_EVENT_SCHEMA_VERSION,
   type AdminCapabilityState,
   type AdminControlProjections,
+  type AdminControlFixtureData,
   type AdminControlSnapshot,
   type AdminControlSourceMode,
   type AdminDeployState,
@@ -61,6 +58,7 @@ const AUTH_CONTRACT = {
 
 export async function loadAdminControlSnapshot(
   db: AdminControlDatabase,
+  fixture?: AdminControlFixtureData,
 ): Promise<AdminControlSnapshot> {
   const [
     events,
@@ -72,14 +70,14 @@ export async function loadAdminControlSnapshot(
     serviceRegistryView,
     knowledgeCards,
   ] = await Promise.all([
-    readAdminEvents(db),
-    readInboxItems(db),
-    readPieceStates(db),
-    readFleetStatus(db),
-    readDeployStates(db),
-    readCapabilityStates(db),
-    readServiceRegistryView(db),
-    readKnowledgeCards(db),
+    readAdminEvents(db, fixture?.events),
+    readInboxItems(db, fixture?.projections.inbox_items),
+    readPieceStates(db, fixture?.projections.piece_states),
+    readFleetStatus(db, fixture?.projections.fleet_status),
+    readDeployStates(db, fixture?.projections.deploy_states),
+    readCapabilityStates(db, fixture?.projections.capability_states),
+    readServiceRegistryView(db, fixture?.projections.service_registry_view),
+    readKnowledgeCards(db, fixture?.projections.knowledge_cards),
   ]);
 
   const reads = [
@@ -106,7 +104,10 @@ export async function loadAdminControlSnapshot(
   return {
     schema_version: ADMIN_EVENT_SCHEMA_VERSION,
     generated_at: new Date().toISOString(),
-    source_mode: sourceMode(reads.map((read) => read.usedFallback)),
+    source_mode: sourceMode(
+      db,
+      reads.map((read) => read.usedFallback),
+    ),
     sync: SYNC_CONTRACT,
     retention: RETENTION_CONTRACT,
     auth: AUTH_CONTRACT,
@@ -119,6 +120,7 @@ export async function loadAdminControlSnapshot(
 
 async function readAdminEvents(
   db: AdminControlDatabase,
+  fallback: AdminEventEnvelope[] | undefined,
 ): Promise<ReadResult<AdminEventEnvelope>> {
   return readRows(
     db,
@@ -129,7 +131,7 @@ async function readAdminEvents(
        FROM admin_events
       ORDER BY ts DESC
       LIMIT 80`,
-    fixtureEvents,
+    fallback,
     (row) => ({
       schema_version: toNumber(row.schema_version, ADMIN_EVENT_SCHEMA_VERSION),
       event_id: asString(row.event_id),
@@ -152,6 +154,7 @@ async function readAdminEvents(
 
 async function readInboxItems(
   db: AdminControlDatabase,
+  fallback: AdminInboxItem[] | undefined,
 ): Promise<ReadResult<AdminInboxItem>> {
   return readRows(
     db,
@@ -168,7 +171,7 @@ async function readInboxItems(
           ELSE 3
         END,
         COALESCE(expires_at, last_seen_at, '9999-12-31T23:59:59Z') ASC`,
-    fixtureProjections.inbox_items,
+    fallback,
     (row) => ({
       item_id: asString(row.item_id),
       dedupe_key: asString(row.dedupe_key),
@@ -195,6 +198,7 @@ async function readInboxItems(
 
 async function readPieceStates(
   db: AdminControlDatabase,
+  fallback: AdminPieceState[] | undefined,
 ): Promise<ReadResult<AdminPieceState>> {
   return readRows(
     db,
@@ -203,7 +207,7 @@ async function readPieceStates(
             source_refs, updated_at
        FROM admin_piece_states
       ORDER BY updated_at DESC`,
-    fixtureProjections.piece_states,
+    fallback,
     (row) => ({
       piece_id: asString(row.piece_id),
       dedupe_key: asString(row.dedupe_key),
@@ -219,6 +223,7 @@ async function readPieceStates(
 
 async function readFleetStatus(
   db: AdminControlDatabase,
+  fallback: AdminFleetStatus[] | undefined,
 ): Promise<ReadResult<AdminFleetStatus>> {
   return readRows(
     db,
@@ -227,7 +232,7 @@ async function readFleetStatus(
             updated_at
        FROM admin_fleet_status
       ORDER BY updated_at DESC`,
-    fixtureProjections.fleet_status,
+    fallback,
     (row) => ({
       subject_id: asString(row.subject_id),
       kind: asString(row.kind),
@@ -244,6 +249,7 @@ async function readFleetStatus(
 
 async function readDeployStates(
   db: AdminControlDatabase,
+  fallback: AdminDeployState[] | undefined,
 ): Promise<ReadResult<AdminDeployState>> {
   return readRows(
     db,
@@ -252,7 +258,7 @@ async function readDeployStates(
             updated_at
        FROM admin_deploy_states
       ORDER BY COALESCE(last_run_at, updated_at) DESC`,
-    fixtureProjections.deploy_states,
+    fallback,
     (row) => ({
       deploy_id: asString(row.deploy_id),
       target: asString(row.target),
@@ -268,6 +274,7 @@ async function readDeployStates(
 
 async function readCapabilityStates(
   db: AdminControlDatabase,
+  fallback: AdminCapabilityState[] | undefined,
 ): Promise<ReadResult<AdminCapabilityState>> {
   return readRows(
     db,
@@ -276,7 +283,7 @@ async function readCapabilityStates(
             event_refs, updated_at
        FROM admin_capability_states
       ORDER BY machine ASC, capability_id ASC`,
-    fixtureProjections.capability_states,
+    fallback,
     (row) => ({
       capability_id: asString(row.capability_id),
       machine: asString(row.machine),
@@ -292,6 +299,7 @@ async function readCapabilityStates(
 
 async function readServiceRegistryView(
   db: AdminControlDatabase,
+  fallback: AdminServiceRegistryViewItem[] | undefined,
 ): Promise<ReadResult<AdminServiceRegistryViewItem>> {
   return readRows(
     db,
@@ -302,7 +310,7 @@ async function readServiceRegistryView(
        FROM service_registry
       ORDER BY COALESCE(updated_at, created_at) DESC
       LIMIT 80`,
-    fixtureProjections.service_registry_view,
+    fallback,
     (row) => ({
       service_id: asString(row.service_id),
       name: asString(row.name),
@@ -318,6 +326,7 @@ async function readServiceRegistryView(
 
 async function readKnowledgeCards(
   db: AdminControlDatabase,
+  fallback: AdminKnowledgeCard[] | undefined,
 ): Promise<ReadResult<AdminKnowledgeCard>> {
   return readRows(
     db,
@@ -330,7 +339,7 @@ async function readKnowledgeCards(
             event_refs, indexed_at
        FROM admin_knowledge_cards
       ORDER BY domain ASC, title ASC`,
-    fixtureProjections.knowledge_cards,
+    fallback,
     (row) => ({
       card_id: asString(row.card_id),
       entity_ref: asString(row.entity_ref),
@@ -375,10 +384,17 @@ async function readRows<T>(
   db: AdminControlDatabase,
   tableName: string,
   query: string,
-  fallback: T[],
+  fallback: T[] | undefined,
   mapRow: (row: Record<string, unknown>) => T,
 ): Promise<ReadResult<T>> {
   if (!db) {
+    if (!fallback) {
+      return {
+        rows: [],
+        usedFallback: false,
+        error: "d1 unavailable; no development fixture was requested",
+      };
+    }
     return {
       rows: fallback,
       usedFallback: true,
@@ -405,7 +421,11 @@ async function readRows<T>(
   }
 }
 
-function sourceMode(fallbacks: boolean[]): AdminControlSourceMode {
+function sourceMode(
+  db: AdminControlDatabase,
+  fallbacks: boolean[],
+): AdminControlSourceMode {
+  if (!db && fallbacks.every((fallback) => !fallback)) return "disconnected";
   if (fallbacks.every(Boolean)) return "fixture";
   if (fallbacks.some(Boolean)) return "mixed";
   return "d1";

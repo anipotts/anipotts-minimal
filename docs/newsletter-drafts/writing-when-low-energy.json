@@ -9,7 +9,7 @@
   "audience": "builders who want a content system that still works on low-energy days",
   "source_refs": [
     {
-      "ref": "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+      "ref": "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
       "use": "existing post about specific prompts and next-day continuity"
     },
     {
@@ -37,7 +37,7 @@
       "kind": "opening",
       "body": "some days i do not want to write. that should not break the system.",
       "source_refs": [
-        "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md"
+        "content/public/writing/stop-ending-your-day-with-fix-the-bug.md"
       ]
     },
     {
@@ -70,7 +70,7 @@
       "claim": "the existing writing post argues for specific next-session prompts",
       "status": "source_backed",
       "source_refs": [
-        "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md"
+        "content/public/writing/stop-ending-your-day-with-fix-the-bug.md"
       ]
     }
   ],

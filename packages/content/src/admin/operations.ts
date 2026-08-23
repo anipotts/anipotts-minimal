@@ -323,71 +323,69 @@ type DetailOperationSeed = {
 };
 
 const REMAINING_DETAIL_OPERATION_CREATED_AT = "2026-06-29T07:45:00Z";
-const REMAINING_DETAIL_OPERATION_MIGRATION =
-  "drizzle/migrations/0032_seed_remaining_detail_page_content.sql";
 const REMAINING_DETAIL_OPERATION_SEEDS: DetailOperationSeed[] = [
   {
     kind: "project",
     slug: "chainedchat",
     title: "chainedchat",
     published: true,
-    sourceFile: "apps/www/src/content/projects/chainedchat.md",
+    sourceFile: "content/public/projects/chainedchat.md",
   },
   {
     kind: "project",
     slug: "claude-code-tips",
     title: "claude code tips",
     published: true,
-    sourceFile: "apps/www/src/content/projects/claude-code-tips.md",
+    sourceFile: "content/public/projects/claude-code-tips.md",
   },
   {
     kind: "project",
     slug: "habittracker-obh",
     title: "artist scouting dashboard",
     published: false,
-    sourceFile: "apps/www/src/content/projects/habittracker-obh.md",
+    sourceFile: "content/public/projects/habittracker-obh.md",
   },
   {
     kind: "project",
     slug: "imessage-mcp",
     title: "imessage mcp",
     published: true,
-    sourceFile: "apps/www/src/content/projects/imessage-mcp.md",
+    sourceFile: "content/public/projects/imessage-mcp.md",
   },
   {
     kind: "project",
     slug: "nyu-purity-test",
     title: "nyu purity test",
     published: true,
-    sourceFile: "apps/www/src/content/projects/nyu-purity-test.md",
+    sourceFile: "content/public/projects/nyu-purity-test.md",
   },
   {
     kind: "project",
     slug: "options-pricing-sensitivity",
     title: "options pricing + sensitivity analysis",
     published: true,
-    sourceFile: "apps/www/src/content/projects/options-pricing-sensitivity.md",
+    sourceFile: "content/public/projects/options-pricing-sensitivity.md",
   },
   {
     kind: "project",
     slug: "pgi-research-platform",
     title: "pgi research portal",
     published: true,
-    sourceFile: "apps/www/src/content/projects/pgi-research-platform.md",
+    sourceFile: "content/public/projects/pgi-research-platform.md",
   },
   {
     kind: "project",
     slug: "quantercise-extension",
     title: "mental math extension",
     published: true,
-    sourceFile: "apps/www/src/content/projects/quantercise-extension.md",
+    sourceFile: "content/public/projects/quantercise-extension.md",
   },
   {
     kind: "project",
     slug: "saeshify",
     title: "saeshify",
     published: true,
-    sourceFile: "apps/www/src/content/projects/saeshify.md",
+    sourceFile: "content/public/projects/saeshify.md",
   },
   {
     kind: "writing",
@@ -395,21 +393,21 @@ const REMAINING_DETAIL_OPERATION_SEEDS: DetailOperationSeed[] = [
     title: "i built a monitor for my claude code sessions",
     published: true,
     sourceFile:
-      "apps/www/src/content/writing/i-built-a-monitor-for-my-claude-code-sessions.md",
+      "content/public/writing/i-built-a-monitor-for-my-claude-code-sessions.md",
   },
   {
     kind: "writing",
     slug: "jpegmafia-is-our-kanye-west",
     title: "jpegmafia is our kanye west",
     published: false,
-    sourceFile: "apps/www/src/content/writing/jpegmafia-is-our-kanye-west.md",
+    sourceFile: "content/public/writing/jpegmafia-is-our-kanye-west.md",
   },
   {
     kind: "writing",
     slug: "search-will-be-dead-by-2030",
     title: "search will be dead by 2030",
     published: true,
-    sourceFile: "apps/www/src/content/writing/search-will-be-dead-by-2030.md",
+    sourceFile: "content/public/writing/search-will-be-dead-by-2030.md",
   },
   {
     kind: "writing",
@@ -417,7 +415,7 @@ const REMAINING_DETAIL_OPERATION_SEEDS: DetailOperationSeed[] = [
     title: 'stop ending your day with "fix the bug"',
     published: true,
     sourceFile:
-      "apps/www/src/content/writing/stop-ending-your-day-with-fix-the-bug.md",
+      "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
   },
 ];
 
@@ -448,13 +446,13 @@ function detailOperationFromSeed(seed: DetailOperationSeed): ContentOperation {
     kind: "content_draft",
     surface: "public_site",
     route,
-    source_ref: `D1 page_content:${pageKey} seeded by ${REMAINING_DETAIL_OPERATION_MIGRATION}, fallback ${seed.sourceFile}`,
+    source_ref: seed.sourceFile,
     field_path: `${collection}.${seed.slug.replaceAll("-", "_")}.detail`,
-    current_value_ref: `${seed.published ? "published" : "unpublished"}_page_content:${pageKey}`,
-    proposed_value: `Review future edits to the ${seed.title} title, summary, body, links, tags, and visibility through preview-only operations before any save path edits page_content.`,
+    current_value_ref: `${seed.published ? "published" : "unpublished"}_canonical_source:${pageKey}`,
+    proposed_value: `Review future edits to the ${seed.title} title, summary, body, links, tags, and visibility before proposing a source-controlled canonical update.`,
     status: "previewed",
     risk_level: seed.published ? "medium" : "low",
-    authority_state: "detail_page_content_preview_only_no_write",
+    authority_state: "canonical_source_preview_only_no_write",
     required_approval_ids: [],
     allowed_actions: ["render_preview", "request_review"],
     forbidden_actions: forbiddenActions,
@@ -472,7 +470,7 @@ function detailOperationFromSeed(seed: DetailOperationSeed): ContentOperation {
     updated_at: REMAINING_DETAIL_OPERATION_CREATED_AT,
     expires_at: "2026-07-29T07:45:00Z",
     rollback_ref: `source_markdown:${seed.sourceFile}`,
-    reviewer_note: `${seed.published ? "Published" : "Unpublished"} detail row seeded as preview metadata. No page_content write, source rewrite, external sync, send, schedule, or publish event is created.`,
+    reviewer_note: `${seed.published ? "Published" : "Unpublished"} canonical detail is projected as preview metadata. No source rewrite, external sync, send, schedule, or publish event is created.`,
   };
 }
 
@@ -483,7 +481,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary and @anipotts/content/public homepageSummaryText fallback",
+      "content/public/pages/home.md sections.intro.paragraphs projected through @anipotts/content/public",
     field_path: "homepage.summary",
     current_value_ref: "source_fallback",
     proposed_value:
@@ -512,12 +510,11 @@ export const contentOperationTemplates: ContentOperation[] = [
     kind: "content_draft",
     surface: "newsletter",
     route: "/newsletter",
-    source_ref:
-      "D1 page_content:newsletter, fallback @anipotts/content/public DEFAULT_NEWSLETTER_CONTENT and component props",
+    source_ref: "content/public/pages/newsletter.md",
     field_path: "newsletter.subscribe_copy",
     current_value_ref: "source_fallback",
     proposed_value:
-      "Render headline, deck, CTA, success text, error text, footer text, and archive URL from a newsletter page_content record before any page_content write or publish path exists.",
+      "Render headline, deck, CTA, response text, footer text, and archive URL from canonical content before any publish path exists.",
     status: "previewed",
     risk_level: "medium",
     authority_state: "source_truth_resolved_preview_only",
@@ -542,7 +539,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     kind: "content_draft",
     surface: "public_site",
     route: "/making",
-    source_ref: "apps/www/src/content/projects/*.md frontmatter",
+    source_ref: "content/public/projects/*.md frontmatter",
     field_path: "projects.card_fields",
     current_value_ref: "source_markdown_frontmatter",
     proposed_value:
@@ -569,7 +566,7 @@ export const contentOperationTemplates: ContentOperation[] = [
       "content.projects.frontmatter.schema",
       "admin.content.source-inventory",
     ],
-    evidence_uri: "repo://apps/www/src/content/projects",
+    evidence_uri: "repo://content/public/projects",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-28T00:00:00Z",
@@ -584,15 +581,14 @@ export const contentOperationTemplates: ContentOperation[] = [
     kind: "content_draft",
     surface: "public_site",
     route: "/projects/quantercise",
-    source_ref:
-      "D1 page_content:project:quantercise seeded by drizzle/migrations/0031_seed_detail_page_content.sql, fallback apps/www/src/content/projects/quantercise.md",
+    source_ref: "content/public/projects/quantercise.md",
     field_path: "projects.quantercise.detail",
-    current_value_ref: "published_page_content:project:quantercise",
+    current_value_ref: "published_canonical_source:project:quantercise",
     proposed_value:
-      "Review future edits to the Quantercise title, summary, body, links, tags, and visibility through preview-only operations before any save path edits page_content.",
+      "Review future edits to the Quantercise title, summary, body, links, tags, and visibility before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "medium",
-    authority_state: "detail_page_content_preview_only_no_write",
+    authority_state: "canonical_source_preview_only_no_write",
     required_approval_ids: [],
     allowed_actions: ["render_preview", "request_review"],
     forbidden_actions: [
@@ -611,23 +607,22 @@ export const contentOperationTemplates: ContentOperation[] = [
       "content.projects.quantercise.page-content",
       "admin.content.preview.d1",
     ],
-    evidence_uri: "repo://apps/www/src/content/projects/quantercise.md",
+    evidence_uri: "repo://content/public/projects/quantercise.md",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-29T07:30:00Z",
     updated_at: "2026-06-29T07:30:00Z",
     expires_at: "2026-07-29T07:30:00Z",
-    rollback_ref:
-      "source_markdown:apps/www/src/content/projects/quantercise.md",
+    rollback_ref: "source_markdown:content/public/projects/quantercise.md",
     reviewer_note:
-      "First project detail row seeded as preview metadata. No source rewrite, page_content write, or publish event is created.",
+      "Project detail is projected as preview metadata. No source rewrite or publish event is created.",
   },
   {
     operation_id: "content-draft-writing-newsletter-backfill-2026-06-28",
     kind: "content_draft",
     surface: "newsletter",
     route: "/writing",
-    source_ref: "apps/www/src/content/writing/*.md frontmatter and body",
+    source_ref: "content/public/writing/*.md frontmatter and body",
     field_path: "writing.newsletter_backfill",
     current_value_ref: "source_markdown_collection",
     proposed_value:
@@ -650,7 +645,7 @@ export const contentOperationTemplates: ContentOperation[] = [
       "content.newsletter.backfill.plan",
       "admin.content.source-inventory",
     ],
-    evidence_uri: "repo://apps/www/src/content/writing",
+    evidence_uri: "repo://content/public/writing",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-28T00:00:00Z",
@@ -665,16 +660,15 @@ export const contentOperationTemplates: ContentOperation[] = [
     kind: "content_draft",
     surface: "public_site",
     route: "/writing/saturdays-are-for-claude-code",
-    source_ref:
-      "D1 page_content:writing:saturdays-are-for-claude-code seeded by drizzle/migrations/0031_seed_detail_page_content.sql, fallback apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+    source_ref: "content/public/writing/saturdays-are-for-claude-code.md",
     field_path: "writing.saturdays_are_for_claude_code.detail",
     current_value_ref:
-      "published_page_content:writing:saturdays-are-for-claude-code",
+      "published_canonical_source:writing:saturdays-are-for-claude-code",
     proposed_value:
-      "Review future edits to the Saturdays are for Claude Code title, summary, body, source link, tags, and publish visibility through preview-only operations before any save path edits page_content.",
+      "Review future edits to the Saturdays are for Claude Code title, summary, body, source link, tags, and visibility before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "medium",
-    authority_state: "detail_page_content_preview_only_no_write",
+    authority_state: "canonical_source_preview_only_no_write",
     required_approval_ids: [],
     allowed_actions: ["render_preview", "request_review"],
     forbidden_actions: [
@@ -695,16 +689,16 @@ export const contentOperationTemplates: ContentOperation[] = [
       "admin.content.preview.d1",
     ],
     evidence_uri:
-      "repo://apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+      "repo://content/public/writing/saturdays-are-for-claude-code.md",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-29T07:30:00Z",
     updated_at: "2026-06-29T07:30:00Z",
     expires_at: "2026-07-29T07:30:00Z",
     rollback_ref:
-      "source_markdown:apps/www/src/content/writing/saturdays-are-for-claude-code.md",
+      "source_markdown:content/public/writing/saturdays-are-for-claude-code.md",
     reviewer_note:
-      "First writing detail row seeded as preview metadata. No source rewrite, send, page_content write, or publish event is created.",
+      "Writing detail is projected as preview metadata. No source rewrite, send, or publish event is created.",
   },
   ...remainingDetailContentOperationTemplates,
   {
@@ -712,12 +706,11 @@ export const contentOperationTemplates: ContentOperation[] = [
     kind: "content_draft",
     surface: "public_site",
     route: "/making",
-    source_ref:
-      "D1 page_content:making.buckets and page copy, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
+    source_ref: "content/public/pages/making.md",
     field_path: "projects.making_index_copy_and_buckets",
-    current_value_ref: "published_page_content:making",
+    current_value_ref: "published_canonical_source:making",
     proposed_value:
-      "Review future edits to the /making title, meta description, hero title, hero summary, and project bucket labels/notes through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /making title, meta description, hero copy, and project bucket labels before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -741,19 +734,18 @@ export const contentOperationTemplates: ContentOperation[] = [
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "published_page_content:making",
+    rollback_ref: "source_markdown:content/public/pages/making.md",
   },
   {
     operation_id: "content-draft-projects-index-copy-2026-06-29",
     kind: "content_draft",
     surface: "public_site",
     route: "/projects",
-    source_ref:
-      "D1 page_content:projects, fallback @anipotts/content/public DEFAULT_PROJECTS_INDEX_CONTENT",
+    source_ref: "content/public/pages/projects.md",
     field_path: "projects.archive_index_copy",
-    current_value_ref: "published_page_content:projects",
+    current_value_ref: "published_canonical_source:projects",
     proposed_value:
-      "Review future edits to the /projects title, meta description, hero title, hero summary, and making link through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /projects title, meta description, hero copy, and making link before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -777,19 +769,18 @@ export const contentOperationTemplates: ContentOperation[] = [
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "published_page_content:projects",
+    rollback_ref: "source_markdown:content/public/pages/projects.md",
   },
   {
     operation_id: "content-draft-writing-index-copy-2026-06-29",
     kind: "content_draft",
     surface: "public_site",
     route: "/writing",
-    source_ref:
-      "D1 page_content:writing, fallback @anipotts/content/public DEFAULT_WRITING_INDEX_CONTENT",
+    source_ref: "content/public/pages/writing.md",
     field_path: "writing.index_copy",
-    current_value_ref: "published_page_content:writing",
+    current_value_ref: "published_canonical_source:writing",
     proposed_value:
-      "Review future edits to the /writing title, meta description, hero summary, and search placeholder through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /writing title, meta description, hero summary, and search placeholder before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -813,19 +804,18 @@ export const contentOperationTemplates: ContentOperation[] = [
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "published_page_content:writing",
+    rollback_ref: "source_markdown:content/public/pages/writing.md",
   },
   {
     operation_id: "content-draft-newsletter-archive-copy-2026-06-29",
     kind: "content_draft",
     surface: "newsletter",
     route: "/newsletter/archive",
-    source_ref:
-      "D1 page_content:newsletter_archive, fallback @anipotts/content/public DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
+    source_ref: "content/public/pages/newsletter_archive.md",
     field_path: "newsletter.archive_copy",
-    current_value_ref: "published_page_content:newsletter_archive",
+    current_value_ref: "published_canonical_source:newsletter_archive",
     proposed_value:
-      "Review future edits to the /newsletter/archive title, meta description, section label, hero title, and hero summary through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /newsletter/archive title, meta description, section label, hero title, and hero summary before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -847,19 +837,18 @@ export const contentOperationTemplates: ContentOperation[] = [
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "published_page_content:newsletter_archive",
+    rollback_ref: "source_markdown:content/public/pages/newsletter_archive.md",
   },
   {
     operation_id: "content-draft-orchestrating-hero-copy-2026-06-29",
     kind: "content_draft",
     surface: "public_site",
     route: "/orchestrating",
-    source_ref:
-      "D1 page_content:orchestrating, fallback @anipotts/content/public DEFAULT_ORCHESTRATING_CONTENT",
+    source_ref: "content/public/pages/orchestrating.md",
     field_path: "orchestrating.hero_sections_loop_tools",
-    current_value_ref: "published_page_content:orchestrating",
+    current_value_ref: "published_canonical_source:orchestrating",
     proposed_value:
-      "Review future edits to the /orchestrating hero, section labels, loop cards, and public-tool cards through preview-only operations before any save path edits page_content.",
+      "Review future edits to the /orchestrating hero, section labels, loop cards, and public-tool cards before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "medium",
     authority_state: "page_content_preview_only_no_write",
@@ -883,7 +872,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "published_page_content:orchestrating",
+    rollback_ref: "source_markdown:content/public/pages/orchestrating.md",
     reviewer_note:
       "Expanded from hero-only copy to a fuller page_content contract. Still inert preview metadata only.",
   },

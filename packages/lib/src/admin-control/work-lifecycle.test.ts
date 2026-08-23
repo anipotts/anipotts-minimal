@@ -6,7 +6,6 @@ import {
   createArchiveProposalBatches,
   emptyWorkLifecycleSnapshot,
   evaluateArchiveCandidate,
-  fixtureWorkLifecycle,
   loadWorkLifecycleSnapshot,
   promoteSourcesToEntity,
   restoreArchiveReceipt,
@@ -16,6 +15,7 @@ import {
   type WorkLifecycleSnapshot,
   type WorkSourceImport,
 } from "./index";
+import { fixtureWorkLifecycle } from "./dev-work-lifecycle-fixtures";
 
 const LATER = "2026-07-22T17:00:00.000Z";
 
@@ -312,6 +312,14 @@ describe("work lifecycle", () => {
     expect(failed.source_mode).toBe("adapter");
     expect(failed.entities).toEqual([]);
     expect(failed.errors).toEqual(["lifecycle adapter read failed"]);
+  });
+
+  it("reports missing lifecycle adapters as disconnected", async () => {
+    const snapshot = await loadWorkLifecycleSnapshot(null);
+
+    expect(snapshot.source_mode).toBe("disconnected");
+    expect(snapshot.entities).toEqual([]);
+    expect(snapshot.errors).toEqual(["lifecycle adapter unavailable"]);
   });
 
   it("rejects forbidden raw fields from sanitized lifecycle data", () => {

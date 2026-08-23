@@ -308,9 +308,9 @@ export const overviewCards: DashboardCard[] = [
   },
   {
     title: "content inventory",
-    status: "D1 page_content rows are visible with source fallback",
+    status: "canonical public content is visible with D1 draft history",
     risk: "low",
-    next: "keep public content readable while editor writes are proven separately",
+    next: "keep review proposals separate from source-controlled publication",
     href: "/content",
     action: "open content",
   },
@@ -344,26 +344,26 @@ export const contentRows: QueueRow[] = [
   {
     title: "homepage intro",
     owner: "apps/www",
-    status: "published D1 page_content with source fallback",
-    evidence: "D1 page_content:home and @anipotts/content/public",
+    status: "canonical source projected into Admin",
+    evidence: "content/public/pages/home.md",
   },
   {
     title: "projects",
     owner: "apps/www",
-    status: "published D1 detail rows with source fallback",
-    evidence: "D1 page_content:project:* and apps/www/src/content/projects",
+    status: "canonical project files projected into Admin",
+    evidence: "content/public/projects/*.md",
   },
   {
     title: "writing",
     owner: "apps/www",
-    status: "published D1 detail rows with source fallback",
-    evidence: "D1 page_content:writing:* and apps/www/src/content/writing",
+    status: "canonical writing files projected into Admin",
+    evidence: "content/public/writing/*.md",
   },
   {
     title: "newsletter",
     owner: "apps/www",
-    status: "D1 page content, subscribe surface, and retained send worker",
-    evidence: "D1 page_content:newsletter and workers/newsletter",
+    status: "canonical copy, subscribe surface, and retained send worker",
+    evidence: "content/public/pages/newsletter.md and workers/newsletter",
   },
 ];
 

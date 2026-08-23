@@ -80,7 +80,7 @@ function recordFromRaw(
     title,
     route,
     status,
-    source_ref: `apps/www/src/content/${surface}/${file}.md`,
+    source_ref: `content/public/${surface}/${file}.md`,
     summary:
       asString(frontmatter.summary) ||
       asString(frontmatter.subtitle) ||

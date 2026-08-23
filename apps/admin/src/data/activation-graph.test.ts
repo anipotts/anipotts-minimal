@@ -7,7 +7,7 @@ import {
   testInboxItem as item,
   testInboxReadState as inbox,
 } from "./inbox.test-fixtures";
-import { operatorWorkFixture } from "./operator-work";
+import { operatorWorkFixture } from "./dev-operator-work";
 import {
   defineMissingReference,
   inspectorDestination,

@@ -4,12 +4,9 @@ import Shell from "../../layouts/Shell.astro";
 import CmsMarkdown from "../../components/CmsMarkdown.astro";
 import { Icon } from "astro-icon/components";
 import { projectSlug, visibleProjects } from "../../lib/content";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
 const requestedSlug = Astro.params.slug ?? "";
 const project = (await visibleProjects()).find(
   (candidate) => projectSlug(candidate) === requestedSlug,

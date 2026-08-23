@@ -1,78 +1,9 @@
 #!/usr/bin/env node
 
 import { readFileSync } from "node:fs";
+import { computeDeployTargets, DEPLOY_TARGETS } from "./release-policy.mjs";
 
-const TARGETS = [
-  "www",
-  "admin",
-  "admin_solid",
-  "ingest",
-  "newsletter",
-  "state",
-  "weekly_email",
-];
-
-function isIgnoredForDeploy(file) {
-  return (
-    file.endsWith(".md") ||
-    file.startsWith("docs/") ||
-    file.startsWith(".github/ISSUE_TEMPLATE/") ||
-    file === "LICENSE"
-  );
-}
-
-export function computeDeployTargets(files) {
-  const targets = Object.fromEntries(TARGETS.map((target) => [target, false]));
-
-  for (const file of files) {
-    if (!file || isIgnoredForDeploy(file)) continue;
-    const isAdminControlLib = file.startsWith(
-      "packages/lib/src/admin-control/",
-    );
-
-    if (
-      file.startsWith("apps/www/") ||
-      (file.startsWith("packages/lib/") && !isAdminControlLib) ||
-      file.startsWith("packages/content/src/public/") ||
-      file === "packages/content/package.json" ||
-      file === "packages/content/src/index.ts" ||
-      file.startsWith("packages/styles/") ||
-      file.startsWith("packages/types/")
-    ) {
-      targets.www = true;
-    }
-
-    if (
-      file.startsWith("apps/admin/") ||
-      file.startsWith("packages/content/") ||
-      isAdminControlLib
-    ) {
-      targets.admin = true;
-    }
-
-    // apps/admin-solid is retained as a temporary rollback surface only.
-    // It should not auto-deploy from agent PRs or path-filtered main pushes.
-    // Use the explicit deploy workflow input if rollback deployment is needed.
-
-    if (file.startsWith("workers/ingest/")) {
-      targets.ingest = true;
-    }
-
-    if (file.startsWith("workers/newsletter/")) {
-      targets.newsletter = true;
-    }
-
-    if (file.startsWith("workers/state/")) {
-      targets.state = true;
-    }
-
-    if (file.startsWith("workers/weekly-email/")) {
-      targets.weekly_email = true;
-    }
-  }
-
-  return targets;
-}
+export { computeDeployTargets } from "./release-policy.mjs";
 
 function readFiles(path) {
   return readFileSync(path, "utf8")
@@ -82,7 +13,7 @@ function readFiles(path) {
 }
 
 function printGithubOutput(targets) {
-  for (const target of TARGETS) {
+  for (const target of DEPLOY_TARGETS) {
     console.log(`${target}=${targets[target] ? "true" : "false"}`);
   }
 }

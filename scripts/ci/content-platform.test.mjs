@@ -2,7 +2,16 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import {
   buildPasskeyProofItems,
   countProofEntries,
@@ -74,26 +83,22 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_external",
 ]);
 
-const homepageSummary =
-  DEFAULT_HOMEPAGE_CONTENT.sections.intro.rich_summary ?? [];
-assert.equal(homepageSummary.length, 2);
-assert.deepEqual(homepageSummary[0], {
-  segments: [
-    { kind: "text", text: "i " },
-    { kind: "mention", key: "build" },
-    { kind: "text", text: " with " },
-    { kind: "mention", key: "agents" },
-    { kind: "text", text: " and " },
-    { kind: "mention", key: "write" },
-    { kind: "text", text: " about the " },
-    { kind: "mention", key: "systems" },
-    { kind: "text", text: " that keep the work coherent." },
-  ],
-});
-assert.deepEqual(homepageSummary[1]?.segments[0], {
-  kind: "mention",
-  key: "businessInsider",
-});
+assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.paragraphs, [
+  "i build with agents and write about the systems that keep the work coherent.",
+  "business insider has covered how i work. previously, i worked on real-time agent i/o at structured ai and our bad habit.",
+]);
+assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.mention_keys, [
+  "businessInsider",
+  "structuredAi",
+  "yCombinatorF25",
+  "badHabit",
+  "atlanticRecords",
+]);
+assert.equal(
+  DEFAULT_HOMEPAGE_CONTENT.sections.intro.rich_summary,
+  undefined,
+  "canonical homepage content must not duplicate prose as rich segments",
+);
 
 assert.deepEqual(
   REQUIRED_PASSKEY_AUDIT_EVENTS,
@@ -230,6 +235,88 @@ const contentEditorSource = readFileSync(
   "apps/admin/src/lib/content-editor.ts",
   "utf8",
 );
+const sourceContentModule = readFileSync(
+  "apps/admin/src/data/source-content.ts",
+  "utf8",
+);
+const prettierIgnore = readFileSync(".prettierignore", "utf8");
+const adminContentInventory = readFileSync(
+  "packages/content/src/admin/content.ts",
+  "utf8",
+);
+for (const surface of ["projects", "writing"]) {
+  assert.ok(
+    sourceContentModule.includes(`../../../../content/public/${surface}/*.md`),
+    `Admin ${surface} inventory must read the canonical public content tree`,
+  );
+}
+assert.equal(
+  sourceContentModule.includes("../../../www/src/content/"),
+  false,
+  "Admin must not read the removed public content collections",
+);
+assert.match(
+  prettierIgnore,
+  /^content\/public\/$/m,
+  "canonical public Markdown must remain byte-stable during formatting",
+);
+assert.doesNotMatch(
+  prettierIgnore,
+  /^apps\/www\/src\/content\/$/m,
+  "Prettier must not retain the removed public content path",
+);
+assert.match(
+  adminContentInventory,
+  /content\/public\/pages\/newsletter_archive\.md/,
+  "Admin newsletter inventory must reference the canonical filename",
+);
+
+const alternateSlugRoot = mkdtempSync(join(tmpdir(), "public-content-slug-"));
+try {
+  cpSync("content/public", join(alternateSlugRoot, "content/public"), {
+    recursive: true,
+  });
+  mkdirSync(join(alternateSlugRoot, "content/public/projects"), {
+    recursive: true,
+  });
+  writeFileSync(
+    join(alternateSlugRoot, "content/public/projects/source-name.md"),
+    `---\nslug: route-name\ntitle: Alternate route\nvisible: true\n---\nSource identity follows the file.\n`,
+  );
+  execFileSync(
+    process.execPath,
+    [resolve("scripts/content/generate-public-content.mjs")],
+    { cwd: alternateSlugRoot, stdio: "ignore" },
+  );
+  const alternateAdminProjection = JSON.parse(
+    readFileSync(
+      join(
+        alternateSlugRoot,
+        "packages/content/generated/admin-public-content.json",
+      ),
+      "utf8",
+    ),
+  );
+  const alternateSeed = JSON.parse(
+    readFileSync(
+      join(alternateSlugRoot, "drizzle/seeds/public-content.json"),
+      "utf8",
+    ),
+  );
+  const expectedSource = "content/public/projects/source-name.md";
+  const projected = alternateAdminProjection.records.find(
+    (record) => record.entity_id === "public-project:route-name",
+  );
+  const seeded = alternateSeed.rows.find(
+    (row) => row.page_key === "project:route-name",
+  );
+  assert.equal(projected.source_ref, expectedSource);
+  assert.match(projected.source_hash, /^[a-f0-9]{64}$/);
+  assert.equal(seeded.source_ref, expectedSource);
+  assert.equal(seeded.source_hash, projected.source_hash);
+} finally {
+  rmSync(alternateSlugRoot, { recursive: true, force: true });
+}
 assert.ok(
   contentEditorSource.includes("publish_batch_required"),
   "content editor publish must fail closed when D1 batch semantics are unavailable",
@@ -331,7 +418,7 @@ assert.equal(failedRuntime.error, "bad json");
 
 const sourceRecords = [
   ...recordsFromSourceModules("projects", {
-    "/repo/apps/www/src/content/projects/hidden-lab.md": `---
+    "/repo/content/public/projects/hidden-lab.md": `---
 title: Hidden Lab
 summary: Internal project page
 visible: false
@@ -340,7 +427,7 @@ sort_order: 2
 `,
   }),
   ...recordsFromSourceModules("writing", {
-    "/repo/apps/www/src/content/writing/control-plane.md": `---
+    "/repo/content/public/writing/control-plane.md": `---
 title: Control Plane
 summary: Agents need authority, proof, and state.
 status: published
@@ -369,10 +456,7 @@ const hiddenProject = sourceRecords.find(
 );
 assert.ok(hiddenProject, "hidden project source record must be parsed");
 assert.equal(hiddenProject.status, "hidden");
-assert.equal(
-  hiddenProject.source_ref,
-  "apps/www/src/content/projects/hidden-lab.md",
-);
+assert.equal(hiddenProject.source_ref, "content/public/projects/hidden-lab.md");
 assert.equal(hiddenProject.body_state, "frontmatter only");
 assert.equal(hiddenProject.body_preview, "no markdown body yet");
 
@@ -393,13 +477,10 @@ assert.ok(
   "source content parser must expose a markdown body preview",
 );
 
-assert.equal(
-  contentInventorySource.mode,
-  "read_only_static_plus_d1_page_content",
-);
+assert.equal(contentInventorySource.mode, "canonical_source_plus_d1_drafts");
 assert.equal(
   rootContentInventorySource.mode,
-  "read_only_static_plus_d1_page_content",
+  "canonical_source_plus_d1_drafts",
 );
 
 const orchestratingContent = normalizeOrchestratingPageContent({
@@ -465,7 +546,7 @@ assert.equal(
     ],
     { cwd: "apps/admin", encoding: "utf8" },
   ),
-  "read_only_static_plus_d1_page_content",
+  "canonical_source_plus_d1_drafts",
   "apps/admin must be able to import @anipotts/content/admin from the built package export",
 );
 

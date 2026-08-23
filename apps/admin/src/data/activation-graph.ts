@@ -355,7 +355,7 @@ function isWorkProjectionCurrent(
   work: OperatorWorkProjection,
   now: Date,
 ): boolean {
-  if (work.mode === "tracked_fixture") return false;
+  if (work.mode !== "live") return false;
   const generatedAt = Date.parse(work.generated_at);
   if (!Number.isFinite(generatedAt)) return false;
   const ageSeconds = (now.getTime() - generatedAt) / 1000;
@@ -403,33 +403,49 @@ function buildWorkSourceReference(
   work: OperatorWorkProjection,
   state: "current" | "stale",
 ): SemanticReference<"source"> {
+  const disconnected = work.mode === "disconnected";
+  const fixture = work.mode === "tracked_fixture";
   return defineKnownReference({
     id: "operator-work:source",
     kind: "source",
     label: "work source",
-    value: "tracked operator work fixture",
-    summary:
-      "The operator work projection is a retained fixture and cannot establish live activity.",
+    value: disconnected
+      ? "work source disconnected"
+      : fixture
+        ? "tracked operator work fixture"
+        : "connected operator work projection",
+    summary: disconnected
+      ? "No current operator work source is connected. No fixture activity was substituted."
+      : fixture
+        ? "The operator work projection is a retained fixture and cannot establish live activity."
+        : "The operator work projection comes from the connected read source.",
     source_state: state === "current" ? "verified" : "stale",
-    checked_at: work.reconciled_at,
-    authority: { kind: "recorded", label: "operator work fixture" },
+    checked_at: disconnected ? null : work.reconciled_at,
+    authority: disconnected
+      ? { kind: "none", label: "operator work source unavailable" }
+      : { kind: "recorded", label: "operator work source" },
     provenance: {
       source: work.projection_id,
       source_ref: work.projection_id,
-      method: "fixture",
-      evidence_refs: [work.projection_id],
+      method: fixture ? "fixture" : disconnected ? "inference" : "projection",
+      evidence_refs: disconnected ? [] : [work.projection_id],
     },
     confidence: {
-      level: "medium",
-      explanation:
-        "The fixture preserves prior observations but does not prove current runtime state.",
+      level: disconnected ? "low" : fixture ? "medium" : "high",
+      explanation: disconnected
+        ? "No source-backed work projection is currently available."
+        : fixture
+          ? "The fixture preserves prior observations but does not prove current runtime state."
+          : "The connected source supplied the current work projection.",
     },
     sensitivity: "internal",
     validity: { valid_from: work.generated_at, valid_until: null },
     retrieval_policy: {
       mode: "inspect",
       refresh_href: null,
-      explanation: "Inspect the fixture boundary and last reconciliation time.",
+      explanation: disconnected
+        ? "Connect a governed work source before showing current activity."
+        : "Inspect the source boundary and last reconciliation time.",
     },
     destination: inspectorDestination("inspect work source"),
   });

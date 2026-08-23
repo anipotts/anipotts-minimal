@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "surface": "apps/admin-solid",
+  "state": "retained_rollback",
+  "retire_ready": false,
+  "recovery_ref": null,
+  "proofs": {
+    "route_parity": {
+      "status": "pending",
+      "ref": null
+    },
+    "native_auth": {
+      "status": "pending",
+      "ref": null
+    },
+    "mobile_qa": {
+      "status": "pending",
+      "ref": null
+    },
+    "rollback_rehearsal": {
+      "status": "pending",
+      "ref": null
+    },
+    "production_proof": {
+      "status": "pending",
+      "ref": null
+    },
+    "recovery_ref": {
+      "status": "pending",
+      "ref": null
+    }
+  }
+}

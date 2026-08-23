@@ -1,0 +1,79 @@
+/* anipotts semantic color and spacing contract */
+
+:root {
+  --brand-dark-background: #080b10;
+  --brand-elevated-surface: #11151d;
+  --brand-action: #61abea;
+  --brand-primary-text: #f7faff;
+  --brand-muted-text: #abb2be;
+
+  --color-background: var(--brand-action);
+  --color-surface: #0b1220;
+  --color-surface-elevated: #111b2e;
+  --color-text: #ffffff;
+  --color-text-muted: #cbd5e1;
+  --color-action: var(--brand-action);
+  --color-action-ink: #07111a;
+  --color-border: color-mix(in srgb, white 18%, transparent);
+  --color-border-strong: color-mix(in srgb, white 36%, transparent);
+  --color-focus: #ffffff;
+  --color-accent-soft: color-mix(in srgb, var(--brand-action) 18%, transparent);
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4rem;
+  --space-8: 6rem;
+
+  --radius-control: 0.5rem;
+  --radius-surface: 0.5rem;
+  --measure-reading: 65ch;
+
+  /* compatibility aliases while application CSS is consolidated */
+  --brand-dark-blue: var(--brand-dark-background);
+  --brand-blue: var(--brand-action);
+  --brand-white: var(--brand-primary-text);
+  --bg: var(--color-background);
+  --surface: var(--color-surface-elevated);
+  --ink: var(--color-text);
+  --ink-muted: var(--color-text-muted);
+  --interactive: var(--color-action);
+  --interactive-ink: var(--color-action-ink);
+  --focus: var(--color-focus);
+  --accent: var(--color-action);
+  --accent-soft: var(--color-accent-soft);
+  --border: var(--color-border);
+  --border-strong: var(--color-border-strong);
+  --brand-display: var(--color-text);
+  --s-1: var(--space-1);
+  --s-2: var(--space-2);
+  --s-3: var(--space-3);
+  --s-4: var(--space-4);
+  --s-5: var(--space-5);
+  --s-6: var(--space-6);
+  --s-7: var(--space-7);
+  --s-8: var(--space-8);
+  --measure: var(--measure-reading);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: var(--brand-dark-background);
+  --color-surface: var(--brand-elevated-surface);
+  --color-surface-elevated: var(--brand-elevated-surface);
+  --color-text: var(--brand-primary-text);
+  --color-text-muted: var(--brand-muted-text);
+  --color-action: var(--brand-action);
+  --color-action-ink: #07111a;
+  --color-border: color-mix(in srgb, var(--brand-muted-text) 22%, transparent);
+  --color-border-strong: color-mix(
+    in srgb,
+    var(--brand-muted-text) 42%,
+    transparent
+  );
+  --color-accent-soft: color-mix(in srgb, var(--brand-action) 18%, transparent);
+  --brand-display: var(--brand-primary-text);
+}

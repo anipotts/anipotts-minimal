@@ -1,0 +1,30 @@
+@font-face {
+  font-family: "AP Structural";
+  src: url("../ap-structural-v0.1.0-candidate.1/fonts/APStructuralDisplayBlack-v0.1.0-candidate.1.woff2")
+    format("woff2");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --font-interface:
+    "Instrument Sans Variable", "Instrument Sans", -apple-system,
+    BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-display: "AP Structural", "Urbanist", var(--font-interface);
+  --font-code:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo,
+    monospace;
+
+  --sans: var(--font-interface);
+  --display: var(--font-display);
+  --code: var(--font-code);
+  --mono: var(--font-code);
+}
+
+.brand-display {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 900;
+  font-synthesis: none;
+}

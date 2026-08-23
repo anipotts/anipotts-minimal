@@ -95,6 +95,10 @@ const current = Astro.url.pathname;
     display: none;
   }
 
+  .brand-mark-light {
+    filter: brightness(0) invert(1);
+  }
+
   :global(html[data-theme="dark"]) .brand-mark-light {
     display: none;
   }

@@ -144,7 +144,7 @@ export interface WorkLifecycleReceipt {
 export interface WorkLifecycleSnapshot {
   schema_version: number;
   generated_at: string;
-  source_mode: "fixture" | "adapter";
+  source_mode: "fixture" | "adapter" | "disconnected";
   adapter_version: string;
   sources: WorkSourceRecord[];
   entities: WorkEntity[];
@@ -237,11 +237,18 @@ const MAX_TEXT_LENGTH = 800;
 
 export async function loadWorkLifecycleSnapshot(
   adapter: WorkLifecycleAdapter | null | undefined,
-  fixture: WorkLifecycleSnapshot,
+  fixture?: WorkLifecycleSnapshot,
 ): Promise<WorkLifecycleSnapshot> {
   if (!adapter) {
-    assertValidWorkLifecycle(fixture);
-    return cloneSnapshot(fixture);
+    if (fixture) {
+      assertValidWorkLifecycle(fixture);
+      return cloneSnapshot(fixture);
+    }
+    return emptyWorkLifecycleSnapshot(
+      "unavailable",
+      "lifecycle adapter unavailable",
+      "disconnected",
+    );
   }
   try {
     const snapshot = await adapter.readSnapshot();
@@ -262,11 +269,12 @@ export async function loadWorkLifecycleSnapshot(
 export function emptyWorkLifecycleSnapshot(
   adapterVersion = "unavailable",
   error?: string,
+  sourceMode: WorkLifecycleSnapshot["source_mode"] = "adapter",
 ): WorkLifecycleSnapshot {
   return {
     schema_version: WORK_LIFECYCLE_SCHEMA_VERSION,
     generated_at: new Date(0).toISOString(),
-    source_mode: "adapter",
+    source_mode: sourceMode,
     adapter_version: adapterVersion,
     sources: [],
     entities: [],

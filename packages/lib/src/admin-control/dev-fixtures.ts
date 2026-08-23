@@ -1,7 +1,6 @@
 import {
   ADMIN_EVENT_SCHEMA_VERSION,
   type AdminCapabilityState,
-  type AdminControlContracts,
   type AdminControlProjections,
   type AdminDeployState,
   type AdminEventEnvelope,
@@ -11,7 +10,6 @@ import {
   type AdminPieceState,
   type AdminServiceRegistryViewItem,
 } from "./types";
-import { knowledgeRetrievalContract } from "./knowledge";
 import {
   buildSentMailAwareness,
   buildSentMailMetadata,
@@ -56,98 +54,6 @@ const raybanPaymentFollowUp = buildSentMailAwareness(raybanSentMail, {
     last_seen_at: "2026-07-09T00:00:00.000Z",
   },
 });
-
-export const adminControlContracts: AdminControlContracts = {
-  event_fields: [
-    "schema_version",
-    "event_id",
-    "dedupe_key",
-    "source",
-    "provider",
-    "account",
-    "actor",
-    "kind",
-    "ts",
-    "privacy",
-    "title",
-    "summary",
-    "href",
-    "payload_ref",
-    "created_by",
-  ],
-  inbox_card_fields: [
-    "item_id",
-    "dedupe_key",
-    "event_refs",
-    "domain",
-    "entity_ref",
-    "attention_kind",
-    "source",
-    "account",
-    "title",
-    "summary",
-    "href",
-    "status",
-    "urgency",
-    "owner",
-    "action_kind",
-    "expires_at",
-    "last_seen_at",
-  ],
-  sent_mail_metadata_fields: [
-    "account",
-    "sent_ref",
-    "subject",
-    "sent_at",
-    "has_attachments",
-    "href",
-  ],
-  sent_mail_card_policy: {
-    dedupe: "gmail-message-id-derived-ref",
-    completed_obligation: "event-only",
-    followups: "separate-inbox-items",
-    sync: "refresh-on-open-plus-light-polling",
-    raw_identifiers: "omitted",
-    snippet: "omitted",
-  },
-  piece_states: [
-    "idea",
-    "draft",
-    "review",
-    "export-ready",
-    "publish-ready",
-    "published",
-    "archived",
-  ],
-  legal_piece_cycles: ["review -> draft", "published -> draft"],
-  knowledge_card_fields: [
-    "card_id",
-    "entity_ref",
-    "domain",
-    "kind",
-    "title",
-    "summary",
-    "source_system",
-    "source_locator",
-    "source_native_id",
-    "canonical_host",
-    "canonical_path",
-    "sensitivity",
-    "reveal_policy",
-    "freshness_state",
-    "observed_at",
-    "stale_after_seconds",
-    "content_hash",
-    "proof_refs",
-    "lineage_refs",
-    "related_card_ids",
-    "retrieval_instructions",
-    "context_budget_tokens",
-    "event_refs",
-    "indexed_at",
-  ],
-  knowledge_retrieval: knowledgeRetrievalContract,
-};
 
 export const fixtureEvents: AdminEventEnvelope[] = [
   {
@@ -298,7 +204,7 @@ export const fixturePieceStates: AdminPieceState[] = [
     title: "first newsletter on agent control planes",
     state: "draft",
     channels: ["newsletter", "writing", "x-thread"],
-    source_refs: ["apps/www/src/content/writing"],
+    source_refs: ["content/public/writing"],
     updated_at: NOW,
   },
   {
@@ -780,3 +686,8 @@ export const fixtureProjections: AdminControlProjections = {
   service_registry_view: fixtureServiceRegistryView,
   knowledge_cards: fixtureKnowledgeCards,
 };
+
+export const adminControlFixtureData = {
+  events: fixtureEvents,
+  projections: fixtureProjections,
+} satisfies import("./types").AdminControlFixtureData;

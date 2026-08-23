@@ -5,6 +5,8 @@ summary: business insider interviewed me about ai usage limits. the forced pause
 tags: [claude-code, press, workflow, building]
 status: published
 published_at: 2026-04-13
+artifact_url: https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4
+artifact_label: source
 ---
 
 The original Business Insider piece is here: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4).

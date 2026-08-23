@@ -33,6 +33,14 @@ const FORBIDDEN_PAGE_SEGMENTS = new Set([
 
 const FORBIDDEN_SOURCE_PATTERNS = [
   {
+    pattern: /@anipotts\/lib\/(?:cms|db)\b/,
+    message: "apps/www must render canonical content without D1 CMS adapters",
+  },
+  {
+    pattern: /\b(?:fetchPageContent|fetchPublishedPageContentByPrefix|setDB)\b/,
+    message: "apps/www must not load public render content from D1",
+  },
+  {
     pattern: /@anipotts\/content\/admin\b/,
     message: "apps/www must not import admin content package entrypoints",
   },

@@ -12,6 +12,7 @@ import {
   loadAdminControlSnapshot,
   type AdminControlDatabase,
   type AdminInboxItem as AdminControlInboxItem,
+  type AdminControlSourceMode,
 } from "@anipotts/lib/admin-control";
 import { carouselPosts, carouselSeries, carouselSummary } from "./carousels";
 import { loadRuntimeOverlayResponse } from "./runtime";
@@ -117,7 +118,7 @@ export async function readAdminInbox(
 ): Promise<AdminInboxReadState> {
   const now = new Date().toISOString();
   const [control, proof, operations, pageContent, runtime] = await Promise.all([
-    loadAdminControlSnapshot(db),
+    loadControlSnapshot(db),
     readProofEntries(db),
     readContentOperationStore(db),
     readPageContentInventoryStore(db),
@@ -131,7 +132,11 @@ export async function readAdminInbox(
         ? "verified"
         : "stale";
   const controlReferenceMethod: SemanticProvenanceMethod =
-    control.source_mode === "d1" ? "projection" : "fixture";
+    control.source_mode === "d1"
+      ? "projection"
+      : control.source_mode === "fixture"
+        ? "fixture"
+        : "inference";
   const runtimeReferenceState: "verified" | "stale" =
     runtime.available && runtime.generated_at ? "verified" : "stale";
 
@@ -461,6 +466,15 @@ export async function readAdminInbox(
       errors: control.errors,
     }),
   };
+}
+
+async function loadControlSnapshot(db: AdminControlDatabase) {
+  if (import.meta.env.DEV) {
+    const { adminControlFixtureData } =
+      await import("@anipotts/lib/admin-control/dev-fixtures");
+    return loadAdminControlSnapshot(null, adminControlFixtureData);
+  }
+  return loadAdminControlSnapshot(db);
 }
 
 function isOpenProjectionItem(
@@ -902,7 +916,7 @@ function buildDeadlineReference(
 
 function inboxReadSourceReference(input: {
   mode: "ready" | "partial";
-  sourceMode: "d1" | "fixture" | "mixed";
+  sourceMode: AdminControlSourceMode;
   checkedAt: string;
   errors: string[];
 }): SemanticReference<"source"> {
@@ -912,7 +926,9 @@ function inboxReadSourceReference(input: {
     method:
       input.sourceMode === "d1"
         ? ("projection" as const)
-        : ("fixture" as const),
+        : input.sourceMode === "fixture"
+          ? ("fixture" as const)
+          : ("inference" as const),
     evidence_refs: [] as string[],
   };
   if (input.mode === "ready" && input.sourceMode === "d1") {
@@ -950,7 +966,9 @@ function inboxReadSourceReference(input: {
     summary:
       state === "unchecked"
         ? "Current providers were not checked; tracked fixtures remain visible as stale values."
-        : `${input.errors.length} required source read${input.errors.length === 1 ? "" : "s"} did not establish a complete current projection.`,
+        : input.sourceMode === "disconnected"
+          ? "The current source is disconnected. No fixture data was substituted."
+          : `${input.errors.length} required source read${input.errors.length === 1 ? "" : "s"} did not establish a complete current projection.`,
     source_state: state,
     checked_at: state === "unchecked" ? null : input.checkedAt,
     authority: { kind: "none", label: "complete source authority unavailable" },

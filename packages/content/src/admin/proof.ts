@@ -169,12 +169,12 @@ async function readContentOperationProof(
       id: "proof.content-operation.d1",
       kind: "repo",
       status: isReady ? "verified" : "pending",
-      title: "content state is D1-backed with publish proof",
-      summary: `published_page_content=${publishedPages}/${REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS}, content_records=${records}, content_draft_operations=${drafts}/${REQUIRED_CONTENT_DRAFT_OPERATIONS}, content_publish_events=${events}. Public route copy renders from published page_content; draft rows stay private until selected-draft publish records a proof event.`,
+      title: "content draft history is available",
+      summary: `historical_page_content=${publishedPages}/${REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS}, content_records=${records}, content_draft_operations=${drafts}/${REQUIRED_CONTENT_DRAFT_OPERATIONS}, content_publish_events=${events}. Public routes render canonical repository content; D1 retains private draft and migration history.`,
       evidence_uri: "D1 anipotts-db page_content and content operation tables",
       redaction: "metadata_only",
       next_safe_action: isReady
-        ? "Use passkey-protected drafts and publish only selected published-visibility drafts with proof."
+        ? "Use passkey-protected drafts and convert approved changes into source-controlled canonical updates with proof."
         : contentOperationNextAction(publishedPages, records, drafts, events),
     };
   } catch (error) {
@@ -200,15 +200,15 @@ function contentOperationNextAction(
   _events: number,
 ): string {
   if (records > 0) {
-    return "Review content_records before enabling any public runtime read from draft records.";
+    return "Review content_records without enabling public runtime reads from draft records.";
   }
   if (publishedPages < REQUIRED_PUBLISHED_PAGE_CONTENT_ROWS) {
-    return "Seed the remaining public route copy into published page_content rows.";
+    return "Reconcile historical page_content rows against canonical repository content.";
   }
   if (drafts < REQUIRED_CONTENT_DRAFT_OPERATIONS) {
-    return "Seed draft operations for every D1-backed public copy surface.";
+    return "Seed draft operations for every canonical public copy surface.";
   }
-  return "Use selected-draft publish only; keep source rewrites, deploys, sends, and content_records writes disabled.";
+  return "Keep draft review separate from source updates, deploys, sends, and content_records writes.";
 }
 
 async function readDurableProofEntries(

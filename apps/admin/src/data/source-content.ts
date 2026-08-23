@@ -4,7 +4,7 @@ import {
 } from "@anipotts/content/admin";
 
 const projectModules = import.meta.glob<string>(
-  "../../../www/src/content/projects/*.md",
+  "../../../../content/public/projects/*.md",
   {
     eager: true,
     import: "default",
@@ -13,7 +13,7 @@ const projectModules = import.meta.glob<string>(
 );
 
 const writingModules = import.meta.glob<string>(
-  "../../../www/src/content/writing/*.md",
+  "../../../../content/public/writing/*.md",
   {
     eager: true,
     import: "default",

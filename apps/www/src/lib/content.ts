@@ -1,15 +1,4 @@
 import { getCollection, type CollectionEntry } from "astro:content";
-import {
-  type CmsWritingContent,
-  cmsProjectPageKey,
-  cmsWritingPageKey,
-  normalizeCmsProject,
-  normalizeCmsWriting,
-} from "@anipotts/content/public";
-import {
-  fetchPageContent,
-  fetchPublishedPageContentByPrefix,
-} from "@anipotts/lib/cms";
 
 type ProjectEntry = CollectionEntry<"projects">;
 type WritingEntry = CollectionEntry<"writing">;
@@ -18,7 +7,7 @@ export interface Project {
   id: string;
   slug: string;
   body: string;
-  source: "markdown" | "cms";
+  source: "markdown";
   entry?: ProjectEntry;
   data: ProjectEntry["data"];
 }
@@ -27,7 +16,7 @@ export interface Writing {
   id: string;
   slug: string;
   body: string;
-  source: "markdown" | "cms";
+  source: "markdown";
   entry?: WritingEntry;
   data: WritingEntry["data"];
 }
@@ -37,156 +26,27 @@ export const projectSlug = (p: Project): string => p.slug;
 
 const HIDDEN_PUBLIC_PROJECTS = new Set(["habittracker-obh"]);
 
-function cmsLink(
-  links: { label: string; url: string }[],
-  labels: string[],
-): string | undefined {
-  const normalized = labels.map((label) => label.toLowerCase());
-  return links.find((link) => normalized.includes(link.label.toLowerCase()))
-    ?.url;
-}
-
-async function projectFromEntry(entry: ProjectEntry): Promise<Project> {
+function projectFromEntry(entry: ProjectEntry): Project {
   const slug = entry.data.slug ?? entry.id;
-  const page = await fetchPageContent(cmsProjectPageKey(slug));
-  if (!page) {
-    return {
-      id: entry.id,
-      slug,
-      body: entry.body ?? "",
-      source: "markdown",
-      entry,
-      data: entry.data,
-    };
-  }
-
-  const cms = normalizeCmsProject(page.content, {
-    slug,
-    title: entry.data.title,
-    status: entry.data.status,
-    year: entry.data.year,
-    range: entry.data.duration,
-    tags: entry.data.tags,
-    summary: entry.data.subtitle ?? entry.data.description,
-    body: entry.body || entry.data.description,
-    featured: entry.data.featured,
-    order: entry.data.sort_order,
-    visible: entry.data.visible,
-  });
-  const live = cmsLink(cms.links, ["live", "live site", "site"]);
-  const repo = cmsLink(cms.links, ["source", "repo", "github"]);
-
   return {
     id: entry.id,
-    slug: cms.slug,
-    body: cms.body,
-    source: "cms",
-    entry,
-    data: {
-      ...entry.data,
-      title: cms.title,
-      slug: cms.slug,
-      subtitle: cms.summary,
-      description: cms.body,
-      year: cms.year,
-      duration: cms.range,
-      status: cms.status,
-      featured: cms.featured,
-      visible: cms.visible,
-      sort_order: cms.order,
-      tags: cms.tags,
-      link_live: live,
-      link_repo: repo,
-    },
-  };
-}
-
-async function writingFromEntry(entry: WritingEntry): Promise<Writing> {
-  const slug = entry.data.slug ?? entry.id;
-  const page = await fetchPageContent(cmsWritingPageKey(slug));
-  if (!page) {
-    return {
-      id: entry.id,
-      slug,
-      body: entry.body ?? "",
-      source: "markdown",
-      entry,
-      data: entry.data,
-    };
-  }
-
-  const cms = normalizeCmsWriting(page.content, {
     slug,
-    title: entry.data.title,
-    date: entry.data.published_at?.toISOString().slice(0, 10) ?? "",
-    tags: entry.data.tags,
-    preview: entry.data.summary,
     body: entry.body ?? "",
-    visible: entry.data.status === "published",
-  });
-  const source = cms.sourceLinks[0];
-
-  return {
-    id: entry.id,
-    slug: cms.slug,
-    body: cms.body,
-    source: "cms",
+    source: "markdown",
     entry,
-    data: {
-      ...entry.data,
-      title: cms.title,
-      slug: cms.slug,
-      summary: cms.preview,
-      tags: cms.tags,
-      status: cms.visible ? "published" : "draft",
-      published_at: cms.visible
-        ? new Date(`${cms.date}T00:00:00.000Z`)
-        : undefined,
-      artifact_url: source?.url,
-      artifact_type:
-        source?.label === "repo" ||
-        source?.label === "gist" ||
-        source?.label === "demo" ||
-        source?.label === "screenshot" ||
-        source?.label === "recording"
-          ? source.label
-          : entry.data.artifact_type,
-    },
+    data: entry.data,
   };
 }
 
-function writingFromCmsPage(
-  page: Awaited<
-    ReturnType<typeof fetchPublishedPageContentByPrefix<CmsWritingContent>>
-  >[number],
-): Writing | null {
-  const cms = normalizeCmsWriting(page.content);
-  if (!cms.visible) return null;
-  const source = cms.sourceLinks[0];
-
+function writingFromEntry(entry: WritingEntry): Writing {
+  const slug = entry.data.slug ?? entry.id;
   return {
-    id: page.page_key,
-    slug: cms.slug,
-    body: cms.body,
-    source: "cms",
-    data: {
-      title: cms.title,
-      slug: cms.slug,
-      summary: cms.preview,
-      tags: cms.tags,
-      status: "published",
-      published_at: new Date(`${cms.date}T00:00:00.000Z`),
-      content_type: "article",
-      artifact_url: source?.url,
-      artifact_type:
-        source?.label === "repo" ||
-        source?.label === "gist" ||
-        source?.label === "demo" ||
-        source?.label === "screenshot" ||
-        source?.label === "recording"
-          ? source.label
-          : undefined,
-    },
+    id: entry.id,
+    slug,
+    body: entry.body ?? "",
+    source: "markdown",
+    entry,
+    data: entry.data,
   };
 }
 
@@ -195,16 +55,8 @@ export async function publishedWriting(): Promise<Writing[]> {
     "writing",
     (t) => t.data.status === "published",
   );
-  const all = await Promise.all(entries.map(writingFromEntry));
-  const markdownSlugs = new Set(all.map((item) => item.slug));
-  const cmsRows =
-    await fetchPublishedPageContentByPrefix<CmsWritingContent>("writing:");
-  const cmsOnly = cmsRows
-    .map(writingFromCmsPage)
-    .filter((item): item is Writing => Boolean(item))
-    .filter((item) => !markdownSlugs.has(item.slug));
-
-  return [...all, ...cmsOnly]
+  return entries
+    .map(writingFromEntry)
     .filter((item) => item.data.status === "published")
     .sort(
       (a, b) =>
@@ -215,8 +67,8 @@ export async function publishedWriting(): Promise<Writing[]> {
 
 export async function visibleProjects(): Promise<Project[]> {
   const entries = await getCollection("projects", (p) => p.data.visible);
-  const all = await Promise.all(entries.map(projectFromEntry));
-  return all
+  return entries
+    .map(projectFromEntry)
     .filter(
       (project) =>
         project.data.visible && !HIDDEN_PUBLIC_PROJECTS.has(project.slug),

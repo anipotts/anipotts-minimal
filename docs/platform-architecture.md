@@ -14,16 +14,16 @@ launchd templates must point at `/Users/anipotts`.
 
 ## target state
 
-| Surface        | Target                              | Status              | Next action                                           |
-| -------------- | ----------------------------------- | ------------------- | ----------------------------------------------------- |
-| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`           |
-| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access     |
-| current admin  | `apps/admin-solid`                  | manual rollback     | no auto-deploy; archive or delete after passkey proof |
-| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                             |
-| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                       |
-| workers        | `workers/*`                         | review individually | keep only production-required workers                 |
-| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables        |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated       |
+| Surface        | Target                              | Status              | Next action                                       |
+| -------------- | ----------------------------------- | ------------------- | ------------------------------------------------- |
+| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`       |
+| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access |
+| current admin  | `apps/admin-solid`                  | manual rollback     | satisfy the checked retirement contract           |
+| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                         |
+| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                   |
+| workers        | `workers/*`                         | review individually | keep only production-required workers             |
+| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables    |
+| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated   |
 
 ## current inventory
 
@@ -56,9 +56,9 @@ deploy target coverage, and live version history.
 | ------------------------------- | ------------------------------------------------------------------------ | ------------------------------- |
 | `packages/lib`                  | D1-backed CMS readers, db, data, services helpers                        | keep as runtime adapter layer   |
 | `packages/content`              | public content contracts, admin inventory, previews, parsers, and drafts | keep, expand toward D1 adapters |
-| `packages/styles`               | shared style tokens                                                      | keep                            |
+| `packages/brand`                | marks, fonts, semantic tokens, type roles, and motion                    | keep                            |
 | `packages/types`                | shared generated types                                                   | keep                            |
-| `packages/config`               | shared TypeScript, Tailwind, and PostCSS config                          | keep minimal shared config      |
+| `config/typescript`             | shared compiler policy without a publishable package boundary            | keep as repository config       |
 | `packages/control-plane-runner` | outbound ap-mini relay client, local journal, and proof outbox           | keep local, capability-gated    |
 
 ## route parity target
@@ -66,6 +66,14 @@ deploy target coverage, and live version history.
 The Astro admin replacement covers these live admin-solid routes. Keep them
 covered while passkey proof and Access removal are completed, then remove
 `apps/admin-solid`:
+
+`config/admin-solid-retirement.json` is the machine-checked retirement gate.
+Removal requires durable proof for route parity, native authentication, mobile
+QA, a rollback rehearsal, production behavior, and an immutable recovery ref.
+`pnpm test:admin-solid-retirement` keeps the app present and excluded from
+automatic deployment until all six proofs pass. Once they pass, the contract
+requires a dated `admin-solid-recovery-YYYY-MM-DD` tag and requires the active
+rollback app to be absent.
 
 `pnpm test:admin-routes` enforces the route files, admin navigation, deploy
 smoke list, manual smoke list, passkey proof route set, and full admin page/API
@@ -185,7 +193,7 @@ Rules:
   deploy both `www` and admin consumers.
 - `apps/admin-solid` changes do not auto-deploy. Its deploy job remains
   workflow-dispatch only for rollback while passkey proof is incomplete.
-- `packages/lib` and `packages/styles` changes deploy `www` only because
+- `packages/lib` and `packages/brand` changes deploy `www` only because
   `apps/admin` does not depend on them.
 - `agent-automerge.yml` and `deploy.yml` both use
   `scripts/ci/compute-deploy-targets.mjs`; target rules should not be duplicated
@@ -288,9 +296,9 @@ Rules:
     the admin app only owns the Vite raw-markdown import boundary.
 31. move public page content defaults, pure normalizers, validators, content key
     helpers, and homepage summary helpers into `@anipotts/content/public`.
-    Keep `@anipotts/lib/cms` as the D1-backed reader facade and compatibility
-    export. Public route consumers should import pure content shape contracts
-    from `@anipotts/content/public`; D1 readers stay in `@anipotts/lib/cms`.
+    Public routes render the generated canonical content contract and Astro
+    collections. `@anipotts/lib/cms` remains an Admin-side compatibility and D1
+    history adapter, not a public runtime source.
     Metadata-only source-ref refresh is covered by
     `drizzle/migrations/0029_update_public_content_contract_source_refs.sql`.
 32. expand `/orchestrating` page content from hero-only copy into structured

@@ -16,6 +16,14 @@ import { classifyRelease } from "./release-policy.mjs";
 const base = { sourceSha: "a".repeat(40), eventName: "pull_request" };
 
 assert.equal(classifyRelease(["docs/release.md"], base).docs_only, true);
+const canonicalContentRelease = classifyRelease(
+  ["M\tcontent/public/pages/home.md"],
+  base,
+);
+assert.equal(canonicalContentRelease.docs_only, false);
+assert.equal(canonicalContentRelease.risk, "automatic");
+assert.equal(canonicalContentRelease.deploy_targets.www, true);
+assert.equal(canonicalContentRelease.deploy_targets.admin, true);
 assert.equal(
   classifyRelease(["M\tapps/admin/src/pages/inbox.astro"], base).risk,
   "automatic",
@@ -94,6 +102,18 @@ assert.equal(safeMigration.deploy_targets.www, true);
 assert.equal(safeMigration.database_schema_version, "0043");
 assert.equal(safeMigration.migration_schema_before, `sha256:${"1".repeat(64)}`);
 assert.equal(safeMigration.migration_schema_after, `sha256:${"2".repeat(64)}`);
+
+const removedMigration = classifyRelease(
+  ["D\tdrizzle/migrations/0044_public_identity_systems.sql"],
+  base,
+);
+assert.equal(removedMigration.risk, "approval");
+assert.equal(removedMigration.d1_changed, true);
+assert.equal(removedMigration.migration_risk, "approval");
+assert.equal(removedMigration.remote_migration_allowed, false);
+assert.deepEqual(removedMigration.reasons, [
+  "0044_public_identity_systems.sql: removed migration",
+]);
 
 assert.throws(
   () =>

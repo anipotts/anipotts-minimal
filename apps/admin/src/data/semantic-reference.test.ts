@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { operatorWorkFixture } from "./operator-work";
+import { operatorWorkFixture } from "./dev-operator-work";
 import {
   buildOperatorTaskSemanticReferences,
   defineKnownReference,

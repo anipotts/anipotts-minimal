@@ -1,16 +1,14 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
-import { normalizeNewsletterContent } from "@anipotts/content/public";
-import { fetchPageContent } from "@anipotts/lib/cms";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
+import {
+  DEFAULT_NEWSLETTER_CONTENT,
+  normalizeNewsletterContent,
+} from "@anipotts/content/public";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const page = await fetchPageContent("newsletter");
-const copy = normalizeNewsletterContent(page?.content);
+const copy = normalizeNewsletterContent(DEFAULT_NEWSLETTER_CONTENT);
 ---
 
 <Shell

@@ -3,18 +3,12 @@ import Shell from "../../layouts/Shell.astro";
 import {
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
   normalizeListingPageContent,
-  type ListingPageContent,
 } from "@anipotts/content/public";
-import { fetchPageContent } from "@anipotts/lib/cms";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const page = await fetchPageContent<ListingPageContent>("newsletter_archive");
 const copy = normalizeListingPageContent(
-  page?.content,
+  DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
 );
 ---

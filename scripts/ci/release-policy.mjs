@@ -2,8 +2,17 @@
 
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
-import { computeDeployTargets } from "./compute-deploy-targets.mjs";
 import { inspectMigrationChanges } from "./migration-policy.mjs";
+
+export const DEPLOY_TARGETS = [
+  "www",
+  "admin",
+  "admin_solid",
+  "ingest",
+  "newsletter",
+  "state",
+  "weekly_email",
+];
 
 const APPROVAL_PATHS = [
   /^\.github\/workflows\//,
@@ -22,6 +31,7 @@ const APPROVAL_PATHS = [
 const KNOWN_SAFE_ROOTS = [
   /^apps\/(?:admin|www)\//,
   /^packages\//,
+  /^content\/public\//,
   /^scripts\//,
   /^config\//,
   /^drizzle\/migrations\//,
@@ -36,13 +46,55 @@ function parseChange(line) {
   return { status, path: parts.at(-1) };
 }
 
-function isIgnored(path) {
+export function isReleaseIgnored(path) {
+  if (path.startsWith("content/public/")) return false;
   return (
     path.endsWith(".md") ||
     path.startsWith("docs/") ||
     path.startsWith(".github/ISSUE_TEMPLATE/") ||
     path === "LICENSE"
   );
+}
+
+export function computeDeployTargets(paths) {
+  const targets = Object.fromEntries(
+    DEPLOY_TARGETS.map((target) => [target, false]),
+  );
+
+  for (const path of paths) {
+    if (!path || isReleaseIgnored(path)) continue;
+    if (
+      path.startsWith("apps/www/") ||
+      path.startsWith("content/public/") ||
+      path.startsWith("packages/content/src/public/") ||
+      path === "packages/content/package.json" ||
+      path === "packages/content/src/index.ts" ||
+      path.startsWith("packages/brand/")
+    ) {
+      targets.www = true;
+    }
+
+    if (
+      path.startsWith("apps/admin/") ||
+      path.startsWith("content/public/") ||
+      path.startsWith("packages/content/") ||
+      path.startsWith("packages/lib/") ||
+      path.startsWith("packages/brand/") ||
+      path.startsWith("packages/types/")
+    ) {
+      targets.admin = true;
+    }
+
+    if (path.startsWith("packages/types/")) targets.state = true;
+
+    for (const worker of ["ingest", "newsletter", "state", "weekly-email"]) {
+      if (path.startsWith(`workers/${worker}/`)) {
+        targets[worker.replace("-", "_")] = true;
+      }
+    }
+  }
+
+  return targets;
 }
 
 function routeContractChanged(change) {
@@ -57,7 +109,27 @@ export function classifyRelease(changeLines, options = {}) {
   const changes = changeLines.filter(Boolean).map(parseChange);
   const paths = changes.map((change) => change.path);
   const deployTargets = computeDeployTargets(paths);
-  const migration = inspectMigrationChanges(paths, options);
+  const deletedMigrations = changes.filter(
+    (change) =>
+      change.status.startsWith("D") &&
+      /^drizzle\/migrations\/\d{4}_.+\.sql$/.test(change.path),
+  );
+  const migration = inspectMigrationChanges(
+    changes
+      .filter((change) => !deletedMigrations.includes(change))
+      .map((change) => change.path),
+    options,
+  );
+  if (deletedMigrations.length > 0) {
+    migration.changed = true;
+    migration.risk = "approval";
+    migration.remoteAllowed = false;
+    migration.reasons.push(
+      ...deletedMigrations.map(
+        (change) => `${basename(change.path)}: removed migration`,
+      ),
+    );
+  }
   for (const consumer of migration.consumers) {
     if (Object.hasOwn(deployTargets, consumer)) deployTargets[consumer] = true;
   }
@@ -65,7 +137,7 @@ export function classifyRelease(changeLines, options = {}) {
   let risk = migration.risk;
 
   for (const change of changes) {
-    if (isIgnored(change.path)) continue;
+    if (isReleaseIgnored(change.path)) continue;
     if (APPROVAL_PATHS.some((pattern) => pattern.test(change.path))) {
       risk = "approval";
       reasons.push(`protected surface: ${change.path}`);
@@ -83,7 +155,7 @@ export function classifyRelease(changeLines, options = {}) {
   }
 
   const hasDeployTarget = Object.values(deployTargets).some(Boolean);
-  const docsOnly = changes.length > 0 && paths.every(isIgnored);
+  const docsOnly = changes.length > 0 && paths.every(isReleaseIgnored);
   if (risk === "none" && hasDeployTarget) risk = "automatic";
   if (risk === "none" && !docsOnly && paths.length > 0) risk = "automatic";
 

@@ -13,9 +13,7 @@ export async function readAdminKnowledge(
   query = "",
   options: KnowledgeSearchOptions = {},
 ) {
-  const snapshot = await loadAdminControlSnapshot(
-    import.meta.env.DEV ? null : db,
-  );
+  const snapshot = await loadKnowledgeSnapshot(db);
   assertValidKnowledgeCards(snapshot.projections.knowledge_cards);
 
   return {
@@ -38,8 +36,15 @@ export async function readAdminKnowledgeCard(
   db: AdminControlDatabase,
   cardId: string,
 ) {
-  const snapshot = await loadAdminControlSnapshot(
-    import.meta.env.DEV ? null : db,
-  );
+  const snapshot = await loadKnowledgeSnapshot(db);
   return getKnowledgeCard(snapshot.projections.knowledge_cards, cardId);
+}
+
+async function loadKnowledgeSnapshot(db: AdminControlDatabase) {
+  if (import.meta.env.DEV) {
+    const { adminControlFixtureData } =
+      await import("@anipotts/lib/admin-control/dev-fixtures");
+    return loadAdminControlSnapshot(null, adminControlFixtureData);
+  }
+  return loadAdminControlSnapshot(db);
 }

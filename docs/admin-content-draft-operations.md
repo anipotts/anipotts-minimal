@@ -13,7 +13,7 @@ runtime, outbound, or publish mutation exists.
 
 The target flow is:
 
-`source default -> content record -> draft operation -> preview -> approval -> published record -> render proof`
+`canonical source -> generated projection -> draft operation -> preview -> approval -> source patch -> checks -> deploy proof`
 
 ## operation schema v0
 
@@ -25,7 +25,7 @@ Each draft operation should be represented as a plain data object:
   "kind": "content_draft",
   "surface": "public_site",
   "route": "/",
-  "source_ref": "D1 page_content:home.sections.intro.rich_summary and @anipotts/lib/cms homepageSummaryText fallback",
+  "source_ref": "content/public/pages/home.md sections.intro.paragraphs",
   "field_path": "homepage.summary",
   "current_value_ref": "source_default",
   "proposed_value": "new copy goes here",
@@ -37,7 +37,7 @@ Each draft operation should be represented as a plain data object:
   "forbidden_actions": ["publish", "deploy", "send", "write_page_content"],
   "preview_targets": ["/content/preview", "/"],
   "proof_ids": [],
-  "evidence_uri": "repo://apps/www/src/data/site.ts",
+  "evidence_uri": "repo://content/public/pages/home.md",
   "redaction": "public_copy_only",
   "created_by": "agent",
   "created_at": "2026-06-25T00:00:00Z",
@@ -130,11 +130,11 @@ the proposed copy in the proof row.
 
 ## storage
 
-The content store now has an additive D1 schema proposal in
+The content store has an additive D1 schema in
 `drizzle/migrations/0007_content_operations.sql`, mirrored in the canonical
 Drizzle schema at `packages/lib/src/db/schema.ts`.
 
-- `content_records`: published field overrides
+- `content_records`: retained field-override proposals
 - `content_draft_operations`: draft and preview operations
 - `content_publish_events`: immutable publish proof
 
@@ -143,9 +143,9 @@ inert rows into `content_draft_operations`: homepage summary and newsletter
 copy. These rows exist so admin can review real D1 operation state instead of
 only static templates.
 
-The schema and seed rows do not authorize public-site runtime reads from draft
-records, browser writes to `page_content`, outbound sends, deploys, or publish
-actions.
+Public routes render canonical repository content. The schema and seed rows do
+not authorize runtime overrides, browser writes to `page_content`, outbound
+sends, deploys, or publish actions.
 
 `drizzle/migrations/0034_seed_content_draft_save_proof.sql` seeds the pending
 draft-save proof row. The proof row is verified only after a passkey-authenticated
