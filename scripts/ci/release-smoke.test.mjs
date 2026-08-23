@@ -15,6 +15,7 @@ const publicReceipt = await smokeRelease({
   target: "www",
   baseUrl: "https://example.test",
   expectedSha,
+  retryDelayMs: 0,
   fetchImpl: async (url) =>
     url.endsWith("/api/health")
       ? response(200, { release_sha: expectedSha, schema_version: "0042" })
@@ -27,6 +28,7 @@ const adminReceipt = await smokeRelease({
   target: "admin",
   baseUrl: "https://admin.example.test",
   expectedSha,
+  retryDelayMs: 0,
   fetchImpl: async (url) =>
     url.endsWith("/api/health")
       ? response(200, { release_sha: expectedSha, schema_version: "0042" })
@@ -38,6 +40,7 @@ const publicPasskeyReceipt = await smokeRelease({
   target: "admin",
   baseUrl: "https://admin.example.test",
   expectedSha,
+  retryDelayMs: 0,
   fetchImpl: async (url) => {
     if (url.endsWith("/api/health")) {
       return response(200, {
@@ -54,11 +57,41 @@ assert.equal(
   200,
 );
 
+let healthAttempts = 0;
+const propagatedReceipt = await smokeRelease({
+  target: "www",
+  baseUrl: "https://example.test",
+  expectedSha,
+  retryDelayMs: 0,
+  fetchImpl: async (url) => {
+    if (!url.endsWith("/api/health")) return response(200);
+    healthAttempts += 1;
+    return response(200, {
+      release_sha: healthAttempts === 1 ? "stale" : expectedSha,
+      schema_version: "0042",
+    });
+  },
+});
+assert.equal(propagatedReceipt.release_sha, expectedSha);
+assert.equal(healthAttempts, 2);
+
+const unversionedRollbackReceipt = await smokeRelease({
+  target: "www",
+  baseUrl: "https://example.test",
+  allowUnversioned: true,
+  retryDelayMs: 0,
+  fetchImpl: async () => response(200, { ok: true }),
+});
+assert.equal(unversionedRollbackReceipt.release_sha, "unversioned");
+assert.equal(unversionedRollbackReceipt.rollback_unversioned, true);
+
 await assert.rejects(
   smokeRelease({
     target: "www",
     baseUrl: "https://example.test",
     expectedSha,
+    healthAttempts: 2,
+    retryDelayMs: 0,
     fetchImpl: async (url) =>
       url.endsWith("/api/health")
         ? response(200, { release_sha: "wrong", schema_version: "0042" })
@@ -73,6 +106,7 @@ await assert.rejects(
     mode: "authenticated",
     baseUrl: "https://admin.example.test",
     expectedSha,
+    retryDelayMs: 0,
     env: {},
     fetchImpl: async (url) =>
       url.endsWith("/api/health")
@@ -88,6 +122,7 @@ await assert.rejects(
     mode: "authenticated",
     baseUrl: "https://admin.example.test",
     expectedSha,
+    retryDelayMs: 0,
     env: {
       ADMIN_CI_ACCESS_CLIENT_ID: "test-client",
       ADMIN_CI_ACCESS_CLIENT_SECRET: "test-secret",

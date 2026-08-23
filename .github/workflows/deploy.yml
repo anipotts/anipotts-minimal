@@ -287,7 +287,11 @@ jobs:
         if: steps.smoke.outcome == 'failure' && needs.release.outputs.app_rollback_enabled == 'true' && needs.release.outputs.d1_changed != 'true'
         run: |
           node scripts/ci/worker-version.mjs rollback apps/www/wrangler.toml "${{ steps.previous.outputs.previous_version }}"
-          node scripts/ci/release-smoke.mjs --target www --base-url https://anipotts.com --expected-sha "${{ steps.previous.outputs.previous_sha }}"
+          if [ "${{ steps.previous.outputs.previous_sha }}" = "unknown" ]; then
+            node scripts/ci/release-smoke.mjs --target www --base-url https://anipotts.com --allow-unversioned
+          else
+            node scripts/ci/release-smoke.mjs --target www --base-url https://anipotts.com --expected-sha "${{ steps.previous.outputs.previous_sha }}"
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -381,7 +385,11 @@ jobs:
         if: (steps.boundary_smoke.outcome == 'failure' || steps.identity_smoke.outcome == 'failure') && needs.release.outputs.app_rollback_enabled == 'true' && needs.release.outputs.d1_changed != 'true'
         run: |
           node scripts/ci/worker-version.mjs rollback apps/admin/wrangler.toml "${{ steps.previous.outputs.previous_version }}"
-          node scripts/ci/release-smoke.mjs --target admin --mode unauthenticated --base-url https://admin.anipotts.com --expected-sha "${{ steps.previous.outputs.previous_sha }}"
+          if [ "${{ steps.previous.outputs.previous_sha }}" = "unknown" ]; then
+            node scripts/ci/release-smoke.mjs --target admin --mode unauthenticated --base-url https://admin.anipotts.com --allow-unversioned
+          else
+            node scripts/ci/release-smoke.mjs --target admin --mode unauthenticated --base-url https://admin.anipotts.com --expected-sha "${{ steps.previous.outputs.previous_sha }}"
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

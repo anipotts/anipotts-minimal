@@ -49,27 +49,46 @@ function authenticatedHeaders(env) {
   };
 }
 
-async function verifyHealth(baseUrl, expectedSha, fetchImpl) {
-  const response = await requestWithRetry(
-    `${baseUrl}/api/health`,
-    {},
-    {
-      attempts: 6,
-      delayMs: 10_000,
-      fetchImpl,
-      accept: (candidate) => candidate.status === 200,
-    },
-  );
-  const health = await response.json();
-  if (health.release_sha !== expectedSha) {
+async function verifyHealth(
+  baseUrl,
+  expectedSha,
+  fetchImpl,
+  { allowUnversioned, attempts, delayMs },
+) {
+  let lastHealth;
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetchImpl(`${baseUrl}/api/health`);
+      if (response.status === 200) {
+        const health = await response.json();
+        lastHealth = health;
+        const versionMatches = allowUnversioned
+          ? !health.release_sha
+          : health.release_sha === expectedSha;
+        const schemaMatches =
+          allowUnversioned || Boolean(health.schema_version);
+        if (versionMatches && schemaMatches) return health;
+      } else {
+        lastError = `HTTP ${response.status}`;
+      }
+    } catch (error) {
+      lastError = String(error);
+    }
+    if (attempt < attempts) await sleep(delayMs);
+  }
+
+  if (allowUnversioned) {
     throw new Error(
-      `release SHA mismatch at ${baseUrl}: expected ${expectedSha}, received ${health.release_sha || "missing"}`,
+      `unversioned rollback did not stabilize at ${baseUrl}: received ${lastHealth?.release_sha || lastError || "missing health"}`,
     );
   }
-  if (!health.schema_version) {
-    throw new Error(`schema version missing at ${baseUrl}`);
+  if (lastHealth?.release_sha !== expectedSha) {
+    throw new Error(
+      `release SHA mismatch at ${baseUrl}: expected ${expectedSha}, received ${lastHealth?.release_sha || lastError || "missing"}`,
+    );
   }
-  return health;
+  throw new Error(`schema version missing at ${baseUrl}`);
 }
 
 export async function smokeRelease(options) {
@@ -80,10 +99,19 @@ export async function smokeRelease(options) {
     mode = "unauthenticated",
     fetchImpl = fetch,
     env = process.env,
+    allowUnversioned = false,
+    healthAttempts = 6,
+    retryDelayMs = 10_000,
   } = options;
-  if (!expectedSha) throw new Error("expected release SHA is required");
+  if (!expectedSha && !allowUnversioned) {
+    throw new Error("expected release SHA is required");
+  }
 
-  const health = await verifyHealth(baseUrl, expectedSha, fetchImpl);
+  const health = await verifyHealth(baseUrl, expectedSha, fetchImpl, {
+    allowUnversioned,
+    attempts: healthAttempts,
+    delayMs: retryDelayMs,
+  });
   const checks = [];
 
   if (target === "www") {
@@ -168,8 +196,9 @@ export async function smokeRelease(options) {
     target,
     mode,
     base_url: baseUrl,
-    release_sha: expectedSha,
-    database_schema: health.schema_version,
+    release_sha: health.release_sha || "unversioned",
+    database_schema: health.schema_version || "unversioned",
+    rollback_unversioned: allowUnversioned,
     checks,
   };
 }
@@ -185,6 +214,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     baseUrl: argument("base-url"),
     expectedSha: argument("expected-sha"),
     mode: argument("mode") || "unauthenticated",
+    allowUnversioned: process.argv.includes("--allow-unversioned"),
   })
     .then((receipt) => console.log(JSON.stringify(receipt, null, 2)))
     .catch((error) => {
