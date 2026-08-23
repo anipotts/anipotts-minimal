@@ -226,6 +226,21 @@ const contentEditorSource = readFileSync(
   "apps/admin/src/lib/content-editor.ts",
   "utf8",
 );
+const sourceContentModule = readFileSync(
+  "apps/admin/src/data/source-content.ts",
+  "utf8",
+);
+for (const surface of ["projects", "writing"]) {
+  assert.ok(
+    sourceContentModule.includes(`../../../../content/public/${surface}/*.md`),
+    `Admin ${surface} inventory must read the canonical public content tree`,
+  );
+}
+assert.equal(
+  sourceContentModule.includes("../../../www/src/content/"),
+  false,
+  "Admin must not read the removed public content collections",
+);
 assert.ok(
   contentEditorSource.includes("publish_batch_required"),
   "content editor publish must fail closed when D1 batch semantics are unavailable",
