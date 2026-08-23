@@ -99,6 +99,7 @@ jobs:
       migration_schema_before: ${{ steps.release.outputs.migration_schema_before }}
       migration_schema_after: ${{ steps.release.outputs.migration_schema_after }}
       production_enabled: ${{ steps.gates.outputs.production_enabled }}
+      admin_enabled: ${{ steps.gates.outputs.admin_enabled }}
       app_rollback_enabled: ${{ steps.gates.outputs.app_rollback_enabled }}
     steps:
       - uses: actions/checkout@v7
@@ -156,6 +157,7 @@ jobs:
           node <<'NODE' >> "$GITHUB_OUTPUT"
           const policy = require("./config/release-train.json");
           console.log(`production_enabled=${policy.production_promotion === "enabled"}`);
+          console.log(`admin_enabled=${policy.authenticated_admin_smoke === "enabled"}`);
           console.log(`app_rollback_enabled=${policy.automatic_app_rollback === "enabled"}`);
           NODE
 
@@ -304,6 +306,7 @@ jobs:
     if: >
       always() &&
       needs.release.outputs.production_enabled == 'true' &&
+      needs.release.outputs.admin_enabled == 'true' &&
       (needs['deploy-admin-solid'].result == 'success' || needs['deploy-admin-solid'].result == 'skipped') &&
       (
         (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||

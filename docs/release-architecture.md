@@ -84,17 +84,21 @@ routes. Secret values stay outside the repository and logs.
 
 ## current rollout state
 
-All production gates in `config/release-train.json` are held. Merging this
-foundation cannot deploy an app or apply a migration. Enable each gate only
-after its canary receipt exists:
+Ordinary application promotion and application-only rollback are enabled.
+Deployments still revalidate the exact `main` SHA, use serialized production
+jobs, deploy only classified targets, and smoke the resulting release.
 
-1. merge this foundation and install required branch checks
-2. prove the exact-head native merge path with a harmless deployable PR
-3. install and verify the read-only Admin identity
-4. approve and execute the one-time D1 ledger bootstrap
-5. run one additive migration canary
-6. run one app canary and deliberately exercise Worker rollback
-7. enable safe automatic production promotion
+Database and authenticated Admin gates remain independent:
+
+- remote D1 migration promotion stays held until the one-time ledger bootstrap
+  is approved and verified
+- authenticated Admin smoke stays held until its least-privileged production
+  identity is installed and proven unable to write
+- Cloudflare Access stays in front of Admin until native auth production proof
+  passes
+
+No separate application canary ceremony is required. A normal scoped release
+with exact-SHA validation and smoke proof is the release proof.
 
 `admin-solid` remains a manual rollback target until native auth production
 proof is complete.
