@@ -6,7 +6,6 @@ import { join } from "node:path";
 
 const WORKFLOW_DIR = ".github/workflows";
 const ALLOWED_WORKFLOWS = [
-  "agent-automerge.yml",
   "ci.yml",
   "deploy.yml",
   "security-review.yml",
@@ -25,10 +24,6 @@ const workflowFiles = readdirSync(WORKFLOW_DIR)
   .filter((file) => file.endsWith(".yml") || file.endsWith(".yaml"))
   .sort();
 
-const autoMergeWorkflow = readFileSync(
-  join(WORKFLOW_DIR, "agent-automerge.yml"),
-  "utf8",
-);
 const deployWorkflow = readFileSync(join(WORKFLOW_DIR, "deploy.yml"), "utf8");
 const ciWorkflow = readFileSync(join(WORKFLOW_DIR, "ci.yml"), "utf8");
 const securityWorkflow = readFileSync(
@@ -36,12 +31,29 @@ const securityWorkflow = readFileSync(
   "utf8",
 );
 const smokeWorkflow = readFileSync(join(WORKFLOW_DIR, "smoke.yml"), "utf8");
+const codeRabbit = readFileSync(".coderabbit.yaml", "utf8");
 
 assert.deepEqual(
   workflowFiles,
   ALLOWED_WORKFLOWS,
   "workflow inventory drifted from the approved CI/CD set",
 );
+assert.ok(
+  codeRabbit.includes("profile: chill") &&
+    codeRabbit.includes("request_changes_workflow: false"),
+  "CodeRabbit must stay advisory for low-risk solo-repository changes",
+);
+for (const protectedPath of [
+  "apps/admin/src/{middleware.ts,lib/passkey-auth.ts,pages/auth/**}",
+  "drizzle/{migrations/**,meta/**}",
+  ".github/workflows/**",
+  "workers/**",
+]) {
+  assert.ok(
+    codeRabbit.includes(protectedPath),
+    `CodeRabbit must retain focused review for ${protectedPath}`,
+  );
+}
 
 assert.ok(
   deployWorkflow.includes("push:\n    branches: [main]"),
@@ -52,27 +64,45 @@ assert.equal(
   false,
   "deploy workflow must not suppress canonical public Markdown",
 );
-assert.equal(
-  autoMergeWorkflow.includes("gh workflow run deploy.yml"),
-  false,
-  "automerge must not dispatch a duplicate deploy after the main push",
-);
-for (const checkName of [
-  "Build, lint, typecheck, test",
-  "Migration Preflight",
-]) {
+for (const checkName of ["Build, lint, typecheck, test"]) {
   assert.ok(
     ciWorkflow.includes(`name: ${checkName}`),
     `ci.yml must report required check ${checkName}`,
   );
 }
-for (const workflow of [ciWorkflow, deployWorkflow]) {
-  assert.ok(
-    workflow.includes("uses: oven-sh/setup-bun@v2") &&
-      workflow.includes('bun-version: "1.3.4"'),
-    "full validation workflows must install the pinned Bun runtime",
+assert.equal(
+  ciWorkflow.includes("name: Migration Preflight"),
+  false,
+  "migration preflight must be a fast path inside the stable CI summary",
+);
+assert.ok(
+  ciWorkflow.includes(
+    "needs.classify.outputs.migration_preflight_required == 'true'",
+  ),
+  "migration replay must run only for migration-owned paths",
+);
+for (const command of [
+  "pnpm turbo build --affected",
+  "pnpm turbo lint --affected",
+  "pnpm turbo typecheck --affected",
+  "pnpm turbo test --affected",
+]) {
+  assert.equal(
+    ciWorkflow.split(command).length - 1,
+    1,
+    `${command} must run once`,
   );
 }
+assert.ok(
+  ciWorkflow.includes("uses: oven-sh/setup-bun@v2") &&
+    ciWorkflow.includes('bun-version: "1.3.4"'),
+  "pull request validation must install the pinned Bun runtime when needed",
+);
+assert.equal(
+  deployWorkflow.includes("uses: oven-sh/setup-bun@v2"),
+  false,
+  "deployment must not reinstall Bun after required PR validation",
+);
 assert.ok(
   securityWorkflow.includes("name: Security Review"),
   "security-review.yml must report the required security check",
@@ -82,32 +112,6 @@ assert.equal(
   false,
   "required security review must run for every pull request",
 );
-assert.ok(
-  autoMergeWorkflow.includes("name: Agent Merge Readiness"),
-  "the retained workflow must describe merge readiness without merging",
-);
-assert.ok(
-  autoMergeWorkflow.includes("contents: read") &&
-    autoMergeWorkflow.includes("pull-requests: read"),
-  "merge readiness must use read-only repository permissions",
-);
-for (const guard of [
-  "!github.event.pull_request.draft",
-  "github.event.pull_request.base.ref == 'main'",
-  "github.event.pull_request.head.repo.full_name == github.repository",
-]) {
-  assert.ok(
-    autoMergeWorkflow.includes(guard),
-    `merge readiness is missing ${guard}`,
-  );
-}
-assert.equal(
-  /gh\s+pr\s+merge|gh\s+pr\s+edit|gh\s+label\s+create|contents:\s*write|pull-requests:\s*write|issues:\s*write/.test(
-    autoMergeWorkflow,
-  ),
-  false,
-  "merge readiness must not mutate pull requests, labels, or shared history",
-);
 for (const forbiddenCeremony of [
   "/approve-release",
   "release-approved",
@@ -116,7 +120,7 @@ for (const forbiddenCeremony of [
   "Promotion Policy",
 ]) {
   assert.equal(
-    `${autoMergeWorkflow}\n${ciWorkflow}`.includes(forbiddenCeremony),
+    ciWorkflow.includes(forbiddenCeremony),
     false,
     `workflow approval ceremony must not include ${forbiddenCeremony}`,
   );
@@ -130,12 +134,13 @@ assert.ok(
   "a newer release must not cancel an in-flight release",
 );
 assert.ok(
-  deployWorkflow.includes("node scripts/ci/release-policy.mjs"),
-  "deployment must use the shared release classifier",
+  deployWorkflow.includes("node scripts/ci/deployment-plan.mjs"),
+  "deployment must compare live target state through the shared release classifier",
 );
-assert.ok(
+assert.equal(
   deployWorkflow.includes("pnpm validate"),
-  "deployment must revalidate the exact main SHA before mutation",
+  false,
+  "deployment must not rerun the full workspace after required PR validation",
 );
 assert.ok(
   deployWorkflow.includes(
@@ -175,6 +180,13 @@ for (const workflow of [deployWorkflow, smokeWorkflow]) {
 
 for (const file of workflowFiles) {
   const body = readFileSync(join(WORKFLOW_DIR, file), "utf8");
+  assert.equal(
+    /gh\s+pr\s+merge|\/approve-release|release-approved|pull-requests:\s*write|contents:\s*write/.test(
+      body,
+    ),
+    false,
+    `${file} must not merge or recreate an approval ceremony`,
+  );
   for (const pattern of BANNED_PATTERNS) {
     assert.equal(
       pattern.test(body),

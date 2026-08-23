@@ -5,13 +5,22 @@ default setup is deliberately rootless and loopback-only:
 
 - public site: `http://anipotts.localhost:1355/`
 - Admin: `http://admin.anipotts.localhost:1355/`
-- Admin fallback: `http://localhost:4311/`
+- Admin fallback when Admin review is active: `http://localhost:4311/`
 
-Start or reuse both named previews:
+All local actions, CI, and deploy jobs use Node `24.19.0`, pinned in `.nvmrc`.
+The launcher selects that runtime through NVM when available and exits early
+with one install command when the current runtime is unsupported.
+
+Start only the surface being reviewed:
 
 ```bash
-pnpm dev:local:ensure
+pnpm dev:www
+pnpm dev:admin
+pnpm dev:all
 ```
+
+`dev:www` starts only the public Astro process. `dev:admin` starts the named
+Admin process and the managed `localhost:4311` fallback. `dev:all` starts both.
 
 The canonical names are reserved for the clean physical checkout on `main`
 when its commit equals `origin/main`. The manager refuses to claim them from a
@@ -22,14 +31,14 @@ surface.
 Inspect ownership and health without changing anything:
 
 ```bash
-pnpm dev:local:status
+pnpm dev:status
 pnpm admin:preview:status
 ```
 
 Stop only the two Portless app processes owned by the current worktree:
 
 ```bash
-pnpm dev:local:stop
+pnpm dev:stop
 ```
 
 The stop command leaves the shared rootless proxy and the managed Admin

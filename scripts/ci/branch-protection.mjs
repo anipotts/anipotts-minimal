@@ -5,7 +5,6 @@ import { execFileSync } from "node:child_process";
 export const REQUIRED_CHECKS = [
   "Build, lint, typecheck, test",
   "Security Review",
-  "Migration Preflight",
 ];
 
 export function protectionPayload() {

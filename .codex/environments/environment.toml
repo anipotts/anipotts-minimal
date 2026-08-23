@@ -28,46 +28,26 @@ rm -rf apps/admin/.open-next apps/labs/.open-next
 '''
 
 [[actions]]
-name = "local dev"
+name = "develop public"
 icon = "run"
-command = "bash ./scripts/codex-action local-dev"
+command = "bash ./scripts/codex-action www-dev"
 
 [[actions]]
-name = "local status"
-icon = "tool"
-command = "bash ./scripts/codex-action local-status"
+name = "develop admin"
+icon = "run"
+command = "bash ./scripts/codex-action admin-dev"
 
 [[actions]]
-name = "local stop"
-icon = "tool"
-command = "bash ./scripts/codex-action local-stop"
-
-[[actions]]
-name = "check www"
+name = "check changed scope"
 icon = "test"
-command = "bash ./scripts/codex-action check-www"
+command = "bash ./scripts/codex-action check-changed"
 
 [[actions]]
-name = "check all"
-icon = "test"
-command = "bash ./scripts/codex-action check-all"
-
-[[actions]]
-name = "pr status"
+name = "inspect pull request"
 icon = "tool"
 command = "bash ./scripts/codex-action pr-status"
 
 [[actions]]
-name = "watch pr"
+name = "inspect live state"
 icon = "tool"
-command = "bash ./scripts/codex-action watch-pr"
-
-[[actions]]
-name = "deploys"
-icon = "tool"
-command = "bash ./scripts/codex-action deploys"
-
-[[actions]]
-name = "smoke live"
-icon = "test"
-command = "bash ./scripts/codex-action smoke-live"
+command = "bash ./scripts/codex-action live-state"

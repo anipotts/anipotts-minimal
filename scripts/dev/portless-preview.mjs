@@ -20,15 +20,18 @@ const LOCAL_DIR = join(WORKTREE_ROOT, ".local", "portless-preview");
 const METADATA_PATH = join(LOCAL_DIR, "processes.json");
 const PROXY_PORT = 1355;
 const CANONICAL_BRANCH = "main";
+const REQUIRED_NODE = { major: 24, minor: 19, patch: 0 };
 const APPS = [
   {
     key: "www",
+    packageName: "@anipotts/www",
     name: "anipotts",
     cwd: join(WORKTREE_ROOT, "apps", "www"),
     healthPath: "/",
   },
   {
     key: "admin",
+    packageName: "@anipotts/admin",
     name: "admin.anipotts",
     cwd: join(WORKTREE_ROOT, "apps", "admin"),
     healthPath: "/api/health",
@@ -103,10 +106,15 @@ function pnpm(args, options = {}) {
 }
 
 function assertRuntime() {
-  const major = Number.parseInt(process.versions.node.split(".")[0] ?? "0", 10);
-  if (major < 24) {
+  const [major, minor, patch] = process.versions.node.split(".").map(Number);
+  const supported =
+    (major === REQUIRED_NODE.major &&
+      (minor > REQUIRED_NODE.minor ||
+        (minor === REQUIRED_NODE.minor && patch >= REQUIRED_NODE.patch))) ||
+    major === 25;
+  if (!supported) {
     throw new Error(
-      `Portless 0.15.5 requires Node 24 or newer; current runtime is ${process.version}`,
+      `anipotts.com local tools require Node >=24.19.0 <26; found ${process.version}. Run: nvm install && nvm use`,
     );
   }
 
@@ -253,6 +261,18 @@ function startApp(app, url) {
   };
 }
 
+function prepareAppDependencies(app) {
+  pnpm(
+    [
+      "turbo",
+      "build",
+      `--filter=${app.packageName}^...`,
+      "--output-logs=errors-only",
+    ],
+    { stdio: "inherit" },
+  );
+}
+
 async function waitForApp(app, record) {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
@@ -273,15 +293,22 @@ async function ensureFallbackAdmin() {
   pnpm(["admin:preview:ensure"], { stdio: "inherit" });
 }
 
-async function ensure() {
+function selectedApps(surface) {
+  if (surface === "all") return APPS;
+  const app = APPS.find((candidate) => candidate.key === surface);
+  if (!app) throw new Error("surface must be www, admin, or all");
+  return [app];
+}
+
+async function ensure(surface) {
   assertRuntime();
   assertCanonicalPreviewOwnership();
   ensureProxy();
-  await ensureFallbackAdmin();
+  if (surface === "admin" || surface === "all") await ensureFallbackAdmin();
 
   const previous = readMetadata();
-  const records = [];
-  for (const app of APPS) {
+  const records = previous?.apps ? [...previous.apps] : [];
+  for (const app of selectedApps(surface)) {
     const url = appUrl(app);
     const prior = previous?.apps?.find((record) => record.key === app.key);
     if (
@@ -289,25 +316,46 @@ async function ensure() {
       isRecognizedProcess(app, prior.pid) &&
       (await isHealthy(url, app.healthPath))
     ) {
-      records.push({ ...prior, url });
+      const index = records.findIndex((record) => record.key === app.key);
+      records.splice(index < 0 ? records.length : index, index < 0 ? 0 : 1, {
+        ...prior,
+        url,
+      });
       continue;
     }
 
     if (await isHealthy(url, app.healthPath)) {
-      records.push({
+      const existing = {
         key: app.key,
         name: app.name,
         url,
         pid: null,
         ownership: "existing",
         logPath: null,
-      });
+      };
+      const index = records.findIndex((record) => record.key === app.key);
+      records.splice(
+        index < 0 ? records.length : index,
+        index < 0 ? 0 : 1,
+        existing,
+      );
       continue;
     }
 
+    prepareAppDependencies(app);
     const record = startApp(app, url);
-    await waitForApp(app, record);
-    records.push(record);
+    try {
+      await waitForApp(app, record);
+    } catch (error) {
+      await stopRecord(app, record);
+      throw error;
+    }
+    const index = records.findIndex((candidate) => candidate.key === app.key);
+    records.splice(
+      index < 0 ? records.length : index,
+      index < 0 ? 0 : 1,
+      record,
+    );
   }
 
   writeMetadata(records);
@@ -332,10 +380,12 @@ function printStatus(records) {
       `${record.key}=${record.url} state=${state} ownership=${record.ownership}${record.pid ? ` pid=${record.pid}` : ""}`,
     );
   }
-  console.log("admin-fallback=http://localhost:4311/");
+  if (records.some((record) => record.key === "admin")) {
+    console.log("admin-fallback=http://localhost:4311/");
+  }
 }
 
-async function status() {
+async function status(surface) {
   assertRuntime();
   const metadata = readMetadata();
   if (!metadata) {
@@ -345,7 +395,13 @@ async function status() {
   }
 
   let healthy = true;
-  for (const app of APPS) {
+  const expectedApps =
+    surface === "all"
+      ? metadata.apps
+          .map((record) => APPS.find((app) => app.key === record.key))
+          .filter(Boolean)
+      : selectedApps(surface);
+  for (const app of expectedApps) {
     const record = metadata.apps.find((candidate) => candidate.key === app.key);
     if (!record || !(await isHealthy(record.url, app.healthPath)))
       healthy = false;
@@ -370,29 +426,38 @@ async function stopRecord(app, record) {
   if (isAlive(record.pid)) process.kill(-record.pid, "SIGKILL");
 }
 
-async function stop() {
+async function stop(surface) {
   const metadata = readMetadata();
   if (!metadata) {
     console.log("portless preview is not managed for this worktree");
     return;
   }
 
-  for (const app of APPS) {
+  const selected = selectedApps(surface);
+  for (const app of selected) {
     const record = metadata.apps.find((candidate) => candidate.key === app.key);
     if (record) await stopRecord(app, record);
   }
-  rmSync(METADATA_PATH, { force: true });
+  const remaining = metadata.apps.filter(
+    (record) => !selected.some((app) => app.key === record.key),
+  );
+  if (remaining.length > 0) writeMetadata(remaining);
+  else rmSync(METADATA_PATH, { force: true });
   console.log(
-    "stopped worktree app routes; shared proxy and Admin fallback remain running",
+    `stopped managed ${surface} route${surface === "all" ? "s" : ""}; shared proxy and Admin fallback remain running`,
   );
 }
 
 const action = process.argv[2] ?? "ensure";
+const surface = process.argv[3] ?? "all";
 try {
-  if (action === "ensure") await ensure();
-  else if (action === "status") await status();
-  else if (action === "stop") await stop();
-  else throw new Error("usage: portless-preview.mjs {ensure|status|stop}");
+  if (action === "ensure") await ensure(surface);
+  else if (action === "status") await status(surface);
+  else if (action === "stop") await stop(surface);
+  else
+    throw new Error(
+      "usage: portless-preview.mjs {ensure|status|stop} {www|admin|all}",
+    );
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;

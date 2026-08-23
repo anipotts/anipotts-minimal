@@ -1,28 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-prepend_path() {
-  case ":$PATH:" in
-    *":$1:"*) ;;
-    *) PATH="$1:$PATH" ;;
-  esac
-}
-
-for bin_dir in \
-  "/opt/homebrew/bin" \
-  "/usr/local/bin" \
-  "$HOME/.nvm/versions/node/v20.11.1/bin" \
-  "$HOME/.nvm/versions/node/v20.18.0/bin" \
-  "$HOME/.nvm/versions/node/v22.22.3/bin"
-do
-  if [ -d "$bin_dir" ]; then
-    prepend_path "$bin_dir"
-  fi
-done
-export PATH
-
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${CODEX_WORKTREE_PATH:-$repo_root}"
+
+if [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
+  # shellcheck disable=SC1090
+  . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+  nvm use --silent "$(cat "$repo_root/.nvmrc")" >/dev/null
+fi
 
 require_tool() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -33,7 +19,9 @@ require_tool() {
 }
 
 pnpm_cmd() {
+  require_tool node
   require_tool pnpm
+  node -e 'const [M,m,p]=process.versions.node.split(".").map(Number); if (!((M===24&&(m>19||(m===19&&p>=0)))||M===25)) { console.error(`anipotts.com requires Node >=24.19.0 <26; found ${process.version}. Run: nvm install && nvm use`); process.exit(1) }'
   pnpm "$@"
 }
 
@@ -45,15 +33,13 @@ case "${1:-}" in
     pnpm_cmd install --frozen-lockfile
     ;;
   www-dev)
-    require_tool pnpm
-    exec pnpm turbo dev --filter=@anipotts/www
+    pnpm_cmd dev:www
     ;;
   admin-dev)
-    require_tool pnpm
-    exec pnpm turbo dev --filter=@anipotts/admin
+    pnpm_cmd dev:admin
     ;;
   local-dev)
-    pnpm_cmd dev:local:ensure
+    pnpm_cmd dev:all
     ;;
   local-status)
     pnpm_cmd dev:local:status
@@ -68,24 +54,16 @@ case "${1:-}" in
   check-all)
     pnpm_cmd validate
     ;;
+  check-changed)
+    pnpm_cmd check:changed
+    ;;
   pr-status)
     require_tool gh
-    exec gh pr view --web
+    exec gh pr view --json number,title,state,isDraft,headRefOid,mergeStateStatus,statusCheckRollup,url
     ;;
-  watch-pr)
+  live-state)
     require_tool gh
-    pr_url="$(gh pr view --json url -q .url 2>/dev/null || true)"
-    if [ -z "$pr_url" ]; then
-      echo "no pull request for current branch"
-      exit 1
-    fi
-    exec gh pr checks "$pr_url" --watch --fail-fast --interval 15
-    ;;
-  deploys)
-    require_tool gh
-    exec gh run list --workflow Deploy --limit 10
-    ;;
-  smoke-live)
+    gh run list --workflow Deploy --limit 5
     for path in / /making /orchestrating /writing /writing/saturdays-are-for-claude-code /api/health; do
       code="$(curl -s -o /dev/null -w '%{http_code}' "https://anipotts.com$path")"
       echo "anipotts.com$path -> $code"
@@ -97,7 +75,7 @@ case "${1:-}" in
     done
     ;;
   *)
-    echo "usage: $0 {setup|www-dev|admin-dev|local-dev|local-status|local-stop|check-www|check-all|pr-status|watch-pr|deploys|smoke-live}" >&2
+    echo "usage: $0 {setup|www-dev|admin-dev|local-dev|local-status|local-stop|check-www|check-all|check-changed|pr-status|live-state}" >&2
     exit 2
     ;;
 esac

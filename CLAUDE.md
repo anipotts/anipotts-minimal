@@ -33,7 +33,6 @@ Primary workflows are intentionally limited to:
 
 - `ci.yml`
 - `security-review.yml`
-- `agent-automerge.yml`
 - `deploy.yml`
 - `smoke.yml`
 
@@ -125,6 +124,7 @@ leave the hard stop explicit.
 Use the narrowest command that covers the diff.
 
 ```bash
+pnpm check:changed
 pnpm turbo typecheck --filter=@anipotts/www...
 pnpm turbo build --filter=@anipotts/www...
 pnpm turbo typecheck --filter=@anipotts/admin...
@@ -134,19 +134,22 @@ pnpm turbo build --filter=@anipotts/admin-solid...
 pnpm validate
 ```
 
-## local admin preview
+## local development
 
-For the complete named local development entrypoint, use:
+Use Node `24.19.0` and start only the surface under review:
 
 ```bash
-pnpm dev:local:ensure
-pnpm dev:local:status
+pnpm dev:www
+pnpm dev:admin
+pnpm dev:all
+pnpm dev:status
+pnpm dev:stop
 ```
 
-This serves the public site at `http://anipotts.localhost:1355/` and Admin at
-`http://admin.anipotts.localhost:1355/`. It is pinned, rootless, loopback-only,
-and worktree-aware. See `docs/local-development.md` for lifecycle and safety
-details.
+The public URL is `http://anipotts.localhost:1355/`; Admin is
+`http://admin.anipotts.localhost:1355/`. Portless is pinned, rootless,
+loopback-only, and worktree-aware. `dev:www` does not start Admin or its fallback.
+See `docs/local-development.md`.
 
 The canonical local review URL is `http://localhost:4311/`.
 
@@ -165,9 +168,8 @@ The manager records only local process metadata and logs under ignored
 `.local/admin-preview/`. It refuses to stop an unrecognized process or replace
 an unrelated listener on port 4311.
 
-`pnpm validate` mirrors the local PR gate: workspace/deploy/admin/public/path
-invariants, content platform invariants, workflow/security guards, formatting,
-and full build/lint/typecheck/test.
+`pnpm check:changed` mirrors the affected PR scope. `pnpm validate` remains the
+full-workspace path for shared or consequential changes.
 
 For deploys, record:
 
