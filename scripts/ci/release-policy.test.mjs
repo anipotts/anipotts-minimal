@@ -16,6 +16,14 @@ import { classifyRelease } from "./release-policy.mjs";
 const base = { sourceSha: "a".repeat(40), eventName: "pull_request" };
 
 assert.equal(classifyRelease(["docs/release.md"], base).docs_only, true);
+const canonicalContentRelease = classifyRelease(
+  ["M\tcontent/public/pages/home.md"],
+  base,
+);
+assert.equal(canonicalContentRelease.docs_only, false);
+assert.equal(canonicalContentRelease.risk, "automatic");
+assert.equal(canonicalContentRelease.deploy_targets.www, true);
+assert.equal(canonicalContentRelease.deploy_targets.admin, true);
 assert.equal(
   classifyRelease(["M\tapps/admin/src/pages/inbox.astro"], base).risk,
   "automatic",

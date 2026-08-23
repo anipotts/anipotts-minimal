@@ -11,8 +11,9 @@
 # relevant to that target actually changed. `apps/admin-solid` is a legacy
 # rollback surface and is workflow_dispatch-only. Root dependency changes do not
 # fan out to every target; use workflow_dispatch for an explicit deploy when a
-# root-only change needs promotion. Docs-only commits skip the workflow entirely
-# via paths-ignore. Workflow-only changes run detection but deploy nothing. No
+# root-only change needs promotion. Documentation-only commits skip the workflow
+# through the explicit paths below. Canonical public Markdown remains deployable.
+# Workflow-only changes run detection but deploy nothing. No
 # untrusted input is interpolated into run: blocks anywhere here.
 
 name: Deploy
@@ -21,7 +22,6 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - "**.md"
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - "LICENSE"

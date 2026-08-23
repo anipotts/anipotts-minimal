@@ -31,6 +31,7 @@ const APPROVAL_PATHS = [
 const KNOWN_SAFE_ROOTS = [
   /^apps\/(?:admin|www)\//,
   /^packages\//,
+  /^content\/public\//,
   /^scripts\//,
   /^config\//,
   /^drizzle\/migrations\//,
@@ -46,6 +47,7 @@ function parseChange(line) {
 }
 
 export function isReleaseIgnored(path) {
+  if (path.startsWith("content/public/")) return false;
   return (
     path.endsWith(".md") ||
     path.startsWith("docs/") ||
@@ -63,6 +65,7 @@ export function computeDeployTargets(paths) {
     if (!path || isReleaseIgnored(path)) continue;
     if (
       path.startsWith("apps/www/") ||
+      path.startsWith("content/public/") ||
       path.startsWith("packages/content/src/public/") ||
       path === "packages/content/package.json" ||
       path === "packages/content/src/index.ts" ||
@@ -73,6 +76,7 @@ export function computeDeployTargets(paths) {
 
     if (
       path.startsWith("apps/admin/") ||
+      path.startsWith("content/public/") ||
       path.startsWith("packages/content/") ||
       path.startsWith("packages/lib/") ||
       path.startsWith("packages/brand/") ||

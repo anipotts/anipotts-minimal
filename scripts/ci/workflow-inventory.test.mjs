@@ -48,6 +48,11 @@ assert.ok(
   "deploy workflow must promote path-filtered changes from merged main",
 );
 assert.equal(
+  deployWorkflow.includes('- "**.md"'),
+  false,
+  "deploy workflow must not suppress canonical public Markdown",
+);
+assert.equal(
   autoMergeWorkflow.includes("gh workflow run deploy.yml"),
   false,
   "automerge must not dispatch a duplicate deploy after the main push",
