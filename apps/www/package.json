@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@anipotts/content": "workspace:*",
-    "@anipotts/lib": "workspace:*",
     "@anipotts/brand": "workspace:*",
     "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/rss": "^4.0.19",

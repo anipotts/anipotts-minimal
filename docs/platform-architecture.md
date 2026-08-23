@@ -296,9 +296,9 @@ Rules:
     the admin app only owns the Vite raw-markdown import boundary.
 31. move public page content defaults, pure normalizers, validators, content key
     helpers, and homepage summary helpers into `@anipotts/content/public`.
-    Keep `@anipotts/lib/cms` as the D1-backed reader facade and compatibility
-    export. Public route consumers should import pure content shape contracts
-    from `@anipotts/content/public`; D1 readers stay in `@anipotts/lib/cms`.
+    Public routes render the generated canonical content contract and Astro
+    collections. `@anipotts/lib/cms` remains an Admin-side compatibility and D1
+    history adapter, not a public runtime source.
     Metadata-only source-ref refresh is covered by
     `drizzle/migrations/0029_update_public_content_contract_source_refs.sql`.
 32. expand `/orchestrating` page content from hero-only copy into structured

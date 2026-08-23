@@ -90,7 +90,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
-      content="#ffffff"
+      content="#61abea"
     />
     <meta
       name="theme-color"
@@ -115,12 +115,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <script is:inline>
       (() => {
         const stored = localStorage.getItem("theme");
-        const theme =
-          stored === "dark" || stored === "light"
-            ? stored
-            : matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light";
+        const theme = stored === "dark" ? "dark" : "light";
         document.documentElement.dataset.theme = theme;
       })();
     </script>

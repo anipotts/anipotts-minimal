@@ -25,6 +25,7 @@ export interface HomepageSection {
   heading: string;
   subheading?: string;
   rich_summary?: HomepageRichSummarySentence[];
+  mention_keys?: string[];
   paragraphs?: string[];
   links?: { label: string; href: string }[];
   limit?: number;

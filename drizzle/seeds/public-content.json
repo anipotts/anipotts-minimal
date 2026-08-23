@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "bc9520e91b49442bd48519969eba0cf56a3470e9ac739a7465cfa103a738a2ab",
+  "source_hash": "c1bd6a4e27172eecbbc1c79ec688c5c511abaad6206022a790cd0c28bb472067",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -13,103 +13,16 @@
             "label": "index",
             "heading": "hi, i'm ani",
             "subheading": "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-            "rich_summary": [
-              {
-                "segments": [
-                  {
-                    "kind": "text",
-                    "text": "i "
-                  },
-                  {
-                    "kind": "mention",
-                    "key": "build"
-                  },
-                  {
-                    "kind": "text",
-                    "text": " with "
-                  },
-                  {
-                    "kind": "mention",
-                    "key": "agents"
-                  },
-                  {
-                    "kind": "text",
-                    "text": " and "
-                  },
-                  {
-                    "kind": "mention",
-                    "key": "write"
-                  },
-                  {
-                    "kind": "text",
-                    "text": " about the "
-                  },
-                  {
-                    "kind": "mention",
-                    "key": "systems"
-                  },
-                  {
-                    "kind": "text",
-                    "text": " that keep the work coherent."
-                  }
-                ]
-              },
-              {
-                "segments": [
-                  {
-                    "kind": "mention",
-                    "key": "businessInsider"
-                  },
-                  {
-                    "kind": "text",
-                    "text": " has covered how i work; previously, i worked on real-time agent i/o at "
-                  },
-                  {
-                    "kind": "cluster",
-                    "segments": [
-                      {
-                        "kind": "mention",
-                        "key": "structuredAi"
-                      },
-                      {
-                        "kind": "parens",
-                        "segments": [
-                          {
-                            "kind": "mention",
-                            "key": "yCombinatorF25"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "kind": "text",
-                    "text": " and "
-                  },
-                  {
-                    "kind": "cluster",
-                    "segments": [
-                      {
-                        "kind": "mention",
-                        "key": "badHabit",
-                        "suffix": ","
-                      },
-                      {
-                        "kind": "text",
-                        "text": "an "
-                      },
-                      {
-                        "kind": "mention",
-                        "key": "atlanticRecords"
-                      },
-                      {
-                        "kind": "text",
-                        "text": " venture."
-                      }
-                    ]
-                  }
-                ]
-              }
+            "paragraphs": [
+              "i build with agents and write about the systems that keep the work coherent.",
+              "business insider has covered how i work. previously, i worked on real-time agent i/o at structured ai and our bad habit."
+            ],
+            "mention_keys": [
+              "businessInsider",
+              "structuredAi",
+              "yCombinatorF25",
+              "badHabit",
+              "atlanticRecords"
             ]
           },
           "past_work": {
@@ -236,7 +149,7 @@
         ]
       },
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "ae026d68f81686d5dee100ec6a13ebb20c2ccb589f805811fee153cc6a1dfad5"
+      "source_hash": "defa27aecfa9dac74c4dafd74471ba9de55882435adf5afde2a63a2e8379af89"
     },
     {
       "page_key": "making",

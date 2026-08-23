@@ -1,0 +1,158 @@
+---
+import type { HomepageMention } from "@anipotts/content/public";
+
+interface Props {
+  keys: string[];
+  mentions: Record<string, HomepageMention>;
+}
+
+const { keys, mentions } = Astro.props;
+const items = keys.flatMap((key) => {
+  const mention = mentions[key];
+  return mention ? [{ key, mention }] : [];
+});
+---
+
+<aside class="context-rail" aria-label="selected context">
+  <span class="context-label">work and coverage</span>
+  <ul class="context-list">
+    {
+      items.map(({ key, mention }) => {
+        const Tag = mention.href ? "a" : "span";
+        const external = Boolean(mention.href?.startsWith("http"));
+        return (
+          <li>
+            <Tag
+              class="context-item"
+              href={mention.href}
+              target={external ? "_blank" : undefined}
+              rel={external ? "noopener noreferrer" : undefined}
+            >
+              <span class="context-mark" aria-hidden="true">
+                {mention.logoSrc ? (
+                  <img
+                    src={mention.logoSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    class:list={{
+                      "context-logo": true,
+                      "context-logo-wide": mention.logoShape === "wide",
+                      "context-logo-white": mention.logoTone === "white",
+                    }}
+                  />
+                ) : (
+                  <span class="context-monogram">{key.slice(0, 2)}</span>
+                )}
+              </span>
+              <span>{mention.label}</span>
+            </Tag>
+          </li>
+        );
+      })
+    }
+  </ul>
+</aside>
+
+<style>
+  .context-rail {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.5fr) minmax(0, 3fr);
+    gap: var(--s-3) var(--s-5);
+    align-items: start;
+    margin-top: var(--s-5);
+    padding-block: var(--s-3);
+    border-block: 1px solid var(--border);
+  }
+
+  .context-label {
+    padding-top: 0.48rem;
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .context-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .context-item {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    gap: 0.58rem;
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 560;
+    text-decoration: none;
+    transition: opacity 160ms ease;
+  }
+
+  a.context-item:hover {
+    opacity: 0.72;
+  }
+
+  .context-mark {
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: 0 0 1.5rem;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 0.3rem;
+    background: var(--surface);
+  }
+
+  .context-logo {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+  }
+
+  .context-logo-wide {
+    width: 1.18rem;
+  }
+
+  .context-logo-white {
+    filter: brightness(0) invert(1);
+  }
+
+  .context-monogram {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 640px) {
+    .context-rail {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+    }
+
+    .context-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--s-2);
+    }
+
+    .context-item {
+      min-width: 0;
+      font-size: 0.82rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .context-item {
+      transition: none;
+    }
+  }
+</style>

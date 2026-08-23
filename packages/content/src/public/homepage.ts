@@ -118,6 +118,16 @@ function normalizeSection(
   }
 
   if (
+    Array.isArray(source.mention_keys) ||
+    fallback.mention_keys !== undefined
+  ) {
+    normalized.mention_keys = normalizeMentionKeyList(
+      source.mention_keys,
+      fallback.mention_keys ?? [],
+    );
+  }
+
+  if (
     Array.isArray(source.writing_slugs) ||
     fallback.writing_slugs !== undefined
   ) {
@@ -128,6 +138,18 @@ function normalizeSection(
   }
 
   return normalized;
+}
+
+function normalizeMentionKeyList(value: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(value)) return fallback;
+
+  const keys = value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(isSafeMentionKey)
+    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax);
+
+  return keys.length > 0 ? keys : fallback;
 }
 
 function normalizeSlugList(value: unknown, fallback: string[]): string[] {
@@ -653,10 +675,10 @@ export function validateHomepageContent(content: HomepageContent): {
     validateRichSummary(intro.rich_summary);
   if (introError) return { ok: false, error: introError };
 
-  const mentionError = validateMentions(
-    content.mentions,
-    collectRichSummaryMentionKeys(intro.rich_summary),
-  );
+  const mentionError = validateMentions(content.mentions, [
+    ...collectRichSummaryMentionKeys(intro.rich_summary),
+    ...(intro.mention_keys ?? []),
+  ]);
   if (mentionError) return { ok: false, error: mentionError };
 
   const workError =

@@ -1,15 +1,13 @@
 ---
 import Shell from "../layouts/Shell.astro";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
-import { fetchPageContent } from "@anipotts/lib/cms";
-import { normalizeSystemsPageContent } from "@anipotts/content/public";
+import {
+  DEFAULT_SYSTEMS_CONTENT,
+  normalizeSystemsPageContent,
+} from "@anipotts/content/public";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const page = await fetchPageContent("systems");
-const content = normalizeSystemsPageContent(page?.content);
+const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 ---
 
 <Shell title={content.title} description={content.description} path="/systems">

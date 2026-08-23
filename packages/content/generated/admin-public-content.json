@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "bc9520e91b49442bd48519969eba0cf56a3470e9ac739a7465cfa103a738a2ab",
+  "source_hash": "c1bd6a4e27172eecbbc1c79ec688c5c511abaad6206022a790cd0c28bb472067",
   "records": [
     {
       "entity_id": "public-page:home",
@@ -9,7 +9,7 @@
       "status": "source_controlled",
       "route": "/",
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "ae026d68f81686d5dee100ec6a13ebb20c2ccb589f805811fee153cc6a1dfad5"
+      "source_hash": "defa27aecfa9dac74c4dafd74471ba9de55882435adf5afde2a63a2e8379af89"
     },
     {
       "entity_id": "public-page:making",

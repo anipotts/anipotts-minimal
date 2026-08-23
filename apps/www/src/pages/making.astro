@@ -2,25 +2,17 @@
 import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { visibleProjects, type Project } from "../lib/content";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
 import {
   DEFAULT_MAKING_INDEX_CONTENT,
   normalizeListingPageContent,
-  type ListingPageContent,
 } from "@anipotts/content/public";
-import { fetchPageContent } from "@anipotts/lib/cms";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
 const ORCHESTRATING_PROJECTS = new Set(["claude-code-tips", "imessage-mcp"]);
-const [allProjects, makingPage] = await Promise.all([
-  visibleProjects(),
-  fetchPageContent<ListingPageContent>("making"),
-]);
+const allProjects = await visibleProjects();
 const copy = normalizeListingPageContent(
-  makingPage?.content,
+  DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_MAKING_INDEX_CONTENT,
 );
 const projects = allProjects.filter(

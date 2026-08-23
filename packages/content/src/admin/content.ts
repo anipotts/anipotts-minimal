@@ -107,9 +107,9 @@ type PageContentD1Row = {
 export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
   architecture_doc: "docs/admin-v2-architecture.md",
-  mode: "read_only_static_plus_d1_page_content",
+  mode: "canonical_source_plus_d1_drafts",
   generated_from:
-    "canonical content/public source files, generated Admin projection, and versioned D1 page_content runtime overrides",
+    "canonical content/public source files and the generated Admin projection; D1 page_content rows remain draft and migration history",
 };
 
 export async function readPageContentInventoryStore(
@@ -168,7 +168,7 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero heading",
     source_ref:
-      "D1 page_content:home.sections.intro.heading seeded by drizzle/migrations/0010_seed_home_page_content.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+      "content/public/pages/home.md sections.intro.heading, projected through @anipotts/content/public",
     current_value: "hi, i'm ani",
     editability: "ready",
     risk_level: "low",
@@ -182,13 +182,13 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary seeded by drizzle/migrations/0016_seed_homepage_rich_summary.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+      "content/public/pages/home.md sections.intro.paragraphs, projected through @anipotts/content/public",
     current_value:
-      "Homepage intro summary uses structured D1 text and mention keys when present.",
+      "Homepage intro copy uses two readable paragraphs followed by a separate context rail.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview rich-summary segment edits before any save path touches above-fold public copy.",
+      "Preview paragraph edits before any publish path updates canonical public content.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
   },
@@ -197,13 +197,13 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "homepage mention metadata",
     source_ref:
-      "D1 page_content:home.mentions seeded by drizzle/migrations/0017_seed_homepage_mentions.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+      "content/public/pages/home.md mentions and sections.intro.mention_keys, projected through @anipotts/content/public",
     current_value:
       "Structured AI, YC F25, Our Bad Habit, Atlantic Records, and Business Insider labels, links, and local logo paths are now structured homepage content.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview mention label, link, and local logo-path edits before any save path touches above-fold public copy.",
+      "Preview context label, link, and local logo-path edits before canonical public content changes.",
     required_authority: [],
     proof_ids: ["content.homepage.mentions.page-content"],
   },
@@ -211,14 +211,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.proof_cards",
     surface: "homepage",
     title: "proof cards",
-    source_ref:
-      "D1 page_content:home.proof_cards seeded by drizzle/migrations/0013_seed_homepage_proof_cards.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+    source_ref: "content/public/pages/home.md proof_cards",
     current_value:
-      "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from D1 when present.",
+      "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from canonical content.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Use the normalized D1 proof card schema for preview before any save path.",
+      "Use the normalized canonical proof card schema for preview before any save path.",
     required_authority: [],
     proof_ids: ["content.homepage.proof.page-content"],
   },
@@ -226,14 +225,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.making_selection",
     surface: "homepage",
     title: "homepage making selection",
-    source_ref:
-      "D1 page_content:home.sections.past_work.project_slugs seeded by drizzle/migrations/0014_seed_homepage_making_slugs.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+    source_ref: "content/public/pages/home.md sections.past_work",
     current_value:
-      "D1 controls the making label, limit, view-all link, and ordered homepage project slugs when present.",
+      "Canonical homepage content controls the making label, limit, view-all link, and ordered project slugs.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview ordered project selections from D1 before any save path edits the home content record.",
+      "Preview ordered project selections before changing canonical homepage content.",
     required_authority: [],
     proof_ids: ["content.homepage.making.page-content"],
   },
@@ -241,14 +239,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "homepage.writing_selection",
     surface: "homepage",
     title: "homepage writing selection",
-    source_ref:
-      "D1 page_content:home.sections.latest_thoughts.writing_slugs seeded by drizzle/migrations/0015_seed_homepage_writing_slugs.sql, fallback @anipotts/content/public DEFAULT_HOMEPAGE_CONTENT",
+    source_ref: "content/public/pages/home.md sections.latest_thoughts",
     current_value:
-      "D1 controls the writing label, limit, view-all link, and ordered homepage writing slugs when present.",
+      "Canonical homepage content controls the writing label, limit, view-all link, and ordered writing slugs.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview ordered writing selections from D1 before any save path edits the home content record.",
+      "Preview ordered writing selections before changing canonical homepage content.",
     required_authority: [],
     proof_ids: ["content.homepage.writing.page-content"],
   },
@@ -270,14 +267,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.index_copy",
     surface: "projects",
     title: "making index copy",
-    source_ref:
-      "D1 page_content:making seeded by drizzle/migrations/0023_seed_making_index_page_content.sql and 0035_seed_making_bucket_copy.sql, fallback @anipotts/content/public DEFAULT_MAKING_INDEX_CONTENT",
+    source_ref: "content/public/pages/making.md",
     current_value:
-      "The /making title, meta description, hero title, hero summary, and project bucket labels/notes use structured page_content when present.",
+      "The /making title, meta description, hero copy, and project bucket labels come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Preview index and bucket copy changes before any save path edits the making page content record.",
+      "Preview index and bucket copy changes before changing canonical content.",
     required_authority: [],
     proof_ids: ["content.projects.index.page-content"],
   },
@@ -285,14 +281,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.archive_index_copy",
     surface: "projects",
     title: "project archive index copy",
-    source_ref:
-      "D1 page_content:projects seeded by drizzle/migrations/0024_seed_projects_index_page_content.sql, fallback @anipotts/content/public DEFAULT_PROJECTS_INDEX_CONTENT",
+    source_ref: "content/public/pages/projects.md",
     current_value:
-      "The /projects title, meta description, hero title, hero summary, and /making hero link use structured page_content when present.",
+      "The /projects title, meta description, hero copy, and /making link come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Preview archive index copy changes before any save path edits the projects page content record.",
+      "Preview archive index copy changes before changing canonical content.",
     required_authority: [],
     proof_ids: ["content.projects.archive-index.page-content"],
   },
@@ -300,14 +295,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "projects.detail_body",
     surface: "projects",
     title: "project detail body",
-    source_ref:
-      "D1 page_content:project:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback content/public/projects/*.md body",
+    source_ref: "content/public/projects/*.md",
     current_value:
-      "Every tracked project detail record now has a structured page_content row. Visible rows publish to public routes; hidden rows remain available for admin review only.",
+      "Project frontmatter and body are the public route source. Historical page_content rows remain available for Admin review.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Review detail page_content rows in admin before replacing markdown fallback or adding any save path, because detail pages carry public claims.",
+      "Review changes in Admin before proposing a source-controlled canonical update because detail pages carry public claims.",
     required_authority: [],
     proof_ids: [
       "content.projects.body.schema",
@@ -332,14 +326,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.index_copy",
     surface: "writing",
     title: "writing index copy",
-    source_ref:
-      "D1 page_content:writing seeded by drizzle/migrations/0022_seed_writing_index_page_content.sql, fallback @anipotts/content/public DEFAULT_WRITING_INDEX_CONTENT",
+    source_ref: "content/public/pages/writing.md",
     current_value:
-      "The /writing title, meta description, hero summary, and search placeholder use structured page_content when present.",
+      "The /writing title, meta description, hero summary, and search placeholder come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Preview index copy changes before any save path edits the writing page content record.",
+      "Preview index copy changes before changing canonical content.",
     required_authority: [],
     proof_ids: ["content.writing.index.page-content"],
   },
@@ -347,14 +340,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "writing.body",
     surface: "writing",
     title: "writing body",
-    source_ref:
-      "D1 page_content:writing:<slug> seeded by drizzle/migrations/0031_seed_detail_page_content.sql and drizzle/migrations/0032_seed_remaining_detail_page_content.sql, fallback content/public/writing/*.md body",
+    source_ref: "content/public/writing/*.md",
     current_value:
-      "Every tracked writing detail record now has a structured page_content row. Published rows render on public routes; the draft row remains unpublished for admin review only.",
+      "Writing frontmatter and body are the public route source. Historical page_content rows remain available for Admin review.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Review writing detail page_content rows in admin before replacing markdown fallback or adding any save/send path.",
+      "Review writing changes in Admin before proposing a source-controlled canonical update or any send path.",
     required_authority: [],
     proof_ids: [
       "content.writing.body.source",
@@ -379,14 +371,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "newsletter.subscribe_copy",
     surface: "newsletter",
     title: "subscribe block copy",
-    source_ref:
-      "D1 page_content:newsletter seeded by drizzle/migrations/0009_seed_newsletter_page_content.sql and updated by drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql, fallback @anipotts/content/public DEFAULT_NEWSLETTER_CONTENT",
+    source_ref: "content/public/pages/newsletter.md",
     current_value:
-      "Headline, deck, CTA label, success text, error text, footer text, sender metadata, archive label, archive copy, and archive URL use D1 page_content as the live source with @anipotts/content/public as the fallback contract.",
+      "Headline, deck, CTA labels, response text, sender metadata, and archive copy come from canonical public content.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Review draft operations before any page_content write or newsletter publish path exists.",
+      "Review source-controlled drafts before any newsletter publish path runs.",
     required_authority: [],
     proof_ids: [
       "content.newsletter.page-content.source",
@@ -397,14 +388,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "newsletter.archive_copy",
     surface: "newsletter",
     title: "newsletter archive copy",
-    source_ref:
-      "D1 page_content:newsletter_archive seeded by drizzle/migrations/0025_seed_newsletter_archive_page_content.sql, fallback @anipotts/content/public DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
+    source_ref: "content/public/pages/newsletter-archive.md",
     current_value:
-      "The /newsletter/archive title, meta description, section label, and hero summary use structured page_content when present.",
+      "The /newsletter/archive title, meta description, section label, and hero summary come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
-      "Preview archive copy changes before any save path edits the newsletter archive page content record.",
+      "Preview archive copy changes before changing canonical content.",
     required_authority: [],
     proof_ids: ["content.newsletter.archive.page-content"],
   },
@@ -427,14 +417,13 @@ export const contentInventory: ContentInventoryItem[] = [
     id: "systems.hero_copy",
     surface: "systems",
     title: "systems page copy",
-    source_ref:
-      "D1 page_content:systems seeded by drizzle/migrations/0044_public_identity_systems.sql, fallback @anipotts/content/public DEFAULT_SYSTEMS_CONTENT",
+    source_ref: "content/public/pages/systems.md",
     current_value:
-      "The /systems title, description, hero, operating principles, featured writing, and public tools use structured page_content when present.",
+      "The /systems title, description, hero, operating principles, featured writing, and public tools come from canonical content.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview systems copy changes before any save path edits the page content record.",
+      "Preview systems copy changes before changing canonical content.",
     required_authority: [],
     proof_ids: ["content.systems.hero.page-content"],
   },
@@ -548,10 +537,14 @@ function sourceBackedFields(
   const gaps: string[] = [];
 
   if (
-    !hasNestedField(content, ["sections", "intro", "rich_summary"]) &&
+    !hasNestedField(content, ["sections", "intro", "paragraphs"]) &&
     !hasNestedField(content, ["sections", "intro", "subheading"])
   ) {
-    gaps.unshift("sections.intro.rich_summary");
+    gaps.unshift("sections.intro.paragraphs");
+  }
+
+  if (!hasNestedField(content, ["sections", "intro", "mention_keys"])) {
+    gaps.push("sections.intro.mention_keys");
   }
 
   if (!hasNestedField(content, ["proof_cards"])) {
@@ -662,7 +655,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     status: "preview",
     risk_level: "medium",
     source_ref:
-      "D1 page_content:home.sections.intro.rich_summary and home.mentions",
+      "content/public/pages/home.md sections.intro.paragraphs and mentions",
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:
@@ -724,11 +717,11 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     title: "choose newsletter copy source",
     status: "preview",
     risk_level: "medium",
-    source_ref: "D1 page_content:newsletter",
+    source_ref: "content/public/pages/newsletter.md",
     current_value:
-      "Newsletter copy has a published `newsletter` page_content seed and source defaults as fallback.",
+      "Newsletter copy comes from canonical repository content; D1 retains draft-operation history.",
     proposed_value:
-      "Render the newsletter content record in admin and require an audited content operation before writes.",
+      "Render canonical newsletter content in Admin and require an audited proposal before source changes.",
     preview_route: "/newsletter",
     authority_state: "source_truth_resolved_preview_only",
     required_approval_ids: [],

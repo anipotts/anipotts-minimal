@@ -3,33 +3,28 @@ import Shell from "../layouts/Shell.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import WritingRow from "../components/WritingRow.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
-import HomepageRichSummary from "../components/HomepageRichSummary.astro";
+import HomepageContextRail from "../components/HomepageContextRail.astro";
 import { Icon } from "astro-icon/components";
 import { publishedWriting, visibleProjects } from "../lib/content";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
 import {
+  DEFAULT_HOMEPAGE_CONTENT,
+  DEFAULT_NEWSLETTER_CONTENT,
   homepageSummaryText,
   normalizeHomepageContent,
   normalizeNewsletterContent,
 } from "@anipotts/content/public";
-import { fetchPageContent } from "@anipotts/lib/cms";
 
 export const prerender = false;
 
-setDB(Astro.locals.runtime.env.DB as unknown as D1Database);
-const [homePage, newsletterPage] = await Promise.all([
-  fetchPageContent("home"),
-  fetchPageContent("newsletter"),
-]);
-const cmsHome = normalizeHomepageContent(homePage?.content);
-const newsletterCopy = normalizeNewsletterContent(newsletterPage?.content);
+const cmsHome = normalizeHomepageContent(DEFAULT_HOMEPAGE_CONTENT);
+const newsletterCopy = normalizeNewsletterContent(DEFAULT_NEWSLETTER_CONTENT);
 const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
 const heading = intro.heading;
 const proofCards = cmsHome.proof_cards;
 const mentionMap = cmsHome.mentions;
+const contextKeys = intro.mention_keys ?? [];
 const selectedMakingSlugs = work.project_slugs ?? [];
 const selectedWritingSlugs = writing.writing_slugs ?? [];
 const homeMakingOrder = new Map<string, number>(
@@ -55,6 +50,13 @@ const writingEntries = (await publishedWriting())
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
 const summaryText = homepageSummaryText(cmsHome);
+const summaryParts = summaryText.match(/^(.+?\.)\s+(.+)$/);
+const introParagraphs =
+  intro.paragraphs && intro.paragraphs.length > 1
+    ? intro.paragraphs
+    : summaryParts
+      ? summaryParts.slice(1)
+      : [summaryText];
 const profileLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
@@ -78,18 +80,16 @@ const profileLd = {
     <h1 class="home-hero">
       {heading}.
     </h1>
-    <p class="hero-summary hero-line">
+    <div class="hero-copy">
       {
-        intro.rich_summary && intro.rich_summary.length > 0 ? (
-          <HomepageRichSummary
-            sentences={intro.rich_summary}
-            mentions={mentionMap}
-          />
-        ) : (
-          summaryText
-        )
+        introParagraphs.map((paragraph, index) => (
+          <p class:list={{ "hero-line": true, "hero-line-history": index > 0 }}>
+            {paragraph}
+          </p>
+        ))
       }
-    </p>
+    </div>
+    <HomepageContextRail keys={contextKeys} mentions={mentionMap} />
     <div
       class="proof-grid mobile-carousel"
       aria-label="selected engineering proof"
@@ -166,46 +166,25 @@ const profileLd = {
     font-weight: 900;
   }
 
-  .hero-line {
+  .hero-copy {
     display: grid;
-    max-width: none;
-    row-gap: 0.72em;
-    line-height: 1.52;
+    max-width: 45rem;
+    gap: var(--s-2);
+  }
+
+  .hero-line {
+    margin: 0;
+    color: var(--ink);
+    max-width: 43rem;
+    font-size: clamp(1.08rem, 2.2vw, 1.42rem);
+    line-height: 1.48;
     text-wrap: pretty;
   }
 
-  .hero-line :global(.hero-sentence) {
-    display: block;
-    max-width: none;
-  }
-
-  .hero-line :global(.hero-break) {
-    display: none;
-  }
-
-  .hero-line :global(.mention-cluster) {
-    display: inline-flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    column-gap: 0.22em;
-    row-gap: 0;
-    white-space: normal;
-  }
-
-  .hero-line :global(.mention-cluster .inline-mention) {
-    transform: translateY(0.04em);
-  }
-
-  .hero-line :global(.brand-parens) {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.08em;
-    white-space: nowrap;
-  }
-
-  .hero-line :global(.brand-parens > span),
-  .hero-line :global(.brand-parens .inline-mention) {
-    font-size: inherit;
+  .hero-line-history {
+    max-width: 42rem;
+    color: var(--ink-muted);
+    font-size: clamp(0.98rem, 1.7vw, 1.12rem);
   }
 
   .text-link {
@@ -314,39 +293,7 @@ const profileLd = {
     }
 
     .hero-line {
-      font-size: clamp(1rem, 3.9vw, 1.12rem);
-      line-height: 1.5;
-    }
-
-    .hero-line :global(.hero-sentence) {
-      min-width: 0;
-      max-width: 32rem;
-      overflow-wrap: anywhere;
-    }
-
-    .hero-line :global(.mention-cluster) {
-      display: inline;
-      min-width: 0;
-      white-space: normal;
-    }
-
-    .hero-line :global(.brand-parens) {
-      white-space: normal;
-    }
-
-    .hero-line :global(.inline-mention) {
-      gap: 0.22em;
-    }
-
-    .hero-line :global(.brand-mark) {
-      width: 1em;
-      height: 1em;
-      flex-basis: 1em;
-    }
-
-    .hero-line :global(.brand-mark-wide) {
-      width: 1.34em;
-      flex-basis: 1.34em;
+      font-size: 1.05rem;
     }
 
     .proof-grid {

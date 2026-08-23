@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "bc9520e91b49442bd48519969eba0cf56a3470e9ac739a7465cfa103a738a2ab";
+  "c1bd6a4e27172eecbbc1c79ec688c5c511abaad6206022a790cd0c28bb472067";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -20,103 +20,16 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       heading: "hi, i'm ani",
       subheading:
         "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-      rich_summary: [
-        {
-          segments: [
-            {
-              kind: "text",
-              text: "i ",
-            },
-            {
-              kind: "mention",
-              key: "build",
-            },
-            {
-              kind: "text",
-              text: " with ",
-            },
-            {
-              kind: "mention",
-              key: "agents",
-            },
-            {
-              kind: "text",
-              text: " and ",
-            },
-            {
-              kind: "mention",
-              key: "write",
-            },
-            {
-              kind: "text",
-              text: " about the ",
-            },
-            {
-              kind: "mention",
-              key: "systems",
-            },
-            {
-              kind: "text",
-              text: " that keep the work coherent.",
-            },
-          ],
-        },
-        {
-          segments: [
-            {
-              kind: "mention",
-              key: "businessInsider",
-            },
-            {
-              kind: "text",
-              text: " has covered how i work; previously, i worked on real-time agent i/o at ",
-            },
-            {
-              kind: "cluster",
-              segments: [
-                {
-                  kind: "mention",
-                  key: "structuredAi",
-                },
-                {
-                  kind: "parens",
-                  segments: [
-                    {
-                      kind: "mention",
-                      key: "yCombinatorF25",
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              kind: "text",
-              text: " and ",
-            },
-            {
-              kind: "cluster",
-              segments: [
-                {
-                  kind: "mention",
-                  key: "badHabit",
-                  suffix: ",",
-                },
-                {
-                  kind: "text",
-                  text: "an ",
-                },
-                {
-                  kind: "mention",
-                  key: "atlanticRecords",
-                },
-                {
-                  kind: "text",
-                  text: " venture.",
-                },
-              ],
-            },
-          ],
-        },
+      paragraphs: [
+        "i build with agents and write about the systems that keep the work coherent.",
+        "business insider has covered how i work. previously, i worked on real-time agent i/o at structured ai and our bad habit.",
+      ],
+      mention_keys: [
+        "businessInsider",
+        "structuredAi",
+        "yCombinatorF25",
+        "badHabit",
+        "atlanticRecords",
       ],
     },
     past_work: {

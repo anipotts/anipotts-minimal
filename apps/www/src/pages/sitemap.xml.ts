@@ -5,8 +5,6 @@ import {
   writingSlug,
   visibleProjects,
 } from "../lib/content";
-import { setDB } from "@anipotts/lib/db";
-import type { D1Database } from "@anipotts/lib/db";
 
 export const prerender = false;
 
@@ -18,8 +16,7 @@ interface Entry {
   lastmod?: string;
 }
 
-export const GET: APIRoute = async (context) => {
-  setDB(context.locals.runtime.env.DB as unknown as D1Database);
+export const GET: APIRoute = async () => {
   const writingEntries = await publishedWriting();
   const projects = await visibleProjects();
 
