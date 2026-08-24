@@ -140,14 +140,13 @@ export function buildBootstrapSql(manifest = loadManifest()) {
         `INSERT INTO d1_migrations (name) VALUES (${sqlString(name)});`,
     )
     .join("\n");
-  return `BEGIN IMMEDIATE;
+  return `-- D1 remote file ingestion is transactional. Do not add SQL BEGIN or COMMIT.
 CREATE TABLE d1_migrations(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE,
   applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 ${inserts}
-COMMIT;
 `;
 }
 
