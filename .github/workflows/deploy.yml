@@ -187,7 +187,7 @@ jobs:
 
       - name: Verify migration preconditions
         if: steps.gates.outputs.production_enabled == 'true' && steps.release.outputs.d1_changed == 'true'
-        run: node scripts/ci/d1-migration-conditions.mjs preconditions "$RUNNER_TEMP/deploy-changed-files.txt"
+        run: node scripts/ci/d1-migration-conditions.mjs preconditions all-pending
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -201,7 +201,7 @@ jobs:
 
       - name: Verify migration postconditions
         if: steps.gates.outputs.production_enabled == 'true' && steps.release.outputs.d1_changed == 'true'
-        run: node scripts/ci/d1-migration-conditions.mjs postconditions "$RUNNER_TEMP/deploy-changed-files.txt"
+        run: node scripts/ci/d1-migration-conditions.mjs postconditions all-pending
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

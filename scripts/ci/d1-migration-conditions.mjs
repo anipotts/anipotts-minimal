@@ -7,6 +7,11 @@ import { basename } from "node:path";
 import { loadManifest } from "./migration-policy.mjs";
 
 export function selectedConditions(manifest, changedLines, phase) {
+  if (changedLines === "all-pending") {
+    return manifest.migrations.flatMap((record) =>
+      record[phase].map((condition) => ({ file: record.file, ...condition })),
+    );
+  }
   const changed = new Set(
     changedLines
       .filter(Boolean)
@@ -40,17 +45,19 @@ export function assertConditionResult(condition, payload) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const [phase, changesPath] = process.argv.slice(2);
-  if (!["preconditions", "postconditions"].includes(phase) || !changesPath) {
+  const [phase, selection] = process.argv.slice(2);
+  if (!["preconditions", "postconditions"].includes(phase) || !selection) {
     console.error(
-      "usage: d1-migration-conditions.mjs <preconditions|postconditions> <name-status-file>",
+      "usage: d1-migration-conditions.mjs <preconditions|postconditions> <name-status-file|all-pending>",
     );
     process.exit(2);
   }
   const manifest = loadManifest();
   const conditions = selectedConditions(
     manifest,
-    readFileSync(changesPath, "utf8").split(/\r?\n/),
+    selection === "all-pending"
+      ? "all-pending"
+      : readFileSync(selection, "utf8").split(/\r?\n/),
     phase,
   );
   for (const condition of conditions) {
