@@ -7,19 +7,19 @@
     "migrations_dir": "drizzle/migrations"
   },
   "bootstrap": {
-    "status": "pending_explicit_approval",
-    "baseline_through": "0042_admin_inbox_attention_contract.sql",
-    "automatic_remote_apply": false,
-    "captured_at": "2026-08-05T14:25:00Z",
-    "wrangler_version": "4.92.0",
-    "schema_fingerprint": "sha256:8ffd0dacff04904a34b40b2be4436c0121ac56a8f8f68c660c16237fac5a43f4",
+    "status": "verified",
+    "baseline_through": "0043_admin_auth_v2.sql",
+    "automatic_remote_apply": true,
+    "captured_at": "2026-08-24T00:21:22Z",
+    "wrangler_version": "4.125.0",
+    "schema_fingerprint": "sha256:dccfe386fcab350e62bf3da2d5fb961dab0ec5f6b6e9227cab1cfc13f3625df3",
     "schema_objects": {
-      "tables": 55,
-      "indexes": 74,
+      "tables": 64,
+      "indexes": 87,
       "triggers": 6
     },
-    "rows_written": 0,
-    "note": "Read-only sqlite_master fingerprint. Remote export is unavailable because production contains FTS5 virtual tables. No ledger was created and no migration was applied."
+    "rows_written": 123,
+    "note": "Production ledger bootstrap verified 40 historical names without replay. Migration 0043 then applied once through Wrangler; postconditions and the final sqlite_master fingerprint passed."
   },
   "historical": [
     [
@@ -181,40 +181,11 @@
     [
       "0042_admin_inbox_attention_contract.sql",
       "34ba441a1921d0a5265695236ec73abead8665475cb6c3d9ada5dc78e30a48ed"
+    ],
+    [
+      "0043_admin_auth_v2.sql",
+      "c19e5b0d2a68021d91f8c5879fde3b9a8804fdbe9e46abffc56652b97fc5b125"
     ]
   ],
-  "migrations": [
-    {
-      "file": "0043_admin_auth_v2.sql",
-      "checksum": "sha256:c19e5b0d2a68021d91f8c5879fde3b9a8804fdbe9e46abffc56652b97fc5b125",
-      "risk": "approval",
-      "consumers": ["admin"],
-      "preconditions": [
-        {
-          "sql": "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('admin_users','admin_sessions','admin_invites','admin_device_authorizations','admin_external_identities','admin_recovery_requests','admin_machine_tokens','admin_security_notifications')) AS auth_tables, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_credentials') WHERE name IN ('label','created_by_session_id','revocation_reason')) AS credential_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_challenges') WHERE name IN ('user_id','session_id','invite_id','recovery_session_id','request_origin','metadata')) AS challenge_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_audit') WHERE name IN ('user_id','session_id','outcome','metadata')) AS audit_columns",
-          "expected": {
-            "auth_tables": 0,
-            "credential_columns": 0,
-            "challenge_columns": 0,
-            "audit_columns": 0
-          }
-        }
-      ],
-      "postconditions": [
-        {
-          "sql": "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('admin_users','admin_sessions','admin_invites','admin_device_authorizations','admin_external_identities','admin_recovery_requests','admin_machine_tokens','admin_security_notifications')) AS auth_tables, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_credentials') WHERE name IN ('label','created_by_session_id','revocation_reason')) AS credential_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_challenges') WHERE name IN ('user_id','session_id','invite_id','recovery_session_id','request_origin','metadata')) AS challenge_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_passkey_audit') WHERE name IN ('user_id','session_id','outcome','metadata')) AS audit_columns, (SELECT COUNT(*) FROM pragma_table_info('admin_device_authorizations') WHERE name = 'approved_by_credential_id') AS approval_credential_columns",
-          "expected": {
-            "auth_tables": 8,
-            "credential_columns": 3,
-            "challenge_columns": 6,
-            "audit_columns": 4,
-            "approval_credential_columns": 1
-          }
-        }
-      ],
-      "rollback": "Keep Cloudflare Access active and the prior Admin deployment available. If application proof fails, roll back the Worker only and preserve the additive auth tables for a forward fix. Do not drop auth history automatically.",
-      "schema_fingerprint_before": "sha256:8ffd0dacff04904a34b40b2be4436c0121ac56a8f8f68c660c16237fac5a43f4",
-      "schema_fingerprint_after": "pending_bootstrap"
-    }
-  ]
+  "migrations": []
 }

@@ -36,17 +36,15 @@ safety, and native approval owns consequential effects.
 ## D1 boundary
 
 `apps/admin` is the only migration owner. Its D1 binding points at the governed
-repository migration directory, while remote application remains disabled
-because production has no verified Wrangler ledger. Replaying historical files
-would be unsafe.
+repository migration directory. The production Wrangler ledger was bootstrapped
+and verified on August 24, 2026 without replaying historical files.
 
-The manifest records immutable hashes for the 40 historical files and a
-read-only production schema fingerprint. The August 5 query observed 55 tables,
-74 indexes, 6 triggers, and zero rows written. Wrangler schema export was not
-available because the database contains FTS5 virtual tables, so the fingerprint
-uses normalized `sqlite_master` metadata.
+The manifest records immutable hashes for the 41 applied files and the current
+read-only production schema fingerprint. The verified baseline contains 64
+tables, 87 indexes, and 6 triggers. The fingerprint uses normalized
+`sqlite_master` metadata because the database contains FTS5 virtual tables.
 
-Remote migration promotion remains disabled until one approved bootstrap:
+The approved bootstrap completed with this proof:
 
 1. verify the live schema fingerprint and every historical postcondition
 2. repair any mismatch without replaying history
@@ -86,8 +84,9 @@ jobs, deploy only classified targets, and smoke the resulting release.
 
 Database and authenticated Admin gates remain independent:
 
-- remote D1 migration promotion stays held until the one-time ledger bootstrap
-  is approved and verified
+- provably safe additive migrations may promote through the governed manifest
+  and Wrangler ledger; destructive, auth, rewrite, and unknown migrations stay
+  exact-gated
 - authenticated Admin smoke stays held until its least-privileged production
   identity is installed and proven unable to write
 - Cloudflare Access stays in front of Admin until native auth production proof
