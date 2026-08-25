@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import icon from "astro-icon";
+import { publicContentHotReload } from "../../scripts/dev/public-content-hot-reload.mjs";
 
 export default defineConfig({
   site: "https://anipotts.com",
@@ -9,6 +10,7 @@ export default defineConfig({
   trailingSlash: "never",
   build: { format: "file" },
   vite: {
+    plugins: [publicContentHotReload()],
     server: {
       allowedHosts: ["news.anipotts.com", ".anipotts.localhost"],
     },
