@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "d8ad0931a6c72802350ab4dfe92baf890894d88cb62d43b365854df0332e6665",
+  "source_hash": "a438d8fdd8bf7a596e34a5d0b4ae1244ff666f9a80eead94b4616caac792601d",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -11,7 +11,7 @@
           "intro": {
             "visible": true,
             "label": "index",
-            "heading": "hi, i'm ani",
+            "heading": "hi, i'm ani!",
             "subheading": "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
             "paragraphs": [
               "i build with agents and write about the systems that keep the work coherent.",
@@ -127,7 +127,7 @@
           {
             "label": "paragon global investments",
             "href": "https://paragoninvestments.org",
-            "title": "research portal for a quant fund",
+            "title": "platform for an intercollegiate quant fund",
             "detail": "next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work."
           },
           {
@@ -139,7 +139,7 @@
         ]
       },
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "56b119601eb195219f0bdf44230faf56055f771cbf4c91b88b6155f3ef86d2da"
+      "source_hash": "f9694ad8695a7bffc5db883c9678b3993a4151773e518846b765828c874961e3"
     },
     {
       "page_key": "making",

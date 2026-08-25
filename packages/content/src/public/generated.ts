@@ -10,14 +10,14 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "d8ad0931a6c72802350ab4dfe92baf890894d88cb62d43b365854df0332e6665";
+  "a438d8fdd8bf7a596e34a5d0b4ae1244ff666f9a80eead94b4616caac792601d";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
     intro: {
       visible: true,
       label: "index",
-      heading: "hi, i'm ani",
+      heading: "hi, i'm ani!",
       subheading:
         "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
       paragraphs: [
@@ -146,7 +146,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     {
       label: "paragon global investments",
       href: "https://paragoninvestments.org",
-      title: "research portal for a quant fund",
+      title: "platform for an intercollegiate quant fund",
       detail:
         "next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.",
     },

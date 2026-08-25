@@ -3,7 +3,7 @@ sections:
   intro:
     visible: true
     label: index
-    heading: hi, i'm ani
+    heading: hi, i'm ani!
     subheading: i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
     paragraphs:
       - i build with agents and write about the systems that keep the work coherent.
@@ -103,7 +103,7 @@ proof_cards:
     detail: next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.
   - label: paragon global investments
     href: https://paragoninvestments.org
-    title: research portal for a quant fund
+    title: platform for an intercollegiate quant fund
     detail: next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.
   - label: public tooling
     href: /projects/claude-code-tips
