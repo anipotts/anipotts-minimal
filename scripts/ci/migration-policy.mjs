@@ -165,7 +165,7 @@ export function inspectMigrationChanges(paths, options = {}) {
   const readFile = options.readFile || readFileSync;
   let risk = "automatic";
   const consumers = new Set();
-  const reasons = [];
+  const changedRecords = new Set();
 
   for (const file of migrationFiles) {
     if (historical.has(file)) {
@@ -179,27 +179,41 @@ export function inspectMigrationChanges(paths, options = {}) {
       file,
       manifest.bootstrap,
     );
+    changedRecords.add(record.file);
+  }
+
+  const pending = manifest.migrations
+    .map((record) => {
+      const sql = readFile(join(MIGRATION_DIR, record.file), "utf8");
+      return validateNewRecord(record, sql, record.file, manifest.bootstrap);
+    })
+    .sort((a, b) => a.file.localeCompare(b.file));
+
+  for (const record of pending) {
     if (record.risk === "approval") risk = "approval";
     record.consumers.forEach((consumer) => consumers.add(consumer));
-    reasons.push(`${file}: ${record.risk}`);
   }
 
   const remoteAllowed =
     manifest.bootstrap.status === "verified" &&
     manifest.bootstrap.automatic_remote_apply === true &&
-    risk === "automatic";
-  const orderedFiles = [...migrationFiles].sort();
+    risk === "automatic" &&
+    pending.length > 0 &&
+    pending.every((record) => record.risk === "automatic");
+  const firstPending = pending[0];
+  const lastPending = pending.at(-1);
   return {
     changed: true,
     risk,
     consumers: [...consumers].sort(),
     remoteAllowed,
-    schemaVersion: orderedFiles.at(-1).slice(0, 4),
-    schemaFingerprintBefore: records.get(orderedFiles[0])
-      .schema_fingerprint_before,
-    schemaFingerprintAfter: records.get(orderedFiles.at(-1))
-      .schema_fingerprint_after,
-    reasons,
+    schemaVersion: lastPending.file.slice(0, 4),
+    schemaFingerprintBefore: firstPending.schema_fingerprint_before,
+    schemaFingerprintAfter: lastPending.schema_fingerprint_after,
+    reasons: pending.map(
+      (record) =>
+        `${record.file}: ${record.risk}${changedRecords.has(record.file) ? " (changed)" : " (pending)"}`,
+    ),
   };
 }
 

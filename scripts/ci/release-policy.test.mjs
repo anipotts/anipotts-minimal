@@ -119,6 +119,38 @@ assert.equal(safeMigration.database_schema_version, "0043");
 assert.equal(safeMigration.migration_schema_before, `sha256:${"1".repeat(64)}`);
 assert.equal(safeMigration.migration_schema_after, `sha256:${"2".repeat(64)}`);
 
+const heldFile = "0042_held_rewrite.sql";
+const heldSql = "UPDATE release_canary SET id = id;";
+const mixedPendingManifest = {
+  ...safeManifest,
+  bootstrap: {
+    ...safeManifest.bootstrap,
+    status: "verified",
+    automatic_remote_apply: true,
+  },
+  migrations: [
+    {
+      ...safeManifest.migrations[0],
+      file: heldFile,
+      checksum: `sha256:${sha256(heldSql)}`,
+      risk: "approval",
+    },
+    safeManifest.migrations[0],
+  ],
+};
+const heldThenSafe = classifyRelease([`A\tdrizzle/migrations/${safeFile}`], {
+  ...base,
+  manifest: mixedPendingManifest,
+  files: [heldFile, safeFile],
+  readFile: (path) => (path.endsWith(heldFile) ? heldSql : safeSql),
+});
+assert.equal(heldThenSafe.migration_risk, "approval");
+assert.equal(heldThenSafe.remote_migration_allowed, false);
+assert.match(
+  heldThenSafe.reasons.join("\n"),
+  /0042_held_rewrite\.sql: approval \(pending\)/,
+);
+
 const removedMigration = classifyRelease(
   ["D\tdrizzle/migrations/0044_public_identity_systems.sql"],
   base,
@@ -229,6 +261,10 @@ assert.equal(
     [`A\tdrizzle/migrations/${safeFile}`],
     "postconditions",
   ).length,
+  1,
+);
+assert.equal(
+  selectedConditions(safeManifest, "all-pending", "postconditions").length,
   1,
 );
 assert.doesNotThrow(() =>

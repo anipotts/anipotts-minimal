@@ -148,6 +148,15 @@ assert.ok(
   ) && deployWorkflow.includes("needs.release.outputs.admin_enabled == 'true'"),
   "Admin deployment must retain its independent authenticated smoke gate",
 );
+assert.ok(
+  deployWorkflow.includes(
+    'automatic_migrations_enabled=${policy.automatic_migrations === "enabled_safe_additive"}',
+  ) &&
+    deployWorkflow.includes(
+      "steps.gates.outputs.automatic_migrations_enabled != 'true'",
+    ),
+  "automatic D1 promotion must honor the release-train emergency hold",
+);
 for (const manualGuard of [
   'test "${{ github.ref }}" = "refs/heads/main"',
   'test "${{ github.actor }}" = "anipotts"',
