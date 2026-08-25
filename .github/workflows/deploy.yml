@@ -158,14 +158,15 @@ jobs:
           node <<'NODE' >> "$GITHUB_OUTPUT"
           const policy = require("./config/release-train.json");
           console.log(`production_enabled=${policy.production_promotion === "enabled"}`);
+          console.log(`automatic_migrations_enabled=${policy.automatic_migrations === "enabled_safe_additive"}`);
           console.log(`admin_enabled=${policy.authenticated_admin_smoke === "enabled"}`);
           console.log(`app_rollback_enabled=${policy.automatic_app_rollback === "enabled"}`);
           NODE
 
-      - name: Stop safely when migration bootstrap is not verified
-        if: steps.release.outputs.d1_changed == 'true' && steps.release.outputs.remote_migration_allowed != 'true'
+      - name: Stop safely when automatic migration promotion is held
+        if: steps.release.outputs.d1_changed == 'true' && (steps.release.outputs.remote_migration_allowed != 'true' || steps.gates.outputs.automatic_migrations_enabled != 'true')
         run: |
-          echo "::error::migration promotion is held until the production ledger bootstrap receipt is verified"
+          echo "::error::automatic migration promotion is held by release policy or migration eligibility"
           exit 1
 
       - name: Reject production schema drift
