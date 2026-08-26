@@ -415,6 +415,12 @@ function normalizeMention(
   copyOptionalString(mention, source, fallback, "logoAlt");
   copyOptionalString(mention, source, fallback, "badgeSrc");
   copyOptionalString(mention, source, fallback, "badgeAlt");
+  if (source.visualOnly !== undefined || fallback?.visualOnly !== undefined) {
+    mention.visualOnly = coerceBoolean(
+      source.visualOnly,
+      fallback?.visualOnly ?? false,
+    );
+  }
   mention.logoTone = normalizeMentionOption(
     source.logoTone,
     fallback?.logoTone,

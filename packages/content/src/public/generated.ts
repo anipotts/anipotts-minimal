@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "ac1fe9629cb54439acd129f658dcdad1154261df2ed3217ea231a6d606f780f3";
+  "09d13c085c0ce4ae2b84edf83ad3158dc6aea98d3a31a9114e9c1d9bcc4ad6b0";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -19,7 +19,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       label: "index",
       heading: "hi, i'm ani!",
       subheading:
-        "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
+        "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai YC F25 and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
       mention_keys: [
         "structuredAi",
         "yCombinatorF25",
@@ -96,9 +96,10 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       logoTone: "white",
     },
     yCombinatorF25: {
-      label: "F25",
+      label: "YC F25",
       logoSrc: "/images/brand/ycombinator-favicon.ico",
-      logoAlt: "y combinator",
+      logoAlt: "Y Combinator F25",
+      visualOnly: true,
     },
     badHabit: {
       label: "our bad habit",

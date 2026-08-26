@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "ac1fe9629cb54439acd129f658dcdad1154261df2ed3217ea231a6d606f780f3",
+  "source_hash": "09d13c085c0ce4ae2b84edf83ad3158dc6aea98d3a31a9114e9c1d9bcc4ad6b0",
   "sources": {
-    "content/public/pages/home.md": "e3f5d5987f91bd0000b29d80c6458f94890c1ccbac985e19e2593d7b94f30653",
+    "content/public/pages/home.md": "87cd4e13e0e4a2cb33e9b39c4d2b8825ada5694e2f978d43a5073cd2f194a450",
     "content/public/pages/making.md": "0f39baf327182292b0c12ca87e65cd72f417df4fc3a02b759f469f4c0cefbda2",
     "content/public/pages/newsletter.md": "0adbb5fb819a790e2d490dc048586b3528ff45bcfd0e49e6c03ed4378ae4ec72",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
@@ -35,7 +35,7 @@
           "visible": true,
           "label": "index",
           "heading": "hi, i'm ani!",
-          "subheading": "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
+          "subheading": "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai YC F25 and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
           "mention_keys": [
             "structuredAi",
             "yCombinatorF25",
@@ -102,9 +102,10 @@
           "logoTone": "white"
         },
         "yCombinatorF25": {
-          "label": "F25",
+          "label": "YC F25",
           "logoSrc": "/images/brand/ycombinator-favicon.ico",
-          "logoAlt": "y combinator"
+          "logoAlt": "Y Combinator F25",
+          "visualOnly": true
         },
         "badHabit": {
           "label": "our bad habit",

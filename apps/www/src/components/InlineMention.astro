@@ -13,7 +13,7 @@ interface Props {
   badgeSrc?: string;
   badgeAlt?: string;
   suffix?: string;
-  wrap?: boolean;
+  visualOnly?: boolean;
 }
 
 const {
@@ -22,49 +22,105 @@ const {
   icon,
   mark,
   logoSrc,
+  logoAlt,
   logoTone,
   logoShape,
   badgeSrc,
   badgeAlt,
   suffix,
-  wrap = false,
+  visualOnly = false,
 } = Astro.props;
 const Tag = href ? "a" : "span";
 const external = Boolean(href && !href.startsWith("/"));
 const hasVisual = Boolean(logoSrc || icon || mark);
+const [firstWord = label, ...remainingWords] = label.trim().split(/\s+/);
+const remainingLabel = remainingWords.join(" ");
 ---
 
 <Tag
   href={href}
-  class:list={{ "inline-mention": true, "inline-mention-wrap": wrap }}
+  class="inline-mention"
   target={external ? "_blank" : undefined}
   rel={external ? "noopener noreferrer" : undefined}
 >
   {
-    hasVisual && (
-      <span
-        class:list={{
-          "brand-mark": true,
-          "brand-mark-wide": logoShape === "wide",
-        }}
-        aria-hidden="true"
-      >
-        {logoSrc && (
-          <img
-            src={logoSrc}
-            alt=""
-            class:list={{ logo: true, "logo-white": logoTone === "white" }}
-            loading="lazy"
-            decoding="async"
-            width="24"
-            height="24"
-          />
+    hasVisual && visualOnly ? (
+      <span class="mention-lead mention-lead-visual-only">
+        <span
+          class:list={{
+            "brand-mark": true,
+            "brand-mark-wide": logoShape === "wide",
+          }}
+          aria-hidden="true"
+        >
+          {logoSrc && (
+            <img
+              src={logoSrc}
+              alt=""
+              class:list={{ logo: true, "logo-white": logoTone === "white" }}
+              loading="lazy"
+              decoding="async"
+              width="24"
+              height="24"
+            />
+          )}
+          {icon && <Icon name={icon} />}
+          {mark && <span class="mark">{mark}</span>}
+        </span>
+        <span class="sr-only">
+          {logoAlt ?? label}
+          {suffix}
+        </span>
+      </span>
+    ) : hasVisual ? (
+      <>
+        <span class="mention-lead">
+          <span
+            class:list={{
+              "brand-mark": true,
+              "brand-mark-wide": logoShape === "wide",
+            }}
+            aria-hidden="true"
+          >
+            {logoSrc && (
+              <img
+                src={logoSrc}
+                alt=""
+                class:list={{
+                  logo: true,
+                  "logo-white": logoTone === "white",
+                }}
+                loading="lazy"
+                decoding="async"
+                width="24"
+                height="24"
+              />
+            )}
+            {icon && <Icon name={icon} />}
+            {mark && <span class="mark">{mark}</span>}
+          </span>
+          <span class="text">
+            {firstWord}
+            {remainingLabel ? "" : suffix}
+          </span>
+        </span>
+        {remainingLabel && (
+          <>
+            {" "}
+            <span class="text">
+              {remainingLabel}
+              {suffix}
+            </span>
+          </>
         )}
-        {icon && <Icon name={icon} />}
-        {mark && <span class="mark">{mark}</span>}
+      </>
+    ) : (
+      <span class="text">
+        {label}
+        {suffix}
       </span>
     )
-  }<span class="text">{label}{suffix}</span>{
+  }{
     badgeSrc && (
       <span class="brand-mark badge" aria-hidden="true">
         <img
@@ -83,19 +139,37 @@ const hasVisual = Boolean(logoSrc || icon || mark);
 
 <style>
   .inline-mention {
+    display: inline;
+    color: var(--ink);
+    line-height: inherit;
+    text-decoration: none;
+    white-space: normal;
+    vertical-align: baseline;
+  }
+
+  .mention-lead {
     display: inline-grid;
     grid-auto-flow: column;
     align-items: baseline;
     gap: 0.24em;
-    color: var(--ink);
-    line-height: inherit;
-    text-decoration: none;
     white-space: nowrap;
     vertical-align: baseline;
   }
 
-  .inline-mention-wrap {
-    white-space: normal;
+  .mention-lead-visual-only {
+    gap: 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   a.inline-mention .text {
