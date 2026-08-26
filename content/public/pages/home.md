@@ -4,17 +4,13 @@ sections:
     visible: true
     label: index
     heading: hi, i'm ani!
-    subheading: i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
+    subheading: i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.
     mention_keys:
-      - build
-      - agents
-      - write
-      - systems
-      - businessInsider
       - structuredAi
       - yCombinatorF25
       - badHabit
       - atlanticRecords
+      - businessInsider
   past_work:
     visible: true
     label: making

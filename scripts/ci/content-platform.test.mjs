@@ -91,15 +91,11 @@ assert.equal(
   "canonical homepage content must not duplicate the intro as paragraph rows",
 );
 assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.mention_keys, [
-  "build",
-  "agents",
-  "write",
-  "systems",
-  "businessInsider",
   "structuredAi",
   "yCombinatorF25",
   "badHabit",
   "atlanticRecords",
+  "businessInsider",
 ]);
 assert.equal(
   DEFAULT_HOMEPAGE_CONTENT.sections.intro.rich_summary,
