@@ -4,12 +4,30 @@ import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const CONTENT_ROOT = join(REPO_ROOT, "content", "public");
-const GENERATOR = join(
-  REPO_ROOT,
-  "scripts",
-  "content",
-  "generate-public-content.mjs",
-);
+const PNPM = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+
+function refreshPublicContent(callback) {
+  execFile(
+    PNPM,
+    ["content:generate"],
+    { cwd: REPO_ROOT },
+    (generateError, _generateStdout, generateStderr) => {
+      if (generateError) {
+        callback(generateError, generateStderr);
+        return;
+      }
+
+      execFile(
+        PNPM,
+        ["--filter", "@anipotts/content", "build"],
+        { cwd: REPO_ROOT },
+        (buildError, _buildStdout, buildStderr) => {
+          callback(buildError, `${generateStderr}${buildStderr}`);
+        },
+      );
+    },
+  );
+}
 
 export function publicContentHotReload() {
   let closed = false;
@@ -19,7 +37,6 @@ export function publicContentHotReload() {
 
   return {
     name: "anipotts-public-content-hot-reload",
-    apply: "serve",
     configureServer(server) {
       server.watcher.add(CONTENT_ROOT);
 
@@ -30,30 +47,26 @@ export function publicContentHotReload() {
         }
 
         running = true;
-        execFile(
-          process.execPath,
-          [GENERATOR],
-          { cwd: REPO_ROOT },
-          (error, stdout, stderr) => {
-            running = false;
-            if (closed) return;
-            if (error) {
-              server.config.logger.error(
-                `canonical public content generation failed\n${stderr || error.message}`,
-              );
-            } else {
-              server.config.logger.info(
-                `canonical public content updated: ${stdout.trim().split("\n").length} projections`,
-              );
-              server.ws.send({ type: "full-reload" });
-            }
+        refreshPublicContent((error, stderr) => {
+          running = false;
+          if (closed) return;
+          if (error) {
+            server.config.logger.error(
+              `canonical public content generation failed\n${stderr || error.message}`,
+            );
+          } else {
+            server.config.logger.info(
+              "canonical public content and projections updated",
+            );
+            server.moduleGraph.invalidateAll();
+            server.ws.send({ type: "full-reload" });
+          }
 
-            if (rerun) {
-              rerun = false;
-              generate();
-            }
-          },
-        );
+          if (rerun) {
+            rerun = false;
+            generate();
+          }
+        });
       };
 
       const schedule = (path) => {

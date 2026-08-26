@@ -182,13 +182,13 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "content/public/pages/home.md sections.intro.paragraphs, projected through @anipotts/content/public",
+      "content/public/pages/home.md sections.intro.subheading, projected through @anipotts/content/public",
     current_value:
       "Homepage intro copy uses two readable sentences with structured mentions rendered inline.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview paragraph edits before any publish path updates canonical public content.",
+      "Preview the summary edit before any publish path updates canonical public content.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
   },

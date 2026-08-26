@@ -92,11 +92,14 @@ assert.ok(environment.includes('name = "inspect pull request"'));
 assert.ok(environment.includes('name = "inspect live state"'));
 assert.ok(adminConfig.includes('[".admin.anipotts.localhost"]'));
 assert.ok(publicConfig.includes('".anipotts.localhost"'));
+assert.ok(adminConfig.includes("publicContentHotReload()"));
 assert.ok(publicConfig.includes("publicContentHotReload()"));
 for (const invariant of [
   "server.watcher.add(CONTENT_ROOT)",
   'server.watcher.on("change", schedule)',
-  "[GENERATOR]",
+  '["content:generate"]',
+  '["--filter", "@anipotts/content", "build"]',
+  "server.moduleGraph.invalidateAll()",
   'server.ws.send({ type: "full-reload" })',
 ]) {
   assert.ok(
