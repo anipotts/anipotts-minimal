@@ -89,6 +89,7 @@ const current = Astro.url.pathname;
     display: block;
     width: 4rem;
     height: 4rem;
+    transition: filter 160ms ease;
   }
 
   .brand-mark-dark {
@@ -105,6 +106,12 @@ const current = Astro.url.pathname;
 
   :global(html[data-theme="dark"]) .brand-mark-dark {
     display: block;
+    filter: brightness(0) invert(1);
+  }
+
+  :global(html[data-theme="dark"]) .wordmark:hover .brand-mark-dark,
+  :global(html[data-theme="dark"]) .wordmark:focus-visible .brand-mark-dark {
+    filter: none;
   }
 
   .primary-nav {
@@ -256,6 +263,7 @@ const current = Astro.url.pathname;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .brand-mark,
     .primary-nav,
     .nav-toggle span {
       transition: none;
