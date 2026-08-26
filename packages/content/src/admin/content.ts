@@ -536,11 +536,8 @@ function sourceBackedFields(
 
   const gaps: string[] = [];
 
-  if (
-    !hasNestedField(content, ["sections", "intro", "paragraphs"]) &&
-    !hasNestedField(content, ["sections", "intro", "subheading"])
-  ) {
-    gaps.unshift("sections.intro.paragraphs");
+  if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
+    gaps.unshift("sections.intro.subheading");
   }
 
   if (!hasNestedField(content, ["sections", "intro", "mention_keys"])) {
@@ -655,7 +652,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     status: "preview",
     risk_level: "medium",
     source_ref:
-      "content/public/pages/home.md sections.intro.paragraphs and mentions",
+      "content/public/pages/home.md sections.intro.subheading and mentions",
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:

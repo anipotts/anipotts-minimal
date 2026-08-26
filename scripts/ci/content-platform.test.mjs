@@ -25,12 +25,12 @@ import {
   passkeyAccessRemovalBlockers,
   passkeyMissingProofItems,
   proofSource,
-  recordsFromSourceModules,
   readProofEntries,
   REQUIRED_PASSKEY_AUDIT_EVENTS,
   RUNTIME_FEED_PATH,
   runtimeOverlayErrorResponse,
   runtimeOverlayResponseFromFeed,
+  sourceContentRecordsFromProjection,
   summarizeSourceContentRecords,
 } from "../../packages/content/dist/admin/index.js";
 import {
@@ -85,22 +85,10 @@ const UNSAFE_ALLOWED_ACTIONS = new Set([
   "sync_external",
 ]);
 
-assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.paragraphs, [
-  "i build with agents and write about the systems that keep the work coherent.",
-  "business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-]);
-const homepageWithEmptyParagraphs = normalizeHomepageContent({
-  sections: {
-    intro: {
-      ...DEFAULT_HOMEPAGE_CONTENT.sections.intro,
-      paragraphs: ["", "   "],
-    },
-  },
-});
-assert.deepEqual(
-  homepageWithEmptyParagraphs.sections.intro.paragraphs,
+assert.equal(
   DEFAULT_HOMEPAGE_CONTENT.sections.intro.paragraphs,
-  "empty homepage paragraph lists must fall back to canonical summary paragraphs",
+  undefined,
+  "canonical homepage content must not duplicate the intro as paragraph rows",
 );
 assert.deepEqual(DEFAULT_HOMEPAGE_CONTENT.sections.intro.mention_keys, [
   "build",
@@ -160,9 +148,10 @@ assert.equal(
   false,
   "homepage context must remain embedded in the canonical intro prose",
 );
-assert.ok(
-  homepageSource.includes(".hero-sentence + .hero-sentence"),
-  "consecutive intro sentences must share one controlled text rhythm",
+assert.equal(
+  homepageSource.includes("hero-sentence"),
+  false,
+  "homepage intro must wrap as one semantic paragraph without forced sentence blocks",
 );
 assert.ok(
   inlineMentionSource.includes('width="24"') &&
@@ -329,12 +318,17 @@ const adminContentInventory = readFileSync(
   "packages/content/src/admin/content.ts",
   "utf8",
 );
-for (const surface of ["projects", "writing"]) {
-  assert.ok(
-    sourceContentModule.includes(`../../../../content/public/${surface}/*.md`),
-    `Admin ${surface} inventory must read the canonical public content tree`,
-  );
-}
+assert.ok(
+  sourceContentModule.includes(
+    "packages/content/generated/admin-public-content.json",
+  ),
+  "Admin inventory must consume the canonical generated projection",
+);
+assert.equal(
+  sourceContentModule.includes("import.meta.glob"),
+  false,
+  "Admin must not parse canonical Markdown through a second runtime path",
+);
 assert.equal(
   sourceContentModule.includes("../../../www/src/content/"),
   false,
@@ -501,29 +495,41 @@ const failedRuntime = runtimeOverlayErrorResponse(new Error("bad json"));
 assert.equal(failedRuntime.mode, "error");
 assert.equal(failedRuntime.error, "bad json");
 
-const sourceRecords = [
-  ...recordsFromSourceModules("projects", {
-    "/repo/content/public/projects/hidden-lab.md": `---
-title: Hidden Lab
-summary: Internal project page
-visible: false
-sort_order: 2
----
-`,
-  }),
-  ...recordsFromSourceModules("writing", {
-    "/repo/content/public/writing/control-plane.md": `---
-title: Control Plane
-summary: Agents need authority, proof, and state.
-status: published
-tags: [agents, admin]
----
-## opening
-
-The admin app should render source-backed writing as a preview before any publish or send path exists.
-`,
-  }),
-];
+const sourceRecords = sourceContentRecordsFromProjection([
+  {
+    id: "projects.hidden-lab",
+    surface: "projects",
+    slug: "hidden-lab",
+    title: "Hidden Lab",
+    route: "/projects/hidden-lab",
+    status: "hidden",
+    source_ref: "content/public/projects/hidden-lab.md",
+    summary: "Internal project page",
+    body_words: 0,
+    body_state: "frontmatter only",
+    body_section_count: 0,
+    body_preview: "no markdown body yet",
+    fields: [{ path: "visible", value: "false", kind: "boolean" }],
+    next_safe_action: "review project source",
+  },
+  {
+    id: "writing.control-plane",
+    surface: "writing",
+    slug: "control-plane",
+    title: "Control Plane",
+    route: "/writing/control-plane",
+    status: "published",
+    source_ref: "content/public/writing/control-plane.md",
+    summary: "Agents need authority, proof, and state.",
+    body_words: 17,
+    body_state: "short body",
+    body_section_count: 1,
+    body_preview:
+      "## opening The admin app should render source-backed writing as a preview before any publish or send path exists.",
+    fields: [{ path: "tags", value: "agents, admin", kind: "array" }],
+    next_safe_action: "review writing source",
+  },
+]);
 
 assert.deepEqual(
   summarizeSourceContentRecords(sourceRecords),
@@ -533,13 +539,13 @@ assert.deepEqual(
     published_writing: 1,
     visible_projects: 0,
   },
-  "source content parser must preserve admin summary counts",
+  "generated source content projection must preserve admin summary counts",
 );
 
 const hiddenProject = sourceRecords.find(
   (record) => record.id === "projects.hidden-lab",
 );
-assert.ok(hiddenProject, "hidden project source record must be parsed");
+assert.ok(hiddenProject, "hidden project source record must be projected");
 assert.equal(hiddenProject.status, "hidden");
 assert.equal(hiddenProject.source_ref, "content/public/projects/hidden-lab.md");
 assert.equal(hiddenProject.body_state, "frontmatter only");
@@ -548,18 +554,24 @@ assert.equal(hiddenProject.body_preview, "no markdown body yet");
 const writingRecord = sourceRecords.find(
   (record) => record.id === "writing.control-plane",
 );
-assert.ok(writingRecord, "writing source record must be parsed");
+assert.ok(writingRecord, "writing source record must be projected");
 assert.equal(writingRecord.status, "published");
 assert.equal(writingRecord.body_section_count, 1);
 assert.ok(
   writingRecord.fields.some(
     (field) => field.path === "tags" && field.value === "agents, admin",
   ),
-  "source content parser must preserve list frontmatter fields",
+  "generated source content projection must preserve list frontmatter fields",
 );
 assert.ok(
   writingRecord.body_preview.includes("admin app should render source-backed"),
-  "source content parser must expose a markdown body preview",
+  "generated source content projection must expose a markdown body preview",
+);
+
+assert.throws(
+  () => sourceContentRecordsFromProjection([{ surface: "invalid" }]),
+  /surface is invalid/,
+  "invalid generated source records must fail closed",
 );
 
 assert.equal(contentInventorySource.mode, "canonical_source_plus_d1_drafts");

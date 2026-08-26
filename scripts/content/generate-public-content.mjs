@@ -51,10 +51,12 @@ if (BOOTSTRAP) {
 const projectEntries = markdownFiles(PROJECTS_ROOT).map((file) => ({
   content: projectRecord(file),
   source: sourceRef(file),
+  source_record: sourceContentRecord("projects", file),
 }));
 const writingEntries = markdownFiles(WRITING_ROOT).map((file) => ({
   content: writingRecord(file),
   source: sourceRef(file),
+  source_record: sourceContentRecord("writing", file),
 }));
 const projects = projectEntries.map(({ content }) => content);
 const writing = writingEntries.map(({ content }) => content);
@@ -98,6 +100,10 @@ const canonical = {
 const adminProjection = {
   schema_version: 1,
   source_hash: sourceHash,
+  source_records: [
+    ...projectEntries.map(({ source_record }) => source_record),
+    ...writingEntries.map(({ source_record }) => source_record),
+  ].sort(compareSourceRecords),
   records: [
     ...Object.entries(pages).map(([key, content]) => ({
       entity_id: `public-page:${key}`,
@@ -248,6 +254,101 @@ function writingRecord(file) {
     visible: String(frontmatter.status ?? "draft") === "published",
     order: Number(date.replaceAll("-", "")) || 0,
   };
+}
+
+function sourceContentRecord(surface, file) {
+  const { frontmatter, body } = parseMarkdown(file);
+  const slug = String(frontmatter.slug ?? basename(file, ".md"));
+  const status =
+    surface === "writing"
+      ? String(frontmatter.status ?? "draft")
+      : frontmatter.visible === false
+        ? "hidden"
+        : String(frontmatter.status ?? "unknown");
+
+  return {
+    id: `${surface}.${slug}`,
+    surface,
+    slug,
+    title: String(frontmatter.title ?? slug),
+    route: `/${surface}/${slug}`,
+    status,
+    source_ref: sourceRef(file),
+    summary: String(
+      frontmatter.summary ??
+        frontmatter.subtitle ??
+        frontmatter.description ??
+        "no summary field",
+    ),
+    body_words: countWords(body),
+    body_state: bodyState(surface, body),
+    body_section_count: body
+      .split("\n")
+      .filter((line) => /^#{2,6}\s+\S/.test(line.trim())).length,
+    body_preview: markdownPreview(body),
+    fields: Object.entries(frontmatter).map(([path, value]) => ({
+      path,
+      value: formatFieldValue(value),
+      kind: fieldKind(value),
+    })),
+    next_safe_action:
+      surface === "projects"
+        ? "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+        : "review title, summary, tags, and body before newsletter backfill",
+  };
+}
+
+function compareSourceRecords(a, b) {
+  if (a.surface !== b.surface) return a.surface.localeCompare(b.surface);
+  if (a.surface === "projects") {
+    const aOrder = Number(
+      a.fields.find((field) => field.path === "sort_order")?.value ?? 0,
+    );
+    const bOrder = Number(
+      b.fields.find((field) => field.path === "sort_order")?.value ?? 0,
+    );
+    return bOrder - aOrder || a.title.localeCompare(b.title);
+  }
+  return b.source_ref.localeCompare(a.source_ref);
+}
+
+function countWords(body) {
+  return body.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function bodyState(surface, body) {
+  const words = countWords(body);
+  if (words === 0 && surface === "projects") return "frontmatter only";
+  if (words === 0) return "empty body";
+  if (words < 80) return "short body";
+  return "body ready for preview";
+}
+
+function markdownPreview(body) {
+  const normalized = body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(" ");
+  if (!normalized) return "no markdown body yet";
+  return normalized.length > 220
+    ? `${normalized.slice(0, 217).trimEnd()}...`
+    : normalized;
+}
+
+function formatFieldValue(value) {
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return String(value);
+  if (typeof value === "string") {
+    return value.length > 96 ? `${value.slice(0, 93)}...` : value;
+  }
+  return JSON.stringify(value) ?? String(value);
+}
+
+function fieldKind(value) {
+  if (Array.isArray(value)) return "array";
+  return typeof value;
 }
 
 function projectionRecord(kind, content, source) {

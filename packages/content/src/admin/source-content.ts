@@ -30,13 +30,14 @@ export type SourceContentSummary = {
   visible_projects: number;
 };
 
-export function recordsFromSourceModules(
-  surface: SourceSurface,
-  modules: Record<string, string>,
+export function sourceContentRecordsFromProjection(
+  value: unknown,
 ): SourceContentRecord[] {
-  return Object.entries(modules)
-    .map(([path, raw]) => recordFromRaw(surface, path, raw))
-    .sort(compareSourceRecords);
+  if (!Array.isArray(value)) {
+    throw new Error("canonical Admin source records must be an array");
+  }
+
+  return value.map((record, index) => sourceContentRecord(record, index));
 }
 
 export function summarizeSourceContentRecords(
@@ -54,187 +55,79 @@ export function summarizeSourceContentRecords(
   };
 }
 
-function recordFromRaw(
-  surface: SourceSurface,
-  path: string,
-  raw: string,
+function sourceContentRecord(
+  value: unknown,
+  index: number,
 ): SourceContentRecord {
-  const file = fileSlug(path);
-  const source = splitMarkdown(raw);
-  const frontmatter = parseFrontmatter(source.frontmatter);
-  const slug = asString(frontmatter.slug) || file;
-  const title = asString(frontmatter.title) || slug;
-  const status = sourceStatus(surface, frontmatter);
-  const route =
-    surface === "projects" ? `/projects/${slug}` : `/writing/${slug}`;
-  const fields = Object.entries(frontmatter).map(([key, value]) => ({
-    path: key,
-    value: formatFieldValue(value),
-    kind: fieldKind(value),
-  }));
-
+  const record = object(value, `source_records[${index}]`);
+  const surface = sourceSurface(record.surface, index);
   return {
-    id: `${surface}.${slug}`,
+    id: string(record.id, index, "id"),
     surface,
-    slug,
-    title,
-    route,
-    status,
-    source_ref: `content/public/${surface}/${file}.md`,
-    summary:
-      asString(frontmatter.summary) ||
-      asString(frontmatter.subtitle) ||
-      asString(frontmatter.description) ||
-      "no summary field",
-    body_words: countWords(source.body),
-    body_state: bodyState(surface, source.body),
-    body_section_count: countMarkdownSections(source.body),
-    body_preview: markdownPreview(source.body),
-    fields,
-    next_safe_action:
-      surface === "projects"
-        ? "review project frontmatter, detail body, and structured sections before modeling a draft operation"
-        : "review title, summary, tags, and body before newsletter backfill",
+    slug: string(record.slug, index, "slug"),
+    title: string(record.title, index, "title"),
+    route: string(record.route, index, "route"),
+    status: string(record.status, index, "status"),
+    source_ref: string(record.source_ref, index, "source_ref"),
+    summary: string(record.summary, index, "summary"),
+    body_words: number(record.body_words, index, "body_words"),
+    body_state: string(record.body_state, index, "body_state"),
+    body_section_count: number(
+      record.body_section_count,
+      index,
+      "body_section_count",
+    ),
+    body_preview: string(record.body_preview, index, "body_preview"),
+    fields: fields(record.fields, index),
+    next_safe_action: string(
+      record.next_safe_action,
+      index,
+      "next_safe_action",
+    ),
   };
 }
 
-function splitMarkdown(raw: string): { frontmatter: string; body: string } {
-  if (!raw.startsWith("---\n")) {
-    return { frontmatter: "", body: raw };
-  }
-
-  const end = raw.indexOf("\n---", 4);
-  if (end === -1) {
-    return { frontmatter: "", body: raw };
-  }
-
-  return {
-    frontmatter: raw.slice(4, end),
-    body: raw.slice(end + 4).trim(),
-  };
-}
-
-function parseFrontmatter(raw: string): Record<string, unknown> {
-  const fields: Record<string, unknown> = {};
-  const lines = raw.split("\n");
-  for (const line of lines) {
-    if (!line.trim() || line.startsWith(" ") || line.startsWith("-")) {
-      continue;
-    }
-
-    const match = line.match(/^([A-Za-z0-9_-]+):(?:\s*(.*))?$/);
-    if (!match) continue;
-
-    const key = match[1];
-    if (!key) continue;
-
-    const rawValue = match[2] ?? "";
-    fields[key] = parseScalar(rawValue);
-  }
-  return fields;
-}
-
-function parseScalar(raw: string): unknown {
-  const value = raw.trim();
-  if (!value) return "[structured list]";
-  if (value === "true") return true;
-  if (value === "false") return false;
-  if (/^-?\d+(?:\.\d+)?$/.test(value)) return Number(value);
-  if (value.startsWith("[") && value.endsWith("]")) {
-    return value
-      .slice(1, -1)
-      .split(",")
-      .map((part) => stripQuotes(part.trim()))
-      .filter(Boolean);
-  }
-  return stripQuotes(value);
-}
-
-function stripQuotes(value: string): string {
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
+function sourceSurface(value: unknown, index: number): SourceSurface {
+  if (value !== "projects" && value !== "writing") {
+    throw new Error(`source_records[${index}].surface is invalid`);
   }
   return value;
 }
 
-function fileSlug(path: string): string {
-  return path.split("/").pop()?.replace(/\.md$/, "") ?? path;
-}
-
-function sourceStatus(
-  surface: SourceSurface,
-  frontmatter: Record<string, unknown>,
-): string {
-  if (surface === "writing") return asString(frontmatter.status) || "draft";
-  if (frontmatter.visible === false) return "hidden";
-  return asString(frontmatter.status) || "unknown";
-}
-
-function asString(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-function countWords(body: string): number {
-  return body.trim().split(/\s+/).filter(Boolean).length;
-}
-
-function countMarkdownSections(body: string): number {
-  return body.split("\n").filter((line) => /^#{2,6}\s+\S/.test(line.trim()))
-    .length;
-}
-
-function bodyState(surface: SourceSurface, body: string): string {
-  const words = countWords(body);
-  if (words === 0 && surface === "projects") return "frontmatter only";
-  if (words === 0) return "empty body";
-  if (words < 80) return "short body";
-  return "body ready for preview";
-}
-
-function markdownPreview(body: string): string {
-  const normalized = body
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .join(" ");
-  if (!normalized) return "no markdown body yet";
-  return normalized.length > 220
-    ? `${normalized.slice(0, 217).trimEnd()}...`
-    : normalized;
-}
-
-function formatFieldValue(value: unknown): string {
-  if (Array.isArray(value)) return value.join(", ");
-  if (typeof value === "boolean") return value ? "true" : "false";
-  if (typeof value === "number") return String(value);
-  if (typeof value === "string") {
-    return value.length > 96 ? `${value.slice(0, 93)}...` : value;
+function fields(value: unknown, index: number): SourceContentField[] {
+  if (!Array.isArray(value)) {
+    throw new Error(`source_records[${index}].fields must be an array`);
   }
-  return JSON.stringify(value) ?? String(value);
+  return value.map((field, fieldIndex) => {
+    const item = object(
+      field,
+      `source_records[${index}].fields[${fieldIndex}]`,
+    );
+    return {
+      path: string(item.path, index, `fields[${fieldIndex}].path`),
+      value: string(item.value, index, `fields[${fieldIndex}].value`),
+      kind: string(item.kind, index, `fields[${fieldIndex}].kind`),
+    };
+  });
 }
 
-function fieldKind(value: unknown): string {
-  if (Array.isArray(value)) return "array";
-  return typeof value;
-}
-
-function compareSourceRecords(
-  a: SourceContentRecord,
-  b: SourceContentRecord,
-): number {
-  if (a.surface !== b.surface) return a.surface.localeCompare(b.surface);
-  if (a.surface === "projects") {
-    const aOrder = numericField(a, "sort_order");
-    const bOrder = numericField(b, "sort_order");
-    return bOrder - aOrder || a.title.localeCompare(b.title);
+function object(value: unknown, label: string): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
   }
-  return b.source_ref.localeCompare(a.source_ref);
+  return value as Record<string, unknown>;
 }
 
-function numericField(record: SourceContentRecord, path: string): number {
-  const field = record.fields.find((item) => item.path === path);
-  return Number(field?.value ?? 0);
+function string(value: unknown, index: number, field: string): string {
+  if (typeof value !== "string") {
+    throw new Error(`source_records[${index}].${field} must be a string`);
+  }
+  return value;
+}
+
+function number(value: unknown, index: number, field: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new Error(`source_records[${index}].${field} must be a number`);
+  }
+  return value;
 }

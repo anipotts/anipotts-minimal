@@ -5,9 +5,6 @@ sections:
     label: index
     heading: hi, i'm ani!
     subheading: i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
-    paragraphs:
-      - i build with agents and write about the systems that keep the work coherent.
-      - business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
     mention_keys:
       - build
       - agents

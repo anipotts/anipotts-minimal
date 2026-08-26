@@ -1,30 +1,12 @@
 import {
-  recordsFromSourceModules,
+  sourceContentRecordsFromProjection,
   summarizeSourceContentRecords,
 } from "@anipotts/content/admin";
+import adminPublicContent from "../../../../packages/content/generated/admin-public-content.json";
 
-const projectModules = import.meta.glob<string>(
-  "../../../../content/public/projects/*.md",
-  {
-    eager: true,
-    import: "default",
-    query: "?raw",
-  },
+export const sourceContentRecords = sourceContentRecordsFromProjection(
+  adminPublicContent.source_records,
 );
-
-const writingModules = import.meta.glob<string>(
-  "../../../../content/public/writing/*.md",
-  {
-    eager: true,
-    import: "default",
-    query: "?raw",
-  },
-);
-
-export const sourceContentRecords = [
-  ...recordsFromSourceModules("projects", projectModules),
-  ...recordsFromSourceModules("writing", writingModules),
-];
 
 export const sourceContentSummary =
   summarizeSourceContentRecords(sourceContentRecords);

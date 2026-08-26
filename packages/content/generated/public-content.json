@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "a438d8fdd8bf7a596e34a5d0b4ae1244ff666f9a80eead94b4616caac792601d",
+  "source_hash": "5b6a583b8cea72c9bb8c22fb033558c6abe86220b77e7974e1d3e5e0cf8dd3b3",
   "sources": {
-    "content/public/pages/home.md": "f9694ad8695a7bffc5db883c9678b3993a4151773e518846b765828c874961e3",
+    "content/public/pages/home.md": "89c839db07c31b3c41e2d5b99783b7ba1184c23a24c269ce30a8d0e24a3a99b4",
     "content/public/pages/making.md": "0f39baf327182292b0c12ca87e65cd72f417df4fc3a02b759f469f4c0cefbda2",
     "content/public/pages/newsletter.md": "0adbb5fb819a790e2d490dc048586b3528ff45bcfd0e49e6c03ed4378ae4ec72",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
@@ -36,10 +36,6 @@
           "label": "index",
           "heading": "hi, i'm ani!",
           "subheading": "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-          "paragraphs": [
-            "i build with agents and write about the systems that keep the work coherent.",
-            "business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture."
-          ],
           "mention_keys": [
             "build",
             "agents",

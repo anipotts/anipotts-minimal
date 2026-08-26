@@ -1,6 +1,702 @@
 {
   "schema_version": 1,
-  "source_hash": "a438d8fdd8bf7a596e34a5d0b4ae1244ff666f9a80eead94b4616caac792601d",
+  "source_hash": "5b6a583b8cea72c9bb8c22fb033558c6abe86220b77e7974e1d3e5e0cf8dd3b3",
+  "source_records": [
+    {
+      "id": "projects.quantercise",
+      "surface": "projects",
+      "slug": "quantercise",
+      "title": "quantercise",
+      "route": "/projects/quantercise",
+      "status": "live",
+      "source_ref": "content/public/projects/quantercise.md",
+      "summary": "quant interview practice with 400+ problems, instant grading, and sandboxed python.",
+      "body_words": 26,
+      "body_state": "short body",
+      "body_section_count": 0,
+      "body_preview": "Quantercise started as my own quant interview prep tool and turned into a full product: 400+ problems, real-time Python execution, math rendering, progress tracking, and payments.",
+      "fields": [
+        { "path": "title", "value": "quantercise", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "quant interview practice with 400+ problems, instant grading, and sandboxed python.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built from my own interview-prep workflow, Quantercise combines 400+ quant problems, instant ...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2024", "kind": "string" },
+        { "path": "category", "value": "product", "kind": "string" },
+        { "path": "role", "value": "Founder and Engineer", "kind": "string" },
+        { "path": "duration", "value": "Launched 2024", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "featured", "value": "true", "kind": "boolean" },
+        { "path": "sort_order", "value": "100", "kind": "number" },
+        {
+          "path": "link_live",
+          "value": "https://quantercise.com",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Next.js, TypeScript, Postgres, Drizzle, Stripe, Python",
+          "kind": "array"
+        },
+        {
+          "path": "technical",
+          "value": "[object Object], [object Object], [object Object], [object Object]",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.pgi-research-platform",
+      "surface": "projects",
+      "slug": "pgi-research-platform",
+      "title": "pgi research portal",
+      "route": "/projects/pgi-research-platform",
+      "status": "live",
+      "source_ref": "content/public/projects/pgi-research-platform.md",
+      "summary": "next.js and supabase portal for an nyu quant fund.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "pgi research portal", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "next.js and supabase portal for an nyu quant fund.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built a Next.js and TypeScript research portal backed by Supabase for Paragon Global Investme...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2025", "kind": "string" },
+        { "path": "category", "value": "quant", "kind": "string" },
+        { "path": "role", "value": "Chief Tech Officer", "kind": "string" },
+        { "path": "duration", "value": "2025-", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "sort_order", "value": "95", "kind": "number" },
+        {
+          "path": "link_live",
+          "value": "https://paragoninvestments.org",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Next.js, TypeScript, Supabase, TailwindCSS, Research",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.claude-code-tips",
+      "surface": "projects",
+      "slug": "claude-code-tips",
+      "title": "claude code tips",
+      "route": "/projects/claude-code-tips",
+      "status": "live",
+      "source_ref": "content/public/projects/claude-code-tips.md",
+      "summary": "public notes from running agent workflows in real repos.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "claude code tips", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "public notes from running agent workflows in real repos.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MC...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2025-", "kind": "string" },
+        { "path": "category", "value": "ai", "kind": "string" },
+        { "path": "role", "value": "Creator", "kind": "string" },
+        { "path": "duration", "value": "Ongoing", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "sort_order", "value": "92", "kind": "number" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anipotts/claude-code-tips",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Python, Claude Code, Hooks, Agents, MCP, Plugins",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.imessage-mcp",
+      "surface": "projects",
+      "slug": "imessage-mcp",
+      "title": "imessage mcp",
+      "route": "/projects/imessage-mcp",
+      "status": "live",
+      "source_ref": "content/public/projects/imessage-mcp.md",
+      "summary": "local-first mcp over imessage search and stats.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "imessage mcp", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "local-first mcp over imessage search and stats.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built a read-only macOS MCP server for local iMessage search, contact stats, streaks, and pri...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2025-", "kind": "string" },
+        { "path": "category", "value": "ai", "kind": "string" },
+        { "path": "role", "value": "Creator", "kind": "string" },
+        { "path": "duration", "value": "Ongoing", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "featured", "value": "true", "kind": "boolean" },
+        { "path": "sort_order", "value": "91", "kind": "number" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anipotts/imessage-mcp",
+          "kind": "string"
+        },
+        {
+          "path": "link_live",
+          "value": "https://npmjs.com/package/imessage-mcp",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "TypeScript, MCP, SQLite, macOS, Privacy",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.quantercise-extension",
+      "surface": "projects",
+      "slug": "quantercise-extension",
+      "title": "mental math extension",
+      "route": "/projects/quantercise-extension",
+      "status": "archived",
+      "source_ref": "content/public/projects/quantercise-extension.md",
+      "summary": "browser drills for fast mental math reps.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "mental math extension", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "browser drills for fast mental math reps.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built a self-contained Chrome extension for keyboard-driven mental math practice. Includes so...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2026", "kind": "string" },
+        { "path": "category", "value": "product", "kind": "string" },
+        { "path": "role", "value": "Creator", "kind": "string" },
+        { "path": "duration", "value": "Winter 2026", "kind": "string" },
+        { "path": "status", "value": "archived", "kind": "string" },
+        { "path": "sort_order", "value": "90", "kind": "number" },
+        { "path": "icon", "value": "google-chrome-logo", "kind": "string" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anipotts/quantercise-mental-math-extension",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Chrome Extension, JavaScript, Manifest V3",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.chainedchat",
+      "surface": "projects",
+      "slug": "chainedchat",
+      "title": "chainedchat",
+      "route": "/projects/chainedchat",
+      "status": "archived",
+      "source_ref": "content/public/projects/chainedchat.md",
+      "summary": "sunsetted multi-model chat with shared context and routing.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "chainedchat", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "sunsetted multi-model chat with shared context and routing.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Archived Convex and Clerk app that preserved shared context across multiple LLMs. It had shar...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2025", "kind": "string" },
+        { "path": "category", "value": "ai", "kind": "string" },
+        { "path": "role", "value": "Founder", "kind": "string" },
+        { "path": "duration", "value": "Summer 2025", "kind": "string" },
+        { "path": "status", "value": "archived", "kind": "string" },
+        { "path": "sort_order", "value": "89", "kind": "number" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anipotts/chained-chat",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Next.js, TypeScript, Convex, LangGraph, Stripe, TailwindCSS",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.saeshify",
+      "surface": "projects",
+      "slug": "saeshify",
+      "title": "saeshify",
+      "route": "/projects/saeshify",
+      "status": "live",
+      "source_ref": "content/public/projects/saeshify.md",
+      "summary": "real-time rhyme visualizer for lyrics and audio.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "saeshify", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "real-time rhyme visualizer for lyrics and audio.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built a WebGL and Web Audio pipeline that follows lyrics as they play and makes rhyme pattern...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2025-", "kind": "string" },
+        { "path": "category", "value": "music", "kind": "string" },
+        { "path": "role", "value": "Creator", "kind": "string" },
+        { "path": "duration", "value": "Ongoing", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "sort_order", "value": "85", "kind": "number" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anipotts/saeshify",
+          "kind": "string"
+        },
+        {
+          "path": "link_live",
+          "value": "https://saeshify.vercel.app",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "TypeScript, WebGL, Audio, Visualization",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.nyu-purity-test",
+      "surface": "projects",
+      "slug": "nyu-purity-test",
+      "title": "nyu purity test",
+      "route": "/projects/nyu-purity-test",
+      "status": "live",
+      "source_ref": "content/public/projects/nyu-purity-test.md",
+      "summary": "campus quiz with 3,000+ student completions.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        { "path": "title", "value": "nyu purity test", "kind": "string" },
+        {
+          "path": "subtitle",
+          "value": "campus quiz with 3,000+ student completions.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built and launched a TypeScript campus quiz in one night. It reached 1,000+ completions in un...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2024", "kind": "string" },
+        { "path": "category", "value": "product", "kind": "string" },
+        { "path": "role", "value": "Creator", "kind": "string" },
+        { "path": "duration", "value": "Fall 2024", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "sort_order", "value": "84", "kind": "number" },
+        {
+          "path": "link_live",
+          "value": "https://nyupuritytest.com",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "TypeScript, React, Next.js, TailwindCSS, Analytics",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.habittracker-obh",
+      "surface": "projects",
+      "slug": "habittracker-obh",
+      "title": "artist scouting dashboard",
+      "route": "/projects/habittracker-obh",
+      "status": "hidden",
+      "source_ref": "content/public/projects/habittracker-obh.md",
+      "summary": "growth tracking for an atlantic records venture.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        {
+          "path": "title",
+          "value": "artist scouting dashboard",
+          "kind": "string"
+        },
+        {
+          "path": "subtitle",
+          "value": "growth tracking for an atlantic records venture.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Built a scouting dashboard that pulled Chartmetric, YouTube, TikTok, and Instagram signals in...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2024", "kind": "string" },
+        { "path": "category", "value": "music", "kind": "string" },
+        {
+          "path": "role",
+          "value": "Data Engineering Intern",
+          "kind": "string"
+        },
+        { "path": "duration", "value": "Summer 2024", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "visible", "value": "false", "kind": "boolean" },
+        { "path": "sort_order", "value": "41", "kind": "number" },
+        {
+          "path": "tags",
+          "value": "Python, Streamlit, SQL, APIs, Data Pipelines",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "projects.options-pricing-sensitivity",
+      "surface": "projects",
+      "slug": "options-pricing-sensitivity",
+      "title": "options pricing + sensitivity analysis",
+      "route": "/projects/options-pricing-sensitivity",
+      "status": "live",
+      "source_ref": "content/public/projects/options-pricing-sensitivity.md",
+      "summary": "black-scholes and binomial pricing with volatility sweeps.",
+      "body_words": 0,
+      "body_state": "frontmatter only",
+      "body_section_count": 0,
+      "body_preview": "no markdown body yet",
+      "fields": [
+        {
+          "path": "title",
+          "value": "options pricing + sensitivity analysis",
+          "kind": "string"
+        },
+        {
+          "path": "subtitle",
+          "value": "black-scholes and binomial pricing with volatility sweeps.",
+          "kind": "string"
+        },
+        {
+          "path": "description",
+          "value": "Wrote a Python tool for pricing European options with Black-Scholes and binomial models, then...",
+          "kind": "string"
+        },
+        { "path": "year", "value": "2023", "kind": "string" },
+        { "path": "category", "value": "quant", "kind": "string" },
+        { "path": "role", "value": "Developer", "kind": "string" },
+        { "path": "duration", "value": "Spring 2023", "kind": "string" },
+        { "path": "status", "value": "live", "kind": "string" },
+        { "path": "sort_order", "value": "40", "kind": "number" },
+        {
+          "path": "link_repo",
+          "value": "https://github.com/anirudhp15/Options-Pricing-and-Sensitivity-Analysis-Tool",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "Python, NumPy, Pandas, Quantitative Finance",
+          "kind": "array"
+        }
+      ],
+      "next_safe_action": "review project frontmatter, detail body, and structured sections before modeling a draft operation"
+    },
+    {
+      "id": "writing.stop-ending-your-day-with-fix-the-bug",
+      "surface": "writing",
+      "slug": "stop-ending-your-day-with-fix-the-bug",
+      "title": "stop ending your day with \"fix the bug\"",
+      "route": "/writing/stop-ending-your-day-with-fix-the-bug",
+      "status": "published",
+      "source_ref": "content/public/writing/stop-ending-your-day-with-fix-the-bug.md",
+      "summary": "vague todos waste context. specific prompts let claude code start from the right file.",
+      "body_words": 364,
+      "body_state": "body ready for preview",
+      "body_section_count": 0,
+      "body_preview": "I used to end my day with todos like \"fix auth\" and \"clean up API\" and then wake up the next morning having no idea what I actually meant. Fix auth how? Which auth? The login flow? The token refresh? The middleware? I...",
+      "fields": [
+        {
+          "path": "slug",
+          "value": "stop-ending-your-day-with-fix-the-bug",
+          "kind": "string"
+        },
+        {
+          "path": "title",
+          "value": "stop ending your day with \"fix the bug\"",
+          "kind": "string"
+        },
+        {
+          "path": "summary",
+          "value": "vague todos waste context. specific prompts let claude code start from the right file.",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "claude-code, productivity, ai-tools",
+          "kind": "array"
+        },
+        { "path": "status", "value": "published", "kind": "string" },
+        { "path": "published_at", "value": "2026-04-07", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    },
+    {
+      "id": "writing.search-will-be-dead-by-2030",
+      "surface": "writing",
+      "slug": "search-will-be-dead-by-2030",
+      "title": "search will be dead by 2030",
+      "route": "/writing/search-will-be-dead-by-2030",
+      "status": "published",
+      "source_ref": "content/public/writing/search-will-be-dead-by-2030.md",
+      "summary": "search becomes infrastructure while agents, memory, retrieval, and synthesis become the interface.",
+      "body_words": 69,
+      "body_state": "short body",
+      "body_section_count": 0,
+      "body_preview": "Classic search assumes users can translate intent into keywords The next interface assumes the system already understands intent from context and history What changes first: - query boxes become fallback UX - ranking...",
+      "fields": [
+        {
+          "path": "slug",
+          "value": "search-will-be-dead-by-2030",
+          "kind": "string"
+        },
+        {
+          "path": "title",
+          "value": "search will be dead by 2030",
+          "kind": "string"
+        },
+        {
+          "path": "summary",
+          "value": "search becomes infrastructure while agents, memory, retrieval, and synthesis become the inter...",
+          "kind": "string"
+        },
+        { "path": "tags", "value": "ai, search, product", "kind": "array" },
+        { "path": "status", "value": "published", "kind": "string" },
+        { "path": "published_at", "value": "2026-01-31", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    },
+    {
+      "id": "writing.saturdays-are-for-claude-code",
+      "surface": "writing",
+      "slug": "saturdays-are-for-claude-code",
+      "title": "saturdays are for claude code",
+      "route": "/writing/saturdays-are-for-claude-code",
+      "status": "published",
+      "source_ref": "content/public/writing/saturdays-are-for-claude-code.md",
+      "summary": "business insider interviewed me about ai usage limits. the forced pauses sharpened my workflow.",
+      "body_words": 478,
+      "body_state": "body ready for preview",
+      "body_section_count": 3,
+      "body_preview": "The original Business Insider piece is here: [Saturdays are for Claude: How AI limits are reshaping the workday](https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4). A rep...",
+      "fields": [
+        {
+          "path": "slug",
+          "value": "saturdays-are-for-claude-code",
+          "kind": "string"
+        },
+        {
+          "path": "title",
+          "value": "saturdays are for claude code",
+          "kind": "string"
+        },
+        {
+          "path": "summary",
+          "value": "business insider interviewed me about ai usage limits. the forced pauses sharpened my workflow.",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "claude-code, press, workflow, building",
+          "kind": "array"
+        },
+        { "path": "status", "value": "published", "kind": "string" },
+        { "path": "published_at", "value": "2026-04-13", "kind": "string" },
+        {
+          "path": "artifact_url",
+          "value": "https://www.businessinsider.com/ai-usage-limits-causing-some-to-restructure-their-workday-2026-4",
+          "kind": "string"
+        },
+        { "path": "artifact_label", "value": "source", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    },
+    {
+      "id": "writing.jpegmafia-is-our-kanye-west",
+      "surface": "writing",
+      "slug": "jpegmafia-is-our-kanye-west",
+      "title": "jpegmafia is our kanye west",
+      "route": "/writing/jpegmafia-is-our-kanye-west",
+      "status": "draft",
+      "source_ref": "content/public/writing/jpegmafia-is-our-kanye-west.md",
+      "summary": "a short note on taste, consensus, feedback, and shipping with strong defaults.",
+      "body_words": 87,
+      "body_state": "body ready for preview",
+      "body_section_count": 0,
+      "body_preview": "Teams often over-index on being understood early The highest leverage work often looks wrong in public before it looks obvious in hindsight JPEGMAFIA reminds me of that builder pattern - hard constraints - aggressive...",
+      "fields": [
+        {
+          "path": "slug",
+          "value": "jpegmafia-is-our-kanye-west",
+          "kind": "string"
+        },
+        {
+          "path": "title",
+          "value": "jpegmafia is our kanye west",
+          "kind": "string"
+        },
+        {
+          "path": "summary",
+          "value": "a short note on taste, consensus, feedback, and shipping with strong defaults.",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "music, product, execution",
+          "kind": "array"
+        },
+        { "path": "status", "value": "draft", "kind": "string" },
+        { "path": "published_at", "value": "2026-02-12", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    },
+    {
+      "id": "writing.i-built-a-monitor-for-my-claude-code-sessions",
+      "surface": "writing",
+      "slug": "i-built-a-monitor-for-my-claude-code-sessions",
+      "title": "i built a monitor for my claude code sessions",
+      "route": "/writing/i-built-a-monitor-for-my-claude-code-sessions",
+      "status": "published",
+      "source_ref": "content/public/writing/i-built-a-monitor-for-my-claude-code-sessions.md",
+      "summary": "claudemon makes parallel claude code sessions visible from one dashboard.",
+      "body_words": 443,
+      "body_state": "body ready for preview",
+      "body_section_count": 0,
+      "body_preview": "At any given time I've got several Claude Code sessions running across different projects. One is on a side project, another is doing a refactor I kicked off before dinner, and another has already slipped out of my at...",
+      "fields": [
+        {
+          "path": "slug",
+          "value": "i-built-a-monitor-for-my-claude-code-sessions",
+          "kind": "string"
+        },
+        {
+          "path": "title",
+          "value": "i built a monitor for my claude code sessions",
+          "kind": "string"
+        },
+        {
+          "path": "summary",
+          "value": "claudemon makes parallel claude code sessions visible from one dashboard.",
+          "kind": "string"
+        },
+        {
+          "path": "tags",
+          "value": "claude-code, claudemon, observability, building",
+          "kind": "array"
+        },
+        { "path": "status", "value": "published", "kind": "string" },
+        { "path": "published_at", "value": "2026-04-07", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    },
+    {
+      "id": "writing.awareness-is-alpha",
+      "surface": "writing",
+      "slug": "awareness-is-alpha",
+      "title": "awareness is alpha",
+      "route": "/writing/awareness-is-alpha",
+      "status": "published",
+      "source_ref": "content/public/writing/awareness-is-alpha.md",
+      "summary": "awareness keeps ownership intact while more execution moves through agents.",
+      "body_words": 362,
+      "body_state": "body ready for preview",
+      "body_section_count": 0,
+      "body_preview": "i keep coming back to the same thing: awareness is alpha when you're orchestrating agents. awareness means holding a live model of what you're thinking, what the system is doing, what you are trying to finish, and how...",
+      "fields": [
+        { "path": "title", "value": "awareness is alpha", "kind": "string" },
+        { "path": "slug", "value": "awareness-is-alpha", "kind": "string" },
+        { "path": "published_at", "value": "2026-07-14", "kind": "string" },
+        {
+          "path": "tags",
+          "value": "agents, systems, operations, building",
+          "kind": "array"
+        },
+        {
+          "path": "summary",
+          "value": "awareness keeps ownership intact while more execution moves through agents.",
+          "kind": "string"
+        },
+        { "path": "status", "value": "published", "kind": "string" }
+      ],
+      "next_safe_action": "review title, summary, tags, and body before newsletter backfill"
+    }
+  ],
   "records": [
     {
       "entity_id": "public-page:home",
@@ -9,7 +705,7 @@
       "status": "source_controlled",
       "route": "/",
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "f9694ad8695a7bffc5db883c9678b3993a4151773e518846b765828c874961e3"
+      "source_hash": "89c839db07c31b3c41e2d5b99783b7ba1184c23a24c269ce30a8d0e24a3a99b4"
     },
     {
       "entity_id": "public-page:making",

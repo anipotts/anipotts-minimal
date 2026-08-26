@@ -6,31 +6,25 @@ import {
 } from "@anipotts/content/public";
 
 interface Props {
-  paragraphs: string[];
+  text: string;
   mentionKeys: string[];
   mentions: Record<string, HomepageMention>;
 }
 
-const { paragraphs, mentionKeys, mentions } = Astro.props;
-const renderedParagraphs = paragraphs.map((paragraph) =>
-  segmentHomepageSummaryParagraph(paragraph, mentionKeys, mentions),
-);
+const { text, mentionKeys, mentions } = Astro.props;
+const segments = segmentHomepageSummaryParagraph(text, mentionKeys, mentions);
 ---
 
 {
-  renderedParagraphs.map((segments) => (
-    <span class="hero-sentence">
-      {segments.map((segment) =>
-        segment.kind === "text" ? (
-          segment.text
-        ) : (
-          <InlineMention
-            {...mentions[segment.key]}
-            label={segment.text}
-            suffix={segment.suffix}
-          />
-        ),
-      )}
-    </span>
-  ))
+  segments.map((segment) =>
+    segment.kind === "text" ? (
+      segment.text
+    ) : (
+      <InlineMention
+        {...mentions[segment.key]}
+        label={segment.text}
+        suffix={segment.suffix}
+      />
+    ),
+  )
 }
