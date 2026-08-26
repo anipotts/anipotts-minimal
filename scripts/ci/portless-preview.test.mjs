@@ -45,6 +45,7 @@ for (const expected of [
   'PORTLESS_TLD: "localhost"',
   'name: "anipotts"',
   'name: "admin.anipotts"',
+  'pnpm(["content:generate"], { stdio: "inherit" });',
   "prepareAppDependencies(app);",
   "`--filter=${app.packageName}^...`",
   'if (surface === "admin" || surface === "all") await ensureFallbackAdmin()',
