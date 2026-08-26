@@ -13,7 +13,9 @@ interface Props {
   badgeSrc?: string;
   badgeAlt?: string;
   suffix?: string;
-  visualOnly?: boolean;
+  visualLabel?: string;
+  visualPrefix?: string;
+  visualSuffix?: string;
 }
 
 const {
@@ -28,7 +30,9 @@ const {
   badgeSrc,
   badgeAlt,
   suffix,
-  visualOnly = false,
+  visualLabel,
+  visualPrefix,
+  visualSuffix,
 } = Astro.props;
 const Tag = href ? "a" : "span";
 const external = Boolean(href && !href.startsWith("/"));
@@ -44,8 +48,9 @@ const remainingLabel = remainingWords.join(" ");
   rel={external ? "noopener noreferrer" : undefined}
 >
   {
-    hasVisual && visualOnly ? (
-      <span class="mention-lead mention-lead-visual-only">
+    hasVisual && visualLabel ? (
+      <span class="mention-lead mention-lead-compact">
+        {visualPrefix && <span class="text">{visualPrefix}</span>}
         <span
           class:list={{
             "brand-mark": true,
@@ -67,8 +72,10 @@ const remainingLabel = remainingWords.join(" ");
           {icon && <Icon name={icon} />}
           {mark && <span class="mark">{mark}</span>}
         </span>
-        <span class="sr-only">
-          {logoAlt ?? label}
+        <span class="sr-only">{logoAlt ?? label}</span>
+        <span class="text">
+          {visualLabel}
+          {visualSuffix}
           {suffix}
         </span>
       </span>
@@ -156,8 +163,12 @@ const remainingLabel = remainingWords.join(" ");
     vertical-align: baseline;
   }
 
-  .mention-lead-visual-only {
+  .mention-lead-compact {
     gap: 0;
+  }
+
+  .mention-lead-compact .brand-mark {
+    margin-right: 0.14em;
   }
 
   .sr-only {

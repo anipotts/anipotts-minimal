@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "09d13c085c0ce4ae2b84edf83ad3158dc6aea98d3a31a9114e9c1d9bcc4ad6b0",
+  "source_hash": "1cc32190f2b2f14bf9cba039352cb1854e572ded9e857dfc0bcbada848b477da",
   "source_records": [
     {
       "id": "projects.quantercise",
@@ -705,7 +705,7 @@
       "status": "source_controlled",
       "route": "/",
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "87cd4e13e0e4a2cb33e9b39c4d2b8825ada5694e2f978d43a5073cd2f194a450"
+      "source_hash": "badae8f590e8f0a73ba4a7bb71effcddca6fb6eab437c521a7e510ed6ac4869c"
     },
     {
       "entity_id": "public-page:making",
