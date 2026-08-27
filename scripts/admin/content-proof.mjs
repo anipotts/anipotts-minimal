@@ -192,16 +192,6 @@ SELECT
   END AS home_about_label_type,
   CASE
     WHEN page_key = 'home'
-    THEN coalesce(json_array_length(json_extract(content, '$.proof_cards')), 0)
-    ELSE NULL
-  END AS home_proof_card_count,
-  CASE
-    WHEN page_key = 'home'
-    THEN coalesce(json_array_length(json_extract(content, '$.sections.past_work.project_slugs')), 0)
-    ELSE NULL
-  END AS home_making_slug_count,
-  CASE
-    WHEN page_key = 'home'
     THEN coalesce(json_array_length(json_extract(content, '$.sections.latest_thoughts.writing_slugs')), 0)
     ELSE NULL
   END AS home_writing_slug_count,
@@ -357,20 +347,10 @@ const unpublishedPublicRouteFailures = unpublishedPublicRouteChecks.filter(
 const adminBoundary = summarizeBoundary(adminRoutes);
 const publishEvents = contentCounts.content_publish_events ?? 0;
 const contentRecords = contentCounts.content_records ?? 0;
-const homeProofCardCount = Number(
-  pageRows.find(
-    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
-  )?.home_proof_card_count ?? 0,
-);
 const homeRichSummaryCount = Number(
   pageRows.find(
     (row) => String(row.page_key) === "home" && Number(row.published) === 1,
   )?.home_rich_summary_count ?? 0,
-);
-const homeMakingSlugCount = Number(
-  pageRows.find(
-    (row) => String(row.page_key) === "home" && Number(row.published) === 1,
-  )?.home_making_slug_count ?? 0,
 );
 const homeAboutParagraphCount = Number(
   pageRows.find(
@@ -441,8 +421,6 @@ const missingProof = [
   ...(homeAboutParagraphCount === 2 && homeAboutLabelType === "text"
     ? []
     : ["home_about_section"]),
-  ...(homeProofCardCount === 4 ? [] : ["home_proof_cards"]),
-  ...(homeMakingSlugCount === 4 ? [] : ["home_making_slugs"]),
   ...(homeWritingSlugCount === 3 ? [] : ["home_writing_slugs"]),
   ...(homeMentionCount === 5 ? [] : ["home_mentions"]),
   ...missingNewsletterFields,

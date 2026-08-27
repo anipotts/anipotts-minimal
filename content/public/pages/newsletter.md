@@ -1,6 +1,6 @@
 ---
 headline: notes from the build loop
-deck: notes on agent workflows and product builds, including the parts that broke while shipping.
+deck: my personal notes on agent workflows and product builds
 cta_label: subscribe
 success_message: subscribed. check your inbox.
 error_message: try again in a minute.

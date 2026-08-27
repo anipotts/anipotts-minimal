@@ -7,6 +7,14 @@ category: music
 role: Creator
 duration: Ongoing
 status: live
+kind: project
+public_state: hidden
+homepage_placement: none
+homepage_order: 0
+card_copy: real-time rhyme visualization for lyrics and audio.
+detail_path: /projects/saeshify
+identity:
+  icon: waveform
 sort_order: 85
 link_repo: https://github.com/anipotts/saeshify
 link_live: https://saeshify.vercel.app

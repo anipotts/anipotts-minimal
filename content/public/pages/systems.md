@@ -17,7 +17,7 @@ principles:
   - label: stop
     title: close the loop
     detail: a stopping condition keeps motion tied to the solution and makes the next action obvious.
-writing_label: field note
+writing_label: field notes
 featured_writing:
   title: awareness is alpha
   href: /writing/awareness-is-alpha

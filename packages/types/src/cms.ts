@@ -30,7 +30,6 @@ export interface HomepageSection {
   links?: { label: string; href: string }[];
   limit?: number;
   view_all?: string;
-  project_slugs?: string[];
   writing_slugs?: string[];
 }
 
@@ -60,13 +59,6 @@ export interface HomepageRichSummarySentence {
   segments: HomepageRichSummarySegment[];
 }
 
-export interface HomepageProofCard {
-  label: string;
-  href: string;
-  title: string;
-  detail: string;
-}
-
 export interface HomepageMention {
   label: string;
   href?: string;
@@ -92,7 +84,6 @@ export interface HomepageContent {
     latest_thoughts: HomepageSection;
   };
   section_order: ("intro" | "past_work" | "latest_thoughts")[];
-  proof_cards: HomepageProofCard[];
   mentions: Record<string, HomepageMention>;
 }
 
@@ -122,9 +113,23 @@ export interface CmsProjectContent {
   summary: string;
   body: string;
   links: CmsEditorLink[];
-  featured: boolean;
   order: number;
-  visible: boolean;
+  kind: "experience" | "project";
+  public_state: "featured" | "listed" | "hidden";
+  homepage_placement: "experience" | "making" | "none";
+  homepage_order: number;
+  card_copy: string;
+  detail_path: string;
+  identity: {
+    logo_src?: string;
+    logo_alt?: string;
+    icon?: string;
+  };
+  preview_media: {
+    kind: "image" | "gif" | "video";
+    src: string;
+    alt: string;
+  } | null;
   updated_at?: string | null;
 }
 

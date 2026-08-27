@@ -7,6 +7,15 @@ category: ai
 role: Creator
 duration: Ongoing
 status: live
+kind: project
+public_state: featured
+homepage_placement: making
+homepage_order: 80
+card_copy: practical patterns from running coding agents in real repositories.
+detail_path: /projects/claude-code-tips
+identity:
+  logo_src: /images/brand/claude-code-tips-favicon.svg
+  logo_alt: claude code tips
 sort_order: 92
 link_repo: https://github.com/anipotts/claude-code-tips
 tags: [Python, Claude Code, Hooks, Agents, MCP, Plugins]

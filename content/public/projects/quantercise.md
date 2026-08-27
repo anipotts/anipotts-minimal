@@ -7,7 +7,15 @@ category: product
 role: Founder and Engineer
 duration: Launched 2024
 status: live
-featured: true
+kind: project
+public_state: featured
+homepage_placement: making
+homepage_order: 100
+card_copy: quant interview practice with instant grading and real Python execution.
+detail_path: /projects/quantercise
+identity:
+  logo_src: /images/brand/quantercise-legacy-icon.png
+  logo_alt: quantercise
 sort_order: 100
 link_live: https://quantercise.com
 tags: [Next.js, TypeScript, Postgres, Drizzle, Stripe, Python]

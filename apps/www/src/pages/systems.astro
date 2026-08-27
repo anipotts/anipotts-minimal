@@ -1,5 +1,6 @@
 ---
 import Shell from "../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
 import {
   DEFAULT_SYSTEMS_CONTENT,
   normalizeSystemsPageContent,
@@ -11,113 +12,176 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 ---
 
 <Shell title={content.title} description={content.description} path="/systems">
-  <article data-rise class="systems-page">
-    <header class="hero">
-      <p class="mono kicker">operating method</p>
-      <h1>{content.hero_title}</h1>
-      <p>{content.hero_summary}</p>
-    </header>
+  <section data-rise>
+    <h1 class="hero-title">{content.hero_title}</h1>
+    <p class="hero-summary">{content.hero_summary}</p>
+  </section>
 
-    <section class="stack">
-      <h2 class="section-label">{content.principles_label}</h2>
-      <div class="principle-grid">
-        {
-          content.principles.map((principle) => (
-            <article class="principle">
-              <span class="mono">{principle.label}</span>
-              <h3>{principle.title}</h3>
-              <p>{principle.detail}</p>
-            </article>
-          ))
-        }
+  <section data-rise class="stack" aria-labelledby="system-map-title">
+    <h2 id="system-map-title" class="section-label">the system</h2>
+    <figure class="system-map">
+      <div class="map-stage map-stage--life">
+        <Icon name="ph:user-circle" aria-hidden="true" />
+        <span
+          ><strong>life and ideas</strong><small>attention starts here</small
+          ></span
+        >
       </div>
-    </section>
-
-    <section class="stack">
-      <h2 class="section-label">{content.writing_label}</h2>
-      <a class="feature" href={content.featured_writing.href}>
-        <strong>{content.featured_writing.title}</strong>
-        <span>{content.featured_writing.detail}</span>
-      </a>
-    </section>
-
-    <section class="stack">
-      <h2 class="section-label">{content.tools_label}</h2>
-      <div class="tool-grid">
-        {
-          content.public_tools.map((tool) => (
-            <a
-              class="feature"
-              href={tool.href}
-              target={tool.href.startsWith("/") ? undefined : "_blank"}
-              rel={
-                tool.href.startsWith("/") ? undefined : "noopener noreferrer"
-              }
-            >
-              <strong>{tool.title}</strong>
-              <span>{tool.detail}</span>
-            </a>
-          ))
-        }
+      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
+      <div class="map-stage map-stage--compute">
+        <Icon name="ph:devices" aria-hidden="true" />
+        <span
+          ><strong>private machines</strong><small>one secure network</small
+          ></span
+        >
       </div>
-    </section>
-  </article>
+      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
+      <div class="map-stage map-stage--agents">
+        <Icon name="ph:sparkle" aria-hidden="true" />
+        <span
+          ><strong>codex + claude code</strong><small>parallel execution</small
+          ></span
+        >
+      </div>
+      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
+      <div class="map-stage map-stage--record">
+        <Icon name="ph:github-logo" aria-hidden="true" />
+        <span
+          ><strong>shared record</strong><small>code, checks, and history</small
+          ></span
+        >
+      </div>
+      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
+      <div class="map-stage map-stage--output">
+        <Icon name="ph:globe-hemisphere-west" aria-hidden="true" />
+        <span
+          ><strong>useful outputs</strong><small
+            >sites, tools, and writing</small
+          ></span
+        >
+      </div>
+      <figcaption>
+        my attention moves between life and work while the machines, agents, and
+        repository keep the state durable.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">{content.writing_label}</h2>
+    <a class="feature" href={content.featured_writing.href}>
+      <strong>{content.featured_writing.title}</strong>
+      <span>{content.featured_writing.detail}</span>
+      <Icon name="ph:arrow-bend-right-up" aria-hidden="true" />
+    </a>
+  </section>
+
+  <section data-rise class="stack">
+    <h2 class="section-label">{content.tools_label}</h2>
+    <div class="tool-grid">
+      {
+        content.public_tools.map((tool) => (
+          <a
+            class="feature"
+            href={tool.href}
+            target={tool.href.startsWith("/") ? undefined : "_blank"}
+            rel={tool.href.startsWith("/") ? undefined : "noopener noreferrer"}
+          >
+            <strong>{tool.title}</strong>
+            <span>{tool.detail}</span>
+            <Icon name="ph:arrow-bend-right-up" aria-hidden="true" />
+          </a>
+        ))
+      }
+    </div>
+  </section>
 </Shell>
 
 <style>
-  .systems-page,
-  .hero,
   .stack,
-  .feature,
-  .principle {
+  .feature {
     display: grid;
   }
-  .systems-page {
-    gap: var(--s-8);
-  }
-  .hero {
-    gap: var(--s-3);
-    padding-block: var(--s-5) var(--s-7);
-    max-width: 54rem;
-  }
-  .hero h1 {
-    margin: 0;
-    font-size: clamp(3rem, 12vw, 7rem);
-    line-height: 0.9;
-  }
-  .hero p:last-child {
-    margin: 0;
-    max-width: 46rem;
-    font-size: 1.25rem;
-    line-height: 1.55;
-  }
-  .kicker,
-  .principle span {
-    color: var(--ink-muted);
+  .hero-title {
+    margin-bottom: var(--s-3);
   }
   .stack {
     gap: var(--s-4);
   }
-  .principle-grid,
   .tool-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-3);
   }
-  .principle,
+
+  .system-map {
+    display: grid;
+    grid-template-columns: repeat(9, auto);
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    padding: var(--s-5);
+    border-radius: 0.75rem;
+    background: var(--surface);
+  }
+
+  .map-stage {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-width: 0;
+  }
+
+  .map-stage > :global(svg) {
+    flex: 0 0 auto;
+    font-size: 1.35rem;
+    color: var(--interactive);
+  }
+
+  .map-stage span {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .map-stage strong,
+  .map-stage small {
+    line-height: 1.2;
+  }
+
+  .map-stage strong {
+    font-size: var(--p-small);
+  }
+
+  .map-stage small,
+  figcaption {
+    color: var(--ink-muted);
+  }
+
+  .map-arrow {
+    color: var(--ink-muted);
+  }
+
+  figcaption {
+    grid-column: 1 / -1;
+    margin-top: var(--s-3);
+    max-width: 58ch;
+    font-size: var(--p-small);
+    line-height: 1.45;
+  }
+
   .feature {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--s-2);
     padding: var(--s-4);
-    border: 1px solid var(--border);
-    border-radius: 1rem;
+    border-radius: 0.75rem;
+    background: var(--surface);
   }
-  .principle h3,
-  .principle p,
   .feature {
     margin: 0;
   }
-  .principle p,
   .feature span {
+    grid-column: 1;
     color: var(--ink-muted);
     line-height: 1.55;
   }
@@ -125,18 +189,39 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     color: var(--ink);
     text-decoration: none;
     transition:
-      border-color 0.18s ease,
+      background 0.18s ease,
       transform 0.18s ease;
   }
   .feature:hover,
   .feature:focus-visible {
-    border-color: var(--interactive);
+    background: var(--accent-soft);
     transform: translateY(-2px);
   }
-  @media (max-width: 680px) {
-    .principle-grid,
+
+  @media (max-width: 980px) {
     .tool-grid {
       grid-template-columns: 1fr;
+    }
+
+    .system-map {
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+
+    .map-arrow {
+      justify-self: center;
+      transform: rotate(90deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feature {
+      transition: none;
+    }
+
+    .feature:hover,
+    .feature:focus-visible {
+      transform: none;
     }
   }
 </style>

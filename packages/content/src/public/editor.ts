@@ -162,6 +162,26 @@ function normalizeProjectStatus(value: unknown): CmsProjectContent["status"] {
   return "wip";
 }
 
+function normalizeProjectKind(value: unknown): CmsProjectContent["kind"] {
+  return value === "experience" ? "experience" : "project";
+}
+
+function normalizeProjectPublicState(
+  value: unknown,
+): CmsProjectContent["public_state"] {
+  if (value === "featured") return "featured";
+  if (value === "hidden") return "hidden";
+  return "listed";
+}
+
+function normalizeHomepagePlacement(
+  value: unknown,
+): CmsProjectContent["homepage_placement"] {
+  if (value === "experience") return "experience";
+  if (value === "making") return "making";
+  return "none";
+}
+
 export function normalizeCmsProject(
   project: unknown,
   fallback?: Partial<CmsProjectContent>,
@@ -198,12 +218,38 @@ export function normalizeCmsProject(
       fallback?.body ?? "",
     ).trim(),
     links: links.slice(0, 4),
-    featured: coerceBoolean(source.featured, fallback?.featured ?? false),
     order: coerceNumber(
       source.order ?? source.sort_order,
       fallback?.order ?? 0,
     ),
-    visible: coerceBoolean(source.visible, fallback?.visible ?? true),
+    kind: normalizeProjectKind(source.kind ?? fallback?.kind),
+    public_state: normalizeProjectPublicState(
+      source.public_state ?? fallback?.public_state,
+    ),
+    homepage_placement: normalizeHomepagePlacement(
+      source.homepage_placement ?? fallback?.homepage_placement,
+    ),
+    homepage_order: coerceNumber(
+      source.homepage_order,
+      fallback?.homepage_order ?? 0,
+    ),
+    card_copy: coerceString(
+      source.card_copy ?? source.summary ?? source.subtitle,
+      fallback?.card_copy ?? fallback?.summary ?? "",
+    ).trim(),
+    detail_path: coerceString(
+      source.detail_path,
+      fallback?.detail_path ??
+        `/projects/${normalizeSlug(source.slug, fallback?.slug ?? "project")}`,
+    ).trim(),
+    identity:
+      source.identity && typeof source.identity === "object"
+        ? (source.identity as CmsProjectContent["identity"])
+        : (fallback?.identity ?? {}),
+    preview_media:
+      source.preview_media && typeof source.preview_media === "object"
+        ? (source.preview_media as CmsProjectContent["preview_media"])
+        : (fallback?.preview_media ?? null),
     updated_at:
       coerceString(source.updated_at, fallback?.updated_at ?? "") || null,
   };
@@ -223,13 +269,41 @@ export function validateCmsProject(project: CmsProjectContent): {
       "Project summary",
       CMS_TEXT_LIMITS.summary,
     ) ??
+    validateCmsString(
+      project.card_copy,
+      "Project card copy",
+      CMS_TEXT_LIMITS.summary,
+    ) ??
+    validateCmsString(
+      project.detail_path,
+      "Project detail path",
+      CMS_TEXT_LIMITS.linkUrl,
+    ) ??
+    validateCmsLinks(project.links, "Project") ??
+    (!/^\/projects\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(project.detail_path)
+      ? "Project detail path must be an internal project route"
+      : null) ??
+    (!project.identity.logo_src && !project.identity.icon
+      ? "Project identity requires a logo or icon"
+      : null) ??
+    (project.identity.logo_src && !project.identity.logo_src.startsWith("/")
+      ? "Project logo must use a local path"
+      : null) ??
+    (project.preview_media && !project.preview_media.src.startsWith("/")
+      ? "Project preview media must use a local path"
+      : null) ??
+    (project.kind === "experience" && project.homepage_placement === "making"
+      ? "Experience records cannot use the making placement"
+      : null) ??
+    (project.kind === "project" && project.homepage_placement === "experience"
+      ? "Project records cannot use the experience placement"
+      : null) ??
     validateCmsString(project.body, "Project body", CMS_TEXT_LIMITS.body) ??
     project.tags
       .map((tag) =>
         validateCmsString(tag, "Project tag", CMS_TEXT_LIMITS.tag, true),
       )
-      .find(Boolean) ??
-    validateCmsLinks(project.links, "Project");
+      .find(Boolean);
   return error ? { ok: false, error } : { ok: true };
 }
 

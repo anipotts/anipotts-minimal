@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "1cc32190f2b2f14bf9cba039352cb1854e572ded9e857dfc0bcbada848b477da";
+  "c9dc4c03efb24f3464f7638f7d4a12f770b593247eb19da6ff1d30e0e64bb615";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -40,12 +40,6 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
         },
       ],
       view_all: "/making",
-      project_slugs: [
-        "quantercise",
-        "quantercise-extension",
-        "saeshify",
-        "nyu-purity-test",
-      ],
     },
     latest_thoughts: {
       visible: true,
@@ -123,36 +117,6 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       logoAlt: "business insider",
     },
   },
-  proof_cards: [
-    {
-      label: "structured ai",
-      href: "https://getstructured.ai/",
-      title: "drawing chat with page-level citations",
-      detail:
-        "architectural PDFs in, cited answers out. streamed claude/gemini and kept redis replay for live spectating and later debugging.",
-    },
-    {
-      label: "quantercise",
-      href: "/projects/quantercise",
-      title: "quant prep with real grading",
-      detail:
-        "next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.",
-    },
-    {
-      label: "paragon global investments",
-      href: "https://paragoninvestments.org",
-      title: "platform for an intercollegiate quant fund",
-      detail:
-        "next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.",
-    },
-    {
-      label: "public tooling",
-      href: "/projects/claude-code-tips",
-      title: "tools i actually use",
-      detail:
-        "claude-code-tips and imessage mcp are small public receipts from the same local-first workflow i run every day.",
-    },
-  ],
 };
 
 export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
@@ -160,8 +124,7 @@ export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
   description:
     "projects, experiments, weekly traces, and small utilities from ani potts.",
   hero_title: "making",
-  hero_summary:
-    "work i built or helped ship. product surfaces, data systems, quant tools, and the older pieces that still explain how i think.",
+  hero_summary: "work i built or helped developed.",
   buckets: [
     {
       id: "active",
@@ -196,12 +159,11 @@ export const DEFAULT_WRITING_INDEX_CONTENT: ListingPageContent = {
     "things ani's written. claude code workflows, ai builds, the occasional music take.",
   hero_title: "writing",
   hero_summary: "stuff i've figured out and wanted to write down.",
-  search_placeholder: "search writing",
 };
 
 export const DEFAULT_NEWSLETTER_CONTENT: NewsletterContent = {
   headline: "notes from the build loop",
-  deck: "notes on agent workflows and product builds, including the parts that broke while shipping.",
+  deck: "my personal notes on agent workflows and product builds",
   cta_label: "subscribe",
   success_message: "subscribed. check your inbox.",
   error_message: "try again in a minute.",
@@ -324,7 +286,7 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
         "a stopping condition keeps motion tied to the solution and makes the next action obvious.",
     },
   ],
-  writing_label: "field note",
+  writing_label: "field notes",
   featured_writing: {
     title: "awareness is alpha",
     href: "/writing/awareness-is-alpha",
@@ -374,9 +336,18 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anipotts/chained-chat",
       },
     ],
-    featured: false,
     order: 89,
-    visible: true,
+    kind: "project",
+    public_state: "listed",
+    homepage_placement: "none",
+    homepage_order: 0,
+    card_copy: "shared multi-model chat with one preserved context.",
+    detail_path: "/projects/chainedchat",
+    identity: {
+      logo_src: "/images/brand/chainedchat-favicon.svg",
+      logo_alt: "chainedchat",
+    },
+    preview_media: null,
   },
   {
     slug: "claude-code-tips",
@@ -393,13 +364,23 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anipotts/claude-code-tips",
       },
     ],
-    featured: false,
     order: 92,
-    visible: true,
+    kind: "project",
+    public_state: "featured",
+    homepage_placement: "making",
+    homepage_order: 80,
+    card_copy:
+      "practical patterns from running coding agents in real repositories.",
+    detail_path: "/projects/claude-code-tips",
+    identity: {
+      logo_src: "/images/brand/claude-code-tips-favicon.svg",
+      logo_alt: "claude code tips",
+    },
+    preview_media: null,
   },
   {
     slug: "habittracker-obh",
-    title: "artist scouting dashboard",
+    title: "our bad habit",
     status: "live",
     year: "2024",
     range: "Summer 2024",
@@ -407,9 +388,18 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     summary: "growth tracking for an atlantic records venture.",
     body: "Built a scouting dashboard that pulled Chartmetric, YouTube, TikTok, and Instagram signals into one workflow. Added geo-based discovery for finding emerging artists in campaign markets.",
     links: [],
-    featured: false,
     order: 41,
-    visible: false,
+    kind: "experience",
+    public_state: "featured",
+    homepage_placement: "experience",
+    homepage_order: 80,
+    card_copy: "discovery and growth in one scouting workflow.",
+    detail_path: "/projects/habittracker-obh",
+    identity: {
+      logo_src: "/images/brand/bad-habit-favicon.png",
+      logo_alt: "our bad habit",
+    },
+    preview_media: null,
   },
   {
     slug: "imessage-mcp",
@@ -430,9 +420,18 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anipotts/imessage-mcp",
       },
     ],
-    featured: true,
     order: 91,
-    visible: true,
+    kind: "project",
+    public_state: "featured",
+    homepage_placement: "making",
+    homepage_order: 90,
+    card_copy: "private, read-only search and stats for Apple Messages.",
+    detail_path: "/projects/imessage-mcp",
+    identity: {
+      logo_src: "/images/brand/npm-icon.svg",
+      logo_alt: "npm",
+    },
+    preview_media: null,
   },
   {
     slug: "nyu-purity-test",
@@ -449,9 +448,18 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://nyupuritytest.com",
       },
     ],
-    featured: false,
     order: 84,
-    visible: true,
+    kind: "project",
+    public_state: "featured",
+    homepage_placement: "making",
+    homepage_order: 70,
+    card_copy: "a campus quiz that spread through NYU group chats overnight.",
+    detail_path: "/projects/nyu-purity-test",
+    identity: {
+      logo_src: "/images/brand/nyu-purity-test-favicon.png",
+      logo_alt: "nyu purity test",
+    },
+    preview_media: null,
   },
   {
     slug: "options-pricing-sensitivity",
@@ -468,13 +476,22 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anirudhp15/Options-Pricing-and-Sensitivity-Analysis-Tool",
       },
     ],
-    featured: false,
     order: 40,
-    visible: true,
+    kind: "project",
+    public_state: "listed",
+    homepage_placement: "none",
+    homepage_order: 0,
+    card_copy:
+      "options pricing with Black-Scholes, binomial models, and volatility sweeps.",
+    detail_path: "/projects/options-pricing-sensitivity",
+    identity: {
+      icon: "chart-line-up",
+    },
+    preview_media: null,
   },
   {
     slug: "pgi-research-platform",
-    title: "pgi research portal",
+    title: "paragon global investments",
     status: "live",
     year: "2025",
     range: "2025-",
@@ -487,9 +504,18 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://paragoninvestments.org",
       },
     ],
-    featured: false,
     order: 95,
-    visible: true,
+    kind: "experience",
+    public_state: "featured",
+    homepage_placement: "experience",
+    homepage_order: 90,
+    card_copy: "research platform for an intercollegiate quant fund.",
+    detail_path: "/projects/pgi-research-platform",
+    identity: {
+      logo_src: "/images/brand/paragon-favicon.png",
+      logo_alt: "paragon global investments",
+    },
+    preview_media: null,
   },
   {
     slug: "quantercise-extension",
@@ -506,9 +532,17 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anipotts/quantercise-mental-math-extension",
       },
     ],
-    featured: false,
     order: 90,
-    visible: true,
+    kind: "project",
+    public_state: "listed",
+    homepage_placement: "none",
+    homepage_order: 0,
+    card_copy: "keyboard-first browser drills for faster mental math.",
+    detail_path: "/projects/quantercise-extension",
+    identity: {
+      icon: "google-chrome-logo",
+    },
+    preview_media: null,
   },
   {
     slug: "quantercise",
@@ -526,9 +560,41 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://quantercise.com",
       },
     ],
-    featured: true,
     order: 100,
-    visible: true,
+    kind: "project",
+    public_state: "featured",
+    homepage_placement: "making",
+    homepage_order: 100,
+    card_copy:
+      "quant interview practice with instant grading and real Python execution.",
+    detail_path: "/projects/quantercise",
+    identity: {
+      logo_src: "/images/brand/quantercise-legacy-icon.png",
+      logo_alt: "quantercise",
+    },
+    preview_media: null,
+  },
+  {
+    slug: "range-media-partners",
+    title: "range media partners",
+    status: "wip",
+    year: "current",
+    range: "Client work",
+    tags: ["a&r", "research", "music"],
+    summary: "client A&R research and artist monitoring.",
+    body: "Client A&R research and artist monitoring for Range Media Partners.",
+    links: [],
+    order: 70,
+    kind: "experience",
+    public_state: "featured",
+    homepage_placement: "experience",
+    homepage_order: 70,
+    card_copy: "client A&R research and artist monitoring.",
+    detail_path: "/projects/range-media-partners",
+    identity: {
+      icon: "waveform",
+    },
+    preview_media: null,
   },
   {
     slug: "saeshify",
@@ -549,9 +615,46 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
         url: "https://github.com/anipotts/saeshify",
       },
     ],
-    featured: false,
     order: 85,
-    visible: true,
+    kind: "project",
+    public_state: "hidden",
+    homepage_placement: "none",
+    homepage_order: 0,
+    card_copy: "real-time rhyme visualization for lyrics and audio.",
+    detail_path: "/projects/saeshify",
+    identity: {
+      icon: "waveform",
+    },
+    preview_media: null,
+  },
+  {
+    slug: "structured-ai",
+    title: "structured ai",
+    status: "archived",
+    year: "2025",
+    range: "2025",
+    tags: ["agents", "realtime", "citations", "observability"],
+    summary: "real-time agent i/o for architectural work.",
+    body: "I worked on real-time agent interaction for architectural workflows, including cited answers and execution that people could inspect while the system was working.",
+    links: [
+      {
+        label: "live site",
+        url: "https://getstructured.ai/",
+      },
+    ],
+    order: 99,
+    kind: "experience",
+    public_state: "featured",
+    homepage_placement: "experience",
+    homepage_order: 100,
+    card_copy:
+      "real-time agent interaction with citations and visible execution.",
+    detail_path: "/projects/structured-ai",
+    identity: {
+      logo_src: "/images/brand/structured-ai-favicon.png",
+      logo_alt: "structured ai",
+    },
+    preview_media: null,
   },
 ];
 

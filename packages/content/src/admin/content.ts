@@ -208,18 +208,19 @@ export const contentInventory: ContentInventoryItem[] = [
     proof_ids: ["content.homepage.mentions.page-content"],
   },
   {
-    id: "homepage.proof_cards",
+    id: "homepage.work_records",
     surface: "homepage",
-    title: "proof cards",
-    source_ref: "content/public/pages/home.md proof_cards",
+    title: "homepage work records",
+    source_ref:
+      "content/public/projects/*.md homepage_placement and homepage_order",
     current_value:
-      "Structured AI, Quantercise, Paragon Global Investments, and public tooling cards feed the homepage proof grid from canonical content.",
+      "Canonical work records select and order homepage experience and project cards without copying card content into the homepage page record.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Use the normalized canonical proof card schema for preview before any save path.",
+      "Preview project-record placement changes before canonical public content changes.",
     required_authority: [],
-    proof_ids: ["content.homepage.proof.page-content"],
+    proof_ids: ["content.homepage.work-records.source"],
   },
   {
     id: "homepage.making_selection",
@@ -542,14 +543,6 @@ function sourceBackedFields(
 
   if (!hasNestedField(content, ["sections", "intro", "mention_keys"])) {
     gaps.push("sections.intro.mention_keys");
-  }
-
-  if (!hasNestedField(content, ["proof_cards"])) {
-    gaps.push("proof_cards");
-  }
-
-  if (!hasNestedField(content, ["sections", "past_work", "project_slugs"])) {
-    gaps.push("sections.past_work.project_slugs");
   }
 
   if (

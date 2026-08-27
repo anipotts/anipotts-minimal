@@ -24,8 +24,6 @@ export interface Writing {
 export const writingSlug = (t: Writing): string => t.slug;
 export const projectSlug = (p: Project): string => p.slug;
 
-const HIDDEN_PUBLIC_PROJECTS = new Set(["habittracker-obh"]);
-
 function projectFromEntry(entry: ProjectEntry): Project {
   const slug = entry.data.slug ?? entry.id;
   return {
@@ -66,13 +64,13 @@ export async function publishedWriting(): Promise<Writing[]> {
 }
 
 export async function visibleProjects(): Promise<Project[]> {
-  const entries = await getCollection("projects", (p) => p.data.visible);
+  const entries = await getCollection(
+    "projects",
+    (project) => project.data.public_state !== "hidden",
+  );
   return entries
     .map(projectFromEntry)
-    .filter(
-      (project) =>
-        project.data.visible && !HIDDEN_PUBLIC_PROJECTS.has(project.slug),
-    )
+    .filter((project) => project.data.public_state !== "hidden")
     .sort((a, b) => b.data.sort_order - a.data.sort_order);
 }
 

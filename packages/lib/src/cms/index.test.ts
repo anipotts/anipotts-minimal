@@ -87,65 +87,22 @@ describe("homepage cms validation", () => {
     });
   });
 
-  it("normalizes D1-shaped proof cards", () => {
+  it("drops legacy copied homepage work fields", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,
-      proof_cards: [
-        {
-          label: " demo ",
-          href: " /making ",
-          title: " proof ",
-          detail: " card detail ",
-        },
-      ],
-    });
-
-    expect(content.proof_cards).toEqual([
-      {
-        label: "demo",
-        href: "/making",
-        title: "proof",
-        detail: "card detail",
-      },
-    ]);
-    expect(validateHomepageContent(content)).toEqual({ ok: true });
-  });
-
-  it("normalizes D1-shaped homepage project slugs", () => {
-    const content = normalizeHomepageContent({
-      ...DEFAULT_HOMEPAGE_CONTENT,
+      proof_cards: [{ label: "old", href: "/making" }],
       sections: {
         ...DEFAULT_HOMEPAGE_CONTENT.sections,
         past_work: {
           ...DEFAULT_HOMEPAGE_CONTENT.sections.past_work,
-          project_slugs: [" quantercise ", " saeshify "],
+          project_slugs: ["quantercise"],
         },
       },
-    });
+    } as unknown);
 
-    expect(content.sections.past_work.project_slugs).toEqual([
-      "quantercise",
-      "saeshify",
-    ]);
+    expect("proof_cards" in content).toBe(false);
+    expect("project_slugs" in content.sections.past_work).toBe(false);
     expect(validateHomepageContent(content)).toEqual({ ok: true });
-  });
-
-  it("rejects malformed homepage project slugs", () => {
-    const content = normalizeHomepageContent({
-      ...DEFAULT_HOMEPAGE_CONTENT,
-      sections: {
-        ...DEFAULT_HOMEPAGE_CONTENT.sections,
-        past_work: {
-          ...DEFAULT_HOMEPAGE_CONTENT.sections.past_work,
-          project_slugs: ["Bad Slug"],
-        },
-      },
-    });
-
-    expect(validateHomepageContent(content)).toEqual({
-      ok: false,
-      error: "Work slug must be lowercase kebab-case",
-    });
   });
 
   it("normalizes D1-shaped homepage writing slugs", () => {
@@ -324,25 +281,6 @@ describe("homepage cms validation", () => {
     });
   });
 
-  it("rejects unsafe proof card links", () => {
-    const content = normalizeHomepageContent({
-      ...DEFAULT_HOMEPAGE_CONTENT,
-      proof_cards: [
-        {
-          label: "demo",
-          href: "javascript:alert(1)",
-          title: "proof",
-          detail: "card detail",
-        },
-      ],
-    });
-
-    expect(validateHomepageContent(content)).toEqual({
-      ok: false,
-      error: "Proof card 1 link must start with / or https://",
-    });
-  });
-
   it("rejects excessive homepage summary length", () => {
     const content = normalizeHomepageContent({
       ...DEFAULT_HOMEPAGE_CONTENT,
@@ -514,6 +452,8 @@ describe("owner editor cms validation", () => {
       featured: 1,
       visible: 1,
       sort_order: 10,
+      icon: "circles-three-plus",
+      identity: { icon: "circles-three-plus" },
     });
 
     expect(project).toMatchObject({
@@ -521,10 +461,10 @@ describe("owner editor cms validation", () => {
       status: "wip",
       summary: "summary",
       tags: ["ai", "tools"],
-      featured: true,
-      visible: true,
       order: 10,
     });
+    expect("featured" in project).toBe(false);
+    expect("visible" in project).toBe(false);
     expect(validateCmsProject(project)).toEqual({ ok: true });
   });
 

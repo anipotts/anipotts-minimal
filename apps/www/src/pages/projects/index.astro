@@ -1,7 +1,7 @@
 ---
 import Shell from "../../layouts/Shell.astro";
 import { Icon } from "astro-icon/components";
-import { projectSlug, visibleProjects } from "../../lib/content";
+import { visibleProjects } from "../../lib/content";
 import {
   DEFAULT_PROJECTS_INDEX_CONTENT,
   normalizeListingPageContent,
@@ -43,14 +43,14 @@ const copy = normalizeListingPageContent(
   <section data-rise class="list">
     {
       projects.map((p) => (
-        <a href={`/projects/${projectSlug(p)}`} class="row-link entry">
+        <a href={p.data.detail_path} class="row-link entry">
           <span class="line">
             <span class="row-title">{p.data.title}</span>
             <span class="mono muted">{p.data.year}</span>
             <span class="mono muted">{p.data.status}</span>
             <Icon name="ph:arrow-bend-right-up" class="affordance" />
           </span>
-          <span class="dek">{p.data.subtitle ?? p.data.description}</span>
+          <span class="dek">{p.data.card_copy}</span>
         </a>
       ))
     }
