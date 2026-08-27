@@ -114,8 +114,12 @@ const {
     padding: 0;
     background: transparent;
     border-radius: 0;
-    border-bottom: 1px solid var(--border);
-    color: var(--ink-muted);
+    border-bottom: 1px solid #aab6ca;
+    color: #0b1220;
+  }
+
+  .row .field::placeholder {
+    color: #526078;
   }
 
   .hp {
@@ -127,7 +131,7 @@ const {
   }
 
   .row .field:focus {
-    border-color: var(--focus);
+    border-color: var(--newsletter-accent);
   }
 
   .row .fill {
@@ -156,7 +160,7 @@ const {
     grid-column: 2;
     margin: 0;
     font-size: 0.8rem;
-    color: var(--ink-muted);
+    color: #8c1d2f;
     min-height: 1em;
   }
 
@@ -168,7 +172,7 @@ const {
   }
 
   .status.ok {
-    color: var(--ink);
+    color: #17683a;
   }
 
   @media (max-width: 720px) {
