@@ -415,6 +415,9 @@ function normalizeMention(
   copyOptionalString(mention, source, fallback, "logoAlt");
   copyOptionalString(mention, source, fallback, "badgeSrc");
   copyOptionalString(mention, source, fallback, "badgeAlt");
+  copyOptionalString(mention, source, fallback, "visualLabel");
+  copyOptionalString(mention, source, fallback, "visualPrefix");
+  copyOptionalString(mention, source, fallback, "visualSuffix");
   mention.logoTone = normalizeMentionOption(
     source.logoTone,
     fallback?.logoTone,

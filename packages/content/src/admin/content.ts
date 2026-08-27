@@ -182,13 +182,13 @@ export const contentInventory: ContentInventoryItem[] = [
     surface: "homepage",
     title: "hero summary",
     source_ref:
-      "content/public/pages/home.md sections.intro.paragraphs, projected through @anipotts/content/public",
+      "content/public/pages/home.md sections.intro.subheading, projected through @anipotts/content/public",
     current_value:
       "Homepage intro copy uses two readable sentences with structured mentions rendered inline.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
-      "Preview paragraph edits before any publish path updates canonical public content.",
+      "Preview the summary edit before any publish path updates canonical public content.",
     required_authority: [],
     proof_ids: ["content.homepage.summary.source"],
   },
@@ -536,11 +536,8 @@ function sourceBackedFields(
 
   const gaps: string[] = [];
 
-  if (
-    !hasNestedField(content, ["sections", "intro", "paragraphs"]) &&
-    !hasNestedField(content, ["sections", "intro", "subheading"])
-  ) {
-    gaps.unshift("sections.intro.paragraphs");
+  if (!hasNestedField(content, ["sections", "intro", "subheading"])) {
+    gaps.unshift("sections.intro.subheading");
   }
 
   if (!hasNestedField(content, ["sections", "intro", "mention_keys"])) {
@@ -655,11 +652,11 @@ export const contentPreviewItems: ContentPreviewItem[] = [
     status: "preview",
     risk_level: "medium",
     source_ref:
-      "content/public/pages/home.md sections.intro.paragraphs and mentions",
+      "content/public/pages/home.md sections.intro.subheading and mentions",
     current_value:
       "homepage intro copy as rendered from the published `home` content record or source fallback.",
     proposed_value:
-      "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
+      "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
     preview_route: "/",
     authority_state: "preview_only_no_write",
     required_approval_ids: [],

@@ -3,21 +3,14 @@ sections:
   intro:
     visible: true
     label: index
-    heading: hi, i'm ani
-    subheading: i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
-    paragraphs:
-      - i build with agents and write about the systems that keep the work coherent.
-      - business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.
+    heading: hi, i'm ani!
+    subheading: i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.
     mention_keys:
-      - build
-      - agents
-      - write
-      - systems
-      - businessInsider
       - structuredAi
       - yCombinatorF25
       - badHabit
       - atlanticRecords
+      - businessInsider
   past_work:
     visible: true
     label: making
@@ -73,9 +66,12 @@ mentions:
     logoAlt: structured ai
     logoTone: white
   yCombinatorF25:
-    label: F25
+    label: (YC F25)
     logoSrc: /images/brand/ycombinator-favicon.ico
-    logoAlt: y combinator
+    logoAlt: YC
+    visualLabel: F25
+    visualPrefix: (
+    visualSuffix: )
   badHabit:
     label: our bad habit
     href: https://ourbadhabit.com/
@@ -103,7 +99,7 @@ proof_cards:
     detail: next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.
   - label: paragon global investments
     href: https://paragoninvestments.org
-    title: research portal for a quant fund
+    title: platform for an intercollegiate quant fund
     detail: next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.
   - label: public tooling
     href: /projects/claude-code-tips

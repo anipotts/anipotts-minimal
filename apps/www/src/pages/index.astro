@@ -49,10 +49,6 @@ const writingEntries = (await publishedWriting())
 const workLabel = work.label || "making";
 const workHref = work.view_all ?? work.links?.[0]?.href ?? "/making";
 const summaryText = homepageSummaryText(cmsHome);
-const introParagraphs =
-  intro.paragraphs && intro.paragraphs.length > 0
-    ? intro.paragraphs
-    : [summaryText];
 const introMentionKeys = intro.mention_keys ?? [];
 const profileLd = {
   "@context": "https://schema.org",
@@ -75,13 +71,13 @@ const profileLd = {
 <Shell title="ani potts" description={summaryText} path="/" jsonLd={profileLd}>
   <section data-rise>
     <h1 class="home-hero">
-      {heading}.
+      {heading}
     </h1>
     <p class="hero-summary hero-line">
       {
         (
           <HomepageRichSummary
-            paragraphs={introParagraphs}
+            text={summaryText}
             mentionKeys={introMentionKeys}
             mentions={mentionMap}
           />
@@ -174,16 +170,6 @@ const profileLd = {
     font-size: clamp(1.08rem, 2.2vw, 1.42rem);
     line-height: 1.52;
     text-wrap: pretty;
-  }
-
-  .hero-line :global(.hero-sentence) {
-    display: block;
-    max-width: 52rem;
-  }
-
-  .hero-line :global(.hero-sentence + .hero-sentence) {
-    color: var(--ink-muted);
-    font-size: 0.9em;
   }
 
   .text-link {

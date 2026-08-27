@@ -13,6 +13,10 @@ const environment = readFileSync(
 );
 const adminConfig = readFileSync("apps/admin/astro.config.mjs", "utf8");
 const publicConfig = readFileSync("apps/www/astro.config.mjs", "utf8");
+const publicContentHotReload = readFileSync(
+  "scripts/dev/public-content-hot-reload.mjs",
+  "utf8",
+);
 
 assert.equal(packageJson.devDependencies.portless, "0.15.5");
 assert.equal(nodeVersion, "24.19.0");
@@ -41,6 +45,7 @@ for (const expected of [
   'PORTLESS_TLD: "localhost"',
   'name: "anipotts"',
   'name: "admin.anipotts"',
+  'pnpm(["content:generate"], { stdio: "inherit" });',
   "prepareAppDependencies(app);",
   "`--filter=${app.packageName}^...`",
   'if (surface === "admin" || surface === "all") await ensureFallbackAdmin()',
@@ -88,5 +93,20 @@ assert.ok(environment.includes('name = "inspect pull request"'));
 assert.ok(environment.includes('name = "inspect live state"'));
 assert.ok(adminConfig.includes('[".admin.anipotts.localhost"]'));
 assert.ok(publicConfig.includes('".anipotts.localhost"'));
+assert.ok(adminConfig.includes("publicContentHotReload()"));
+assert.ok(publicConfig.includes("publicContentHotReload()"));
+for (const invariant of [
+  "server.watcher.add(CONTENT_ROOT)",
+  'server.watcher.on("change", schedule)',
+  '["content:generate"]',
+  '["--filter", "@anipotts/content", "build"]',
+  "server.moduleGraph.invalidateAll()",
+  'server.ws.send({ type: "full-reload" })',
+]) {
+  assert.ok(
+    publicContentHotReload.includes(invariant),
+    `missing canonical content hot-reload invariant: ${invariant}`,
+  );
+}
 
 console.log("portless preview invariants passed");

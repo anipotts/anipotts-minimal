@@ -78,6 +78,9 @@ export interface HomepageMention {
   logoShape?: "square" | "wide" | "mark" | "large";
   badgeSrc?: string;
   badgeAlt?: string;
+  visualLabel?: string;
+  visualPrefix?: string;
+  visualSuffix?: string;
   presentation?: "brand" | "facet";
 }
 

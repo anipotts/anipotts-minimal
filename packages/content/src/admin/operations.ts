@@ -481,7 +481,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     surface: "public_site",
     route: "/",
     source_ref:
-      "content/public/pages/home.md sections.intro.paragraphs projected through @anipotts/content/public",
+      "content/public/pages/home.md sections.intro.subheading projected through @anipotts/content/public",
     field_path: "homepage.summary",
     current_value_ref: "source_fallback",
     proposed_value:

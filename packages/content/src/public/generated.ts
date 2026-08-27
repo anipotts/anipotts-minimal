@@ -10,30 +10,22 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "d8ad0931a6c72802350ab4dfe92baf890894d88cb62d43b365854df0332e6665";
+  "1cc32190f2b2f14bf9cba039352cb1854e572ded9e857dfc0bcbada848b477da";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
     intro: {
       visible: true,
       label: "index",
-      heading: "hi, i'm ani",
+      heading: "hi, i'm ani!",
       subheading:
-        "i build with agents and write about the systems that keep the work coherent. business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-      paragraphs: [
-        "i build with agents and write about the systems that keep the work coherent.",
-        "business insider has covered how i work; previously, i worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture.",
-      ],
+        "i work on realtime agent systems and write about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.",
       mention_keys: [
-        "build",
-        "agents",
-        "write",
-        "systems",
-        "businessInsider",
         "structuredAi",
         "yCombinatorF25",
         "badHabit",
         "atlanticRecords",
+        "businessInsider",
       ],
     },
     past_work: {
@@ -104,9 +96,12 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       logoTone: "white",
     },
     yCombinatorF25: {
-      label: "F25",
+      label: "(YC F25)",
       logoSrc: "/images/brand/ycombinator-favicon.ico",
-      logoAlt: "y combinator",
+      logoAlt: "YC",
+      visualLabel: "F25",
+      visualPrefix: "(",
+      visualSuffix: ")",
     },
     badHabit: {
       label: "our bad habit",
@@ -146,7 +141,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     {
       label: "paragon global investments",
       href: "https://paragoninvestments.org",
-      title: "research portal for a quant fund",
+      title: "platform for an intercollegiate quant fund",
       detail:
         "next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.",
     },

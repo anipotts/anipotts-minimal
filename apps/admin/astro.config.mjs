@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import { publicContentHotReload } from "../../scripts/dev/public-content-hot-reload.mjs";
 
 export default defineConfig({
   site: "https://admin.anipotts.com",
@@ -13,6 +14,7 @@ export default defineConfig({
     port: 3001,
   },
   vite: {
+    plugins: [publicContentHotReload()],
     server: {
       allowedHosts: [".admin.anipotts.localhost"],
     },

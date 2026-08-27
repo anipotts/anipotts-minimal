@@ -262,6 +262,7 @@ function startApp(app, url) {
 }
 
 function prepareAppDependencies(app) {
+  pnpm(["content:generate"], { stdio: "inherit" });
   pnpm(
     [
       "turbo",
