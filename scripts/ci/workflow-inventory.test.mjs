@@ -104,6 +104,10 @@ assert.equal(
   "deployment must not reinstall Bun after required PR validation",
 );
 assert.ok(
+  deployWorkflow.includes("pnpm turbo typecheck --filter=@anipotts/state"),
+  "state deployment must build workspace dependencies before typechecking",
+);
+assert.ok(
   securityWorkflow.includes("name: Security Review"),
   "security-review.yml must report the required security check",
 );
