@@ -545,7 +545,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck state worker
-        run: pnpm --filter @anipotts/state typecheck
+        run: pnpm turbo typecheck --filter=@anipotts/state
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
