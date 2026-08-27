@@ -18,53 +18,14 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   </section>
 
   <section data-rise class="stack" aria-labelledby="system-map-title">
-    <h2 id="system-map-title" class="section-label">the system</h2>
-    <figure class="system-map">
-      <div class="map-stage map-stage--life">
-        <Icon name="ph:user-circle" aria-hidden="true" />
-        <span
-          ><strong>life and ideas</strong><small>attention starts here</small
-          ></span
-        >
-      </div>
-      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
-      <div class="map-stage map-stage--compute">
-        <Icon name="ph:devices" aria-hidden="true" />
-        <span
-          ><strong>private machines</strong><small>one secure network</small
-          ></span
-        >
-      </div>
-      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
-      <div class="map-stage map-stage--agents">
-        <Icon name="ph:sparkle" aria-hidden="true" />
-        <span
-          ><strong>codex + claude code</strong><small>parallel execution</small
-          ></span
-        >
-      </div>
-      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
-      <div class="map-stage map-stage--record">
-        <Icon name="ph:github-logo" aria-hidden="true" />
-        <span
-          ><strong>shared record</strong><small>code, checks, and history</small
-          ></span
-        >
-      </div>
-      <Icon class="map-arrow" name="ph:arrow-right" aria-hidden="true" />
-      <div class="map-stage map-stage--output">
-        <Icon name="ph:globe-hemisphere-west" aria-hidden="true" />
-        <span
-          ><strong>useful outputs</strong><small
-            >sites, tools, and writing</small
-          ></span
-        >
-      </div>
-      <figcaption>
-        my attention moves between life and work while the machines, agents, and
-        repository keep the state durable.
-      </figcaption>
-    </figure>
+    <h2 id="system-map-title" class="section-label">work and life system</h2>
+    <div class="system-map-placeholder">
+      <Icon name="ph:graph" aria-hidden="true" />
+      <strong>a fuller map is in progress.</strong>
+      <span
+        >i'm mapping the real system before publishing a simplified version.</span
+      >
+    </div>
   </section>
 
   <section data-rise class="stack">
@@ -114,59 +75,28 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     gap: var(--s-3);
   }
 
-  .system-map {
+  .system-map-placeholder {
     display: grid;
-    grid-template-columns: repeat(9, auto);
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: var(--s-2);
-    margin: 0;
+    column-gap: var(--s-3);
+    row-gap: var(--s-1);
+    min-height: 12rem;
     padding: var(--s-5);
     border-radius: 0.75rem;
     background: var(--surface);
   }
 
-  .map-stage {
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    min-width: 0;
-  }
-
-  .map-stage > :global(svg) {
-    flex: 0 0 auto;
-    font-size: 1.35rem;
+  .system-map-placeholder > :global(svg) {
+    grid-row: 1 / 3;
+    font-size: 1.5rem;
     color: var(--interactive);
   }
 
-  .map-stage span {
-    display: grid;
-    gap: 0.15rem;
-  }
-
-  .map-stage strong,
-  .map-stage small {
-    line-height: 1.2;
-  }
-
-  .map-stage strong {
-    font-size: var(--p-small);
-  }
-
-  .map-stage small,
-  figcaption {
+  .system-map-placeholder span {
+    max-width: 48ch;
     color: var(--ink-muted);
-  }
-
-  .map-arrow {
-    color: var(--ink-muted);
-  }
-
-  figcaption {
-    grid-column: 1 / -1;
-    margin-top: var(--s-3);
-    max-width: 58ch;
-    font-size: var(--p-small);
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .feature {
@@ -201,16 +131,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   @media (max-width: 980px) {
     .tool-grid {
       grid-template-columns: 1fr;
-    }
-
-    .system-map {
-      grid-template-columns: 1fr;
-      align-items: stretch;
-    }
-
-    .map-arrow {
-      justify-self: center;
-      transform: rotate(90deg);
     }
   }
 
