@@ -20,11 +20,6 @@ sections:
       - label: view all
         href: /making
     view_all: /making
-    project_slugs:
-      - quantercise
-      - quantercise-extension
-      - saeshify
-      - nyu-purity-test
   latest_thoughts:
     visible: true
     label: writing
@@ -88,21 +83,4 @@ mentions:
     href: /writing/saturdays-are-for-claude-code
     logoSrc: /images/brand/business-insider-favicon.svg
     logoAlt: business insider
-proof_cards:
-  - label: structured ai
-    href: https://getstructured.ai/
-    title: drawing chat with page-level citations
-    detail: architectural PDFs in, cited answers out. streamed claude/gemini and kept redis replay for live spectating and later debugging.
-  - label: quantercise
-    href: /projects/quantercise
-    title: quant prep with real grading
-    detail: next.js, typescript, postgres, drizzle, stripe, sandboxed python, and math-heavy grading paths.
-  - label: paragon global investments
-    href: https://paragoninvestments.org
-    title: platform for an intercollegiate quant fund
-    detail: next.js and typescript on supabase. made fund research searchable and usable from mobile, with one clear home for the work.
-  - label: public tooling
-    href: /projects/claude-code-tips
-    title: tools i actually use
-    detail: claude-code-tips and imessage mcp are small public receipts from the same local-first workflow i run every day.
 ---

@@ -67,17 +67,17 @@ const {
 
 <style>
   .subscribe {
+    --newsletter-accent: #1247e6;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.82fr);
     align-items: end;
     gap: var(--s-5);
     width: 100%;
     max-width: none;
-    padding: var(--s-4) 0;
-    background: transparent;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
+    padding: var(--s-5);
+    background: #ffffff;
+    color: #0b1220;
+    border-radius: 0.75rem;
   }
 
   .copy {
@@ -87,7 +87,7 @@ const {
   }
 
   .label {
-    color: var(--ink-muted);
+    color: var(--newsletter-accent);
     font-size: 0.72rem;
     letter-spacing: 0;
     text-transform: uppercase;
@@ -96,7 +96,7 @@ const {
   .lede {
     margin: 0;
     max-width: none;
-    color: var(--ink);
+    color: #0b1220;
     font-size: var(--p-body);
     line-height: 1.45;
   }
@@ -135,6 +135,8 @@ const {
     min-height: 44px;
     border-radius: 0.45rem;
     padding-inline: var(--s-4);
+    background: var(--newsletter-accent);
+    color: #ffffff;
   }
 
   .cta {
@@ -146,6 +148,8 @@ const {
     border-radius: 0.45rem;
     padding-inline: var(--s-4);
     text-decoration: none;
+    background: var(--newsletter-accent);
+    color: #ffffff;
   }
 
   .status {
@@ -159,7 +163,7 @@ const {
   .footer {
     grid-column: 1 / -1;
     margin: 0;
-    color: var(--ink-muted);
+    color: #526078;
     font-size: 0.75rem;
   }
 

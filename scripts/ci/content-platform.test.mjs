@@ -159,15 +159,11 @@ assert.equal(
   false,
   "inline mentions must not reintroduce the replaced-element baseline bug",
 );
-assert.ok(
-  writingIndexSource.includes('id="writing-result-template"') &&
-    writingIndexSource.includes('class="card writing-card"'),
-  "writing search results must reuse the writing card contract",
-);
 assert.equal(
-  writingIndexSource.includes('row.className = "row-link"'),
+  writingIndexSource.includes('id="writing-search"') ||
+    writingIndexSource.includes('id="writing-result-template"'),
   false,
-  "writing search must not restore the legacy row presentation",
+  "the small writing index must not carry a redundant client-side search UI",
 );
 
 assert.deepEqual(

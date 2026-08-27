@@ -1,7 +1,6 @@
 import type {
   HomepageContent,
   HomepageMention,
-  HomepageProofCard,
   HomepageRichSummarySegment,
   HomepageRichSummarySentence,
   HomepageRichSummarySimpleSegment,
@@ -202,16 +201,6 @@ function normalizeSection(
   }
 
   if (
-    Array.isArray(source.project_slugs) ||
-    fallback.project_slugs !== undefined
-  ) {
-    normalized.project_slugs = normalizeSlugList(
-      source.project_slugs,
-      fallback.project_slugs ?? [],
-    );
-  }
-
-  if (
     Array.isArray(source.mention_keys) ||
     fallback.mention_keys !== undefined
   ) {
@@ -343,29 +332,6 @@ function isSimpleRichSummarySegment(
 
 function isSafeMentionKey(key: string): boolean {
   return /^[A-Za-z][A-Za-z0-9]*$/.test(key);
-}
-
-function normalizeProofCards(
-  value: unknown,
-  fallback: HomepageProofCard[],
-): HomepageProofCard[] {
-  if (!Array.isArray(value)) {
-    return fallback;
-  }
-
-  const cards = value
-    .filter((card): card is Record<string, unknown> => {
-      return Boolean(card) && typeof card === "object" && !Array.isArray(card);
-    })
-    .slice(0, HOMEPAGE_FIELD_LIMITS.limitMax)
-    .map((card) => ({
-      label: coerceString(card.label, "").trim(),
-      href: coerceString(card.href, "").trim(),
-      title: coerceString(card.title, "").trim(),
-      detail: coerceString(card.detail, "").trim(),
-    }));
-
-  return cards.length > 0 ? cards : fallback;
 }
 
 function normalizeMentions(
@@ -716,39 +682,6 @@ function validateOptionalMentionText(
       );
 }
 
-function validateProofCard(card: HomepageProofCard, index: number) {
-  const label = `Proof card ${index + 1}`;
-  return (
-    validateTextField(
-      card.label,
-      `${label} label`,
-      HOMEPAGE_FIELD_LIMITS.linkLabel,
-      true,
-    ) ??
-    validateTextField(
-      card.href,
-      `${label} link`,
-      HOMEPAGE_FIELD_LIMITS.linkHref,
-      true,
-    ) ??
-    (!isSafeHomepageLink(card.href)
-      ? `${label} link must start with / or https://`
-      : null) ??
-    validateTextField(
-      card.title,
-      `${label} title`,
-      HOMEPAGE_FIELD_LIMITS.proofTitle,
-      true,
-    ) ??
-    validateTextField(
-      card.detail,
-      `${label} detail`,
-      HOMEPAGE_FIELD_LIMITS.proofDetail,
-      true,
-    )
-  );
-}
-
 export function validateHomepageContent(content: HomepageContent): {
   ok: boolean;
   error?: string;
@@ -780,10 +713,7 @@ export function validateHomepageContent(content: HomepageContent): {
 
   const workError =
     validateSectionLabel(past_work, "Work label") ??
-    validateSectionLink(past_work, "Work") ??
-    (past_work.visible
-      ? validateSlugList(past_work.project_slugs ?? [], "Work")
-      : null);
+    validateSectionLink(past_work, "Work");
   if (workError) return { ok: false, error: workError };
 
   const writingError =
@@ -793,15 +723,6 @@ export function validateHomepageContent(content: HomepageContent): {
       ? validateSlugList(latest_thoughts.writing_slugs ?? [], "Writing")
       : null);
   if (writingError) return { ok: false, error: writingError };
-
-  if (content.proof_cards.length === 0) {
-    return { ok: false, error: "Homepage proof cards are required" };
-  }
-
-  for (const [index, card] of content.proof_cards.entries()) {
-    const cardError = validateProofCard(card, index);
-    if (cardError) return { ok: false, error: cardError };
-  }
 
   return { ok: true };
 }
@@ -828,10 +749,6 @@ export function normalizeHomepageContent(content: unknown): HomepageContent {
       ),
     },
     section_order: HOME_SECTION_ORDER,
-    proof_cards: normalizeProofCards(
-      source.proof_cards,
-      DEFAULT_HOMEPAGE_CONTENT.proof_cards,
-    ),
     mentions: normalizeMentions(
       source.mentions,
       DEFAULT_HOMEPAGE_CONTENT.mentions,

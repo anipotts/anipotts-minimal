@@ -132,7 +132,12 @@ const d1Seeds = {
       seedRow(key, content, true, `content/public/pages/${key}.md`),
     ),
     ...projectEntries.map(({ content, source }) =>
-      seedRow(`project:${content.slug}`, content, content.visible, source),
+      seedRow(
+        `project:${content.slug}`,
+        content,
+        content.public_state !== "hidden",
+        source,
+      ),
     ),
     ...writingEntries.map(({ content, source }) =>
       seedRow(`writing:${content.slug}`, content, content.visible, source),
@@ -222,9 +227,15 @@ function projectRecord(file) {
         ? { label: "source", url: String(frontmatter.link_repo) }
         : null,
     ].filter(Boolean),
-    featured: frontmatter.featured === true,
     order: Number(frontmatter.sort_order ?? 0),
-    visible: frontmatter.visible !== false,
+    kind: String(frontmatter.kind),
+    public_state: String(frontmatter.public_state),
+    homepage_placement: String(frontmatter.homepage_placement),
+    homepage_order: Number(frontmatter.homepage_order ?? 0),
+    card_copy: String(frontmatter.card_copy),
+    detail_path: String(frontmatter.detail_path),
+    identity: frontmatter.identity ?? {},
+    preview_media: frontmatter.preview_media ?? null,
   };
 }
 
@@ -262,7 +273,7 @@ function sourceContentRecord(surface, file) {
   const status =
     surface === "writing"
       ? String(frontmatter.status ?? "draft")
-      : frontmatter.visible === false
+      : frontmatter.public_state === "hidden"
         ? "hidden"
         : String(frontmatter.status ?? "unknown");
 

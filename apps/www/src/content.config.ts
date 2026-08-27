@@ -47,8 +47,25 @@ const projects = defineCollection({
     role: z.string(),
     duration: z.string(),
     status: z.enum(["live", "wip", "archived"]),
-    featured: z.boolean().default(false),
-    visible: z.boolean().default(true),
+    kind: z.enum(["experience", "project"]),
+    public_state: z.enum(["featured", "listed", "hidden"]),
+    homepage_placement: z.enum(["experience", "making", "none"]),
+    homepage_order: z.number().default(0),
+    card_copy: z.string().min(1).max(180),
+    detail_path: z.string().regex(/^\/projects\/[a-z0-9-]+$/),
+    identity: z.object({
+      logo_src: z.string().startsWith("/").optional(),
+      logo_alt: z.string().min(1).optional(),
+      icon: phosphor,
+    }),
+    preview_media: z
+      .object({
+        kind: z.enum(["image", "gif", "video"]),
+        src: z.string().startsWith("/"),
+        alt: z.string().min(1),
+      })
+      .nullable()
+      .default(null),
     sort_order: z.number().default(0),
     icon: phosphor,
     link_live: z.string().url().optional(),

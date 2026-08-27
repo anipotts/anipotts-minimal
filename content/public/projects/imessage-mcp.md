@@ -7,7 +7,15 @@ category: ai
 role: Creator
 duration: Ongoing
 status: live
-featured: true
+kind: project
+public_state: featured
+homepage_placement: making
+homepage_order: 90
+card_copy: private, read-only search and stats for Apple Messages.
+detail_path: /projects/imessage-mcp
+identity:
+  logo_src: /images/brand/npm-icon.svg
+  logo_alt: npm
 sort_order: 91
 link_repo: https://github.com/anipotts/imessage-mcp
 link_live: https://npmjs.com/package/imessage-mcp

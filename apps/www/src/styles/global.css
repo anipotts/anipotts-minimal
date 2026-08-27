@@ -44,6 +44,7 @@ html[data-theme="dark"] {
 }
 
 body {
+  min-height: 100vh;
   margin: 0;
   background: var(--bg);
   color: var(--ink);
@@ -54,6 +55,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
+  display: flex;
+  flex-direction: column;
 }
 
 ::selection {
@@ -130,6 +133,7 @@ h1 {
 }
 
 .page {
+  flex: 1 0 auto;
   padding-block: var(--s-6) var(--s-8);
   display: flex;
   flex-direction: column;

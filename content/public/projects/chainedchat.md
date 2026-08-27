@@ -7,6 +7,15 @@ category: ai
 role: Founder
 duration: Summer 2025
 status: archived
+kind: project
+public_state: listed
+homepage_placement: none
+homepage_order: 0
+card_copy: shared multi-model chat with one preserved context.
+detail_path: /projects/chainedchat
+identity:
+  logo_src: /images/brand/chainedchat-favicon.svg
+  logo_alt: chainedchat
 sort_order: 89
 link_repo: https://github.com/anipotts/chained-chat
 tags: [Next.js, TypeScript, Convex, LangGraph, Stripe, TailwindCSS]

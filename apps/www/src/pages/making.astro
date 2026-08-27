@@ -1,6 +1,6 @@
 ---
 import Shell from "../layouts/Shell.astro";
-import ProjectCard from "../components/ProjectCard.astro";
+import WorkCard from "../components/WorkCard.astro";
 import { visibleProjects, type Project } from "../lib/content";
 import {
   DEFAULT_MAKING_INDEX_CONTENT,
@@ -9,14 +9,13 @@ import {
 
 export const prerender = false;
 
-const ORCHESTRATING_PROJECTS = new Set(["claude-code-tips", "imessage-mcp"]);
 const allProjects = await visibleProjects();
 const copy = normalizeListingPageContent(
   DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_MAKING_INDEX_CONTENT,
 );
 const projects = allProjects.filter(
-  (project) => !ORCHESTRATING_PROJECTS.has(project.slug),
+  (project) => project.data.kind === "project",
 );
 
 type BucketId = "active" | "past" | "archive";
@@ -77,11 +76,6 @@ const buckets: Array<{
   </section>
 
   <section data-rise class="catalog">
-    <span class="section-head">
-      <h2 class="section-label">projects</h2>
-      <span class="mono muted">{projects.length} visible</span>
-    </span>
-
     <div class="groups">
       {
         buckets
@@ -96,7 +90,7 @@ const buckets: Array<{
               </span>
               <div class="grid mobile-carousel">
                 {bucket.projects.map((project) => (
-                  <ProjectCard project={project} />
+                  <WorkCard project={project} />
                 ))}
               </div>
             </section>
@@ -120,13 +114,6 @@ const buckets: Array<{
 
   .catalog {
     gap: var(--s-6);
-  }
-
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s-3);
   }
 
   .groups {
@@ -159,7 +146,6 @@ const buckets: Array<{
   }
 
   @media (max-width: 720px) {
-    .section-head,
     .bucket-head {
       align-items: flex-start;
       flex-direction: column;

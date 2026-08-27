@@ -1,6 +1,6 @@
 ---
 import Shell from "../layouts/Shell.astro";
-import ProjectCard from "../components/ProjectCard.astro";
+import WorkCard from "../components/WorkCard.astro";
 import WritingRow from "../components/WritingRow.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
 import HomepageRichSummary from "../components/HomepageRichSummary.astro";
@@ -22,22 +22,18 @@ const intro = cmsHome.sections.intro;
 const work = cmsHome.sections.past_work;
 const writing = cmsHome.sections.latest_thoughts;
 const heading = intro.heading;
-const proofCards = cmsHome.proof_cards;
 const mentionMap = cmsHome.mentions;
-const selectedMakingSlugs = work.project_slugs ?? [];
 const selectedWritingSlugs = writing.writing_slugs ?? [];
-const homeMakingOrder = new Map<string, number>(
-  selectedMakingSlugs.map((slug, index) => [slug, index]),
-);
 const homeWritingOrder = new Map<string, number>(
   selectedWritingSlugs.map((slug, index) => [slug, index]),
 );
-const projects = (await visibleProjects())
-  .filter((project) => homeMakingOrder.has(project.slug))
-  .sort(
-    (a, b) =>
-      (homeMakingOrder.get(a.slug) ?? 0) - (homeMakingOrder.get(b.slug) ?? 0),
-  )
+const allWork = await visibleProjects();
+const experiences = allWork
+  .filter((project) => project.data.homepage_placement === "experience")
+  .sort((a, b) => b.data.homepage_order - a.data.homepage_order);
+const projects = allWork
+  .filter((project) => project.data.homepage_placement === "making")
+  .sort((a, b) => b.data.homepage_order - a.data.homepage_order)
   .slice(0, work.limit ?? 4);
 const writingEntries = (await publishedWriting())
   .filter((item) => homeWritingOrder.has(item.slug))
@@ -84,22 +80,8 @@ const profileLd = {
         )
       }
     </p>
-    <div
-      class="proof-grid mobile-carousel"
-      aria-label="selected engineering proof"
-    >
-      {
-        proofCards.map((item) => (
-          <a href={item.href} class="card proof-card">
-            <span class="proof-head">
-              <span class="proof-label mono">{item.label}</span>
-              <Icon name="ph:arrow-bend-right-up" class="proof-affordance" />
-            </span>
-            <span class="proof-title">{item.title}</span>
-            <span class="proof-detail">{item.detail}</span>
-          </a>
-        ))
-      }
+    <div class="experience-grid" aria-label="experience">
+      {experiences.map((experience) => <WorkCard project={experience} />)}
     </div>
   </section>
 
@@ -113,9 +95,9 @@ const profileLd = {
             <Icon name="ph:arrow-bend-right-up" />
           </a>
         </span>
-        <div class="grid mobile-carousel">
+        <div class="grid">
           {projects.map((project) => (
-            <ProjectCard project={project} />
+            <WorkCard project={project} />
           ))}
         </div>
       </section>
@@ -135,7 +117,7 @@ const profileLd = {
             <Icon name="ph:arrow-bend-right-up" />
           </a>
         </span>
-        <div class="grid mobile-carousel">
+        <div class="writing-list">
           {writingEntries.map((item) => (
             <WritingRow item={item} />
           ))}
@@ -185,67 +167,11 @@ const profileLd = {
     text-decoration-color: var(--interactive);
   }
 
-  .proof-grid {
+  .experience-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4);
     margin-top: var(--s-6);
-  }
-
-  .proof-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    color: inherit;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-
-  .proof-card:hover {
-    background: var(--accent-soft);
-  }
-
-  .proof-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s-3);
-  }
-
-  .proof-label {
-    color: var(--ink-muted);
-    font-size: 0.72rem;
-    letter-spacing: 0;
-    text-transform: uppercase;
-  }
-
-  .proof-affordance {
-    flex-shrink: 0;
-    color: var(--ink-muted);
-    transition:
-      color 0.2s,
-      transform 0.2s;
-  }
-
-  .proof-card:hover .proof-affordance {
-    color: var(--interactive);
-    transform: translate(0.14em, -0.14em);
-  }
-
-  .proof-title {
-    font-family: var(--display);
-    color: var(--ink);
-    font-size: clamp(1.1rem, 2vw, 1.45rem);
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: 0;
-    font-synthesis: none;
-  }
-
-  .proof-detail {
-    color: var(--ink-muted);
-    font-size: var(--p-small);
-    line-height: 1.5;
   }
 
   .stack {
@@ -273,10 +199,10 @@ const profileLd = {
     gap: var(--s-4);
   }
 
-  @media (max-width: 960px) {
-    .proof-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .writing-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
   }
 
   @media (max-width: 640px) {
@@ -288,7 +214,7 @@ const profileLd = {
       font-size: 1.05rem;
     }
 
-    .proof-grid {
+    .experience-grid {
       grid-template-columns: 1fr;
     }
   }

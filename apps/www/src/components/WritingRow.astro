@@ -8,26 +8,29 @@ interface Props {
 
 const { item } = Astro.props;
 const slug = writingSlug(item);
-const { title, summary, published_at, tags } = item.data;
+const { title, summary, published_at } = item.data;
 ---
 
 <a href={`/writing/${slug}`} class="card writing-card">
   <span class="head">
-    <span class="title">{title}</span>
+    <span class="title-group">
+      <span class="title">{title}</span>
+      {
+        published_at && (
+          <span class="date mono">{formatDate(published_at)}</span>
+        )
+      }
+    </span>
     <Icon name="ph:arrow-bend-right-up" class="affordance" />
   </span>
   <span class="sub">{summary}</span>
-  <span class="meta mono">
-    {published_at && <span>{formatDate(published_at)}</span>}
-    {tags.slice(0, 4).map((t) => <span>{t.toLowerCase()}</span>)}
-  </span>
 </a>
 
 <style is:global>
   .writing-card {
     display: flex;
     flex-direction: column;
-    gap: var(--s-2);
+    gap: var(--s-1);
     text-decoration: none;
     transition: background 0.2s;
   }
@@ -38,9 +41,17 @@ const { title, summary, published_at, tags } = item.data;
 
   .writing-card .head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--s-3);
+  }
+
+  .writing-card .title-group {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    min-width: 0;
   }
 
   .writing-card .title {
@@ -70,10 +81,7 @@ const { title, summary, published_at, tags } = item.data;
     font-size: var(--p-small);
   }
 
-  .writing-card .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-3);
+  .writing-card .date {
     color: var(--ink-muted);
     font-size: 0.8rem;
   }
