@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "4c72a73d44a19e75ec8ac8746847f2fe92db49f1e08a344b448b161d16943968",
+  "source_hash": "d855154e5e4535792d36d20e7641b11ac3b7a4e19f4f2b7ff7489a0d40350dba",
   "sources": {
     "content/public/pages/home.md": "baee7559ef159e3f4bad1aa67c6c9065e830a2094cb6b7286851dfa0efd03e89",
-    "content/public/pages/making.md": "fb175136d109ff7e43277abfb261b0a8b6b58656c3b15e9fde9da4bf7cd9bc31",
+    "content/public/pages/making.md": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
     "content/public/pages/orchestrating.md": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714",
@@ -138,7 +138,7 @@
           "note": "developing and maintaining"
         },
         { "id": "past", "label": "past", "note": "past projects" },
-        { "id": "taken_down", "label": "archive", "note": "taken down" }
+        { "id": "taken-down", "label": "archive", "note": "taken down" }
       ]
     },
     "newsletter": {

@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "4c72a73d44a19e75ec8ac8746847f2fe92db49f1e08a344b448b161d16943968";
+  "d855154e5e4535792d36d20e7641b11ac3b7a4e19f4f2b7ff7489a0d40350dba";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -137,7 +137,7 @@ export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
       note: "past projects",
     },
     {
-      id: "taken_down",
+      id: "taken-down",
       label: "archive",
       note: "taken down",
     },

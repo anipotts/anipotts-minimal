@@ -10,7 +10,7 @@ buckets:
   - id: past
     label: past
     note: past projects
-  - id: taken_down
+  - id: taken-down
     label: archive
     note: taken down
 ---

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "4c72a73d44a19e75ec8ac8746847f2fe92db49f1e08a344b448b161d16943968",
+  "source_hash": "d855154e5e4535792d36d20e7641b11ac3b7a4e19f4f2b7ff7489a0d40350dba",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -119,11 +119,11 @@
             "note": "developing and maintaining"
           },
           { "id": "past", "label": "past", "note": "past projects" },
-          { "id": "taken_down", "label": "archive", "note": "taken down" }
+          { "id": "taken-down", "label": "archive", "note": "taken down" }
         ]
       },
       "source_ref": "content/public/pages/making.md",
-      "source_hash": "fb175136d109ff7e43277abfb261b0a8b6b58656c3b15e9fde9da4bf7cd9bc31"
+      "source_hash": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d"
     },
     {
       "page_key": "newsletter",
