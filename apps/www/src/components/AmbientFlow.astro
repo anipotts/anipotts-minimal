@@ -101,9 +101,30 @@ const writingPaths = [
   ],
 ];
 
+const makingDeepPaths = [
+  "M488 300c34-18 70-17 112 5v-5H488Z",
+  "M-28 300v-31c29-12 58-3 91 31H-28Z",
+  "M500 300c29-19 62-18 100 5v-5H500Z",
+  "M524 300c20-19 45-29 76-31v31H524Z",
+  "M468 300c38-23 82-20 132 9v-9H468Z",
+  "M442 300c43-20 95-17 158 10v-10H442Z",
+  "M518 300c18-23 45-34 82-36v36H518Z",
+  "M506 300c26-17 57-13 94 11v-11H506Z",
+];
+
+const writingDeepPaths = [
+  "M830 194c46-19 95-16 146 10v-10H830Z",
+  "M492 194c34-20 72-14 111 20v-20H492Z",
+  "M784 194c53-21 111-15 192 27v-27H784Z",
+  "M858 194c23-22 62-35 118-38v38H858Z",
+  "M800 194c54-20 111-13 176 31v-31H800Z",
+  "M824 194c36-18 87-20 152-6v6H824Z",
+];
+
 const library = kind === "making" ? makingPaths : writingPaths;
 const variant = Math.abs(requestedVariant ?? stableHash) % library.length;
-const paths = library[variant];
+const deepLibrary = kind === "making" ? makingDeepPaths : writingDeepPaths;
+const paths = [...library[variant], deepLibrary[variant]];
 ---
 
 <span
@@ -142,10 +163,12 @@ const paths = library[variant];
     --flow-2: #83c7f4;
     --flow-3: #4d8bea;
     --flow-4: #174ee8;
+    --flow-5: #0e2d73;
     --flow-opacity-1: 0.72;
     --flow-opacity-2: 0.62;
     --flow-opacity-3: 0.5;
     --flow-opacity-4: 0.44;
+    --flow-opacity-5: 0.5;
   }
 
   .ambient-flow svg {
@@ -156,11 +179,7 @@ const paths = library[variant];
     overflow: hidden;
   }
   .ambient-flow__shape {
-    transform-box: fill-box;
-    transform-origin: center;
-    transition:
-      transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1),
-      opacity 200ms ease;
+    transition: opacity 200ms ease;
   }
   .ambient-flow__shape--1 {
     fill: var(--flow-1);
@@ -178,31 +197,22 @@ const paths = library[variant];
     fill: var(--flow-4);
     opacity: var(--flow-opacity-4);
   }
+  .ambient-flow__shape--5 {
+    fill: var(--flow-5);
+    opacity: var(--flow-opacity-5);
+  }
 
   :global(html[data-theme="dark"]) .ambient-flow {
     --flow-1: #61abea;
     --flow-2: #3e82e8;
     --flow-3: #2459d8;
     --flow-4: #173b91;
+    --flow-5: #0d275f;
     --flow-opacity-1: 0.18;
     --flow-opacity-2: 0.2;
     --flow-opacity-3: 0.24;
     --flow-opacity-4: 0.28;
-  }
-
-  @media (hover: hover) {
-    :global(a:hover) > .ambient-flow .ambient-flow__shape--1 {
-      transform: translate3d(-0.3rem, -0.12rem, 0);
-    }
-    :global(a:hover) > .ambient-flow .ambient-flow__shape--2 {
-      transform: translate3d(0.22rem, -0.2rem, 0);
-    }
-    :global(a:hover) > .ambient-flow .ambient-flow__shape--3 {
-      transform: translate3d(-0.18rem, 0.18rem, 0);
-    }
-    :global(a:hover) > .ambient-flow .ambient-flow__shape--4 {
-      transform: translate3d(0.12rem, 0.1rem, 0);
-    }
+    --flow-opacity-5: 0.34;
   }
 
   @media (prefers-reduced-motion: reduce) {

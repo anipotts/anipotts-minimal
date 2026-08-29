@@ -350,7 +350,11 @@ function markdownPreview(body) {
 }
 
 function formatFieldValue(value) {
-  if (Array.isArray(value)) return value.join(", ");
+  if (Array.isArray(value)) {
+    return value.some((item) => item !== null && typeof item === "object")
+      ? JSON.stringify(value)
+      : value.join(", ");
+  }
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return String(value);
   if (typeof value === "string") {

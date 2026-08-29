@@ -152,6 +152,30 @@ for (const file of sourceFiles) {
   }
 }
 
+for (const component of [
+  "AmbientFlow.astro",
+  "CodingAgentTipsCard.astro",
+  "ExperienceFeatureCard.astro",
+  "NewsletterSubscribe.astro",
+]) {
+  const source = readFileSync(join(WWW_SRC, "components", component), "utf8");
+  assert.doesNotMatch(
+    source,
+    /:hover[^{}]*\{[^{}]*transform\s*:[^;}]*translate3d/s,
+    `${component} must keep decorative geometry fixed inside its clipped surface on hover`,
+  );
+}
+
+const ambientFlow = readFileSync(
+  join(WWW_SRC, "components", "AmbientFlow.astro"),
+  "utf8",
+);
+assert.match(
+  ambientFlow,
+  /--flow-5:\s*#[0-9a-f]{6}/i,
+  "ambient card geometry must retain the fifth deep-blue layer",
+);
+
 const wrangler = readFileSync("apps/www/wrangler.toml", "utf8");
 for (const marker of [
   "ACCESS_POLICY_AUD",

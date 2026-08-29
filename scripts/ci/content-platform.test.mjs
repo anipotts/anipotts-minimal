@@ -345,6 +345,34 @@ assert.match(
   "Admin newsletter inventory must reference the canonical filename",
 );
 
+const generatedAdminProjection = JSON.parse(
+  readFileSync("packages/content/generated/admin-public-content.json", "utf8"),
+);
+const pgiStoryField = generatedAdminProjection.source_records
+  .find((record) => record.slug === "pgi-research-platform")
+  ?.fields.find((field) => field.path === "story");
+assert.equal(pgiStoryField?.kind, "array");
+assert.equal(
+  JSON.parse(pgiStoryField?.value ?? "[]").length,
+  4,
+  "structured project story arrays must remain reviewable in the Admin projection",
+);
+
+const projectDetailSource = readFileSync(
+  "apps/www/src/pages/projects/[slug].astro",
+  "utf8",
+);
+assert.match(
+  projectDetailSource,
+  /section\.media\.fit === "contain"/,
+  "project story media must honor the canonical contain fit setting",
+);
+assert.match(
+  projectDetailSource,
+  /\.story-media--contain img,[\s\S]*object-fit: contain;/,
+  "project story media contain fit must reach rendered images and videos",
+);
+
 const alternateSlugRoot = mkdtempSync(join(tmpdir(), "public-content-slug-"));
 try {
   cpSync("content/public", join(alternateSlugRoot, "content/public"), {

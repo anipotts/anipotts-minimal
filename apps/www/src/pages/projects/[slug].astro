@@ -156,7 +156,12 @@ const uniqueMedia = Array.from(
                 ))}
               </div>
               {section.media && (
-                <figure class="story-media">
+                <figure
+                  class:list={[
+                    "story-media",
+                    section.media.fit === "contain" && "story-media--contain",
+                  ]}
+                >
                   {section.media.kind === "video" ? (
                     <video
                       controls
@@ -432,6 +437,11 @@ const uniqueMedia = Array.from(
     object-position: center;
     border-radius: var(--radius-desktop-ui-media);
     background: #f7faff;
+  }
+
+  .story-media--contain img,
+  .story-media--contain video {
+    object-fit: contain;
   }
 
   .story-media figcaption {

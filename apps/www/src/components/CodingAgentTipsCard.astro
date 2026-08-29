@@ -152,21 +152,6 @@ const href = "https://agents.anipotts.com";
     --agent-tips-control-ink: #f7faff;
   }
 
-  @media (hover: hover) {
-    .visual path {
-      transition: transform 220ms ease;
-      transform-origin: center;
-    }
-
-    .coding-agent-card:hover .visual path:nth-of-type(2) {
-      transform: translate3d(0.35rem, -0.2rem, 0);
-    }
-
-    .coding-agent-card:hover .visual path:nth-of-type(3) {
-      transform: translate3d(-0.25rem, 0.15rem, 0);
-    }
-  }
-
   @media (max-width: 720px) {
     .coding-agent-card {
       grid-template-columns: 1fr;
@@ -179,8 +164,7 @@ const href = "https://agents.anipotts.com";
 
   @media (prefers-reduced-motion: reduce) {
     .coding-agent-card,
-    .cta,
-    .visual path {
+    .cta {
       transition: none;
     }
   }
