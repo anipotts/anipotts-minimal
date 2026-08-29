@@ -231,11 +231,13 @@ function projectRecord(file) {
     kind: String(frontmatter.kind),
     public_state: String(frontmatter.public_state),
     homepage_placement: String(frontmatter.homepage_placement),
+    catalog_group: String(frontmatter.catalog_group),
     homepage_order: Number(frontmatter.homepage_order ?? 0),
     card_copy: String(frontmatter.card_copy),
     detail_path: String(frontmatter.detail_path),
     identity: frontmatter.identity ?? {},
     preview_media: frontmatter.preview_media ?? null,
+    story: Array.isArray(frontmatter.story) ? frontmatter.story : [],
   };
 }
 
@@ -348,7 +350,11 @@ function markdownPreview(body) {
 }
 
 function formatFieldValue(value) {
-  if (Array.isArray(value)) return value.join(", ");
+  if (Array.isArray(value)) {
+    return value.some((item) => item !== null && typeof item === "object")
+      ? JSON.stringify(value)
+      : value.join(", ");
+  }
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return String(value);
   if (typeof value === "string") {

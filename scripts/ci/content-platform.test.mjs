@@ -40,10 +40,13 @@ import {
 import {
   contentInventorySource as rootContentInventorySource,
   DEFAULT_HOMEPAGE_CONTENT,
+  DEFAULT_SYSTEMS_CONTENT,
   normalizeHomepageContent,
   normalizeOrchestratingPageContent,
+  normalizeSystemsPageContent,
   segmentHomepageSummaryParagraph,
   validateOrchestratingPageContent,
+  validateSystemsPageContent,
 } from "../../packages/content/dist/index.js";
 
 const EXPECTED_OPERATION_IDS = [
@@ -342,6 +345,34 @@ assert.match(
   "Admin newsletter inventory must reference the canonical filename",
 );
 
+const generatedAdminProjection = JSON.parse(
+  readFileSync("packages/content/generated/admin-public-content.json", "utf8"),
+);
+const pgiStoryField = generatedAdminProjection.source_records
+  .find((record) => record.slug === "pgi-research-platform")
+  ?.fields.find((field) => field.path === "story");
+assert.equal(pgiStoryField?.kind, "array");
+assert.equal(
+  JSON.parse(pgiStoryField?.value ?? "[]").length,
+  4,
+  "structured project story arrays must remain reviewable in the Admin projection",
+);
+
+const projectDetailSource = readFileSync(
+  "apps/www/src/pages/projects/[slug].astro",
+  "utf8",
+);
+assert.match(
+  projectDetailSource,
+  /section\.media\.fit === "contain"/,
+  "project story media must honor the canonical contain fit setting",
+);
+assert.match(
+  projectDetailSource,
+  /\.story-media--contain img,[\s\S]*object-fit: contain;/,
+  "project story media contain fit must reach rendered images and videos",
+);
+
 const alternateSlugRoot = mkdtempSync(join(tmpdir(), "public-content-slug-"));
 try {
   cpSync("content/public", join(alternateSlugRoot, "content/public"), {
@@ -624,6 +655,59 @@ assert.equal(
   ).ok,
   true,
   "invalid orchestrating cards fall back to safe defaults before validation",
+);
+
+const systemsContent = normalizeSystemsPageContent({
+  map_principle: " autonomy is an attention-routing problem. ",
+  map_domains: [
+    { label: "career", children: ["business", "content"] },
+    { label: "learning", children: [] },
+    { label: "wellbeing", children: [] },
+    { label: "personal", children: [] },
+  ],
+});
+assert.equal(
+  systemsContent.map_principle,
+  "autonomy is an attention-routing problem.",
+);
+assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
+assert.deepEqual(
+  normalizeSystemsPageContent({}).map_domains,
+  DEFAULT_SYSTEMS_CONTENT.map_domains,
+  "systems map domains must fall back to the reviewed public taxonomy",
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ map_domains: [] }).map_domains,
+  DEFAULT_SYSTEMS_CONTENT.map_domains,
+  "an empty systems map must not erase the public taxonomy",
+);
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({
+      map_domains: [
+        { label: "career", children: [] },
+        { label: "career", children: [] },
+        { label: "wellbeing", children: [] },
+        { label: "personal", children: [] },
+      ],
+    }),
+  ).ok,
+  false,
+  "systems map domain identities must remain unique",
+);
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({
+      map_domains: [
+        { label: "career", children: ["business", "business"] },
+        { label: "learning", children: [] },
+        { label: "wellbeing", children: [] },
+        { label: "personal", children: [] },
+      ],
+    }),
+  ).ok,
+  false,
+  "systems map domain children must remain unique",
 );
 
 assert.equal(
