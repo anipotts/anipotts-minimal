@@ -7,7 +7,7 @@ import {
   normalizeListingPageContent,
 } from "@anipotts/content/public";
 
-export const prerender = false;
+export const prerender = true;
 
 const projects = await visibleProjects();
 const copy = normalizeListingPageContent(
