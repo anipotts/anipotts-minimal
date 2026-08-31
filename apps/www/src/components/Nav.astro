@@ -1,26 +1,14 @@
 ---
 import { Icon } from "astro-icon/components";
 import { navItems } from "../data/site";
+import BrandMark from "./BrandMark.astro";
 
 const current = Astro.url.pathname;
 ---
 
 <header class="frame nav">
   <a href="/" class="wordmark" aria-label="home">
-    <img
-      class="brand-mark brand-mark-light"
-      src="/brand/ap-mark-dark-blue.svg?v=20260717"
-      width="48"
-      height="48"
-      alt=""
-    />
-    <img
-      class="brand-mark brand-mark-dark"
-      src="/brand/ap-mark-blue.svg?v=20260717"
-      width="48"
-      height="48"
-      alt=""
-    />
+    <BrandMark />
   </a>
   <nav
     id="primary-nav"
@@ -46,6 +34,14 @@ const current = Astro.url.pathname;
       }
     </span>
   </nav>
+  <a
+    class="email-action"
+    href="mailto:contact@anipotts.com"
+    aria-label="email Ani"
+    title="email Ani"
+  >
+    <Icon name="ph:envelope-simple" />
+  </a>
   <button
     id="theme-toggle"
     class="theme-toggle"
@@ -83,35 +79,8 @@ const current = Astro.url.pathname;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
-  }
-
-  .brand-mark {
-    display: block;
     width: 4rem;
     height: 4rem;
-    transition: filter 160ms ease;
-  }
-
-  .brand-mark-dark {
-    display: none;
-  }
-
-  .brand-mark-light {
-    filter: brightness(0) invert(1);
-  }
-
-  :global(html[data-theme="dark"]) .brand-mark-light {
-    display: none;
-  }
-
-  :global(html[data-theme="dark"]) .brand-mark-dark {
-    display: block;
-    filter: brightness(0) invert(1);
-  }
-
-  :global(html[data-theme="dark"]) .wordmark:hover .brand-mark-dark,
-  :global(html[data-theme="dark"]) .wordmark:focus-visible .brand-mark-dark {
-    filter: none;
   }
 
   .primary-nav {
@@ -139,11 +108,11 @@ const current = Astro.url.pathname;
     color: var(--interactive);
   }
 
+  .email-action,
   .theme-toggle {
     background: none;
     border: 0;
     color: var(--ink-muted);
-    cursor: pointer;
     width: 44px;
     height: 44px;
     display: inline-flex;
@@ -153,7 +122,18 @@ const current = Astro.url.pathname;
     transition: color 0.2s;
   }
 
-  .theme-toggle:hover {
+  .email-action {
+    text-decoration: none;
+  }
+
+  .theme-toggle {
+    cursor: pointer;
+  }
+
+  .email-action:hover,
+  .email-action:focus-visible,
+  .theme-toggle:hover,
+  .theme-toggle:focus-visible {
     color: var(--interactive);
   }
 
@@ -200,13 +180,13 @@ const current = Astro.url.pathname;
       -webkit-backdrop-filter: blur(16px);
     }
 
-    .brand-mark {
+    .wordmark {
       width: 3.5rem;
       height: 3.5rem;
     }
 
     .theme-toggle {
-      margin-left: auto;
+      margin-left: 0;
     }
 
     .nav-toggle {
@@ -263,7 +243,6 @@ const current = Astro.url.pathname;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .brand-mark,
     .primary-nav,
     .nav-toggle span {
       transition: none;

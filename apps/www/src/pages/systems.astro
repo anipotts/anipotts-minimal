@@ -1,22 +1,20 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import SystemMap from "../components/SystemMap.astro";
+import PageHero from "../components/PageHero.astro";
 import { Icon } from "astro-icon/components";
 import {
   DEFAULT_SYSTEMS_CONTENT,
   normalizeSystemsPageContent,
 } from "@anipotts/content/public";
 
-export const prerender = false;
+export const prerender = true;
 
 const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 ---
 
 <Shell title={content.title} description={content.description} path="/systems">
-  <section data-rise>
-    <h1 class="hero-title">{content.hero_title}</h1>
-    <p class="hero-summary">{content.hero_summary}</p>
-  </section>
+  <PageHero title={content.hero_title} summary={content.hero_summary} />
 
   <section data-rise class="stack">
     <SystemMap
@@ -89,18 +87,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   .resource-stack,
   .feature {
     display: grid;
-  }
-  .hero-title {
-    margin-bottom: var(--s-4);
-    font-size: clamp(3rem, 12vw, 7rem);
-    line-height: 0.9;
-  }
-
-  .hero-summary {
-    max-width: none;
-    font-size: clamp(1.08rem, 2.2vw, 1.42rem);
-    line-height: 1.52;
-    text-wrap: pretty;
   }
   .stack {
     gap: var(--s-4);
@@ -286,14 +272,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   }
 
   @media (max-width: 620px) {
-    .hero-title {
-      margin-bottom: var(--s-3);
-    }
-
-    .hero-summary {
-      font-size: 1.05rem;
-    }
-
     .capability-grid {
       grid-template-columns: 1fr;
     }

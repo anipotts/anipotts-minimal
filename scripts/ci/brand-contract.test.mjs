@@ -62,6 +62,20 @@ for (const value of Object.values(release.semantic_colors)) {
   assert.ok(tokens.includes(value), `tokens must contain ${value}`);
 }
 
+for (const token of [
+  "--p-hero",
+  "--p-h1",
+  "--p-h2",
+  "--p-h3",
+  "--p-body",
+  "--p-small",
+  "--p-mono",
+  "--lh-body",
+  "--lh-tight",
+]) {
+  assert.ok(tokens.includes(`${token}:`), `tokens must define ${token}`);
+}
+
 const typography = readFileSync(join(ROOT, "src/typography.css"), "utf8");
 assert.ok(typography.includes('font-family: "AP Structural"'));
 assert.ok(typography.includes('"Instrument Sans Variable"'));
