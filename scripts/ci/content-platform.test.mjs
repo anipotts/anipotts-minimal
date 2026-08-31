@@ -672,6 +672,40 @@ assert.equal(
 );
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
 assert.deepEqual(
+  systemsContent.map_nodes.map(({ id }) => id),
+  ["life", "snap_store", "admin", "ani", "agents", "work", "record"],
+  "systems map nodes must preserve the reviewed information flow",
+);
+assert.deepEqual(
+  systemsContent.map_foundations.map(({ id }) => id),
+  ["calendar", "github", "mac_mini", "external_ssd"],
+  "systems map foundations must preserve the reviewed storage model",
+);
+assert.deepEqual(
+  systemsContent.map_authority_modes.map(({ id }) => id),
+  ["own", "with_me", "mixed"],
+  "systems map authority modes must preserve the reviewed trust model",
+);
+assert.deepEqual(
+  systemsContent.map_relationships.map(
+    ({ id, source, destination, authority }) => ({
+      id,
+      source,
+      destination,
+      authority,
+    }),
+  ),
+  DEFAULT_SYSTEMS_CONTENT.map_relationships.map(
+    ({ id, source, destination, authority }) => ({
+      id,
+      source,
+      destination,
+      authority,
+    }),
+  ),
+  "systems map paths must preserve their reviewed endpoints and authority",
+);
+assert.deepEqual(
   normalizeSystemsPageContent({}).map_domains,
   DEFAULT_SYSTEMS_CONTENT.map_domains,
   "systems map domains must fall back to the reviewed public taxonomy",
@@ -680,6 +714,38 @@ assert.deepEqual(
   normalizeSystemsPageContent({ map_domains: [] }).map_domains,
   DEFAULT_SYSTEMS_CONTENT.map_domains,
   "an empty systems map must not erase the public taxonomy",
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ map_nodes: [] }).map_nodes,
+  DEFAULT_SYSTEMS_CONTENT.map_nodes,
+  "an incomplete systems map must fall back to the reviewed nodes",
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ map_foundations: [] }).map_foundations,
+  DEFAULT_SYSTEMS_CONTENT.map_foundations,
+  "an incomplete systems map must fall back to the reviewed foundations",
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ map_authority_modes: [] }).map_authority_modes,
+  DEFAULT_SYSTEMS_CONTENT.map_authority_modes,
+  "an incomplete systems map must fall back to the reviewed authority modes",
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ map_relationships: [] }).map_relationships,
+  DEFAULT_SYSTEMS_CONTENT.map_relationships,
+  "an incomplete systems map must fall back to the reviewed relationships",
+);
+assert.equal(
+  validateSystemsPageContent({
+    ...systemsContent,
+    map_relationships: systemsContent.map_relationships.map((relationship) =>
+      relationship.id === "ani_to_agents"
+        ? { ...relationship, authority: "own" }
+        : relationship,
+    ),
+  }).ok,
+  false,
+  "systems map relationships must keep their reviewed authority mode",
 );
 assert.equal(
   validateSystemsPageContent(
