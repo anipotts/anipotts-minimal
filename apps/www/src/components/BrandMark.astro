@@ -32,29 +32,16 @@
     fill: currentColor;
     transform-box: fill-box;
     transform-origin: center;
-    transition:
-      transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
-      fill 180ms ease;
+    transition: transform 160ms cubic-bezier(0.2, 0.75, 0.25, 1);
   }
 
   :global(.wordmark:focus-visible) .brand-mark__half--right {
-    fill: var(--brand-dark-blue);
-    transform: translateX(2px);
-  }
-
-  :global(html[data-theme="dark"] .wordmark:focus-visible)
-    .brand-mark__half--right {
-    fill: var(--brand-blue);
+    transform: translateX(6px);
   }
 
   @media (hover: hover) and (pointer: fine) {
     :global(.wordmark:hover) .brand-mark__half--right {
-      fill: var(--brand-dark-blue);
-      transform: translateX(2px);
-    }
-
-    :global(html[data-theme="dark"] .wordmark:hover) .brand-mark__half--right {
-      fill: var(--brand-blue);
+      transform: translateX(6px);
     }
   }
 

@@ -10,14 +10,7 @@ import {
   writingSlug,
 } from "../../lib/content";
 
-export const prerender = true;
-
-export async function getStaticPaths() {
-  const writingEntries = await publishedWriting();
-  return writingEntries.map((item) => ({
-    params: { slug: writingSlug(item) },
-  }));
-}
+export const prerender = false;
 
 const requestedSlug = Astro.params.slug ?? "";
 const item = (await publishedWriting()).find(
