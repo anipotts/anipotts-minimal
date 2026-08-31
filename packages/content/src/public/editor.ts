@@ -783,6 +783,160 @@ export function normalizeSystemsPageContent(
         .filter((item) => item.label)
         .slice(0, 4)
     : DEFAULT_SYSTEMS_CONTENT.map_domains;
+  const mapNodeIds = [
+    "life",
+    "snap_store",
+    "admin",
+    "ani",
+    "agents",
+    "work",
+    "record",
+  ] as const;
+  const mapNodes = Array.isArray(source.map_nodes)
+    ? source.map_nodes
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const id = coerceString(item.id, "").trim();
+          if (!mapNodeIds.includes(id as (typeof mapNodeIds)[number])) {
+            return null;
+          }
+          const fallback = DEFAULT_SYSTEMS_CONTENT.map_nodes.find(
+            (node) => node.id === id,
+          );
+          if (!fallback) return null;
+          return {
+            id: id as (typeof mapNodeIds)[number],
+            label: coerceString(item.label, fallback.label).trim(),
+            title: coerceString(item.title, fallback.title).trim(),
+            detail: coerceString(item.detail, fallback.detail).trim(),
+            items: Array.isArray(item.items)
+              ? item.items
+                  .map((entry) => coerceString(entry, "").trim())
+                  .filter(Boolean)
+                  .slice(0, 6)
+              : fallback.items,
+          };
+        })
+        .filter((item): item is SystemsPageContent["map_nodes"][number] =>
+          Boolean(item?.label && item.title && item.detail),
+        )
+    : DEFAULT_SYSTEMS_CONTENT.map_nodes;
+  const foundationIds = [
+    "calendar",
+    "github",
+    "mac_mini",
+    "external_ssd",
+  ] as const;
+  const mapFoundations = Array.isArray(source.map_foundations)
+    ? source.map_foundations
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const id = coerceString(item.id, "").trim();
+          if (!foundationIds.includes(id as (typeof foundationIds)[number])) {
+            return null;
+          }
+          const fallback = DEFAULT_SYSTEMS_CONTENT.map_foundations.find(
+            (foundation) => foundation.id === id,
+          );
+          if (!fallback) return null;
+          return {
+            id: id as (typeof foundationIds)[number],
+            title: coerceString(item.title, fallback.title).trim(),
+            detail: coerceString(item.detail, fallback.detail).trim(),
+          };
+        })
+        .filter((item): item is SystemsPageContent["map_foundations"][number] =>
+          Boolean(item?.title && item.detail),
+        )
+    : DEFAULT_SYSTEMS_CONTENT.map_foundations;
+  const authorityIds = ["own", "with_me", "mixed"] as const;
+  const mapAuthorityModes = Array.isArray(source.map_authority_modes)
+    ? source.map_authority_modes
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const id = coerceString(item.id, "").trim();
+          if (!authorityIds.includes(id as (typeof authorityIds)[number])) {
+            return null;
+          }
+          const fallback = DEFAULT_SYSTEMS_CONTENT.map_authority_modes.find(
+            (mode) => mode.id === id,
+          );
+          if (!fallback) return null;
+          return {
+            id: id as (typeof authorityIds)[number],
+            label: coerceString(item.label, fallback.label).trim(),
+            detail: coerceString(item.detail, fallback.detail).trim(),
+          };
+        })
+        .filter(
+          (item): item is SystemsPageContent["map_authority_modes"][number] =>
+            Boolean(item?.label && item.detail),
+        )
+    : DEFAULT_SYSTEMS_CONTENT.map_authority_modes;
+  const relationshipIds = [
+    "life_to_snap",
+    "snap_to_admin",
+    "admin_to_ani",
+    "ani_to_agents",
+    "agents_to_work",
+    "work_to_record",
+    "record_to_admin",
+    "record_to_ani",
+  ] as const;
+  const mapRelationships = Array.isArray(source.map_relationships)
+    ? source.map_relationships
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const id = coerceString(item.id, "").trim();
+          if (
+            !relationshipIds.includes(id as (typeof relationshipIds)[number])
+          ) {
+            return null;
+          }
+          const fallback = DEFAULT_SYSTEMS_CONTENT.map_relationships.find(
+            (relationship) => relationship.id === id,
+          );
+          if (!fallback) return null;
+          const sourceId = coerceString(item.source, fallback.source).trim();
+          const destinationId = coerceString(
+            item.destination,
+            fallback.destination,
+          ).trim();
+          const authorityId = coerceString(
+            item.authority,
+            fallback.authority,
+          ).trim();
+          return {
+            id: id as (typeof relationshipIds)[number],
+            source: mapNodeIds.includes(sourceId as (typeof mapNodeIds)[number])
+              ? (sourceId as (typeof mapNodeIds)[number])
+              : fallback.source,
+            destination: mapNodeIds.includes(
+              destinationId as (typeof mapNodeIds)[number],
+            )
+              ? (destinationId as (typeof mapNodeIds)[number])
+              : fallback.destination,
+            authority: authorityIds.includes(
+              authorityId as (typeof authorityIds)[number],
+            )
+              ? (authorityId as (typeof authorityIds)[number])
+              : fallback.authority,
+            detail: coerceString(item.detail, fallback.detail).trim(),
+          };
+        })
+        .filter(
+          (item): item is SystemsPageContent["map_relationships"][number] =>
+            Boolean(item?.detail),
+        )
+    : DEFAULT_SYSTEMS_CONTENT.map_relationships;
 
   return {
     title: coerceString(source.title, DEFAULT_SYSTEMS_CONTENT.title).trim(),
@@ -798,6 +952,10 @@ export function normalizeSystemsPageContent(
       source.hero_summary,
       DEFAULT_SYSTEMS_CONTENT.hero_summary,
     ).trim(),
+    map_label: coerceString(
+      source.map_label,
+      DEFAULT_SYSTEMS_CONTENT.map_label,
+    ).trim(),
     map_principle: coerceString(
       source.map_principle,
       DEFAULT_SYSTEMS_CONTENT.map_principle,
@@ -805,6 +963,30 @@ export function normalizeSystemsPageContent(
     map_domains: mapDomains.length
       ? mapDomains
       : DEFAULT_SYSTEMS_CONTENT.map_domains,
+    map_nodes:
+      mapNodes.length === mapNodeIds.length
+        ? mapNodes
+        : DEFAULT_SYSTEMS_CONTENT.map_nodes,
+    map_foundation_label: coerceString(
+      source.map_foundation_label,
+      DEFAULT_SYSTEMS_CONTENT.map_foundation_label,
+    ).trim(),
+    map_foundations:
+      mapFoundations.length === foundationIds.length
+        ? mapFoundations
+        : DEFAULT_SYSTEMS_CONTENT.map_foundations,
+    map_authority_label: coerceString(
+      source.map_authority_label,
+      DEFAULT_SYSTEMS_CONTENT.map_authority_label,
+    ).trim(),
+    map_authority_modes:
+      mapAuthorityModes.length === authorityIds.length
+        ? mapAuthorityModes
+        : DEFAULT_SYSTEMS_CONTENT.map_authority_modes,
+    map_relationships:
+      mapRelationships.length === relationshipIds.length
+        ? mapRelationships
+        : DEFAULT_SYSTEMS_CONTENT.map_relationships,
     principles_label: coerceString(
       source.principles_label,
       DEFAULT_SYSTEMS_CONTENT.principles_label,
@@ -847,7 +1029,10 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     [content.description, "Systems description"],
     [content.hero_title, "Systems hero title"],
     [content.hero_summary, "Systems hero summary"],
+    [content.map_label, "Systems map label"],
     [content.map_principle, "Systems map principle"],
+    [content.map_foundation_label, "Systems map foundation label"],
+    [content.map_authority_label, "Systems map authority label"],
     [content.principles_label, "Systems principles label"],
     [content.writing_label, "Systems writing label"],
     [content.tools_label, "Systems tools label"],
@@ -876,8 +1061,205 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
       };
     }
   }
+  const requiredNodeIds: Array<SystemsPageContent["map_nodes"][number]["id"]> =
+    ["life", "snap_store", "admin", "ani", "agents", "work", "record"];
+  const nodeIds = content.map_nodes.map(({ id }) => id);
+  if (
+    nodeIds.length !== requiredNodeIds.length ||
+    new Set(nodeIds).size !== nodeIds.length ||
+    !requiredNodeIds.every((id) => nodeIds.includes(id))
+  ) {
+    return { ok: false, error: "Systems map needs every canonical node" };
+  }
+  const requiredRelationships: Record<
+    SystemsPageContent["map_relationships"][number]["id"],
+    {
+      source: SystemsPageContent["map_relationships"][number]["source"];
+      destination: SystemsPageContent["map_relationships"][number]["destination"];
+      authority: SystemsPageContent["map_relationships"][number]["authority"];
+    }
+  > = {
+    life_to_snap: {
+      source: "life",
+      destination: "snap_store",
+      authority: "mixed",
+    },
+    snap_to_admin: {
+      source: "snap_store",
+      destination: "admin",
+      authority: "own",
+    },
+    admin_to_ani: {
+      source: "admin",
+      destination: "ani",
+      authority: "with_me",
+    },
+    ani_to_agents: {
+      source: "ani",
+      destination: "agents",
+      authority: "mixed",
+    },
+    agents_to_work: {
+      source: "agents",
+      destination: "work",
+      authority: "own",
+    },
+    work_to_record: {
+      source: "work",
+      destination: "record",
+      authority: "own",
+    },
+    record_to_admin: {
+      source: "record",
+      destination: "admin",
+      authority: "mixed",
+    },
+    record_to_ani: {
+      source: "record",
+      destination: "ani",
+      authority: "with_me",
+    },
+  };
+  const relationshipIds = content.map_relationships.map(({ id }) => id);
+  if (
+    relationshipIds.length !== Object.keys(requiredRelationships).length ||
+    new Set(relationshipIds).size !== relationshipIds.length ||
+    !Object.keys(requiredRelationships).every((id) =>
+      relationshipIds.includes(
+        id as SystemsPageContent["map_relationships"][number]["id"],
+      ),
+    )
+  ) {
+    return {
+      ok: false,
+      error: "Systems map needs every canonical relationship",
+    };
+  }
+  for (const relationship of content.map_relationships) {
+    const expected = requiredRelationships[relationship.id];
+    if (
+      relationship.source !== expected.source ||
+      relationship.destination !== expected.destination ||
+      relationship.authority !== expected.authority
+    ) {
+      return {
+        ok: false,
+        error: `Systems map relationship ${relationship.id} changed its reviewed path`,
+      };
+    }
+    const error = validateCmsString(
+      relationship.detail,
+      `Systems map ${relationship.id} relationship detail`,
+      CMS_TEXT_LIMITS.summary,
+    );
+    if (error) return { ok: false, error };
+  }
+  const requiredFoundationIds: Array<
+    SystemsPageContent["map_foundations"][number]["id"]
+  > = ["calendar", "github", "mac_mini", "external_ssd"];
+  const foundationIds = content.map_foundations.map(({ id }) => id);
+  if (
+    foundationIds.length !== requiredFoundationIds.length ||
+    new Set(foundationIds).size !== foundationIds.length ||
+    !requiredFoundationIds.every((id) => foundationIds.includes(id))
+  ) {
+    return {
+      ok: false,
+      error: "Systems map needs every canonical foundation",
+    };
+  }
+  const requiredAuthorityIds: Array<
+    SystemsPageContent["map_authority_modes"][number]["id"]
+  > = ["own", "with_me", "mixed"];
+  const modeIds = content.map_authority_modes.map(({ id }) => id);
+  if (
+    modeIds.length !== requiredAuthorityIds.length ||
+    new Set(modeIds).size !== modeIds.length ||
+    !requiredAuthorityIds.every((id) => modeIds.includes(id))
+  ) {
+    return {
+      ok: false,
+      error: "Systems map needs every canonical authority mode",
+    };
+  }
+
+  for (const node of content.map_nodes) {
+    const error =
+      validateCmsString(
+        node.label,
+        `Systems map ${node.id} label`,
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        node.title,
+        `Systems map ${node.id} title`,
+        CMS_TEXT_LIMITS.title,
+      ) ??
+      validateCmsString(
+        node.detail,
+        `Systems map ${node.id} detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
+    if (new Set(node.items).size !== node.items.length) {
+      return {
+        ok: false,
+        error: `Systems map ${node.id} has duplicate items`,
+      };
+    }
+  }
+
+  for (const foundation of content.map_foundations) {
+    const error =
+      validateCmsString(
+        foundation.title,
+        `Systems map ${foundation.id} title`,
+        CMS_TEXT_LIMITS.title,
+      ) ??
+      validateCmsString(
+        foundation.detail,
+        `Systems map ${foundation.id} detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
+  }
+
+  for (const mode of content.map_authority_modes) {
+    const error =
+      validateCmsString(
+        mode.label,
+        `Systems map ${mode.id} authority label`,
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        mode.detail,
+        `Systems map ${mode.id} authority detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
+  }
+
   if (content.principles.length === 0) {
     return { ok: false, error: "Systems principles are required" };
+  }
+  for (const principle of content.principles) {
+    const error =
+      validateCmsString(
+        principle.label,
+        "Systems principle label",
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        principle.title,
+        "Systems principle title",
+        CMS_TEXT_LIMITS.title,
+      ) ??
+      validateCmsString(
+        principle.detail,
+        "Systems principle detail",
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
   }
   const links = [content.featured_writing, ...content.public_tools];
   for (const link of links) {

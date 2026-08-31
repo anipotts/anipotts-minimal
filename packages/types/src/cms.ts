@@ -251,13 +251,66 @@ export interface SystemsMapDomain {
   children: string[];
 }
 
+export type SystemsMapNodeId =
+  "life" | "snap_store" | "admin" | "ani" | "agents" | "work" | "record";
+
+export interface SystemsMapNode {
+  id: SystemsMapNodeId;
+  label: string;
+  title: string;
+  detail: string;
+  items: string[];
+}
+
+export type SystemsMapFoundationId =
+  "calendar" | "github" | "mac_mini" | "external_ssd";
+
+export interface SystemsMapFoundation {
+  id: SystemsMapFoundationId;
+  title: string;
+  detail: string;
+}
+
+export type SystemsAuthorityModeId = "own" | "with_me" | "mixed";
+
+export interface SystemsAuthorityMode {
+  id: SystemsAuthorityModeId;
+  label: string;
+  detail: string;
+}
+
+export type SystemsMapRelationshipId =
+  | "life_to_snap"
+  | "snap_to_admin"
+  | "admin_to_ani"
+  | "ani_to_agents"
+  | "agents_to_work"
+  | "work_to_record"
+  | "record_to_admin"
+  | "record_to_ani";
+
+export interface SystemsMapRelationship {
+  id: SystemsMapRelationshipId;
+  source: SystemsMapNodeId;
+  destination: SystemsMapNodeId;
+  authority: SystemsAuthorityModeId;
+  detail: string;
+}
+
 export interface SystemsPageContent {
   title: string;
   description: string;
   hero_title: string;
   hero_summary: string;
+  map_label: string;
   map_principle: string;
   map_domains: SystemsMapDomain[];
+  map_nodes: SystemsMapNode[];
+  map_foundation_label: string;
+  map_foundations: SystemsMapFoundation[];
+  map_authority_label: string;
+  map_authority_modes: SystemsAuthorityMode[];
+  map_relationships: SystemsMapRelationship[];
   principles_label: string;
   principles: SystemsPrinciple[];
   writing_label: string;
