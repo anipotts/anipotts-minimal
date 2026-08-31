@@ -6,7 +6,14 @@ import ProjectMediaStage from "../../components/ProjectMediaStage.astro";
 import Shell from "../../layouts/Shell.astro";
 import { projectSlug, visibleProjects } from "../../lib/content";
 
-export const prerender = false;
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const projects = await visibleProjects();
+  return projects.map((project) => ({
+    params: { slug: projectSlug(project) },
+  }));
+}
 
 const requestedSlug = Astro.params.slug ?? "";
 const project = (await visibleProjects()).find(
