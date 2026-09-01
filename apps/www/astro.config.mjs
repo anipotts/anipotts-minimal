@@ -39,7 +39,6 @@ export default defineConfig({
           "circle-half",
           "desktop-tower",
           "envelope-open",
-          "envelope-simple",
           "github-logo",
           "hard-drives",
           "heart",
