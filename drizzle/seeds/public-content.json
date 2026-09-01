@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "abb2489779a0b77fee6f9cbed3720adae70eaacb4c9563bef7474ed9d0d3f95b",
+  "source_hash": "eb2b70ea257a0ed33604b9bb34cbd83103f82af73cbb8ae4c75669acc325721a",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -68,7 +68,7 @@
           "structuredAi": {
             "label": "structured ai",
             "href": "https://getstructured.ai/",
-            "logoSrc": "/images/brand/structured-ai-favicon.png",
+            "logoSrc": "/images/brand/structured-ai-mark.svg",
             "logoAlt": "structured ai",
             "logoTone": "white"
           },
@@ -102,7 +102,7 @@
         }
       },
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "baee7559ef159e3f4bad1aa67c6c9065e830a2094cb6b7286851dfa0efd03e89"
+      "source_hash": "e52c60cdba57fa3f57c7dc8fdd3a26d3992f5bbdeee0fb6091ebac861ed2280e"
     },
     {
       "page_key": "making",
@@ -944,7 +944,7 @@
         "card_copy": "real-time agent interaction with citations and visible execution.",
         "detail_path": "/projects/structured-ai",
         "identity": {
-          "logo_src": "/images/brand/structured-ai-favicon.png",
+          "logo_src": "/images/brand/structured-ai-mark.svg",
           "logo_alt": "structured ai",
           "logo_tone": "adaptive"
         },
@@ -957,7 +957,7 @@
         "story": []
       },
       "source_ref": "content/public/projects/structured-ai.md",
-      "source_hash": "f588a6366b53c21be2756cf0e4c5301e174feefcfdd1306d9afdc59f1e281363"
+      "source_hash": "dca69a3a36e3d463b6c05d8776ff215cc7fae0c166e629f2f939b2c85f52f636"
     },
     {
       "page_key": "writing:awareness-is-alpha",

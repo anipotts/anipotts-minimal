@@ -20,7 +20,7 @@ preview_media:
   alt: Structured AI Drawing Set Chat flags an issue on an architectural plan and explains it with citations.
   fit: contain
 identity:
-  logo_src: /images/brand/structured-ai-favicon.png
+  logo_src: /images/brand/structured-ai-mark.svg
   logo_alt: structured ai
   logo_tone: adaptive
 sort_order: 99

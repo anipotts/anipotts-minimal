@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "abb2489779a0b77fee6f9cbed3720adae70eaacb4c9563bef7474ed9d0d3f95b";
+  "eb2b70ea257a0ed33604b9bb34cbd83103f82af73cbb8ae4c75669acc325721a";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -85,7 +85,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     structuredAi: {
       label: "structured ai",
       href: "https://getstructured.ai/",
-      logoSrc: "/images/brand/structured-ai-favicon.png",
+      logoSrc: "/images/brand/structured-ai-mark.svg",
       logoAlt: "structured ai",
       logoTone: "white",
     },
@@ -922,7 +922,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
       "real-time agent interaction with citations and visible execution.",
     detail_path: "/projects/structured-ai",
     identity: {
-      logo_src: "/images/brand/structured-ai-favicon.png",
+      logo_src: "/images/brand/structured-ai-mark.svg",
       logo_alt: "structured ai",
       logo_tone: "adaptive",
     },
