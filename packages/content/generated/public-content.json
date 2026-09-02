@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "eb2b70ea257a0ed33604b9bb34cbd83103f82af73cbb8ae4c75669acc325721a",
+  "source_hash": "517a57e1d1d5f048085b41b170ad6f3395023360509c36cb3cd2acb1d2fb959d",
   "sources": {
-    "content/public/pages/home.md": "e52c60cdba57fa3f57c7dc8fdd3a26d3992f5bbdeee0fb6091ebac861ed2280e",
+    "content/public/pages/home.md": "8d6c7458d55011cef014d639d2cc87fd4dbc0e03749bcbb599d500c535787bbe",
     "content/public/pages/making.md": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
@@ -95,7 +95,8 @@
           "href": "https://getstructured.ai/",
           "logoSrc": "/images/brand/structured-ai-mark.svg",
           "logoAlt": "structured ai",
-          "logoTone": "white"
+          "logoTone": "white",
+          "logoShape": "mark"
         },
         "yCombinatorF25": {
           "label": "(YC F25)",

@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "eb2b70ea257a0ed33604b9bb34cbd83103f82af73cbb8ae4c75669acc325721a";
+  "517a57e1d1d5f048085b41b170ad6f3395023360509c36cb3cd2acb1d2fb959d";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -88,6 +88,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
       logoSrc: "/images/brand/structured-ai-mark.svg",
       logoAlt: "structured ai",
       logoTone: "white",
+      logoShape: "mark",
     },
     yCombinatorF25: {
       label: "(YC F25)",
