@@ -659,12 +659,6 @@ assert.equal(
 
 const systemsContent = normalizeSystemsPageContent({
   map_principle: " autonomy is an attention-routing problem. ",
-  map_domains: [
-    { label: "career", children: ["business", "content"] },
-    { label: "learning", children: [] },
-    { label: "wellbeing", children: [] },
-    { label: "personal", children: [] },
-  ],
 });
 assert.equal(
   systemsContent.map_principle,
@@ -673,13 +667,29 @@ assert.equal(
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
 assert.deepEqual(
   systemsContent.map_nodes.map(({ id }) => id),
-  ["life", "snap_store", "admin", "ani", "agents", "work", "record"],
+  [
+    "life",
+    "snap_store",
+    "admin",
+    "ani",
+    "agents",
+    "work",
+    "record",
+    "calendar",
+    "credentials",
+    "infrastructure",
+  ],
   "systems map nodes must preserve the reviewed information flow",
 );
 assert.deepEqual(
   systemsContent.map_foundations.map(({ id }) => id),
-  ["calendar", "github", "mac_mini", "external_ssd"],
+  ["calendar", "github", "mac_mini", "one_password", "tailnet", "external_ssd"],
   "systems map foundations must preserve the reviewed storage model",
+);
+assert.deepEqual(
+  systemsContent.map_devices.map(({ id }) => id),
+  ["iphone", "macbook", "mac_mini"],
+  "systems map devices must preserve the reviewed tailnet",
 );
 assert.deepEqual(
   systemsContent.map_authority_modes.map(({ id }) => id),
@@ -688,19 +698,21 @@ assert.deepEqual(
 );
 assert.deepEqual(
   systemsContent.map_relationships.map(
-    ({ id, source, destination, authority }) => ({
+    ({ id, source, destination, authority, kind }) => ({
       id,
       source,
       destination,
       authority,
+      kind,
     }),
   ),
   DEFAULT_SYSTEMS_CONTENT.map_relationships.map(
-    ({ id, source, destination, authority }) => ({
+    ({ id, source, destination, authority, kind }) => ({
       id,
       source,
       destination,
       authority,
+      kind,
     }),
   ),
   "systems map paths must preserve their reviewed endpoints and authority",
@@ -726,6 +738,11 @@ assert.deepEqual(
   "an incomplete systems map must fall back to the reviewed foundations",
 );
 assert.deepEqual(
+  normalizeSystemsPageContent({ map_devices: [] }).map_devices,
+  DEFAULT_SYSTEMS_CONTENT.map_devices,
+  "an incomplete systems map must fall back to the reviewed tailnet",
+);
+assert.deepEqual(
   normalizeSystemsPageContent({ map_authority_modes: [] }).map_authority_modes,
   DEFAULT_SYSTEMS_CONTENT.map_authority_modes,
   "an incomplete systems map must fall back to the reviewed authority modes",
@@ -740,7 +757,7 @@ assert.equal(
     ...systemsContent,
     map_relationships: systemsContent.map_relationships.map((relationship) =>
       relationship.id === "ani_to_agents"
-        ? { ...relationship, authority: "own" }
+        ? { ...relationship, authority: "with_me" }
         : relationship,
     ),
   }).ok,
@@ -750,12 +767,9 @@ assert.equal(
 assert.equal(
   validateSystemsPageContent(
     normalizeSystemsPageContent({
-      map_domains: [
-        { label: "career", children: [] },
-        { label: "career", children: [] },
-        { label: "wellbeing", children: [] },
-        { label: "personal", children: [] },
-      ],
+      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
+        index === 1 ? { ...domain, label: "career" } : domain,
+      ),
     }),
   ).ok,
   false,
@@ -764,16 +778,15 @@ assert.equal(
 assert.equal(
   validateSystemsPageContent(
     normalizeSystemsPageContent({
-      map_domains: [
-        { label: "career", children: ["business", "business"] },
-        { label: "learning", children: [] },
-        { label: "wellbeing", children: [] },
-        { label: "personal", children: [] },
-      ],
+      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
+        index === 0
+          ? { ...domain, sources: [domain.sources[0], domain.sources[0]] }
+          : domain,
+      ),
     }),
   ).ok,
   false,
-  "systems map domain children must remain unique",
+  "systems map source identities must remain unique within each domain",
 );
 
 assert.equal(

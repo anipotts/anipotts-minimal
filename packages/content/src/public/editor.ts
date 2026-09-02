@@ -766,6 +766,27 @@ export function normalizeSystemsPageContent(
     source.featured_writing && typeof source.featured_writing === "object"
       ? (source.featured_writing as Record<string, unknown>)
       : {};
+  const mapSourceIds = [
+    "gmail",
+    "linkedin",
+    "x",
+    "instagram",
+    "github",
+    "nyu",
+    "chrome",
+    "apple_books",
+    "withings",
+    "zocdoc",
+    "imessage",
+    "real_life",
+    "files",
+    "apple_health",
+    "physical_measurement",
+    "people",
+    "notes",
+  ] as const;
+  const mapSourceModes = ["event", "scheduled", "manual", "local"] as const;
+  const mapSourceKinds = ["signal", "record"] as const;
   const mapDomains = Array.isArray(source.map_domains)
     ? source.map_domains
         .filter((item): item is Record<string, unknown> =>
@@ -773,14 +794,48 @@ export function normalizeSystemsPageContent(
         )
         .map((item) => ({
           label: coerceString(item.label, "").trim(),
-          children: Array.isArray(item.children)
-            ? item.children
-                .map((child) => coerceString(child, "").trim())
-                .filter(Boolean)
-                .slice(0, 4)
+          detail: coerceString(item.detail, "").trim(),
+          sources: Array.isArray(item.sources)
+            ? item.sources
+                .filter((entry): entry is Record<string, unknown> =>
+                  Boolean(
+                    entry && typeof entry === "object" && !Array.isArray(entry),
+                  ),
+                )
+                .map((entry) => {
+                  const id = coerceString(entry.id, "").trim();
+                  const mode = coerceString(entry.mode, "").trim();
+                  const kind = coerceString(entry.kind, "").trim();
+                  if (
+                    !mapSourceIds.includes(
+                      id as (typeof mapSourceIds)[number],
+                    ) ||
+                    !mapSourceModes.includes(
+                      mode as (typeof mapSourceModes)[number],
+                    ) ||
+                    !mapSourceKinds.includes(
+                      kind as (typeof mapSourceKinds)[number],
+                    )
+                  ) {
+                    return null;
+                  }
+                  return {
+                    id: id as (typeof mapSourceIds)[number],
+                    label: coerceString(entry.label, "").trim(),
+                    mode: mode as (typeof mapSourceModes)[number],
+                    kind: kind as (typeof mapSourceKinds)[number],
+                  };
+                })
+                .filter(
+                  (
+                    entry,
+                  ): entry is SystemsPageContent["map_domains"][number]["sources"][number] =>
+                    Boolean(entry?.label),
+                )
+                .slice(0, 6)
             : [],
         }))
-        .filter((item) => item.label)
+        .filter((item) => item.label && item.detail && item.sources.length)
         .slice(0, 4)
     : DEFAULT_SYSTEMS_CONTENT.map_domains;
   const mapNodeIds = [
@@ -791,6 +846,9 @@ export function normalizeSystemsPageContent(
     "agents",
     "work",
     "record",
+    "calendar",
+    "credentials",
+    "infrastructure",
   ] as const;
   const mapNodes = Array.isArray(source.map_nodes)
     ? source.map_nodes
@@ -827,6 +885,8 @@ export function normalizeSystemsPageContent(
     "calendar",
     "github",
     "mac_mini",
+    "one_password",
+    "tailnet",
     "external_ssd",
   ] as const;
   const mapFoundations = Array.isArray(source.map_foundations)
@@ -846,13 +906,43 @@ export function normalizeSystemsPageContent(
           return {
             id: id as (typeof foundationIds)[number],
             title: coerceString(item.title, fallback.title).trim(),
+            role: coerceString(item.role, fallback.role).trim(),
             detail: coerceString(item.detail, fallback.detail).trim(),
+            state:
+              item.state === "planned" || item.state === "active"
+                ? item.state
+                : fallback.state,
           };
         })
         .filter((item): item is SystemsPageContent["map_foundations"][number] =>
-          Boolean(item?.title && item.detail),
+          Boolean(item?.title && item.role && item.detail),
         )
     : DEFAULT_SYSTEMS_CONTENT.map_foundations;
+  const deviceIds = ["iphone", "macbook", "mac_mini"] as const;
+  const mapDevices = Array.isArray(source.map_devices)
+    ? source.map_devices
+        .filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object" && !Array.isArray(item)),
+        )
+        .map((item) => {
+          const id = coerceString(item.id, "").trim();
+          if (!deviceIds.includes(id as (typeof deviceIds)[number])) {
+            return null;
+          }
+          const fallback = DEFAULT_SYSTEMS_CONTENT.map_devices.find(
+            (device) => device.id === id,
+          );
+          if (!fallback) return null;
+          return {
+            id: id as (typeof deviceIds)[number],
+            title: coerceString(item.title, fallback.title).trim(),
+            detail: coerceString(item.detail, fallback.detail).trim(),
+          };
+        })
+        .filter((item): item is SystemsPageContent["map_devices"][number] =>
+          Boolean(item?.title && item.detail),
+        )
+    : DEFAULT_SYSTEMS_CONTENT.map_devices;
   const authorityIds = ["own", "with_me", "mixed"] as const;
   const mapAuthorityModes = Array.isArray(source.map_authority_modes)
     ? source.map_authority_modes
@@ -880,14 +970,24 @@ export function normalizeSystemsPageContent(
         )
     : DEFAULT_SYSTEMS_CONTENT.map_authority_modes;
   const relationshipIds = [
-    "life_to_snap",
-    "snap_to_admin",
-    "admin_to_ani",
+    "signals_to_records",
+    "records_to_ani",
+    "calendar_to_ani",
     "ani_to_agents",
-    "agents_to_work",
-    "work_to_record",
-    "record_to_admin",
-    "record_to_ani",
+    "agents_to_ani",
+    "agents_to_credentials",
+    "agents_to_infrastructure",
+    "agents_to_record",
+    "record_to_records",
+  ] as const;
+  const relationshipKinds = [
+    "signal",
+    "scheduled",
+    "authorized",
+    "needs_human",
+    "verified_update",
+    "transport",
+    "credential",
   ] as const;
   const mapRelationships = Array.isArray(source.map_relationships)
     ? source.map_relationships
@@ -914,6 +1014,7 @@ export function normalizeSystemsPageContent(
             item.authority,
             fallback.authority,
           ).trim();
+          const kind = coerceString(item.kind, fallback.kind).trim();
           return {
             id: id as (typeof relationshipIds)[number],
             source: mapNodeIds.includes(sourceId as (typeof mapNodeIds)[number])
@@ -929,6 +1030,11 @@ export function normalizeSystemsPageContent(
             )
               ? (authorityId as (typeof authorityIds)[number])
               : fallback.authority,
+            kind: relationshipKinds.includes(
+              kind as (typeof relationshipKinds)[number],
+            )
+              ? (kind as (typeof relationshipKinds)[number])
+              : fallback.kind,
             detail: coerceString(item.detail, fallback.detail).trim(),
           };
         })
@@ -975,6 +1081,14 @@ export function normalizeSystemsPageContent(
       mapFoundations.length === foundationIds.length
         ? mapFoundations
         : DEFAULT_SYSTEMS_CONTENT.map_foundations,
+    map_device_label: coerceString(
+      source.map_device_label,
+      DEFAULT_SYSTEMS_CONTENT.map_device_label,
+    ).trim(),
+    map_devices:
+      mapDevices.length === deviceIds.length
+        ? mapDevices
+        : DEFAULT_SYSTEMS_CONTENT.map_devices,
     map_authority_label: coerceString(
       source.map_authority_label,
       DEFAULT_SYSTEMS_CONTENT.map_authority_label,
@@ -1032,6 +1146,7 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     [content.map_label, "Systems map label"],
     [content.map_principle, "Systems map principle"],
     [content.map_foundation_label, "Systems map foundation label"],
+    [content.map_device_label, "Systems map device label"],
     [content.map_authority_label, "Systems map authority label"],
     [content.principles_label, "Systems principles label"],
     [content.writing_label, "Systems writing label"],
@@ -1054,15 +1169,52 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     };
   }
   for (const domain of content.map_domains) {
-    if (new Set(domain.children).size !== domain.children.length) {
+    const detailError = validateCmsString(
+      domain.detail,
+      `Systems map ${domain.label} detail`,
+      CMS_TEXT_LIMITS.summary,
+    );
+    if (detailError) return { ok: false, error: detailError };
+    const sourceIds = domain.sources.map(({ id }) => id);
+    if (
+      sourceIds.length === 0 ||
+      new Set(sourceIds).size !== sourceIds.length
+    ) {
       return {
         ok: false,
-        error: `Systems map domain ${domain.label} has duplicate children`,
+        error: `Systems map domain ${domain.label} needs unique sources`,
       };
+    }
+    const signals = domain.sources.filter(({ kind }) => kind === "signal");
+    const records = domain.sources.filter(({ kind }) => kind === "record");
+    if (signals.length === 0 || records.length !== 2) {
+      return {
+        ok: false,
+        error: `Systems map domain ${domain.label} needs signals and exactly two records`,
+      };
+    }
+    for (const source of domain.sources) {
+      const sourceError = validateCmsString(
+        source.label,
+        `Systems map ${domain.label} source ${source.id}`,
+        CMS_TEXT_LIMITS.linkLabel,
+      );
+      if (sourceError) return { ok: false, error: sourceError };
     }
   }
   const requiredNodeIds: Array<SystemsPageContent["map_nodes"][number]["id"]> =
-    ["life", "snap_store", "admin", "ani", "agents", "work", "record"];
+    [
+      "life",
+      "snap_store",
+      "admin",
+      "ani",
+      "agents",
+      "work",
+      "record",
+      "calendar",
+      "credentials",
+      "infrastructure",
+    ];
   const nodeIds = content.map_nodes.map(({ id }) => id);
   if (
     nodeIds.length !== requiredNodeIds.length ||
@@ -1077,47 +1229,62 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
       source: SystemsPageContent["map_relationships"][number]["source"];
       destination: SystemsPageContent["map_relationships"][number]["destination"];
       authority: SystemsPageContent["map_relationships"][number]["authority"];
+      kind: SystemsPageContent["map_relationships"][number]["kind"];
     }
   > = {
-    life_to_snap: {
+    signals_to_records: {
       source: "life",
       destination: "snap_store",
       authority: "mixed",
+      kind: "signal",
     },
-    snap_to_admin: {
+    records_to_ani: {
       source: "snap_store",
-      destination: "admin",
-      authority: "own",
-    },
-    admin_to_ani: {
-      source: "admin",
       destination: "ani",
-      authority: "with_me",
+      authority: "mixed",
+      kind: "signal",
+    },
+    calendar_to_ani: {
+      source: "calendar",
+      destination: "ani",
+      authority: "own",
+      kind: "scheduled",
     },
     ani_to_agents: {
       source: "ani",
       destination: "agents",
-      authority: "mixed",
+      authority: "own",
+      kind: "authorized",
     },
-    agents_to_work: {
+    agents_to_ani: {
       source: "agents",
-      destination: "work",
-      authority: "own",
-    },
-    work_to_record: {
-      source: "work",
-      destination: "record",
-      authority: "own",
-    },
-    record_to_admin: {
-      source: "record",
-      destination: "admin",
-      authority: "mixed",
-    },
-    record_to_ani: {
-      source: "record",
       destination: "ani",
       authority: "with_me",
+      kind: "needs_human",
+    },
+    agents_to_credentials: {
+      source: "agents",
+      destination: "credentials",
+      authority: "own",
+      kind: "credential",
+    },
+    agents_to_infrastructure: {
+      source: "agents",
+      destination: "infrastructure",
+      authority: "own",
+      kind: "transport",
+    },
+    agents_to_record: {
+      source: "agents",
+      destination: "record",
+      authority: "own",
+      kind: "verified_update",
+    },
+    record_to_records: {
+      source: "record",
+      destination: "snap_store",
+      authority: "mixed",
+      kind: "verified_update",
     },
   };
   const relationshipIds = content.map_relationships.map(({ id }) => id);
@@ -1140,7 +1307,8 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     if (
       relationship.source !== expected.source ||
       relationship.destination !== expected.destination ||
-      relationship.authority !== expected.authority
+      relationship.authority !== expected.authority ||
+      relationship.kind !== expected.kind
     ) {
       return {
         ok: false,
@@ -1156,7 +1324,14 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
   }
   const requiredFoundationIds: Array<
     SystemsPageContent["map_foundations"][number]["id"]
-  > = ["calendar", "github", "mac_mini", "external_ssd"];
+  > = [
+    "calendar",
+    "github",
+    "mac_mini",
+    "one_password",
+    "tailnet",
+    "external_ssd",
+  ];
   const foundationIds = content.map_foundations.map(({ id }) => id);
   if (
     foundationIds.length !== requiredFoundationIds.length ||
@@ -1167,6 +1342,53 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
       ok: false,
       error: "Systems map needs every canonical foundation",
     };
+  }
+  for (const foundation of content.map_foundations) {
+    const error =
+      validateCmsString(
+        foundation.title,
+        `Systems map ${foundation.id} title`,
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        foundation.role,
+        `Systems map ${foundation.id} role`,
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        foundation.detail,
+        `Systems map ${foundation.id} detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
+  }
+  const requiredDeviceIds: Array<
+    SystemsPageContent["map_devices"][number]["id"]
+  > = ["iphone", "macbook", "mac_mini"];
+  const deviceIds = content.map_devices.map(({ id }) => id);
+  if (
+    deviceIds.length !== requiredDeviceIds.length ||
+    new Set(deviceIds).size !== deviceIds.length ||
+    !requiredDeviceIds.every((id) => deviceIds.includes(id))
+  ) {
+    return {
+      ok: false,
+      error: "Systems map needs the three canonical tailnet devices",
+    };
+  }
+  for (const device of content.map_devices) {
+    const error =
+      validateCmsString(
+        device.title,
+        `Systems map ${device.id} title`,
+        CMS_TEXT_LIMITS.linkLabel,
+      ) ??
+      validateCmsString(
+        device.detail,
+        `Systems map ${device.id} detail`,
+        CMS_TEXT_LIMITS.summary,
+      );
+    if (error) return { ok: false, error };
   }
   const requiredAuthorityIds: Array<
     SystemsPageContent["map_authority_modes"][number]["id"]

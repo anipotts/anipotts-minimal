@@ -1,140 +1,257 @@
 ---
 title: systems
-description: "a personal map for noticing what matters, organizing context, and deciding what agents can watch, prepare, or act on with me."
+description: "a system design map of how signals move through my life, devices, agents, authority gates, and records."
 hero_title: systems
-hero_summary: "i keep a map of the work, people, plans, ideas, and responsibilities moving through my life. it helps me see what matters, decide what needs me, and let agents help with the rest."
-map_label: how it moves
-map_principle: "this map shows what agents can notice, watch, prepare, act on, check, and record, and where they work on their own, with me, or through a mix of both."
+hero_summary: "how signals move through my life, devices, agents, authority gates, and records."
+map_label: system topology
+map_principle: "life produces signals. records hold facts. i direct agents. agents verify and persist changes back to the record that owns them."
 map_domains:
   - label: career
-    children:
-      - projects
-      - applications
-      - content
+    detail: opportunities, applications, project activity
+    sources:
+      - id: linkedin
+        label: LinkedIn
+        mode: manual
+        kind: signal
+      - id: x
+        label: X
+        mode: manual
+        kind: signal
+      - id: instagram
+        label: Instagram
+        mode: manual
+        kind: signal
+      - id: gmail
+        label: Gmail
+        mode: scheduled
+        kind: record
+      - id: github
+        label: GitHub
+        mode: event
+        kind: record
   - label: learning
-    children:
-      - school
-      - research
-      - skills
+    detail: degree records, research, reading
+    sources:
+      - id: chrome
+        label: Chrome
+        mode: manual
+        kind: signal
+      - id: apple_books
+        label: Apple Books
+        mode: manual
+        kind: signal
+      - id: nyu
+        label: NYU
+        mode: manual
+        kind: record
+      - id: files
+        label: Files
+        mode: local
+        kind: record
   - label: wellbeing
-    children:
-      - health
-      - routines
-      - energy
+    detail: measurements, appointments, care
+    sources:
+      - id: zocdoc
+        label: Zocdoc
+        mode: manual
+        kind: signal
+      - id: physical_measurement
+        label: physical measurements
+        mode: scheduled
+        kind: signal
+      - id: withings
+        label: Withings
+        mode: scheduled
+        kind: record
+      - id: apple_health
+        label: Apple Health
+        mode: local
+        kind: record
   - label: personal
-    children:
-      - plans + trips
-      - family + friends
-      - people i know online
+    detail: messages, plans, people
+    sources:
+      - id: real_life
+        label: real life
+        mode: manual
+        kind: signal
+      - id: people
+        label: people
+        mode: manual
+        kind: signal
+      - id: imessage
+        label: Messages
+        mode: local
+        kind: record
+      - id: notes
+        label: Notes
+        mode: local
+        kind: record
 map_nodes:
   - id: life
-    label: attention loop
-    title: life brings things into view
-    detail: career, learning, wellbeing, and personal life keep giving me things to notice.
+    label: life areas
+    title: signals from life
+    detail: services, devices, and real-world inputs produce changes worth noticing.
     items: []
   - id: snap_store
-    label: snap + store
-    title: capture what matters
-    detail: thoughts, plans, and things i save get a place to land before they disappear.
+    label: records
+    title: authoritative records
+    detail: facts stay in the service or local record that owns them rather than inside the model.
     items:
-      - journal
-      - notes + reminders
-      - saved posts + articles
-      - videos + watch history
+      - provider events
+      - scheduled scans
+      - local reads
+      - manual capture
   - id: admin
-    label: my private dashboard
+    label: private index
     title: admin.anipotts.com
-    detail: one view of what changed, what needs me, and what can keep moving.
-    items:
-      - gated by cloudflare access
+    detail: blockers, approvals, verified changes, and provenance in one private view.
+    items: []
   - id: ani
-    label: execution loop
-    title: ani
-    detail: i decide what needs my judgment and what can keep moving.
+    label: human authority
+    title: ani potts
+    detail: i set direction, grant authority, resolve ambiguity, and own final decisions.
     items: []
   - id: agents
-    label: agents
+    label: workers
     title: codex + claude code
-    detail: each agent gets one clear job and only the context it needs.
+    detail: workers execute bounded tasks and return consequential or uncertain work to me.
     items:
       - codex
       - claude code
   - id: work
-    label: inside the loop
-    title: watch · prepare · act
-    detail: the job moves as far as i have said it can.
+    label: authorized work
+    title: bounded task
+    detail: execution stays inside task, context, device, and action limits.
     items: []
   - id: record
-    label: returns
-    title: check + record
-    detail: what happened, what changed, and what still needs me.
+    label: verify + persist
+    title: verified update
+    detail: deterministic checks attach evidence before changes return to the record that owns the state.
     items: []
-map_foundation_label: what keeps the context grounded
+  - id: calendar
+    label: scheduled
+    title: Google Calendar
+    detail: commitments and time-based triggers span every life area.
+    items: []
+  - id: credentials
+    label: credentials
+    title: 1Password
+    detail: credential access enables an authorized action but does not grant authority.
+    items: []
+  - id: infrastructure
+    label: transport
+    title: Tailnet
+    detail: a private network connects the iPhone, MacBook, and always-on Mac mini runtime.
+    items: []
+map_foundation_label: execution substrate
 map_foundations:
   - id: calendar
-    title: calendar
-    detail: starts scheduled checks
+    title: Google Calendar
+    role: shared schedule
+    detail: cross-domain commitments and time-based starts
+    state: active
   - id: github
-    title: github
-    detail: keeps project history
+    title: GitHub
+    role: cloud record
+    detail: repositories, commits, issues, and deployment proof
+    state: active
   - id: mac_mini
-    title: mac mini
-    detail: recent context, kept local
+    title: Mac mini
+    role: local runtime
+    detail: 24/7 working state, recent context, and agent execution
+    state: active
+  - id: one_password
+    title: 1Password
+    role: credential access
+    detail: credentials for already-authorized work
+    state: active
+  - id: tailnet
+    title: Tailnet
+    role: private transport
+    detail: encrypted connectivity between my active devices
+    state: active
   - id: external_ssd
-    title: external ssd
-    detail: long-term archive, planned
-map_authority_label: how work moves
+    title: external SSD
+    role: cold archive
+    detail: long-term recovery copies
+    state: planned
+map_device_label: tailnet
+map_devices:
+  - id: iphone
+    title: iPhone
+    detail: observation and approval
+  - id: macbook
+    title: MacBook
+    detail: primary operator console
+  - id: mac_mini
+    title: Mac mini
+    detail: always-on remote runtime
+map_authority_label: execution policy
 map_authority_modes:
   - id: own
-    label: on its own
-    detail: clear work that is easy to undo
+    label: within policy
+    detail: contained and reversible operation
   - id: with_me
-    label: with me
-    detail: judgment, permission, or a real consequence
+    label: approval required
+    detail: external effect, ambiguity, or irreversible consequence
   - id: mixed
-    label: a mix of both
-    detail: agents prepare, i decide, agents continue
+    label: bounded handoff
+    detail: worker prepares, control plane authorizes, worker resumes
 map_relationships:
-  - id: life_to_snap
+  - id: signals_to_records
     source: life
     destination: snap_store
     authority: mixed
-    detail: things worth keeping get captured while i can still add the meaning behind them.
-  - id: snap_to_admin
+    kind: signal
+    detail: events, local reads, and manual observation enter the record that owns the fact.
+  - id: records_to_ani
     source: snap_store
-    destination: admin
-    authority: own
-    detail: captured context moves into one private view.
-  - id: admin_to_ani
-    source: admin
     destination: ani
-    authority: with_me
-    detail: choices, permissions, consequences, and unclear results come back to me.
+    authority: mixed
+    kind: signal
+    detail: relevant changes and current context come into my view.
+  - id: calendar_to_ani
+    source: calendar
+    destination: ani
+    authority: own
+    kind: scheduled
+    detail: scheduled commitments and checks create time-based starts.
   - id: ani_to_agents
     source: ani
     destination: agents
-    authority: mixed
-    detail: i set the job, the context, and how far it can go.
-  - id: agents_to_work
+    authority: own
+    kind: authorized
+    detail: i assign a bounded job, context, device, and action limit.
+  - id: agents_to_ani
     source: agents
-    destination: work
-    authority: own
-    detail: agents carry clear, contained work forward.
-  - id: work_to_record
-    source: work
-    destination: record
-    authority: own
-    detail: finished work gets checked and recorded with what changed.
-  - id: record_to_admin
-    source: record
-    destination: admin
-    authority: mixed
-    detail: the verified result returns to the private dashboard.
-  - id: record_to_ani
-    source: record
     destination: ani
     authority: with_me
-    detail: anything still waiting on me returns with the context to decide.
+    kind: needs_human
+    detail: ambiguity, changed goals, and consequential actions return to me.
+  - id: agents_to_credentials
+    source: agents
+    destination: credentials
+    authority: own
+    kind: credential
+    detail: authorized work can request credentials without exposing their values to the model.
+  - id: agents_to_infrastructure
+    source: agents
+    destination: infrastructure
+    authority: own
+    kind: transport
+    detail: agents reach the appropriate device through the private network.
+  - id: agents_to_record
+    source: agents
+    destination: record
+    authority: own
+    kind: verified_update
+    detail: completed work is checked and paired with evidence.
+  - id: record_to_records
+    source: record
+    destination: snap_store
+    authority: mixed
+    kind: verified_update
+    detail: verified changes return to the authoritative record and become context for the next decision.
 principles_label: what agents can help with
 principles:
   - label: notice

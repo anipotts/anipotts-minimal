@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "abb2489779a0b77fee6f9cbed3720adae70eaacb4c9563bef7474ed9d0d3f95b",
+  "source_hash": "f6995507a8cb5eb672c85dba3a8db18b8e57d3194e2dc39e1331defc21507278",
   "source_records": [
     {
       "id": "projects.quantercise",
@@ -1101,7 +1101,7 @@
       "status": "source_controlled",
       "route": "/systems",
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "d16b90f3a8afd071485e885ddb8924710fb20fd5abd7e3216704101a4f8212cf"
+      "source_hash": "57b047e5b19bc61a050dc702aee809ddfaa7a53a6399ff6cc181e84d85e913e5"
     },
     {
       "entity_id": "public-page:writing",

@@ -246,13 +246,52 @@ export interface SystemsLinkCard {
   detail: string;
 }
 
+export type SystemsMapSourceId =
+  | "gmail"
+  | "linkedin"
+  | "x"
+  | "instagram"
+  | "github"
+  | "nyu"
+  | "chrome"
+  | "apple_books"
+  | "withings"
+  | "zocdoc"
+  | "imessage"
+  | "real_life"
+  | "files"
+  | "apple_health"
+  | "physical_measurement"
+  | "people"
+  | "notes";
+
+export type SystemsMapSourceMode = "event" | "scheduled" | "manual" | "local";
+export type SystemsMapSourceKind = "signal" | "record";
+
+export interface SystemsMapSource {
+  id: SystemsMapSourceId;
+  label: string;
+  mode: SystemsMapSourceMode;
+  kind: SystemsMapSourceKind;
+}
+
 export interface SystemsMapDomain {
   label: string;
-  children: string[];
+  detail: string;
+  sources: SystemsMapSource[];
 }
 
 export type SystemsMapNodeId =
-  "life" | "snap_store" | "admin" | "ani" | "agents" | "work" | "record";
+  | "life"
+  | "snap_store"
+  | "admin"
+  | "ani"
+  | "agents"
+  | "work"
+  | "record"
+  | "calendar"
+  | "credentials"
+  | "infrastructure";
 
 export interface SystemsMapNode {
   id: SystemsMapNodeId;
@@ -263,10 +302,25 @@ export interface SystemsMapNode {
 }
 
 export type SystemsMapFoundationId =
-  "calendar" | "github" | "mac_mini" | "external_ssd";
+  | "calendar"
+  | "github"
+  | "mac_mini"
+  | "one_password"
+  | "tailnet"
+  | "external_ssd";
 
 export interface SystemsMapFoundation {
   id: SystemsMapFoundationId;
+  title: string;
+  role: string;
+  detail: string;
+  state: "active" | "planned";
+}
+
+export type SystemsMapDeviceId = "iphone" | "macbook" | "mac_mini";
+
+export interface SystemsMapDevice {
+  id: SystemsMapDeviceId;
   title: string;
   detail: string;
 }
@@ -280,20 +334,31 @@ export interface SystemsAuthorityMode {
 }
 
 export type SystemsMapRelationshipId =
-  | "life_to_snap"
-  | "snap_to_admin"
-  | "admin_to_ani"
+  | "signals_to_records"
+  | "records_to_ani"
+  | "calendar_to_ani"
   | "ani_to_agents"
-  | "agents_to_work"
-  | "work_to_record"
-  | "record_to_admin"
-  | "record_to_ani";
+  | "agents_to_ani"
+  | "agents_to_credentials"
+  | "agents_to_infrastructure"
+  | "agents_to_record"
+  | "record_to_records";
+
+export type SystemsMapRelationshipKind =
+  | "signal"
+  | "scheduled"
+  | "authorized"
+  | "needs_human"
+  | "verified_update"
+  | "transport"
+  | "credential";
 
 export interface SystemsMapRelationship {
   id: SystemsMapRelationshipId;
   source: SystemsMapNodeId;
   destination: SystemsMapNodeId;
   authority: SystemsAuthorityModeId;
+  kind: SystemsMapRelationshipKind;
   detail: string;
 }
 
@@ -308,6 +373,8 @@ export interface SystemsPageContent {
   map_nodes: SystemsMapNode[];
   map_foundation_label: string;
   map_foundations: SystemsMapFoundation[];
+  map_device_label: string;
+  map_devices: SystemsMapDevice[];
   map_authority_label: string;
   map_authority_modes: SystemsAuthorityMode[];
   map_relationships: SystemsMapRelationship[];

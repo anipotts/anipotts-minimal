@@ -1,13 +1,16 @@
 ---
 import type {
   SystemsAuthorityMode,
+  SystemsMapDevice,
   SystemsMapDomain,
   SystemsMapFoundation,
   SystemsMapNode,
   SystemsMapRelationship,
+  SystemsMapSource,
 } from "@anipotts/content/public";
 import { Icon } from "astro-icon/components";
 import AgentMark from "./AgentMark.astro";
+import SystemSemantics from "./systems/SystemSemantics.astro";
 
 interface Props {
   label: string;
@@ -16,6 +19,8 @@ interface Props {
   nodes: SystemsMapNode[];
   foundationLabel: string;
   foundations: SystemsMapFoundation[];
+  deviceLabel: string;
+  devices: SystemsMapDevice[];
   authorityLabel: string;
   authorityModes: SystemsAuthorityMode[];
   relationships: SystemsMapRelationship[];
@@ -28,766 +33,810 @@ const {
   nodes,
   foundationLabel,
   foundations,
+  deviceLabel,
+  devices,
   authorityLabel,
   authorityModes,
   relationships,
 } = Astro.props;
 
-const domainIcons: Record<string, string> = {
-  career: "ph:briefcase",
-  learning: "ph:book-open-text",
-  wellbeing: "ph:heart",
-  personal: "ph:user-circle",
-};
-const foundationIcons: Record<string, string> = {
-  calendar: "ph:calendar-dots",
-  github: "ph:github-logo",
-  mac_mini: "ph:desktop-tower",
-  external_ssd: "ph:hard-drives",
-};
-const mapNodes = Object.fromEntries(
+const nodeById = Object.fromEntries(
   nodes.map((node) => [node.id, node]),
 ) as Record<SystemsMapNode["id"], SystemsMapNode>;
-const modes = Object.fromEntries(
-  authorityModes.map((mode) => [mode.id, mode]),
-) as Record<SystemsAuthorityMode["id"], SystemsAuthorityMode>;
-const paths = Object.fromEntries(
-  relationships.map((relationship) => [relationship.id, relationship]),
-) as Record<SystemsMapRelationship["id"], SystemsMapRelationship>;
+const foundationById = Object.fromEntries(
+  foundations.map((foundation) => [foundation.id, foundation]),
+) as Record<SystemsMapFoundation["id"], SystemsMapFoundation>;
+const deviceById = Object.fromEntries(
+  devices.map((device) => [device.id, device]),
+) as Record<SystemsMapDevice["id"], SystemsMapDevice>;
+
+const sourceIcons: Record<SystemsMapSource["id"], string> = {
+  gmail: "logos:google-gmail",
+  linkedin: "logos:linkedin-icon",
+  x: "logos:x",
+  instagram: "logos:instagram-icon",
+  github: "logos:github-icon",
+  nyu: "ph:graduation-cap-fill",
+  chrome: "logos:chrome",
+  apple_books: "ph:book-open-text-fill",
+  withings: "ph:heartbeat-fill",
+  zocdoc: "ph:first-aid-fill",
+  imessage: "simple-icons:imessage",
+  real_life: "ph:eye-fill",
+  files: "ph:folder-simple-fill",
+  apple_health: "ph:heart-straight-fill",
+  physical_measurement: "ph:scales-fill",
+  people: "ph:users-three-fill",
+  notes: "ph:note-fill",
+};
+
+const sourceImages: Partial<Record<SystemsMapSource["id"], string>> = {
+  nyu: "/brand/sources/nyu.png",
+  withings: "/brand/sources/withings.jpg",
+  zocdoc: "/brand/sources/zocdoc.jpg",
+  files: "/brand/sources/files.png",
+  notes: "/brand/sources/notes.png",
+};
+
+const calendarTitle = foundationById.calendar.title;
+const macMiniTitle = deviceById.mac_mini.title;
+const externalSsdTitle = foundationById.external_ssd.title;
 ---
 
 <figure class="system-map" aria-labelledby="system-map-heading">
   <figcaption class="system-map__caption">
     <h2 id="system-map-heading" class="section-label">{label}</h2>
-    <strong>{principle}</strong>
+    <span class="sr-only">{principle}</span>
   </figcaption>
 
-  <div class="system-map__canvas" aria-hidden="true">
-    <svg viewBox="0 0 1100 750" role="presentation">
-      <defs>
-        <marker
-          id="map-arrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="5"
-          markerHeight="5"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z"></path>
-        </marker>
-        <marker
-          id="map-loop-arrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="6"
-          markerHeight="6"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z"></path>
-        </marker>
-      </defs>
-
+  <div class="topology" aria-hidden="true">
+    <svg
+      class="routes routes--desktop"
+      viewBox="0 0 1200 960"
+      role="presentation"
+    >
+      <g class="route route--signal">
+        <path d="M150 205V245M450 205V245M750 205V245M1050 205V245"></path>
+        <path d="M150 245H1050M600 245V318"></path>
+      </g>
+      <path class="route route--scheduled" d="M600 272V318"></path>
+      <path class="route route--authorized" d="M600 405V494"></path>
       <path
-        class="map-loop map-loop--attention"
-        d="M 575 65 A 505 275 0 1 0 575 615 A 505 275 0 1 0 575 65"></path>
-      <path
-        class="map-loop map-loop--execution"
-        d="M 285 340 A 290 220 0 1 0 865 340 A 290 220 0 1 0 285 340"></path>
-      <g class="map-loop-headings">
-        <text x="84" y="68">{mapNodes.life.label}</text>
-        <text x="685" y="70">{mapNodes.ani.label}</text>
-      </g>
-
-      <g class="map-edges">
-        <path
-          class:list={["map-edge", `map-edge--${paths.life_to_snap.authority}`]}
-          d="M 275 242 C 300 215 315 195 330 180"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.snap_to_admin.authority}`,
-          ]}
-          d="M 430 240 C 420 305 415 365 415 440"></path>
-        <path
-          class:list={["map-edge", `map-edge--${paths.admin_to_ani.authority}`]}
-          d="M 520 486 C 545 445 558 405 568 390"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.ani_to_agents.authority}`,
-          ]}
-          d="M 610 300 C 630 250 650 215 680 190"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.agents_to_work.authority}`,
-          ]}
-          d="M 790 250 C 795 275 795 295 790 320"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.work_to_record.authority}`,
-          ]}
-          d="M 760 425 C 740 455 720 470 700 490"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.record_to_admin.authority}`,
-          ]}
-          d="M 610 540 C 565 550 520 535 500 505"></path>
-        <path
-          class:list={[
-            "map-edge",
-            `map-edge--${paths.record_to_ani.authority}`,
-          ]}
-          d="M 650 495 C 625 455 605 415 590 390"></path>
-      </g>
-      <g class="map-edge-labels">
-        <text x="278" y="205">{modes[paths.life_to_snap.authority].label}</text>
-        <text x="425" y="342">{modes[paths.snap_to_admin.authority].label}</text
-        >
-        <text x="518" y="449">{modes[paths.admin_to_ani.authority].label}</text>
-        <text x="616" y="274">{modes[paths.ani_to_agents.authority].label}</text
-        >
-        <text x="800" y="287"
-          >{modes[paths.agents_to_work.authority].label}</text
-        >
-        <text x="744" y="459"
-          >{modes[paths.work_to_record.authority].label}</text
-        >
-        <text x="524" y="558"
-          >{modes[paths.record_to_admin.authority].label}</text
-        >
-        <text x="606" y="446">{modes[paths.record_to_ani.authority].label}</text
-        >
-      </g>
-      <g class="map-currents">
-        <path
-          class="map-current map-current--attention"
-          d="M 575 65 A 505 275 0 1 0 575 615 A 505 275 0 1 0 575 65"></path>
-        <path
-          class="map-current map-current--execution"
-          d="M 285 340 A 290 220 0 1 0 865 340 A 290 220 0 1 0 285 340"></path>
-      </g>
-
-      <rect class="map-group" x="55" y="155" width="220" height="360" rx="24"
-      ></rect>
-      <foreignObject x="75" y="174" width="180" height="325">
-        <div class="map-life">
-          <span class="map-kicker">{mapNodes.life.title}</span>
-          {
-            domains.map((domain) => (
-              <div class="map-domain">
-                <span class="map-identity">
-                  <Icon
-                    name={domainIcons[domain.label] ?? "ph:circle"}
-                    class="map-icon"
-                    size={17}
-                    aria-hidden="true"
-                  />
-                  <strong>{domain.label}</strong>
-                </span>
-                {domain.children.length > 0 && (
-                  <span>{domain.children.join(" / ")}</span>
-                )}
-              </div>
-            ))
-          }
-        </div>
-      </foreignObject>
-
-      <rect class="map-node" x="320" y="100" width="255" height="140" rx="22"
-      ></rect>
-      <foreignObject x="340" y="118" width="215" height="106">
-        <div class="map-copy">
-          <span class="map-kicker">{mapNodes.snap_store.label}</span>
-          <strong>{mapNodes.snap_store.title}</strong>
-          <div class="map-node-items">
-            {mapNodes.snap_store.items.map((item) => <span>{item}</span>)}
-          </div>
-        </div>
-      </foreignObject>
-
-      <rect class="map-node" x="305" y="440" width="215" height="125" rx="22"
-      ></rect>
-      <foreignObject x="325" y="454" width="175" height="100">
-        <div class="map-copy">
-          <span class="map-kicker">{mapNodes.admin.label}</span>
-          <strong>{mapNodes.admin.title}</strong>
-          <span class="map-detail">{mapNodes.admin.detail}</span>
-          <div class="map-node-items">
-            {mapNodes.admin.items.map((item) => <span>{item}</span>)}
-          </div>
-        </div>
-      </foreignObject>
-
-      <rect class="map-center" x="535" y="280" width="80" height="120" rx="40"
-      ></rect>
-      <foreignObject x="542" y="304" width="66" height="72">
-        <div class="map-center-copy">
-          <Icon
-            name="ph:user-focus"
-            class="map-center-icon"
-            size={19}
-            aria-hidden="true"
-          />
-          <strong>{mapNodes.ani.title}</strong>
-          <span>{mapNodes.ani.label}</span>
-        </div>
-      </foreignObject>
-
-      <rect class="map-node" x="660" y="100" width="265" height="150" rx="22"
-      ></rect>
-      <foreignObject x="682" y="120" width="221" height="112">
-        <div class="map-copy">
-          <span class="map-kicker">{mapNodes.agents.label}</span>
-          <div class="map-agent-list">
-            <span class="map-agent"
-              ><AgentMark
-                provider="openai"
-                class="map-agent-icon map-agent-icon--openai"
-                size={18}
-              /><strong>{mapNodes.agents.items[0]}</strong></span
-            >
-            <span class="map-agent"
-              ><AgentMark
-                provider="claude"
-                class="map-agent-icon map-agent-icon--claude"
-                size={18}
-              /><strong>{mapNodes.agents.items[1]}</strong></span
-            >
-          </div>
-          <span class="map-detail">{mapNodes.agents.detail}</span>
-        </div>
-      </foreignObject>
-
-      <rect class="map-node" x="680" y="320" width="220" height="105" rx="22"
-      ></rect>
-      <foreignObject x="700" y="339" width="180" height="70">
-        <div class="map-copy">
-          <span class="map-kicker">{mapNodes.work.label}</span><strong
-            >{mapNodes.work.title}</strong
-          ><span class="map-detail">{mapNodes.work.detail}</span>
-        </div>
-      </foreignObject>
-
-      <rect class="map-node" x="610" y="490" width="230" height="105" rx="22"
-      ></rect>
-      <foreignObject x="630" y="508" width="190" height="70">
-        <div class="map-copy">
-          <span class="map-kicker">{mapNodes.record.label}</span><strong
-            >{mapNodes.record.title}</strong
-          ><span class="map-detail">{mapNodes.record.detail}</span>
-        </div>
-      </foreignObject>
-
-      <text class="map-foundation-heading" x="75" y="647"
-        >{foundationLabel}</text
-      >
-      <rect class="map-support" x="55" y="655" width="990" height="70" rx="20"
-      ></rect>
-      <foreignObject x="75" y="668" width="950" height="44">
-        <div class="map-support-copy">
-          {
-            foundations.map((foundation) => (
-              <span>
-                <Icon
-                  name={foundationIcons[foundation.id] ?? "ph:circle"}
-                  class="map-icon"
-                  size={17}
-                  aria-hidden="true"
-                />
-                <span>
-                  <>
-                    <strong>{foundation.title}</strong>
-                    <small>{foundation.detail}</small>
-                  </>
-                </span>
-              </span>
-            ))
-          }
-        </div>
-      </foreignObject>
+        class="route route--needs-human"
+        d="M785 525C1015 525 962 361 690 361"></path>
+      <path class="route route--credential" d="M600 552V642"></path>
+      <path class="route route--transport" d="M600 684V752"></path>
+      <path class="route route--verified" d="M600 800V857H1138V245H1050"></path>
+      <path class="route route--archive" d="M600 857V918"></path>
+      <circle class="route-packet" r="4">
+        <animateMotion
+          dur="16s"
+          repeatCount="indefinite"
+          path="M600 405V494M600 552V642M600 684V752M600 800V857H1138V245H1050"
+        ></animateMotion>
+      </circle>
     </svg>
-  </div>
 
-  <div class="system-map__semantic">
-    <section class="map-semantic-card" aria-labelledby="map-semantic-life">
-      <span class="map-semantic-label">{mapNodes.life.label}</span>
-      <h3 id="map-semantic-life">{mapNodes.life.title}</h3>
-      <p>{mapNodes.life.detail}</p>
-      <div class="map-semantic-domains">
-        {
-          domains.map((domain) => (
-            <span>
-              <Icon
-                name={domainIcons[domain.label] ?? "ph:circle"}
-                size={18}
-                aria-hidden="true"
-              />
-              <strong>{domain.label}</strong>
-              <small>{domain.children.join(" / ")}</small>
-            </span>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="map-semantic-card" aria-labelledby="map-semantic-context">
-      <span class="map-semantic-label">{mapNodes.snap_store.label}</span>
-      <h3 id="map-semantic-context">{mapNodes.snap_store.title}</h3>
-      <p>{mapNodes.snap_store.detail}</p>
-      <div class="map-semantic-pills">
-        {mapNodes.snap_store.items.map((item) => <span>{item}</span>)}
-      </div>
-      <div class="map-semantic-subnode">
-        <span class="map-semantic-label">{mapNodes.admin.label}</span>
-        <strong>{mapNodes.admin.title}</strong>
-        <p>{mapNodes.admin.detail}</p>
-        <div class="map-semantic-pills">
-          {mapNodes.admin.items.map((item) => <span>{item}</span>)}
-        </div>
-      </div>
-    </section>
-
-    <section
-      class="map-semantic-card map-semantic-card--execution"
-      aria-labelledby="map-semantic-execution"
+    <svg
+      class="routes routes--mobile"
+      viewBox="0 0 1200 1100"
+      role="presentation"
     >
-      <span class="map-semantic-label">{mapNodes.ani.label}</span>
-      <h3 id="map-semantic-execution">{mapNodes.ani.title}</h3>
-      <p>{mapNodes.ani.detail}</p>
-      <div class="map-semantic-agent-list" aria-label={mapNodes.agents.title}>
-        <span
-          ><AgentMark provider="openai" size={18} /><strong
-            >{mapNodes.agents.items[0]}</strong
-          ></span
-        >
-        <span
-          ><AgentMark provider="claude" size={18} /><strong
-            >{mapNodes.agents.items[1]}</strong
-          ></span
-        >
-      </div>
-      <div class="map-semantic-execution-steps">
-        <span
-          ><Icon name="ph:activity" size={18} aria-hidden="true" /><span
-            ><strong>{mapNodes.work.title}</strong><small
-              >{mapNodes.work.detail}</small
-            ></span
-          ></span
-        >
-        <span
-          ><Icon name="ph:seal-check" size={18} aria-hidden="true" /><span
-            ><strong>{mapNodes.record.title}</strong><small
-              >{mapNodes.record.detail}</small
-            ></span
-          ></span
-        >
-      </div>
+      <g class="route route--signal">
+        <path d="M150 314V354M450 314V354M750 314V354M1050 314V354"></path>
+        <path d="M150 354H1050M600 354V429"></path>
+      </g>
+      <path class="route route--scheduled" d="M600 381V429"></path>
+      <path class="route route--authorized" d="M600 518V604"></path>
+      <path
+        class="route route--needs-human"
+        d="M790 635C1014 635 978 475 692 475"></path>
+      <path class="route route--credential" d="M600 664V743"></path>
+      <path class="route route--transport" d="M600 782V860"></path>
+      <path class="route route--verified" d="M600 910V974H1145V354H1050"></path>
+      <path class="route route--archive" d="M600 974V1042"></path>
+      <circle class="route-packet" r="4">
+        <animateMotion
+          dur="18s"
+          repeatCount="indefinite"
+          path="M600 518V604M600 664V743M600 782V860M600 910V974H1145V354H1050"
+        ></animateMotion>
+      </circle>
+    </svg>
+
+    <div class="domain-grid">
+      {
+        domains.map((domain) => {
+          const signals = domain.sources.filter(
+            ({ kind }) => kind === "signal",
+          );
+          const records = domain.sources.filter(
+            ({ kind }) => kind === "record",
+          );
+          return (
+            <section class="domain" title={domain.detail}>
+              <h3>{domain.label}</h3>
+              <div class="source-list source-list--signals">
+                {signals.map((source) => (
+                  <span
+                    class:list={["source-mark", `source-mark--${source.id}`]}
+                    title={source.label}
+                  >
+                    {sourceImages[source.id] ? (
+                      <img
+                        src={sourceImages[source.id]}
+                        alt=""
+                        width="512"
+                        height="512"
+                        loading="eager"
+                      />
+                    ) : (
+                      <Icon
+                        name={sourceIcons[source.id]}
+                        size={28}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>
+                ))}
+              </div>
+              <div class="source-list source-list--records">
+                {records.map((source) => (
+                  <span
+                    class:list={[
+                      "source-mark",
+                      "source-mark--record",
+                      `source-mark--${source.id}`,
+                    ]}
+                    title={source.label}
+                  >
+                    {sourceImages[source.id] ? (
+                      <img
+                        src={sourceImages[source.id]}
+                        alt=""
+                        width="512"
+                        height="512"
+                        loading="eager"
+                      />
+                    ) : (
+                      <Icon
+                        name={sourceIcons[source.id]}
+                        size={30}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>
+                ))}
+              </div>
+            </section>
+          );
+        })
+      }
+    </div>
+
+    <span class="flow-label flow-label--signals">signals</span>
+
+    <div class="calendar" title={foundationById.calendar.detail}>
+      <span class="calendar__line"></span>
+      <span class="system-icon system-icon--calendar">
+        <Icon name="logos:google-calendar" size={31} aria-hidden="true" />
+      </span>
+      <span class="node-copy">
+        <strong>{calendarTitle}</strong>
+        <small>scheduled</small>
+      </span>
+    </div>
+
+    <section class="ani" title={nodeById.ani.detail}>
+      <img src="/brand/ap-mark-blue.svg?v=20260717" alt="" />
+      <strong>ani</strong>
+      <small>human authority</small>
     </section>
 
-    <section class="map-semantic-card" aria-labelledby="map-semantic-paths">
-      <h3 id="map-semantic-paths">{authorityLabel}</h3>
-      <ol class="map-semantic-paths">
-        {
-          relationships.map((relationship) => (
-            <li>
-              <span
-                class:list={[
-                  "legend-line",
-                  `legend-line--${relationship.authority}`,
-                ]}
-              />
-              <span>
-                <strong>
-                  {mapNodes[relationship.source].title}
-                  <span aria-hidden="true"> → </span>
-                  <span class="sr-only">to </span>
-                  {mapNodes[relationship.destination].title}
-                </strong>
-                <small>
-                  {modes[relationship.authority].label}: {relationship.detail}
-                </small>
-              </span>
-            </li>
-          ))
-        }
-      </ol>
-    </section>
+    <span class="flow-label flow-label--authorized">authorized work</span>
+    <span class="flow-label flow-label--needs">needs me</span>
 
-    <section
-      class="map-semantic-card"
-      aria-labelledby="map-semantic-foundation"
-    >
-      <h3 id="map-semantic-foundation">{foundationLabel}</h3>
-      <div class="map-semantic-foundations">
-        {
-          foundations.map((foundation) => (
-            <span>
-              <Icon
-                name={foundationIcons[foundation.id] ?? "ph:circle"}
-                size={18}
-                aria-hidden="true"
-              />
-              <span>
-                <>
-                  <strong>{foundation.title}</strong>
-                  <small>{foundation.detail}</small>
-                </>
-              </span>
-            </span>
-          ))
-        }
+    <div class="agents" title={nodeById.agents.detail}>
+      <div class="agent agent--claude">
+        <span><AgentMark provider="claude" size={33} /></span>
+        <strong>claude</strong>
       </div>
-    </section>
-  </div>
+      <div class="agent agent--codex">
+        <span><AgentMark provider="openai" size={33} /></span>
+        <strong>codex</strong>
+      </div>
+    </div>
 
-  <div class="system-map__authority" aria-label={authorityLabel}>
-    <span class="system-map__authority-label">{authorityLabel}</span>
-    {
-      authorityModes.map((mode) => (
-        <span class="system-map__authority-mode">
-          <i class:list={["legend-line", `legend-line--${mode.id}`]} />
-          <span>
-            <>
-              <strong>{mode.label}</strong>
-              <small>{mode.detail}</small>
-            </>
-          </span>
+    <div class="credential" title={foundationById.one_password.detail}>
+      <span class="system-icon system-icon--one-password">
+        <Icon name="simple-icons:1password" size={28} aria-hidden="true" />
+      </span>
+      <span class="node-copy">
+        <strong>1Password</strong>
+        <small>credentials</small>
+      </span>
+    </div>
+
+    <section class="infrastructure" title={foundationById.tailnet.detail}>
+      <div class="tailnet-label">
+        <Icon name="simple-icons:tailscale" size={21} aria-hidden="true" />
+        <strong>{deviceLabel}</strong>
+      </div>
+      <div class="device device--iphone" title={deviceById.iphone.detail}>
+        <span class="device__icon"
+          ><Icon name="ph:device-mobile" size={28} aria-hidden="true" /></span
+        >
+        <small>iphone</small>
+      </div>
+      <div class="device device--mac-mini" title={deviceById.mac_mini.detail}>
+        <span class="device__icon device__icon--mac-mini">
+          <img
+            src="/brand/sources/mac-mini.png"
+            alt=""
+            width="660"
+            height="660"
+            loading="eager"
+          />
         </span>
-      ))
-    }
+        <span class="node-copy">
+          <strong>{macMiniTitle}</strong>
+          <small>always on</small>
+        </span>
+      </div>
+      <div class="device device--macbook" title={deviceById.macbook.detail}>
+        <span class="device__icon"
+          ><Icon name="ph:laptop" size={32} aria-hidden="true" /></span
+        >
+        <small>macbook</small>
+      </div>
+    </section>
+
+    <div class="persist" title={nodeById.record.detail}>
+      <Icon name="ph:seal-check-fill" size={27} aria-hidden="true" />
+      <strong>verify + persist</strong>
+    </div>
+    <span class="flow-label flow-label--verified">verified update</span>
+
+    <div class="archive" title={foundationById.external_ssd.detail}>
+      <Icon name="ph:hard-drive" size={28} aria-hidden="true" />
+      <span class="node-copy">
+        <strong>{externalSsdTitle}</strong>
+        <small>planned archive</small>
+      </span>
+    </div>
   </div>
+
+  <SystemSemantics
+    id="systems-map-description"
+    {principle}
+    {domains}
+    {nodes}
+    {foundationLabel}
+    {foundations}
+    {deviceLabel}
+    {devices}
+    {authorityLabel}
+    {authorityModes}
+    {relationships}
+  />
 </figure>
 
 <style>
   .system-map {
     display: grid;
-    gap: var(--s-4);
+    gap: var(--s-2);
     margin: 0;
   }
+
   .system-map__caption {
-    display: grid;
-    grid-template-columns: minmax(8rem, 0.35fr) minmax(0, 1fr);
-    align-items: start;
-    gap: var(--s-5);
-  }
-  .system-map__caption strong {
-    justify-self: end;
-    max-width: 56ch;
-    color: var(--ink);
-    font-size: clamp(1.05rem, 2vw, 1.35rem);
-    line-height: 1.35;
-    text-align: right;
-  }
-  .system-map__canvas {
-    padding: clamp(0.35rem, 1.5vw, 0.85rem);
-    border-radius: var(--paper-radius);
-    background: var(--paper-surface);
-    box-shadow: var(--paper-shadow);
-    overflow: hidden;
-  }
-  .system-map__canvas > svg {
     display: block;
-    width: 100%;
-    height: auto;
+  }
+
+  .topology {
+    --line: color-mix(in srgb, var(--paper-muted) 60%, transparent);
+    --line-soft: color-mix(in srgb, var(--paper-muted) 34%, transparent);
+    --blue: #1769e0;
+    --orange: #d96542;
+    position: relative;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 60rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--paper-muted) 24%, transparent);
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--paper-muted) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        color-mix(in srgb, var(--paper-muted) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      color-mix(in srgb, var(--paper-surface) 98%, var(--paper-ink) 2%);
+    background-size: 2rem 2rem;
+    box-shadow: var(--paper-shadow);
     color: var(--paper-ink);
+    container-type: inline-size;
   }
-  .map-loop {
-    stroke-width: 1.5;
-    marker-end: url(#map-loop-arrow);
-  }
-  .map-loop--attention {
-    fill: color-mix(in srgb, var(--paper-accent) 4%, transparent);
-    stroke: color-mix(in srgb, var(--paper-accent) 32%, transparent);
-  }
-  .map-loop--execution {
-    fill: color-mix(in srgb, var(--paper-accent) 6%, transparent);
-    stroke: color-mix(in srgb, var(--paper-accent) 42%, transparent);
-  }
-  :global(#map-loop-arrow path) {
-    fill: var(--paper-accent);
-  }
-  .map-group,
-  .map-node,
-  .map-support {
-    fill: var(--paper-surface-hover);
-    stroke: color-mix(in srgb, var(--paper-muted) 24%, transparent);
-    stroke-width: 1.4;
-  }
-  .map-group {
-    fill: color-mix(
-      in srgb,
-      var(--paper-surface-hover) 82%,
-      var(--paper-accent)
-    );
-  }
-  .map-support {
-    fill: color-mix(
-      in srgb,
-      var(--paper-surface-hover) 92%,
-      var(--paper-accent)
-    );
-  }
-  .map-center {
-    fill: var(--paper-ink);
-  }
-  .map-life,
-  .map-copy,
-  .map-center-copy,
-  .map-support-copy {
+
+  .routes {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     width: 100%;
     height: 100%;
-    color: var(--paper-ink);
-    font-family: var(--sans);
+    pointer-events: none;
   }
-  .map-life {
+
+  .routes--mobile {
+    display: none;
+  }
+
+  .route {
+    fill: none;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .route--signal,
+  .route--transport {
+    stroke: var(--line);
+    stroke-width: 1.4;
+  }
+
+  .route--scheduled {
+    stroke: #2f8f6c;
+    stroke-width: 2;
+    stroke-dasharray: 2 6;
+    stroke-linecap: round;
+  }
+
+  .route--authorized,
+  .route--credential,
+  .route--verified {
+    stroke: var(--blue);
+    stroke-width: 2.5;
+  }
+
+  .route--needs-human {
+    stroke: var(--orange);
+    stroke-width: 2;
+    stroke-dasharray: 3 7;
+    stroke-linecap: round;
+  }
+
+  .route--archive {
+    stroke: var(--line);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 7;
+  }
+
+  .route-packet {
+    fill: var(--blue);
+    opacity: 0.78;
+  }
+
+  .domain-grid {
+    position: absolute;
+    z-index: 2;
+    top: 1.5rem;
+    right: clamp(1rem, 3vw, 2.2rem);
+    left: clamp(1rem, 3vw, 2.2rem);
     display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(0.75rem, 3vw, 2.6rem);
+    height: 11.6rem;
+  }
+
+  .domain {
+    display: grid;
+    grid-template-rows: auto 3.15rem 4.35rem;
+    min-width: 0;
     align-content: start;
-    gap: 0.62rem;
+    text-align: center;
   }
-  .map-domain {
+
+  .domain h3 {
+    margin: 0;
+    font-size: clamp(0.78rem, 1.45vw, 1.02rem);
+    font-weight: 720;
+    line-height: 1;
+  }
+
+  .source-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.28rem, 0.75vw, 0.55rem);
+    min-width: 0;
+  }
+
+  .source-list--signals {
+    align-self: center;
+  }
+
+  .source-list--records {
+    align-self: end;
+    padding-top: 0.78rem;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .source-mark,
+  .system-icon,
+  .device__icon {
     display: grid;
-    gap: 0.18rem;
-    padding: 0.54rem 0.62rem;
-    border-radius: 0.55rem;
-    background: var(--paper-surface);
+    flex: 0 0 auto;
+    place-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #fff;
+    color: #121721;
   }
-  .map-domain strong,
-  .map-copy strong {
-    font-size: 0.93rem;
-    line-height: 1.08;
+
+  .source-mark {
+    width: clamp(1.85rem, 3.2vw, 2.3rem);
+    aspect-ratio: 1;
+    border: 1px solid #d9dee6;
+    border-radius: 0.52rem;
+    box-shadow: 0 1px 3px rgb(9 20 36 / 10%);
   }
-  .map-domain > span:last-child,
-  .map-detail {
+
+  .source-mark--record {
+    width: clamp(2.15rem, 3.7vw, 2.65rem);
+    border-color: color-mix(in srgb, var(--blue) 32%, #d9dee6);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 7%, transparent);
+  }
+
+  .source-mark :global(svg) {
+    width: 70%;
+    height: 70%;
+  }
+
+  .source-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .source-mark--nyu img,
+  .source-mark--files img,
+  .source-mark--notes img {
+    object-fit: contain;
+  }
+
+  .source-mark--apple_books {
+    border-color: #e86f16;
+    background: #f47a20;
+    color: #fff;
+  }
+
+  .source-mark--imessage {
+    color: #22a947;
+  }
+
+  .source-mark--apple_health {
+    color: #ff375f;
+  }
+
+  .source-mark--physical_measurement {
+    color: #4f6578;
+  }
+
+  .source-mark--real_life,
+  .source-mark--people {
+    color: #263240;
+  }
+
+  .calendar,
+  .credential,
+  .archive,
+  .persist,
+  .ani,
+  .agents,
+  .infrastructure,
+  .flow-label {
+    position: absolute;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+  }
+
+  .calendar,
+  .credential,
+  .archive {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: color-mix(in srgb, var(--paper-surface) 94%, transparent);
+  }
+
+  .calendar {
+    top: 28.7%;
+    left: 50%;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .calendar__line {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: min(44vw, 27rem);
+    height: 1px;
+    background: var(--line-soft);
+    transform: translate(-50%, -50%);
+  }
+
+  .system-icon {
+    width: 2.45rem;
+    aspect-ratio: 1;
+    border: 1px solid #d9dee6;
+    border-radius: 0.52rem;
+  }
+
+  .node-copy {
+    display: grid;
+    gap: 0.12rem;
+    min-width: 0;
+  }
+
+  .node-copy strong,
+  .node-copy small {
+    white-space: nowrap;
+  }
+
+  .node-copy strong {
+    font-size: 0.76rem;
+    font-weight: 680;
+    line-height: 1;
+  }
+
+  .node-copy small {
     color: var(--paper-muted);
-    font-size: 0.68rem;
-    line-height: 1.3;
+    font-size: 0.6rem;
+    line-height: 1;
   }
-  .map-identity,
-  .map-agent {
+
+  .ani {
+    top: 38%;
+    left: 50%;
+    display: grid;
+    place-content: center;
+    width: clamp(5.8rem, 10vw, 7rem);
+    aspect-ratio: 1;
+    border: 1.5px solid var(--blue);
+    border-radius: 50%;
+    background: var(--paper-surface);
+    box-shadow: 0 0.55rem 1.4rem
+      color-mix(in srgb, var(--blue) 13%, transparent);
+    text-align: center;
+  }
+
+  .ani img {
+    width: 72%;
+    height: 2.9rem;
+    margin: -0.28rem auto -0.14rem;
+    object-fit: contain;
+    transform: scale(1.35);
+  }
+
+  .ani strong {
+    font-size: 0.78rem;
+    line-height: 1;
+  }
+
+  .ani small {
+    margin-top: 0.28rem;
+    color: var(--paper-muted);
+    font-size: 0.56rem;
+    font-weight: 620;
+    line-height: 1;
+  }
+
+  .agents {
+    top: 54.7%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(5.8rem, 19vw, 12rem);
+    width: min(70%, 38rem);
+  }
+
+  .agents::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 1.45rem;
+    left: 15%;
+    width: 70%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .agent {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+  }
+
+  .agent > span {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: #fff;
+    box-shadow: 0 0 0 0.32rem var(--paper-surface);
+  }
+
+  .agent--claude > span {
+    background: var(--orange);
+  }
+
+  .agent--codex > span {
+    background: var(--blue);
+  }
+
+  .agent strong {
+    padding: 0.12rem 0.3rem;
+    background: var(--paper-surface);
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+
+  .credential {
+    top: 65.2%;
+    left: 50%;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .system-icon--one-password {
+    border-color: #c7ddf7;
+    color: #0572ec;
+  }
+
+  .infrastructure {
+    top: 77.5%;
+    left: 50%;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    align-items: center;
+    width: min(68%, 37rem);
+    min-width: 24rem;
+  }
+
+  .infrastructure::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    right: 10%;
+    left: 10%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .tailnet-label {
+    position: absolute;
+    bottom: calc(100% + 0.55rem);
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.2rem 0.35rem;
+    background: var(--paper-surface);
+    color: var(--paper-muted);
+    transform: translateX(-50%);
+  }
+
+  .tailnet-label strong {
+    font-size: 0.65rem;
+    font-weight: 720;
+    line-height: 1;
+    text-transform: lowercase;
+  }
+
+  .device {
+    display: grid;
+    justify-items: center;
+    gap: 0.24rem;
+    min-width: 0;
+  }
+
+  .device__icon {
+    width: 2.7rem;
+    aspect-ratio: 1;
+    border: 1px solid #d9dee6;
+    border-radius: 0.52rem;
+  }
+
+  .device__icon--mac-mini {
+    width: 3.7rem;
+  }
+
+  .device__icon--mac-mini img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .device small {
+    padding: 0.1rem 0.25rem;
+    background: var(--paper-surface);
+    color: var(--paper-muted);
+    font-size: 0.58rem;
+    font-weight: 620;
+    line-height: 1;
+  }
+
+  .device--mac-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+  }
+
+  .persist {
+    top: 87.6%;
+    left: 50%;
     display: flex;
     align-items: center;
     gap: 0.42rem;
-    min-width: 0;
-  }
-  :global(.map-icon) {
-    flex: 0 0 auto;
-    width: 17px;
-    height: 17px;
-    color: var(--paper-accent);
-  }
-  .map-copy {
-    display: grid;
-    align-content: start;
-    gap: 0.4rem;
-  }
-  .map-kicker,
-  .map-semantic-label,
-  .system-map__authority-label {
-    color: var(--paper-muted);
-    font-family: var(--sans);
-    font-size: 0.62rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .map-node-items,
-  .map-semantic-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.28rem;
-  }
-  .map-node-items span,
-  .map-semantic-pills span {
-    padding: 0.2rem 0.42rem;
-    border-radius: 99px;
-    background: color-mix(in srgb, var(--paper-accent) 10%, transparent);
-    color: var(--paper-muted);
-    font-size: 0.61rem;
-    font-weight: 650;
-    line-height: 1.2;
-  }
-  .map-center-copy {
-    display: grid;
-    place-content: center;
-    gap: 0.08rem;
-    color: var(--interactive-ink);
-    text-align: center;
-  }
-  :global(.map-center-icon) {
-    width: 19px;
-    height: 19px;
-    margin: 0 auto 0.12rem;
-  }
-  .map-center-copy strong {
-    font-size: 0.82rem;
-    line-height: 1;
-  }
-  .map-center-copy span {
-    margin-top: 0.2rem;
-    font-size: 0.55rem;
-    opacity: 0.78;
-  }
-  .map-agent-list {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .map-agent strong {
-    font-size: 0.78rem;
-  }
-  :global(.map-agent-icon) {
-    width: 18px;
-    height: 18px;
-  }
-  :global(.map-agent-icon--openai) {
-    color: var(--paper-ink);
-  }
-  :global(.map-agent-icon--claude) {
-    color: #d97757;
-  }
-  .map-support-copy {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: center;
-    gap: 1rem;
-  }
-  .map-support-copy > span {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-  .map-support-copy > span > span {
-    display: grid;
-    gap: 0.08rem;
-  }
-  .map-support-copy strong {
-    font-size: 0.76rem;
-    line-height: 1.1;
-  }
-  .map-support-copy small {
-    color: var(--paper-muted);
-    font-size: 0.68rem;
-    line-height: 1.2;
-  }
-  .map-loop-headings,
-  .map-foundation-heading,
-  .map-edge-labels {
-    fill: var(--paper-muted);
-    font-family: var(--sans);
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .map-loop-headings {
-    font-size: 12px;
-    letter-spacing: 0.09em;
-  }
-  .map-foundation-heading {
-    font-size: 10px;
-    letter-spacing: 0.06em;
-  }
-  .map-edge-labels {
-    font-size: 10.5px;
-    letter-spacing: 0.025em;
-  }
-  .map-edge,
-  .map-current {
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .map-edge {
-    marker-end: url(#map-arrow);
-    stroke: color-mix(in srgb, var(--paper-muted) 68%, transparent);
-    stroke-width: 1.8;
-  }
-  .map-edge--with_me {
-    stroke-dasharray: 2 7;
-  }
-  .map-edge--mixed {
-    stroke-dasharray: 12 5 2 5;
-  }
-  :global(#map-arrow path) {
-    fill: var(--paper-muted);
-  }
-  .map-current {
-    stroke: var(--paper-accent);
-    stroke-width: 3.6;
-  }
-  .map-current--attention {
-    stroke-dasharray: 44 3260;
-    animation: attention-current 13s linear infinite;
-  }
-  .map-current--execution {
-    stroke-dasharray: 36 2100;
-    animation: execution-current 9.5s linear infinite;
+    padding: 0.24rem 0.48rem;
+    background: var(--paper-surface);
+    color: var(--blue);
   }
 
-  .system-map__semantic {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-  .system-map__authority {
-    display: grid;
-    grid-template-columns: auto repeat(3, minmax(0, 1fr));
-    align-items: center;
-    gap: var(--s-4);
-    padding: var(--s-3) var(--s-4);
-    border-radius: var(--paper-radius);
-    background: color-mix(in srgb, var(--paper-surface) 88%, transparent);
+  .persist strong {
     color: var(--paper-ink);
+    font-size: 0.72rem;
+    font-weight: 680;
+    line-height: 1;
   }
-  .system-map__authority-mode {
-    display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    align-items: center;
-    gap: var(--s-2);
+
+  .archive {
+    top: 95.1%;
+    left: 50%;
+    padding: 0.22rem 0.48rem;
   }
-  .system-map__authority-mode > span {
-    display: grid;
-    gap: 0.1rem;
-  }
-  .system-map__authority-mode strong {
-    font-size: 0.75rem;
-    line-height: 1.1;
-  }
-  .system-map__authority-mode small {
+
+  .flow-label {
+    padding: 0.13rem 0.3rem;
+    background: var(--paper-surface);
     color: var(--paper-muted);
-    font-size: 0.64rem;
-    line-height: 1.25;
+    font-size: clamp(0.55rem, 0.85vw, 0.67rem);
+    font-weight: 680;
+    line-height: 1;
+    white-space: nowrap;
   }
-  .legend-line {
-    width: 2rem;
-    border-top: 2px solid var(--paper-muted);
+
+  .flow-label--signals {
+    top: 25.5%;
+    left: 20%;
   }
-  .legend-line--with_me {
-    border-top-style: dotted;
+
+  .flow-label--authorized {
+    top: 47%;
+    left: 52.5%;
+    color: var(--blue);
   }
-  .legend-line--mixed {
-    border-top: 0;
-    height: 2px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--paper-muted) 0 0.65rem,
-      transparent 0.65rem 0.9rem,
-      var(--paper-muted) 0.9rem 1rem,
-      transparent 1rem 1.25rem
-    );
+
+  .flow-label--needs {
+    top: 48.8%;
+    left: 76%;
+    color: var(--orange);
   }
+
+  .flow-label--verified {
+    top: 87.6%;
+    left: 82%;
+    color: var(--blue);
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;
@@ -799,193 +848,141 @@ const paths = Object.fromEntries(
     white-space: nowrap;
     border: 0;
   }
-  @keyframes attention-current {
-    to {
-      stroke-dashoffset: -3304;
-    }
-  }
-  @keyframes execution-current {
-    to {
-      stroke-dashoffset: -2136;
-    }
-  }
-
-  @media (max-width: 960px) {
-    .system-map__caption {
-      grid-template-columns: 1fr;
-      gap: var(--s-2);
-    }
-    .system-map__caption strong {
-      justify-self: start;
-      text-align: left;
-    }
-    .system-map__canvas {
-      display: none;
-    }
-    .system-map__semantic {
-      position: static;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s-3);
-      width: auto;
-      height: auto;
-      padding: 0;
-      margin: 0;
-      overflow: visible;
-      clip: auto;
-      white-space: normal;
-    }
-    .map-semantic-card {
-      display: grid;
-      align-content: start;
-      gap: var(--s-3);
-      margin: 0;
-      padding: var(--s-4);
-      border-radius: var(--paper-radius);
-      background: var(--paper-surface);
-      color: var(--paper-ink);
-      box-shadow: var(--paper-shadow);
-    }
-    .map-semantic-card--execution,
-    .map-semantic-card:nth-child(4),
-    .map-semantic-card:nth-child(5) {
-      grid-column: 1 / -1;
-    }
-    .map-semantic-card--execution {
-      background:
-        linear-gradient(
-          145deg,
-          color-mix(in srgb, var(--paper-accent) 10%, transparent),
-          transparent 48%
-        ),
-        var(--paper-surface);
-    }
-    .map-semantic-card h3 {
-      font-size: 1.15rem;
-      line-height: 1.05;
-    }
-    .map-semantic-card p {
-      margin: 0;
-      color: var(--paper-muted);
-      line-height: 1.45;
-    }
-    .map-semantic-domains,
-    .map-semantic-foundations,
-    .map-semantic-execution-steps {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s-2);
-    }
-    .map-semantic-domains > span,
-    .map-semantic-foundations > span,
-    .map-semantic-execution-steps > span {
-      display: grid;
-      grid-template-columns: 1.25rem minmax(0, 1fr);
-      align-items: start;
-      gap: 0.18rem var(--s-2);
-      padding: var(--s-3);
-      border-radius: 0.6rem;
-      background: var(--paper-surface-hover);
-    }
-    .map-semantic-domains :global(svg),
-    .map-semantic-foundations :global(svg),
-    .map-semantic-execution-steps :global(svg) {
-      width: 18px;
-      height: 18px;
-      color: var(--paper-accent);
-    }
-    .map-semantic-domains small {
-      grid-column: 2;
-      color: var(--paper-muted);
-      line-height: 1.35;
-    }
-    .map-semantic-foundations > span > span,
-    .map-semantic-execution-steps > span > span {
-      display: grid;
-      gap: 0.1rem;
-    }
-    .map-semantic-foundations small,
-    .map-semantic-execution-steps small {
-      color: var(--paper-muted);
-      line-height: 1.3;
-    }
-    .map-semantic-pills span {
-      font-size: 0.7rem;
-    }
-    .map-semantic-subnode {
-      display: grid;
-      gap: var(--s-2);
-      margin-top: var(--s-2);
-      padding-top: var(--s-3);
-      border-top: 1px solid
-        color-mix(in srgb, var(--paper-muted) 20%, transparent);
-    }
-    .map-semantic-agent-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-3);
-    }
-    .map-semantic-agent-list > span {
-      display: flex;
-      align-items: center;
-      gap: var(--s-2);
-      padding: var(--s-2) var(--s-3);
-      border-radius: 999px;
-      background: var(--paper-surface-hover);
-    }
-    .map-semantic-execution-steps {
-      margin-top: var(--s-1);
-    }
-    .map-semantic-paths {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s-3);
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .map-semantic-paths li {
-      display: grid;
-      grid-template-columns: 2rem minmax(0, 1fr);
-      align-items: start;
-      gap: var(--s-2);
-    }
-    .map-semantic-paths li > span:last-child {
-      display: grid;
-      gap: 0.15rem;
-    }
-    .map-semantic-paths small {
-      color: var(--paper-muted);
-      line-height: 1.35;
-    }
-    .map-semantic-paths .legend-line {
-      margin-top: 0.55rem;
-    }
-    .system-map__authority {
-      display: none;
-    }
-  }
 
   @media (max-width: 620px) {
-    .system-map__semantic,
-    .map-semantic-domains,
-    .map-semantic-foundations,
-    .map-semantic-execution-steps,
-    .map-semantic-paths {
-      grid-template-columns: 1fr;
+    .topology {
+      min-height: 68.75rem;
+      background-size: 1.45rem 1.45rem;
     }
-    .map-semantic-card--execution,
-    .map-semantic-card:nth-child(4),
-    .map-semantic-card:nth-child(5) {
-      grid-column: auto;
+
+    .routes--desktop {
+      display: none;
+    }
+
+    .routes--mobile {
+      display: block;
+    }
+
+    .domain-grid {
+      top: 1.1rem;
+      right: 0.6rem;
+      left: 0.6rem;
+      gap: 0.22rem;
+      height: 18rem;
+    }
+
+    .domain {
+      grid-template-rows: auto 7rem 6rem;
+    }
+
+    .domain h3 {
+      overflow: hidden;
+      font-size: clamp(0.55rem, 2.75vw, 0.72rem);
+      text-overflow: clip;
+    }
+
+    .source-list {
+      flex-direction: column;
+      gap: 0.28rem;
+    }
+
+    .source-list--records {
+      align-self: stretch;
+      justify-content: flex-start;
+      padding-top: 0.58rem;
+    }
+
+    .source-mark {
+      width: 1.75rem;
+      border-radius: 0.42rem;
+    }
+
+    .source-mark--record {
+      width: 2rem;
+    }
+
+    .calendar {
+      top: 35.8%;
+    }
+
+    .calendar__line {
+      width: 64vw;
+    }
+
+    .ani {
+      top: 43.2%;
+      width: 5.7rem;
+    }
+
+    .agents {
+      top: 57.8%;
+      gap: min(25vw, 6rem);
+      width: 76%;
+    }
+
+    .credential {
+      top: 67.9%;
+    }
+
+    .infrastructure {
+      top: 79.2%;
+      width: 84%;
+      min-width: 0;
+    }
+
+    .device--mac-mini {
+      display: grid;
+      gap: 0.24rem;
+    }
+
+    .device--mac-mini .node-copy {
+      justify-items: center;
+    }
+
+    .device__icon {
+      width: 2.45rem;
+    }
+
+    .device__icon--mac-mini {
+      width: 3.15rem;
+    }
+
+    .persist {
+      top: 88.8%;
+    }
+
+    .archive {
+      top: 95.7%;
+    }
+
+    .flow-label--signals {
+      top: 32.1%;
+      left: 18%;
+    }
+
+    .flow-label--authorized {
+      top: 51.8%;
+      left: 56%;
+    }
+
+    .flow-label--needs {
+      top: 53.5%;
+      left: 79%;
+    }
+
+    .flow-label--verified {
+      top: 85.8%;
+      left: 50%;
+    }
+
+    .node-copy strong {
+      font-size: 0.7rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .map-current {
-      animation: none;
-      stroke-dasharray: 18 14;
-      opacity: 0.45;
+    .route-packet {
+      display: none;
     }
   }
 </style>

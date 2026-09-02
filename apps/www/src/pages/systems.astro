@@ -1,7 +1,6 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import SystemMap from "../components/SystemMap.astro";
-import { Icon } from "astro-icon/components";
 import {
   DEFAULT_SYSTEMS_CONTENT,
   normalizeSystemsPageContent,
@@ -26,70 +25,21 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
       nodes={content.map_nodes}
       foundationLabel={content.map_foundation_label}
       foundations={content.map_foundations}
+      deviceLabel={content.map_device_label}
+      devices={content.map_devices}
       authorityLabel={content.map_authority_label}
       authorityModes={content.map_authority_modes}
       relationships={content.map_relationships}
     />
   </section>
-
-  <section data-rise class="stack">
-    <h2 class="section-label">{content.principles_label}</h2>
-    <div class="capability-grid">
-      {
-        content.principles.map((principle) => (
-          <article class="capability-card">
-            <span class="capability-card__label">{principle.label}</span>
-            <h3>{principle.title}</h3>
-            <p>{principle.detail}</p>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-
-  <section data-rise class="resources">
-    <div class="resource-stack">
-      <h2 class="section-label">{content.writing_label}</h2>
-      <a class="feature feature--writing" href={content.featured_writing.href}>
-        <strong>{content.featured_writing.title}</strong>
-        <span>{content.featured_writing.detail}</span>
-        <Icon name="ph:arrow-bend-right-up" aria-hidden="true" />
-      </a>
-    </div>
-
-    <div class="resource-stack">
-      <h2 class="section-label">{content.tools_label}</h2>
-      <div class="tool-grid">
-        {
-          content.public_tools.map((tool) => (
-            <a
-              class="feature"
-              href={tool.href}
-              target={tool.href.startsWith("/") ? undefined : "_blank"}
-              rel={
-                tool.href.startsWith("/") ? undefined : "noopener noreferrer"
-              }
-            >
-              <strong>{tool.title}</strong>
-              {!tool.href.startsWith("/") && (
-                <span class="sr-only">opens in a new tab</span>
-              )}
-              <span>{tool.detail}</span>
-              <Icon name="ph:arrow-bend-right-up" aria-hidden="true" />
-            </a>
-          ))
-        }
-      </div>
-    </div>
-  </section>
 </Shell>
 
 <style>
-  .stack,
-  .resource-stack,
-  .feature {
+  .stack {
     display: grid;
+    gap: var(--s-4);
   }
+
   .hero-title {
     margin-bottom: var(--s-4);
     font-size: clamp(3rem, 12vw, 7rem);
@@ -102,188 +52,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     line-height: 1.52;
     text-wrap: pretty;
   }
-  .stack {
-    gap: var(--s-4);
-  }
-
-  .capability-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--s-3);
-  }
-
-  .capability-card {
-    position: relative;
-    display: grid;
-    grid-column: span 2;
-    align-content: start;
-    gap: var(--s-3);
-    min-height: 13rem;
-    margin: 0;
-    padding: var(--s-5);
-    border-radius: var(--paper-radius);
-    overflow: hidden;
-    background: var(--paper-surface);
-    color: var(--paper-ink);
-    box-shadow: var(--paper-shadow);
-  }
-
-  .capability-card:nth-child(4),
-  .capability-card:nth-child(5) {
-    grid-column: span 3;
-  }
-
-  .capability-card::after {
-    content: "";
-    position: absolute;
-    inset: auto -10% -32% 28%;
-    height: 55%;
-    border-radius: 55% 45% 0 0;
-    background: color-mix(in srgb, var(--paper-accent) 12%, transparent);
-    pointer-events: none;
-  }
-
-  .capability-card:nth-child(2)::after {
-    inset: auto 22% -35% -8%;
-    border-radius: 45% 55% 0 0;
-  }
-
-  .capability-card:nth-child(3)::after {
-    inset: auto -18% -38% 8%;
-    height: 62%;
-  }
-
-  .capability-card:nth-child(4)::after {
-    inset: auto 5% -42% 35%;
-  }
-
-  .capability-card:nth-child(5)::after {
-    inset: auto 38% -40% -10%;
-  }
-
-  .capability-card__label {
-    position: relative;
-    z-index: 1;
-    color: var(--paper-accent);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .capability-card h3 {
-    position: relative;
-    z-index: 1;
-    max-width: 15ch;
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
-    line-height: 1.05;
-  }
-
-  .capability-card p {
-    position: relative;
-    z-index: 1;
-    max-width: 34ch;
-    margin: 0;
-    color: var(--paper-muted);
-    line-height: 1.5;
-  }
-
-  .resources {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
-    gap: var(--s-4);
-  }
-
-  .resource-stack {
-    gap: var(--s-4);
-  }
-
-  .tool-grid {
-    display: grid;
-    gap: var(--s-3);
-  }
-
-  .feature {
-    position: relative;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--s-2);
-    padding: var(--s-4);
-    border-radius: var(--paper-radius);
-    background: var(--paper-surface);
-    color: var(--paper-ink);
-    box-shadow: var(--paper-shadow);
-  }
-  .feature {
-    margin: 0;
-  }
-  .feature span {
-    grid-column: 1;
-    color: var(--paper-muted);
-    line-height: 1.55;
-  }
-  .feature {
-    text-decoration: none;
-    transition:
-      background 0.18s ease,
-      color 0.18s ease,
-      transform 0.18s ease;
-  }
-
-  .feature :global(svg) {
-    color: var(--paper-muted);
-    transition: color 0.18s ease;
-  }
-
-  .feature:hover,
-  .feature:focus-visible {
-    background: var(--paper-surface-hover);
-    transform: translateY(-2px);
-  }
-
-  .feature:hover :global(svg),
-  .feature:focus-visible :global(svg) {
-    color: var(--paper-accent);
-  }
-
-  .feature--writing {
-    min-height: 100%;
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  @media (max-width: 960px) {
-    .capability-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .capability-card,
-    .capability-card:nth-child(4),
-    .capability-card:nth-child(5) {
-      grid-column: auto;
-      min-height: 12rem;
-    }
-
-    .capability-card:last-child {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (max-width: 980px) {
-    .resources {
-      grid-template-columns: 1fr;
-    }
-  }
 
   @media (max-width: 620px) {
     .hero-title {
@@ -292,28 +60,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 
     .hero-summary {
       font-size: 1.05rem;
-    }
-
-    .capability-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .capability-card,
-    .capability-card:nth-child(4),
-    .capability-card:nth-child(5) {
-      grid-column: auto;
-      min-height: 11rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .feature {
-      transition: none;
-    }
-
-    .feature:hover,
-    .feature:focus-visible {
-      transform: none;
     }
   }
 </style>
