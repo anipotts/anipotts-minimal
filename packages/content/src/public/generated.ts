@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "f6995507a8cb5eb672c85dba3a8db18b8e57d3194e2dc39e1331defc21507278";
+  "90cc4d523a9faffecc02dbd3f24bb27235a34269812d99929a3f85038127d6f3";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -255,10 +255,574 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
 export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
   title: "systems",
   description:
-    "a system design map of how signals move through my life, devices, agents, authority gates, and records.",
+    "how i use coding agents in my life: requests, context, execution, decisions, and verified outcomes.",
   hero_title: "systems",
-  hero_summary:
-    "how signals move through my life, devices, agents, authority gates, and records.",
+  hero_summary: "how i use coding agents in my life.",
+  lifecycle: {
+    status: "intended system",
+    domains: ["career", "learning", "wellbeing", "personal"],
+    workers: [
+      {
+        id: "claude",
+        label: "Claude Code",
+        mark: "claude",
+      },
+      {
+        id: "codex",
+        label: "Codex",
+        mark: "openai",
+      },
+    ],
+    copy: {
+      caption: "requests → outcomes → learning",
+      context_hint: "retrieve, check, then ask",
+      human_hint:
+        "unresolved questions pause here. an answer resumes the requesting stage.",
+      more_sources: "more sources",
+      transport: "Tailnet",
+      feedback_hint: "a separate task",
+      walkthrough_label: "walk through an example",
+      back: "back",
+      next: "next",
+      reset: "reset",
+    },
+    principle:
+      "requests become verified outcomes. decisions return to me. each outcome informs the next task.",
+    execution_label: "agent execution",
+    completion_rule:
+      "A task is complete when nothing remains within its agreed scope, the outcome is verified, and an accurate record is saved. Execution receipts stay on the Mac mini; changes return to the record that owns them.",
+    pause_rule:
+      "Missing information is retrieved before asking Ani. Stale or conflicting facts, required decisions, and unavailable information return to Ani. A paused task remains open. Recoverable failures retry while a useful recovery path exists; external waits resume on a relevant response or event.",
+    stages: [
+      {
+        id: "request",
+        label: "request or trigger",
+        detail: "a request, watch, event, or schedule",
+        kind: "stage",
+      },
+      {
+        id: "understand",
+        label: "understand",
+        detail: "objective, scope, and what done means",
+        kind: "stage",
+      },
+      {
+        id: "gather",
+        label: "gather context",
+        detail: "retrieve relevant facts and access",
+        kind: "stage",
+      },
+      {
+        id: "act",
+        label: "act",
+        detail: "take the next authorized action",
+        kind: "stage",
+      },
+      {
+        id: "verify",
+        label: "verify",
+        detail: "check the outcome and remaining work",
+        kind: "stage",
+      },
+      {
+        id: "complete",
+        label: "record + complete",
+        detail: "save what happened, then close the task",
+        kind: "stage",
+      },
+    ],
+    support: [
+      {
+        id: "context",
+        label: "personal context",
+        detail:
+          "Retrieve task-relevant preferences, records, and documents. Check freshness and contradictions before using them. Ask Ani only when the needed information or decision remains unresolved.",
+        kind: "context",
+        mark: "ph:stack",
+      },
+      {
+        id: "records",
+        label: "personal records",
+        detail:
+          "Gmail, Calendar, GitHub, Messages, Files, and Notes hold their respective facts. Verified changes return to the owning record.",
+        kind: "records",
+      },
+      {
+        id: "credentials",
+        label: "credential access",
+        detail:
+          "1Password supplies access for an authorized action. Secret values stay out of model-visible context; access does not grant authority.",
+        kind: "credential",
+      },
+      {
+        id: "ani",
+        label: "ani",
+        detail: "direction + decisions",
+        kind: "human",
+        mark: "ap",
+      },
+      {
+        id: "runtime",
+        label: "runtime + transport",
+        detail:
+          "The always-on Mac mini runs agents and keeps local execution receipts. Tailnet connects it to iPhone and MacBook. Ani is outside the device topology.",
+        kind: "runtime",
+        mark: "simple-icons:tailscale",
+      },
+      {
+        id: "archive",
+        label: "external SSD",
+        detail: "planned archive",
+        kind: "archive",
+        mark: "ph:hard-drive",
+      },
+      {
+        id: "feedback",
+        label: "follow-up",
+        detail:
+          "A separate task asks how the outcome worked out and saves feedback for future decisions.",
+        kind: "feedback",
+        mark: "ph:arrow-counter-clockwise",
+      },
+    ],
+    sources: [
+      {
+        id: "gmail",
+        label: "Gmail",
+        group: "records",
+        mark: "logos:google-gmail",
+      },
+      {
+        id: "calendar",
+        label: "Calendar",
+        group: "records",
+        mark: "logos:google-calendar",
+      },
+      {
+        id: "github",
+        label: "GitHub",
+        group: "records",
+        mark: "simple-icons:github",
+      },
+      {
+        id: "messages",
+        label: "Messages",
+        group: "records",
+        mark: "simple-icons:imessage",
+      },
+      {
+        id: "files",
+        label: "Files",
+        group: "records",
+        mark: "files",
+      },
+      {
+        id: "notes",
+        label: "Notes",
+        group: "records",
+        mark: "notes",
+      },
+      {
+        id: "1password",
+        label: "1Password",
+        group: "credentials",
+        mark: "simple-icons:1password",
+      },
+      {
+        id: "linkedin",
+        label: "LinkedIn",
+        group: "more",
+        mark: "logos:linkedin-icon",
+      },
+      {
+        id: "x",
+        label: "X",
+        group: "more",
+        mark: "simple-icons:x",
+      },
+      {
+        id: "instagram",
+        label: "Instagram",
+        group: "more",
+        mark: "logos:instagram-icon",
+      },
+      {
+        id: "chrome",
+        label: "Chrome",
+        group: "more",
+        mark: "logos:chrome",
+      },
+      {
+        id: "books",
+        label: "Books",
+        group: "more",
+        mark: "books",
+      },
+      {
+        id: "nyu",
+        label: "NYU",
+        group: "more",
+        mark: "nyu",
+      },
+      {
+        id: "withings",
+        label: "Withings",
+        group: "more",
+        mark: "withings",
+      },
+      {
+        id: "zocdoc",
+        label: "Zocdoc",
+        group: "more",
+        mark: "zocdoc",
+      },
+      {
+        id: "health",
+        label: "Health",
+        group: "more",
+        mark: "apple-health",
+      },
+    ],
+    devices: [
+      {
+        id: "iphone",
+        label: "iPhone",
+        detail: "mobile access",
+        mark: "ph:device-mobile",
+      },
+      {
+        id: "macmini",
+        label: "Mac mini",
+        detail: "always on / local receipts",
+        mark: "mac-mini",
+      },
+      {
+        id: "macbook",
+        label: "MacBook",
+        detail: "desktop access",
+        mark: "ph:laptop",
+      },
+    ],
+    edges: [
+      {
+        id: "start",
+        source: "request",
+        destination: "understand",
+        label: "",
+        detail: "A direct request or configured trigger starts a task.",
+        kind: "flow",
+        route: "direct",
+      },
+      {
+        id: "scope",
+        source: "understand",
+        destination: "gather",
+        label: "",
+        detail: "The objective determines which context is relevant.",
+        kind: "flow",
+        route: "direct",
+      },
+      {
+        id: "ready",
+        source: "gather",
+        destination: "act",
+        label: "",
+        detail: "Current context and sufficient authority enable action.",
+        kind: "flow",
+        route: "direct",
+      },
+      {
+        id: "check",
+        source: "act",
+        destination: "verify",
+        label: "",
+        detail: "Inspect the actual outcome of the action.",
+        kind: "flow",
+        route: "direct",
+      },
+      {
+        id: "finish",
+        source: "verify",
+        destination: "complete",
+        label: "scope satisfied",
+        detail:
+          "Only verified work with no remaining scope proceeds to persistence.",
+        kind: "persist",
+        route: "direct",
+      },
+      {
+        id: "lookup",
+        source: "gather",
+        destination: "context",
+        label: "retrieve",
+        detail: "Retrieve missing facts before interrupting Ani.",
+        kind: "context",
+        route: "support",
+      },
+      {
+        id: "context_back",
+        source: "context",
+        destination: "gather",
+        label: "current context",
+        detail:
+          "Return relevant facts with provenance; identify contradictions.",
+        kind: "context",
+        route: "support",
+      },
+      {
+        id: "read_records",
+        source: "records",
+        destination: "context",
+        label: "",
+        detail: "Consult the records that own the relevant facts.",
+        kind: "context",
+        route: "support",
+      },
+      {
+        id: "access",
+        source: "credentials",
+        destination: "context",
+        label: "access",
+        detail: "Request credentials through the secure access mechanism.",
+        kind: "credential",
+        route: "support",
+      },
+      {
+        id: "more_work",
+        source: "verify",
+        destination: "act",
+        label: "more work",
+        detail:
+          "Continue useful execution when verification finds work remains.",
+        kind: "retry",
+        route: "right",
+      },
+      {
+        id: "missing_context",
+        source: "act",
+        destination: "gather",
+        label: "missing context",
+        detail:
+          "Return to context gathering when execution needs additional facts.",
+        kind: "context",
+        route: "left",
+      },
+      {
+        id: "needs_me",
+        source: "context",
+        destination: "ani",
+        label: "needs me",
+        detail:
+          "Unresolved information, conflicting facts, choices, or missing authority require Ani.",
+        kind: "human",
+        route: "support",
+      },
+      {
+        id: "decision",
+        source: "act",
+        destination: "ani",
+        label: "needs me",
+        detail: "Request a choice or permission at the point it is needed.",
+        kind: "human",
+        route: "right",
+      },
+      {
+        id: "answer",
+        source: "ani",
+        destination: "act",
+        label: "answer or decision",
+        detail:
+          "Resume the requesting stage with Ani's decision. For an information question, retrieve context again.",
+        kind: "human",
+        route: "right",
+      },
+      {
+        id: "answer_context",
+        source: "ani",
+        destination: "gather",
+        label: "new information",
+        detail: "An answer about missing context returns to context gathering.",
+        kind: "human",
+        route: "support",
+      },
+      {
+        id: "new_goal",
+        source: "ani",
+        destination: "understand",
+        label: "changed objective",
+        detail: "A changed goal is understood before execution resumes.",
+        kind: "human",
+        route: "right",
+      },
+      {
+        id: "ani_start",
+        source: "ani",
+        destination: "request",
+        label: "request",
+        detail: "Ani can initiate work directly.",
+        kind: "human",
+        route: "outer",
+      },
+      {
+        id: "record_failed",
+        source: "complete",
+        destination: "complete",
+        label: "record failed",
+        detail: "Retry persistence without closing the task.",
+        kind: "retry",
+        route: "self",
+      },
+      {
+        id: "record_blocked",
+        source: "complete",
+        destination: "ani",
+        label: "needs me / answer",
+        detail:
+          "An unresolved persistence failure leaves the task paused and returns to Ani.",
+        kind: "human",
+        route: "outer",
+      },
+      {
+        id: "answer_record",
+        source: "ani",
+        destination: "complete",
+        label: "resume recording",
+        detail:
+          "An answer that resolves a persistence failure resumes recording. The task closes only after persistence succeeds.",
+        kind: "human",
+        route: "right",
+      },
+      {
+        id: "persist",
+        source: "complete",
+        destination: "records",
+        label: "save outcome",
+        detail: "Write changes to their owning records and retain provenance.",
+        kind: "persist",
+        route: "left",
+      },
+      {
+        id: "runtime_access",
+        source: "runtime",
+        destination: "act",
+        label: "runtime",
+        detail:
+          "Devices and Tailnet support execution; credentials do not grant authority.",
+        kind: "transport",
+        route: "support",
+      },
+      {
+        id: "receipts",
+        source: "complete",
+        destination: "runtime",
+        label: "local receipts",
+        detail: "Keep execution receipts on the Mac mini.",
+        kind: "persist",
+        route: "support",
+      },
+      {
+        id: "archive_copy",
+        source: "complete",
+        destination: "archive",
+        label: "planned",
+        detail: "The planned external SSD branches from persistence.",
+        kind: "archive",
+        route: "support",
+      },
+      {
+        id: "followup",
+        source: "complete",
+        destination: "feedback",
+        label: "later",
+        detail: "Completion may schedule a separate follow-up task.",
+        kind: "feedback",
+        route: "support",
+      },
+      {
+        id: "followup_due",
+        source: "feedback",
+        destination: "request",
+        label: "follow-up due",
+        detail:
+          "The due event starts a new task; it does not reopen a completed booking.",
+        kind: "feedback",
+        route: "outer",
+      },
+      {
+        id: "learn",
+        source: "feedback",
+        destination: "context",
+        label: "feedback",
+        detail: "Persist Ani's explicit feedback as context for future tasks.",
+        kind: "feedback",
+        route: "support",
+      },
+    ],
+    walkthrough: [
+      {
+        title: "Find a barber",
+        detail: "I ask for a nearby barber who can handle curly hair.",
+        nodes: ["request", "ani"],
+        edges: ["ani_start", "start"],
+      },
+      {
+        title: "Retrieve what matters",
+        detail:
+          "The agent retrieves my location and haircut preferences, checking that the information is current.",
+        nodes: ["understand", "gather", "context", "records"],
+        edges: ["scope", "lookup", "context_back"],
+      },
+      {
+        title: "Inspect the options",
+        detail:
+          "The agent searches nearby shops and gathers Google Maps photos and other relevant evidence.",
+        nodes: ["act"],
+        edges: ["ready"],
+      },
+      {
+        title: "My choice",
+        detail:
+          "I review the photos, choose a barber, and select a time that works for me.",
+        nodes: ["ani", "act"],
+        edges: ["decision", "answer"],
+      },
+      {
+        title: "Book the appointment",
+        detail:
+          "The agent books my chosen appointment and checks the response.",
+        nodes: ["act", "verify"],
+        edges: ["check"],
+      },
+      {
+        title: "Use the confirmation",
+        detail:
+          "Use the confirmation email's Add to calendar action. If it has none, check for an existing entry before creating an event.",
+        nodes: ["records", "act", "verify"],
+        edges: ["more_work", "check"],
+      },
+      {
+        title: "Verify and save",
+        detail:
+          "Verify the booking and calendar details, then save the outcome in the appropriate records and keep a local receipt.",
+        nodes: ["verify", "complete", "records", "runtime"],
+        edges: ["finish", "persist", "receipts"],
+      },
+      {
+        title: "Booking complete",
+        detail:
+          "The booking is confirmed, the calendar entry is verified, and what happened is recorded. This task is closed.",
+        nodes: ["complete"],
+        edges: [],
+      },
+      {
+        title: "A separate feedback loop",
+        detail:
+          "After the appointment, a new task asks how I liked the cut. My answer records a preferred barber or informs the next search.",
+        nodes: ["feedback", "request", "ani", "context"],
+        edges: ["followup", "followup_due", "learn"],
+      },
+    ],
+  },
   map_label: "system topology",
   map_principle:
     "life produces signals. records hold facts. i direct agents. agents verify and persist changes back to the record that owns them.",

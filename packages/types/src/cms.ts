@@ -362,7 +362,81 @@ export interface SystemsMapRelationship {
   detail: string;
 }
 
+export interface SystemsLifecycleNode {
+  id: string;
+  label: string;
+  detail: string;
+  kind:
+    | "stage"
+    | "human"
+    | "context"
+    | "records"
+    | "credential"
+    | "runtime"
+    | "archive"
+    | "feedback";
+  mark?: string;
+}
+
+export interface SystemsLifecycleEdge {
+  id: string;
+  source: string;
+  destination: string;
+  label: string;
+  detail: string;
+  kind:
+    | "flow"
+    | "context"
+    | "human"
+    | "retry"
+    | "persist"
+    | "transport"
+    | "credential"
+    | "feedback"
+    | "archive";
+  route: "direct" | "left" | "right" | "outer" | "support" | "self";
+}
+
+export interface SystemsLifecycle {
+  status: "intended system";
+  domains: string[];
+  workers: { id: string; label: string; mark: "claude" | "openai" }[];
+  copy: {
+    caption: string;
+    context_hint: string;
+    human_hint: string;
+    more_sources: string;
+    transport: string;
+    feedback_hint: string;
+    walkthrough_label: string;
+    back: string;
+    next: string;
+    reset: string;
+  };
+  principle: string;
+  execution_label: string;
+  completion_rule: string;
+  pause_rule: string;
+  stages: SystemsLifecycleNode[];
+  support: SystemsLifecycleNode[];
+  sources: {
+    id: string;
+    label: string;
+    group: "records" | "credentials" | "more";
+    mark: string;
+  }[];
+  devices: { id: string; label: string; detail: string; mark: string }[];
+  edges: SystemsLifecycleEdge[];
+  walkthrough: {
+    title: string;
+    detail: string;
+    nodes: string[];
+    edges: string[];
+  }[];
+}
+
 export interface SystemsPageContent {
+  lifecycle: SystemsLifecycle;
   title: string;
   description: string;
   hero_title: string;

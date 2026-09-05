@@ -18,19 +18,7 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   </section>
 
   <section data-rise class="stack">
-    <SystemMap
-      label={content.map_label}
-      principle={content.map_principle}
-      domains={content.map_domains}
-      nodes={content.map_nodes}
-      foundationLabel={content.map_foundation_label}
-      foundations={content.map_foundations}
-      deviceLabel={content.map_device_label}
-      devices={content.map_devices}
-      authorityLabel={content.map_authority_label}
-      authorityModes={content.map_authority_modes}
-      relationships={content.map_relationships}
-    />
+    <SystemMap lifecycle={content.lifecycle} />
   </section>
 </Shell>
 

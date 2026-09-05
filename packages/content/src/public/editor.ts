@@ -16,6 +16,11 @@ import {
   DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults.js";
 
+import {
+  normalizeSystemsLifecycle,
+  validateSystemsLifecycle,
+} from "./systems-lifecycle.js";
+
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === "string" ? value : fallback;
 }
@@ -1045,6 +1050,10 @@ export function normalizeSystemsPageContent(
     : DEFAULT_SYSTEMS_CONTENT.map_relationships;
 
   return {
+    lifecycle: normalizeSystemsLifecycle(
+      source.lifecycle,
+      DEFAULT_SYSTEMS_CONTENT.lifecycle,
+    ),
     title: coerceString(source.title, DEFAULT_SYSTEMS_CONTENT.title).trim(),
     description: coerceString(
       source.description,
@@ -1135,6 +1144,25 @@ export function normalizeSystemsPageContent(
 }
 
 export function validateSystemsPageContent(content: SystemsPageContent): {
+  ok: boolean;
+  error?: string;
+} {
+  const lifecycleResult = validateSystemsLifecycle(content.lifecycle);
+  if (!lifecycleResult.ok) return lifecycleResult;
+  for (const [value, label] of [
+    [content.title, "Systems title"],
+    [content.description, "Systems description"],
+    [content.hero_title, "Systems hero title"],
+    [content.hero_summary, "Systems hero summary"],
+  ] as const) {
+    const error = validateCmsString(value, label, CMS_TEXT_LIMITS.summary);
+    if (error) return { ok: false, error };
+  }
+  return { ok: true };
+}
+
+/** Compatibility only for retained experiments. The public page uses lifecycle. */
+export function validateLegacySystemsPageContent(content: SystemsPageContent): {
   ok: boolean;
   error?: string;
 } {

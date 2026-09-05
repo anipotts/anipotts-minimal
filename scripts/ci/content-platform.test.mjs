@@ -761,8 +761,8 @@ assert.equal(
         : relationship,
     ),
   }).ok,
-  false,
-  "systems map relationships must keep their reviewed authority mode",
+  true,
+  "legacy experiment relationships must not constrain the lifecycle page",
 );
 assert.equal(
   validateSystemsPageContent(
@@ -772,8 +772,8 @@ assert.equal(
       ),
     }),
   ).ok,
-  false,
-  "systems map domain identities must remain unique",
+  true,
+  "legacy domain data is independent of the canonical lifecycle domains",
 );
 assert.equal(
   validateSystemsPageContent(
@@ -785,8 +785,156 @@ assert.equal(
       ),
     }),
   ).ok,
+  true,
+  "legacy source data is independent of the canonical lifecycle sources",
+);
+
+const lifecycle = systemsContent.lifecycle;
+assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
+assert.equal(
+  systemsContent.hero_summary,
+  "how i use coding agents in my life.",
+);
+assert.deepEqual(lifecycle.domains, [
+  "career",
+  "learning",
+  "wellbeing",
+  "personal",
+]);
+assert.deepEqual(
+  lifecycle.stages.map(({ id }) => id),
+  ["request", "understand", "gather", "act", "verify", "complete"],
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ lifecycle: JSON.stringify(lifecycle) })
+    .lifecycle,
+  lifecycle,
+);
+for (const [name, mutate] of [
+  [
+    "missing endpoint",
+    (graph) => {
+      graph.edges[0].destination = "absent";
+    },
+  ],
+  [
+    "duplicate node",
+    (graph) => {
+      graph.support.push(graph.support[0]);
+    },
+  ],
+  [
+    "duplicate edge",
+    (graph) => {
+      graph.edges.push(graph.edges[0]);
+    },
+  ],
+  [
+    "duplicate source",
+    (graph) => {
+      graph.sources.push(graph.sources[0]);
+    },
+  ],
+  [
+    "duplicate device",
+    (graph) => {
+      graph.devices.push(graph.devices[0]);
+    },
+  ],
+  [
+    "invalid walkthrough node",
+    (graph) => {
+      graph.walkthrough[0].nodes = ["absent"];
+    },
+  ],
+  [
+    "invalid walkthrough edge",
+    (graph) => {
+      graph.walkthrough[0].edges = ["absent"];
+    },
+  ],
+  [
+    "missing completion path",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "finish");
+    },
+  ],
+  [
+    "missing retry",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "record_failed");
+    },
+  ],
+  [
+    "missing feedback task",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "followup_due");
+    },
+  ],
+]) {
+  const graph = structuredClone(lifecycle);
+  mutate(graph);
+  const result = validateSystemsPageContent(
+    normalizeSystemsPageContent({ lifecycle: graph }),
+  );
+  assert.equal(
+    result.ok,
+    false,
+    `reject ${name} without silently falling back`,
+  );
+}
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({ lifecycle: "{broken" }),
+  ).ok,
   false,
-  "systems map source identities must remain unique within each domain",
+);
+const paths = new Map(lifecycle.edges.map((edge) => [edge.id, edge]));
+function follow(start, edgeIds) {
+  let current = start;
+  for (const id of edgeIds) {
+    const edge = paths.get(id);
+    assert.ok(edge, `missing route ${id}`);
+    assert.equal(edge.source, current, `disconnected route ${id}`);
+    current = edge.destination;
+  }
+  return current;
+}
+assert.equal(
+  follow("request", ["start", "scope", "ready", "check", "finish"]),
+  "complete",
+);
+assert.equal(
+  follow("act", [
+    "missing_context",
+    "lookup",
+    "needs_me",
+    "answer_context",
+    "ready",
+  ]),
+  "act",
+);
+assert.equal(follow("act", ["decision", "new_goal", "scope"]), "gather");
+assert.equal(follow("verify", ["more_work", "check"]), "verify");
+assert.equal(
+  follow("complete", ["record_failed", "record_blocked", "answer_record"]),
+  "complete",
+);
+assert.equal(follow("complete", ["followup", "followup_due"]), "request");
+assert.equal(follow("feedback", ["learn", "context_back"]), "gather");
+assert.match(lifecycle.completion_rule, /record is saved/);
+assert.match(lifecycle.pause_rule, /paused task remains open/);
+assert.equal(lifecycle.walkthrough.length, 9);
+assert.match(
+  lifecycle.walkthrough.map(({ detail }) => detail).join(" "),
+  /Add to calendar/,
+);
+const lifecyclePage = readFileSync("apps/www/src/pages/systems.astro", "utf8");
+assert.ok(lifecyclePage.includes("lifecycle={content.lifecycle}"));
+assert.equal(
+  lifecyclePage.includes("content.map_"),
+  false,
+  "public lifecycle must not depend on the experimental topology",
 );
 
 assert.equal(

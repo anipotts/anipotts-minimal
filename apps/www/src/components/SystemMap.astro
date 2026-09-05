@@ -1,988 +1,1096 @@
 ---
-import type {
-  SystemsAuthorityMode,
-  SystemsMapDevice,
-  SystemsMapDomain,
-  SystemsMapFoundation,
-  SystemsMapNode,
-  SystemsMapRelationship,
-  SystemsMapSource,
-} from "@anipotts/content/public";
-import { Icon } from "astro-icon/components";
+import type { SystemsLifecycle } from "@anipotts/content/public";
 import AgentMark from "./AgentMark.astro";
-import SystemSemantics from "./systems/SystemSemantics.astro";
-
+import LifecycleMark from "./systems/LifecycleMark.astro";
+import { Icon } from "astro-icon/components";
 interface Props {
-  label: string;
-  principle: string;
-  domains: SystemsMapDomain[];
-  nodes: SystemsMapNode[];
-  foundationLabel: string;
-  foundations: SystemsMapFoundation[];
-  deviceLabel: string;
-  devices: SystemsMapDevice[];
-  authorityLabel: string;
-  authorityModes: SystemsAuthorityMode[];
-  relationships: SystemsMapRelationship[];
+  lifecycle: SystemsLifecycle;
 }
-
-const {
-  label,
-  principle,
-  domains,
-  nodes,
-  foundationLabel,
-  foundations,
-  deviceLabel,
-  devices,
-  authorityLabel,
-  authorityModes,
-  relationships,
-} = Astro.props;
-
-const nodeById = Object.fromEntries(
-  nodes.map((node) => [node.id, node]),
-) as Record<SystemsMapNode["id"], SystemsMapNode>;
-const foundationById = Object.fromEntries(
-  foundations.map((foundation) => [foundation.id, foundation]),
-) as Record<SystemsMapFoundation["id"], SystemsMapFoundation>;
-const deviceById = Object.fromEntries(
-  devices.map((device) => [device.id, device]),
-) as Record<SystemsMapDevice["id"], SystemsMapDevice>;
-
-const sourceIcons: Record<SystemsMapSource["id"], string> = {
-  gmail: "logos:google-gmail",
-  linkedin: "logos:linkedin-icon",
-  x: "logos:x",
-  instagram: "logos:instagram-icon",
-  github: "logos:github-icon",
-  nyu: "ph:graduation-cap-fill",
-  chrome: "logos:chrome",
-  apple_books: "ph:book-open-text-fill",
-  withings: "ph:heartbeat-fill",
-  zocdoc: "ph:first-aid-fill",
-  imessage: "simple-icons:imessage",
-  real_life: "ph:eye-fill",
-  files: "ph:folder-simple-fill",
-  apple_health: "ph:heart-straight-fill",
-  physical_measurement: "ph:scales-fill",
-  people: "ph:users-three-fill",
-  notes: "ph:note-fill",
-};
-
-const sourceImages: Partial<Record<SystemsMapSource["id"], string>> = {
-  nyu: "/brand/sources/nyu.png",
-  withings: "/brand/sources/withings.jpg",
-  zocdoc: "/brand/sources/zocdoc.jpg",
-  files: "/brand/sources/files.png",
-  notes: "/brand/sources/notes.png",
-};
-
-const calendarTitle = foundationById.calendar.title;
-const macMiniTitle = deviceById.mac_mini.title;
-const externalSsdTitle = foundationById.external_ssd.title;
+const { lifecycle: graph } = Astro.props;
+const support = Object.fromEntries(graph.support.map((n) => [n.id, n]));
+const nodes = Object.fromEntries(
+  [...graph.stages, ...graph.support].map((n) => [n.id, n]),
+);
 ---
 
-<figure class="system-map" aria-labelledby="system-map-heading">
-  <figcaption class="system-map__caption">
-    <h2 id="system-map-heading" class="section-label">{label}</h2>
-    <span class="sr-only">{principle}</span>
+<figure class="lifecycle-map" data-lifecycle>
+  <figcaption class="map-caption">
+    <h2>{graph.status}</h2><span class="caption-note">{graph.copy.caption}</span
+    >
   </figcaption>
-
-  <div class="topology" aria-hidden="true">
-    <svg
-      class="routes routes--desktop"
-      viewBox="0 0 1200 960"
-      role="presentation"
-    >
-      <g class="route route--signal">
-        <path d="M150 205V245M450 205V245M750 205V245M1050 205V245"></path>
-        <path d="M150 245H1050M600 245V318"></path>
-      </g>
-      <path class="route route--scheduled" d="M600 272V318"></path>
-      <path class="route route--authorized" d="M600 405V494"></path>
-      <path
-        class="route route--needs-human"
-        d="M785 525C1015 525 962 361 690 361"></path>
-      <path class="route route--credential" d="M600 552V642"></path>
-      <path class="route route--transport" d="M600 684V752"></path>
-      <path class="route route--verified" d="M600 800V857H1138V245H1050"></path>
-      <path class="route route--archive" d="M600 857V918"></path>
-      <circle class="route-packet" r="4">
-        <animateMotion
-          dur="16s"
-          repeatCount="indefinite"
-          path="M600 405V494M600 552V642M600 684V752M600 800V857H1138V245H1050"
-        ></animateMotion>
-      </circle>
-    </svg>
-
-    <svg
-      class="routes routes--mobile"
-      viewBox="0 0 1200 1100"
-      role="presentation"
-    >
-      <g class="route route--signal">
-        <path d="M150 314V354M450 314V354M750 314V354M1050 314V354"></path>
-        <path d="M150 354H1050M600 354V429"></path>
-      </g>
-      <path class="route route--scheduled" d="M600 381V429"></path>
-      <path class="route route--authorized" d="M600 518V604"></path>
-      <path
-        class="route route--needs-human"
-        d="M790 635C1014 635 978 475 692 475"></path>
-      <path class="route route--credential" d="M600 664V743"></path>
-      <path class="route route--transport" d="M600 782V860"></path>
-      <path class="route route--verified" d="M600 910V974H1145V354H1050"></path>
-      <path class="route route--archive" d="M600 974V1042"></path>
-      <circle class="route-packet" r="4">
-        <animateMotion
-          dur="18s"
-          repeatCount="indefinite"
-          path="M600 518V604M600 664V743M600 782V860M600 910V974H1145V354H1050"
-        ></animateMotion>
-      </circle>
-    </svg>
-
-    <div class="domain-grid">
-      {
-        domains.map((domain) => {
-          const signals = domain.sources.filter(
-            ({ kind }) => kind === "signal",
-          );
-          const records = domain.sources.filter(
-            ({ kind }) => kind === "record",
-          );
-          return (
-            <section class="domain" title={domain.detail}>
-              <h3>{domain.label}</h3>
-              <div class="source-list source-list--signals">
-                {signals.map((source) => (
-                  <span
-                    class:list={["source-mark", `source-mark--${source.id}`]}
-                    title={source.label}
-                  >
-                    {sourceImages[source.id] ? (
-                      <img
-                        src={sourceImages[source.id]}
-                        alt=""
-                        width="512"
-                        height="512"
-                        loading="eager"
-                      />
-                    ) : (
-                      <Icon
-                        name={sourceIcons[source.id]}
-                        size={28}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>
-                ))}
-              </div>
-              <div class="source-list source-list--records">
-                {records.map((source) => (
-                  <span
-                    class:list={[
-                      "source-mark",
-                      "source-mark--record",
-                      `source-mark--${source.id}`,
-                    ]}
-                    title={source.label}
-                  >
-                    {sourceImages[source.id] ? (
-                      <img
-                        src={sourceImages[source.id]}
-                        alt=""
-                        width="512"
-                        height="512"
-                        loading="eager"
-                      />
-                    ) : (
-                      <Icon
-                        name={sourceIcons[source.id]}
-                        size={30}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>
-                ))}
-              </div>
-            </section>
-          );
-        })
-      }
+  <div class="map-surface">
+    <div class="domain-strip" aria-label="life areas">
+      {graph.domains.map((label) => <span>{label}</span>)}
     </div>
-
-    <span class="flow-label flow-label--signals">signals</span>
-
-    <div class="calendar" title={foundationById.calendar.detail}>
-      <span class="calendar__line"></span>
-      <span class="system-icon system-icon--calendar">
-        <Icon name="logos:google-calendar" size={31} aria-hidden="true" />
-      </span>
-      <span class="node-copy">
-        <strong>{calendarTitle}</strong>
-        <small>scheduled</small>
-      </span>
-    </div>
-
-    <section class="ani" title={nodeById.ani.detail}>
-      <img src="/brand/ap-mark-blue.svg?v=20260717" alt="" />
-      <strong>ani</strong>
-      <small>human authority</small>
-    </section>
-
-    <span class="flow-label flow-label--authorized">authorized work</span>
-    <span class="flow-label flow-label--needs">needs me</span>
-
-    <div class="agents" title={nodeById.agents.detail}>
-      <div class="agent agent--claude">
-        <span><AgentMark provider="claude" size={33} /></span>
-        <strong>claude</strong>
-      </div>
-      <div class="agent agent--codex">
-        <span><AgentMark provider="openai" size={33} /></span>
-        <strong>codex</strong>
-      </div>
-    </div>
-
-    <div class="credential" title={foundationById.one_password.detail}>
-      <span class="system-icon system-icon--one-password">
-        <Icon name="simple-icons:1password" size={28} aria-hidden="true" />
-      </span>
-      <span class="node-copy">
-        <strong>1Password</strong>
-        <small>credentials</small>
-      </span>
-    </div>
-
-    <section class="infrastructure" title={foundationById.tailnet.detail}>
-      <div class="tailnet-label">
-        <Icon name="simple-icons:tailscale" size={21} aria-hidden="true" />
-        <strong>{deviceLabel}</strong>
-      </div>
-      <div class="device device--iphone" title={deviceById.iphone.detail}>
-        <span class="device__icon"
-          ><Icon name="ph:device-mobile" size={28} aria-hidden="true" /></span
+    <div class="diagram-body" data-canvas>
+      <svg class="connections" aria-hidden="true" focusable="false">
+        <defs
+          >{
+            [
+              "flow",
+              "context",
+              "human",
+              "retry",
+              "persist",
+              "transport",
+              "credential",
+              "feedback",
+              "archive",
+            ].map((kind) => (
+              <marker
+                id={`arrow-${kind}`}
+                markerWidth="7"
+                markerHeight="7"
+                refX="6"
+                refY="3.5"
+                orient="auto-start-reverse"
+                markerUnits="userSpaceOnUse"
+              >
+                <path d="M0 0L7 3.5L0 7Z" class={`arrow-${kind}`} />
+              </marker>
+            ))
+          }</defs
         >
-        <small>iphone</small>
+        {
+          graph.edges.map((edge) => (
+            <g
+              data-edge={edge.id}
+              class={`connection connection--${edge.kind}`}
+            >
+              <>
+                <path marker-end={`url(#arrow-${edge.kind})`} />
+                <text text-anchor="middle">{edge.label}</text>
+              </>
+            </g>
+          ))
+        }
+      </svg>
+      <div class="spine">
+        <div class="stage stage--request" data-node="request">
+          <span class="stage-number" aria-hidden="true">01</span><h3>
+            {graph.stages[0].label}
+          </h3><p>{graph.stages[0].detail}</p>
+        </div>
+        <section class="execution" aria-label={graph.execution_label}>
+          <header class="execution-heading">
+            <h3>{graph.execution_label}</h3><div class="workers">
+              {
+                graph.workers.map((worker) => (
+                  <span>
+                    <AgentMark provider={worker.mark} size={17} />
+                    {worker.label}
+                  </span>
+                ))
+              }
+            </div>
+          </header>
+          {
+            graph.stages.slice(1, 5).map((stage, index) => (
+              <div class="stage" data-node={stage.id}>
+                <>
+                  <span class="stage-number" aria-hidden="true">
+                    {String(index + 2).padStart(2, "0")}
+                  </span>
+                  <h3>{stage.label}</h3>
+                  <p>{stage.detail}</p>
+                </>
+              </div>
+            ))
+          }
+        </section>
+        <div class="stage stage--complete" data-node="complete">
+          <span class="stage-number" aria-hidden="true">06</span><h3>
+            {graph.stages[5].label}
+          </h3><p>{graph.stages[5].detail}</p>
+        </div>
       </div>
-      <div class="device device--mac-mini" title={deviceById.mac_mini.detail}>
-        <span class="device__icon device__icon--mac-mini">
+      <aside class="human-area" aria-label="Ani's role">
+        <div class="ani" data-node="ani">
           <img
-            src="/brand/sources/mac-mini.png"
+            src="/brand/ap-mark-blue.svg"
             alt=""
-            width="660"
-            height="660"
-            loading="eager"
-          />
-        </span>
-        <span class="node-copy">
-          <strong>{macMiniTitle}</strong>
-          <small>always on</small>
-        </span>
-      </div>
-      <div class="device device--macbook" title={deviceById.macbook.detail}>
-        <span class="device__icon"
-          ><Icon name="ph:laptop" size={32} aria-hidden="true" /></span
+            width="60"
+            height="45"
+          /><strong>{support.ani.label}</strong>
+        </div><p>{support.ani.detail}</p><span class="human-note"
+          >{graph.copy.human_hint}</span
         >
-        <small>macbook</small>
+      </aside>
+      <aside class="context-area" aria-label="Supporting context">
+        <div class="context-heading" data-node="context">
+          <Icon name="ph:stack" size={20} /><h3>{support.context.label}</h3>
+        </div><p class="support-description">{graph.copy.context_hint}</p>
+        <div class="source-group" data-node="records">
+          <h4>{support.records.label}</h4><div class="source-grid">
+            {
+              graph.sources
+                .filter((s) => s.group === "records")
+                .map((s) => (
+                  <span class="source-item">
+                    <LifecycleMark mark={s.mark} label={s.label} />
+                  </span>
+                ))
+            }
+          </div>
+        </div>
+        <div class="source-group credential-group" data-node="credentials">
+          <h4>{support.credentials.label}</h4>{
+            graph.sources
+              .filter((s) => s.group === "credentials")
+              .map((s) => (
+                <span class="source-item">
+                  <LifecycleMark mark={s.mark} label={s.label} />
+                </span>
+              ))
+          }
+        </div>
+        <details class="more-sources">
+          <summary>{graph.copy.more_sources}</summary><div class="source-grid">
+            {
+              graph.sources
+                .filter((s) => s.group === "more")
+                .map((s) => (
+                  <span class="source-item">
+                    <LifecycleMark mark={s.mark} label={s.label} />
+                  </span>
+                ))
+            }
+          </div>
+        </details>
+      </aside>
+      <div class="context-port" data-port="context" aria-hidden="true">
+        <Icon name="ph:stack" size={14} />context
       </div>
-    </section>
-
-    <div class="persist" title={nodeById.record.detail}>
-      <Icon name="ph:seal-check-fill" size={27} aria-hidden="true" />
-      <strong>verify + persist</strong>
+      <div class="runtime-port" data-port="runtime" aria-hidden="true">
+        <Icon name="ph:desktop" size={14} />runtime
+      </div>
+      <aside class="feedback" data-node="feedback">
+        <Icon name="ph:arrow-counter-clockwise" size={18} /><strong
+          >{support.feedback.label}</strong
+        ><small>{graph.copy.feedback_hint}</small>
+      </aside>
+      <section class="infrastructure" aria-label={support.runtime.label}>
+        <header data-node="runtime">
+          <Icon name={support.runtime.mark!} size={22} /><h3>
+            {graph.copy.transport}
+          </h3><span>{support.runtime.label}</span>
+        </header>
+        <div class="devices">
+          {
+            graph.devices.map((device) => (
+              <div
+                class:list={[
+                  "device",
+                  { "device--primary": device.id === "macmini" },
+                ]}
+              >
+                <>
+                  <LifecycleMark mark={device.mark} />
+                  <strong>{device.label}</strong>
+                  <small>{device.detail}</small>
+                </>
+              </div>
+            ))
+          }
+        </div>
+        <div class="archive" data-node="archive">
+          <LifecycleMark mark={support.archive.mark!} /><span
+            ><strong>{support.archive.label}</strong><small
+              >{support.archive.detail}</small
+            ></span
+          >
+        </div>
+      </section>
     </div>
-    <span class="flow-label flow-label--verified">verified update</span>
-
-    <div class="archive" title={foundationById.external_ssd.detail}>
-      <Icon name="ph:hard-drive" size={28} aria-hidden="true" />
-      <span class="node-copy">
-        <strong>{externalSsdTitle}</strong>
-        <small>planned archive</small>
-      </span>
-    </div>
+    <noscript>
+      <style is:inline>
+        .lifecycle-map .context-area {
+          position: relative;
+          top: auto;
+          left: auto;
+          width: auto;
+          margin: 1rem 0 2rem;
+        }
+        .lifecycle-map .source-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      </style>
+      <section class="static-routes" aria-label="Lifecycle routes">
+        <p>{graph.completion_rule}</p><p>{graph.pause_rule}</p>
+        <dl>
+          {
+            graph.edges
+              .filter((edge) => edge.label)
+              .map((edge) => (
+                <>
+                  <>
+                    <dt>
+                      {edge.label}: {nodes[edge.source].label} →{" "}
+                      {nodes[edge.destination].label}
+                    </dt>
+                    <dd>{edge.detail}</dd>
+                  </>
+                </>
+              ))
+          }
+        </dl>
+      </section>
+    </noscript>
+    <details class="walkthrough" data-walkthrough>
+      <summary
+        >{graph.copy.walkthrough_label}
+        <span aria-hidden="true">↗</span></summary
+      ><div class="walkthrough-content">
+        <div class="walkthrough-story" aria-live="polite" aria-atomic="true">
+          <span data-step-count>1 / {graph.walkthrough.length}</span><h3
+            data-step-title
+          >
+            {graph.walkthrough[0].title}
+          </h3><p data-step-detail>{graph.walkthrough[0].detail}</p>
+        </div>
+        <div class="walkthrough-controls" hidden>
+          <button type="button" data-back>{graph.copy.back}</button><button
+            type="button"
+            data-next>{graph.copy.next}</button
+          ><button type="button" data-reset>{graph.copy.reset}</button>
+        </div>
+        <noscript
+          ><ol>
+            {
+              graph.walkthrough.slice(1).map((step) => (
+                <li>
+                  <>
+                    <strong>{step.title}</strong>
+                    <p>{step.detail}</p>
+                  </>
+                </li>
+              ))
+            }
+          </ol></noscript
+        >
+      </div>
+    </details>
   </div>
-
-  <SystemSemantics
-    id="systems-map-description"
-    {principle}
-    {domains}
-    {nodes}
-    {foundationLabel}
-    {foundations}
-    {deviceLabel}
-    {devices}
-    {authorityLabel}
-    {authorityModes}
-    {relationships}
+  <div class="sr-only">
+    <h3>Lifecycle relationships</h3><p>{graph.principle}</p><p>
+      {graph.completion_rule}
+    </p><p>{graph.pause_rule}</p>
+    <ol>
+      {
+        graph.edges.map((edge) => (
+          <li>
+            {nodes[edge.source].label} to {nodes[edge.destination].label}
+            {edge.label ? `: ${edge.label}` : ""}. {edge.detail}
+          </li>
+        ))
+      }
+    </ol>
+    <h3>Supporting systems</h3><dl>
+      {
+        graph.support.map((n) => (
+          <>
+            <>
+              <dt>{n.label}</dt>
+              <dd>{n.detail}</dd>
+            </>
+          </>
+        ))
+      }
+    </dl>
+    <h3>Haircut example</h3><ol>
+      {
+        graph.walkthrough.map((step) => (
+          <li>
+            {step.title}. {step.detail}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+  <script
+    is:inline
+    type="application/json"
+    data-graph
+    set:html={JSON.stringify(graph).replace(/</g, "\\u003c")}
   />
 </figure>
-
+<script>
+  import { initializeLifecycleMaps } from "./systems/lifecycle-controller";
+  initializeLifecycleMaps();
+  document.addEventListener("astro:page-load", initializeLifecycleMaps);
+</script>
 <style>
-  .system-map {
-    display: grid;
-    gap: var(--s-2);
+  .lifecycle-map {
     margin: 0;
+    --map-bg: #fafbfc;
+    --map-ink: #202a38;
+    --map-muted: #5a6677;
+    --map-line: #a8b2c1;
+    --map-node: #f0f2f5;
+    --map-blue: #2768b3;
+    --map-orange: #a94e27;
+    --map-green: #29714e;
+    color: var(--map-ink);
   }
-
-  .system-map__caption {
-    display: block;
+  :global([data-theme="dark"]) .lifecycle-map,
+  :global(.dark) .lifecycle-map {
+    --map-bg: #15191f;
+    --map-ink: #e4e9f0;
+    --map-muted: #a4afbd;
+    --map-line: #586575;
+    --map-node: #222831;
+    --map-blue: #80b8f2;
+    --map-orange: #efa47c;
+    --map-green: #88c5a0;
   }
-
-  .topology {
-    --line: color-mix(in srgb, var(--paper-muted) 60%, transparent);
-    --line-soft: color-mix(in srgb, var(--paper-muted) 34%, transparent);
-    --blue: #1769e0;
-    --orange: #d96542;
+  .map-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--map-ink);
+  }
+  .caption-note {
+    opacity: 0.8;
+  }
+  .map-caption h2 {
+    margin: 0;
+    font: inherit;
+  }
+  .map-surface {
+    padding: 2rem 1.3rem 0;
+    background: var(--map-bg);
+    border: 1px solid var(--map-line);
+    border-radius: 6px;
+  }
+  .domain-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    text-align: center;
+    gap: 0.3rem;
+    padding: 0 0 1.5rem;
+    border-bottom: 1px solid var(--map-line);
+    font-size: 0.84rem;
+    font-weight: 650;
+  }
+  .diagram-body {
     position: relative;
-    box-sizing: border-box;
-    min-width: 0;
-    min-height: 60rem;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--paper-muted) 24%, transparent);
-    background:
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--paper-muted) 6%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        color-mix(in srgb, var(--paper-muted) 6%, transparent) 1px,
-        transparent 1px
-      ),
-      color-mix(in srgb, var(--paper-surface) 98%, var(--paper-ink) 2%);
-    background-size: 2rem 2rem;
-    box-shadow: var(--paper-shadow);
-    color: var(--paper-ink);
-    container-type: inline-size;
+    isolation: isolate;
+    padding: 2.2rem 0 0;
   }
-
-  .routes {
+  .spine {
+    position: relative;
+    width: 34%;
+    margin-left: 33%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4.4rem;
+    padding-bottom: 4.5rem;
+  }
+  .stage {
+    position: relative;
+    background: var(--map-node);
+    border: 1px solid var(--map-line);
+    border-radius: 6px;
+    padding: 1rem 0.65rem;
+    min-height: 4.5rem;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 2;
+  }
+  .stage h3 {
+    font-size: 0.94rem;
+    font-weight: 670;
+    margin: 0;
+    line-height: 1.35;
+  }
+  .stage p {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: var(--map-muted);
+    margin: 0.32rem 0 0;
+    text-wrap: balance;
+  }
+  .stage-number {
+    position: absolute;
+    left: 0.55rem;
+    top: 0.35rem;
+    font-size: 0.56rem;
+    line-height: 1;
+    color: var(--map-muted);
+  }
+  .stage--request {
+    border-color: var(--map-blue);
+  }
+  .stage--complete {
+    background: color-mix(in srgb, var(--map-green) 10%, var(--map-bg));
+    border-color: var(--map-green);
+  }
+  .execution {
+    position: relative;
+    display: grid;
+    gap: 4.4rem;
+    width: 100%;
+    padding: 4.7rem 0 1rem;
+  }
+  .execution::before {
+    content: "";
+    position: absolute;
+    inset: 0 -1.15rem -1.15rem;
+    border: 1px dashed var(--map-blue);
+    border-radius: 6px;
+    z-index: -1;
+  }
+  .execution-heading {
+    position: absolute;
+    top: 0.65rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+  .execution-heading h3 {
+    margin: 0 0 0.45rem;
+    font-size: 0.76rem;
+    color: var(--map-blue);
+    font-weight: 650;
+  }
+  .workers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .workers span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+  .workers span:first-child :global(svg) {
+    color: var(--map-orange);
+  }
+  .stage:not(.stage--complete)::after {
+    content: "↓";
+    position: absolute;
+    top: calc(100% + 1.3rem);
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--map-blue);
+    font-size: 1.4rem;
+  }
+  [data-connected] .stage::after {
+    display: none;
+  }
+  .connections {
+    visibility: hidden;
     position: absolute;
     inset: 0;
-    z-index: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
+    overflow: visible;
+    z-index: 1;
   }
-
-  .routes--mobile {
+  [data-connected] .connections {
+    visibility: visible;
+  }
+  .static-routes {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    padding-block: 1rem;
+  }
+  .static-routes dt {
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+  .static-routes dd {
+    margin: 0;
+    color: var(--map-muted);
+  }
+  .connection {
+    color: var(--map-blue);
+  }
+  .connection path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+  }
+  .connection text {
+    fill: currentColor;
+    stroke: var(--map-bg);
+    stroke-width: 5px;
+    paint-order: stroke;
+    stroke-linejoin: round;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 550;
+  }
+  .connection--human {
+    color: var(--map-orange);
+  }
+  .connection--human path,
+  .connection--context path {
+    stroke-dasharray: 3 4;
+  }
+  .connection--transport,
+  .connection--archive {
+    color: var(--map-muted);
+  }
+  .connection--transport path,
+  .connection--archive path {
+    stroke-dasharray: 5 5;
+  }
+  .connection--persist,
+  .connection--feedback {
+    color: var(--map-green);
+  }
+  .arrow-flow,
+  .arrow-context,
+  .arrow-retry,
+  .arrow-credential {
+    fill: var(--map-blue);
+  }
+  .arrow-human {
+    fill: var(--map-orange);
+  }
+  .arrow-persist,
+  .arrow-feedback {
+    fill: var(--map-green);
+  }
+  .arrow-transport,
+  .arrow-archive {
+    fill: var(--map-muted);
+  }
+  .human-area {
+    position: absolute;
+    right: 1%;
+    top: 20rem;
+    width: 23%;
+    text-align: center;
+    z-index: 2;
+  }
+  .ani {
+    width: 5.5rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--map-orange);
+    border-radius: 50%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    background: var(--map-bg);
+  }
+  .ani img {
+    width: 3.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+  }
+  .ani strong {
+    font-size: 0.85rem;
+  }
+  .human-area p {
+    font-size: 0.71rem;
+    margin: 0.7rem 0;
+    color: var(--map-ink);
+  }
+  .human-note {
+    display: block;
+    color: var(--map-muted);
+    font-size: 0.64rem;
+    line-height: 1.7;
+  }
+  .context-area {
+    position: absolute;
+    top: 20.3rem;
+    left: 1%;
+    width: 22%;
+    z-index: 2;
+  }
+  .context-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: 1px solid var(--map-line);
+    border-radius: 6px;
+    padding: 0.8rem 0.4rem;
+    background: var(--map-bg);
+  }
+  .context-heading h3 {
+    font-size: 0.81rem;
+    margin: 0;
+  }
+  .support-description {
+    font-size: 0.62rem;
+    text-align: center;
+    color: var(--map-muted);
+    margin: 0.55rem 0 1.35rem;
+  }
+  .source-group {
+    border-top: 1px solid var(--map-line);
+    padding-top: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .source-group h4 {
+    font-weight: 550;
+    font-size: 0.66rem;
+    color: var(--map-muted);
+    margin: 0 0 0.75rem;
+  }
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem 0.4rem;
+  }
+  .source-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    text-align: center;
+  }
+  .credential-group .source-item {
+    flex-direction: row;
+    text-align: left;
+  }
+  .more-sources {
+    font-size: 0.72rem;
+    color: var(--map-muted);
+  }
+  .more-sources summary {
+    cursor: pointer;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .more-sources summary::before {
+    content: "+";
+  }
+  .more-sources[open] summary::before {
+    content: "−";
+  }
+  .more-sources .source-grid {
+    padding: 0.4rem 0 1.5rem;
+  }
+  .context-port,
+  .runtime-port {
     display: none;
   }
-
-  .route {
-    fill: none;
-    stroke-linecap: square;
-    stroke-linejoin: miter;
-    vector-effect: non-scaling-stroke;
-  }
-
-  .route--signal,
-  .route--transport {
-    stroke: var(--line);
-    stroke-width: 1.4;
-  }
-
-  .route--scheduled {
-    stroke: #2f8f6c;
-    stroke-width: 2;
-    stroke-dasharray: 2 6;
-    stroke-linecap: round;
-  }
-
-  .route--authorized,
-  .route--credential,
-  .route--verified {
-    stroke: var(--blue);
-    stroke-width: 2.5;
-  }
-
-  .route--needs-human {
-    stroke: var(--orange);
-    stroke-width: 2;
-    stroke-dasharray: 3 7;
-    stroke-linecap: round;
-  }
-
-  .route--archive {
-    stroke: var(--line);
-    stroke-width: 1.5;
-    stroke-dasharray: 5 7;
-  }
-
-  .route-packet {
-    fill: var(--blue);
-    opacity: 0.78;
-  }
-
-  .domain-grid {
+  .feedback {
     position: absolute;
-    z-index: 2;
-    top: 1.5rem;
-    right: clamp(1rem, 3vw, 2.2rem);
-    left: clamp(1rem, 3vw, 2.2rem);
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(0.75rem, 3vw, 2.6rem);
-    height: 11.6rem;
-  }
-
-  .domain {
-    display: grid;
-    grid-template-rows: auto 3.15rem 4.35rem;
-    min-width: 0;
-    align-content: start;
-    text-align: center;
-  }
-
-  .domain h3 {
-    margin: 0;
-    font-size: clamp(0.78rem, 1.45vw, 1.02rem);
-    font-weight: 720;
-    line-height: 1;
-  }
-
-  .source-list {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(0.28rem, 0.75vw, 0.55rem);
-    min-width: 0;
-  }
-
-  .source-list--signals {
-    align-self: center;
-  }
-
-  .source-list--records {
-    align-self: end;
-    padding-top: 0.78rem;
-    border-top: 1px solid var(--line-soft);
-  }
-
-  .source-mark,
-  .system-icon,
-  .device__icon {
-    display: grid;
-    flex: 0 0 auto;
-    place-items: center;
-    box-sizing: border-box;
-    overflow: hidden;
-    background: #fff;
-    color: #121721;
-  }
-
-  .source-mark {
-    width: clamp(1.85rem, 3.2vw, 2.3rem);
-    aspect-ratio: 1;
-    border: 1px solid #d9dee6;
-    border-radius: 0.52rem;
-    box-shadow: 0 1px 3px rgb(9 20 36 / 10%);
-  }
-
-  .source-mark--record {
-    width: clamp(2.15rem, 3.7vw, 2.65rem);
-    border-color: color-mix(in srgb, var(--blue) 32%, #d9dee6);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 7%, transparent);
-  }
-
-  .source-mark :global(svg) {
-    width: 70%;
-    height: 70%;
-  }
-
-  .source-mark img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .source-mark--nyu img,
-  .source-mark--files img,
-  .source-mark--notes img {
-    object-fit: contain;
-  }
-
-  .source-mark--apple_books {
-    border-color: #e86f16;
-    background: #f47a20;
-    color: #fff;
-  }
-
-  .source-mark--imessage {
-    color: #22a947;
-  }
-
-  .source-mark--apple_health {
-    color: #ff375f;
-  }
-
-  .source-mark--physical_measurement {
-    color: #4f6578;
-  }
-
-  .source-mark--real_life,
-  .source-mark--people {
-    color: #263240;
-  }
-
-  .calendar,
-  .credential,
-  .archive,
-  .persist,
-  .ani,
-  .agents,
-  .infrastructure,
-  .flow-label {
-    position: absolute;
-    z-index: 3;
-    transform: translate(-50%, -50%);
-  }
-
-  .calendar,
-  .credential,
-  .archive {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    background: color-mix(in srgb, var(--paper-surface) 94%, transparent);
-  }
-
-  .calendar {
-    top: 28.7%;
-    left: 50%;
-    padding: 0.25rem 0.55rem;
-  }
-
-  .calendar__line {
-    position: absolute;
-    z-index: -1;
-    top: 50%;
-    left: 50%;
-    width: min(44vw, 27rem);
-    height: 1px;
-    background: var(--line-soft);
-    transform: translate(-50%, -50%);
-  }
-
-  .system-icon {
-    width: 2.45rem;
-    aspect-ratio: 1;
-    border: 1px solid #d9dee6;
-    border-radius: 0.52rem;
-  }
-
-  .node-copy {
-    display: grid;
-    gap: 0.12rem;
-    min-width: 0;
-  }
-
-  .node-copy strong,
-  .node-copy small {
-    white-space: nowrap;
-  }
-
-  .node-copy strong {
-    font-size: 0.76rem;
-    font-weight: 680;
-    line-height: 1;
-  }
-
-  .node-copy small {
-    color: var(--paper-muted);
-    font-size: 0.6rem;
-    line-height: 1;
-  }
-
-  .ani {
-    top: 38%;
-    left: 50%;
-    display: grid;
-    place-content: center;
-    width: clamp(5.8rem, 10vw, 7rem);
-    aspect-ratio: 1;
-    border: 1.5px solid var(--blue);
-    border-radius: 50%;
-    background: var(--paper-surface);
-    box-shadow: 0 0.55rem 1.4rem
-      color-mix(in srgb, var(--blue) 13%, transparent);
-    text-align: center;
-  }
-
-  .ani img {
-    width: 72%;
-    height: 2.9rem;
-    margin: -0.28rem auto -0.14rem;
-    object-fit: contain;
-    transform: scale(1.35);
-  }
-
-  .ani strong {
-    font-size: 0.78rem;
-    line-height: 1;
-  }
-
-  .ani small {
-    margin-top: 0.28rem;
-    color: var(--paper-muted);
-    font-size: 0.56rem;
-    font-weight: 620;
-    line-height: 1;
-  }
-
-  .agents {
-    top: 54.7%;
-    left: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(5.8rem, 19vw, 12rem);
-    width: min(70%, 38rem);
-  }
-
-  .agents::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: 1.45rem;
-    left: 15%;
-    width: 70%;
-    height: 1px;
-    background: var(--line);
-  }
-
-  .agent {
+    right: 2%;
+    top: 54.7rem;
+    width: 21%;
     display: grid;
     justify-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
+    background: var(--map-bg);
+    padding: 0.5rem;
+    z-index: 2;
+    box-sizing: border-box;
+    color: var(--map-green);
   }
-
-  .agent > span {
-    display: grid;
-    place-items: center;
-    width: 3rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    color: #fff;
-    box-shadow: 0 0 0 0.32rem var(--paper-surface);
+  .feedback strong {
+    font-size: 0.75rem;
   }
-
-  .agent--claude > span {
-    background: var(--orange);
+  .feedback small {
+    font-size: 0.62rem;
+    color: var(--map-muted);
   }
-
-  .agent--codex > span {
-    background: var(--blue);
-  }
-
-  .agent strong {
-    padding: 0.12rem 0.3rem;
-    background: var(--paper-surface);
-    font-size: 0.72rem;
-    line-height: 1;
-  }
-
-  .credential {
-    top: 65.2%;
-    left: 50%;
-    padding: 0.25rem 0.55rem;
-  }
-
-  .system-icon--one-password {
-    border-color: #c7ddf7;
-    color: #0572ec;
-  }
-
   .infrastructure {
-    top: 77.5%;
-    left: 50%;
+    position: relative;
+    margin: 0 8%;
+    padding: 1.25rem 0 1.7rem;
+    border-top: 1px solid var(--map-line);
+  }
+  .infrastructure header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-bottom: 1.4rem;
+    width: fit-content;
+    margin-inline: auto;
+    background: var(--map-bg);
+    position: relative;
+    z-index: 2;
+  }
+  .infrastructure h3 {
+    font-size: 0.79rem;
+    margin: 0;
+  }
+  .infrastructure header > span {
+    font-size: 0.68rem;
+    color: var(--map-muted);
+  }
+  .devices {
     display: grid;
     grid-template-columns: 1fr 1.4fr 1fr;
-    align-items: center;
-    width: min(68%, 37rem);
-    min-width: 24rem;
+    gap: 0.75rem;
+    position: relative;
   }
-
-  .infrastructure::before {
+  .devices::before {
     content: "";
     position: absolute;
+    top: 1rem;
+    left: 16%;
+    right: 16%;
+    border-top: 1px solid var(--map-line);
     z-index: -1;
-    top: 50%;
-    right: 10%;
-    left: 10%;
-    height: 1px;
-    background: var(--line);
   }
-
-  .tailnet-label {
-    position: absolute;
-    bottom: calc(100% + 0.55rem);
-    left: 50%;
-    display: flex;
-    align-items: center;
-    gap: 0.38rem;
-    padding: 0.2rem 0.35rem;
-    background: var(--paper-surface);
-    color: var(--paper-muted);
-    transform: translateX(-50%);
-  }
-
-  .tailnet-label strong {
-    font-size: 0.65rem;
-    font-weight: 720;
-    line-height: 1;
-    text-transform: lowercase;
-  }
-
   .device {
-    display: grid;
-    justify-items: center;
-    gap: 0.24rem;
-    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.35rem;
   }
-
-  .device__icon {
-    width: 2.7rem;
-    aspect-ratio: 1;
-    border: 1px solid #d9dee6;
-    border-radius: 0.52rem;
+  .device strong {
+    font-size: 0.73rem;
   }
-
-  .device__icon--mac-mini {
-    width: 3.7rem;
-  }
-
-  .device__icon--mac-mini img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
   .device small {
-    padding: 0.1rem 0.25rem;
-    background: var(--paper-surface);
-    color: var(--paper-muted);
-    font-size: 0.58rem;
-    font-weight: 620;
-    line-height: 1;
+    font-size: 0.61rem;
+    text-align: center;
+    color: var(--map-muted);
   }
-
-  .device--mac-mini {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
+  .device--primary :global(.source-icon) {
+    width: 2.8rem;
+    height: 2.8rem;
+    margin-top: -0.4rem;
   }
-
-  .persist {
-    top: 87.6%;
-    left: 50%;
-    display: flex;
-    align-items: center;
-    gap: 0.42rem;
-    padding: 0.24rem 0.48rem;
-    background: var(--paper-surface);
-    color: var(--blue);
-  }
-
-  .persist strong {
-    color: var(--paper-ink);
-    font-size: 0.72rem;
-    font-weight: 680;
-    line-height: 1;
-  }
-
   .archive {
-    top: 95.1%;
-    left: 50%;
-    padding: 0.22rem 0.48rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.7rem;
+    width: fit-content;
+    margin-inline: auto;
+    position: relative;
+    z-index: 2;
+    background: var(--map-bg);
   }
-
-  .flow-label {
-    padding: 0.13rem 0.3rem;
-    background: var(--paper-surface);
-    color: var(--paper-muted);
-    font-size: clamp(0.55rem, 0.85vw, 0.67rem);
-    font-weight: 680;
-    line-height: 1;
-    white-space: nowrap;
+  .archive span {
+    display: grid;
+    gap: 0.25rem;
   }
-
-  .flow-label--signals {
-    top: 25.5%;
-    left: 20%;
+  .archive strong {
+    font-size: 0.74rem;
   }
-
-  .flow-label--authorized {
-    top: 47%;
-    left: 52.5%;
-    color: var(--blue);
+  .archive small {
+    font-size: 0.62rem;
+    color: var(--map-muted);
   }
-
-  .flow-label--needs {
-    top: 48.8%;
-    left: 76%;
-    color: var(--orange);
+  .walkthrough {
+    border-top: 1px solid var(--map-line);
   }
-
-  .flow-label--verified {
-    top: 87.6%;
-    left: 82%;
-    color: var(--blue);
+  .walkthrough > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 4rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
-
+  .walkthrough-content {
+    padding: 0 0 1.4rem;
+    max-width: 38rem;
+    margin: auto;
+  }
+  .walkthrough-story {
+    min-height: 7rem;
+  }
+  .walkthrough-story > span {
+    font-size: 0.7rem;
+    color: var(--map-muted);
+  }
+  .walkthrough-story h3 {
+    font-size: 1rem;
+    margin: 0.55rem 0;
+  }
+  .walkthrough-story p {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .walkthrough-controls {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+  .walkthrough-controls[hidden] {
+    display: none;
+  }
+  .walkthrough-controls button {
+    font: inherit;
+    font-size: 0.8rem;
+    border: 1px solid var(--map-line);
+    border-radius: 6px;
+    color: var(--map-ink);
+    background: var(--map-node);
+    min-height: 44px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+  }
+  .walkthrough-controls button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .walkthrough-controls button:last-child {
+    margin-left: auto;
+  }
+  button:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--map-blue);
+    outline-offset: 4px;
+  }
+  [data-walking] [data-node] {
+    opacity: 0.45;
+    transition: opacity 160ms ease;
+  }
+  [data-walking] [data-node][data-active] {
+    opacity: 1;
+    outline: 2px solid var(--map-blue);
+    outline-offset: 5px;
+    border-radius: 6px;
+  }
+  [data-walking] .ani[data-active] {
+    border-radius: 50%;
+  }
+  [data-walking] .connection {
+    opacity: 0.12;
+    transition: opacity 160ms ease;
+  }
+  [data-walking] .connection[data-active] {
+    opacity: 1;
+  }
+  .connection[data-active] path {
+    stroke-width: 2.4;
+  }
   .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
-    padding: 0;
     margin: -1px;
+    padding: 0;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
   }
-
-  @media (max-width: 620px) {
-    .topology {
-      min-height: 68.75rem;
-      background-size: 1.45rem 1.45rem;
-    }
-
-    .routes--desktop {
-      display: none;
-    }
-
-    .routes--mobile {
-      display: block;
-    }
-
-    .domain-grid {
-      top: 1.1rem;
-      right: 0.6rem;
-      left: 0.6rem;
-      gap: 0.22rem;
-      height: 18rem;
-    }
-
-    .domain {
-      grid-template-rows: auto 7rem 6rem;
-    }
-
-    .domain h3 {
-      overflow: hidden;
-      font-size: clamp(0.55rem, 2.75vw, 0.72rem);
-      text-overflow: clip;
-    }
-
-    .source-list {
-      flex-direction: column;
-      gap: 0.28rem;
-    }
-
-    .source-list--records {
-      align-self: stretch;
-      justify-content: flex-start;
-      padding-top: 0.58rem;
-    }
-
-    .source-mark {
-      width: 1.75rem;
-      border-radius: 0.42rem;
-    }
-
-    .source-mark--record {
-      width: 2rem;
-    }
-
-    .calendar {
-      top: 35.8%;
-    }
-
-    .calendar__line {
-      width: 64vw;
-    }
-
-    .ani {
-      top: 43.2%;
-      width: 5.7rem;
-    }
-
-    .agents {
-      top: 57.8%;
-      gap: min(25vw, 6rem);
-      width: 76%;
-    }
-
-    .credential {
-      top: 67.9%;
-    }
-
-    .infrastructure {
-      top: 79.2%;
-      width: 84%;
-      min-width: 0;
-    }
-
-    .device--mac-mini {
-      display: grid;
-      gap: 0.24rem;
-    }
-
-    .device--mac-mini .node-copy {
-      justify-items: center;
-    }
-
-    .device__icon {
-      width: 2.45rem;
-    }
-
-    .device__icon--mac-mini {
-      width: 3.15rem;
-    }
-
-    .persist {
-      top: 88.8%;
-    }
-
-    .archive {
-      top: 95.7%;
-    }
-
-    .flow-label--signals {
-      top: 32.1%;
-      left: 18%;
-    }
-
-    .flow-label--authorized {
-      top: 51.8%;
-      left: 56%;
-    }
-
-    .flow-label--needs {
-      top: 53.5%;
-      left: 79%;
-    }
-
-    .flow-label--verified {
-      top: 85.8%;
-      left: 50%;
-    }
-
-    .node-copy strong {
+  @media (max-width: 1000px) and (min-width: 700px) {
+    .stage p {
       font-size: 0.7rem;
     }
+    .human-area {
+      right: 0;
+    }
+    .context-area {
+      left: 0;
+      width: 21%;
+    }
+    .context-heading h3 {
+      font-size: 0.71rem;
+    }
+    .context-heading :global(svg) {
+      width: 16px;
+    }
+    .source-grid {
+      gap: 0.8rem 0.2rem;
+    }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .route-packet {
+  @media (max-width: 699px) {
+    .map-caption {
+      font-size: 0.73rem;
+    }
+    .caption-note {
       display: none;
+    }
+    .map-surface {
+      padding: 1rem 0.7rem 0;
+    }
+    .domain-strip {
+      font-size: clamp(0.63rem, 2.5vw, 0.8rem);
+      padding-bottom: 1rem;
+      gap: 0.1rem;
+    }
+    .diagram-body {
+      padding-top: 2rem;
+    }
+    .spine {
+      width: 55%;
+      margin-left: 10%;
+      gap: 4.5rem;
+      padding-bottom: 7rem;
+    }
+    .stage {
+      padding: 0.95rem 0.45rem;
+      min-height: 4.3rem;
+    }
+    .stage h3 {
+      font-size: 0.83rem;
+    }
+    .stage p {
+      font-size: 0.7rem;
+    }
+    .stage-number {
+      font-size: 0.5rem;
+    }
+    .execution {
+      gap: 4.5rem;
+      padding-top: 5.1rem;
+    }
+    .execution::before {
+      inset: 0 -0.55rem -0.9rem;
+    }
+    .execution-heading h3 {
+      font-size: 0.69rem;
+    }
+    .workers {
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .workers span {
+      font-size: 0.6rem;
+    }
+    .workers :global(svg) {
+      width: 14px;
+      height: 14px;
+    }
+    .human-area {
+      right: 0.3rem;
+      top: 19.4rem;
+      width: 24%;
+    }
+    .ani {
+      width: 3.5rem;
+    }
+    .ani img {
+      width: 2.65rem;
+      height: 1.8rem;
+    }
+    .ani strong {
+      font-size: 0.68rem;
+    }
+    .human-area p {
+      font-size: 0.6rem;
+      line-height: 1.5;
+    }
+    .human-note {
+      display: none;
+    }
+    .context-area {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: auto;
+      margin: 0 0 2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--map-line);
+    }
+    .context-heading {
+      width: fit-content;
+      margin: auto;
+      padding: 0.7rem 1rem;
+    }
+    .support-description {
+      font-size: 0.7rem;
+    }
+    .source-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .source-group h4 {
+      font-size: 0.73rem;
+    }
+    .source-group {
+      margin-bottom: 1.1rem;
+      margin-inline: 1rem 2rem;
+    }
+    .credential-group .source-item {
+      justify-content: center;
+    }
+    .more-sources summary {
+      font-size: 0.76rem;
+    }
+    .more-sources {
+      margin-inline: 1rem 2rem;
+    }
+    .context-port,
+    .runtime-port {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      z-index: 2;
+      background: var(--map-bg);
+      font-size: 0.59rem;
+      writing-mode: vertical-rl;
+      padding: 0.2rem;
+    }
+    .context-port {
+      left: -0.3rem;
+      top: 24rem;
+    }
+    .runtime-port {
+      right: 0;
+      top: 40rem;
+    }
+    .feedback {
+      right: 0;
+      top: 54.7rem;
+      width: 26%;
+      font-size: 0.6rem;
+      padding: 0.3rem;
+    }
+    .feedback strong {
+      font-size: 0.64rem;
+    }
+    .feedback small {
+      font-size: 0.56rem;
+    }
+    .infrastructure {
+      margin: 0;
+      padding-top: 1.3rem;
+    }
+    .infrastructure header {
+      flex-wrap: wrap;
+    }
+    .infrastructure header > span {
+      font-size: 0.65rem;
+    }
+    .device strong {
+      font-size: 0.67rem;
+    }
+    .device small {
+      font-size: 0.57rem;
+    }
+    .devices {
+      gap: 0.4rem;
+    }
+    .connection text {
+      font-size: 9px;
+      stroke-width: 4px;
+    }
+    .walkthrough > summary {
+      font-size: 0.76rem;
+    }
+    .walkthrough-story p {
+      font-size: 0.8rem;
+    }
+    .walkthrough-story {
+      min-height: 10rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-walking] [data-node],
+    [data-walking] .connection {
+      transition: none !important;
     }
   }
 </style>
