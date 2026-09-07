@@ -1,10 +1,18 @@
 ---
 import type { SystemsPageContent } from "@anipotts/content/public";
+import { Icon } from "astro-icon/components";
+import AgentMark from "./AgentMark.astro";
 
 interface Props {
   workflow: SystemsPageContent["workflow"];
 }
 const { workflow } = Astro.props;
+
+const stepIcons: Record<string, string> = {
+  outcome: "ph:user-focus",
+  context: "ph:stack",
+  check: "ph:seal-check",
+};
 ---
 
 <figure class="workflow" aria-label="How I work with agents">
@@ -16,7 +24,25 @@ const { workflow } = Astro.props;
             <span class="step-number" aria-hidden="true">
               {index + 1}
             </span>
-            <h2>{step.label}</h2>
+            <h2>
+              <span
+                class:list={[
+                  "step-icon",
+                  { "step-icon--agents": step.id === "work" },
+                ]}
+                aria-hidden="true"
+              >
+                {step.id === "work" ? (
+                  <>
+                    <AgentMark provider="openai" size={17} />
+                    <AgentMark provider="claude" size={17} />
+                  </>
+                ) : (
+                  <Icon name={stepIcons[step.id] ?? "ph:circle"} size={19} />
+                )}
+              </span>
+              <span>{step.label}</span>
+            </h2>
             <p>{step.detail}</p>
           </li>
         ))
@@ -56,6 +82,9 @@ const { workflow } = Astro.props;
     margin-bottom: 1.1rem;
   }
   .step h2 {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
     min-height: 2.5em;
     font-family: var(--sans);
     font-size: clamp(1.05rem, 1.7vw, 1.35rem);
@@ -63,6 +92,17 @@ const { workflow } = Astro.props;
     line-height: 1.25;
     margin: 0 0 0.75rem;
     text-wrap: balance;
+  }
+  .step-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.25em;
+    color: currentColor;
+  }
+  .step-icon--agents {
+    gap: 0.2rem;
   }
   .step p {
     font-size: 0.95rem;
