@@ -1,14 +1,14 @@
 ---
 title: systems
-description: "how i work with coding agents: choose an outcome, bring context, build, and check the result."
+description: "how i work with coding agents: define the task, bring relevant context, work with agents, and review and complete."
 hero_title: systems
 hero_summary: "how i actually work."
 workflow:
   intro: "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task."
   steps:
     - id: outcome
-      label: choose an outcome
-      detail: "i decide what matters and what a useful result would look like"
+      label: define the task
+      detail: "i decide what i want done, what matters, and what a useful result looks like"
     - id: context
       label: bring relevant context
       detail: "i share the files, examples, and constraints that make the task specific"
@@ -16,8 +16,8 @@ workflow:
       label: work with agents
       detail: "i answer questions and steer as the work takes shape"
     - id: check
-      label: complete the work
-      detail: "i review the result, ask for changes, deliver it, and record exactly what happened"
+      label: review and complete
+      detail: "i check the result, ask for changes, and make sure it is delivered and recorded"
   feedback: "lessons from the result inform the next task"
 # Retained experiment data. The public page renders workflow only.
 lifecycle:

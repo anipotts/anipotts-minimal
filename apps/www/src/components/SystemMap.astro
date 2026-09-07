@@ -25,7 +25,7 @@ const stepMarks: Record<
     { icon: "simple-icons:linear", label: "Linear", monochrome: true },
   ],
   work: [
-    { icon: "simple-icons:openai", label: "Codex", monochrome: true },
+    { image: "/brand/sources/codex.png", label: "Codex" },
     { icon: "logos:claude-icon", label: "Claude Code" },
   ],
 };
@@ -130,23 +130,12 @@ const stepMarks: Record<
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: #fff;
+    width: 36px;
+    height: 36px;
     color: #171717;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-  }
-  :global([data-theme="dark"]) .app-mark {
-    background: #242424;
   }
   :global([data-theme="dark"]) .app-mark--monochrome {
     color: #fff;
-  }
-  .app-mark--native,
-  :global([data-theme="dark"]) .app-mark--native {
-    background: transparent;
-    box-shadow: none;
   }
   .step-mark img {
     display: block;
@@ -155,8 +144,8 @@ const stepMarks: Record<
     object-fit: contain;
   }
   .app-mark--native img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
   .step p {
     font-size: 0.95rem;
@@ -195,6 +184,16 @@ const stepMarks: Record<
     color: var(--ink-muted);
     text-align: center;
     margin: 0.65rem 0 0;
+  }
+  @media (min-width: 700px) {
+    .step h2 {
+      display: grid;
+      grid-template-rows: 2.5em 36px;
+      align-items: start;
+    }
+    .step-mark {
+      justify-content: flex-start;
+    }
   }
   @media (max-width: 699px) {
     .steps {

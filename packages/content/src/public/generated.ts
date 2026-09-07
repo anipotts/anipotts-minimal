@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "66cb71352176036f001103ac4de2b7ddedbeb7c74c5e0eb581041c952eaba603";
+  "a3b209d2f3126adb2767ab9d8a81ae86bbff899429582ff6189c842389644acf";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -255,7 +255,7 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
 export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
   title: "systems",
   description:
-    "how i work with coding agents: choose an outcome, bring context, build, and check the result.",
+    "how i work with coding agents: define the task, bring relevant context, work with agents, and review and complete.",
   hero_title: "systems",
   hero_summary: "how i actually work.",
   workflow: {
@@ -264,9 +264,9 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
     steps: [
       {
         id: "outcome",
-        label: "choose an outcome",
+        label: "define the task",
         detail:
-          "i decide what matters and what a useful result would look like",
+          "i decide what i want done, what matters, and what a useful result looks like",
       },
       {
         id: "context",
@@ -281,9 +281,9 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
       },
       {
         id: "check",
-        label: "complete the work",
+        label: "review and complete",
         detail:
-          "i review the result, ask for changes, deliver it, and record exactly what happened",
+          "i check the result, ask for changes, and make sure it is delivered and recorded",
       },
     ],
     feedback: "lessons from the result inform the next task",
