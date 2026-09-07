@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "767b3b2f7c3759babd48f7917e7fb7189ed4f043776b31d269ff3343339c50a9",
+  "source_hash": "4d12488252baa1aa6580db053ccde3c377e25887d35c6faa06e9ecf60cf684c6",
   "source_records": [
     {
       "id": "projects.quantercise",
@@ -131,7 +131,7 @@
         },
         {
           "path": "identity",
-          "value": "{\"logo_src\":\"/images/brand/structured-ai-favicon.png\",\"logo_alt\":\"structured ai\",\"logo_tone\":\"adaptive\"}",
+          "value": "{\"logo_src\":\"/images/brand/structured-ai-mark.svg\",\"logo_alt\":\"structured ai\",\"logo_tone\":\"adaptive\"}",
           "kind": "object"
         },
         { "path": "sort_order", "value": "99", "kind": "number" },
@@ -1047,7 +1047,7 @@
       "status": "source_controlled",
       "route": "/",
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "baee7559ef159e3f4bad1aa67c6c9065e830a2094cb6b7286851dfa0efd03e89"
+      "source_hash": "8d6c7458d55011cef014d639d2cc87fd4dbc0e03749bcbb599d500c535787bbe"
     },
     {
       "entity_id": "public-page:making",
@@ -1218,7 +1218,7 @@
       "status": "archived",
       "route": "/projects/structured-ai",
       "source_ref": "content/public/projects/structured-ai.md",
-      "source_hash": "f588a6366b53c21be2756cf0e4c5301e174feefcfdd1306d9afdc59f1e281363"
+      "source_hash": "dca69a3a36e3d463b6c05d8776ff215cc7fae0c166e629f2f939b2c85f52f636"
     },
     {
       "entity_id": "public-writing:awareness-is-alpha",

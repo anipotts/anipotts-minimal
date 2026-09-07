@@ -190,7 +190,6 @@ const displayTitle = isPgi ? "pgi research" : d.title;
     position: relative;
     display: grid;
     place-items: center;
-    min-height: 15rem;
     padding: clamp(0.8rem, 2.6vw, 1.35rem);
     overflow: hidden;
     isolation: isolate;
@@ -218,6 +217,7 @@ const displayTitle = isPgi ? "pgi research" : d.title;
     overflow: hidden;
     border-radius: var(--radius-desktop-ui-media);
     box-shadow: 0 1.1rem 2.7rem rgb(7 32 93 / 28%);
+    transform-origin: center;
     transition: transform 180ms ease;
   }
 
@@ -315,10 +315,6 @@ const displayTitle = isPgi ? "pgi research" : d.title;
       box-shadow: 0 1.35rem 3rem rgb(11 18 32 / 20%);
     }
 
-    .experience-feature:hover .experience-feature__window {
-      transform: translateY(-2px);
-    }
-
     .experience-feature:hover .experience-feature__action {
       color: var(--paper-accent);
       transform: translate(0.1rem, -0.1rem);
@@ -327,6 +323,18 @@ const displayTitle = isPgi ? "pgi research" : d.title;
 
   .experience-feature:focus-visible .experience-feature__action {
     color: var(--paper-accent);
+  }
+
+  @media (min-width: 641px) {
+    .experience-feature:focus-visible .experience-feature__window {
+      transform: scale(1.075);
+    }
+  }
+
+  @media (hover: hover) and (min-width: 641px) {
+    .experience-feature:hover .experience-feature__window {
+      transform: scale(1.075);
+    }
   }
 
   .experience-feature__mark--pgi {
@@ -351,10 +359,6 @@ const displayTitle = isPgi ? "pgi research" : d.title;
   }
 
   @media (max-width: 640px) {
-    .experience-feature__visual {
-      min-height: 13rem;
-    }
-
     .experience-feature__body {
       min-height: auto;
     }

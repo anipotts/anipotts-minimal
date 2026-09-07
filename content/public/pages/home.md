@@ -57,9 +57,10 @@ mentions:
   structuredAi:
     label: structured ai
     href: https://getstructured.ai/
-    logoSrc: /images/brand/structured-ai-favicon.png
+    logoSrc: /images/brand/structured-ai-mark.svg
     logoAlt: structured ai
     logoTone: white
+    logoShape: mark
   yCombinatorF25:
     label: (YC F25)
     logoSrc: /images/brand/ycombinator-favicon.ico
