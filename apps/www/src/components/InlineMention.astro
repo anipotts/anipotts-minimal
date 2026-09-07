@@ -55,6 +55,7 @@ const remainingLabel = remainingWords.join(" ");
           class:list={{
             "brand-mark": true,
             "brand-mark-wide": logoShape === "wide",
+            "brand-mark-standalone": logoShape === "mark",
           }}
           aria-hidden="true"
         >
@@ -86,6 +87,7 @@ const remainingLabel = remainingWords.join(" ");
             class:list={{
               "brand-mark": true,
               "brand-mark-wide": logoShape === "wide",
+              "brand-mark-standalone": logoShape === "mark",
             }}
             aria-hidden="true"
           >
@@ -218,6 +220,15 @@ const remainingLabel = remainingWords.join(" ");
 
   .brand-mark-wide {
     width: 1.24em;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .brand-mark-standalone {
+    width: 1.08em;
+    height: 1.08em;
+    overflow: visible;
     border-radius: 0;
     background: transparent;
     box-shadow: none;

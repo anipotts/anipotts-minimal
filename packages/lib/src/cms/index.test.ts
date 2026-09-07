@@ -219,6 +219,7 @@ describe("homepage cms validation", () => {
       logoSrc: "/images/brand/structured-ai-favicon.png",
       logoAlt: "structured ai",
       logoTone: "white",
+      logoShape: "mark",
     });
     expect(validateHomepageContent(content)).toEqual({ ok: true });
   });

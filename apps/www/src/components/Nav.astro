@@ -34,14 +34,6 @@ const current = Astro.url.pathname;
       }
     </span>
   </nav>
-  <a
-    class="email-action"
-    href="mailto:contact@anipotts.com"
-    aria-label="email Ani"
-    title="email Ani"
-  >
-    <Icon name="ph:envelope-simple" />
-  </a>
   <button
     id="theme-toggle"
     class="theme-toggle"
@@ -108,7 +100,6 @@ const current = Astro.url.pathname;
     color: var(--interactive);
   }
 
-  .email-action,
   .theme-toggle {
     background: none;
     border: 0;
@@ -122,16 +113,10 @@ const current = Astro.url.pathname;
     transition: color 0.2s;
   }
 
-  .email-action {
-    text-decoration: none;
-  }
-
   .theme-toggle {
     cursor: pointer;
   }
 
-  .email-action:hover,
-  .email-action:focus-visible,
   .theme-toggle:hover,
   .theme-toggle:focus-visible {
     color: var(--interactive);

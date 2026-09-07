@@ -1,0 +1,76 @@
+---
+import { Icon } from "astro-icon/components";
+interface Props {
+  mark: string;
+  label?: string;
+}
+const { mark, label } = Astro.props;
+const images: Record<string, string> = {
+  nyu: "nyu.png",
+  files: "files.png",
+  notes: "notes.png",
+  withings: "withings.jpg",
+  zocdoc: "zocdoc.jpg",
+  "mac-mini": "mac-mini.png",
+  books: "apple-books.jpg",
+  "apple-health": "apple-health.jpg",
+};
+---
+
+<span
+  class:list={[
+    "source-icon",
+    {
+      messages: mark === "simple-icons:imessage",
+      password: mark === "simple-icons:1password",
+    },
+  ]}
+  aria-hidden="true"
+>
+  {
+    images[mark] ? (
+      <img
+        src={`/brand/sources/${images[mark]}`}
+        alt=""
+        width="64"
+        height="64"
+      />
+    ) : (
+      <Icon name={mark} />
+    )
+  }
+</span>
+{label && <span class="source-name">{label}</span>}
+<style>
+  .source-icon {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    background: white;
+    color: #20252e;
+    border: 1px solid #dce1e9;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .source-icon :global(svg) {
+    width: 70%;
+    height: 70%;
+  }
+  .source-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .source-name {
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+  .messages {
+    color: #24af4b;
+  }
+  .password {
+    color: #0572ec;
+  }
+</style>

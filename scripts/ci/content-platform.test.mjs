@@ -37,6 +37,7 @@ import {
   contentOperationTables,
   contentOperationTemplates,
 } from "../../packages/content/dist/admin/operations.js";
+import { validateSystemsLifecycle } from "../../packages/content/dist/public/systems-lifecycle.js";
 import {
   contentInventorySource as rootContentInventorySource,
   DEFAULT_HOMEPAGE_CONTENT,
@@ -659,12 +660,6 @@ assert.equal(
 
 const systemsContent = normalizeSystemsPageContent({
   map_principle: " autonomy is an attention-routing problem. ",
-  map_domains: [
-    { label: "career", children: ["business", "content"] },
-    { label: "learning", children: [] },
-    { label: "wellbeing", children: [] },
-    { label: "personal", children: [] },
-  ],
 });
 assert.equal(
   systemsContent.map_principle,
@@ -673,13 +668,29 @@ assert.equal(
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
 assert.deepEqual(
   systemsContent.map_nodes.map(({ id }) => id),
-  ["life", "snap_store", "admin", "ani", "agents", "work", "record"],
+  [
+    "life",
+    "snap_store",
+    "admin",
+    "ani",
+    "agents",
+    "work",
+    "record",
+    "calendar",
+    "credentials",
+    "infrastructure",
+  ],
   "systems map nodes must preserve the reviewed information flow",
 );
 assert.deepEqual(
   systemsContent.map_foundations.map(({ id }) => id),
-  ["calendar", "github", "mac_mini", "external_ssd"],
+  ["calendar", "github", "mac_mini", "one_password", "tailnet", "external_ssd"],
   "systems map foundations must preserve the reviewed storage model",
+);
+assert.deepEqual(
+  systemsContent.map_devices.map(({ id }) => id),
+  ["iphone", "macbook", "mac_mini"],
+  "systems map devices must preserve the reviewed tailnet",
 );
 assert.deepEqual(
   systemsContent.map_authority_modes.map(({ id }) => id),
@@ -688,19 +699,21 @@ assert.deepEqual(
 );
 assert.deepEqual(
   systemsContent.map_relationships.map(
-    ({ id, source, destination, authority }) => ({
+    ({ id, source, destination, authority, kind }) => ({
       id,
       source,
       destination,
       authority,
+      kind,
     }),
   ),
   DEFAULT_SYSTEMS_CONTENT.map_relationships.map(
-    ({ id, source, destination, authority }) => ({
+    ({ id, source, destination, authority, kind }) => ({
       id,
       source,
       destination,
       authority,
+      kind,
     }),
   ),
   "systems map paths must preserve their reviewed endpoints and authority",
@@ -726,6 +739,11 @@ assert.deepEqual(
   "an incomplete systems map must fall back to the reviewed foundations",
 );
 assert.deepEqual(
+  normalizeSystemsPageContent({ map_devices: [] }).map_devices,
+  DEFAULT_SYSTEMS_CONTENT.map_devices,
+  "an incomplete systems map must fall back to the reviewed tailnet",
+);
+assert.deepEqual(
   normalizeSystemsPageContent({ map_authority_modes: [] }).map_authority_modes,
   DEFAULT_SYSTEMS_CONTENT.map_authority_modes,
   "an incomplete systems map must fall back to the reviewed authority modes",
@@ -740,40 +758,223 @@ assert.equal(
     ...systemsContent,
     map_relationships: systemsContent.map_relationships.map((relationship) =>
       relationship.id === "ani_to_agents"
-        ? { ...relationship, authority: "own" }
+        ? { ...relationship, authority: "with_me" }
         : relationship,
     ),
   }).ok,
-  false,
-  "systems map relationships must keep their reviewed authority mode",
+  true,
+  "legacy experiment relationships must not constrain the lifecycle page",
 );
 assert.equal(
   validateSystemsPageContent(
     normalizeSystemsPageContent({
-      map_domains: [
-        { label: "career", children: [] },
-        { label: "career", children: [] },
-        { label: "wellbeing", children: [] },
-        { label: "personal", children: [] },
-      ],
+      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
+        index === 1 ? { ...domain, label: "career" } : domain,
+      ),
     }),
   ).ok,
-  false,
-  "systems map domain identities must remain unique",
+  true,
+  "legacy domain data is independent of the canonical lifecycle domains",
 );
 assert.equal(
   validateSystemsPageContent(
     normalizeSystemsPageContent({
-      map_domains: [
-        { label: "career", children: ["business", "business"] },
-        { label: "learning", children: [] },
-        { label: "wellbeing", children: [] },
-        { label: "personal", children: [] },
-      ],
+      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
+        index === 0
+          ? { ...domain, sources: [domain.sources[0], domain.sources[0]] }
+          : domain,
+      ),
     }),
   ).ok,
+  true,
+  "legacy source data is independent of the canonical lifecycle sources",
+);
+
+const lifecycle = systemsContent.lifecycle;
+assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
+assert.equal(
+  systemsContent.hero_summary,
+  "i've always done a lot of my work through technology, now agents help with tasks and thinking i don't need to do myself, especially when figuring it out takes longer than doing it",
+);
+assert.deepEqual(lifecycle.domains, [
+  "career",
+  "learning",
+  "wellbeing",
+  "personal",
+]);
+assert.deepEqual(
+  lifecycle.stages.map(({ id }) => id),
+  ["request", "understand", "gather", "act", "verify", "complete"],
+);
+assert.deepEqual(
+  normalizeSystemsPageContent({ lifecycle: JSON.stringify(lifecycle) })
+    .lifecycle,
+  lifecycle,
+);
+for (const [name, mutate] of [
+  [
+    "missing endpoint",
+    (graph) => {
+      graph.edges[0].destination = "absent";
+    },
+  ],
+  [
+    "duplicate node",
+    (graph) => {
+      graph.support.push(graph.support[0]);
+    },
+  ],
+  [
+    "duplicate edge",
+    (graph) => {
+      graph.edges.push(graph.edges[0]);
+    },
+  ],
+  [
+    "duplicate source",
+    (graph) => {
+      graph.sources.push(graph.sources[0]);
+    },
+  ],
+  [
+    "duplicate device",
+    (graph) => {
+      graph.devices.push(graph.devices[0]);
+    },
+  ],
+  [
+    "invalid walkthrough node",
+    (graph) => {
+      graph.walkthrough[0].nodes = ["absent"];
+    },
+  ],
+  [
+    "invalid walkthrough edge",
+    (graph) => {
+      graph.walkthrough[0].edges = ["absent"];
+    },
+  ],
+  [
+    "missing completion path",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "finish");
+    },
+  ],
+  [
+    "missing retry",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "record_failed");
+    },
+  ],
+  [
+    "missing feedback task",
+    (graph) => {
+      graph.edges = graph.edges.filter(({ id }) => id !== "followup_due");
+    },
+  ],
+]) {
+  const graph = structuredClone(lifecycle);
+  mutate(graph);
+  const result = validateSystemsLifecycle(
+    normalizeSystemsPageContent({ lifecycle: graph }).lifecycle,
+  );
+  assert.equal(
+    result.ok,
+    false,
+    `reject ${name} without silently falling back`,
+  );
+}
+assert.equal(
+  validateSystemsLifecycle(
+    normalizeSystemsPageContent({ lifecycle: "{broken" }).lifecycle,
+  ).ok,
   false,
-  "systems map domain children must remain unique",
+);
+const paths = new Map(lifecycle.edges.map((edge) => [edge.id, edge]));
+function follow(start, edgeIds) {
+  let current = start;
+  for (const id of edgeIds) {
+    const edge = paths.get(id);
+    assert.ok(edge, `missing route ${id}`);
+    assert.equal(edge.source, current, `disconnected route ${id}`);
+    current = edge.destination;
+  }
+  return current;
+}
+assert.equal(
+  follow("request", ["start", "scope", "ready", "check", "finish"]),
+  "complete",
+);
+assert.equal(
+  follow("act", [
+    "missing_context",
+    "lookup",
+    "needs_me",
+    "answer_context",
+    "ready",
+  ]),
+  "act",
+);
+assert.equal(follow("act", ["decision", "new_goal", "scope"]), "gather");
+assert.equal(follow("verify", ["more_work", "check"]), "verify");
+assert.equal(
+  follow("complete", ["record_failed", "record_blocked", "answer_record"]),
+  "complete",
+);
+assert.equal(follow("complete", ["followup", "followup_due"]), "request");
+assert.equal(follow("feedback", ["learn", "context_back"]), "gather");
+assert.match(lifecycle.completion_rule, /record is saved/);
+assert.match(lifecycle.pause_rule, /paused task remains open/);
+assert.equal(lifecycle.walkthrough.length, 9);
+assert.match(
+  lifecycle.walkthrough.map(({ detail }) => detail).join(" "),
+  /Add to calendar/,
+);
+const lifecyclePage = readFileSync("apps/www/src/pages/systems.astro", "utf8");
+assert.ok(lifecyclePage.includes("workflow={content.workflow}"));
+assert.equal(lifecyclePage.includes("content.lifecycle"), false);
+assert.deepEqual(
+  validateSystemsPageContent({ ...systemsContent, lifecycle: null }),
+  { ok: true },
+  "experimental lifecycle does not constrain public workflow",
+);
+const workflow = systemsContent.workflow;
+assert.equal(workflow.steps.length, 4);
+assert.deepEqual(
+  normalizeSystemsPageContent({ workflow: JSON.stringify(workflow) }).workflow,
+  workflow,
+);
+for (const invalid of [
+  { ...workflow, steps: workflow.steps.slice(1) },
+  {
+    ...workflow,
+    steps: [workflow.steps[0], workflow.steps[0], ...workflow.steps.slice(2)],
+  },
+  { ...workflow, intro: "" },
+])
+  assert.equal(
+    validateSystemsPageContent({ ...systemsContent, workflow: invalid }).ok,
+    false,
+  );
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({ workflow: "{broken" }),
+  ).ok,
+  false,
+);
+const workflowComponent = readFileSync(
+  "apps/www/src/components/SystemMap.astro",
+  "utf8",
+);
+assert.equal(
+  workflowComponent.includes("<script"),
+  false,
+  "diagram must be static without a client controller",
+);
+assert.equal(
+  lifecyclePage.includes("content.map_"),
+  false,
+  "public lifecycle must not depend on the experimental topology",
 );
 
 assert.equal(
