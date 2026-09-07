@@ -96,7 +96,7 @@ const stepMarks: Record<
   .step {
     position: relative;
     min-width: 0;
-    padding: 1.1rem 0 1rem;
+    padding: 1.1rem 0;
     border-top: 1px solid var(--border-strong);
   }
   .step-number {
@@ -179,14 +179,15 @@ const stepMarks: Record<
   @media (max-width: 699px) {
     .steps {
       grid-template-columns: minmax(0, 1fr);
-      gap: 1.8rem;
+      gap: 0;
       padding-left: 2rem;
     }
     .step {
       display: grid;
       grid-template-columns: 1.2rem 1fr;
       column-gap: 0.6rem;
-      padding: 0.9rem 0 0;
+      row-gap: 0.5rem;
+      padding: 1.35rem 0;
     }
     .step-number {
       margin: 0.1rem 0 0;
@@ -195,7 +196,7 @@ const stepMarks: Record<
     .step h2 {
       min-height: 0;
       font-size: 1.18rem;
-      margin-bottom: 0.5rem;
+      margin: 0;
       text-wrap: initial;
     }
     .step p {
