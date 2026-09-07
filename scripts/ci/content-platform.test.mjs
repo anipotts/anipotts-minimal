@@ -794,7 +794,7 @@ const lifecycle = systemsContent.lifecycle;
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
 assert.equal(
   systemsContent.hero_summary,
-  "i've always done a lot of my work through technology, now agents help with tasks and thinking i don't need to do myself, especially when figuring it out takes longer than doing it",
+  "i've always used technology to get more out of my time, and now i work with agents to turn plans into actionable tasks while keeping my attention on the decisions that matter to me",
 );
 assert.deepEqual(lifecycle.domains, [
   "career",
@@ -940,6 +940,47 @@ assert.deepEqual(
 );
 const workflow = systemsContent.workflow;
 assert.equal(workflow.steps.length, 4);
+assert.deepEqual(workflow.sources, [
+  "messages",
+  "gmail",
+  "calendar",
+  "notes",
+  "youtube",
+  "spotify",
+  "x",
+  "instagram",
+  "whatsapp",
+  "chrome",
+  "linkedin",
+  "granola",
+  "mercury",
+  "stripe",
+]);
+assert.deepEqual(
+  workflow.steps.map((step) => step.marks),
+  [
+    ["mac-mini", "github", "linear"],
+    ["tailscale", "1password", "obsidian"],
+    ["codex", "claude"],
+    ["github", "linear"],
+  ],
+);
+const legacyWorkflow = { ...workflow };
+delete legacyWorkflow.sources;
+legacyWorkflow.steps = workflow.steps.map(({ marks, ...step }) => step);
+assert.deepEqual(
+  normalizeSystemsPageContent({ workflow: legacyWorkflow }).workflow,
+  workflow,
+);
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({
+      workflow: { ...workflow, steps: [null, ...workflow.steps.slice(1)] },
+    }),
+  ).ok,
+  false,
+  "malformed legacy steps fail validation without crashing normalization",
+);
 assert.deepEqual(
   normalizeSystemsPageContent({ workflow: JSON.stringify(workflow) }).workflow,
   workflow,
@@ -951,6 +992,14 @@ for (const invalid of [
     steps: [workflow.steps[0], workflow.steps[0], ...workflow.steps.slice(2)],
   },
   { ...workflow, intro: "" },
+  { ...workflow, sources: ["unknown-provider"] },
+  {
+    ...workflow,
+    steps: workflow.steps.map((step) => ({
+      ...step,
+      marks: ["https://untrusted.example/logo.svg"],
+    })),
+  },
 ])
   assert.equal(
     validateSystemsPageContent({ ...systemsContent, workflow: invalid }).ok,
@@ -966,10 +1015,56 @@ const workflowComponent = readFileSync(
   "apps/www/src/components/SystemMap.astro",
   "utf8",
 );
+assert.ok(
+  workflowComponent.includes("workflow.sources.map"),
+  "sources must render without JavaScript",
+);
+assert.ok(
+  workflowComponent.includes("workflow.steps.map"),
+  "all steps must render without JavaScript",
+);
+assert.ok(
+  /data-motion-toggle\s+hidden/.test(workflowComponent),
+  "controls are progressively enhanced",
+);
 assert.equal(
-  workflowComponent.includes("<script"),
+  /source-heading|data-event|event-layer/.test(workflowComponent),
   false,
-  "diagram must be static without a client controller",
+  "no event heading or travelling marker",
+);
+const workflowAnimation = readFileSync(
+  "apps/www/src/scripts/workflow-animation.ts",
+  "utf8",
+);
+assert.equal(
+  /pointerenter|pointerleave|focusin|focusout|data-event/.test(
+    workflowAnimation,
+  ),
+  false,
+  "hover and focus never stop the marquee and event simulation is removed",
+);
+execFileSync(
+  process.execPath,
+  ["--experimental-strip-types", "scripts/ci/workflow-motion.test.mjs"],
+  { stdio: "inherit" },
+);
+for (const required of [
+  "prefers-reduced-motion",
+  "astro:before-swap",
+  "ResizeObserver",
+  "IntersectionObserver",
+  "visibilitychange",
+  "aria-hidden",
+  "listeners.abort()",
+])
+  assert.ok(
+    workflowAnimation.includes(required),
+    `animation needs ${required}`,
+  );
+assert.equal(
+  /fetch\(|WebSocket|EventSource/.test(workflowAnimation),
+  false,
+  "diagram has no live data connection",
 );
 assert.equal(
   lifecyclePage.includes("content.map_"),

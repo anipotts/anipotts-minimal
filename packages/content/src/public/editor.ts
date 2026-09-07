@@ -1057,6 +1057,27 @@ export function normalizeSystemsPageContent(
       workflow = null;
     }
   }
+  if (workflow && typeof workflow === "object" && !Array.isArray(workflow)) {
+    const legacy = workflow as Partial<SystemsPageContent["workflow"]>;
+    workflow = {
+      ...legacy,
+      sources: legacy.sources ?? DEFAULT_SYSTEMS_CONTENT.workflow.sources,
+      steps: Array.isArray(legacy.steps)
+        ? legacy.steps.map((step) =>
+            step && typeof step === "object"
+              ? {
+                  ...step,
+                  marks:
+                    step.marks ??
+                    DEFAULT_SYSTEMS_CONTENT.workflow.steps.find(
+                      (fallback) => fallback.id === step.id,
+                    )?.marks,
+                }
+              : step,
+          )
+        : legacy.steps,
+    };
+  }
 
   return {
     workflow: workflow as SystemsPageContent["workflow"],
@@ -1168,6 +1189,44 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     return {
       ok: false,
       error: "Systems workflow needs four unique ordered steps",
+    };
+  const providers = new Set([
+    "messages",
+    "gmail",
+    "calendar",
+    "notes",
+    "youtube",
+    "x",
+    "instagram",
+    "chrome",
+    "linkedin",
+    "spotify",
+    "whatsapp",
+    "granola",
+    "mercury",
+    "stripe",
+    "mac-mini",
+    "github",
+    "linear",
+    "tailscale",
+    "1password",
+    "obsidian",
+    "codex",
+    "claude",
+  ]);
+  const validMarks = (marks: unknown): marks is string[] =>
+    Array.isArray(marks) &&
+    marks.length > 0 &&
+    marks.length <= providers.size &&
+    new Set(marks).size === marks.length &&
+    marks.every((mark) => typeof mark === "string" && providers.has(mark));
+  if (
+    !validMarks(workflow.sources) ||
+    workflow.steps.some((step) => !validMarks(step.marks))
+  )
+    return {
+      ok: false,
+      error: "Systems workflow contains invalid provider marks",
     };
   for (const [value, label] of [
     [content.title, "Systems title"],

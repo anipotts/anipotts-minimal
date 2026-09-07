@@ -1,135 +1,80 @@
 ---
 import type { SystemsPageContent } from "@anipotts/content/public";
-import { Icon } from "astro-icon/components";
+import WorkflowMark from "./WorkflowMark.astro";
 
 interface Props {
   workflow: SystemsPageContent["workflow"];
 }
 const { workflow } = Astro.props;
-
-const stepMarks: Record<
-  string,
-  Array<{
-    icon?: string;
-    image?: string;
-    darkImage?: string;
-    label: string;
-    monochrome?: boolean;
-  }>
-> = {
-  outcome: [{ icon: "simple-icons:linear", label: "Linear", monochrome: true }],
-  context: [
-    { icon: "logos:google-gmail", label: "Gmail" },
-    { icon: "logos:google-calendar", label: "Google Calendar" },
-  ],
-  check: [
-    { icon: "simple-icons:github", label: "GitHub", monochrome: true },
-    { icon: "simple-icons:linear", label: "Linear", monochrome: true },
-  ],
-  work: [
-    {
-      image: "/brand/sources/codex-light.png",
-      darkImage: "/brand/sources/codex.png",
-      label: "Codex",
-    },
-    { icon: "logos:claude-icon", label: "Claude Code" },
-  ],
-};
 ---
 
-<figure class="workflow" aria-label="How I work with agents">
+<figure class="workflow" data-workflow aria-label="How I work with agents">
+  <div class="source-panel">
+    <div class="source-window">
+      <ul class="source-track" aria-label="Everyday sources">
+        {
+          workflow.sources.map((id) => (
+            <li data-source={id}>
+              <WorkflowMark id={id} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <button
+      type="button"
+      data-motion-toggle
+      hidden
+      aria-pressed="false"
+      aria-label="Pause source animation"
+      title="Pause source animation"
+    >
+      <svg
+        class="pause-symbol"
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        aria-hidden="true"
+        ><path
+          d="M5 3v10M11 3v10"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"></path></svg
+      >
+      <svg
+        class="play-symbol"
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        aria-hidden="true"
+        ><path d="m5 3 8 5-8 5Z" fill="currentColor"></path></svg
+      >
+    </button>
+  </div>
+  <div class="intake-space" aria-hidden="true">
+    <span class="intake-line"></span>
+  </div>
   <div class="diagram">
     <div class="step-flow">
       <ol class="steps">
         {
-          workflow.steps.map((step, index) => (
-            <li class="step">
-              <span class="step-number" aria-hidden="true">
-                {index + 1}
-              </span>
+          workflow.steps.map((step) => (
+            <li class="step" data-step={step.id}>
               <h2>
                 <span>{step.label}</span>
-                <span class="step-mark">
-                  {(step.id === "context" || step.id === "outcome") && (
-                    <span
-                      class="device-files"
-                      role="img"
-                      aria-label={
-                        step.id === "outcome"
-                          ? "Apple Notes on my Mac mini"
-                          : "Files on my Mac mini"
-                      }
-                      title={
-                        step.id === "outcome"
-                          ? "Apple Notes on my Mac mini"
-                          : "Files on my Mac mini"
-                      }
-                    >
-                      <span class="device-icon">
-                        <img
-                          class="mac-mini"
-                          src="/brand/sources/mac-mini.png"
-                          alt=""
-                          width="48"
-                          height="48"
-                          loading="lazy"
-                        />
-                      </span>
-                      <span class="device-icon">
-                        <img
-                          src={
-                            step.id === "outcome"
-                              ? "/brand/sources/notes.png"
-                              : "/brand/sources/files.png"
-                          }
-                          alt=""
-                          width="36"
-                          height="36"
-                          loading="lazy"
-                        />
-                      </span>
-                    </span>
-                  )}
-                  {stepMarks[step.id]?.map((mark) => (
-                    <span
-                      class:list={[
-                        "app-mark",
-                        { "app-mark--monochrome": mark.monochrome },
-                        { "app-mark--native": Boolean(mark.image) },
-                        { "app-mark--codex": mark.label === "Codex" },
-                        {
-                          "app-mark--apple": mark.label === "Apple Notes",
-                        },
-                      ]}
-                      title={mark.label}
-                    >
-                      {mark.image ? (
-                        <>
-                          <img
-                            class:list={{
-                              "app-image--light": Boolean(mark.darkImage),
-                            }}
-                            src={mark.image}
-                            alt={mark.label}
-                            width="30"
-                            height="30"
-                            loading="lazy"
-                          />
-                          {mark.darkImage && (
-                            <img
-                              class="app-image--dark"
-                              src={mark.darkImage}
-                              alt={mark.label}
-                              width="30"
-                              height="30"
-                              loading="lazy"
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <Icon name={mark.icon!} size={30} title={mark.label} />
-                      )}
-                    </span>
+                <span
+                  class:list={[
+                    "step-mark",
+                    { "device-files": step.id === "outcome" },
+                  ]}
+                  aria-label={
+                    step.id === "outcome"
+                      ? "Mac mini with GitHub and Linear records"
+                      : undefined
+                  }
+                >
+                  {step.marks.map((id) => (
+                    <WorkflowMark id={id} grouped={step.id === "outcome"} />
                   ))}
                 </span>
               </h2>
@@ -140,26 +85,32 @@ const stepMarks: Record<
       </ol>
       <span class="return-route" aria-hidden="true"></span>
     </div>
-    <div class="loop-note">
-      <p class="feedback">{workflow.feedback}</p>
-      <span class="access-note" title="1Password: credentials and access">
-        <span class="access-mark"
-          ><Icon
-            name="simple-icons:1password"
-            size={22}
-            title="1Password"
-          /></span
-        >
-        <span>credentials and access</span>
-      </span>
-    </div>
+    <div class="loop-note"><p class="feedback">{workflow.feedback}</p></div>
   </div>
 </figure>
 
+<script>
+  import { mountWorkflows } from "../scripts/workflow-animation";
+  mountWorkflows();
+  document.addEventListener("astro:page-load", mountWorkflows);
+</script>
+
 <style>
+  /* Shared app tiles keep provider marks consistent across steps and the loop. */
   .workflow {
+    min-width: 0;
+    width: 100%;
+    --app-tile-size: 36px;
+    --app-tile-bg: linear-gradient(#fff, #f4f4f4);
+    --app-tile-border: rgb(0 0 0 / 16%);
     margin: 0;
+    position: relative;
   }
+  :global([data-theme="dark"]) .workflow {
+    --app-tile-bg: linear-gradient(#303130, #111313);
+    --app-tile-border: rgb(255 255 255 / 24%);
+  }
+
   .step-flow {
     position: relative;
   }
@@ -176,12 +127,6 @@ const stepMarks: Record<
     min-width: 0;
     padding: 1.1rem 0;
     border-top: 1px solid var(--border-strong);
-  }
-  .step-number {
-    display: block;
-    color: var(--ink-muted);
-    font-size: 0.875rem;
-    margin-bottom: 1.1rem;
   }
   .step h2 {
     display: flex;
@@ -205,88 +150,15 @@ const stepMarks: Record<
     color: currentColor;
     gap: 0.5rem;
   }
-  .app-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    color: #171717;
-  }
-  .app-mark:not(.app-mark--native) {
-    border-radius: 9px;
-    background: #fff;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
-  }
-  .app-mark:not(.app-mark--native) :global(svg) {
-    width: 26px;
-    height: 26px;
-  }
-  :global([data-theme="dark"]) .app-mark:not(.app-mark--native) {
-    background: #242424;
-    box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 7%),
-      0 1px 3px rgb(0 0 0 / 20%);
-  }
-  .app-mark--apple img {
-    filter: drop-shadow(0 2px 2px rgb(0 0 0 / 18%));
-  }
-  :global([data-theme="dark"]) .app-mark--monochrome {
-    color: #fff;
-  }
-  .step-mark img {
-    display: block;
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-  }
-  .app-mark--native img {
-    width: 36px;
-    height: 36px;
-  }
-  .app-mark--codex img {
-    width: 43px;
-    height: 43px;
-    max-width: none;
-  }
   .device-files {
-    display: inline-flex;
-    align-items: center;
     gap: 4px;
     padding-inline: 4px;
+    width: max-content;
     height: 36px;
+    border: 1px solid var(--app-tile-border);
     border-radius: 9px;
-    background: #fff;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
-  }
-  .device-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-  }
-  .device-icon img {
-    width: 36px;
-    height: 36px;
-  }
-  .device-icon img.mac-mini {
-    width: 48px;
-    height: 48px;
-    max-width: none;
-  }
-  :global([data-theme="dark"]) .device-files {
-    background: #242424;
-    box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 7%),
-      0 1px 3px rgb(0 0 0 / 20%);
-  }
-  .app-mark img.app-image--dark,
-  :global([data-theme="dark"]) .app-mark img.app-image--light {
-    display: none;
-  }
-  :global([data-theme="dark"]) .app-mark img.app-image--dark {
-    display: block;
+    background: var(--app-tile-bg);
+    box-sizing: border-box;
   }
   .step p {
     font-size: 0.95rem;
@@ -297,8 +169,12 @@ const stepMarks: Record<
   .step:not(:last-child)::after {
     content: "→";
     position: absolute;
-    right: -1.65rem;
-    top: 0.9rem;
+    right: -1.875rem;
+    top: -1px;
+    width: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    transform: translateY(-50%);
     color: var(--ink);
   }
   .return-route {
@@ -324,37 +200,48 @@ const stepMarks: Record<
     font-size: 0.95rem;
     color: var(--ink-muted);
     margin: 0;
-    max-width: 34ch;
+    max-width: 48ch;
     text-wrap: pretty;
   }
   .loop-note {
     display: grid;
-    justify-items: end;
+    justify-items: center;
     gap: 0.75rem;
     margin-top: 1.25rem;
-    text-align: right;
+    text-align: center;
   }
-  .access-note {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--ink-muted);
-    font-size: 0.8rem;
-  }
-  .access-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: #fff;
-    color: #0094f5;
-  }
-  :global([data-theme="dark"]) .access-mark {
-    background: #242424;
-  }
-  @media (min-width: 700px) {
+  @media (min-width: 880px) {
+    .step {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-block: 2rem;
+    }
+    .step-flow::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      /* Fourth column starts at 75% plus three quarters of the 2.25rem gap. */
+      left: calc(75% + 1.6875rem);
+      right: 12.5%;
+      height: 0.75rem;
+      border-top: 1px solid var(--border-strong);
+      border-right: 1px solid var(--border-strong);
+      pointer-events: none;
+    }
+    .step:first-child,
+    .step:last-child {
+      border-top-color: transparent;
+    }
+    .step:first-child::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      /* Half the column plus 3/8 of the grid gap meets the 12.5% intake. */
+      left: calc(50% + 0.84375rem);
+      right: 0;
+      border-top: 1px solid var(--border-strong);
+    }
     .step h2 {
       display: grid;
       grid-template-rows: 2.5em 36px;
@@ -364,32 +251,47 @@ const stepMarks: Record<
       justify-content: flex-start;
     }
   }
-  @media (max-width: 699px) {
+  @media (max-width: 879px) {
+    .workflow {
+      --step-inset: 4rem;
+    }
+    .diagram {
+      position: relative;
+    }
     .steps {
       grid-template-columns: minmax(0, 1fr);
       gap: 0;
-      padding-left: 3rem;
+      padding-left: var(--step-inset);
     }
     .step {
       display: grid;
-      grid-template-columns: 1.2rem 1fr;
-      column-gap: 0.6rem;
-      row-gap: 0.5rem;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 0.75rem;
       padding: 1.35rem 0;
     }
-    .step-number {
-      margin: 0.1rem 0 0;
-      grid-row: 1 / 3;
-    }
     .step h2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+      gap: 0.75rem;
       min-height: 0;
       font-size: 1.18rem;
       margin: 0;
       text-wrap: initial;
     }
     .step p {
-      grid-column: 2;
       max-width: 42ch;
+    }
+    .step:first-child {
+      border-top-color: transparent;
+    }
+    .step:first-child::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 2.2rem;
+      right: 0;
+      border-top: 1px solid var(--border-strong);
     }
     .step:not(:last-child)::after {
       content: none;
@@ -428,8 +330,8 @@ const stepMarks: Record<
       position: absolute;
       top: 1.6rem;
       bottom: 0;
-      left: 0.5rem;
-      width: 1.5rem;
+      left: 2rem;
+      width: 1.25rem;
       height: auto;
       margin: 0;
       border: 1px solid var(--border-strong);
@@ -442,8 +344,112 @@ const stepMarks: Record<
       transform: rotate(135deg);
     }
     .loop-note {
-      margin-top: 1.7rem;
-      margin-left: 3rem;
+      position: absolute;
+      top: 1.6rem;
+      bottom: 0;
+      left: 0;
+      width: 1.25rem;
+      margin: 0;
+      place-items: center;
+    }
+    .feedback {
+      max-width: none;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      white-space: nowrap;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+  }
+
+  .source-panel {
+    min-width: 0;
+    position: relative;
+    padding-right: 44px;
+  }
+  [data-motion-toggle] {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  .play-symbol,
+  [aria-pressed="true"] .pause-symbol {
+    display: none;
+  }
+  [aria-pressed="true"] .play-symbol {
+    display: block;
+  }
+  .workflow:not([data-animated]) .source-panel {
+    padding-right: 0;
+  }
+  [data-motion-toggle]:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  .source-window {
+    min-width: 0;
+    max-width: 100%;
+    padding: 12px 0;
+  }
+  .source-track {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .source-track li {
+    display: flex;
+    flex: 0 0 36px;
+  }
+  .workflow[data-animated] .source-window {
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent
+    );
+  }
+  .workflow[data-animated] .source-track {
+    flex-wrap: nowrap;
+    width: max-content;
+    will-change: transform;
+  }
+  .intake-space {
+    position: relative;
+    height: 3rem;
+  }
+  .intake-line {
+    position: absolute;
+    left: 12.5%;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--border-strong);
+  }
+  @media (max-width: 879px) {
+    .intake-line {
+      left: calc(var(--step-inset) + 2.2rem);
+    }
+    .source-track {
+      gap: 18px;
     }
   }
 </style>

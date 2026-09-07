@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "4d12488252baa1aa6580db053ccde3c377e25887d35c6faa06e9ecf60cf684c6";
+  "bc0d10c510eab92b44067679fad74cb9f11c4866331c901440fe64408b308137";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -256,39 +256,60 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
 export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
   title: "systems",
   description:
-    "how i work with coding agents: define the task, bring relevant context, work with agents, and review and complete.",
+    "how i work with coding agents: define the task, retrieve context, work with agents, and review and complete.",
   hero_title: "systems",
   hero_summary:
-    "i've always done a lot of my work through technology, now agents help with tasks and thinking i don't need to do myself, especially when figuring it out takes longer than doing it",
+    "i've always used technology to get more out of my time, and now i work with agents to turn plans into actionable tasks while keeping my attention on the decisions that matter to me",
   workflow: {
+    sources: [
+      "messages",
+      "gmail",
+      "calendar",
+      "notes",
+      "youtube",
+      "spotify",
+      "x",
+      "instagram",
+      "whatsapp",
+      "chrome",
+      "linkedin",
+      "granola",
+      "mercury",
+      "stripe",
+    ],
     intro:
-      "the diagram below shows how i delegate work and keep track of what's happening, where i'm needed, and what i'm working towards",
+      "the map below shows my general process for keeping track of what i'm working towards",
     steps: [
       {
         id: "outcome",
+        marks: ["mac-mini", "github", "linear"],
         label: "define the task",
         detail:
-          "i decide what i want done, what matters, and what a useful result looks like",
+          "i assess the current state to define new tasks or review existing ones",
       },
       {
         id: "context",
-        label: "bring relevant context",
+        marks: ["tailscale", "1password", "obsidian"],
+        label: "retrieve context",
         detail:
           "i share the files, examples, and constraints that make the task specific",
       },
       {
         id: "work",
+        marks: ["codex", "claude"],
         label: "work with agents",
         detail: "i answer questions and steer as the work takes shape",
       },
       {
         id: "check",
+        marks: ["github", "linear"],
         label: "review and complete",
         detail:
           "i check the result, ask for changes, and make sure it is delivered and recorded",
       },
     ],
-    feedback: "i review what happened and decide what comes next",
+    feedback:
+      "we persist what we learn, and my agents carry that context into the next task",
   },
   lifecycle: {
     status: "intended system",
