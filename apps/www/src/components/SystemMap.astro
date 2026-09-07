@@ -9,7 +9,13 @@ const { workflow } = Astro.props;
 
 const stepMarks: Record<
   string,
-  Array<{ icon?: string; image?: string; label: string; monochrome?: boolean }>
+  Array<{
+    icon?: string;
+    image?: string;
+    darkImage?: string;
+    label: string;
+    monochrome?: boolean;
+  }>
 > = {
   outcome: [
     { image: "/brand/sources/notes.png", label: "Apple Notes" },
@@ -25,7 +31,11 @@ const stepMarks: Record<
     { icon: "simple-icons:linear", label: "Linear", monochrome: true },
   ],
   work: [
-    { image: "/brand/sources/codex.png", label: "Codex" },
+    {
+      image: "/brand/sources/codex-light.png",
+      darkImage: "/brand/sources/codex.png",
+      label: "Codex",
+    },
     { icon: "logos:claude-icon", label: "Claude Code" },
   ],
 };
@@ -53,13 +63,28 @@ const stepMarks: Record<
                     title={mark.label}
                   >
                     {mark.image ? (
-                      <img
-                        src={mark.image}
-                        alt={mark.label}
-                        width="30"
-                        height="30"
-                        loading="lazy"
-                      />
+                      <>
+                        <img
+                          class:list={{
+                            "app-image--light": Boolean(mark.darkImage),
+                          }}
+                          src={mark.image}
+                          alt={mark.label}
+                          width="30"
+                          height="30"
+                          loading="lazy"
+                        />
+                        {mark.darkImage && (
+                          <img
+                            class="app-image--dark"
+                            src={mark.darkImage}
+                            alt={mark.label}
+                            width="30"
+                            height="30"
+                            loading="lazy"
+                          />
+                        )}
+                      </>
                     ) : (
                       <Icon name={mark.icon!} size={30} title={mark.label} />
                     )}
@@ -146,6 +171,13 @@ const stepMarks: Record<
   .app-mark--native img {
     width: 36px;
     height: 36px;
+  }
+  .app-mark img.app-image--dark,
+  :global([data-theme="dark"]) .app-mark img.app-image--light {
+    display: none;
+  }
+  :global([data-theme="dark"]) .app-mark img.app-image--dark {
+    display: block;
   }
   .step p {
     font-size: 0.95rem;

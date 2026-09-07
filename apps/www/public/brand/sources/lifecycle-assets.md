@@ -4,6 +4,11 @@ The Codex mark (`codex.png`) is reused from the repository's localized official
 Codex macOS app resource in `apps/admin/src/assets/provider-marks/codex.png`.
 It retains the native app artwork and background.
 
+The light variant (`codex-light.png`) is the unmodified official
+`icon-codex-light.png` bundled in the installed app's Resources directory.
+Source SHA-256: `de7d43f3386105ab20952958c2c25beb0d903e2aeb6e1aef57c49a648c0d1c07`.
+The site selects the light or dark artwork using its active theme.
+
 Apple Books and Apple Health artwork is localized from Apple's App Store lookup
 metadata at 512 x 512 pixels. Retrieved 2026-09-05. The images retain their
 original brand colors and are displayed at 32 CSS pixels.
