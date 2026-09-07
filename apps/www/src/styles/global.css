@@ -159,6 +159,21 @@ h1 {
   gap: var(--s-8);
 }
 
+/* Primary listing pages share one introduction rhythm. */
+.page--listing {
+  gap: clamp(2rem, 5vw, 3rem);
+}
+
+.page--listing .hero-summary,
+.page--listing .page-intro {
+  font-size: clamp(1.05rem, 2.2vw, 1.42rem);
+  line-height: 1.52;
+  color: var(--ink-muted);
+  max-width: none;
+  text-wrap: pretty;
+  margin: 0;
+}
+
 .section-label {
   font-family: var(--sans);
   font-weight: 600;

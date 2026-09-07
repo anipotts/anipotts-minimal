@@ -23,7 +23,7 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
         content.workflow.intro
           .split(/\n\s*\n/)
           .filter(Boolean)
-          .map((paragraph) => <p>{paragraph}</p>)
+          .map((paragraph) => <p class="page-intro">{paragraph}</p>)
       }
     </div>
     <SystemMap workflow={content.workflow} />
@@ -37,20 +37,12 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   }
 
   .intro {
-    max-width: 65ch;
     display: grid;
     gap: 1.25em;
-    font-size: 1.15rem;
-    line-height: 1.65;
     margin: 0;
   }
   .intro p {
     margin: 0;
-  }
-  @media (max-width: 699px) {
-    .intro {
-      font-size: 1.05rem;
-    }
   }
 
   .hero-title {
@@ -59,20 +51,9 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     line-height: 0.9;
   }
 
-  .hero-summary {
-    max-width: none;
-    font-size: clamp(1.08rem, 2.2vw, 1.42rem);
-    line-height: 1.52;
-    text-wrap: pretty;
-  }
-
   @media (max-width: 620px) {
     .hero-title {
       margin-bottom: var(--s-3);
-    }
-
-    .hero-summary {
-      font-size: 1.05rem;
     }
   }
 </style>
