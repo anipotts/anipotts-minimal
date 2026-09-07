@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "a3b209d2f3126adb2767ab9d8a81ae86bbff899429582ff6189c842389644acf",
+  "source_hash": "4eb5fd772145a10b8a0df226624434ca89abb2fb6c37352137798b370fcb63a8",
   "sources": {
     "content/public/pages/home.md": "baee7559ef159e3f4bad1aa67c6c9065e830a2094cb6b7286851dfa0efd03e89",
     "content/public/pages/making.md": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d",
@@ -9,7 +9,7 @@
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
     "content/public/pages/orchestrating.md": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714",
     "content/public/pages/projects.md": "3fbd16ec46c50a7556adc9b711ba0f3b08817a9cbf3dff4262c1a622529f5b48",
-    "content/public/pages/systems.md": "37b6026945e183fedec0fe90fbfe5e12b312bdb94506d9e44aca61c92ebaafe2",
+    "content/public/pages/systems.md": "c026473137b30ddcc5ae2ddb17d990cf504d06d7d004133d2dd0a3e86f8c3fbc",
     "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
     "content/public/projects/chainedchat.md": "2fe160412514b5c714131e275f94ebda10e2e77c2bba55e41f18ae3fb96c0a9b",
     "content/public/projects/claude-code-tips.md": "187746649476952e6e555cdc7228e3cbb85f580fa7d88b89178bb66dba816a3d",
@@ -232,9 +232,9 @@
       "title": "systems",
       "description": "how i work with coding agents: define the task, bring relevant context, work with agents, and review and complete.",
       "hero_title": "systems",
-      "hero_summary": "how i actually work.",
+      "hero_summary": "how i've found myself operating my work towards my goals",
       "workflow": {
-        "intro": "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task.",
+        "intro": "i've always done much of my work through technology. now i can ask agents to help me think through a problem and take on parts of the work itself.\n\nthat's made me more deliberate about how i organize my work, my data, and the context about my life. i want to be able to hand off a task with enough context to make it useful, then stay involved as it takes shape.\n\nthis page is a view of how i'm putting that together: what i'm working towards, what i delegate, and where i make the decisions. having a system helps me keep track of it all.",
         "steps": [
           {
             "id": "outcome",

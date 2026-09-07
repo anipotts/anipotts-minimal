@@ -18,7 +18,14 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   </section>
 
   <section class="stack" aria-label="Working with agents">
-    <p class="intro">{content.workflow.intro}</p>
+    <div class="intro">
+      {
+        content.workflow.intro
+          .split(/\n\s*\n/)
+          .filter(Boolean)
+          .map((paragraph) => <p>{paragraph}</p>)
+      }
+    </div>
     <SystemMap workflow={content.workflow} />
   </section>
 </Shell>
@@ -31,10 +38,13 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 
   .intro {
     max-width: 65ch;
-  }
-  .intro {
+    display: grid;
+    gap: 1.25em;
     font-size: 1.15rem;
     line-height: 1.65;
+    margin: 0;
+  }
+  .intro p {
     margin: 0;
   }
   @media (max-width: 699px) {

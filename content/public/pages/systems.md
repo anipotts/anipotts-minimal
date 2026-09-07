@@ -2,9 +2,14 @@
 title: systems
 description: "how i work with coding agents: define the task, bring relevant context, work with agents, and review and complete."
 hero_title: systems
-hero_summary: "how i actually work."
+hero_summary: "how i've found myself operating my work towards my goals"
 workflow:
-  intro: "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task."
+  intro: |-
+    i've always done much of my work through technology. now i can ask agents to help me think through a problem and take on parts of the work itself.
+
+    that's made me more deliberate about how i organize my work, my data, and the context about my life. i want to be able to hand off a task with enough context to make it useful, then stay involved as it takes shape.
+
+    this page is a view of how i'm putting that together: what i'm working towards, what i delegate, and where i make the decisions. having a system helps me keep track of it all.
   steps:
     - id: outcome
       label: define the task

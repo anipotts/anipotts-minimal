@@ -31,6 +31,7 @@ const stepMarks: Record<
     { icon: "simple-icons:linear", label: "Linear", monochrome: true },
   ],
   work: [
+    { image: "/brand/sources/mac-mini.png", label: "Mac mini" },
     {
       image: "/brand/sources/codex-light.png",
       darkImage: "/brand/sources/codex.png",
@@ -62,8 +63,10 @@ const stepMarks: Record<
                       {
                         "app-mark--apple":
                           mark.label === "Apple Notes" ||
-                          mark.label === "Finder",
+                          mark.label === "Finder" ||
+                          mark.label === "Mac mini",
                       },
+                      { "app-mark--mac-mini": mark.label === "Mac mini" },
                     ]}
                     title={mark.label}
                   >
@@ -194,6 +197,9 @@ const stepMarks: Record<
   .app-mark--native img {
     width: 36px;
     height: 36px;
+  }
+  .app-mark--mac-mini img {
+    transform: scale(1.85);
   }
   .app-mark img.app-image--dark,
   :global([data-theme="dark"]) .app-mark img.app-image--light {

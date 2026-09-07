@@ -792,7 +792,10 @@ assert.equal(
 
 const lifecycle = systemsContent.lifecycle;
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
-assert.equal(systemsContent.hero_summary, "how i actually work.");
+assert.equal(
+  systemsContent.hero_summary,
+  "how i've found myself operating my work towards my goals",
+);
 assert.deepEqual(lifecycle.domains, [
   "career",
   "learning",
