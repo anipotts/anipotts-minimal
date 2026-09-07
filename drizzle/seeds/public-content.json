@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "4eb5fd772145a10b8a0df226624434ca89abb2fb6c37352137798b370fcb63a8",
+  "source_hash": "836673ae0d37330cb4dfa97544c18930f3e2541790cc37c05d40e0955253178d",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -268,7 +268,7 @@
               "detail": "i check the result, ask for changes, and make sure it is delivered and recorded"
             }
           ],
-          "feedback": "lessons from the result inform the next task"
+          "feedback": "i review what happened and decide what comes next"
         },
         "lifecycle": {
           "status": "intended system",
@@ -1201,7 +1201,7 @@
         ]
       },
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "c026473137b30ddcc5ae2ddb17d990cf504d06d7d004133d2dd0a3e86f8c3fbc"
+      "source_hash": "60d2f52ff5feac8514e6102aecf977c5bf30a5970588483644d4840ff356bc6f"
     },
     {
       "page_key": "writing",

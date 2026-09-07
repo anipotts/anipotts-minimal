@@ -23,7 +23,7 @@ workflow:
     - id: check
       label: review and complete
       detail: "i check the result, ask for changes, and make sure it is delivered and recorded"
-  feedback: "lessons from the result inform the next task"
+  feedback: "i review what happened and decide what comes next"
 # Retained experiment data. The public page renders workflow only.
 lifecycle:
   {

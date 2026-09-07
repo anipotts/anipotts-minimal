@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "4eb5fd772145a10b8a0df226624434ca89abb2fb6c37352137798b370fcb63a8";
+  "836673ae0d37330cb4dfa97544c18930f3e2541790cc37c05d40e0955253178d";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -286,7 +286,7 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
           "i check the result, ask for changes, and make sure it is delivered and recorded",
       },
     ],
-    feedback: "lessons from the result inform the next task",
+    feedback: "i review what happened and decide what comes next",
   },
   lifecycle: {
     status: "intended system",

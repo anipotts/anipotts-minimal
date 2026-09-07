@@ -17,10 +17,7 @@ const stepMarks: Record<
     monochrome?: boolean;
   }>
 > = {
-  outcome: [
-    { image: "/brand/sources/notes.png", label: "Apple Notes" },
-    { icon: "simple-icons:linear", label: "Linear", monochrome: true },
-  ],
+  outcome: [{ icon: "simple-icons:linear", label: "Linear", monochrome: true }],
   context: [
     { icon: "logos:google-gmail", label: "Gmail" },
     { icon: "logos:google-calendar", label: "Google Calendar" },
@@ -42,93 +39,120 @@ const stepMarks: Record<
 
 <figure class="workflow" aria-label="How I work with agents">
   <div class="diagram">
-    <ol class="steps">
-      {
-        workflow.steps.map((step, index) => (
-          <li class="step">
-            <span class="step-number" aria-hidden="true">
-              {index + 1}
-            </span>
-            <h2>
-              <span>{step.label}</span>
-              <span class="step-mark">
-                {step.id === "context" && (
-                  <span
-                    class="device-files"
-                    role="img"
-                    aria-label="Files on my Mac mini"
-                    title="Files on my Mac mini"
-                  >
-                    <span class="device-icon">
-                      <img
-                        class="mac-mini"
-                        src="/brand/sources/mac-mini.png"
-                        alt=""
-                        width="60"
-                        height="60"
-                        loading="lazy"
-                      />
-                    </span>
-                    <span class="device-icon">
-                      <img
-                        src="/brand/sources/files.png"
-                        alt=""
-                        width="36"
-                        height="36"
-                        loading="lazy"
-                      />
-                    </span>
-                  </span>
-                )}
-                {stepMarks[step.id]?.map((mark) => (
-                  <span
-                    class:list={[
-                      "app-mark",
-                      { "app-mark--monochrome": mark.monochrome },
-                      { "app-mark--native": Boolean(mark.image) },
-                      {
-                        "app-mark--apple": mark.label === "Apple Notes",
-                      },
-                    ]}
-                    title={mark.label}
-                  >
-                    {mark.image ? (
-                      <>
+    <div class="step-flow">
+      <ol class="steps">
+        {
+          workflow.steps.map((step, index) => (
+            <li class="step">
+              <span class="step-number" aria-hidden="true">
+                {index + 1}
+              </span>
+              <h2>
+                <span>{step.label}</span>
+                <span class="step-mark">
+                  {(step.id === "context" || step.id === "outcome") && (
+                    <span
+                      class="device-files"
+                      role="img"
+                      aria-label={
+                        step.id === "outcome"
+                          ? "Apple Notes on my Mac mini"
+                          : "Files on my Mac mini"
+                      }
+                      title={
+                        step.id === "outcome"
+                          ? "Apple Notes on my Mac mini"
+                          : "Files on my Mac mini"
+                      }
+                    >
+                      <span class="device-icon">
                         <img
-                          class:list={{
-                            "app-image--light": Boolean(mark.darkImage),
-                          }}
-                          src={mark.image}
-                          alt={mark.label}
-                          width="30"
-                          height="30"
+                          class="mac-mini"
+                          src="/brand/sources/mac-mini.png"
+                          alt=""
+                          width="48"
+                          height="48"
                           loading="lazy"
                         />
-                        {mark.darkImage && (
+                      </span>
+                      <span class="device-icon">
+                        <img
+                          src={
+                            step.id === "outcome"
+                              ? "/brand/sources/notes.png"
+                              : "/brand/sources/files.png"
+                          }
+                          alt=""
+                          width="36"
+                          height="36"
+                          loading="lazy"
+                        />
+                      </span>
+                    </span>
+                  )}
+                  {stepMarks[step.id]?.map((mark) => (
+                    <span
+                      class:list={[
+                        "app-mark",
+                        { "app-mark--monochrome": mark.monochrome },
+                        { "app-mark--native": Boolean(mark.image) },
+                        { "app-mark--codex": mark.label === "Codex" },
+                        {
+                          "app-mark--apple": mark.label === "Apple Notes",
+                        },
+                      ]}
+                      title={mark.label}
+                    >
+                      {mark.image ? (
+                        <>
                           <img
-                            class="app-image--dark"
-                            src={mark.darkImage}
+                            class:list={{
+                              "app-image--light": Boolean(mark.darkImage),
+                            }}
+                            src={mark.image}
                             alt={mark.label}
                             width="30"
                             height="30"
                             loading="lazy"
                           />
-                        )}
-                      </>
-                    ) : (
-                      <Icon name={mark.icon!} size={30} title={mark.label} />
-                    )}
-                  </span>
-                ))}
-              </span>
-            </h2>
-            <p>{step.detail}</p>
-          </li>
-        ))
-      }
-    </ol>
-    <span class="return-route" aria-hidden="true"></span>
-    <p class="feedback">{workflow.feedback}</p>
+                          {mark.darkImage && (
+                            <img
+                              class="app-image--dark"
+                              src={mark.darkImage}
+                              alt={mark.label}
+                              width="30"
+                              height="30"
+                              loading="lazy"
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <Icon name={mark.icon!} size={30} title={mark.label} />
+                      )}
+                    </span>
+                  ))}
+                </span>
+              </h2>
+              <p>{step.detail}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <span class="return-route" aria-hidden="true"></span>
+    </div>
+    <div class="loop-note">
+      <p class="feedback">{workflow.feedback}</p>
+      <span class="access-note" title="1Password: credentials and access">
+        <span class="access-mark"
+          ><Icon
+            name="simple-icons:1password"
+            size={22}
+            title="1Password"
+          /></span
+        >
+        <span>credentials and access</span>
+      </span>
+    </div>
   </div>
 </figure>
 
@@ -136,7 +160,7 @@ const stepMarks: Record<
   .workflow {
     margin: 0;
   }
-  .diagram {
+  .step-flow {
     position: relative;
   }
   .steps {
@@ -220,6 +244,11 @@ const stepMarks: Record<
     width: 36px;
     height: 36px;
   }
+  .app-mark--codex img {
+    width: 43px;
+    height: 43px;
+    max-width: none;
+  }
   .device-files {
     display: inline-flex;
     align-items: center;
@@ -242,8 +271,8 @@ const stepMarks: Record<
     height: 36px;
   }
   .device-icon img.mac-mini {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     max-width: none;
   }
   :global([data-theme="dark"]) .device-files {
@@ -292,10 +321,38 @@ const stepMarks: Record<
     transform: rotate(45deg);
   }
   .feedback {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--ink-muted);
-    text-align: center;
-    margin: 0.65rem 0 0;
+    margin: 0;
+    max-width: 34ch;
+    text-wrap: pretty;
+  }
+  .loop-note {
+    display: grid;
+    justify-items: end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    text-align: right;
+  }
+  .access-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+  }
+  .access-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #fff;
+    color: #0094f5;
+  }
+  :global([data-theme="dark"]) .access-mark {
+    background: #242424;
   }
   @media (min-width: 700px) {
     .step h2 {
@@ -311,7 +368,7 @@ const stepMarks: Record<
     .steps {
       grid-template-columns: minmax(0, 1fr);
       gap: 0;
-      padding-left: 2rem;
+      padding-left: 3rem;
     }
     .step {
       display: grid;
@@ -370,9 +427,9 @@ const stepMarks: Record<
     .return-route {
       position: absolute;
       top: 1.6rem;
-      bottom: 2.9rem;
-      left: 0;
-      width: 1rem;
+      bottom: 0;
+      left: 0.5rem;
+      width: 1.5rem;
       height: auto;
       margin: 0;
       border: 1px solid var(--border-strong);
@@ -384,10 +441,9 @@ const stepMarks: Record<
       right: 0;
       transform: rotate(135deg);
     }
-    .feedback {
+    .loop-note {
       margin-top: 1.7rem;
-      padding-left: 2rem;
-      text-align: left;
+      margin-left: 3rem;
     }
   }
 </style>
