@@ -10,11 +10,18 @@ const { workflow } = Astro.props;
 
 const stepMarks: Record<
   string,
-  { icon?: string; image?: string; label: string }
+  Array<{ icon?: string; image?: string; label: string }>
 > = {
-  outcome: { image: "/brand/sources/notes.png", label: "Apple Notes" },
-  context: { image: "/brand/sources/files.png", label: "Finder" },
-  check: { icon: "simple-icons:github", label: "GitHub" },
+  outcome: [{ image: "/brand/sources/notes.png", label: "Apple Notes" }],
+  context: [
+    { image: "/brand/sources/files.png", label: "Finder" },
+    { icon: "logos:google-gmail", label: "Gmail" },
+    { icon: "logos:google-calendar", label: "Google Calendar" },
+  ],
+  check: [
+    { icon: "simple-icons:github", label: "GitHub" },
+    { icon: "simple-icons:linear", label: "Linear" },
+  ],
 };
 ---
 
@@ -44,20 +51,20 @@ const stepMarks: Record<
                       <AgentMark provider="claude" size={18} />
                     </span>
                   </>
-                ) : stepMarks[step.id]?.image ? (
-                  <img
-                    src={stepMarks[step.id].image}
-                    alt={stepMarks[step.id].label}
-                    width="20"
-                    height="20"
-                    loading="lazy"
-                  />
                 ) : (
-                  <Icon
-                    name={stepMarks[step.id]?.icon ?? "simple-icons:github"}
-                    size={18}
-                    title={stepMarks[step.id]?.label}
-                  />
+                  stepMarks[step.id]?.map((mark) =>
+                    mark.image ? (
+                      <img
+                        src={mark.image}
+                        alt={mark.label}
+                        width="20"
+                        height="20"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <Icon name={mark.icon!} size={18} title={mark.label} />
+                    ),
+                  )
                 )}
               </span>
             </h2>
@@ -117,6 +124,7 @@ const stepMarks: Record<
     justify-content: center;
     min-height: 1.2em;
     color: currentColor;
+    gap: 0.2rem;
   }
   .step-mark img {
     display: block;
