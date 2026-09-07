@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "f594a31d34a5062113619a6f72394adf766e9fa459bba7dca8fd6833da6e26c4",
+  "source_hash": "da6e6935213f2ad1f6564b9015e875a7c8cc8bb11cb78ac1bb02b2840a7446eb",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -250,22 +250,22 @@
             {
               "id": "outcome",
               "label": "choose an outcome",
-              "detail": "i decide what matters and what a useful result would look like."
+              "detail": "i decide what matters and what a useful result would look like"
             },
             {
               "id": "context",
               "label": "bring relevant context",
-              "detail": "i share the files, examples, and constraints that make the task specific."
+              "detail": "i share the files, examples, and constraints that make the task specific"
             },
             {
               "id": "work",
               "label": "work with agents",
-              "detail": "agents do the legwork. i answer questions and steer as the work takes shape."
+              "detail": "i answer questions and steer as the work takes shape"
             },
             {
               "id": "check",
-              "label": "check and ship",
-              "detail": "i review the result, ask for changes, and decide when it is ready."
+              "label": "complete the work",
+              "detail": "i review the result, ask for changes, deliver it, and record exactly what happened"
             }
           ],
           "feedback": "lessons from the result inform the next task",
@@ -1208,7 +1208,7 @@
         ]
       },
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "0f2ea8eb2dc12bceedcc51c7f1be03563dc0eb889eb8c2fd462bf188d3d2fe73"
+      "source_hash": "c6735139a8eb6dee85e8d6ea4298669b8e6a8e4aa8ed7088c19a2834ac5f3da2"
     },
     {
       "page_key": "writing",

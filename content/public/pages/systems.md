@@ -8,16 +8,16 @@ workflow:
   steps:
     - id: outcome
       label: choose an outcome
-      detail: "i decide what matters and what a useful result would look like."
+      detail: "i decide what matters and what a useful result would look like"
     - id: context
       label: bring relevant context
-      detail: "i share the files, examples, and constraints that make the task specific."
+      detail: "i share the files, examples, and constraints that make the task specific"
     - id: work
       label: work with agents
-      detail: "agents do the legwork. i answer questions and steer as the work takes shape."
+      detail: "i answer questions and steer as the work takes shape"
     - id: check
-      label: check and ship
-      detail: "i review the result, ask for changes, and decide when it is ready."
+      label: complete the work
+      detail: "i review the result, ask for changes, deliver it, and record exactly what happened"
   feedback: "lessons from the result inform the next task"
   caption: "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction."
   example:

@@ -8,10 +8,13 @@ interface Props {
 }
 const { workflow } = Astro.props;
 
-const stepIcons: Record<string, string> = {
-  outcome: "ph:user-focus",
-  context: "ph:stack",
-  check: "ph:seal-check",
+const stepMarks: Record<
+  string,
+  { icon?: string; image?: string; label: string }
+> = {
+  outcome: { image: "/brand/sources/notes.png", label: "Apple Notes" },
+  context: { image: "/brand/sources/files.png", label: "Finder" },
+  check: { icon: "simple-icons:github", label: "GitHub" },
 };
 ---
 
@@ -25,23 +28,38 @@ const stepIcons: Record<string, string> = {
               {index + 1}
             </span>
             <h2>
+              <span>{step.label}</span>
               <span
                 class:list={[
-                  "step-icon",
-                  { "step-icon--agents": step.id === "work" },
+                  "step-mark",
+                  { "step-mark--agents": step.id === "work" },
                 ]}
-                aria-hidden="true"
               >
                 {step.id === "work" ? (
                   <>
-                    <AgentMark provider="openai" size={17} />
-                    <AgentMark provider="claude" size={17} />
+                    <span title="Codex">
+                      <AgentMark provider="openai" size={18} />
+                    </span>
+                    <span title="Claude Code">
+                      <AgentMark provider="claude" size={18} />
+                    </span>
                   </>
+                ) : stepMarks[step.id]?.image ? (
+                  <img
+                    src={stepMarks[step.id].image}
+                    alt={stepMarks[step.id].label}
+                    width="20"
+                    height="20"
+                    loading="lazy"
+                  />
                 ) : (
-                  <Icon name={stepIcons[step.id] ?? "ph:circle"} size={19} />
+                  <Icon
+                    name={stepMarks[step.id]?.icon ?? "simple-icons:github"}
+                    size={18}
+                    title={stepMarks[step.id]?.label}
+                  />
                 )}
               </span>
-              <span>{step.label}</span>
             </h2>
             <p>{step.detail}</p>
           </li>
@@ -93,16 +111,25 @@ const stepIcons: Record<string, string> = {
     margin: 0 0 0.75rem;
     text-wrap: balance;
   }
-  .step-icon {
+  .step-mark {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    min-height: 1.25em;
+    min-height: 1.2em;
     color: currentColor;
   }
-  .step-icon--agents {
+  .step-mark img {
+    display: block;
+    width: 1.1em;
+    height: 1.1em;
+    object-fit: contain;
+  }
+  .step-mark--agents {
     gap: 0.2rem;
+  }
+  .step-mark--agents > span {
+    display: inline-flex;
   }
   .step p {
     font-size: 0.95rem;

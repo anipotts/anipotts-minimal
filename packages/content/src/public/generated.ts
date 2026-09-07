@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "f594a31d34a5062113619a6f72394adf766e9fa459bba7dca8fd6833da6e26c4";
+  "da6e6935213f2ad1f6564b9015e875a7c8cc8bb11cb78ac1bb02b2840a7446eb";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -266,25 +266,24 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
         id: "outcome",
         label: "choose an outcome",
         detail:
-          "i decide what matters and what a useful result would look like.",
+          "i decide what matters and what a useful result would look like",
       },
       {
         id: "context",
         label: "bring relevant context",
         detail:
-          "i share the files, examples, and constraints that make the task specific.",
+          "i share the files, examples, and constraints that make the task specific",
       },
       {
         id: "work",
         label: "work with agents",
-        detail:
-          "agents do the legwork. i answer questions and steer as the work takes shape.",
+        detail: "i answer questions and steer as the work takes shape",
       },
       {
         id: "check",
-        label: "check and ship",
+        label: "complete the work",
         detail:
-          "i review the result, ask for changes, and decide when it is ready.",
+          "i review the result, ask for changes, deliver it, and record exactly what happened",
       },
     ],
     feedback: "lessons from the result inform the next task",
