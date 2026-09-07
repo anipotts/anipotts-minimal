@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "da6e6935213f2ad1f6564b9015e875a7c8cc8bb11cb78ac1bb02b2840a7446eb",
+  "source_hash": "66cb71352176036f001103ac4de2b7ddedbeb7c74c5e0eb581041c952eaba603",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -268,14 +268,7 @@
               "detail": "i review the result, ask for changes, deliver it, and record exactly what happened"
             }
           ],
-          "feedback": "lessons from the result inform the next task",
-          "caption": "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction.",
-          "example": {
-            "title": "on this website",
-            "body": "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense.",
-            "href": "https://github.com/anipotts/anipotts.com",
-            "link_label": "site source"
-          }
+          "feedback": "lessons from the result inform the next task"
         },
         "lifecycle": {
           "status": "intended system",
@@ -1208,7 +1201,7 @@
         ]
       },
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "c6735139a8eb6dee85e8d6ea4298669b8e6a8e4aa8ed7088c19a2834ac5f3da2"
+      "source_hash": "aef9bb77540760978d72db708797cccc519cc961a03afa5240884bb50873bd2b"
     },
     {
       "page_key": "writing",

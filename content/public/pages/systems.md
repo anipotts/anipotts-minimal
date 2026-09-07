@@ -19,12 +19,6 @@ workflow:
       label: complete the work
       detail: "i review the result, ask for changes, deliver it, and record exactly what happened"
   feedback: "lessons from the result inform the next task"
-  caption: "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction."
-  example:
-    title: "on this website"
-    body: "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense."
-    href: "https://github.com/anipotts/anipotts.com"
-    link_label: "site source"
 # Retained experiment data. The public page renders workflow only.
 lifecycle:
   {

@@ -20,13 +20,6 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
   <section class="stack" aria-label="Working with agents">
     <p class="intro">{content.workflow.intro}</p>
     <SystemMap workflow={content.workflow} />
-    <section class="example" aria-labelledby="example-heading">
-      <h2 id="example-heading">{content.workflow.example.title}</h2>
-      <p>{content.workflow.example.body}</p>
-      <a href={content.workflow.example.href}
-        >{content.workflow.example.link_label}</a
-      >
-    </section>
   </section>
 </Shell>
 
@@ -36,35 +29,13 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     gap: var(--s-6);
   }
 
-  .intro,
-  .example {
+  .intro {
     max-width: 65ch;
   }
   .intro {
     font-size: 1.15rem;
     line-height: 1.65;
     margin: 0;
-  }
-  .example h2 {
-    font-family: var(--sans);
-    font-size: 1.35rem;
-    font-weight: 650;
-    margin: 0 0 var(--s-3);
-  }
-  .example p {
-    color: var(--ink-muted);
-    line-height: 1.7;
-    margin: 0 0 var(--s-3);
-  }
-  .example a {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-    display: inline-block;
-    padding-block: 0.5rem;
-  }
-  .example a:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 4px;
   }
   @media (max-width: 699px) {
     .intro {

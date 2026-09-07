@@ -1169,10 +1169,6 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
       ok: false,
       error: "Systems workflow needs four unique ordered steps",
     };
-  if (!workflow.example || typeof workflow.example !== "object")
-    return { ok: false, error: "Systems workflow needs a concrete example" };
-  if (!/^https:\/\//.test(workflow.example.href))
-    return { ok: false, error: "Systems example needs an HTTPS source link" };
   for (const [value, label] of [
     [content.title, "Systems title"],
     [content.description, "Systems description"],
@@ -1180,10 +1176,6 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     [content.hero_summary, "Systems hero summary"],
     [workflow.intro, "Systems introduction"],
     [workflow.feedback, "Systems feedback"],
-    [workflow.caption, "Systems caption"],
-    [workflow.example.title, "Systems example title"],
-    [workflow.example.body, "Systems example body"],
-    [workflow.example.link_label, "Systems example link"],
     ...workflow.steps.flatMap(
       (step) =>
         [

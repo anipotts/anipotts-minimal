@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "da6e6935213f2ad1f6564b9015e875a7c8cc8bb11cb78ac1bb02b2840a7446eb";
+  "66cb71352176036f001103ac4de2b7ddedbeb7c74c5e0eb581041c952eaba603";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -287,14 +287,6 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
       },
     ],
     feedback: "lessons from the result inform the next task",
-    caption:
-      "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction.",
-    example: {
-      title: "on this website",
-      body: "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense.",
-      href: "https://github.com/anipotts/anipotts.com",
-      link_label: "site source",
-    },
   },
   lifecycle: {
     status: "intended system",
