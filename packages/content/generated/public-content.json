@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "90cc4d523a9faffecc02dbd3f24bb27235a34269812d99929a3f85038127d6f3",
+  "source_hash": "f594a31d34a5062113619a6f72394adf766e9fa459bba7dca8fd6833da6e26c4",
   "sources": {
     "content/public/pages/home.md": "baee7559ef159e3f4bad1aa67c6c9065e830a2094cb6b7286851dfa0efd03e89",
     "content/public/pages/making.md": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d",
@@ -9,7 +9,7 @@
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
     "content/public/pages/orchestrating.md": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714",
     "content/public/pages/projects.md": "3fbd16ec46c50a7556adc9b711ba0f3b08817a9cbf3dff4262c1a622529f5b48",
-    "content/public/pages/systems.md": "d7907f34ece8425bc83457018671b9af1aec357364e2e0cbb8c56c39acc720aa",
+    "content/public/pages/systems.md": "0f2ea8eb2dc12bceedcc51c7f1be03563dc0eb889eb8c2fd462bf188d3d2fe73",
     "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
     "content/public/projects/chainedchat.md": "2fe160412514b5c714131e275f94ebda10e2e77c2bba55e41f18ae3fb96c0a9b",
     "content/public/projects/claude-code-tips.md": "187746649476952e6e555cdc7228e3cbb85f580fa7d88b89178bb66dba816a3d",
@@ -230,9 +230,42 @@
     },
     "systems": {
       "title": "systems",
-      "description": "how i use coding agents in my life: requests, context, execution, decisions, and verified outcomes.",
+      "description": "how i work with coding agents: choose an outcome, bring context, build, and check the result.",
       "hero_title": "systems",
-      "hero_summary": "how i use coding agents in my life.",
+      "hero_summary": "how i actually work.",
+      "workflow": {
+        "intro": "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task.",
+        "steps": [
+          {
+            "id": "outcome",
+            "label": "choose an outcome",
+            "detail": "i decide what matters and what a useful result would look like."
+          },
+          {
+            "id": "context",
+            "label": "bring relevant context",
+            "detail": "i share the files, examples, and constraints that make the task specific."
+          },
+          {
+            "id": "work",
+            "label": "work with agents",
+            "detail": "agents do the legwork. i answer questions and steer as the work takes shape."
+          },
+          {
+            "id": "check",
+            "label": "check and ship",
+            "detail": "i review the result, ask for changes, and decide when it is ready."
+          }
+        ],
+        "feedback": "lessons from the result inform the next task",
+        "caption": "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction.",
+        "example": {
+          "title": "on this website",
+          "body": "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense.",
+          "href": "https://github.com/anipotts/anipotts.com",
+          "link_label": "site source"
+        }
+      },
       "lifecycle": {
         "status": "intended system",
         "domains": ["career", "learning", "wellbeing", "personal"],

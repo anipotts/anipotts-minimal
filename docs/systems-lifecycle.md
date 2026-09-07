@@ -1,6 +1,30 @@
-# Systems lifecycle
+# Systems page and retained lifecycle exploration
 
-The public `/systems` page describes intended behavior. It does not operate an
+## Current public page
+
+The public `/systems` page now explains how Ani works with agents through four
+static steps: choose an outcome, bring relevant context, work with agents,
+check and ship. One return arrow describes lessons informing the next task.
+Tools and devices appear only in a supporting caption. The website example is
+grounded in Ani's direct review feedback in the systems task: crowded text,
+unclear icons, and mobile horizontal scrolling. Its source link points to the
+public site repository. Ani's visual review of the new page remains required.
+
+`content/public/pages/systems.md` owns `workflow`, including all visible copy.
+`SystemMap.astro` renders semantic HTML and CSS with no client script or motion.
+The mobile view stacks steps without shrinking the desktop diagram.
+Normalization and validation keep the four ordered steps and a source-backed
+example; generated public, admin, TypeScript, and seed projections remain synced.
+
+The old lifecycle renderer is preserved as `SystemMapLifecycle.astro` with its
+existing controller and content for experimentation. Neither it nor any private
+personal-context-helper setup is a dependency of the public route. Existing
+untracked experiment files are untouched. The following section documents the
+previous exploration and its historical verification, not the current page.
+
+## Retained exploration
+
+The retained lifecycle describes intended behavior. It does not operate an
 agent, read a vault, book appointments, change a calendar, or create automations.
 
 ## Content contract
@@ -9,7 +33,7 @@ agent, read a vault, book appointments, change a calendar, or create automations
 life-area labels, workers, supporting nodes, sources, devices, relationships,
 completion rules, presentation copy, and walkthrough references.
 
-`SystemMap.astro` renders the HTML reading order and a decorative SVG layer.
+`SystemMapLifecycle.astro` renders the HTML reading order and a decorative SVG layer.
 `lifecycle-controller.ts` measures the rendered endpoints after resize, font
 loading, and source expansion. Its only interactive state is the manually
 advanced example. CSS owns responsive layout, theme treatment, and motion.

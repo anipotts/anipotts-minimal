@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "90cc4d523a9faffecc02dbd3f24bb27235a34269812d99929a3f85038127d6f3";
+  "f594a31d34a5062113619a6f72394adf766e9fa459bba7dca8fd6833da6e26c4";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -255,9 +255,48 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
 export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
   title: "systems",
   description:
-    "how i use coding agents in my life: requests, context, execution, decisions, and verified outcomes.",
+    "how i work with coding agents: choose an outcome, bring context, build, and check the result.",
   hero_title: "systems",
-  hero_summary: "how i use coding agents in my life.",
+  hero_summary: "how i actually work.",
+  workflow: {
+    intro:
+      "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task.",
+    steps: [
+      {
+        id: "outcome",
+        label: "choose an outcome",
+        detail:
+          "i decide what matters and what a useful result would look like.",
+      },
+      {
+        id: "context",
+        label: "bring relevant context",
+        detail:
+          "i share the files, examples, and constraints that make the task specific.",
+      },
+      {
+        id: "work",
+        label: "work with agents",
+        detail:
+          "agents do the legwork. i answer questions and steer as the work takes shape.",
+      },
+      {
+        id: "check",
+        label: "check and ship",
+        detail:
+          "i review the result, ask for changes, and decide when it is ready.",
+      },
+    ],
+    feedback: "lessons from the result inform the next task",
+    caption:
+      "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction.",
+    example: {
+      title: "on this website",
+      body: "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense.",
+      href: "https://github.com/anipotts/anipotts.com",
+      link_label: "site source",
+    },
+  },
   lifecycle: {
     status: "intended system",
     domains: ["career", "learning", "wellbeing", "personal"],

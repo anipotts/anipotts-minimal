@@ -436,6 +436,14 @@ export interface SystemsLifecycle {
 }
 
 export interface SystemsPageContent {
+  workflow: {
+    intro: string;
+    steps: Array<{ id: string; label: string; detail: string }>;
+    feedback: string;
+    caption: string;
+    example: { title: string; body: string; href: string; link_label: string };
+  };
+  /** Retained experiment data, independent of the public workflow. */
   lifecycle: SystemsLifecycle;
   title: string;
   description: string;

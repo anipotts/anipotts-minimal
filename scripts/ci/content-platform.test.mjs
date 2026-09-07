@@ -37,6 +37,7 @@ import {
   contentOperationTables,
   contentOperationTemplates,
 } from "../../packages/content/dist/admin/operations.js";
+import { validateSystemsLifecycle } from "../../packages/content/dist/public/systems-lifecycle.js";
 import {
   contentInventorySource as rootContentInventorySource,
   DEFAULT_HOMEPAGE_CONTENT,
@@ -791,10 +792,7 @@ assert.equal(
 
 const lifecycle = systemsContent.lifecycle;
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
-assert.equal(
-  systemsContent.hero_summary,
-  "how i use coding agents in my life.",
-);
+assert.equal(systemsContent.hero_summary, "how i actually work.");
 assert.deepEqual(lifecycle.domains, [
   "career",
   "learning",
@@ -874,8 +872,8 @@ for (const [name, mutate] of [
 ]) {
   const graph = structuredClone(lifecycle);
   mutate(graph);
-  const result = validateSystemsPageContent(
-    normalizeSystemsPageContent({ lifecycle: graph }),
+  const result = validateSystemsLifecycle(
+    normalizeSystemsPageContent({ lifecycle: graph }).lifecycle,
   );
   assert.equal(
     result.ok,
@@ -884,8 +882,8 @@ for (const [name, mutate] of [
   );
 }
 assert.equal(
-  validateSystemsPageContent(
-    normalizeSystemsPageContent({ lifecycle: "{broken" }),
+  validateSystemsLifecycle(
+    normalizeSystemsPageContent({ lifecycle: "{broken" }).lifecycle,
   ).ok,
   false,
 );
@@ -930,7 +928,51 @@ assert.match(
   /Add to calendar/,
 );
 const lifecyclePage = readFileSync("apps/www/src/pages/systems.astro", "utf8");
-assert.ok(lifecyclePage.includes("lifecycle={content.lifecycle}"));
+assert.ok(lifecyclePage.includes("workflow={content.workflow}"));
+assert.equal(lifecyclePage.includes("content.lifecycle"), false);
+assert.deepEqual(
+  validateSystemsPageContent({ ...systemsContent, lifecycle: null }),
+  { ok: true },
+  "experimental lifecycle does not constrain public workflow",
+);
+const workflow = systemsContent.workflow;
+assert.equal(workflow.steps.length, 4);
+assert.deepEqual(
+  normalizeSystemsPageContent({ workflow: JSON.stringify(workflow) }).workflow,
+  workflow,
+);
+for (const invalid of [
+  { ...workflow, steps: workflow.steps.slice(1) },
+  {
+    ...workflow,
+    steps: [workflow.steps[0], workflow.steps[0], ...workflow.steps.slice(2)],
+  },
+  {
+    ...workflow,
+    example: { ...workflow.example, href: "javascript:alert(1)" },
+  },
+  { ...workflow, intro: "" },
+  { ...workflow, caption: undefined },
+])
+  assert.equal(
+    validateSystemsPageContent({ ...systemsContent, workflow: invalid }).ok,
+    false,
+  );
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({ workflow: "{broken" }),
+  ).ok,
+  false,
+);
+const workflowComponent = readFileSync(
+  "apps/www/src/components/SystemMap.astro",
+  "utf8",
+);
+assert.equal(
+  workflowComponent.includes("<script"),
+  false,
+  "diagram must be static without a client controller",
+);
 assert.equal(
   lifecyclePage.includes("content.map_"),
   false,

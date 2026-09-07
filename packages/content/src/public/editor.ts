@@ -16,10 +16,7 @@ import {
   DEFAULT_WRITING_INDEX_CONTENT,
 } from "./defaults.js";
 
-import {
-  normalizeSystemsLifecycle,
-  validateSystemsLifecycle,
-} from "./systems-lifecycle.js";
+import { normalizeSystemsLifecycle } from "./systems-lifecycle.js";
 
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === "string" ? value : fallback;
@@ -1049,7 +1046,20 @@ export function normalizeSystemsPageContent(
         )
     : DEFAULT_SYSTEMS_CONTENT.map_relationships;
 
+  let workflow: unknown =
+    source.workflow === undefined
+      ? DEFAULT_SYSTEMS_CONTENT.workflow
+      : source.workflow;
+  if (typeof source.workflow === "string") {
+    try {
+      workflow = JSON.parse(source.workflow);
+    } catch {
+      workflow = null;
+    }
+  }
+
   return {
+    workflow: workflow as SystemsPageContent["workflow"],
     lifecycle: normalizeSystemsLifecycle(
       source.lifecycle,
       DEFAULT_SYSTEMS_CONTENT.lifecycle,
@@ -1147,21 +1157,50 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
   ok: boolean;
   error?: string;
 } {
-  const lifecycleResult = validateSystemsLifecycle(content.lifecycle);
-  if (!lifecycleResult.ok) return lifecycleResult;
+  const workflow = content.workflow;
+  if (!workflow || typeof workflow !== "object")
+    return { ok: false, error: "Systems workflow must be an object" };
+  if (
+    !Array.isArray(workflow.steps) ||
+    workflow.steps.map((step) => step?.id).join(",") !==
+      "outcome,context,work,check"
+  )
+    return {
+      ok: false,
+      error: "Systems workflow needs four unique ordered steps",
+    };
+  if (!workflow.example || typeof workflow.example !== "object")
+    return { ok: false, error: "Systems workflow needs a concrete example" };
+  if (!/^https:\/\//.test(workflow.example.href))
+    return { ok: false, error: "Systems example needs an HTTPS source link" };
   for (const [value, label] of [
     [content.title, "Systems title"],
     [content.description, "Systems description"],
     [content.hero_title, "Systems hero title"],
     [content.hero_summary, "Systems hero summary"],
+    [workflow.intro, "Systems introduction"],
+    [workflow.feedback, "Systems feedback"],
+    [workflow.caption, "Systems caption"],
+    [workflow.example.title, "Systems example title"],
+    [workflow.example.body, "Systems example body"],
+    [workflow.example.link_label, "Systems example link"],
+    ...workflow.steps.flatMap(
+      (step) =>
+        [
+          [step.label, "Systems step label"],
+          [step.detail, "Systems step detail"],
+        ] as const,
+    ),
   ] as const) {
+    if (typeof value !== "string")
+      return { ok: false, error: `${label} must be text` };
     const error = validateCmsString(value, label, CMS_TEXT_LIMITS.summary);
     if (error) return { ok: false, error };
   }
   return { ok: true };
 }
 
-/** Compatibility only for retained experiments. The public page uses lifecycle. */
+/** Compatibility only for retained experiments. The public page uses workflow. */
 export function validateLegacySystemsPageContent(content: SystemsPageContent): {
   ok: boolean;
   error?: string;

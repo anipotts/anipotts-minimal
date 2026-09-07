@@ -1,1096 +1,171 @@
 ---
-import type { SystemsLifecycle } from "@anipotts/content/public";
-import AgentMark from "./AgentMark.astro";
-import LifecycleMark from "./systems/LifecycleMark.astro";
-import { Icon } from "astro-icon/components";
+import type { SystemsPageContent } from "@anipotts/content/public";
+
 interface Props {
-  lifecycle: SystemsLifecycle;
+  workflow: SystemsPageContent["workflow"];
 }
-const { lifecycle: graph } = Astro.props;
-const support = Object.fromEntries(graph.support.map((n) => [n.id, n]));
-const nodes = Object.fromEntries(
-  [...graph.stages, ...graph.support].map((n) => [n.id, n]),
-);
+const { workflow } = Astro.props;
 ---
 
-<figure class="lifecycle-map" data-lifecycle>
-  <figcaption class="map-caption">
-    <h2>{graph.status}</h2><span class="caption-note">{graph.copy.caption}</span
-    >
-  </figcaption>
-  <div class="map-surface">
-    <div class="domain-strip" aria-label="life areas">
-      {graph.domains.map((label) => <span>{label}</span>)}
-    </div>
-    <div class="diagram-body" data-canvas>
-      <svg class="connections" aria-hidden="true" focusable="false">
-        <defs
-          >{
-            [
-              "flow",
-              "context",
-              "human",
-              "retry",
-              "persist",
-              "transport",
-              "credential",
-              "feedback",
-              "archive",
-            ].map((kind) => (
-              <marker
-                id={`arrow-${kind}`}
-                markerWidth="7"
-                markerHeight="7"
-                refX="6"
-                refY="3.5"
-                orient="auto-start-reverse"
-                markerUnits="userSpaceOnUse"
-              >
-                <path d="M0 0L7 3.5L0 7Z" class={`arrow-${kind}`} />
-              </marker>
-            ))
-          }</defs
-        >
-        {
-          graph.edges.map((edge) => (
-            <g
-              data-edge={edge.id}
-              class={`connection connection--${edge.kind}`}
-            >
-              <>
-                <path marker-end={`url(#arrow-${edge.kind})`} />
-                <text text-anchor="middle">{edge.label}</text>
-              </>
-            </g>
-          ))
-        }
-      </svg>
-      <div class="spine">
-        <div class="stage stage--request" data-node="request">
-          <span class="stage-number" aria-hidden="true">01</span><h3>
-            {graph.stages[0].label}
-          </h3><p>{graph.stages[0].detail}</p>
-        </div>
-        <section class="execution" aria-label={graph.execution_label}>
-          <header class="execution-heading">
-            <h3>{graph.execution_label}</h3><div class="workers">
-              {
-                graph.workers.map((worker) => (
-                  <span>
-                    <AgentMark provider={worker.mark} size={17} />
-                    {worker.label}
-                  </span>
-                ))
-              }
-            </div>
-          </header>
-          {
-            graph.stages.slice(1, 5).map((stage, index) => (
-              <div class="stage" data-node={stage.id}>
-                <>
-                  <span class="stage-number" aria-hidden="true">
-                    {String(index + 2).padStart(2, "0")}
-                  </span>
-                  <h3>{stage.label}</h3>
-                  <p>{stage.detail}</p>
-                </>
-              </div>
-            ))
-          }
-        </section>
-        <div class="stage stage--complete" data-node="complete">
-          <span class="stage-number" aria-hidden="true">06</span><h3>
-            {graph.stages[5].label}
-          </h3><p>{graph.stages[5].detail}</p>
-        </div>
-      </div>
-      <aside class="human-area" aria-label="Ani's role">
-        <div class="ani" data-node="ani">
-          <img
-            src="/brand/ap-mark-blue.svg"
-            alt=""
-            width="60"
-            height="45"
-          /><strong>{support.ani.label}</strong>
-        </div><p>{support.ani.detail}</p><span class="human-note"
-          >{graph.copy.human_hint}</span
-        >
-      </aside>
-      <aside class="context-area" aria-label="Supporting context">
-        <div class="context-heading" data-node="context">
-          <Icon name="ph:stack" size={20} /><h3>{support.context.label}</h3>
-        </div><p class="support-description">{graph.copy.context_hint}</p>
-        <div class="source-group" data-node="records">
-          <h4>{support.records.label}</h4><div class="source-grid">
-            {
-              graph.sources
-                .filter((s) => s.group === "records")
-                .map((s) => (
-                  <span class="source-item">
-                    <LifecycleMark mark={s.mark} label={s.label} />
-                  </span>
-                ))
-            }
-          </div>
-        </div>
-        <div class="source-group credential-group" data-node="credentials">
-          <h4>{support.credentials.label}</h4>{
-            graph.sources
-              .filter((s) => s.group === "credentials")
-              .map((s) => (
-                <span class="source-item">
-                  <LifecycleMark mark={s.mark} label={s.label} />
-                </span>
-              ))
-          }
-        </div>
-        <details class="more-sources">
-          <summary>{graph.copy.more_sources}</summary><div class="source-grid">
-            {
-              graph.sources
-                .filter((s) => s.group === "more")
-                .map((s) => (
-                  <span class="source-item">
-                    <LifecycleMark mark={s.mark} label={s.label} />
-                  </span>
-                ))
-            }
-          </div>
-        </details>
-      </aside>
-      <div class="context-port" data-port="context" aria-hidden="true">
-        <Icon name="ph:stack" size={14} />context
-      </div>
-      <div class="runtime-port" data-port="runtime" aria-hidden="true">
-        <Icon name="ph:desktop" size={14} />runtime
-      </div>
-      <aside class="feedback" data-node="feedback">
-        <Icon name="ph:arrow-counter-clockwise" size={18} /><strong
-          >{support.feedback.label}</strong
-        ><small>{graph.copy.feedback_hint}</small>
-      </aside>
-      <section class="infrastructure" aria-label={support.runtime.label}>
-        <header data-node="runtime">
-          <Icon name={support.runtime.mark!} size={22} /><h3>
-            {graph.copy.transport}
-          </h3><span>{support.runtime.label}</span>
-        </header>
-        <div class="devices">
-          {
-            graph.devices.map((device) => (
-              <div
-                class:list={[
-                  "device",
-                  { "device--primary": device.id === "macmini" },
-                ]}
-              >
-                <>
-                  <LifecycleMark mark={device.mark} />
-                  <strong>{device.label}</strong>
-                  <small>{device.detail}</small>
-                </>
-              </div>
-            ))
-          }
-        </div>
-        <div class="archive" data-node="archive">
-          <LifecycleMark mark={support.archive.mark!} /><span
-            ><strong>{support.archive.label}</strong><small
-              >{support.archive.detail}</small
-            ></span
-          >
-        </div>
-      </section>
-    </div>
-    <noscript>
-      <style is:inline>
-        .lifecycle-map .context-area {
-          position: relative;
-          top: auto;
-          left: auto;
-          width: auto;
-          margin: 1rem 0 2rem;
-        }
-        .lifecycle-map .source-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-      </style>
-      <section class="static-routes" aria-label="Lifecycle routes">
-        <p>{graph.completion_rule}</p><p>{graph.pause_rule}</p>
-        <dl>
-          {
-            graph.edges
-              .filter((edge) => edge.label)
-              .map((edge) => (
-                <>
-                  <>
-                    <dt>
-                      {edge.label}: {nodes[edge.source].label} →{" "}
-                      {nodes[edge.destination].label}
-                    </dt>
-                    <dd>{edge.detail}</dd>
-                  </>
-                </>
-              ))
-          }
-        </dl>
-      </section>
-    </noscript>
-    <details class="walkthrough" data-walkthrough>
-      <summary
-        >{graph.copy.walkthrough_label}
-        <span aria-hidden="true">↗</span></summary
-      ><div class="walkthrough-content">
-        <div class="walkthrough-story" aria-live="polite" aria-atomic="true">
-          <span data-step-count>1 / {graph.walkthrough.length}</span><h3
-            data-step-title
-          >
-            {graph.walkthrough[0].title}
-          </h3><p data-step-detail>{graph.walkthrough[0].detail}</p>
-        </div>
-        <div class="walkthrough-controls" hidden>
-          <button type="button" data-back>{graph.copy.back}</button><button
-            type="button"
-            data-next>{graph.copy.next}</button
-          ><button type="button" data-reset>{graph.copy.reset}</button>
-        </div>
-        <noscript
-          ><ol>
-            {
-              graph.walkthrough.slice(1).map((step) => (
-                <li>
-                  <>
-                    <strong>{step.title}</strong>
-                    <p>{step.detail}</p>
-                  </>
-                </li>
-              ))
-            }
-          </ol></noscript
-        >
-      </div>
-    </details>
-  </div>
-  <div class="sr-only">
-    <h3>Lifecycle relationships</h3><p>{graph.principle}</p><p>
-      {graph.completion_rule}
-    </p><p>{graph.pause_rule}</p>
-    <ol>
+<figure class="workflow" aria-label="How I work with agents">
+  <div class="diagram">
+    <ol class="steps">
       {
-        graph.edges.map((edge) => (
-          <li>
-            {nodes[edge.source].label} to {nodes[edge.destination].label}
-            {edge.label ? `: ${edge.label}` : ""}. {edge.detail}
+        workflow.steps.map((step, index) => (
+          <li class="step">
+            <span class="step-number" aria-hidden="true">
+              {index + 1}
+            </span>
+            <h2>{step.label}</h2>
+            <p>{step.detail}</p>
           </li>
         ))
       }
     </ol>
-    <h3>Supporting systems</h3><dl>
-      {
-        graph.support.map((n) => (
-          <>
-            <>
-              <dt>{n.label}</dt>
-              <dd>{n.detail}</dd>
-            </>
-          </>
-        ))
-      }
-    </dl>
-    <h3>Haircut example</h3><ol>
-      {
-        graph.walkthrough.map((step) => (
-          <li>
-            {step.title}. {step.detail}
-          </li>
-        ))
-      }
-    </ol>
+    <span class="return-route" aria-hidden="true"></span>
+    <p class="feedback">{workflow.feedback}</p>
   </div>
-  <script
-    is:inline
-    type="application/json"
-    data-graph
-    set:html={JSON.stringify(graph).replace(/</g, "\\u003c")}
-  />
+  <figcaption>{workflow.caption}</figcaption>
 </figure>
-<script>
-  import { initializeLifecycleMaps } from "./systems/lifecycle-controller";
-  initializeLifecycleMaps();
-  document.addEventListener("astro:page-load", initializeLifecycleMaps);
-</script>
+
 <style>
-  .lifecycle-map {
+  .workflow {
     margin: 0;
-    --map-bg: #fafbfc;
-    --map-ink: #202a38;
-    --map-muted: #5a6677;
-    --map-line: #a8b2c1;
-    --map-node: #f0f2f5;
-    --map-blue: #2768b3;
-    --map-orange: #a94e27;
-    --map-green: #29714e;
-    color: var(--map-ink);
   }
-  :global([data-theme="dark"]) .lifecycle-map,
-  :global(.dark) .lifecycle-map {
-    --map-bg: #15191f;
-    --map-ink: #e4e9f0;
-    --map-muted: #a4afbd;
-    --map-line: #586575;
-    --map-node: #222831;
-    --map-blue: #80b8f2;
-    --map-orange: #efa47c;
-    --map-green: #88c5a0;
+  .diagram {
+    position: relative;
   }
-  .map-caption {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.8rem;
-    color: var(--map-ink);
-  }
-  .caption-note {
-    opacity: 0.8;
-  }
-  .map-caption h2 {
-    margin: 0;
-    font: inherit;
-  }
-  .map-surface {
-    padding: 2rem 1.3rem 0;
-    background: var(--map-bg);
-    border: 1px solid var(--map-line);
-    border-radius: 6px;
-  }
-  .domain-strip {
+  .steps {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    text-align: center;
-    gap: 0.3rem;
-    padding: 0 0 1.5rem;
-    border-bottom: 1px solid var(--map-line);
-    font-size: 0.84rem;
-    font-weight: 650;
-  }
-  .diagram-body {
-    position: relative;
-    isolation: isolate;
-    padding: 2.2rem 0 0;
-  }
-  .spine {
-    position: relative;
-    width: 34%;
-    margin-left: 33%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4.4rem;
-    padding-bottom: 4.5rem;
-  }
-  .stage {
-    position: relative;
-    background: var(--map-node);
-    border: 1px solid var(--map-line);
-    border-radius: 6px;
-    padding: 1rem 0.65rem;
-    min-height: 4.5rem;
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-    z-index: 2;
-  }
-  .stage h3 {
-    font-size: 0.94rem;
-    font-weight: 670;
+    gap: 2.25rem;
     margin: 0;
-    line-height: 1.35;
+    padding: 0;
+    list-style: none;
   }
-  .stage p {
-    font-size: 0.74rem;
-    line-height: 1.4;
-    color: var(--map-muted);
-    margin: 0.32rem 0 0;
+  .step {
+    position: relative;
+    min-width: 0;
+    padding: 1.1rem 0 1rem;
+    border-top: 1px solid var(--border-strong);
+  }
+  .step-number {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1.1rem;
+  }
+  .step h2 {
+    min-height: 2.5em;
+    font-family: var(--sans);
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    font-weight: 650;
+    line-height: 1.25;
+    margin: 0 0 0.75rem;
     text-wrap: balance;
   }
-  .stage-number {
+  .step p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+  .step:not(:last-child)::after {
+    content: "→";
     position: absolute;
-    left: 0.55rem;
-    top: 0.35rem;
-    font-size: 0.56rem;
-    line-height: 1;
-    color: var(--map-muted);
+    right: -1.65rem;
+    top: 0.9rem;
+    color: var(--ink);
   }
-  .stage--request {
-    border-color: var(--map-blue);
-  }
-  .stage--complete {
-    background: color-mix(in srgb, var(--map-green) 10%, var(--map-bg));
-    border-color: var(--map-green);
-  }
-  .execution {
+  .return-route {
+    display: block;
     position: relative;
-    display: grid;
-    gap: 4.4rem;
-    width: 100%;
-    padding: 4.7rem 0 1rem;
+    height: 1.75rem;
+    margin: 0.75rem 12.5% 0;
+    border: 1px solid var(--border-strong);
+    border-top: 0;
   }
-  .execution::before {
+  .return-route::before {
     content: "";
     position: absolute;
-    inset: 0 -1.15rem -1.15rem;
-    border: 1px dashed var(--map-blue);
-    border-radius: 6px;
-    z-index: -1;
-  }
-  .execution-heading {
-    position: absolute;
-    top: 0.65rem;
-    left: 0;
-    right: 0;
-    text-align: center;
-  }
-  .execution-heading h3 {
-    margin: 0 0 0.45rem;
-    font-size: 0.76rem;
-    color: var(--map-blue);
-    font-weight: 650;
-  }
-  .workers {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  .workers span {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.65rem;
-    white-space: nowrap;
-  }
-  .workers span:first-child :global(svg) {
-    color: var(--map-orange);
-  }
-  .stage:not(.stage--complete)::after {
-    content: "↓";
-    position: absolute;
-    top: calc(100% + 1.3rem);
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--map-blue);
-    font-size: 1.4rem;
-  }
-  [data-connected] .stage::after {
-    display: none;
-  }
-  .connections {
-    visibility: hidden;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: visible;
-    z-index: 1;
-  }
-  [data-connected] .connections {
-    visibility: visible;
-  }
-  .static-routes {
-    font-size: 0.8rem;
-    line-height: 1.6;
-    padding-block: 1rem;
-  }
-  .static-routes dt {
-    font-weight: 600;
-    margin-top: 1rem;
-  }
-  .static-routes dd {
-    margin: 0;
-    color: var(--map-muted);
-  }
-  .connection {
-    color: var(--map-blue);
-  }
-  .connection path {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.25;
-    stroke-linejoin: round;
-  }
-  .connection text {
-    fill: currentColor;
-    stroke: var(--map-bg);
-    stroke-width: 5px;
-    paint-order: stroke;
-    stroke-linejoin: round;
-    font-family: inherit;
-    font-size: 10px;
-    font-weight: 550;
-  }
-  .connection--human {
-    color: var(--map-orange);
-  }
-  .connection--human path,
-  .connection--context path {
-    stroke-dasharray: 3 4;
-  }
-  .connection--transport,
-  .connection--archive {
-    color: var(--map-muted);
-  }
-  .connection--transport path,
-  .connection--archive path {
-    stroke-dasharray: 5 5;
-  }
-  .connection--persist,
-  .connection--feedback {
-    color: var(--map-green);
-  }
-  .arrow-flow,
-  .arrow-context,
-  .arrow-retry,
-  .arrow-credential {
-    fill: var(--map-blue);
-  }
-  .arrow-human {
-    fill: var(--map-orange);
-  }
-  .arrow-persist,
-  .arrow-feedback {
-    fill: var(--map-green);
-  }
-  .arrow-transport,
-  .arrow-archive {
-    fill: var(--map-muted);
-  }
-  .human-area {
-    position: absolute;
-    right: 1%;
-    top: 20rem;
-    width: 23%;
-    text-align: center;
-    z-index: 2;
-  }
-  .ani {
-    width: 5.5rem;
-    aspect-ratio: 1;
-    border: 1px solid var(--map-orange);
-    border-radius: 50%;
-    margin: auto;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    background: var(--map-bg);
-  }
-  .ani img {
-    width: 3.5rem;
-    height: 2.5rem;
-    object-fit: contain;
-  }
-  .ani strong {
-    font-size: 0.85rem;
-  }
-  .human-area p {
-    font-size: 0.71rem;
-    margin: 0.7rem 0;
-    color: var(--map-ink);
-  }
-  .human-note {
-    display: block;
-    color: var(--map-muted);
-    font-size: 0.64rem;
-    line-height: 1.7;
-  }
-  .context-area {
-    position: absolute;
-    top: 20.3rem;
-    left: 1%;
-    width: 22%;
-    z-index: 2;
-  }
-  .context-heading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    border: 1px solid var(--map-line);
-    border-radius: 6px;
-    padding: 0.8rem 0.4rem;
-    background: var(--map-bg);
-  }
-  .context-heading h3 {
-    font-size: 0.81rem;
-    margin: 0;
-  }
-  .support-description {
-    font-size: 0.62rem;
-    text-align: center;
-    color: var(--map-muted);
-    margin: 0.55rem 0 1.35rem;
-  }
-  .source-group {
-    border-top: 1px solid var(--map-line);
-    padding-top: 0.8rem;
-    margin-bottom: 1rem;
-  }
-  .source-group h4 {
-    font-weight: 550;
-    font-size: 0.66rem;
-    color: var(--map-muted);
-    margin: 0 0 0.75rem;
-  }
-  .source-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem 0.4rem;
-  }
-  .source-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    text-align: center;
-  }
-  .credential-group .source-item {
-    flex-direction: row;
-    text-align: left;
-  }
-  .more-sources {
-    font-size: 0.72rem;
-    color: var(--map-muted);
-  }
-  .more-sources summary {
-    cursor: pointer;
-    min-height: 2.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  .more-sources summary::before {
-    content: "+";
-  }
-  .more-sources[open] summary::before {
-    content: "−";
-  }
-  .more-sources .source-grid {
-    padding: 0.4rem 0 1.5rem;
-  }
-  .context-port,
-  .runtime-port {
-    display: none;
+    top: 0;
+    left: -4px;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    transform: rotate(45deg);
   }
   .feedback {
-    position: absolute;
-    right: 2%;
-    top: 54.7rem;
-    width: 21%;
-    display: grid;
-    justify-items: center;
-    gap: 0.25rem;
-    background: var(--map-bg);
-    padding: 0.5rem;
-    z-index: 2;
-    box-sizing: border-box;
-    color: var(--map-green);
-  }
-  .feedback strong {
-    font-size: 0.75rem;
-  }
-  .feedback small {
-    font-size: 0.62rem;
-    color: var(--map-muted);
-  }
-  .infrastructure {
-    position: relative;
-    margin: 0 8%;
-    padding: 1.25rem 0 1.7rem;
-    border-top: 1px solid var(--map-line);
-  }
-  .infrastructure header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
-    margin-bottom: 1.4rem;
-    width: fit-content;
-    margin-inline: auto;
-    background: var(--map-bg);
-    position: relative;
-    z-index: 2;
-  }
-  .infrastructure h3 {
-    font-size: 0.79rem;
-    margin: 0;
-  }
-  .infrastructure header > span {
-    font-size: 0.68rem;
-    color: var(--map-muted);
-  }
-  .devices {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr 1fr;
-    gap: 0.75rem;
-    position: relative;
-  }
-  .devices::before {
-    content: "";
-    position: absolute;
-    top: 1rem;
-    left: 16%;
-    right: 16%;
-    border-top: 1px solid var(--map-line);
-    z-index: -1;
-  }
-  .device {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-  .device strong {
-    font-size: 0.73rem;
-  }
-  .device small {
-    font-size: 0.61rem;
-    text-align: center;
-    color: var(--map-muted);
-  }
-  .device--primary :global(.source-icon) {
-    width: 2.8rem;
-    height: 2.8rem;
-    margin-top: -0.4rem;
-  }
-  .archive {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2.7rem;
-    width: fit-content;
-    margin-inline: auto;
-    position: relative;
-    z-index: 2;
-    background: var(--map-bg);
-  }
-  .archive span {
-    display: grid;
-    gap: 0.25rem;
-  }
-  .archive strong {
-    font-size: 0.74rem;
-  }
-  .archive small {
-    font-size: 0.62rem;
-    color: var(--map-muted);
-  }
-  .walkthrough {
-    border-top: 1px solid var(--map-line);
-  }
-  .walkthrough > summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 4rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-  .walkthrough-content {
-    padding: 0 0 1.4rem;
-    max-width: 38rem;
-    margin: auto;
-  }
-  .walkthrough-story {
-    min-height: 7rem;
-  }
-  .walkthrough-story > span {
-    font-size: 0.7rem;
-    color: var(--map-muted);
-  }
-  .walkthrough-story h3 {
-    font-size: 1rem;
-    margin: 0.55rem 0;
-  }
-  .walkthrough-story p {
     font-size: 0.85rem;
-    line-height: 1.65;
-    margin: 0;
+    color: var(--ink-muted);
+    text-align: center;
+    margin: 0.65rem 0 0;
   }
-  .walkthrough-controls {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 1rem;
-  }
-  .walkthrough-controls[hidden] {
-    display: none;
-  }
-  .walkthrough-controls button {
-    font: inherit;
-    font-size: 0.8rem;
-    border: 1px solid var(--map-line);
-    border-radius: 6px;
-    color: var(--map-ink);
-    background: var(--map-node);
-    min-height: 44px;
-    padding: 0.55rem 1rem;
-    cursor: pointer;
-  }
-  .walkthrough-controls button:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-  .walkthrough-controls button:last-child {
-    margin-left: auto;
-  }
-  button:focus-visible,
-  summary:focus-visible {
-    outline: 2px solid var(--map-blue);
-    outline-offset: 4px;
-  }
-  [data-walking] [data-node] {
-    opacity: 0.45;
-    transition: opacity 160ms ease;
-  }
-  [data-walking] [data-node][data-active] {
-    opacity: 1;
-    outline: 2px solid var(--map-blue);
-    outline-offset: 5px;
-    border-radius: 6px;
-  }
-  [data-walking] .ani[data-active] {
-    border-radius: 50%;
-  }
-  [data-walking] .connection {
-    opacity: 0.12;
-    transition: opacity 160ms ease;
-  }
-  [data-walking] .connection[data-active] {
-    opacity: 1;
-  }
-  .connection[data-active] path {
-    stroke-width: 2.4;
-  }
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-  @media (max-width: 1000px) and (min-width: 700px) {
-    .stage p {
-      font-size: 0.7rem;
-    }
-    .human-area {
-      right: 0;
-    }
-    .context-area {
-      left: 0;
-      width: 21%;
-    }
-    .context-heading h3 {
-      font-size: 0.71rem;
-    }
-    .context-heading :global(svg) {
-      width: 16px;
-    }
-    .source-grid {
-      gap: 0.8rem 0.2rem;
-    }
+  figcaption {
+    max-width: 65ch;
+    margin: 2rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ink-muted);
   }
   @media (max-width: 699px) {
-    .map-caption {
-      font-size: 0.73rem;
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.8rem;
+      padding-left: 2rem;
     }
-    .caption-note {
-      display: none;
+    .step {
+      display: grid;
+      grid-template-columns: 1.2rem 1fr;
+      column-gap: 0.6rem;
+      padding: 0.9rem 0 0;
     }
-    .map-surface {
-      padding: 1rem 0.7rem 0;
+    .step-number {
+      margin: 0.1rem 0 0;
+      grid-row: 1 / 3;
     }
-    .domain-strip {
-      font-size: clamp(0.63rem, 2.5vw, 0.8rem);
-      padding-bottom: 1rem;
-      gap: 0.1rem;
+    .step h2 {
+      min-height: 0;
+      font-size: 1.18rem;
+      margin-bottom: 0.5rem;
+      text-wrap: initial;
     }
-    .diagram-body {
-      padding-top: 2rem;
+    .step p {
+      grid-column: 2;
+      max-width: 42ch;
     }
-    .spine {
-      width: 55%;
-      margin-left: 10%;
-      gap: 4.5rem;
-      padding-bottom: 7rem;
-    }
-    .stage {
-      padding: 0.95rem 0.45rem;
-      min-height: 4.3rem;
-    }
-    .stage h3 {
-      font-size: 0.83rem;
-    }
-    .stage p {
-      font-size: 0.7rem;
-    }
-    .stage-number {
-      font-size: 0.5rem;
-    }
-    .execution {
-      gap: 4.5rem;
-      padding-top: 5.1rem;
-    }
-    .execution::before {
-      inset: 0 -0.55rem -0.9rem;
-    }
-    .execution-heading h3 {
-      font-size: 0.69rem;
-    }
-    .workers {
-      gap: 0.3rem;
-      flex-wrap: wrap;
-    }
-    .workers span {
-      font-size: 0.6rem;
-    }
-    .workers :global(svg) {
-      width: 14px;
-      height: 14px;
-    }
-    .human-area {
-      right: 0.3rem;
-      top: 19.4rem;
-      width: 24%;
-    }
-    .ani {
-      width: 3.5rem;
-    }
-    .ani img {
-      width: 2.65rem;
-      height: 1.8rem;
-    }
-    .ani strong {
-      font-size: 0.68rem;
-    }
-    .human-area p {
-      font-size: 0.6rem;
-      line-height: 1.5;
-    }
-    .human-note {
-      display: none;
-    }
-    .context-area {
-      position: relative;
+    .step:not(:last-child)::after {
+      content: "↓";
+      right: auto;
+      left: 1.8rem;
       top: auto;
-      left: auto;
-      width: auto;
-      margin: 0 0 2rem;
-      padding-top: 1.2rem;
-      border-top: 1px solid var(--map-line);
+      bottom: -1.55rem;
     }
-    .context-heading {
-      width: fit-content;
-      margin: auto;
-      padding: 0.7rem 1rem;
-    }
-    .support-description {
-      font-size: 0.7rem;
-    }
-    .source-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-    }
-    .source-group h4 {
-      font-size: 0.73rem;
-    }
-    .source-group {
-      margin-bottom: 1.1rem;
-      margin-inline: 1rem 2rem;
-    }
-    .credential-group .source-item {
-      justify-content: center;
-    }
-    .more-sources summary {
-      font-size: 0.76rem;
-    }
-    .more-sources {
-      margin-inline: 1rem 2rem;
-    }
-    .context-port,
-    .runtime-port {
+    .return-route {
       position: absolute;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      z-index: 2;
-      background: var(--map-bg);
-      font-size: 0.59rem;
-      writing-mode: vertical-rl;
-      padding: 0.2rem;
+      top: 1.6rem;
+      bottom: 2.9rem;
+      left: 0;
+      width: 1rem;
+      height: auto;
+      margin: 0;
+      border: 1px solid var(--border-strong);
+      border-right: 0;
     }
-    .context-port {
-      left: -0.3rem;
-      top: 24rem;
-    }
-    .runtime-port {
+    .return-route::before {
+      top: -4px;
+      left: auto;
       right: 0;
-      top: 40rem;
+      transform: rotate(135deg);
     }
     .feedback {
-      right: 0;
-      top: 54.7rem;
-      width: 26%;
-      font-size: 0.6rem;
-      padding: 0.3rem;
+      margin-top: 1.7rem;
+      padding-left: 2rem;
+      text-align: left;
     }
-    .feedback strong {
-      font-size: 0.64rem;
-    }
-    .feedback small {
-      font-size: 0.56rem;
-    }
-    .infrastructure {
-      margin: 0;
-      padding-top: 1.3rem;
-    }
-    .infrastructure header {
-      flex-wrap: wrap;
-    }
-    .infrastructure header > span {
-      font-size: 0.65rem;
-    }
-    .device strong {
-      font-size: 0.67rem;
-    }
-    .device small {
-      font-size: 0.57rem;
-    }
-    .devices {
-      gap: 0.4rem;
-    }
-    .connection text {
-      font-size: 9px;
-      stroke-width: 4px;
-    }
-    .walkthrough > summary {
-      font-size: 0.76rem;
-    }
-    .walkthrough-story p {
-      font-size: 0.8rem;
-    }
-    .walkthrough-story {
-      min-height: 10rem;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    [data-walking] [data-node],
-    [data-walking] .connection {
-      transition: none !important;
+    figcaption {
+      margin-top: 1.5rem;
     }
   }
 </style>

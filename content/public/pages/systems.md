@@ -1,8 +1,31 @@
 ---
 title: systems
-description: "how i use coding agents in my life: requests, context, execution, decisions, and verified outcomes."
+description: "how i work with coding agents: choose an outcome, bring context, build, and check the result."
 hero_title: systems
-hero_summary: "how i use coding agents in my life."
+hero_summary: "how i actually work."
+workflow:
+  intro: "i choose what i want to get done and bring the context an agent needs. we work through it, i review the result, and what i learn shapes the next task."
+  steps:
+    - id: outcome
+      label: choose an outcome
+      detail: "i decide what matters and what a useful result would look like."
+    - id: context
+      label: bring relevant context
+      detail: "i share the files, examples, and constraints that make the task specific."
+    - id: work
+      label: work with agents
+      detail: "agents do the legwork. i answer questions and steer as the work takes shape."
+    - id: check
+      label: check and ship
+      detail: "i review the result, ask for changes, and decide when it is ready."
+  feedback: "lessons from the result inform the next task"
+  caption: "i use Codex and Claude Code across my laptop, phone, and Mac mini. the tools support the work; i set the direction."
+  example:
+    title: "on this website"
+    body: "i reviewed earlier versions of this systems page and called out crowded text, unclear icons, and a mobile layout that needed sideways scrolling. that feedback gave the agents concrete changes to build and check. the preview is where i decide whether the work makes sense."
+    href: "https://github.com/anipotts/anipotts.com"
+    link_label: "site source"
+# Retained experiment data. The public page renders workflow only.
 lifecycle:
   {
     "status": "intended system",
