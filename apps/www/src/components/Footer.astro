@@ -9,11 +9,12 @@ import { Icon } from "astro-icon/components";
       >contact@anipotts.com</a
     >
   </div>
-  <span class="glyphs">
+  <nav class="glyphs" aria-label="Social and site links">
     <a
       href="https://github.com/anipotts"
       class="glyph"
       aria-label="github"
+      title="GitHub"
       target="_blank"
       rel="noopener noreferrer"><Icon name="ph:github-logo" /></a
     >
@@ -21,6 +22,7 @@ import { Icon } from "astro-icon/components";
       href="https://x.com/anipottsbuilds"
       class="glyph"
       aria-label="x"
+      title="X"
       target="_blank"
       rel="noopener noreferrer"><Icon name="ph:x-logo" /></a
     >
@@ -28,19 +30,23 @@ import { Icon } from "astro-icon/components";
       href="https://www.linkedin.com/in/anipotts"
       class="glyph"
       aria-label="linkedin"
+      title="LinkedIn"
       target="_blank"
       rel="noopener noreferrer"><Icon name="ph:linkedin-logo" /></a
     >
-    <a href="https://news.anipotts.com" class="glyph" aria-label="newsletter"
-      ><Icon name="ph:envelope-open" /></a
+    <a
+      href="https://news.anipotts.com"
+      class="glyph"
+      aria-label="newsletter"
+      title="Newsletter"><Icon name="ph:envelope-open" /></a
     >
-    <a href="/feed.xml" class="glyph" aria-label="rss feed"
+    <a href="/feed.xml" class="glyph" aria-label="rss feed" title="RSS feed"
       ><Icon name="ph:rss-simple" /></a
     >
-    <a href="/admin" class="glyph admin-glyph" aria-label="admin"
+    <a href="/admin" class="glyph admin-glyph" aria-label="admin" title="Admin"
       ><Icon name="ph:lock-key" /></a
     >
-  </span>
+  </nav>
 </footer>
 
 <style>
@@ -85,5 +91,63 @@ import { Icon } from "astro-icon/components";
   .admin-glyph {
     font-size: 0.95rem;
     opacity: 0.78;
+  }
+
+  @media (max-width: 879px) {
+    .foot {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      gap: 1rem;
+      margin-top: 0;
+      padding-block: 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+    .foot::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      inset-inline: clamp(1.25rem, 5vw, 2.5rem);
+      border-top: 1px solid var(--border-strong);
+    }
+    .contact-copy {
+      gap: 0;
+    }
+    .contact-copy > span {
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+    }
+    .contact-copy > a {
+      display: flex;
+      align-items: center;
+      width: fit-content;
+      max-width: 100%;
+      min-height: 44px;
+      color: var(--ink);
+      font-size: 1.05rem;
+      overflow-wrap: anywhere;
+    }
+    .glyphs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(44px, 1fr));
+      width: 100%;
+      max-width: 22rem;
+      gap: 0;
+    }
+    .glyph {
+      width: 100%;
+      border-radius: 9px;
+      color: var(--ink);
+      opacity: 1;
+    }
+    .glyph:hover,
+    .glyph:focus-visible {
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+    }
+  }
+  @media (max-width: 303px) {
+    .glyphs {
+      grid-template-columns: repeat(3, minmax(44px, 1fr));
+    }
   }
 </style>

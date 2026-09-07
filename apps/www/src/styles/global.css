@@ -164,6 +164,13 @@ h1 {
   gap: clamp(2rem, 5vw, 3rem);
 }
 
+/* A single mobile gap before the shared footer, rather than stacked large gaps. */
+@media (max-width: 879px) {
+  .page {
+    padding-bottom: 3rem;
+  }
+}
+
 .page--listing .page-hero__summary,
 .page--listing .page-intro {
   font-size: clamp(1.05rem, 2.2vw, 1.42rem);
