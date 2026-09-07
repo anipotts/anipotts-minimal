@@ -48,6 +48,7 @@ const stepMarks: Record<
                     class:list={[
                       "app-mark",
                       { "app-mark--monochrome": mark.monochrome },
+                      { "app-mark--native": Boolean(mark.image) },
                     ]}
                     title={mark.label}
                   >
@@ -142,11 +143,20 @@ const stepMarks: Record<
   :global([data-theme="dark"]) .app-mark--monochrome {
     color: #fff;
   }
+  .app-mark--native,
+  :global([data-theme="dark"]) .app-mark--native {
+    background: transparent;
+    box-shadow: none;
+  }
   .step-mark img {
     display: block;
     width: 30px;
     height: 30px;
     object-fit: contain;
+  }
+  .app-mark--native img {
+    width: 40px;
+    height: 40px;
   }
   .step p {
     font-size: 0.95rem;
