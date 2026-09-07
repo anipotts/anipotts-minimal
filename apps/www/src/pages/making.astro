@@ -1,13 +1,14 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import WorkCard from "../components/WorkCard.astro";
+import PageHero from "../components/PageHero.astro";
 import { visibleProjects, type Project } from "../lib/content";
 import {
   DEFAULT_MAKING_INDEX_CONTENT,
   normalizeListingPageContent,
 } from "@anipotts/content/public";
 
-export const prerender = false;
+export const prerender = true;
 
 const allProjects = await visibleProjects();
 const copy = normalizeListingPageContent(
@@ -67,10 +68,7 @@ const buckets: Array<{
   path="/making"
   mood="alert"
 >
-  <section data-rise>
-    <h1 class="hero-title">{copy.hero_title}</h1>
-    <p class="hero-summary">{copy.hero_summary}</p>
-  </section>
+  <PageHero title={copy.hero_title} summary={copy.hero_summary} />
 
   <section data-rise class="catalog">
     <div class="groups">
@@ -101,10 +99,6 @@ const buckets: Array<{
 </Shell>
 
 <style>
-  .hero-title {
-    margin-bottom: var(--s-3);
-  }
-
   .catalog,
   .stack {
     display: flex;

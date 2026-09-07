@@ -18,5 +18,4 @@ export const navItems = [
   { name: "making", path: "/making" },
   { name: "writing", path: "/writing" },
   { name: "systems", path: "/systems" },
-  { name: "contact", path: "/#contact" },
 ] as const;

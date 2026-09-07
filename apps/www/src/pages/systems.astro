@@ -1,22 +1,18 @@
 ---
 import Shell from "../layouts/Shell.astro";
 import SystemMap from "../components/SystemMap.astro";
+import PageHero from "../components/PageHero.astro";
 import {
   DEFAULT_SYSTEMS_CONTENT,
   normalizeSystemsPageContent,
 } from "@anipotts/content/public";
 
 export const prerender = true;
-
 const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
 ---
 
 <Shell title={content.title} description={content.description} path="/systems">
-  <section>
-    <h1 class="hero-title">{content.hero_title}</h1>
-    <p class="hero-summary">{content.hero_summary}</p>
-  </section>
-
+  <PageHero title={content.hero_title} summary={content.hero_summary} />
   <section class="stack" aria-label="Working with agents">
     <div class="intro">
       {
@@ -35,25 +31,9 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
     display: grid;
     gap: var(--s-6);
   }
-
   .intro {
     display: grid;
     gap: 1.25em;
     margin: 0;
-  }
-  .intro p {
-    margin: 0;
-  }
-
-  .hero-title {
-    margin-bottom: var(--s-4);
-    font-size: clamp(3rem, 12vw, 7rem);
-    line-height: 0.9;
-  }
-
-  @media (max-width: 620px) {
-    .hero-title {
-      margin-bottom: var(--s-3);
-    }
   }
 </style>

@@ -1,13 +1,14 @@
 ---
 import Shell from "../../layouts/Shell.astro";
 import WritingRow from "../../components/WritingRow.astro";
+import PageHero from "../../components/PageHero.astro";
 import { publishedWriting } from "../../lib/content";
 import {
   DEFAULT_WRITING_INDEX_CONTENT,
   normalizeListingPageContent,
 } from "@anipotts/content/public";
 
-export const prerender = false;
+export const prerender = true;
 
 const writingEntries = await publishedWriting();
 const copy = normalizeListingPageContent(
@@ -22,10 +23,7 @@ const copy = normalizeListingPageContent(
   path="/writing"
   mood="drowsy"
 >
-  <section data-rise>
-    <h1 class="hero-title">{copy.hero_title}</h1>
-    <p class="hero-summary">{copy.hero_summary}</p>
-  </section>
+  <PageHero title={copy.hero_title} summary={copy.hero_summary} />
 
   <section data-rise class="stack">
     <div class="list">
@@ -39,10 +37,6 @@ const copy = normalizeListingPageContent(
 </Shell>
 
 <style>
-  .hero-title {
-    margin-bottom: var(--s-3);
-  }
-
   .stack {
     display: flex;
     flex-direction: column;
