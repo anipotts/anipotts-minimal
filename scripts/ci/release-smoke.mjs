@@ -49,17 +49,25 @@ function authenticatedHeaders(env) {
   };
 }
 
+export function healthRequestInit(target, env = process.env) {
+  // Health proves the release identity, independently of unauthenticated
+  // route probes. Never forward this identity through an Access redirect.
+  return target === "admin"
+    ? { headers: authenticatedHeaders(env), redirect: "manual" }
+    : { redirect: "manual" };
+}
+
 async function verifyHealth(
   baseUrl,
   expectedSha,
   fetchImpl,
-  { allowUnversioned, attempts, delayMs },
+  { allowUnversioned, attempts, delayMs, requestInit },
 ) {
   let lastHealth;
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetchImpl(`${baseUrl}/api/health`);
+      const response = await fetchImpl(`${baseUrl}/api/health`, requestInit);
       if (response.status === 200) {
         const health = await response.json();
         lastHealth = health;
@@ -111,6 +119,7 @@ export async function smokeRelease(options) {
     allowUnversioned,
     attempts: healthAttempts,
     delayMs: retryDelayMs,
+    requestInit: healthRequestInit(target, env),
   });
   const checks = [];
 
@@ -166,7 +175,7 @@ export async function smokeRelease(options) {
     for (const path of ADMIN_PROTECTED_SMOKE_ROUTES) {
       const response = await requestWithRetry(
         `${baseUrl}${path}`,
-        { headers },
+        { headers, redirect: "manual" },
         {
           attempts: 6,
           delayMs: 10_000,
@@ -179,6 +188,7 @@ export async function smokeRelease(options) {
     for (const path of ADMIN_WRITE_PROBES) {
       const response = await fetchImpl(`${baseUrl}${path}`, {
         method: "POST",
+        redirect: "manual",
         headers: { ...headers, "Content-Type": "application/json" },
         body: "{}",
       });
