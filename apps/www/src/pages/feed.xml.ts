@@ -6,6 +6,10 @@ export const prerender = false;
 
 export const GET: APIRoute = async (context) => {
   const writingEntries = (await publishedWriting()).slice(0, 50);
+  const latestPublication = Math.max(
+    0,
+    ...writingEntries.map((entry) => entry.data.published_at?.getTime() ?? 0),
+  );
   return rss({
     title: "ani potts",
     description:
@@ -17,6 +21,6 @@ export const GET: APIRoute = async (context) => {
       link: `/writing/${writingSlug(t)}`,
       pubDate: t.data.published_at ?? new Date(0),
     })),
-    customData: "<language>en-us</language>",
+    customData: `<language>en-us</language><lastBuildDate>${new Date(latestPublication).toUTCString()}</lastBuildDate>`,
   });
 };

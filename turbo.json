@@ -16,6 +16,7 @@
     "@anipotts/www#build": {
       "dependsOn": ["^build"],
       "inputs": [
+        "$TURBO_ROOT$/content/public/**",
         "src/**",
         "public/**",
         "tsconfig.json",
