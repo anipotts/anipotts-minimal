@@ -175,7 +175,7 @@ export async function smokeRelease(options) {
     for (const path of ADMIN_PROTECTED_SMOKE_ROUTES) {
       const response = await requestWithRetry(
         `${baseUrl}${path}`,
-        { headers },
+        { headers, redirect: "manual" },
         {
           attempts: 6,
           delayMs: 10_000,
@@ -188,6 +188,7 @@ export async function smokeRelease(options) {
     for (const path of ADMIN_WRITE_PROBES) {
       const response = await fetchImpl(`${baseUrl}${path}`, {
         method: "POST",
+        redirect: "manual",
         headers: { ...headers, "Content-Type": "application/json" },
         body: "{}",
       });

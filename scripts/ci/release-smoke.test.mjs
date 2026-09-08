@@ -189,6 +189,11 @@ await assert.rejects(
       ADMIN_CI_READ_TOKEN: "test-read-token",
     },
     fetchImpl: async (url, init = {}) => {
+      assert.equal(
+        init.redirect,
+        "manual",
+        "authenticated probes cannot follow a login redirect or forward credentials",
+      );
       if (url.endsWith("/api/health")) {
         return response(200, {
           release_sha: expectedSha,
