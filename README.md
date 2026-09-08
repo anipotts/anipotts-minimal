@@ -1,60 +1,46 @@
 # anipotts.com
 
-Monorepo for anipotts.com and its admin surface.
+Ani's public website and private admin, both built with Astro and deployed to Cloudflare Workers.
 
-## Stack
+## Development
 
-- Public site: Astro 5 (`apps/www`) on `@astrojs/cloudflare`, served via Cloudflare Workers.
-- Admin: Astro 5 (`apps/admin`) on `@astrojs/cloudflare`, served via Cloudflare Workers.
-- Legacy admin rollback: `apps/admin-solid` until passkey proof is complete.
-- Cloudflare Workers under `workers/*`, shared `packages/*`.
-- Git-first public content: canonical markdown collections under `apps/www/src/content`, synced to Cloudflare D1.
-
-## Quick start
+Use Node 24.19.0 and pnpm 10.5.2.
 
 ```bash
-pnpm install
-pnpm dev          # all apps
-pnpm dev:www      # just the astro site (astro defaults to http://localhost:4321)
+pnpm install --frozen-lockfile
+pnpm dev:www
+pnpm dev:admin
+pnpm dev:status
 ```
 
-## Key commands
+Public preview: http://anipotts.localhost:1355/. Admin preview: http://admin.anipotts.localhost:1355/.
+The managed admin review preview on http://localhost:4311/ is separate; preserve it while review is active.
+See [local development](docs/local-development.md).
+
+## Content
+
+- Published copy and project/writing metadata: `content/public`.
+- Site identity, navigation, contact and social links: `packages/content/src/public/site.ts`.
+- Approved workflow artwork registry: `packages/content/src/public/providers.ts`.
+- `pnpm content:generate` derives the typed defaults and admin review projection.
+- `pnpm content:check` rejects drift. Generated files are never independently edited.
+- Admin proposals and operational data remain separate from Git-backed public content.
+
+Public routes are `/`, `/work`, `/work/[slug]`, `/writing`, `/writing/[slug]`, `/systems`, `/links`, and the newsletter routes.
+Permanent compatibility redirects live in `apps/www/src/middleware.ts`.
+Hidden work and unpublished writing have no successful public detail route.
+
+## Checks and release
 
 ```bash
-pnpm build
-pnpm test
-pnpm validate     # local PR gate: invariants + format + build/lint/typecheck/test
+pnpm check:changed --working-tree # includes committed, staged, unstaged and untracked changes
+pnpm check:changed                # exact committed diff, as used by CI
+pnpm validate                     # full workspace checks and builds
 ```
 
-## Content model
+Deployable changes use a same-repository PR and exact-head protected checks.
+Deploy only affected targets and verify the released SHA.
+See [release architecture](docs/release-architecture.md) and [platform architecture](docs/platform-architecture.md).
 
-- Astro www collections: `apps/www/src/content/{projects,making,writing}` (schema in `apps/www/src/content.config.ts`).
-- Do not add a root `content/` mirror in this repo. Content commands and drafts belong in `~/Content`; this repo owns the published renderer/admin shape.
-- Synced to Cloudflare D1 (`anipotts-db`) for full-text search.
-- Public brand logos live in `apps/www/public/images/brand` and should match `logoSrc` references in `apps/www/src/data/site.ts`.
-
-## Route map (astro www)
-
-- `/`, `/writing`, `/writing/[slug]`
-- `/making`
-- `/projects`, `/projects/[slug]`
-- `/orchestrating` (formerly `/claude`)
-- legacy paths (`/shipping`, `/running`, `/connect`, `/links`, `/claude`, `/thoughts`, `/work`, `/lab`, `/labs`, `/dev`, `/updates`, `/metrics`, `/status`, `/docs`) redirect via `apps/www/src/middleware.ts`
-
-## Claude stats
-
-The `/orchestrating` page reads a generated snapshot at `apps/www/src/data/claude-stats.json`.
-This is a local snapshot generator only. It does not call Claude or Anthropic APIs, and this repo no longer carries launchd or auto-commit wrappers for it.
-
-```bash
-pnpm update-claude-stats # regenerate local snapshot
-```
-
-## Environment
-
-The astro www bakes `PUBLIC_*` vars at build (`PUBLIC_POSTHOG_KEY`). Only set env for features you use.
-
-## Archives
-
-Site version history and old platform notes live under [`docs/archive`](docs/archive).
-Pre-Astro recovery refs are indexed in [`docs/archive/version-history.md`](docs/archive/version-history.md).
+The active apps are `apps/www` and `apps/admin`. Legacy Solid source is retired; rollback uses a previous verified Astro deployment. Production workers and databases are not deleted by source cleanup.
+Historical design notes remain in [docs/archive](docs/archive).

@@ -106,7 +106,7 @@ type PageContentD1Row = {
 
 export const contentInventorySource = {
   source_doc: "docs/content-admin-editor-brief.md",
-  architecture_doc: "docs/admin-v2-architecture.md",
+  architecture_doc: "docs/platform-architecture.md",
   mode: "canonical_source_plus_d1_drafts",
   generated_from:
     "canonical content/public source files and the generated Admin projection; D1 page_content rows remain draft and migration history",

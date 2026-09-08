@@ -1,5 +1,67 @@
 # Site release review: engineer with taste
 
+## September 8 cleanup execution
+
+Status: local implementation and verification in progress. No PR, merge or production deployment has been completed for this cleanup.
+
+Starting release head: `98d2d8292c0bf95c1d66edfd605c8e4d14e365fa`.
+The initial review scope includes 32 modified files, two untracked tests and 15 release-branch commits beyond main.
+Tracked changes are recoverable through `refs/cleanup-recovery/site-2026-09-08` (`a50dcd541cd15d7ee8f4508efb3a8be42f88e90a`).
+The initial untracked tests and ignored legacy build artifacts are preserved under `.local/cleanup-recovery/2026-09-08/`.
+The pre-retirement source is retained at `refs/cleanup-recovery/admin-solid-2026-09-08`.
+
+### Confirmed findings and dispositions
+
+| Severity       | Location                                                                   | Failure or redundancy                                                                            | Disposition                                                                                               |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| P2             | `apps/www/src/pages/writing/[slug].astro`                                  | Unknown and draft article URLs redirected to a successful index instead of returning 404         | Uses the existing not-found component and real 404; detail rendering extracted without changing copy      |
+| P2             | `apps/www/src/pages/api/subscribe.ts`                                      | Re-exported prerender flag was not recognized by Astro, causing the POST alias to be prerendered | Declares server rendering directly; retains the same handler                                              |
+| P2             | `apps/www/src/layouts/Shell.astro`, `components/Nav.astro`                 | Blocked localStorage threw during theme initialization or toggle                                 | Theme applies even when persistence is unavailable                                                        |
+| P2             | `scripts/ci/check-changed-scope.mjs`                                       | Local checks ignored staged, unstaged and untracked edits                                        | Explicit working-tree mode and real temporary-repository tests, including canceling staged/unstaged edits |
+| P2             | `scripts/ci/brand-contract.test.mjs`                                       | Existing marquee tests were not invoked by the suite                                             | Wired into the brand contract                                                                             |
+| P2             | `scripts/ci/public-app-boundary.test.mjs`                                  | Baseline validation required a retired fifth artwork layer                                       | Replaced with proportional-crop and decorative-accessibility checks                                       |
+| Simplification | `apps/admin-solid` and deploy policy                                       | Unused rollback implementation retained a separate dependency/build/deploy surface               | Removed local source and target; regression check prevents their return; production resources untouched   |
+| Simplification | `packages/lib/src/data`, CMS project/settings readers                      | Unused database-first public content with independent stale fallback copy                        | Removed readers, datasets and exports; active operational readers preserved                               |
+| Simplification | Systems lifecycle/topology components, contracts and canonical fields      | Unrendered experiment data imposed validation and generated-data overhead                        | Removed executable experiments and their contracts; current workflow remains                              |
+| Simplification | Public settings and provider registry                                      | Site metadata/social links and allowed provider IDs could drift between consumers                | Shared typed settings and approved provider registry                                                      |
+| Simplification | Public frontmatter and route inventory                                     | Astro and generation accepted different shapes; smoke routes duplicated content records          | Shared canonical schemas and content-derived detail smoke routes                                          |
+| Simplification | Generated projections and bootstrap script                                 | Unconsumed validation JSON, future D1 seed, and reverse-bootstrap mode                           | Removed; retain typed defaults and actual admin projection with drift checks                              |
+| Simplification | Alternate public Markdown path, old Claude stats and unused grouping/types | No active consumer                                                                               | Removed; canonical Astro rendering and current data models remain                                         |
+
+Additional confirmed findings from the final pass:
+
+- P2, `apps/www/src/lib/api.ts`: a caller-controlled leftmost forwarding address could choose the newsletter rate-limit bucket, and database failures allowed the request through. The guard now uses Cloudflare's client identity and fails closed for missing/failed/malformed rate-limit reads. Reproduction failed before the patch and passed afterward. Tests exercise the real subscription handler and its legacy alias with an isolated outbound boundary, including success, 400, 403, 429 and 500 responses. Independent investigation and bypass review found no remaining scoped regression. No real subscription, queue message or database write was made.
+- P2, `SystemMap.astro`, `AmbientFlow.astro`, `Footer.astro` and global styles: fractional viewport widths between 879 and 880 fell into neither responsive rule. Stacked styling now covers every width below 880; desktop starts at 880.
+- P2, shared build scripts: content build/typecheck each invoked the types build, allowing concurrent deletion of the same output. Dependency builds now belong to Turbo's existing dependency graph; direct callers invoke that graph.
+- Test repair, `operator-work.test.ts`: fixture preservation now hashes the actual exported payload rather than requiring a marker string in its implementation. Its digest matches the original release-head payload exactly: `6ed83aa1ef017c21a3bcb8afa8895f55de998e1bb937612579e43a8a54ba1255`.
+
+Baseline `pnpm validate` stopped at the obsolete fifth-layer assertion. Full validation subsequently passed, as did working-tree scope validation, 133 admin tests, 38 shared-library tests and 32 content tests. The final guard/build-ordering tree passed another full `pnpm validate` run. A forced clean affected-build pass and exact committed-diff check follow the final documentation commit.
+
+Browser-only QA covered home, work, writing and systems at 319, 390, 768, 879, 880, 907 and 1440 CSS pixels in both themes (56 checks), plus all 20 public index/detail routes at mobile and desktop widths. No document overflow, missing completed images or console errors were observed. Reduced-motion and JavaScript-disabled systems retain all four steps and 14 sources. At 319px with 200% root text, the return caption fits the arrow's height without overflow. Keyboard pause/resume, menu Escape/focus return and touch targets passed. Three consecutive AP-logo refresh checks kept the artwork separated with the pointer stationary over it. Browser emulation, text-size and media overrides were cleared; the tab was returned to the homepage in normal view, retaining the user's browser zoom.
+
+Compatible `tar` resolution was patched to 7.5.22. The production dependency audit now reports zero critical, 25 high, 41 moderate and 12 low advisories. Existing framework/toolchain advisories remain a maintenance risk, not a claim of a vulnerability-free deployment; major upgrades were not folded into this cleanup.
+
+Focused cleanup commits so far: `26a6b98` Solid retirement, `354eb51` unused services and admin fixture ownership, `92f37cc` canonical public content and reviewed presentation, `e16b8e3` working-tree validation and derived-output cleanup. These remove roughly 30,000 lines before the final guard/documentation pass.
+
+### Recoverable worktree inventory
+
+The primary checkout and running previews remain intact. The other four worktrees have been compared using ancestry and patch equivalence; none was merged wholesale.
+
+| Worktree                                                | Disposition and recovery                                                                                                                                                                                                                       |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `26f0/anipotts-com` discovery                           | Unique rationale document retained at `refs/cleanup-recovery/discovery-2026-09-08`; old diagram decisions are superseded                                                                                                                       |
+| `911c/anipotts-com` systems experiment                  | Committed base integrated; dirty tracked work at `refs/cleanup-recovery/systems-experiment-2026-09-08`; 19 untracked files in `.local/cleanup-recovery/2026-09-08/systems-experiment-untracked.tar.gz`                                         |
+| `anipotts-com-public-site-review-batch-2026-08-28`      | Committed base integrated; older card/hero changes superseded by current components; tracked recovery at `refs/cleanup-recovery/card-review-2026-09-08`, untracked component in `card-review-untracked.tar.gz` beside the other recovery files |
+| `anipotts-com-public-work-canonical-records-2026-08-26` | Record/artwork patches are equivalent to integrated changes; obsolete Portless-removal commit intentionally not merged; dirty work retained at `refs/cleanup-recovery/canonical-records-2026-09-08`                                            |
+
+All archives were listed and checked. Worktree retirement still requires confirming no running process owns those directories.
+
+Read-only production inspection found the current Astro admin worker `anipotts-admin`; its listed deployment uses version `a1825b84-b47b-4b5a-8a9b-7df8f32cccc3`. Probes of admin health, inbox, content and passkey routes redirect to Cloudflare Access. This proves the edge gate is still present, not authenticated app-native access. No auth, secret, production data or worker-resource mutation was made.
+
+The four retained worker configs still declare a state domain/DO bindings, ingest cron, newsletter queue, and weekly cron. Their active operational roles are distinct from public rendering. Final provider and release-target evidence is still required.
+
+Protected production release remains unfinished. The checked release configuration holds authenticated admin smoke at `held_identity_required`; this is an external identity gate, not permission to weaken authentication. Shared changes classify www, admin and state, while removal of the legacy target alone does not deploy unrelated workers. Older checkpoints below describe earlier trees and must not be treated as proof for this cleanup.
+
 Updated: 2026-09-07. Owner: Ani, with Codex implementing the public-site lane.
 
 ## Release state
@@ -67,7 +129,31 @@ After the rationale is reviewed, add ordinary text links below the map: `coding 
 
 ## Editorial method
 
-Current review anchor: writing and work index hero summaries. Ani approved and requested application of writing, “what i'm learning as i build, and thoughts on the things that hold my attention”; work, “things i've built on my own and with teams, from early experiments to products people use”. Applied to canonical page content. These are derived from the existing work catalog and Ani's stated technical/creative interests, not new biographical claims. Individual project and essay copy remains unchanged. Geometric background and interactive refinements are a design discussion, not implemented or launch blockers.
+Current review anchor: homepage and shared work/writing summaries. The approved work hero remains “things i've built on my own and with teams, from early experiments to products people use”. Ani's later exact writing annotation is applied: “what i'm learning as i build systems using AI, and some of my thoughts on the things that hold my attention”.
+
+### Homepage and summary voice pass, local review
+
+Ani requested rewriting the pasted homepage and work-section copy in his voice, with lighter punctuation on short card/component subtext. Applied one candidate pass to the home introduction, all 11 public project card summaries and subtitles, the five published essay summaries, and the Coding Agent Tips callout. These shared canonical summaries also appear on the work/writing indexes and relevant detail-page headers. Full case studies, article bodies, titles, dates, links, ordering, statuses, the hidden project, and the draft essay are unchanged.
+
+The introduction now starts “i build systems with AI and share what i'm learning along the way”. Artist-discovery work at Our Bad Habit is separated from real-time agent I/O at Structured AI instead of grouping them under the same technical role. This wording is based on the existing records and Ani's supplied context, not a fresh employment/affiliation verification. The established factual questions in the route ledger remain open.
+
+Examples of the candidate pass:
+
+- Quantercise: “quant interview practice with mental math and sandboxed Python execution.” → “a place to practice quant problems, work on mental math, and write Python”
+- Coding Agent Tips: “practical patterns from running coding agents in real repositories.” → “my notes on working with coding agents, written while i'm figuring things out”
+- Claude Code todo essay: “vague todos waste context. specific prompts let claude code start from the right file.” → “leaving enough detail in a todo for a coding agent to pick it up the next day”
+
+No blanket punctuation transform was added to components. Short summaries are authored without final periods; normal sentence boundaries, proper names, prose, and accessible image descriptions keep their punctuation. Unsupported numerical teasers were omitted from the revised Quantercise and NYU subtitles; unresolved numbers in the full project records remain part of the later factual review. Candidate wording is available for Ani's local review, not recorded as accepted or published.
+
+### Shared landscape implementation
+
+September 8 follow-up supersedes the page-background portion below: Ani requested restoring the previous root-page background. `PageCurrent.astro` is restored byte-for-byte to its pre-landscape version, including original light/dark opacity and reduced-motion fallback. Component artwork remains intact. The mobile header now has a compact grid, aligned 44px controls, 52px menu links, active-page/tap feedback, and visible focus. Escape closes the menu and returns focus; outside clicks and breakpoint changes close it as well.
+
+The AP logo preserves fine-pointer hover across full-document home navigation and reload using a consumed, short-lived session hint applied before paint. It clears on departure, ignores old/out-of-bounds/different-viewport hints, and tolerates unavailable storage. Browser sampling found all first 24 animation frames separated after both click navigation and reload; pointer departure closes it. Unit regression coverage includes persistence, expiry, touch exclusion, and storage failure. Five widths (319, 390, 720, 721, 1440), both themes, showed no document overflow and the original background opacity. Separate Playwright was used because the in-app Browser tool is unavailable. Typecheck and brand/navigation tests passed; no deployment occurred.
+
+Implemented the requested continuous landscape using one three-path artwork family with proportional SVG cropping. Page-edge curves use separate light/dark opacity levels, increased slightly at Ani's request. Screenshot frames use stronger crops; writing and compact work cards use a fading edge contour. Desktop hover/focus shifts only artwork by 4px. Mobile, coarse pointers, and reduced motion use two static layers. Keyboard focus and mobile tap feedback remain visible.
+
+Ani explicitly authorized separate Playwright QA when the in-app Browser control tool was unavailable. The in-app tab was left untouched. The 84-case route/width/theme matrix found no overflow or page errors. Work and writing interaction checks passed; a fresh homepage navigation also confirmed identical card/text/screenshot bounds during hover, artwork movement only, visible focus, and no artwork transform with reduced motion. No-JavaScript writing content and touch navigation passed. Local public build/typecheck, brand/landscape, content-platform, and public-copy checks passed. This is local implementation proof, not PR, merge, or deployment proof.
 
 Latest systems annotations: applied Ani's exact closing wording beginning “this is how i direct traces of context” and ending “people that are important.” Removed the stacked step descriptions' 42ch width cap below the existing 880px breakpoint, allowing the available column width at intermediate sizes such as 802px. Paragraph-spacing guidance was discussed only: continuous prose should have consistent paragraph gaps, with larger gaps reserved for sections or the map. Browser QA for this follow-up is unavailable because the newly listed in-app Browser skill's required control tool is not exposed; no alternate browser was substituted.
 

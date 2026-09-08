@@ -9,7 +9,6 @@ This repo owns:
 
 - `anipotts.com`: public Astro site in `apps/www`
 - `admin.anipotts.com`: target Astro admin app in `apps/admin`
-- legacy admin rollback worker in `apps/admin-solid`
 - archived labs reference material in `docs/archive/labs` and retained
   `workers/*`
 - shared code in `packages/*`
@@ -58,10 +57,9 @@ For admin UI, feed, content review, auth staging, and operator-dashboard work:
 - deploy only the affected admin target after release gates are enabled
 - record deploy run, skipped targets, route proof, and exact release SHA
 
-`apps/admin-solid` is legacy rollback. Keep it only until the Astro admin
-cutover and passkey proof are complete, then archive or remove it. It is not a
-normal auto-deploy target; use the explicit manual `admin_solid=true` deploy
-input only for rollback.
+The legacy Solid admin is retired from this repository. Rollback uses the
+previous verified Astro admin deployment. Production legacy resources and
+data are not deleted as part of source cleanup.
 
 Approved includes reviewed D1 migrations needed by the checked change, passkey
 auth rollout, and Cloudflare Access removal after passkey proof.
@@ -129,8 +127,6 @@ pnpm turbo typecheck --filter=@anipotts/www...
 pnpm turbo build --filter=@anipotts/www...
 pnpm turbo typecheck --filter=@anipotts/admin...
 pnpm turbo build --filter=@anipotts/admin...
-pnpm turbo typecheck --filter=@anipotts/admin-solid...
-pnpm turbo build --filter=@anipotts/admin-solid...
 pnpm validate
 ```
 
@@ -186,13 +182,15 @@ Public site code should become stable. More public text and project copy should
 move into structured content that admin can review, draft, preview, and later
 publish through an authorized write path.
 
-Pure public content defaults, normalizers, validators, page-key helpers, and
-homepage summary helpers live in `@anipotts/content/public`. D1-backed readers
-and search functions stay in `@anipotts/lib/cms`.
+Public content defaults, normalizers, validators, settings, and homepage summary
+helpers live in `@anipotts/content/public`. Canonical frontmatter schemas are
+shared by Astro and generation. Public search reads the same published Astro
+collection; there is no D1-backed public CMS path. The used admin-control
+contracts remain in `@anipotts/lib/admin-control`.
 
-Admin should become one Astro app for content, fleet state, proof, repo status,
-handoffs, blockers, and future editing. Current Solid admin work is migration
-source, not the long-term home.
+Admin is one Astro app for content, fleet state, proof, repo status,
+handoffs, blockers, and editing proposals. Published public content remains
+Git-backed and separate from admin proposals.
 
 See `docs/platform-architecture.md` for the current inventory and cleanup map.
 

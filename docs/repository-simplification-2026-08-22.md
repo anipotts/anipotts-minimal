@@ -1,6 +1,10 @@
 # repository simplification map
 
-status: implementation baseline, 2026-08-22
+status: historical baseline, 2026-08-22; superseded by the September 8 cleanup
+
+The Solid retention gate below is historical and no longer applies. Current
+architecture and release requirements live in [platform architecture](platform-architecture.md)
+and [the release review](site-release-review-2026-09-07.md).
 
 ## ranked debt
 
