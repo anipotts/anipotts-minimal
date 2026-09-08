@@ -7,7 +7,6 @@ import { inspectMigrationChanges } from "./migration-policy.mjs";
 export const DEPLOY_TARGETS = [
   "www",
   "admin",
-  "admin_solid",
   "ingest",
   "newsletter",
   "state",

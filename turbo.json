@@ -40,18 +40,6 @@
       "outputs": ["dist/**"],
       "env": ["NODE_ENV", "PUBLIC_STATE_API"]
     },
-    "@anipotts/admin-solid#build": {
-      "dependsOn": ["^build"],
-      "inputs": [
-        "src/**",
-        "tsconfig.json",
-        "package.json",
-        "app.config.ts",
-        "wrangler.toml"
-      ],
-      "outputs": [".output/**", ".vinxi/**"],
-      "env": ["NODE_ENV", "PUBLIC_STATE_API"]
-    },
     "@anipotts/state#build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "tsconfig.json", "package.json", "wrangler.toml"],

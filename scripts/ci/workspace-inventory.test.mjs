@@ -5,7 +5,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { classifiedWorkers } from "./workspace-inventory-parser.test.mjs";
 
-const EXPECTED_APPS = ["admin", "admin-solid", "www"];
+const EXPECTED_APPS = ["admin", "www"];
 const EXPECTED_PACKAGES = [
   "brand",
   "content",

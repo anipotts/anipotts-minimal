@@ -13,8 +13,6 @@ const SENSITIVE_PREFIXES = [
   ".github/workflows/",
   "apps/admin/src/pages/api/",
   "apps/admin/src/pages/auth/",
-  "apps/admin-solid/src/lib/",
-  "apps/admin-solid/src/routes/api/",
   "drizzle/migrations/",
   "packages/content/",
   "packages/lib/",
