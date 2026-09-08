@@ -6,11 +6,15 @@ import {
   DEFAULT_WORK_INDEX_CONTENT,
   normalizeCmsProject,
   validateCmsProject,
+  validateListingPageContent,
 } from "../../packages/content/dist/public/index.js";
 import { PUBLIC_SMOKE_ROUTES } from "./public-route-inventory.mjs";
 
 assert.deepEqual(DEFAULT_MAKING_INDEX_CONTENT, DEFAULT_WORK_INDEX_CONTENT);
 assert.equal(DEFAULT_WORK_INDEX_CONTENT.hero_title, "work");
+assert.deepEqual(validateListingPageContent(DEFAULT_WORK_INDEX_CONTENT), {
+  ok: true,
+});
 const record = DEFAULT_CMS_PROJECTS.find(
   (project) => project.kind === "project",
 );

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94",
+  "source_hash": "00ff482ae347cd252b635c75b44b86bc45c6b1f6502db0bcc2790b9cb8c47f9a",
   "sources": {
     "content/public/pages/home.md": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
@@ -9,7 +9,7 @@
     "content/public/pages/orchestrating.md": "1ab1b6d3afbba692de7431cde15684eea9f300b4c1597244abff238d206958c9",
     "content/public/pages/projects.md": "c4e752155a1d91d1ace7e998ce3577eeb03f6c88c01cf5aa75f7290e958ffadb",
     "content/public/pages/systems.md": "69edc2bb4ffcb2449a4cbbee42029a9ec8e1ed8bf7e759eceb83c864dce2001c",
-    "content/public/pages/work.md": "7ef9d0f39f3fd8e0a7b980a003e5a2a6449ab3ca2fde7ea734efb67ef10fd36c",
+    "content/public/pages/work.md": "48ac4ef034995577c72a149804de49936c70ceaa678a7ee39c1e39b82be38f42",
     "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
     "content/public/projects/chainedchat.md": "da0db3e9bbb0f3c4b379600c147315ec0f26488e361db826fd68ed1268e570d6",
     "content/public/projects/claude-code-tips.md": "d05003f7cf6757424cc1dc64f9b86d7dffeb2f58558b45c5acbaacd7a5e444ee",
@@ -1187,9 +1187,17 @@
       "hero_title": "work",
       "hero_summary": "work i've built or contributed to",
       "buckets": [
-        { "id": "experience", "label": "experience", "note": "" },
-        { "id": "selected", "label": "selected projects", "note": "" },
-        { "id": "archive", "label": "archive", "note": "" }
+        {
+          "id": "experience",
+          "label": "experience",
+          "note": "professional work"
+        },
+        {
+          "id": "selected",
+          "label": "selected projects",
+          "note": "featured independent projects"
+        },
+        { "id": "archive", "label": "archive", "note": "other public projects" }
       ]
     },
     "writing": {

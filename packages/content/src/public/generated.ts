@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94";
+  "00ff482ae347cd252b635c75b44b86bc45c6b1f6502db0bcc2790b9cb8c47f9a";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -130,17 +130,17 @@ export const DEFAULT_WORK_INDEX_CONTENT: ListingPageContent = {
     {
       id: "experience",
       label: "experience",
-      note: "",
+      note: "professional work",
     },
     {
       id: "selected",
       label: "selected projects",
-      note: "",
+      note: "featured independent projects",
     },
     {
       id: "archive",
       label: "archive",
-      note: "",
+      note: "other public projects",
     },
   ],
 };

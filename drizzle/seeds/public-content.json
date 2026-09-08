@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94",
+  "source_hash": "00ff482ae347cd252b635c75b44b86bc45c6b1f6502db0bcc2790b9cb8c47f9a",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -1212,13 +1212,25 @@
         "hero_title": "work",
         "hero_summary": "work i've built or contributed to",
         "buckets": [
-          { "id": "experience", "label": "experience", "note": "" },
-          { "id": "selected", "label": "selected projects", "note": "" },
-          { "id": "archive", "label": "archive", "note": "" }
+          {
+            "id": "experience",
+            "label": "experience",
+            "note": "professional work"
+          },
+          {
+            "id": "selected",
+            "label": "selected projects",
+            "note": "featured independent projects"
+          },
+          {
+            "id": "archive",
+            "label": "archive",
+            "note": "other public projects"
+          }
         ]
       },
       "source_ref": "content/public/pages/work.md",
-      "source_hash": "7ef9d0f39f3fd8e0a7b980a003e5a2a6449ab3ca2fde7ea734efb67ef10fd36c"
+      "source_hash": "48ac4ef034995577c72a149804de49936c70ceaa678a7ee39c1e39b82be38f42"
     },
     {
       "page_key": "writing",

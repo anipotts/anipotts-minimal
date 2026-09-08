@@ -634,7 +634,7 @@ describe("owner editor cms validation", () => {
       DEFAULT_PROJECTS_INDEX_CONTENT,
     );
 
-    expect(listing.hero_link_label).toBe("/making");
+    expect(listing.hero_link_label).toBe("/work");
     expect(validateListingPageContent(listing)).toEqual({
       ok: false,
       error: "Listing page hero link must start with /, https://, or mailto:",

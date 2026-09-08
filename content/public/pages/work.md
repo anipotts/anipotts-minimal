@@ -6,11 +6,11 @@ hero_summary: work i've built or contributed to
 buckets:
   - id: experience
     label: experience
-    note: ""
+    note: professional work
   - id: selected
     label: selected projects
-    note: ""
+    note: featured independent projects
   - id: archive
     label: archive
-    note: ""
+    note: other public projects
 ---
