@@ -6,7 +6,11 @@ hero_summary: "i've always used technology to get more out of my time, and now i
 workflow:
   sources: [messages, gmail, calendar, notes, youtube, spotify, x, instagram, whatsapp, chrome, linkedin, granola, mercury, stripe]
   intro: |-
-    the map below shows my general process for keeping track of what i'm working towards
+    over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.
+
+    i use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment
+
+    the map below is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love
   steps:
     - id: outcome
       marks: [mac-mini, github, linear]

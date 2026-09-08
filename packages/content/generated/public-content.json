@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "9366385c14d7dbd48d3b6e4faf5645bfa4d80d8b150a8ac6e3ad2ac3638554ce",
+  "source_hash": "62e7612c9d2f1854512b589bf5105408687c99b850370ff998eb35f722cd75e2",
   "sources": {
     "content/public/pages/home.md": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
     "content/public/pages/orchestrating.md": "1ab1b6d3afbba692de7431cde15684eea9f300b4c1597244abff238d206958c9",
     "content/public/pages/projects.md": "c4e752155a1d91d1ace7e998ce3577eeb03f6c88c01cf5aa75f7290e958ffadb",
-    "content/public/pages/systems.md": "69edc2bb4ffcb2449a4cbbee42029a9ec8e1ed8bf7e759eceb83c864dce2001c",
+    "content/public/pages/systems.md": "f9f0651afe3c3e1e66f86cd379a749e3d85c6a30a30f49f3a8d75327fe5cdf9a",
     "content/public/pages/work.md": "48ac4ef034995577c72a149804de49936c70ceaa678a7ee39c1e39b82be38f42",
     "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
     "content/public/projects/chainedchat.md": "da0db3e9bbb0f3c4b379600c147315ec0f26488e361db826fd68ed1268e570d6",
@@ -232,7 +232,7 @@
           "mercury",
           "stripe"
         ],
-        "intro": "the map below shows my general process for keeping track of what i'm working towards",
+        "intro": "over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.\n\ni use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment\n\nthe map below is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love",
         "steps": [
           {
             "id": "outcome",

@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "9366385c14d7dbd48d3b6e4faf5645bfa4d80d8b150a8ac6e3ad2ac3638554ce";
+  "62e7612c9d2f1854512b589bf5105408687c99b850370ff998eb35f722cd75e2";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -278,7 +278,7 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
       "stripe",
     ],
     intro:
-      "the map below shows my general process for keeping track of what i'm working towards",
+      "over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.\n\ni use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment\n\nthe map below is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love",
     steps: [
       {
         id: "outcome",
