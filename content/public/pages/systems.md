@@ -10,7 +10,7 @@ workflow:
 
     i use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment
 
-    the map below is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love
+  outro: "this is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love"
   steps:
     - id: outcome
       marks: [mac-mini, github, linear]

@@ -1236,6 +1236,9 @@ export function validateSystemsPageContent(content: SystemsPageContent): {
     [content.hero_title, "Systems hero title"],
     [content.hero_summary, "Systems hero summary"],
     [workflow.intro, "Systems introduction"],
+    ...(workflow.outro === undefined
+      ? []
+      : ([[workflow.outro, "Systems closing paragraph"]] as const)),
     [workflow.feedback, "Systems feedback"],
     ...workflow.steps.flatMap(
       (step) =>

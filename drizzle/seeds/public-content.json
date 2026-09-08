@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "62e7612c9d2f1854512b589bf5105408687c99b850370ff998eb35f722cd75e2",
+  "source_hash": "23bcba6d5d361d1c3219f38c75ab98d1177022306a379c972bbe80ddf6a0b0ac",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -241,7 +241,8 @@
             "mercury",
             "stripe"
           ],
-          "intro": "over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.\n\ni use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment\n\nthe map below is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love",
+          "intro": "over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.\n\ni use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment",
+          "outro": "this is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love",
           "steps": [
             {
               "id": "outcome",
@@ -1201,7 +1202,7 @@
         ]
       },
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "f9f0651afe3c3e1e66f86cd379a749e3d85c6a30a30f49f3a8d75327fe5cdf9a"
+      "source_hash": "c5c2a4ba6d6ffaa3683367c005bbb49860fef3d537e9ad6dfb93482463b7dd09"
     },
     {
       "page_key": "making",

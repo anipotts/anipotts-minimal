@@ -23,6 +23,11 @@ const content = normalizeSystemsPageContent(DEFAULT_SYSTEMS_CONTENT);
       }
     </div>
     <SystemMap workflow={content.workflow} />
+    {
+      content.workflow.outro && (
+        <p class="page-intro workflow-outro">{content.workflow.outro}</p>
+      )
+    }
   </section>
 </Shell>
 

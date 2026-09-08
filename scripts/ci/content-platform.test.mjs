@@ -940,6 +940,23 @@ assert.deepEqual(
   "experimental lifecycle does not constrain public workflow",
 );
 const workflow = systemsContent.workflow;
+assert.ok(workflow.outro.startsWith("this is how i organize that"));
+assert.equal(workflow.intro.split(/\n\s*\n/).filter(Boolean).length, 2);
+assert.ok(
+  lifecyclePage.indexOf("content.workflow.outro") >
+    lifecyclePage.indexOf("<SystemMap"),
+  "closing copy follows the map",
+);
+const { outro: omittedOutro, ...workflowWithoutOutro } = workflow;
+assert.equal(
+  validateSystemsPageContent({
+    ...systemsContent,
+    workflow: normalizeSystemsPageContent({ workflow: workflowWithoutOutro })
+      .workflow,
+  }).ok,
+  true,
+  "legacy records remain valid without closing copy",
+);
 assert.equal(workflow.steps.length, 4);
 assert.deepEqual(workflow.sources, [
   "messages",
@@ -993,6 +1010,8 @@ for (const invalid of [
     steps: [workflow.steps[0], workflow.steps[0], ...workflow.steps.slice(2)],
   },
   { ...workflow, intro: "" },
+  { ...workflow, outro: 123 },
+  { ...workflow, outro: "" },
   { ...workflow, sources: ["unknown-provider"] },
   {
     ...workflow,

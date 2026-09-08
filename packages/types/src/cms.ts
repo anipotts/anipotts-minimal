@@ -438,6 +438,8 @@ export interface SystemsLifecycle {
 export interface SystemsPageContent {
   workflow: {
     intro: string;
+    /** Optional closing paragraph rendered after the workflow, absent in legacy records. */
+    outro?: string;
     sources: string[];
     steps: Array<{
       id: string;

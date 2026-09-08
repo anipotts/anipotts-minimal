@@ -67,6 +67,10 @@ After the rationale is reviewed, add ordinary text links below the map: `coding 
 
 ## Editorial method
 
+Systems follow-up: the closing rationale now lives in optional canonical `workflow.outro` and renders below the map, with the location-dependent opening changed to “this is how i organize that.” The loop caption uses available desktop width rather than a 48ch cap; it fits one line at the existing 880px breakpoint while mobile retains vertical placement. Browser checks at 319, 390, 879, 880, 883, 907, and 1440px in both themes found no overflow or console errors; pause/resume still works. A static two-row source collection was proposed as a replacement for the marquee and remains unapproved/unimplemented. Work-page review remains at Structured AI's personal engineering decision.
+
+Ani clarified that the desired format is **tweet-length paragraphs**, not inverted-pyramid news structure. Keep each paragraph focused and short enough to stand alone, preserving the argument's natural order and voice. The approved systems rationale uses three paragraphs below 280 characters each across its introduction and closing copy. Apply this paragraph treatment during each approved work/writing review; do not reorder every piece into a news story or silently rewrite all existing copy.
+
 The supplied portfolio-walkthrough video informs the work-page review: decide what a visitor should learn about Ani, establish role/scope, show the finished artifact early, select important decisions and alternatives, then show evidence and genuine reflection. Avoid a chronological process dump or forcing every small project into seven headings.
 
 For writing, apply clarity of argument, concrete examples, evidence, and purposeful structure. Keep the author's historical perspective and original date. Product-case-study structure does not belong in every essay.
