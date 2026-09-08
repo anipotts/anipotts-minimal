@@ -1090,10 +1090,11 @@ function isPublished(value: number | boolean | null | undefined): boolean {
 }
 
 function routeForPayload(payload: ContentEditorPayload): string {
+  if (payload.page_key === "making" || payload.page_key === "projects")
+    return "/work";
   if (payload.page_key.startsWith("writing:"))
     return `/writing/${payload.slug}`;
-  if (payload.page_key.startsWith("project:"))
-    return `/projects/${payload.slug}`;
+  if (payload.page_key.startsWith("project:")) return `/work/${payload.slug}`;
   if (payload.page_key === "home") return "/";
   return `/${payload.page_key.replaceAll("_", "/").replaceAll(":", "/")}`;
 }

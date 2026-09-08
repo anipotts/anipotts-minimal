@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import "./public-freshness.test.mjs";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
@@ -172,9 +173,10 @@ const ambientFlow = readFileSync(
 );
 assert.match(
   ambientFlow,
-  /--flow-5:\s*#[0-9a-f]{6}/i,
-  "ambient card geometry must retain the fifth deep-blue layer",
+  /preserveAspectRatio="xMidYMid slice"/,
+  "ambient artwork must preserve its proportions inside cropped surfaces",
 );
+assert.match(ambientFlow, /aria-hidden="true"/, "artwork is decorative");
 
 const wrangler = readFileSync("apps/www/wrangler.toml", "utf8");
 for (const marker of [

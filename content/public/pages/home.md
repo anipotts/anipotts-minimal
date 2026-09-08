@@ -4,7 +4,7 @@ sections:
     visible: true
     label: index
     heading: hi, i'm ani!
-    subheading: i work on realtime agent systems and make content about how they work. i previously worked on real-time agent i/o at structured ai (YC F25) and our bad habit, an atlantic records venture, and business insider also covered my everyday workflow.
+    subheading: i build data intensive systems with AI and sometimes share what i'm learning online. i've worked on construction document agents at structured ai (YC F25) and artist discovery tools at our bad habit, an atlantic records venture. business insider also wrote about how i use coding agents in my everyday work under usage constraints.
     mention_keys:
       - structuredAi
       - yCombinatorF25
@@ -13,13 +13,13 @@ sections:
       - businessInsider
   past_work:
     visible: true
-    label: making
+    label: work
     heading: ""
     limit: 4
     links:
       - label: view all
-        href: /making
-    view_all: /making
+        href: /work
+    view_all: /work
   latest_thoughts:
     visible: true
     label: writing
@@ -40,7 +40,7 @@ section_order:
 mentions:
   build:
     label: build
-    href: /making
+    href: /work
     presentation: facet
   agents:
     label: agents

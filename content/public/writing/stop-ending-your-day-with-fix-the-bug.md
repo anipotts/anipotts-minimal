@@ -1,7 +1,7 @@
 ---
 slug: stop-ending-your-day-with-fix-the-bug
 title: stop ending your day with "fix the bug"
-summary: vague todos waste context. specific prompts let claude code start from the right file.
+summary: leaving enough detail in a todo for a coding agent to pick it up the next day
 tags: [claude-code, productivity, ai-tools]
 status: published
 published_at: 2026-04-07

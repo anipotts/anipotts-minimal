@@ -1,4 +1,5 @@
 ---
+import { siteConfig } from "@anipotts/content/public";
 interface Props {
   mode?: "link" | "form";
   lede?: string;
@@ -12,7 +13,7 @@ interface Props {
 const {
   mode = "link",
   lede = "notes on agent workflows and product builds, including the parts that broke while shipping.",
-  href = "https://news.anipotts.com",
+  href = siteConfig.newsletterUrl,
   ctaLabel = "subscribe",
   footerText = "",
   successMessage = "subscribed. check your inbox.",

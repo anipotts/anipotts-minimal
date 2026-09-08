@@ -99,7 +99,7 @@ for (const invariant of [
   "server.watcher.add(CONTENT_ROOT)",
   'server.watcher.on("change", schedule)',
   '["content:generate"]',
-  '["--filter", "@anipotts/content", "build"]',
+  '["turbo", "build", "--filter=@anipotts/content..."]',
   "server.moduleGraph.invalidateAll()",
   'server.ws.send({ type: "full-reload" })',
 ]) {

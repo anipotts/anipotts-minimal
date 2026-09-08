@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { siteConfig } from "@anipotts/content/public";
 import {
   confirmSubscriber,
   html,
@@ -43,5 +44,5 @@ export const GET: APIRoute = async ({ request, locals }) => {
 };
 
 function render(title: string, body: string): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} / ani potts newsletter</title><style>body{margin:0;background:#fbfaf7;color:#171717;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:42rem;margin:12vh auto;padding:0 1.25rem}h1{font-size:clamp(2rem,8vw,4rem);font-weight:520;line-height:.98;margin:0 0 1rem}p{font-size:1.05rem;line-height:1.55;color:#555}a{color:inherit}</style></head><body><main><h1>${title}</h1><p>${body}</p><p><a href="/">back to the newsletter</a></p></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} / ${siteConfig.displayName} newsletter</title><style>body{margin:0;background:#fbfaf7;color:#171717;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:42rem;margin:12vh auto;padding:0 1.25rem}h1{font-size:clamp(2rem,8vw,4rem);font-weight:520;line-height:.98;margin:0 0 1rem}p{font-size:1.05rem;line-height:1.55;color:#555}a{color:inherit}</style></head><body><main><h1>${title}</h1><p>${body}</p><p><a href="/">back to the newsletter</a></p></main></body></html>`;
 }

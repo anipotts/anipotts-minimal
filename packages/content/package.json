@@ -7,6 +7,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./public/schema": {
+      "types": "./dist/public/schema.d.ts",
+      "import": "./dist/public/schema.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -33,14 +37,17 @@
     }
   },
   "scripts": {
-    "build": "pnpm --filter @anipotts/types build && tsc",
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc",
     "dev": "tsc --watch",
-    "typecheck": "pnpm --filter @anipotts/types build && tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@anipotts/types": "workspace:*"
+    "@anipotts/types": "workspace:*",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

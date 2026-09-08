@@ -95,5 +95,6 @@ Database and authenticated Admin gates remain independent:
 No separate application canary ceremony is required. A normal scoped release
 with exact-SHA validation and smoke proof is the release proof.
 
-`admin-solid` remains a manual rollback target until native auth production
-proof is complete.
+The legacy Solid source and deployment target are retired. Rollback uses the
+previous verified Astro deployment. Retirement does not remove production
+resources or change the independent Access and authenticated-smoke gates.

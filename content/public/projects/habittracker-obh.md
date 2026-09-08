@@ -1,6 +1,6 @@
 ---
 title: our bad habit
-subtitle: growth tracking for an atlantic records venture.
+subtitle: tools for finding artists and following their growth
 description: Built a scouting dashboard that pulled Chartmetric, YouTube, TikTok, and Instagram signals into one workflow. Added geo-based discovery for finding emerging artists in campaign markets.
 year: "2024"
 category: music
@@ -12,8 +12,8 @@ public_state: featured
 homepage_placement: none
 catalog_group: past
 homepage_order: 80
-card_copy: discovery and growth in one scouting workflow.
-detail_path: /projects/habittracker-obh
+card_copy: bringing music and social data together to help the team find emerging artists
+detail_path: /work/habittracker-obh
 identity:
   logo_src: /images/brand/bad-habit-favicon.png
   logo_alt: our bad habit

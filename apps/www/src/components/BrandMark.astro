@@ -40,9 +40,14 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    :global(.wordmark:hover) .brand-mark__half--right {
+    :global(.wordmark:hover) .brand-mark__half--right,
+    :global(.wordmark[data-hover-continuity]) .brand-mark__half--right {
       transform: translateX(18%);
     }
+  }
+
+  :global(.wordmark[data-hover-restored]) .brand-mark__half {
+    transition: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -51,6 +56,7 @@
     }
 
     :global(.wordmark:focus-visible) .brand-mark__half,
+    :global(.wordmark[data-hover-continuity]) .brand-mark__half,
     :global(.wordmark:hover) .brand-mark__half {
       transform: none;
     }

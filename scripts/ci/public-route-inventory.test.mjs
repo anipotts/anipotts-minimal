@@ -9,8 +9,8 @@ import {
   validatePublicRouteInventory,
 } from "./public-route-inventory.mjs";
 
-assert.equal(PUBLIC_ROUTE_INVENTORY.length, 22);
-assert.equal(PUBLIC_SMOKE_ROUTES.length, 22);
+assert.equal(PUBLIC_ROUTE_INVENTORY.length, 23);
+assert.equal(PUBLIC_SMOKE_ROUTES.length, 23);
 assert.deepEqual(
   PUBLIC_SMOKE_ROUTES,
   PUBLIC_ROUTE_INVENTORY.map((record) => record.route),
@@ -27,9 +27,9 @@ for (const record of PUBLIC_ROUTE_INVENTORY) {
 
 assert.equal(
   PUBLIC_ROUTE_INVENTORY.filter(
-    (record) => record.file === "apps/www/src/pages/projects/[slug].astro",
+    (record) => record.file === "apps/www/src/pages/work/[slug].astro",
   ).length,
-  9,
+  11,
 );
 assert.equal(
   PUBLIC_ROUTE_INVENTORY.filter(

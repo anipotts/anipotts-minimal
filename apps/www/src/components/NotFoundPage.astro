@@ -1,0 +1,35 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Shell
+  title="lost page"
+  description="page unavailable"
+  path="/404"
+  robots="noindex,follow"
+>
+  <section data-rise>
+    <h1 class="hero-title">nothing here.</h1>
+    <p class="hero-summary">
+      this route has moved or retired. the index can get you back on track.
+    </p>
+    <a href="/" class="quiet-link mono home">
+      <Icon name="ph:arrow-bend-up-left" /> back home
+    </a>
+  </section>
+</Shell>
+
+<style>
+  .hero-title {
+    margin-bottom: var(--s-3);
+  }
+
+  .home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--s-4);
+    min-height: 44px;
+  }
+</style>

@@ -29,15 +29,6 @@ export type NavItem = {
   mobile?: boolean;
 };
 
-export type DashboardCard = {
-  title: string;
-  status: string;
-  risk: "low" | "medium" | "high";
-  next: string;
-  href: string;
-  action: string;
-};
-
 export type QueueRow = {
   title: string;
   owner: string;
@@ -289,84 +280,6 @@ export const navItems: NavItem[] = [
   },
 ];
 
-export const overviewCards: DashboardCard[] = [
-  {
-    title: "passkey proof",
-    status: "two credentials registered, one active session",
-    risk: "high",
-    next: "record revoked-credential and denied-auth proof before Access removal",
-    href: "/auth/passkey",
-    action: "open auth proof",
-  },
-  {
-    title: "writing editor",
-    status: "D1 draft save and selected-draft publish are live",
-    risk: "medium",
-    next: "use the Astryx editor for save, preview, publish, and history",
-    href: "/content/edit/new",
-    action: "open editor",
-  },
-  {
-    title: "content inventory",
-    status: "canonical public content is visible with D1 draft history",
-    risk: "low",
-    next: "keep review proposals separate from source-controlled publication",
-    href: "/content",
-    action: "open content",
-  },
-  {
-    title: "fleet status",
-    status: "runtime and repo state are readable from the operator dashboard",
-    risk: "low",
-    next: "make machine drift, stale work, and current owner clearer",
-    href: "/fleet",
-    action: "open fleet",
-  },
-  {
-    title: "deploy proof",
-    status: "admin and public deploy targets are separated",
-    risk: "low",
-    next: "after each merge, prove only the intended target ran",
-    href: "/deploys",
-    action: "check deploys",
-  },
-  {
-    title: "advanced ops",
-    status: "handoffs, mutations, and destructive ops are demoted",
-    risk: "medium",
-    next: "keep visible for audit without making them the first screen",
-    href: "/mutations",
-    action: "open gates",
-  },
-];
-
-export const contentRows: QueueRow[] = [
-  {
-    title: "homepage intro",
-    owner: "apps/www",
-    status: "canonical source projected into Admin",
-    evidence: "content/public/pages/home.md",
-  },
-  {
-    title: "projects",
-    owner: "apps/www",
-    status: "canonical project files projected into Admin",
-    evidence: "content/public/projects/*.md",
-  },
-  {
-    title: "writing",
-    owner: "apps/www",
-    status: "canonical writing files projected into Admin",
-    evidence: "content/public/writing/*.md",
-  },
-  {
-    title: "newsletter",
-    owner: "apps/www",
-    status: "canonical copy, subscribe surface, and retained send worker",
-    evidence: "content/public/pages/newsletter.md and workers/newsletter",
-  },
-];
-
 export const handoffRows: QueueRow[] = [
   {
     title: "passkey registration proof",
@@ -401,12 +314,6 @@ export const repoRows: QueueRow[] = [
     status: "canonical Astro app",
     evidence: "apps/admin and docs/platform-architecture.md",
   },
-  {
-    title: "apps/admin-solid",
-    owner: "legacy-admin-solid.anipotts.com",
-    status: "legacy rollback",
-    evidence: "manual-only deploy input until passkey proof",
-  },
 ];
 
 export const deployRows: DeployRow[] = [
@@ -425,14 +332,6 @@ export const deployRows: DeployRow[] = [
     status: "automatic safe lane",
     proof: "admin routes return Cloudflare Access 302 until passkey removal",
     next: "enroll passkey, then prove app-native blocking before Access removal",
-  },
-  {
-    target: "admin-solid rollback",
-    input: "admin_solid=true",
-    scope: "apps/admin-solid only",
-    status: "manual rollback",
-    proof: "Deploy admin-solid is skipped unless explicitly requested",
-    next: "archive or remove after passkey proof and Astro admin rollback window closes",
   },
   {
     target: "state worker",
@@ -465,21 +364,6 @@ export const deployRows: DeployRow[] = [
     status: "retained worker",
     proof: "weekly email deploy job is skipped unless the target is selected",
     next: "fold or retire after newsletter/content system owns the summary path",
-  },
-];
-
-export const fleetRows: QueueRow[] = [
-  {
-    title: "ap-pro",
-    owner: "Codex / Claude",
-    status: "operator workstation",
-    evidence: "repo state and browser proof",
-  },
-  {
-    title: "ap-mini",
-    owner: "runtime host",
-    status: "runtime host",
-    evidence: "workers/state and Infra runtime feed",
   },
 ];
 

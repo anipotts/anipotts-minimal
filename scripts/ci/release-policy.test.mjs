@@ -42,7 +42,10 @@ const adminSolidRelease = classifyRelease(
   base,
 );
 assert.equal(adminSolidRelease.risk, "approval");
-assert.equal(adminSolidRelease.deploy_targets.admin_solid, false);
+assert.equal(
+  Object.hasOwn(adminSolidRelease.deploy_targets, "admin_solid"),
+  false,
+);
 assert.deepEqual(adminSolidRelease.reasons, [
   "protected surface: apps/admin-solid/package.json",
 ]);

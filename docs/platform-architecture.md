@@ -1,338 +1,68 @@
-# platform architecture
+# Platform architecture
 
-Last updated: 2026-06-29
+Updated: 2026-09-08. Release completion evidence lives in [the site release review](site-release-review-2026-09-07.md).
 
-This repo is being reduced to one public Astro app, one admin Astro app, one
-structured content/state model, and one predictable CI/CD path.
+## Active surfaces
 
-`pnpm test:workspace` enforces the active app, package, and worker inventory so
-archived surfaces do not re-enter the workspace quietly.
+| Surface            | Source                 | Role                                                                     |
+| ------------------ | ---------------------- | ------------------------------------------------------------------------ |
+| anipotts.com       | `apps/www`             | Public Astro pages, Git-backed work and writing, newsletter endpoints    |
+| admin.anipotts.com | `apps/admin`           | Astro admin, proposals, previews, operational state, app-native passkeys |
+| api.anipotts.com   | `workers/state`        | Durable state and authenticated command relay                            |
+| Ingest             | `workers/ingest`       | Scheduled ingest and authenticated event receivers                       |
+| Newsletter         | `workers/newsletter`   | Subscription and issue queue consumer                                    |
+| Weekly email       | `workers/weekly-email` | Scheduled operational summary                                            |
 
-`pnpm test:path-hygiene` keeps active repo files off retired local account paths.
-Historical references may remain under `docs/archive`, but live scripts and
-launchd templates must point at `/Users/anipotts`.
+The legacy Solid app and deploy target are removed. Historical source is recoverable through Git; the cleanup does not delete any production worker or database. Active Astro route and authentication tests remain independent of retirement.
 
-## target state
+The four retained workers still have explicit routes, cron schedules, queues, or Durable Object bindings. They are operational functionality, not public-page rendering dependencies. Their outbound and data-mutation boundaries remain intact.
 
-| Surface        | Target                              | Status              | Next action                                       |
-| -------------- | ----------------------------------- | ------------------- | ------------------------------------------------- |
-| public site    | `apps/www`                          | keep                | keep as Astro public app for `anipotts.com`       |
-| admin site     | `apps/admin`                        | canonical cutover   | prove passkey registration and then remove Access |
-| current admin  | `apps/admin-solid`                  | manual rollback     | satisfy the checked retirement contract           |
-| legacy admin   | `docs/archive/admin-next-legacy.md` | archived            | no Next admin app remains                         |
-| labs           | `docs/archive/labs`                 | archived            | no app or deploy target remains                   |
-| workers        | `workers/*`                         | review individually | keep only production-required workers             |
-| shared content | `packages/content`, `packages/lib`  | in progress         | use package contracts plus D1 operation tables    |
-| database       | `drizzle`, D1 `anipotts-db`         | keep                | prove draft operations, then keep publish gated   |
+## Public content ownership
 
-## current inventory
+- `content/public/pages`: approved page copy
+- `content/public/projects`: stable work records, visibility, media and detail content
+- `content/public/writing`: essays, original dates, publication states and metadata
+- `packages/content/src/public/site.ts`: site identity, origin, contact, navigation and social links
+- `packages/content/src/public/schema.ts`: canonical project/writing frontmatter validation shared by Astro and generation
+- `packages/content/src/public/providers.ts`: approved workflow artwork
+- `packages/content/src/public/visibility.ts`: public inclusion rules
 
-### apps
+Two generated projections have active consumers: typed defaults for app rendering/adapters, and an admin review JSON projection. Generation is one-way from canonical sources and drift-checked. The unused validation JSON, future database seed, and reverse-bootstrap mode are removed.
 
-| Path                | Role today                                 | Classification  |
-| ------------------- | ------------------------------------------ | --------------- |
-| `apps/www`          | public Astro site and newsletter endpoints | keep            |
-| `apps/admin`        | Astro admin app for `admin.anipotts.com`   | keep            |
-| `apps/admin-solid`  | legacy Solid admin rollback surface        | manual rollback |
-| `docs/archive/labs` | archived labs reference material           | keep as archive |
+Public pages do not read D1 CMS content. Admin can review source-controlled copy and keep proposals and operational records separately. Stored identifiers such as `making` and `project:<slug>` survive only at compatibility boundaries. They do not create another published dataset. Historical migrations and production data are unchanged.
 
-### workers
+`/work` owns the public work index and details. Permanent old-URL redirects remain in the public middleware. Hidden projects and unpublished writing return 404 at detail URLs. Feeds, sitemap and release smoke consume the same public content inclusion decisions.
 
-| Path                   | Role today                                                   | Classification                        |
-| ---------------------- | ------------------------------------------------------------ | ------------------------------------- |
-| `workers/ingest`       | deployed cron/fetch worker for D1 ingest and event receivers | keep, review writers before expansion |
-| `workers/newsletter`   | deployed queue/fetch worker for newsletter sends             | keep, outbound-send gated             |
-| `workers/state`        | deployed `api.anipotts.com` durable-object state plane       | keep with explicit deploy target      |
-| `workers/weekly-email` | deployed scheduled email worker                              | keep, outbound-send gated             |
+## Shared code
 
-Detailed worker evidence and deletion criteria live in
-`docs/worker-inventory.md`. The 2026-06-29 review found no worker safe to delete
-yet: all four retained workers have current config, route or trigger evidence,
-deploy target coverage, and live version history.
+| Package                         | Responsibility                                           |
+| ------------------------------- | -------------------------------------------------------- |
+| `packages/content`              | Public contracts/settings and admin content review logic |
+| `packages/types`                | Shared app and operational contracts                     |
+| `packages/lib`                  | Admin-control runtime and the Drizzle migration schema   |
+| `packages/brand`                | Marks, fonts, shared tokens and typography               |
+| `packages/control-plane-runner` | Local relay client, journal and proof outbox             |
 
-### packages
+The old database-first public readers, fallback datasets, Solid-only services and unused package exports are removed. Astro admin consumes the admin-control entrypoint; root Drizzle tooling still consumes the database schema. Worker and runner implementations remain in their own active packages.
 
-| Path                            | Role today                                                               | Classification                  |
-| ------------------------------- | ------------------------------------------------------------------------ | ------------------------------- |
-| `packages/lib`                  | D1-backed CMS readers, db, data, services helpers                        | keep as runtime adapter layer   |
-| `packages/content`              | public content contracts, admin inventory, previews, parsers, and drafts | keep, expand toward D1 adapters |
-| `packages/brand`                | marks, fonts, semantic tokens, type roles, and motion                    | keep                            |
-| `packages/types`                | shared generated types                                                   | keep                            |
-| `config/typescript`             | shared compiler policy without a publishable package boundary            | keep as repository config       |
-| `packages/control-plane-runner` | outbound ap-mini relay client, local journal, and proof outbox           | keep local, capability-gated    |
+## Authentication and production boundaries
 
-## route parity target
+Cloudflare Access remains in front of Admin. Local source retirement is not proof of passkey enrollment or authenticated production access.
 
-The Astro admin replacement covers these live admin-solid routes. Keep them
-covered while passkey proof and Access removal are completed, then remove
-`apps/admin-solid`:
+App-native authentication is tested through the protected route inventory in `scripts/ci/admin-route-inventory.mjs`. Removing Access still requires registration, login, logout, persistence, revoked-credential denial, unauthenticated blocking and rollback proof. No authentication or secret changes are part of source cleanup.
 
-`config/admin-solid-retirement.json` is the machine-checked retirement gate.
-Removal requires durable proof for route parity, native authentication, mobile
-QA, a rollback rehearsal, production behavior, and an immutable recovery ref.
-`pnpm test:admin-solid-retirement` keeps the app present and excluded from
-automatic deployment until all six proofs pass. Once they pass, the contract
-requires a dated `admin-solid-recovery-YYYY-MM-DD` tag and requires the active
-rollback app to be absent.
+The focused admin draft operations, newsletter controls and command relay retain their existing authorization checks. Public code must not import admin-only contracts or operational write tables; `pnpm test:public-boundary` enforces this separation.
 
-`pnpm test:admin-routes` enforces the route files, admin navigation, deploy
-smoke list, manual smoke list, passkey proof route set, and full admin page/API
-file classification for this parity set. New admin route files must be added to
-the protected route table or to an explicit public exception list before they
-can ship.
+## Verification and releases
 
-The route table lives in `scripts/ci/admin-route-inventory.mjs`; route parity
-and passkey proof both consume that file so protected admin route coverage does
-not drift across scripts.
+The four workflows are `ci.yml`, `security-review.yml`, `deploy.yml` and `smoke.yml`. No external paid model review workflow is allowed.
 
-`pnpm test:public-boundary` enforces the public app boundary for `apps/www`.
-The public app may render public CMS/D1 content, run newsletter subscribe
-endpoints, redirect `/admin/*` to `admin.anipotts.com`, and proxy PostHog
-analytics through `/ingest/*`. It must not add admin routes, admin API routes,
-passkey logic, Cloudflare Access identity handling, proof tables, content draft
-operation tables, or publish-event tables.
+- `check:changed` defaults to the committed PR diff.
+- `check:changed --working-tree` also includes staged, unstaged and untracked files.
+- `validate` checks the whole workspace.
+- `content:check` checks generated content drift.
+- `test:admin-solid-retirement` prevents the retired app or deploy target returning.
 
-| Route                                               | Purpose                              |
-| --------------------------------------------------- | ------------------------------------ |
-| `/`                                                 | redirect to canonical inbox          |
-| `/inbox`                                            | normalized human action queue        |
-| `/auth/passkey`                                     | app-native passkey auth              |
-| `/content`                                          | content inventory                    |
-| `/content/review`                                   | content proposal queue               |
-| `/content/drafts`                                   | draft operation queue                |
-| `/content/edit/:pageKey`                            | focused draft page_content editor    |
-| `/api/admin/content/draft-operation`                | passkey-protected draft save API     |
-| `/content/preview`                                  | draft preview                        |
-| `/content/operations`                               | read-only D1 content operation state |
-| `/newsletter`                                       | newsletter issue queue               |
-| `/newsletter/first-thing-agents-need-control-plane` | newsletter issue detail preview      |
-| `/proof`                                            | deploy, auth, and route proof log    |
-| `/deploys`                                          | scoped deploy target map             |
-| `/repos`                                            | repo and worktree state              |
-| `/handoffs`                                         | handoff freshness                    |
-| `/fleet`                                            | machine and agent state              |
-| `/mutations`                                        | mutation queue                       |
-| `/ops/destructive`                                  | gated destructive-operation register |
-| `/api/admin/runtime-feed`                           | local-dev metadata overlay endpoint  |
+Deployable changes use same-repository PRs and exact-current-head provider checks. The release classifier selects affected targets; deleting the old deployment job must not select unrelated workers. Existing production migration and authenticated-smoke gates remain enforced.
 
-## auth target
-
-Passkey auth is the admin app boundary. Cloudflare Access stays in front only
-until passkey proof is complete.
-
-Required proof before removing Access:
-
-| Proof                     | Evidence                                              |
-| ------------------------- | ----------------------------------------------------- |
-| register                  | D1 credential row exists after biometric registration |
-| login                     | D1 session row exists and protected routes render     |
-| logout                    | session is revoked and protected routes redirect      |
-| persistence               | reload keeps authenticated access until expiry        |
-| revoked credential denial | revoked credential cannot create a new session        |
-| unauthenticated block     | protected admin routes redirect to app-native auth    |
-| rollback                  | previous Access app or policy can be restored         |
-
-Use `pnpm --silent proof:admin-passkey` before and after enrollment. It reads
-the remote `anipotts-db` passkey tables and probes protected admin routes
-without printing Cloudflare Access tokens. Before Access removal, the script
-must show one active credential, one active session, and audit rows for
-registration, session creation, session revocation, credential revocation, and
-revoked-credential denial. It reports missing pre-removal evidence in
-`access_removal_blockers`; `cloudflare_access_still_active: true` is expected
-until the edge gate is removed, not a blocker by itself. After Access removal,
-the same script must show app-native route blocking. The route probe set must
-include content inventory, review, drafts, focused page editor, draft-save API,
-preview, operations, newsletter queue, newsletter detail preview, inbox, proof,
-deploys, repos, handoffs, fleet, mutations, and destructive-ops routes.
-
-First-passkey bootstrap in production requires a verified Cloudflare Access
-application JWT from `Cf-Access-Jwt-Assertion`. The admin Worker validates it
-against `ACCESS_TEAM_DOMAIN` and `ACCESS_POLICY_AUD`, both non-secret
-configuration values in `apps/admin/wrangler.toml`, before allowing the first
-credential registration. After an active passkey session exists, additional
-credential operations use the app-native passkey session rather than Access
-identity headers.
-
-Use `pnpm --silent proof:admin-content` after content migrations. It reads only
-remote D1 metadata and route status, then proves published `home` and
-`newsletter` page content, the newsletter subscribe copy fields, draft
-operations, empty public publish tables, public route health, and protected
-admin route boundaries.
-
-The admin proof log reads durable rows from D1 table `admin_proof_events` when
-available, then appends live D1 metadata for content operations and passkey
-proof. The table is seeded by
-`drizzle/migrations/0012_admin_proof_events.sql`. The focused draft-save route
-may update `proof.admin.content-draft-save` with metadata-only proof after a
-passkey-authenticated `content_draft_operations` write; there is still no
-publish, send, deploy, or public-content proof write path.
-
-## ci/cd target
-
-Primary workflows:
-
-| Workflow              | Role                                                     |
-| --------------------- | -------------------------------------------------------- |
-| `ci.yml`              | build, lint, typecheck, and test affected packages on PR |
-| `security-review.yml` | local static checks for sensitive path changes on PR     |
-| `deploy.yml`          | deploy explicit targets only                             |
-| `smoke.yml`           | manual route proof for public and admin targets          |
-
-`pnpm test:workflows` enforces this exact workflow inventory and rejects
-disabled external Claude or Anthropic review hooks.
-
-Rules:
-
-- docs-only changes deploy nothing.
-- lockfile and root package changes never deploy every target by default.
-- public site changes deploy `www` only.
-- admin changes deploy only the Astro admin target.
-- `packages/content/src/admin` changes deploy admin only.
-- `packages/content/src/public`, package export, or package manifest changes
-  deploy both `www` and admin consumers.
-- `apps/admin-solid` changes do not auto-deploy. Its deploy job remains
-  workflow-dispatch only for rollback while passkey proof is incomplete.
-- `packages/lib` and `packages/brand` changes deploy `www` only because
-  `apps/admin` does not depend on them.
-- `release-policy.mjs` owns target classification for CI and deployment.
-- `deploy.yml` records route proof inside the `www` and `admin` deploy jobs.
-  `pnpm test:public-routes` keeps deploy smoke, manual smoke, and content proof
-  aligned on the public route set: `/`, `/newsletter`, `/newsletter/archive`,
-  `/making`, `/orchestrating`, `/projects`, visible project detail routes,
-  `/writing`, and published writing detail routes.
-- D1 migrations run as reviewed migration steps before app deploy.
-- `security-review.yml` does not call Anthropic, Claude Code, or any external
-  model API. It scans sensitive diffs for literal secrets, disabled LLM review
-  hooks, and destructive migration patterns.
-- `/api/admin/runtime-feed` is disabled in production and reads only the local
-  Infra runtime metadata file during development.
-
-## cleanup sequence
-
-1. keep `main` production-reflective.
-2. finish passkey proof while Access is still available.
-3. remove Access after app-native proof and rollback proof.
-4. keep admin-solid route parity covered in Astro `apps/admin`.
-5. deploy `apps/admin` as the admin production target.
-6. remove or archive `apps/admin-solid`.
-7. archive useful labs docs, then delete the labs app target if unused. done on
-   2026-06-27.
-8. remove the inactive `services/` and `packages/services-platform` planning
-   scaffold; keep the D1 `service_registry` table and `packages/lib` read
-   queries.
-9. review workers and delete unneeded worker targets. first pass completed on
-   2026-06-29 in `docs/worker-inventory.md`; no worker is safe to delete yet
-   because all four retained workers still have route or trigger evidence,
-   deployment history, and production responsibility.
-10. expand `packages/content` from static content inventory into the durable
-    operation schema and D1 adapter layer. started with
-    `drizzle/migrations/0007_content_operations.sql` and inert seed rows in
-    `drizzle/migrations/0008_seed_content_draft_operations.sql`; first published
-    newsletter page-content seed lives in
-    `drizzle/migrations/0009_seed_newsletter_page_content.sql`, and safe
-    homepage heading/section metadata seed lives in
-    `drizzle/migrations/0010_seed_home_page_content.sql`. Source-backed project
-    and writing review operations live in
-    `drizzle/migrations/0011_seed_source_content_review_operations.sql`.
-11. move admin proof baseline rows into D1 `admin_proof_events`; seeded by
-    `drizzle/migrations/0012_admin_proof_events.sql`.
-12. move homepage proof cards into D1 `page_content`; seeded by
-    `drizzle/migrations/0013_seed_homepage_proof_cards.sql` with Astro source
-    fallback still retained.
-13. move homepage making project slugs into D1 `page_content`; seeded by
-    `drizzle/migrations/0014_seed_homepage_making_slugs.sql` with Astro source
-    fallback still retained.
-14. move homepage writing slugs into D1 `page_content`; seeded by
-    `drizzle/migrations/0015_seed_homepage_writing_slugs.sql` with Astro source
-    fallback still retained.
-15. move homepage rich summary text and mention keys into D1 `page_content`;
-    seeded by `drizzle/migrations/0016_seed_homepage_rich_summary.sql` with
-    Astro source fallback still retained.
-16. move homepage mention label, link, and local logo metadata into D1
-    `page_content`; seeded by
-    `drizzle/migrations/0017_seed_homepage_mentions.sql` with Astro source
-    fallback still retained.
-17. remove duplicate `homeContent` homepage fallback from `apps/www/src/data`;
-    homepage fallback content now lives in `@anipotts/content/public`.
-18. stop auto-deploying `apps/admin-solid`; keep it manual-only for rollback.
-19. move homepage intro subheading into D1 `page_content`; seeded by
-    `drizzle/migrations/0019_seed_homepage_intro_subheading.sql` with source
-    fallback still retained.
-20. refresh D1 admin proof event metadata now that the proof log is durable;
-    updated by `drizzle/migrations/0020_refresh_admin_proof_events.sql`.
-21. move homepage about section into D1 `page_content`; seeded by
-    `drizzle/migrations/0021_seed_homepage_about_section.sql` with source
-    fallback still retained.
-22. move `/writing` index route copy into D1 `page_content`; seeded by
-    `drizzle/migrations/0022_seed_writing_index_page_content.sql` with source
-    fallback still retained.
-23. move `/making` index route copy into D1 `page_content`; seeded by
-    `drizzle/migrations/0023_seed_making_index_page_content.sql` with source
-    fallback still retained.
-24. move `/projects` archive index route copy into D1 `page_content`; seeded by
-    `drizzle/migrations/0024_seed_projects_index_page_content.sql` with source
-    fallback still retained.
-25. move `/newsletter/archive` route copy into D1 `page_content`; seeded by
-    `drizzle/migrations/0025_seed_newsletter_archive_page_content.sql` with
-    source fallback still retained.
-26. move the `/newsletter` archive CTA label, copy, and link into D1
-    `page_content`; seeded by
-    `drizzle/migrations/0026_seed_newsletter_archive_cta_content.sql` with
-    source fallback still retained.
-27. move `/orchestrating` hero and live-session panel copy into D1
-    `page_content`; seeded by
-    `drizzle/migrations/0027_seed_orchestrating_page_content.sql` with source
-    fallback still retained.
-28. seed D1 review operations for D1-backed listing/page copy on
-    `/making`, `/projects`, `/writing`, `/newsletter/archive`, and
-    `/orchestrating`; seeded by
-    `drizzle/migrations/0028_seed_listing_content_review_operations.sql`.
-29. add a first-class `/content/drafts` admin route backed by page_content and
-    content_draft_operations.
-30. move project and writing source-content parsing into `packages/content` so
-    the admin app only owns the Vite raw-markdown import boundary.
-31. move public page content defaults, pure normalizers, validators, content key
-    helpers, and homepage summary helpers into `@anipotts/content/public`.
-    Public routes render the generated canonical content contract and Astro
-    collections. `@anipotts/lib/cms` remains an Admin-side compatibility and D1
-    history adapter, not a public runtime source.
-    Metadata-only source-ref refresh is covered by
-    `drizzle/migrations/0029_update_public_content_contract_source_refs.sql`.
-32. expand `/orchestrating` page content from hero-only copy into structured
-    section labels, loop cards, and public-tool cards. Covered by
-    `drizzle/migrations/0030_expand_orchestrating_page_content.sql`; route
-    fallback remains in `@anipotts/content/public`.
-33. seed the first individual project and writing detail records into
-    `page_content` while preserving source fallbacks. Covered by
-    `drizzle/migrations/0031_seed_detail_page_content.sql` for
-    `/projects/quantercise` and `/writing/saturdays-are-for-claude-code`.
-    This proves the detail-record path without adding save APIs, publish
-    writes, sends, source rewrites, or external mutations.
-34. seed the remaining tracked project and writing detail records into
-    `page_content` while preserving source fallbacks. Covered by
-    `drizzle/migrations/0032_seed_remaining_detail_page_content.sql` for all
-    visible project and published writing detail routes, plus unpublished
-    review-only rows for hidden project and draft writing content. This keeps
-    publish writes blocked while making detail content reviewable from D1.
-35. add a passkey-protected `/api/admin/content/draft-operation` route for
-    saving draft operation rows from `/content/edit/:pageKey`; this still does
-    not write page_content, publish events, source files, sends, or deploys.
-    Existing D1 draft operation metadata is refreshed by
-    `drizzle/migrations/0033_refresh_draft_operation_save_metadata.sql`.
-36. add durable `admin_proof_events` coverage for the draft-save write path.
-    `drizzle/migrations/0034_seed_content_draft_save_proof.sql` seeds the
-    pending proof row, and successful draft saves update it with metadata only.
-37. add a read-only `/deploys` route so the admin sidebar exposes scoped
-    deploy targets, rollback-only admin-solid status, retained worker targets,
-    and skipped-target proof expectations.
-38. reduce deploy workflow inputs to retained production targets after rollback
-    no longer needs `apps/admin-solid`.
-39. fail closed on new admin routes: `pnpm test:admin-routes` now requires every
-    `apps/admin/src/pages` route file to be classified and every protected smoke
-    route to appear in passkey proof before merge.
-40. make `scripts/ci/admin-route-inventory.mjs` the shared source for admin
-    route parity and passkey route proof to remove the duplicated proof route
-    list.
-41. move `/making` project bucket labels and notes into D1 `page_content`;
-    covered by `drizzle/migrations/0035_seed_making_bucket_copy.sql` with
-    source fallback still retained in `@anipotts/content/public`.
+See [release architecture](release-architecture.md), [local development](local-development.md), and [worker inventory](worker-inventory.md). Older dated architecture proposals are historical context, not alternate executable contracts.

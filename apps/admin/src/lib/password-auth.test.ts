@@ -1,11 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { createSessionToken, hashAdminPassword } from "@anipotts/lib/admin";
+import { createHmac, pbkdf2Sync } from "node:crypto";
 import {
   hasActivePasswordSession,
   loginWithPassword,
   PASSWORD_SESSION_COOKIE,
   passwordAuthConfigured,
 } from "./password-auth";
+
+// Independent fixtures preserve compatibility with the existing owner password format.
+function hashAdminPassword(password: string): string {
+  const salt = "password-auth-test";
+  const hash = pbkdf2Sync(password, salt, 210000, 32, "sha256").toString("hex");
+  return `pbkdf2_sha256$210000$${salt}$${hash}`;
+}
+
+function createSessionToken(secret: string): string {
+  const timestamp = Date.now().toString();
+  const signature = createHmac("sha256", secret)
+    .update(timestamp)
+    .digest("hex");
+  return `${timestamp}.${signature}`;
+}
 
 function context({
   hash,

@@ -30,10 +30,15 @@ const stateLabel = d.status === "wip" ? "in progress" : d.status;
     preview ? "work-card--visual" : "work-card--compact",
   ]}
 >
-  <AmbientFlow kind="making" seed={project.slug} variant={flowVariant} />
+  {
+    !preview && (
+      <AmbientFlow kind="writing" seed={project.slug} variant={flowVariant} />
+    )
+  }
   {
     preview && (
-      <span class="work-card__media">
+      <span class="work-card__media landscape-frame">
+        <AmbientFlow kind="work" seed={project.slug} variant={flowVariant} />
         {preview.kind === "video" ? (
           <video
             src={preview.src}
@@ -116,14 +121,11 @@ const stateLabel = d.status === "wip" ? "in progress" : d.status;
     color: var(--paper-ink);
     box-shadow: var(--paper-shadow);
     text-decoration: none;
-    transition:
-      background 160ms ease,
-      transform 160ms ease;
+    transition: background 160ms ease;
   }
 
   .work-card:hover {
     background: var(--paper-surface-hover);
-    transform: translateY(-2px);
   }
 
   .work-card--experience {
@@ -153,11 +155,14 @@ const stateLabel = d.status === "wip" ? "in progress" : d.status;
     flex: 0 0 auto;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    padding: var(--s-2);
-    background: color-mix(in srgb, var(--paper-surface) 82%, transparent);
+    padding: var(--s-4);
+    isolation: isolate;
+    background: var(--paper-surface-hover);
   }
 
   .work-card__media :is(img, video) {
+    position: relative;
+    z-index: 1;
     width: auto;
     height: auto;
     max-width: 100%;
@@ -207,7 +212,7 @@ const stateLabel = d.status === "wip" ? "in progress" : d.status;
     font-weight: 900;
     line-height: 1;
     font-synthesis: none;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   .work-card__mark {
@@ -280,7 +285,6 @@ const stateLabel = d.status === "wip" ? "in progress" : d.status;
   .work-card:hover .work-card__affordance,
   .work-card:focus-visible .work-card__affordance {
     color: var(--paper-accent);
-    transform: translate(0.14em, -0.14em);
   }
 
   @media (prefers-reduced-motion: reduce) {

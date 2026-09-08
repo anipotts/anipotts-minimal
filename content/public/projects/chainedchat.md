@@ -1,6 +1,6 @@
 ---
 title: chainedchat
-subtitle: sunsetted multi-model chat with shared context and routing.
+subtitle: an archived experiment in sharing context between AI models
 description: Archived Convex and Clerk app that preserved shared context across multiple LLMs. It had shared-context caching, model routing, prompt-chain UI, and Stripe billing. The archive is a useful product snapshot.
 year: "2025"
 category: ai
@@ -12,8 +12,8 @@ public_state: listed
 homepage_placement: none
 catalog_group: taken_down
 homepage_order: 0
-card_copy: shared multi-model chat with one preserved context.
-detail_path: /projects/chainedchat
+card_copy: a chat app for switching between AI models while carrying the conversation with you
+detail_path: /work/chainedchat
 identity:
   logo_src: /images/brand/chainedchat-logo.png
   logo_alt: chainedchat

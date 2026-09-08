@@ -4,29 +4,7 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js"
-    },
-    "./feature-flags": {
-      "types": "./dist/feature-flags/index.d.ts",
-      "import": "./dist/feature-flags/index.js"
-    },
-    "./data": {
-      "types": "./dist/data/index.d.ts",
-      "import": "./dist/data/index.js"
-    },
-    "./admin": {
-      "types": "./dist/admin/index.d.ts",
-      "import": "./dist/admin/index.js"
-    },
     "./admin-control": {
       "types": "./dist/admin-control/index.d.ts",
       "import": "./dist/admin-control/index.js"
@@ -38,66 +16,6 @@
     "./admin-control/dev-work-lifecycle-fixtures": {
       "types": "./dist/admin-control/dev-work-lifecycle-fixtures.d.ts",
       "import": "./dist/admin-control/dev-work-lifecycle-fixtures.js"
-    },
-    "./metrics": {
-      "types": "./dist/metrics/index.d.ts",
-      "import": "./dist/metrics/index.js"
-    },
-    "./status": {
-      "types": "./dist/status/index.d.ts",
-      "import": "./dist/status/index.js"
-    },
-    "./typefully": {
-      "types": "./dist/typefully/index.d.ts",
-      "import": "./dist/typefully/index.js"
-    },
-    "./db": {
-      "types": "./dist/db/index.d.ts",
-      "import": "./dist/db/index.js"
-    },
-    "./cms": {
-      "types": "./dist/cms/index.d.ts",
-      "import": "./dist/cms/index.js"
-    },
-    "./validation": {
-      "types": "./dist/validation/index.d.ts",
-      "import": "./dist/validation/index.js"
-    },
-    "./money": {
-      "types": "./dist/money/index.d.ts",
-      "import": "./dist/money/index.js"
-    },
-    "./code": {
-      "types": "./dist/code/index.d.ts",
-      "import": "./dist/code/index.js"
-    },
-    "./ops": {
-      "types": "./dist/ops/index.d.ts",
-      "import": "./dist/ops/index.js"
-    },
-    "./services": {
-      "types": "./dist/services/index.d.ts",
-      "import": "./dist/services/index.js"
-    },
-    "./mini": {
-      "types": "./dist/mini/index.d.ts",
-      "import": "./dist/mini/index.js"
-    },
-    "./mini/stream": {
-      "types": "./dist/mini/stream.d.ts",
-      "import": "./dist/mini/stream.js"
-    },
-    "./analytics": {
-      "types": "./dist/analytics/index.d.ts",
-      "import": "./dist/analytics/index.js"
-    },
-    "./quantercise": {
-      "types": "./dist/quantercise/index.d.ts",
-      "import": "./dist/quantercise/index.js"
-    },
-    "./env": {
-      "types": "./dist/env.d.ts",
-      "import": "./dist/env.js"
     }
   },
   "scripts": {
@@ -107,25 +25,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@anipotts/content": "workspace:*",
-    "@anipotts/types": "workspace:*",
-    "clsx": "^2.1.1",
-    "drizzle-orm": "^0.45.2",
-    "otplib": "^12.0.1",
-    "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.6"
-  },
-  "peerDependencies": {
-    "react": "^18 || ^19"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^19.2.18",
     "tsup": "^8.0.0",
     "typescript": "^5",
     "vitest": "^4.1.11"

@@ -2,17 +2,21 @@
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import icon from "astro-icon";
+import { siteConfig } from "@anipotts/content/public";
 import { publicContentHotReload } from "../../scripts/dev/public-content-hot-reload.mjs";
 
 export default defineConfig({
-  site: "https://anipotts.com",
+  site: siteConfig.url,
   output: "static",
   trailingSlash: "never",
   build: { format: "file" },
   vite: {
     plugins: [publicContentHotReload()],
     server: {
-      allowedHosts: ["news.anipotts.com", ".anipotts.localhost"],
+      allowedHosts: [
+        new URL(siteConfig.newsletterUrl).hostname,
+        ".anipotts.localhost",
+      ],
     },
   },
   adapter: cloudflare({

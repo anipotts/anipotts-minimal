@@ -1,6 +1,6 @@
 ---
-title: claude code tips
-subtitle: public notes from running agent workflows in real repos.
+title: coding agent tips
+subtitle: what i'm learning from building things with coding agents
 description: Reference repo built from hundreds of Claude Code sessions. Includes hooks, custom agents, MCP servers, plugin notes, and automation patterns that make agent work easier to debug.
 year: "2025–present"
 category: ai
@@ -9,15 +9,16 @@ duration: Ongoing
 status: live
 kind: project
 public_state: featured
-homepage_placement: making
+homepage_placement: work
 catalog_group: active
 homepage_order: 80
-card_copy: practical patterns from running coding agents in real repositories.
-detail_path: /projects/claude-code-tips
+card_copy: my notes on working with coding agents, written while i'm figuring things out
+detail_path: /work/claude-code-tips
 identity:
   logo_src: /images/brand/claude-code-tips-favicon.svg
-  logo_alt: claude code tips
+  logo_alt: coding agent tips
 sort_order: 92
-link_repo: https://github.com/anipotts/claude-code-tips
+link_repo: https://github.com/anipotts/coding-agent-tips
+link_live: https://agents.anipotts.com
 tags: [Python, Claude Code, Hooks, Agents, MCP, Plugins]
 ---

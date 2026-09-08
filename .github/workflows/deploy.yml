@@ -8,8 +8,7 @@
 #   TYPEFULLY_SOCIAL_SET_ID - Typefully social set ID
 #
 # Path-filtered deploys: each retained production job only runs when files
-# relevant to that target actually changed. `apps/admin-solid` is a legacy
-# rollback surface and is workflow_dispatch-only. Root dependency changes do not
+# relevant to that target actually changed. Root dependency changes do not
 # fan out to every target; use workflow_dispatch for an explicit deploy when a
 # root-only change needs promotion. Documentation-only commits skip the workflow
 # through the explicit paths below. Canonical public Markdown remains deployable.
@@ -39,12 +38,6 @@ on:
         options: ["false", "true"]
       admin:
         description: "deploy admin.anipotts.com"
-        required: true
-        default: "false"
-        type: choice
-        options: ["false", "true"]
-      admin_solid:
-        description: "deploy admin-solid worker"
         required: true
         default: "false"
         type: choice
@@ -305,12 +298,11 @@ jobs:
 
   deploy-admin:
     name: Deploy admin
-    needs: [release, deploy-admin-solid]
+    needs: [release]
     if: >
       always() &&
       needs.release.outputs.production_enabled == 'true' &&
       needs.release.outputs.admin_enabled == 'true' &&
-      (needs['deploy-admin-solid'].result == 'success' || needs['deploy-admin-solid'].result == 'skipped') &&
       (
         (github.event_name == 'workflow_dispatch' && inputs.admin == 'true') ||
         (github.event_name == 'push' && needs.release.outputs.admin == 'true')
@@ -400,42 +392,6 @@ jobs:
         run: |
           echo "::error::admin smoke failed; rollback state is recorded above"
           exit 1
-
-  deploy-admin-solid:
-    name: Deploy admin-solid
-    needs: [release]
-    if: >
-      needs.release.outputs.production_enabled == 'true' &&
-      github.event_name == 'workflow_dispatch' && inputs.admin_solid == 'true'
-    runs-on: ubuntu-latest
-    environment: Production
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: "10.5.2"
-
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24.19.0"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build admin-solid
-        run: pnpm turbo build --filter=@anipotts/admin-solid
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          workingDirectory: apps/admin-solid
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   deploy-ingest:
     name: Deploy ingest worker
@@ -623,7 +579,6 @@ jobs:
       - release
       - deploy-www
       - deploy-admin
-      - deploy-admin-solid
       - deploy-ingest
       - deploy-weekly-email
       - deploy-state
@@ -648,7 +603,6 @@ jobs:
             echo "- schema version: \`${{ needs.release.outputs.database_schema_version }}\`"
             echo "- www: \`${{ needs.deploy-www.result }}\`"
             echo "- admin: \`${{ needs.deploy-admin.result }}\`"
-            echo "- admin-solid: \`${{ needs.deploy-admin-solid.result }}\`"
             echo "- ingest: \`${{ needs.deploy-ingest.result }}\`"
             echo "- weekly email: \`${{ needs.deploy-weekly-email.result }}\`"
             echo "- state: \`${{ needs.deploy-state.result }}\`"

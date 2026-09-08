@@ -1,0 +1,96 @@
+---
+import { Icon } from "astro-icon/components";
+import { workflowProviders as marks } from "@anipotts/content/public";
+interface Props {
+  id: string;
+  grouped?: boolean;
+}
+const { id, grouped = false } = Astro.props;
+const mark = marks[id];
+if (!mark) throw new Error(`Unknown workflow provider: ${id}`);
+---
+
+<span
+  class:list={["provider-mark", { mono: mark.mono, grouped }]}
+  data-provider={id}
+  title={mark.label}
+>
+  {
+    mark.image ? (
+      <>
+        <img
+          class:list={[id, { light: !!mark.darkImage }]}
+          src={mark.image}
+          width="36"
+          height="36"
+          alt={mark.label}
+        />
+        {mark.darkImage && (
+          <img
+            class:list={[id, "dark"]}
+            src={mark.darkImage}
+            width="36"
+            height="36"
+            alt={mark.label}
+          />
+        )}
+      </>
+    ) : (
+      <Icon name={mark.icon!} size={26} title={mark.label} />
+    )
+  }
+</span>
+<style>
+  .provider-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    box-sizing: border-box;
+    border: 1px solid var(--app-tile-border);
+    border-radius: 9px;
+    background: var(--app-tile-bg);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 16%);
+    color: #171717;
+  }
+  .grouped {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  :global([data-theme="dark"]) .mono {
+    color: #fff;
+  }
+  img {
+    display: block;
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    max-width: none;
+    object-fit: contain;
+  }
+  img.messages,
+  img.notes,
+  img[class="1password"] {
+    width: 36px;
+    height: 36px;
+    border-radius: 0;
+  }
+  img.codex {
+    width: 43px;
+    height: 43px;
+  }
+  img.mac-mini {
+    width: 48px;
+    height: 48px;
+  }
+  .dark,
+  :global([data-theme="dark"]) .light {
+    display: none;
+  }
+  :global([data-theme="dark"]) .dark {
+    display: block;
+  }
+</style>

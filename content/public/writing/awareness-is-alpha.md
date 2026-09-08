@@ -3,7 +3,7 @@ title: "awareness is alpha"
 slug: awareness-is-alpha
 published_at: 2026-07-14
 tags: ["agents", "systems", "operations", "building"]
-summary: "awareness keeps ownership intact while more execution moves through agents."
+summary: keeping track of what my agents are doing and whether it's getting me where i want to go
 status: published
 ---
 

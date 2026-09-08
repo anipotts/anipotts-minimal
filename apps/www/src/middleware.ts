@@ -1,9 +1,10 @@
 import { defineMiddleware } from "astro:middleware";
+import { siteConfig } from "@anipotts/content/public";
 
 /** flat redirect map: pathname (exact or prefix) -> destination. */
 const REDIRECTS: Record<string, string> = {
-  "/shipping": "/making",
-  "/running": "/making",
+  "/shipping": "/work",
+  "/running": "/work",
   "/connect": "/systems",
   "/lab": "/systems",
   "/dev": "/systems",
@@ -11,16 +12,17 @@ const REDIRECTS: Record<string, string> = {
   "/metrics": "/systems",
   "/status": "/systems",
   "/docs": "/",
-  "/work": "/making",
   "/labs": "/systems",
 };
 
-const NEWS_HOST = "news.anipotts.com";
+const NEWS_HOST = new URL(siteConfig.newsletterUrl).hostname;
 
 /** segment renames (noun -> verb). preserve subpaths and query. these are
  *  external link-equity redirects: every old anipotts.com/thoughts/* url
  *  ever shared keeps resolving. */
 const RENAMES: Record<string, string> = {
+  "/making": "/work",
+  "/projects": "/work",
   "/thoughts": "/writing",
   "/claude": "/systems",
   "/orchestrating": "/systems",
@@ -88,17 +90,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // on the destination instead of preserving stale subpaths.
   for (const [from, to] of Object.entries(REDIRECTS)) {
     if (pathname === from || pathname.startsWith(`${from}/`)) {
-      return context.redirect(to, 301);
+      return context.redirect(`${to}${search}`, 301);
     }
   }
 
   // /admin moved to the admin subdomain
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const adminPath = pathname.replace(/^\/admin/, "") || "/";
-    return context.redirect(
-      `https://admin.anipotts.com${adminPath}${search}`,
-      308,
-    );
+    return context.redirect(`${siteConfig.adminUrl}${adminPath}${search}`, 308);
   }
 
   const response = await next();

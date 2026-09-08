@@ -2,6 +2,7 @@
 
 import { execFileSync } from "node:child_process";
 import { classifyRelease } from "./release-policy.mjs";
+import { changedFiles } from "./changed-files.mjs";
 
 function run(command, args) {
   execFileSync(command, args, { stdio: "inherit" });
@@ -12,13 +13,16 @@ function git(...args) {
 }
 
 const base = process.env.CHANGED_SCOPE_BASE || "origin/main";
-const mergeBase = git("merge-base", base, "HEAD");
-const changes = git("diff", "--name-status", mergeBase, "HEAD")
-  .split(/\r?\n/u)
-  .filter(Boolean);
+const workingTree = process.argv.includes("--working-tree");
+const unknown = process.argv.slice(2).filter((arg) => arg !== "--working-tree");
+if (unknown.length)
+  throw new Error(`unknown check:changed option: ${unknown.join(", ")}`);
+const changes = changedFiles({ base, workingTree });
 
 if (changes.length === 0) {
-  console.log("changed scope: clean against origin/main");
+  console.log(
+    `changed scope: clean against ${base}${workingTree ? " including working tree" : " (commits only)"}`,
+  );
   process.exit(0);
 }
 
@@ -30,7 +34,9 @@ const targets = Object.entries(release.deploy_targets)
   .filter(([, enabled]) => enabled)
   .map(([target]) => target);
 
-console.log(`changed scope: ${targets.join(",") || "non-deployable"}`);
+console.log(
+  `changed scope: ${targets.join(",") || "non-deployable"}${workingTree ? " including working tree" : " (commits only)"}`,
+);
 
 const broad = changes.some((line) =>
   /\t(?:\.github\/|config\/|scripts\/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|turbo\.json$|packages\/(?:lib|types)\/)/u.test(

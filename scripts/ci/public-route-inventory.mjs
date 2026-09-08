@@ -2,6 +2,11 @@
 
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import {
+  DEFAULT_CMS_PROJECTS,
+  DEFAULT_CMS_WRITING,
+} from "../../packages/content/src/public/generated.ts";
+import { isPublicProject } from "../../packages/content/src/public/visibility.ts";
 
 const inventory = [
   { route: "/", file: "apps/www/src/pages/index.astro" },
@@ -10,67 +15,18 @@ const inventory = [
     route: "/newsletter/archive",
     file: "apps/www/src/pages/newsletter/archive.astro",
   },
-  { route: "/making", file: "apps/www/src/pages/making.astro" },
+  { route: "/work", file: "apps/www/src/pages/work/index.astro" },
   { route: "/systems", file: "apps/www/src/pages/systems.astro" },
   { route: "/links", file: "apps/www/src/pages/links.astro" },
-  { route: "/projects", file: "apps/www/src/pages/projects/index.astro" },
-  {
-    route: "/projects/chainedchat",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/claude-code-tips",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/imessage-mcp",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/nyu-purity-test",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/options-pricing-sensitivity",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/pgi-research-platform",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/quantercise",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/quantercise-extension",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
-  {
-    route: "/projects/saeshify",
-    file: "apps/www/src/pages/projects/[slug].astro",
-  },
+  ...DEFAULT_CMS_PROJECTS.filter(isPublicProject).map((project) => ({
+    route: project.detail_path,
+    file: "apps/www/src/pages/work/[slug].astro",
+  })),
   { route: "/writing", file: "apps/www/src/pages/writing/index.astro" },
-  {
-    route: "/writing/awareness-is-alpha",
+  ...DEFAULT_CMS_WRITING.filter((item) => item.visible).map((item) => ({
+    route: `/writing/${item.slug}`,
     file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/i-built-a-monitor-for-my-claude-code-sessions",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/saturdays-are-for-claude-code",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/search-will-be-dead-by-2030",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
-  {
-    route: "/writing/stop-ending-your-day-with-fix-the-bug",
-    file: "apps/www/src/pages/writing/[slug].astro",
-  },
+  })),
 ];
 
 const SAFE_ROUTE_SEGMENT = /^[A-Za-z0-9._-]+$/;

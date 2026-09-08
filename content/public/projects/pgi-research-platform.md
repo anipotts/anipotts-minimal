@@ -1,6 +1,6 @@
 ---
 title: paragon global investments
-subtitle: next.js and supabase portal for an nyu quant fund.
+subtitle: one place for the fund's research, resources, and members
 description: Built a Next.js and TypeScript research portal backed by Supabase for Paragon Global Investments, NYU's quant fund. Organized internal research so members could read and share fund material from mobile.
 year: "2025"
 category: quant
@@ -12,8 +12,8 @@ public_state: featured
 homepage_placement: experience
 catalog_group: past
 homepage_order: 90
-card_copy: research platform for an intercollegiate quant fund.
-detail_path: /projects/pgi-research-platform
+card_copy: a place for members of our quant fund to find research and share resources
+detail_path: /work/pgi-research-platform
 preview_media:
   kind: image
   src: /images/work/paragon-portal-directory.png

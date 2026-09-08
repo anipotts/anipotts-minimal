@@ -5,7 +5,7 @@ export const prerender = false;
 /** on-demand catch-all. with `run_worker_first = false`, the asset
  *  binding serves all prerendered HTML directly; the worker only fires
  *  for paths with no static file. for those, middleware runs first
- *  (handling legacy redirects such as /thoughts and /work), and if it doesn't
+ *  (handling legacy redirects such as /thoughts and /making), and if it doesn't
  *  redirect, this catchall renders the prerendered 404 page. */
 export const GET: APIRoute = async ({ request, locals }) => {
   const notFound = await locals.runtime.env.ASSETS.fetch(

@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: active
 homepage_order: 0
 card_copy: real-time rhyme visualization for lyrics and audio.
-detail_path: /projects/saeshify
+detail_path: /work/saeshify
 identity:
   icon: waveform
 sort_order: 85

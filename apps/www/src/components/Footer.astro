@@ -1,46 +1,39 @@
 ---
 import { Icon } from "astro-icon/components";
+import { siteConfig, siteLinks } from "@anipotts/content/public";
+const footerLinks = (
+  ["github", "x", "linkedin", "newsletter", "rss", "admin"] as const
+).map((key) => ({ key, link: siteLinks[key] }));
 ---
 
 <footer id="contact" class="frame foot">
   <div class="contact-copy">
     <span>have a question?</span>
-    <a href="mailto:contact@anipotts.com" class="quiet-link mono"
-      >contact@anipotts.com</a
+    <a href={siteLinks.email.href} class="quiet-link mono">{siteConfig.email}</a
     >
   </div>
-  <span class="glyphs">
-    <a
-      href="https://github.com/anipotts"
-      class="glyph"
-      aria-label="github"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:github-logo" /></a
-    >
-    <a
-      href="https://x.com/anipottsbuilds"
-      class="glyph"
-      aria-label="x"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:x-logo" /></a
-    >
-    <a
-      href="https://www.linkedin.com/in/anipotts"
-      class="glyph"
-      aria-label="linkedin"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:linkedin-logo" /></a
-    >
-    <a href="https://news.anipotts.com" class="glyph" aria-label="newsletter"
-      ><Icon name="ph:envelope-open" /></a
-    >
-    <a href="/feed.xml" class="glyph" aria-label="rss feed"
-      ><Icon name="ph:rss-simple" /></a
-    >
-    <a href="/admin" class="glyph admin-glyph" aria-label="admin"
-      ><Icon name="ph:lock-key" /></a
-    >
-  </span>
+  <nav class="glyphs" aria-label="Social and site links">
+    {
+      footerLinks.map(({ key, link }) => (
+        <a
+          href={link.href}
+          class:list={["glyph", { "admin-glyph": key === "admin" }]}
+          aria-label={link.label}
+          title={link.title}
+          target={
+            ["github", "x", "linkedin"].includes(key) ? "_blank" : undefined
+          }
+          rel={
+            ["github", "x", "linkedin"].includes(key)
+              ? "noopener noreferrer"
+              : undefined
+          }
+        >
+          <Icon name={link.icon} />
+        </a>
+      ))
+    }
+  </nav>
 </footer>
 
 <style>
@@ -85,5 +78,63 @@ import { Icon } from "astro-icon/components";
   .admin-glyph {
     font-size: 0.95rem;
     opacity: 0.78;
+  }
+
+  @media (width < 880px) {
+    .foot {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      gap: 1rem;
+      margin-top: 0;
+      padding-block: 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+    .foot::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      inset-inline: clamp(1.25rem, 5vw, 2.5rem);
+      border-top: 1px solid var(--border-strong);
+    }
+    .contact-copy {
+      gap: 0;
+    }
+    .contact-copy > span {
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+    }
+    .contact-copy > a {
+      display: flex;
+      align-items: center;
+      width: fit-content;
+      max-width: 100%;
+      min-height: 44px;
+      color: var(--ink);
+      font-size: 1.05rem;
+      overflow-wrap: anywhere;
+    }
+    .glyphs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(44px, 1fr));
+      width: 100%;
+      max-width: 22rem;
+      gap: 0;
+    }
+    .glyph {
+      width: 100%;
+      border-radius: 9px;
+      color: var(--ink);
+      opacity: 1;
+    }
+    .glyph:hover,
+    .glyph:focus-visible {
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+    }
+  }
+  @media (max-width: 303px) {
+    .glyphs {
+      grid-template-columns: repeat(3, minmax(44px, 1fr));
+    }
   }
 </style>

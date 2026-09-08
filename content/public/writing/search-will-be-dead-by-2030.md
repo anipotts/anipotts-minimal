@@ -1,7 +1,7 @@
 ---
 slug: search-will-be-dead-by-2030
 title: search will be dead by 2030
-summary: search becomes infrastructure while agents, memory, retrieval, and synthesis become the interface.
+summary: why i think agents will change how we find information and what we do with it
 tags: [ai, search, product]
 status: published
 published_at: 2026-01-31

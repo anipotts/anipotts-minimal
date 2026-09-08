@@ -1,0 +1,123 @@
+---
+import { render } from "astro:content";
+import Shell from "../layouts/Shell.astro";
+import { Icon } from "astro-icon/components";
+import {
+  formatDate,
+  readingTime,
+  writingSlug,
+  type Writing,
+} from "../lib/content";
+import { siteConfig } from "@anipotts/content/public";
+
+interface Props {
+  item: Writing;
+}
+const { item } = Astro.props;
+const slug = writingSlug(item);
+const { Content } = await render(item.entry);
+const d = item.data;
+const minutes = readingTime(item.body ?? "");
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: d.title,
+  description: d.summary,
+  datePublished: d.published_at?.toISOString(),
+  author: { "@type": "Person", name: siteConfig.name, url: siteConfig.url },
+  mainEntityOfPage: `${siteConfig.url}/writing/${slug}`,
+};
+---
+
+<Shell
+  title={d.title}
+  description={d.summary}
+  path={`/writing/${slug}`}
+  ogType="article"
+  jsonLd={articleLd}
+  mood="drowsy"
+>
+  <article class="article">
+    <header data-rise class="head">
+      <a href="/writing" class="quiet-link mono back">
+        <Icon name="ph:arrow-bend-up-left" /> all writing
+      </a>
+      <h1 class="title">{d.title}</h1>
+      <p class="meta mono muted">
+        {d.published_at && <span>{formatDate(d.published_at)}</span>}
+        <span>{minutes} min read</span>
+      </p>
+      {
+        d.tags.length > 0 && (
+          <p class="meta mono muted">
+            {d.tags.map((t) => (
+              <span>{t}</span>
+            ))}
+          </p>
+        )
+      }
+      {
+        d.artifact_url && (
+          <a
+            href={d.artifact_url}
+            class="accent-link mono artifact"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            proof artifact ({d.artifact_type ?? "link"})
+            <Icon name="ph:arrow-bend-right-up" />
+          </a>
+        )
+      }
+    </header>
+
+    <div data-rise class="article-body">
+      <Content />
+    </div>
+  </article>
+</Shell>
+
+<style>
+  .article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    max-width: var(--measure);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: 0.85rem;
+    width: fit-content;
+    min-height: 44px;
+  }
+
+  .title {
+    font-size: var(--p-h1);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin: 0;
+    font-size: 0.85rem;
+  }
+
+  .artifact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.85rem;
+    width: fit-content;
+  }
+</style>

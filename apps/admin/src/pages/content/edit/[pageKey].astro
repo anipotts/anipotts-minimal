@@ -35,8 +35,9 @@ function safeDecodePageKey(value: string | undefined): string {
 }
 
 function routeForEditor(pageKey: string, slug: string): string {
+  if (pageKey === "making" || pageKey === "projects") return "/work";
   if (pageKey.startsWith("writing:")) return `/writing/${slug}`;
-  if (pageKey.startsWith("project:")) return `/projects/${slug}`;
+  if (pageKey.startsWith("project:")) return `/work/${slug}`;
   if (pageKey === "home") return "/";
   return `/${pageKey.replaceAll("_", "/").replaceAll(":", "/")}`;
 }

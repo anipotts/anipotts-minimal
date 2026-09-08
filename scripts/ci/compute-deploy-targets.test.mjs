@@ -3,11 +3,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { computeDeployTargets } from "./compute-deploy-targets.mjs";
+import "./changed-files.test.mjs";
 
 const empty = {
   www: false,
   admin: false,
-  admin_solid: false,
   ingest: false,
   newsletter: false,
   state: false,
@@ -70,7 +70,7 @@ expectTargets(
 );
 
 expectTargets(
-  "admin-solid source does not auto-deploy rollback worker",
+  "retiring admin-solid does not deploy any worker",
   ["apps/admin-solid/src/routes/index.tsx"],
   {},
 );

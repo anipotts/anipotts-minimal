@@ -1,4 +1,4 @@
-# Lifecycle source marks
+# Workflow source marks
 
 The Codex mark (`codex.png`) is reused from the repository's localized official
 Codex macOS app resource in `apps/admin/src/assets/provider-marks/codex.png`.
@@ -9,17 +9,35 @@ The light variant (`codex-light.png`) is the unmodified official
 Source SHA-256: `de7d43f3386105ab20952958c2c25beb0d903e2aeb6e1aef57c49a648c0d1c07`.
 The site selects the light or dark artwork using its active theme.
 
-Apple Books and Apple Health artwork is localized from Apple's App Store lookup
-metadata at 512 x 512 pixels. Retrieved 2026-09-05. The images retain their
-original brand colors and are displayed at 32 CSS pixels.
-
-- [Apple Books](https://apps.apple.com/us/app/apple-books/id364709193)
-- [Apple Health](https://apps.apple.com/us/app/apple-health/id1242545199)
-- Lookup: `https://itunes.apple.com/lookup?id=364709193,1242545199&country=us`
-
 These marks identify the services in a personal system diagram. They remain
 the property of their respective owners and do not imply endorsement.
 
-The existing NYU PNG is 1024 x 1024 pixels. The lifecycle never loads the
-retained low-resolution NYU JPEG used by earlier experiments. Other marks use
-the existing local assets and vector icon packages.
+Unused marks belonging only to the retired lifecycle experiment were removed
+on 2026-09-08. Current marks use the local assets and vector icon packages
+listed in the shared provider registry.
+
+## Workflow marquee artwork, 2026-09-07
+
+The workflow uses one 36px tile, 9px corner radius, and a shared theme-aware
+background/border. Brand artwork keeps its original colors in both themes.
+The only native light/dark artwork pair is Codex, as documented above.
+
+- `messages.png`: PNG rendition of Apple's installed Messages
+  `AppIcon.icns`, preserving the original green icon and white bubble
+- `1password.png`: PNG rendition of the installed 1Password app's
+  `icon.icns`, preserving the product icon rather than the single-color
+  company mark; [1Password explains the distinction](https://1password.com/blog/1password-brand-refresh)
+- `obsidian.svg`: unmodified [current gradient mark](https://obsidian.md/images/obsidian-logo-gradient.svg)
+  linked by [Obsidian's brand guidelines](https://obsidian.md/brand)
+- `instagram.jpg`, `linkedin.jpg`, `spotify.jpg`, `whatsapp.jpg`:
+  publisher-supplied 512px artwork returned by Apple's App Store lookup
+  for IDs 389801252, 288429040, 324684580, and 310633997 respectively
+- `granola.png`: unmodified [site icon](https://www.granola.ai/icon.png)
+  referenced by Granola's official homepage
+- `mercury.jpg` and `stripe.jpg`: publisher-supplied 512px artwork from
+  Apple's App Store lookup for Mercury Technologies' app (1491984028) and
+  Stripe Dashboard (978516833), retrieved 2026-09-07
+
+Native ICNS assets were converted to PNG without altering their artwork.
+Small internal padding in native app assets is accounted for by display size.
+No private history, message content, or account information is included in these assets.

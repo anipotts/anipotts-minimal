@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import "./work-migration.test.mjs";
 import { execFileSync } from "node:child_process";
 import {
   cpSync,
@@ -37,16 +38,13 @@ import {
   contentOperationTables,
   contentOperationTemplates,
 } from "../../packages/content/dist/admin/operations.js";
-import { validateSystemsLifecycle } from "../../packages/content/dist/public/systems-lifecycle.js";
 import {
   contentInventorySource as rootContentInventorySource,
   DEFAULT_HOMEPAGE_CONTENT,
   DEFAULT_SYSTEMS_CONTENT,
   normalizeHomepageContent,
-  normalizeOrchestratingPageContent,
   normalizeSystemsPageContent,
   segmentHomepageSummaryParagraph,
-  validateOrchestratingPageContent,
   validateSystemsPageContent,
 } from "../../packages/content/dist/index.js";
 
@@ -108,7 +106,7 @@ assert.equal(
 );
 
 const homepageMentionFixture = {
-  build: { label: "build", href: "/making" },
+  build: { label: "build", href: "/work" },
   agent: { label: "agent", href: "/systems" },
   agents: { label: "agents", href: "/systems" },
   businessInsider: { label: "business insider", href: "/writing" },
@@ -360,7 +358,7 @@ assert.equal(
 );
 
 const projectDetailSource = readFileSync(
-  "apps/www/src/pages/projects/[slug].astro",
+  "apps/www/src/components/WorkDetail.astro",
   "utf8",
 );
 assert.match(
@@ -384,7 +382,12 @@ try {
   });
   writeFileSync(
     join(alternateSlugRoot, "content/public/projects/source-name.md"),
-    `---\nslug: route-name\ntitle: Alternate route\nvisible: true\n---\nSource identity follows the file.\n`,
+    readFileSync("content/public/projects/claude-code-tips.md", "utf8")
+      .replace(/^---\n/, "---\nslug: route-name\n")
+      .replace(
+        "detail_path: /work/claude-code-tips",
+        "detail_path: /work/route-name",
+      ),
   );
   execFileSync(
     process.execPath,
@@ -400,23 +403,36 @@ try {
       "utf8",
     ),
   );
-  const alternateSeed = JSON.parse(
-    readFileSync(
-      join(alternateSlugRoot, "drizzle/seeds/public-content.json"),
-      "utf8",
-    ),
-  );
   const expectedSource = "content/public/projects/source-name.md";
   const projected = alternateAdminProjection.records.find(
     (record) => record.entity_id === "public-project:route-name",
   );
-  const seeded = alternateSeed.rows.find(
-    (row) => row.page_key === "project:route-name",
-  );
   assert.equal(projected.source_ref, expectedSource);
   assert.match(projected.source_hash, /^[a-f0-9]{64}$/);
-  assert.equal(seeded.source_ref, expectedSource);
-  assert.equal(seeded.source_hash, projected.source_hash);
+  const alternateFile = join(
+    alternateSlugRoot,
+    "content/public/projects/source-name.md",
+  );
+  const validAlternate = readFileSync(alternateFile, "utf8");
+  for (const invalid of [
+    validAlternate.replace("slug: route-name", "slug: bad/route"),
+    validAlternate.replace(
+      "detail_path: /work/route-name",
+      "detail_path: /work/wrong-route",
+    ),
+    validAlternate.replaceAll("route-name", "claude-code-tips"),
+  ]) {
+    writeFileSync(alternateFile, invalid);
+    assert.throws(
+      () =>
+        execFileSync(
+          process.execPath,
+          [resolve("scripts/content/generate-public-content.mjs")],
+          { cwd: alternateSlugRoot, stdio: "ignore" },
+        ),
+      "invalid or duplicate public routes must stop generation",
+    );
+  }
 } finally {
   rmSync(alternateSlugRoot, { recursive: true, force: true });
 }
@@ -525,7 +541,7 @@ const sourceRecords = sourceContentRecordsFromProjection([
     surface: "projects",
     slug: "hidden-lab",
     title: "Hidden Lab",
-    route: "/projects/hidden-lab",
+    route: "/work/hidden-lab",
     status: "hidden",
     source_ref: "content/public/projects/hidden-lab.md",
     summary: "Internal project page",
@@ -604,332 +620,10 @@ assert.equal(
   "canonical_source_plus_d1_drafts",
 );
 
-const orchestratingContent = normalizeOrchestratingPageContent({
-  sections: {
-    systems: "systems",
-    loop: "operator loop",
-    public_tools: "public tooling",
-    public_tools_note: "agent notes and local tools",
-    status: "status",
-    status_note: "tool calls + file mutations",
-    records: "strange highs",
-    plugin: "local console",
-    hooks: "safety rails",
-    playbooks: "notes",
-    sessions: "recent traces",
-  },
-  loop_cards: [
-    {
-      label: "logs",
-      title: "everything leaves a trail",
-      detail: "local sessions and cron output get captured for review.",
-    },
-  ],
-  public_tools: [
-    {
-      title: "claude code tips",
-      href: "/projects/claude-code-tips",
-      detail: "agent notes from actual sessions.",
-    },
-  ],
-});
-assert.equal(orchestratingContent.sections.loop, "operator loop");
-assert.equal(orchestratingContent.loop_cards.length, 1);
-assert.equal(
-  orchestratingContent.public_tools[0]?.href,
-  "/projects/claude-code-tips",
-);
-assert.deepEqual(validateOrchestratingPageContent(orchestratingContent), {
-  ok: true,
-});
-assert.equal(
-  validateOrchestratingPageContent(
-    normalizeOrchestratingPageContent({
-      public_tools: [
-        {
-          title: "unsafe",
-          href: "javascript:alert(1)",
-          detail: "bad route",
-        },
-      ],
-    }),
-  ).ok,
-  true,
-  "invalid orchestrating cards fall back to safe defaults before validation",
-);
-
-const systemsContent = normalizeSystemsPageContent({
-  map_principle: " autonomy is an attention-routing problem. ",
-});
-assert.equal(
-  systemsContent.map_principle,
-  "autonomy is an attention-routing problem.",
-);
+const systemsContent = normalizeSystemsPageContent({});
 assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
-assert.deepEqual(
-  systemsContent.map_nodes.map(({ id }) => id),
-  [
-    "life",
-    "snap_store",
-    "admin",
-    "ani",
-    "agents",
-    "work",
-    "record",
-    "calendar",
-    "credentials",
-    "infrastructure",
-  ],
-  "systems map nodes must preserve the reviewed information flow",
-);
-assert.deepEqual(
-  systemsContent.map_foundations.map(({ id }) => id),
-  ["calendar", "github", "mac_mini", "one_password", "tailnet", "external_ssd"],
-  "systems map foundations must preserve the reviewed storage model",
-);
-assert.deepEqual(
-  systemsContent.map_devices.map(({ id }) => id),
-  ["iphone", "macbook", "mac_mini"],
-  "systems map devices must preserve the reviewed tailnet",
-);
-assert.deepEqual(
-  systemsContent.map_authority_modes.map(({ id }) => id),
-  ["own", "with_me", "mixed"],
-  "systems map authority modes must preserve the reviewed trust model",
-);
-assert.deepEqual(
-  systemsContent.map_relationships.map(
-    ({ id, source, destination, authority, kind }) => ({
-      id,
-      source,
-      destination,
-      authority,
-      kind,
-    }),
-  ),
-  DEFAULT_SYSTEMS_CONTENT.map_relationships.map(
-    ({ id, source, destination, authority, kind }) => ({
-      id,
-      source,
-      destination,
-      authority,
-      kind,
-    }),
-  ),
-  "systems map paths must preserve their reviewed endpoints and authority",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({}).map_domains,
-  DEFAULT_SYSTEMS_CONTENT.map_domains,
-  "systems map domains must fall back to the reviewed public taxonomy",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_domains: [] }).map_domains,
-  DEFAULT_SYSTEMS_CONTENT.map_domains,
-  "an empty systems map must not erase the public taxonomy",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_nodes: [] }).map_nodes,
-  DEFAULT_SYSTEMS_CONTENT.map_nodes,
-  "an incomplete systems map must fall back to the reviewed nodes",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_foundations: [] }).map_foundations,
-  DEFAULT_SYSTEMS_CONTENT.map_foundations,
-  "an incomplete systems map must fall back to the reviewed foundations",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_devices: [] }).map_devices,
-  DEFAULT_SYSTEMS_CONTENT.map_devices,
-  "an incomplete systems map must fall back to the reviewed tailnet",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_authority_modes: [] }).map_authority_modes,
-  DEFAULT_SYSTEMS_CONTENT.map_authority_modes,
-  "an incomplete systems map must fall back to the reviewed authority modes",
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ map_relationships: [] }).map_relationships,
-  DEFAULT_SYSTEMS_CONTENT.map_relationships,
-  "an incomplete systems map must fall back to the reviewed relationships",
-);
-assert.equal(
-  validateSystemsPageContent({
-    ...systemsContent,
-    map_relationships: systemsContent.map_relationships.map((relationship) =>
-      relationship.id === "ani_to_agents"
-        ? { ...relationship, authority: "with_me" }
-        : relationship,
-    ),
-  }).ok,
-  true,
-  "legacy experiment relationships must not constrain the lifecycle page",
-);
-assert.equal(
-  validateSystemsPageContent(
-    normalizeSystemsPageContent({
-      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
-        index === 1 ? { ...domain, label: "career" } : domain,
-      ),
-    }),
-  ).ok,
-  true,
-  "legacy domain data is independent of the canonical lifecycle domains",
-);
-assert.equal(
-  validateSystemsPageContent(
-    normalizeSystemsPageContent({
-      map_domains: DEFAULT_SYSTEMS_CONTENT.map_domains.map((domain, index) =>
-        index === 0
-          ? { ...domain, sources: [domain.sources[0], domain.sources[0]] }
-          : domain,
-      ),
-    }),
-  ).ok,
-  true,
-  "legacy source data is independent of the canonical lifecycle sources",
-);
-
-const lifecycle = systemsContent.lifecycle;
-assert.deepEqual(validateSystemsPageContent(systemsContent), { ok: true });
-assert.equal(
-  systemsContent.hero_summary,
-  "i've always done a lot of my work through technology, now agents help with tasks and thinking i don't need to do myself, especially when figuring it out takes longer than doing it",
-);
-assert.deepEqual(lifecycle.domains, [
-  "career",
-  "learning",
-  "wellbeing",
-  "personal",
-]);
-assert.deepEqual(
-  lifecycle.stages.map(({ id }) => id),
-  ["request", "understand", "gather", "act", "verify", "complete"],
-);
-assert.deepEqual(
-  normalizeSystemsPageContent({ lifecycle: JSON.stringify(lifecycle) })
-    .lifecycle,
-  lifecycle,
-);
-for (const [name, mutate] of [
-  [
-    "missing endpoint",
-    (graph) => {
-      graph.edges[0].destination = "absent";
-    },
-  ],
-  [
-    "duplicate node",
-    (graph) => {
-      graph.support.push(graph.support[0]);
-    },
-  ],
-  [
-    "duplicate edge",
-    (graph) => {
-      graph.edges.push(graph.edges[0]);
-    },
-  ],
-  [
-    "duplicate source",
-    (graph) => {
-      graph.sources.push(graph.sources[0]);
-    },
-  ],
-  [
-    "duplicate device",
-    (graph) => {
-      graph.devices.push(graph.devices[0]);
-    },
-  ],
-  [
-    "invalid walkthrough node",
-    (graph) => {
-      graph.walkthrough[0].nodes = ["absent"];
-    },
-  ],
-  [
-    "invalid walkthrough edge",
-    (graph) => {
-      graph.walkthrough[0].edges = ["absent"];
-    },
-  ],
-  [
-    "missing completion path",
-    (graph) => {
-      graph.edges = graph.edges.filter(({ id }) => id !== "finish");
-    },
-  ],
-  [
-    "missing retry",
-    (graph) => {
-      graph.edges = graph.edges.filter(({ id }) => id !== "record_failed");
-    },
-  ],
-  [
-    "missing feedback task",
-    (graph) => {
-      graph.edges = graph.edges.filter(({ id }) => id !== "followup_due");
-    },
-  ],
-]) {
-  const graph = structuredClone(lifecycle);
-  mutate(graph);
-  const result = validateSystemsLifecycle(
-    normalizeSystemsPageContent({ lifecycle: graph }).lifecycle,
-  );
-  assert.equal(
-    result.ok,
-    false,
-    `reject ${name} without silently falling back`,
-  );
-}
-assert.equal(
-  validateSystemsLifecycle(
-    normalizeSystemsPageContent({ lifecycle: "{broken" }).lifecycle,
-  ).ok,
-  false,
-);
-const paths = new Map(lifecycle.edges.map((edge) => [edge.id, edge]));
-function follow(start, edgeIds) {
-  let current = start;
-  for (const id of edgeIds) {
-    const edge = paths.get(id);
-    assert.ok(edge, `missing route ${id}`);
-    assert.equal(edge.source, current, `disconnected route ${id}`);
-    current = edge.destination;
-  }
-  return current;
-}
-assert.equal(
-  follow("request", ["start", "scope", "ready", "check", "finish"]),
-  "complete",
-);
-assert.equal(
-  follow("act", [
-    "missing_context",
-    "lookup",
-    "needs_me",
-    "answer_context",
-    "ready",
-  ]),
-  "act",
-);
-assert.equal(follow("act", ["decision", "new_goal", "scope"]), "gather");
-assert.equal(follow("verify", ["more_work", "check"]), "verify");
-assert.equal(
-  follow("complete", ["record_failed", "record_blocked", "answer_record"]),
-  "complete",
-);
-assert.equal(follow("complete", ["followup", "followup_due"]), "request");
-assert.equal(follow("feedback", ["learn", "context_back"]), "gather");
-assert.match(lifecycle.completion_rule, /record is saved/);
-assert.match(lifecycle.pause_rule, /paused task remains open/);
-assert.equal(lifecycle.walkthrough.length, 9);
-assert.match(
-  lifecycle.walkthrough.map(({ detail }) => detail).join(" "),
-  /Add to calendar/,
-);
+assert.equal("lifecycle" in systemsContent, false);
+assert.equal("map_nodes" in systemsContent, false);
 const lifecyclePage = readFileSync("apps/www/src/pages/systems.astro", "utf8");
 assert.ok(lifecyclePage.includes("workflow={content.workflow}"));
 assert.equal(lifecyclePage.includes("content.lifecycle"), false);
@@ -939,7 +633,68 @@ assert.deepEqual(
   "experimental lifecycle does not constrain public workflow",
 );
 const workflow = systemsContent.workflow;
+assert.equal(
+  workflow.outro,
+  "this is how i direct traces of context that my agents can use to better drive work forward, leaving me with way more time for the work i care about and people that are important",
+);
+assert.equal(workflow.intro.split(/\n\s*\n/).filter(Boolean).length, 2);
+assert.ok(
+  lifecyclePage.indexOf("content.workflow.outro") >
+    lifecyclePage.indexOf("<SystemMap"),
+  "closing copy follows the map",
+);
+const { outro: omittedOutro, ...workflowWithoutOutro } = workflow;
+assert.equal(
+  validateSystemsPageContent({
+    ...systemsContent,
+    workflow: normalizeSystemsPageContent({ workflow: workflowWithoutOutro })
+      .workflow,
+  }).ok,
+  true,
+  "legacy records remain valid without closing copy",
+);
 assert.equal(workflow.steps.length, 4);
+assert.deepEqual(workflow.sources, [
+  "messages",
+  "gmail",
+  "calendar",
+  "notes",
+  "youtube",
+  "spotify",
+  "x",
+  "instagram",
+  "whatsapp",
+  "chrome",
+  "linkedin",
+  "granola",
+  "mercury",
+  "stripe",
+]);
+assert.deepEqual(
+  workflow.steps.map((step) => step.marks),
+  [
+    ["mac-mini", "github", "linear"],
+    ["tailscale", "1password", "obsidian"],
+    ["codex", "claude"],
+    ["github", "linear"],
+  ],
+);
+const legacyWorkflow = { ...workflow };
+delete legacyWorkflow.sources;
+legacyWorkflow.steps = workflow.steps.map(({ marks, ...step }) => step);
+assert.deepEqual(
+  normalizeSystemsPageContent({ workflow: legacyWorkflow }).workflow,
+  workflow,
+);
+assert.equal(
+  validateSystemsPageContent(
+    normalizeSystemsPageContent({
+      workflow: { ...workflow, steps: [null, ...workflow.steps.slice(1)] },
+    }),
+  ).ok,
+  false,
+  "malformed legacy steps fail validation without crashing normalization",
+);
 assert.deepEqual(
   normalizeSystemsPageContent({ workflow: JSON.stringify(workflow) }).workflow,
   workflow,
@@ -951,6 +706,16 @@ for (const invalid of [
     steps: [workflow.steps[0], workflow.steps[0], ...workflow.steps.slice(2)],
   },
   { ...workflow, intro: "" },
+  { ...workflow, outro: 123 },
+  { ...workflow, outro: "" },
+  { ...workflow, sources: ["unknown-provider"] },
+  {
+    ...workflow,
+    steps: workflow.steps.map((step) => ({
+      ...step,
+      marks: ["https://untrusted.example/logo.svg"],
+    })),
+  },
 ])
   assert.equal(
     validateSystemsPageContent({ ...systemsContent, workflow: invalid }).ok,
@@ -967,9 +732,60 @@ const workflowComponent = readFileSync(
   "utf8",
 );
 assert.equal(
-  workflowComponent.includes("<script"),
+  /\.step p\s*\{[^}]*max-width/s.test(workflowComponent),
   false,
-  "diagram must be static without a client controller",
+  "step descriptions use available width in stacked and desktop layouts",
+);
+assert.ok(
+  workflowComponent.includes("workflow.sources.map"),
+  "sources must render without JavaScript",
+);
+assert.ok(
+  workflowComponent.includes("workflow.steps.map"),
+  "all steps must render without JavaScript",
+);
+assert.ok(
+  /data-motion-toggle\s+hidden/.test(workflowComponent),
+  "controls are progressively enhanced",
+);
+assert.equal(
+  /source-heading|data-event|event-layer/.test(workflowComponent),
+  false,
+  "no event heading or travelling marker",
+);
+const workflowAnimation = readFileSync(
+  "apps/www/src/scripts/workflow-animation.ts",
+  "utf8",
+);
+assert.equal(
+  /pointerenter|pointerleave|focusin|focusout|data-event/.test(
+    workflowAnimation,
+  ),
+  false,
+  "hover and focus never stop the marquee and event simulation is removed",
+);
+execFileSync(
+  process.execPath,
+  ["--experimental-strip-types", "scripts/ci/workflow-motion.test.mjs"],
+  { stdio: "inherit" },
+);
+for (const required of [
+  "prefers-reduced-motion",
+  "astro:before-swap",
+  "ResizeObserver",
+  "IntersectionObserver",
+  "visibilitychange",
+  "aria-hidden",
+  "listeners.abort()",
+])
+  assert.ok(
+    workflowAnimation.includes(required),
+    `animation needs ${required}`,
+  );
+assert.equal(
+  /fetch\(|WebSocket|EventSource/.test(workflowAnimation),
+  false,
+  "diagram has no live data connection",
 );
 assert.equal(
   lifecyclePage.includes("content.map_"),

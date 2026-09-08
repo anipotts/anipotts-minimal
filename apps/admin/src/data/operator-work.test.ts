@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createHash } from "node:crypto";
 import { operatorWorkFixture } from "./dev-operator-work";
 import {
   assertValidOperatorWorkProjection,
@@ -6,6 +7,13 @@ import {
 } from "./operator-work";
 
 describe("operator work projection", () => {
+  it("preserves the reviewed fixture payload independently of its implementation", () => {
+    expect(
+      createHash("sha256")
+        .update(JSON.stringify(operatorWorkFixture))
+        .digest("hex"),
+    ).toBe("6ed83aa1ef017c21a3bcb8afa8895f55de998e1bb937612579e43a8a54ba1255");
+  });
   it("keeps runtime, operator, lifecycle, freshness, and attention separate", () => {
     assertValidOperatorWorkProjection(operatorWorkFixture);
 
