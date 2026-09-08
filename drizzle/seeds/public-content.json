@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "0440b31d0f95a4ee3acdd1953f33cbeb02b819aa7a7ee8bcc028f81c41cf92e4",
+  "source_hash": "084cccf3ea2f3e6e5b91816624eb7bd4f7b9ef2217e1f067b82423afe8a8edd0",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -1211,7 +1211,7 @@
         "title": "work",
         "description": "projects, professional experience, and experiments from ani potts.",
         "hero_title": "work",
-        "hero_summary": "work i've built or contributed to",
+        "hero_summary": "things i've built on my own and with teams, from early experiments to products people use",
         "buckets": [
           {
             "id": "experience",
@@ -1231,7 +1231,7 @@
         ]
       },
       "source_ref": "content/public/pages/work.md",
-      "source_hash": "48ac4ef034995577c72a149804de49936c70ceaa678a7ee39c1e39b82be38f42"
+      "source_hash": "78775588f4a24e338e45df145d23381b459c9bdc06e2da83377982cdf94055ed"
     },
     {
       "page_key": "writing",
@@ -1240,10 +1240,10 @@
         "title": "writing",
         "description": "things ani's written. claude code workflows, ai builds, the occasional music take.",
         "hero_title": "writing",
-        "hero_summary": "stuff i've figured out and wanted to write down."
+        "hero_summary": "what i'm learning as i build, and thoughts on the things that hold my attention"
       },
       "source_ref": "content/public/pages/writing.md",
-      "source_hash": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e"
+      "source_hash": "dc8f58eade35ab255c3f0c8416a838c52a3aa77c580080f39abc08b3dd8957c1"
     },
     {
       "page_key": "project:chainedchat",

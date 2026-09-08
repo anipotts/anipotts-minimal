@@ -27,7 +27,7 @@ The broad classifier selects `www`, `admin`, and `state` because shared types/co
 
 ## First editorial batch: systems
 
-Approval state: **rationale approved and applied** after Ani's dictation and wording review, including the correction from “the future” to “my future”. Retrieval-description and related-work proposals remain unapproved. Keep the approved hero and return caption.
+Approval state: **current systems page accepted for production** in Ani's latest request to move on to writing/work subtext. This includes the subsequent exact closing-copy annotation. Retrieval-description, related-work, source-tray, and paragraph-spacing proposals are deferred optimizations, not systems editorial launch blockers. Technical release checks and the wider site review still apply; no deployment is recorded here.
 
 ### Rationale before the map
 
@@ -66,6 +66,8 @@ Preserve exactly:
 After the rationale is reviewed, add ordinary text links below the map: `coding agent tips` and `awareness is alpha`. Use the canonical existing `public_tools`/`featured_writing` content instead of another hardcoded card grid. The essay itself still needs its content review below. No links have been added as a substitute for that review.
 
 ## Editorial method
+
+Current review anchor: writing and work index hero summaries. Ani approved and requested application of writing, “what i'm learning as i build, and thoughts on the things that hold my attention”; work, “things i've built on my own and with teams, from early experiments to products people use”. Applied to canonical page content. These are derived from the existing work catalog and Ani's stated technical/creative interests, not new biographical claims. Individual project and essay copy remains unchanged. Geometric background and interactive refinements are a design discussion, not implemented or launch blockers.
 
 Latest systems annotations: applied Ani's exact closing wording beginning “this is how i direct traces of context” and ending “people that are important.” Removed the stacked step descriptions' 42ch width cap below the existing 880px breakpoint, allowing the available column width at intermediate sizes such as 802px. Paragraph-spacing guidance was discussed only: continuous prose should have consistent paragraph gaps, with larger gaps reserved for sections or the map. Browser QA for this follow-up is unavailable because the newly listed in-app Browser skill's required control tool is not exposed; no alternate browser was substituted.
 

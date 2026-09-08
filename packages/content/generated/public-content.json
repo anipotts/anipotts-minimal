@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "0440b31d0f95a4ee3acdd1953f33cbeb02b819aa7a7ee8bcc028f81c41cf92e4",
+  "source_hash": "084cccf3ea2f3e6e5b91816624eb7bd4f7b9ef2217e1f067b82423afe8a8edd0",
   "sources": {
     "content/public/pages/home.md": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
@@ -9,8 +9,8 @@
     "content/public/pages/orchestrating.md": "1ab1b6d3afbba692de7431cde15684eea9f300b4c1597244abff238d206958c9",
     "content/public/pages/projects.md": "c4e752155a1d91d1ace7e998ce3577eeb03f6c88c01cf5aa75f7290e958ffadb",
     "content/public/pages/systems.md": "29330ba51f9062b6f83538ceacf873c3f30c514ef43da59f0123ea266c1cea03",
-    "content/public/pages/work.md": "48ac4ef034995577c72a149804de49936c70ceaa678a7ee39c1e39b82be38f42",
-    "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
+    "content/public/pages/work.md": "78775588f4a24e338e45df145d23381b459c9bdc06e2da83377982cdf94055ed",
+    "content/public/pages/writing.md": "dc8f58eade35ab255c3f0c8416a838c52a3aa77c580080f39abc08b3dd8957c1",
     "content/public/projects/chainedchat.md": "da0db3e9bbb0f3c4b379600c147315ec0f26488e361db826fd68ed1268e570d6",
     "content/public/projects/claude-code-tips.md": "e10e7cc3a79ac727c700e3ed6ae393a74b0baac7cc4252aa1e078f640d058f39",
     "content/public/projects/habittracker-obh.md": "41b54b507e03571676112a5918575eac9cf6c739ebbcf463601489f95990337c",
@@ -1186,7 +1186,7 @@
       "title": "work",
       "description": "projects, professional experience, and experiments from ani potts.",
       "hero_title": "work",
-      "hero_summary": "work i've built or contributed to",
+      "hero_summary": "things i've built on my own and with teams, from early experiments to products people use",
       "buckets": [
         {
           "id": "experience",
@@ -1205,7 +1205,7 @@
       "title": "writing",
       "description": "things ani's written. claude code workflows, ai builds, the occasional music take.",
       "hero_title": "writing",
-      "hero_summary": "stuff i've figured out and wanted to write down."
+      "hero_summary": "what i'm learning as i build, and thoughts on the things that hold my attention"
     }
   },
   "projects": [

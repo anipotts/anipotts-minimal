@@ -2,7 +2,7 @@
 title: work
 description: projects, professional experience, and experiments from ani potts.
 hero_title: work
-hero_summary: work i've built or contributed to
+hero_summary: things i've built on my own and with teams, from early experiments to products people use
 buckets:
   - id: experience
     label: experience
