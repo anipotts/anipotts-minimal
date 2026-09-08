@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "f332662a7e9736a467f045b4282c510ec80aa6e0c377e9dbb8c1c6d02ee16b24";
+  "2493c79477393106faf5130d302d342797da2d9a2304ed5f5e0de073bc7f01c8";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -1486,7 +1486,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     links: [
       {
         label: "source",
-        url: "https://github.com/anirudhp15/Options-Pricing-and-Sensitivity-Analysis-Tool",
+        url: "https://github.com/anipotts/Options-Pricing-and-Sensitivity-Analysis-Tool",
       },
     ],
     order: 40,
