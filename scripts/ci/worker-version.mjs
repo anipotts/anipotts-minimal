@@ -1,6 +1,22 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { healthRequestInit } from "./release-smoke.mjs";
+
+export async function previousReleaseSha(baseUrl, target, options = {}) {
+  if (!["www", "admin"].includes(target))
+    throw new Error("unsupported health target");
+  const response = await (options.fetchImpl ?? fetch)(
+    `${baseUrl}/api/health`,
+    healthRequestInit(target, options.env),
+  );
+  if (response.status !== 200)
+    throw new Error(`previous release health returned HTTP ${response.status}`);
+  const health = await response.json();
+  return typeof health.release_sha === "string" && health.release_sha
+    ? health.release_sha
+    : "unknown";
+}
 
 export function activeVersion(status) {
   const active = status?.versions?.find(
@@ -37,9 +53,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       "--yes",
     ]);
     console.log(`restored_version=${versionId}`);
+  } else if (command === "health" && config && versionId) {
+    console.log(`previous_sha=${await previousReleaseSha(config, versionId)}`);
   } else {
     console.error(
-      "usage: worker-version.mjs capture <config> | rollback <config> <version-id>",
+      "usage: worker-version.mjs capture <config> | rollback <config> <version-id> | health <base-url> <www|admin>",
     );
     process.exit(2);
   }

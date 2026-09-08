@@ -2,9 +2,14 @@
 
 import assert from "node:assert/strict";
 import { smokeRelease } from "./release-smoke.mjs";
-import { activeVersion } from "./worker-version.mjs";
+import { activeVersion, previousReleaseSha } from "./worker-version.mjs";
 
 const expectedSha = "b".repeat(40);
+const smokeIdentity = {
+  ADMIN_CI_ACCESS_CLIENT_ID: "test-client",
+  ADMIN_CI_ACCESS_CLIENT_SECRET: "test-secret",
+  ADMIN_CI_READ_TOKEN: "test-read-token",
+};
 const response = (status, body = {}) =>
   new Response(JSON.stringify(body), {
     status,
@@ -24,15 +29,69 @@ const publicReceipt = await smokeRelease({
 assert.equal(publicReceipt.release_sha, expectedSha);
 assert.ok(publicReceipt.checks.length > 10);
 
+assert.equal(
+  await previousReleaseSha("https://admin.example.test", "admin", {
+    env: smokeIdentity,
+    fetchImpl: async (url, init) => {
+      assert.equal(url, "https://admin.example.test/api/health");
+      assert.equal(init.redirect, "manual");
+      assert.equal(init.headers.Authorization, "Bearer test-read-token");
+      assert.equal(init.headers["CF-Access-Client-Secret"], "test-secret");
+      return response(200, { release_sha: expectedSha });
+    },
+  }),
+  expectedSha,
+);
+await assert.rejects(
+  previousReleaseSha("https://admin.example.test", "admin", {
+    env: {},
+    fetchImpl: async () => {
+      throw new Error("must not fetch without an identity");
+    },
+  }),
+  /identity is not installed/,
+);
+await assert.rejects(
+  previousReleaseSha("https://admin.example.test", "admin", {
+    env: smokeIdentity,
+    fetchImpl: async () => response(302),
+  }),
+  /HTTP 302/,
+);
+assert.equal(
+  await previousReleaseSha("https://www.example.test", "www", {
+    fetchImpl: async (_url, init) => {
+      assert.equal(init.headers, undefined);
+      return response(200);
+    },
+  }),
+  "unknown",
+);
+
 const adminReceipt = await smokeRelease({
   target: "admin",
   baseUrl: "https://admin.example.test",
   expectedSha,
   retryDelayMs: 0,
-  fetchImpl: async (url) =>
-    url.endsWith("/api/health")
-      ? response(200, { release_sha: expectedSha, schema_version: "0042" })
-      : response(302),
+  env: smokeIdentity,
+  healthAttempts: 1,
+  fetchImpl: async (url, init = {}) => {
+    if (url.endsWith("/api/health")) {
+      assert.equal(init.headers?.Authorization, "Bearer test-read-token");
+      assert.equal(init.headers?.["CF-Access-Client-Id"], "test-client");
+      assert.equal(init.redirect, "manual");
+      return response(200, {
+        release_sha: expectedSha,
+        schema_version: "0042",
+      });
+    }
+    assert.equal(
+      init.headers,
+      undefined,
+      "negative route probes remain unauthenticated",
+    );
+    return response(302);
+  },
 });
 assert.ok(adminReceipt.checks.every((check) => check.status === 302));
 
@@ -41,6 +100,7 @@ const publicPasskeyReceipt = await smokeRelease({
   baseUrl: "https://admin.example.test",
   expectedSha,
   retryDelayMs: 0,
+  env: smokeIdentity,
   fetchImpl: async (url) => {
     if (url.endsWith("/api/health")) {
       return response(200, {

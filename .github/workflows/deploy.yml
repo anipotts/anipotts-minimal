@@ -347,11 +347,13 @@ jobs:
         id: previous
         run: |
           node scripts/ci/worker-version.mjs capture apps/admin/wrangler.toml >> "$GITHUB_OUTPUT"
-          previous_sha="$(curl -fsS https://admin.anipotts.com/api/health | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).release_sha||"unknown"))')"
-          echo "previous_sha=${previous_sha}" >> "$GITHUB_OUTPUT"
+          node scripts/ci/worker-version.mjs health https://admin.anipotts.com admin >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_ID: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_SECRET: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_SECRET }}
+          ADMIN_CI_READ_TOKEN: ${{ secrets.ADMIN_CI_READ_TOKEN }}
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
@@ -364,6 +366,10 @@ jobs:
         id: boundary_smoke
         continue-on-error: true
         run: node scripts/ci/release-smoke.mjs --target admin --mode unauthenticated --base-url https://admin.anipotts.com --expected-sha "${{ github.sha }}"
+        env:
+          ADMIN_CI_ACCESS_CLIENT_ID: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_SECRET: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_SECRET }}
+          ADMIN_CI_READ_TOKEN: ${{ secrets.ADMIN_CI_READ_TOKEN }}
 
       - name: Smoke admin read-only identity
         id: identity_smoke
@@ -386,6 +392,9 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_ID: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_ID }}
+          ADMIN_CI_ACCESS_CLIENT_SECRET: ${{ secrets.ADMIN_CI_ACCESS_CLIENT_SECRET }}
+          ADMIN_CI_READ_TOKEN: ${{ secrets.ADMIN_CI_READ_TOKEN }}
 
       - name: Fail unsuccessful admin release
         if: steps.boundary_smoke.outcome == 'failure' || steps.identity_smoke.outcome == 'failure'

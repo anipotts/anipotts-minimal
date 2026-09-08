@@ -75,6 +75,10 @@ The four retained worker configs still declare a state domain/DO bindings, inges
 
 The checked release configuration holds authenticated admin smoke at `held_identity_required`; this is an external identity gate, not permission to weaken authentication. Shared changes classify www, admin and state, while removal of the legacy target alone does not deploy unrelated workers. Older checkpoints below describe earlier trees and must not be treated as proof for this cleanup.
 
+### Admin release gate follow-up
+
+Read-only checks confirmed that the three `ADMIN_CI_*` identity secrets are absent from both repository and Production-environment secret inventories. The continuation found an additional confirmed release bug: previous-version capture and the smoke health preflight made unauthenticated requests through Cloudflare Access. Health checks now use the configured read-only identity with redirects disabled, including rollback verification; negative route probes remain unauthenticated. A mocked Access-protected health response reproduced the missing header before the fix and passed afterward. Missing credentials still fail before any request, and redirected health responses are rejected. No credential, account, Access policy, production data or release gate was changed.
+
 Updated: 2026-09-07. Owner: Ani, with Codex implementing the public-site lane.
 
 ## Release state
