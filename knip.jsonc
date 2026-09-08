@@ -3,29 +3,17 @@
   "workspaces": {
     ".": {
       "entry": [
-        "scripts/claude/generate-claude-stats.mjs",
         "scripts/sync-yaml-to-d1.sh",
         "scripts/backfill-brands-emails.ts",
         "scripts/mini/commit-publisher.ts",
       ],
       "ignoreDependencies": ["eslint"],
     },
-    "apps/admin-solid": {
-      "entry": [
-        "app.config.ts",
-        "src/app.tsx",
-        "src/entry-client.tsx",
-        "src/entry-server.tsx",
-        "src/routes/**/*.tsx",
-      ],
-    },
     "apps/www": {
       "ignoreDependencies": ["@iconify-json/ph"],
     },
-    "packages/lib": {
-      "ignoreDependencies": ["react"],
-    },
     "workers/state": {
+      "entry": ["src/test-harness.ts"],
       "ignoreDependencies": ["cloudflare"],
     },
   },
