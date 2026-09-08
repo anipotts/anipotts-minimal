@@ -940,7 +940,10 @@ assert.deepEqual(
   "experimental lifecycle does not constrain public workflow",
 );
 const workflow = systemsContent.workflow;
-assert.ok(workflow.outro.startsWith("this is how i organize that"));
+assert.equal(
+  workflow.outro,
+  "this is how i direct traces of context that my agents can use to better drive work forward, leaving me with way more time for the work i care about and people that are important",
+);
 assert.equal(workflow.intro.split(/\n\s*\n/).filter(Boolean).length, 2);
 assert.ok(
   lifecyclePage.indexOf("content.workflow.outro") >
@@ -1034,6 +1037,11 @@ assert.equal(
 const workflowComponent = readFileSync(
   "apps/www/src/components/SystemMap.astro",
   "utf8",
+);
+assert.equal(
+  /\.step p\s*\{[^}]*max-width/s.test(workflowComponent),
+  false,
+  "step descriptions use available width in stacked and desktop layouts",
 );
 assert.ok(
   workflowComponent.includes("workflow.sources.map"),

@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "23bcba6d5d361d1c3219f38c75ab98d1177022306a379c972bbe80ddf6a0b0ac";
+  "0440b31d0f95a4ee3acdd1953f33cbeb02b819aa7a7ee8bcc028f81c41cf92e4";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -280,7 +280,7 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
     intro:
       "over time i've built an intuition for how to approach things, but keeping up with information coming from every direction still takes attention.\n\ni use this system to piece together those everyday details, so i can put more thought into bigger questions about my future and decisions that need my judgment",
     outro:
-      "this is how i organize that, with context that persists and agents that carry work forward, leaving more room for work i care about, things i want to explore, and people i love",
+      "this is how i direct traces of context that my agents can use to better drive work forward, leaving me with way more time for the work i care about and people that are important",
     steps: [
       {
         id: "outcome",
