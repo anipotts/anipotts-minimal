@@ -22,8 +22,7 @@ export const GET: APIRoute = async () => {
 
   const entries: Entry[] = [
     { path: "/", priority: 1 },
-    { path: "/making", priority: 0.9 },
-    { path: "/projects", priority: 0.8 },
+    { path: "/work", priority: 0.9 },
     { path: "/writing", priority: 0.85 },
     { path: "/systems", priority: 0.9 },
     ...writingEntries.map((t) => ({
@@ -32,7 +31,7 @@ export const GET: APIRoute = async () => {
       lastmod: t.data.published_at?.toISOString(),
     })),
     ...projects.map((p) => ({
-      path: `/projects/${projectSlug(p)}`,
+      path: `/work/${projectSlug(p)}`,
       priority: 0.7,
     })),
   ];

@@ -426,9 +426,7 @@ function detailOperationFromSeed(seed: DetailOperationSeed): ContentOperation {
   const collection = seed.kind === "project" ? "projects" : "writing";
   const pageKey = `${seed.kind}:${seed.slug}`;
   const route =
-    seed.kind === "project"
-      ? `/projects/${seed.slug}`
-      : `/writing/${seed.slug}`;
+    seed.kind === "project" ? `/work/${seed.slug}` : `/writing/${seed.slug}`;
   const forbiddenActions =
     seed.kind === "project"
       ? ["save", "publish", "deploy", "rewrite_markdown", "sync_external"]
@@ -538,7 +536,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     operation_id: "content-draft-project-card-fields-2026-06-28",
     kind: "content_draft",
     surface: "public_site",
-    route: "/making",
+    route: "/work",
     source_ref: "content/public/projects/*.md frontmatter",
     field_path: "projects.card_fields",
     current_value_ref: "source_markdown_frontmatter",
@@ -560,7 +558,7 @@ export const contentOperationTemplates: ContentOperation[] = [
       "/content",
       "/content/review",
       "/content/preview",
-      "/making",
+      "/work",
     ],
     proof_ids: [
       "content.projects.frontmatter.schema",
@@ -580,7 +578,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     operation_id: "content-draft-project-quantercise-detail-2026-06-29",
     kind: "content_draft",
     surface: "public_site",
-    route: "/projects/quantercise",
+    route: "/work/quantercise",
     source_ref: "content/public/projects/quantercise.md",
     field_path: "projects.quantercise.detail",
     current_value_ref: "published_canonical_source:project:quantercise",
@@ -601,7 +599,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     preview_targets: [
       "/content/review",
       "/content/preview",
-      "/projects/quantercise",
+      "/work/quantercise",
     ],
     proof_ids: [
       "content.projects.quantercise.page-content",
@@ -705,12 +703,12 @@ export const contentOperationTemplates: ContentOperation[] = [
     operation_id: "content-draft-making-index-copy-2026-06-29",
     kind: "content_draft",
     surface: "public_site",
-    route: "/making",
-    source_ref: "content/public/pages/making.md",
+    route: "/work",
+    source_ref: "content/public/pages/work.md",
     field_path: "projects.making_index_copy_and_buckets",
     current_value_ref: "published_canonical_source:making",
     proposed_value:
-      "Review future edits to the /making title, meta description, hero copy, and project bucket labels before proposing a source-controlled canonical update.",
+      "Review future edits to the /work title, meta description, hero copy, and project bucket labels before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -723,18 +721,18 @@ export const contentOperationTemplates: ContentOperation[] = [
       "rewrite_source",
       "sync_external",
     ],
-    preview_targets: ["/content/review", "/content/preview", "/making"],
+    preview_targets: ["/content/review", "/content/preview", "/work"],
     proof_ids: [
       "content.projects.index.page-content",
       "admin.content.preview.d1",
     ],
-    evidence_uri: "repo://apps/www/src/pages/making.astro",
+    evidence_uri: "repo://apps/www/src/pages/work/index.astro",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-29T00:00:00Z",
     updated_at: "2026-06-29T00:00:00Z",
     expires_at: "2026-07-29T00:00:00Z",
-    rollback_ref: "source_markdown:content/public/pages/making.md",
+    rollback_ref: "source_markdown:content/public/pages/work.md",
   },
   {
     operation_id: "content-draft-projects-index-copy-2026-06-29",
@@ -745,7 +743,7 @@ export const contentOperationTemplates: ContentOperation[] = [
     field_path: "projects.archive_index_copy",
     current_value_ref: "published_canonical_source:projects",
     proposed_value:
-      "Review future edits to the /projects title, meta description, hero copy, and making link before proposing a source-controlled canonical update.",
+      "Review future edits to the /projects title, meta description, hero copy, and work link before proposing a source-controlled canonical update.",
     status: "previewed",
     risk_level: "low",
     authority_state: "page_content_preview_only_no_write",
@@ -763,7 +761,7 @@ export const contentOperationTemplates: ContentOperation[] = [
       "content.projects.archive-index.page-content",
       "admin.content.preview.d1",
     ],
-    evidence_uri: "repo://apps/www/src/pages/projects/index.astro",
+    evidence_uri: "repo://apps/www/src/pages/work/index.astro",
     redaction: "public_copy_only",
     created_by: "agent",
     created_at: "2026-06-29T00:00:00Z",

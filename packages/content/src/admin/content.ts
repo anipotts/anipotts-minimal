@@ -225,10 +225,10 @@ export const contentInventory: ContentInventoryItem[] = [
   {
     id: "homepage.making_selection",
     surface: "homepage",
-    title: "homepage making selection",
+    title: "homepage work selection",
     source_ref: "content/public/pages/home.md sections.past_work",
     current_value:
-      "Canonical homepage content controls the making label, limit, view-all link, and ordered project slugs.",
+      "Canonical homepage content controls the work label, limit, view-all link, and ordered project slugs.",
     editability: "ready",
     risk_level: "medium",
     next_safe_action:
@@ -267,10 +267,10 @@ export const contentInventory: ContentInventoryItem[] = [
   {
     id: "projects.index_copy",
     surface: "projects",
-    title: "making index copy",
-    source_ref: "content/public/pages/making.md",
+    title: "work index copy",
+    source_ref: "content/public/pages/work.md",
     current_value:
-      "The /making title, meta description, hero copy, and project bucket labels come from canonical content.",
+      "The /work title, meta description, hero copy, and project bucket labels come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
@@ -284,7 +284,7 @@ export const contentInventory: ContentInventoryItem[] = [
     title: "project archive index copy",
     source_ref: "content/public/pages/projects.md",
     current_value:
-      "The /projects title, meta description, hero copy, and /making link come from canonical content.",
+      "The /projects title, meta description, hero copy, and /work link come from canonical content.",
     editability: "ready",
     risk_level: "low",
     next_safe_action:
@@ -588,6 +588,7 @@ function summarizePageContent(
 
   if (
     pageKey === "writing" ||
+    pageKey === "work" ||
     pageKey === "making" ||
     pageKey === "projects" ||
     pageKey === "newsletter_archive" ||
@@ -673,7 +674,7 @@ export const contentPreviewItems: ContentPreviewItem[] = [
       "Project cards currently use subtitle plus description, with `summary` reserved for future editor wording.",
     proposed_value:
       "Expose `summary` in admin while mapping it to existing markdown `subtitle` until the schema is renamed.",
-    preview_route: "/making",
+    preview_route: "/work",
     authority_state: "model_only",
     required_approval_ids: [],
     proof_ids: ["content.projects.frontmatter.schema"],

@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: past
 homepage_order: 80
 card_copy: discovery and growth in one scouting workflow.
-detail_path: /projects/habittracker-obh
+detail_path: /work/habittracker-obh
 identity:
   logo_src: /images/brand/bad-habit-favicon.png
   logo_alt: our bad habit

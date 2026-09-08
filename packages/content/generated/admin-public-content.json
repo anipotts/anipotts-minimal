@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "source_hash": "bc0d10c510eab92b44067679fad74cb9f11c4866331c901440fe64408b308137",
+  "source_hash": "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94",
   "source_records": [
     {
       "id": "projects.quantercise",
       "surface": "projects",
       "slug": "quantercise",
       "title": "quantercise",
-      "route": "/projects/quantercise",
+      "route": "/work/quantercise",
       "status": "live",
       "source_ref": "content/public/projects/quantercise.md",
       "summary": "quant interview practice with 400+ problems, instant grading, and sandboxed python.",
@@ -34,7 +34,7 @@
         { "path": "status", "value": "live", "kind": "string" },
         { "path": "kind", "value": "project", "kind": "string" },
         { "path": "public_state", "value": "featured", "kind": "string" },
-        { "path": "homepage_placement", "value": "making", "kind": "string" },
+        { "path": "homepage_placement", "value": "work", "kind": "string" },
         { "path": "catalog_group", "value": "past", "kind": "string" },
         { "path": "homepage_order", "value": "100", "kind": "number" },
         {
@@ -44,7 +44,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/quantercise",
+          "value": "/work/quantercise",
           "kind": "string"
         },
         {
@@ -76,7 +76,7 @@
       "surface": "projects",
       "slug": "structured-ai",
       "title": "structured ai",
-      "route": "/projects/structured-ai",
+      "route": "/work/structured-ai",
       "status": "archived",
       "source_ref": "content/public/projects/structured-ai.md",
       "summary": "real-time agent i/o for architectural work.",
@@ -121,7 +121,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/structured-ai",
+          "value": "/work/structured-ai",
           "kind": "string"
         },
         {
@@ -153,7 +153,7 @@
       "surface": "projects",
       "slug": "pgi-research-platform",
       "title": "paragon global investments",
-      "route": "/projects/pgi-research-platform",
+      "route": "/work/pgi-research-platform",
       "status": "live",
       "source_ref": "content/public/projects/pgi-research-platform.md",
       "summary": "next.js and supabase portal for an nyu quant fund.",
@@ -198,7 +198,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/pgi-research-platform",
+          "value": "/work/pgi-research-platform",
           "kind": "string"
         },
         {
@@ -235,7 +235,7 @@
       "surface": "projects",
       "slug": "claude-code-tips",
       "title": "claude code tips",
-      "route": "/projects/claude-code-tips",
+      "route": "/work/claude-code-tips",
       "status": "live",
       "source_ref": "content/public/projects/claude-code-tips.md",
       "summary": "public notes from running agent workflows in real repos.",
@@ -262,7 +262,7 @@
         { "path": "status", "value": "live", "kind": "string" },
         { "path": "kind", "value": "project", "kind": "string" },
         { "path": "public_state", "value": "featured", "kind": "string" },
-        { "path": "homepage_placement", "value": "making", "kind": "string" },
+        { "path": "homepage_placement", "value": "work", "kind": "string" },
         { "path": "catalog_group", "value": "active", "kind": "string" },
         { "path": "homepage_order", "value": "80", "kind": "number" },
         {
@@ -272,7 +272,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/claude-code-tips",
+          "value": "/work/claude-code-tips",
           "kind": "string"
         },
         {
@@ -299,7 +299,7 @@
       "surface": "projects",
       "slug": "imessage-mcp",
       "title": "imessage mcp",
-      "route": "/projects/imessage-mcp",
+      "route": "/work/imessage-mcp",
       "status": "live",
       "source_ref": "content/public/projects/imessage-mcp.md",
       "summary": "local-first mcp over imessage search and stats.",
@@ -326,7 +326,7 @@
         { "path": "status", "value": "live", "kind": "string" },
         { "path": "kind", "value": "project", "kind": "string" },
         { "path": "public_state", "value": "featured", "kind": "string" },
-        { "path": "homepage_placement", "value": "making", "kind": "string" },
+        { "path": "homepage_placement", "value": "work", "kind": "string" },
         { "path": "catalog_group", "value": "active", "kind": "string" },
         { "path": "homepage_order", "value": "90", "kind": "number" },
         {
@@ -336,7 +336,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/imessage-mcp",
+          "value": "/work/imessage-mcp",
           "kind": "string"
         },
         {
@@ -368,7 +368,7 @@
       "surface": "projects",
       "slug": "quantercise-extension",
       "title": "mental math extension",
-      "route": "/projects/quantercise-extension",
+      "route": "/work/quantercise-extension",
       "status": "archived",
       "source_ref": "content/public/projects/quantercise-extension.md",
       "summary": "browser drills for fast mental math reps.",
@@ -405,7 +405,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/quantercise-extension",
+          "value": "/work/quantercise-extension",
           "kind": "string"
         },
         {
@@ -432,7 +432,7 @@
       "surface": "projects",
       "slug": "chainedchat",
       "title": "chainedchat",
-      "route": "/projects/chainedchat",
+      "route": "/work/chainedchat",
       "status": "archived",
       "source_ref": "content/public/projects/chainedchat.md",
       "summary": "sunsetted multi-model chat with shared context and routing.",
@@ -469,7 +469,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/chainedchat",
+          "value": "/work/chainedchat",
           "kind": "string"
         },
         {
@@ -496,7 +496,7 @@
       "surface": "projects",
       "slug": "saeshify",
       "title": "saeshify",
-      "route": "/projects/saeshify",
+      "route": "/work/saeshify",
       "status": "hidden",
       "source_ref": "content/public/projects/saeshify.md",
       "summary": "real-time rhyme visualizer for lyrics and audio.",
@@ -531,11 +531,7 @@
           "value": "real-time rhyme visualization for lyrics and audio.",
           "kind": "string"
         },
-        {
-          "path": "detail_path",
-          "value": "/projects/saeshify",
-          "kind": "string"
-        },
+        { "path": "detail_path", "value": "/work/saeshify", "kind": "string" },
         {
           "path": "identity",
           "value": "{\"icon\":\"waveform\"}",
@@ -565,7 +561,7 @@
       "surface": "projects",
       "slug": "nyu-purity-test",
       "title": "nyu purity test",
-      "route": "/projects/nyu-purity-test",
+      "route": "/work/nyu-purity-test",
       "status": "live",
       "source_ref": "content/public/projects/nyu-purity-test.md",
       "summary": "campus quiz with 3,000+ student completions.",
@@ -592,7 +588,7 @@
         { "path": "status", "value": "live", "kind": "string" },
         { "path": "kind", "value": "project", "kind": "string" },
         { "path": "public_state", "value": "featured", "kind": "string" },
-        { "path": "homepage_placement", "value": "making", "kind": "string" },
+        { "path": "homepage_placement", "value": "work", "kind": "string" },
         { "path": "catalog_group", "value": "past", "kind": "string" },
         { "path": "homepage_order", "value": "70", "kind": "number" },
         {
@@ -602,7 +598,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/nyu-purity-test",
+          "value": "/work/nyu-purity-test",
           "kind": "string"
         },
         {
@@ -629,7 +625,7 @@
       "surface": "projects",
       "slug": "range-media-partners",
       "title": "range media partners",
-      "route": "/projects/range-media-partners",
+      "route": "/work/range-media-partners",
       "status": "wip",
       "source_ref": "content/public/projects/range-media-partners.md",
       "summary": "client A&R research and artist monitoring.",
@@ -666,7 +662,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/range-media-partners",
+          "value": "/work/range-media-partners",
           "kind": "string"
         },
         {
@@ -684,7 +680,7 @@
       "surface": "projects",
       "slug": "habittracker-obh",
       "title": "our bad habit",
-      "route": "/projects/habittracker-obh",
+      "route": "/work/habittracker-obh",
       "status": "live",
       "source_ref": "content/public/projects/habittracker-obh.md",
       "summary": "growth tracking for an atlantic records venture.",
@@ -725,7 +721,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/habittracker-obh",
+          "value": "/work/habittracker-obh",
           "kind": "string"
         },
         {
@@ -747,7 +743,7 @@
       "surface": "projects",
       "slug": "options-pricing-sensitivity",
       "title": "options pricing + sensitivity analysis",
-      "route": "/projects/options-pricing-sensitivity",
+      "route": "/work/options-pricing-sensitivity",
       "status": "live",
       "source_ref": "content/public/projects/options-pricing-sensitivity.md",
       "summary": "black-scholes and binomial pricing with volatility sweeps.",
@@ -788,7 +784,7 @@
         },
         {
           "path": "detail_path",
-          "value": "/projects/options-pricing-sensitivity",
+          "value": "/work/options-pricing-sensitivity",
           "kind": "string"
         },
         {
@@ -1047,16 +1043,7 @@
       "status": "source_controlled",
       "route": "/",
       "source_ref": "content/public/pages/home.md",
-      "source_hash": "8d6c7458d55011cef014d639d2cc87fd4dbc0e03749bcbb599d500c535787bbe"
-    },
-    {
-      "entity_id": "public-page:making",
-      "kind": "page",
-      "title": "making",
-      "status": "source_controlled",
-      "route": "/making",
-      "source_ref": "content/public/pages/making.md",
-      "source_hash": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d"
+      "source_hash": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607"
     },
     {
       "entity_id": "public-page:newsletter",
@@ -1083,7 +1070,7 @@
       "status": "source_controlled",
       "route": "/orchestrating",
       "source_ref": "content/public/pages/orchestrating.md",
-      "source_hash": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714"
+      "source_hash": "1ab1b6d3afbba692de7431cde15684eea9f300b4c1597244abff238d206958c9"
     },
     {
       "entity_id": "public-page:projects",
@@ -1092,7 +1079,7 @@
       "status": "source_controlled",
       "route": "/projects",
       "source_ref": "content/public/pages/projects.md",
-      "source_hash": "3fbd16ec46c50a7556adc9b711ba0f3b08817a9cbf3dff4262c1a622529f5b48"
+      "source_hash": "c4e752155a1d91d1ace7e998ce3577eeb03f6c88c01cf5aa75f7290e958ffadb"
     },
     {
       "entity_id": "public-page:systems",
@@ -1101,7 +1088,16 @@
       "status": "source_controlled",
       "route": "/systems",
       "source_ref": "content/public/pages/systems.md",
-      "source_hash": "cf7c80033bcae73cb7bf21986829ed493f8920e874c56bd32b3f91d707d5e88a"
+      "source_hash": "69edc2bb4ffcb2449a4cbbee42029a9ec8e1ed8bf7e759eceb83c864dce2001c"
+    },
+    {
+      "entity_id": "public-page:making",
+      "kind": "page",
+      "title": "work",
+      "status": "source_controlled",
+      "route": "/work",
+      "source_ref": "content/public/pages/work.md",
+      "source_hash": "7ef9d0f39f3fd8e0a7b980a003e5a2a6449ab3ca2fde7ea734efb67ef10fd36c"
     },
     {
       "entity_id": "public-page:writing",
@@ -1117,108 +1113,108 @@
       "kind": "project",
       "title": "chainedchat",
       "status": "archived",
-      "route": "/projects/chainedchat",
+      "route": "/work/chainedchat",
       "source_ref": "content/public/projects/chainedchat.md",
-      "source_hash": "2fe160412514b5c714131e275f94ebda10e2e77c2bba55e41f18ae3fb96c0a9b"
+      "source_hash": "da0db3e9bbb0f3c4b379600c147315ec0f26488e361db826fd68ed1268e570d6"
     },
     {
       "entity_id": "public-project:claude-code-tips",
       "kind": "project",
       "title": "claude code tips",
       "status": "live",
-      "route": "/projects/claude-code-tips",
+      "route": "/work/claude-code-tips",
       "source_ref": "content/public/projects/claude-code-tips.md",
-      "source_hash": "187746649476952e6e555cdc7228e3cbb85f580fa7d88b89178bb66dba816a3d"
+      "source_hash": "d05003f7cf6757424cc1dc64f9b86d7dffeb2f58558b45c5acbaacd7a5e444ee"
     },
     {
       "entity_id": "public-project:habittracker-obh",
       "kind": "project",
       "title": "our bad habit",
       "status": "live",
-      "route": "/projects/habittracker-obh",
+      "route": "/work/habittracker-obh",
       "source_ref": "content/public/projects/habittracker-obh.md",
-      "source_hash": "67d8bda6161fd480b071b9887844e07c20d4e9ddc6babda21dc8e7f53ea5bcc5"
+      "source_hash": "41b54b507e03571676112a5918575eac9cf6c739ebbcf463601489f95990337c"
     },
     {
       "entity_id": "public-project:imessage-mcp",
       "kind": "project",
       "title": "imessage mcp",
       "status": "live",
-      "route": "/projects/imessage-mcp",
+      "route": "/work/imessage-mcp",
       "source_ref": "content/public/projects/imessage-mcp.md",
-      "source_hash": "f26a57362289dd5985b9f46f1546cd6d8dfa8044921186b8bc69aaf604633b24"
+      "source_hash": "64625b0b1819b493f087da8dc24ec4e95ef7d053de023a710e66f5224606b432"
     },
     {
       "entity_id": "public-project:nyu-purity-test",
       "kind": "project",
       "title": "nyu purity test",
       "status": "live",
-      "route": "/projects/nyu-purity-test",
+      "route": "/work/nyu-purity-test",
       "source_ref": "content/public/projects/nyu-purity-test.md",
-      "source_hash": "551bde74e1eef0969fb5f60835db93c4f01e695616d3822a177016a999f094d8"
+      "source_hash": "5e180c18ba5d4a1ae6ae149bc16c1949fc4dae673a09d10af674f0f58fe0112f"
     },
     {
       "entity_id": "public-project:options-pricing-sensitivity",
       "kind": "project",
       "title": "options pricing + sensitivity analysis",
       "status": "live",
-      "route": "/projects/options-pricing-sensitivity",
+      "route": "/work/options-pricing-sensitivity",
       "source_ref": "content/public/projects/options-pricing-sensitivity.md",
-      "source_hash": "2109c90b34898f9252ae9a9889f1ee8a1f420f8f5549d12dc5723b109e07e403"
+      "source_hash": "d11b8d7322581f92cb2ffaa6bcc438206c1a5c34738e36d220a27f8795880158"
     },
     {
       "entity_id": "public-project:pgi-research-platform",
       "kind": "project",
       "title": "paragon global investments",
       "status": "live",
-      "route": "/projects/pgi-research-platform",
+      "route": "/work/pgi-research-platform",
       "source_ref": "content/public/projects/pgi-research-platform.md",
-      "source_hash": "6915e7ce85c84ccd6165bb42041ddbd074ec3c105ff85f0d7cee060d44013c41"
+      "source_hash": "e5579bdf6ea0e8fbc83e7c7633edf9858d45533b3ab8180d842e6141a89ba6f7"
     },
     {
       "entity_id": "public-project:quantercise-extension",
       "kind": "project",
       "title": "mental math extension",
       "status": "archived",
-      "route": "/projects/quantercise-extension",
+      "route": "/work/quantercise-extension",
       "source_ref": "content/public/projects/quantercise-extension.md",
-      "source_hash": "32e85dbc0201541288d6259df902539407e4ebe1a35feca37c522665825b69e1"
+      "source_hash": "f6bdfd9fdadbf8d482d5be6db9ee3125b7b65b676b11ae746c2fdb1fb709b1cc"
     },
     {
       "entity_id": "public-project:quantercise",
       "kind": "project",
       "title": "quantercise",
       "status": "live",
-      "route": "/projects/quantercise",
+      "route": "/work/quantercise",
       "source_ref": "content/public/projects/quantercise.md",
-      "source_hash": "67f8abfd3b064eea04b7950cb94371160c84237355e2005389c55e03b350ebb8"
+      "source_hash": "7193819d3b82d770b4b2bcdbffe82eb263004ff3d8db8a259bb1f4ea05f87418"
     },
     {
       "entity_id": "public-project:range-media-partners",
       "kind": "project",
       "title": "range media partners",
       "status": "wip",
-      "route": "/projects/range-media-partners",
+      "route": "/work/range-media-partners",
       "source_ref": "content/public/projects/range-media-partners.md",
-      "source_hash": "18b39d6c9fb1405ea7e03f464d696a4633ff3069a0148bbddf7584603ce19faa"
+      "source_hash": "9b95ebe22cc8d264a469010a51465add499f386250a8c7a70c9a5c9db4b2ba15"
     },
     {
       "entity_id": "public-project:saeshify",
       "kind": "project",
       "title": "saeshify",
       "status": "live",
-      "route": "/projects/saeshify",
+      "route": "/work/saeshify",
       "source_ref": "content/public/projects/saeshify.md",
-      "source_hash": "eae3ba93fc010ffae8ae87093f430a4c69d3c9ae015c78ab1fc13721a60589c4"
+      "source_hash": "541b9d3bb08e2df067ca5c7641db0a5d3541de0bc6ad1ebfe01cdc484b7cb8c9"
     },
     {
       "entity_id": "public-project:structured-ai",
       "kind": "project",
       "title": "structured ai",
       "status": "archived",
-      "route": "/projects/structured-ai",
+      "route": "/work/structured-ai",
       "source_ref": "content/public/projects/structured-ai.md",
-      "source_hash": "dca69a3a36e3d463b6c05d8776ff215cc7fae0c166e629f2f939b2c85f52f636"
+      "source_hash": "36938be0287282a0b42384c5cdc4d5954c3e3ed44c39c48e1eb3378cb1d0291f"
     },
     {
       "entity_id": "public-writing:awareness-is-alpha",

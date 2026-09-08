@@ -9,11 +9,11 @@ duration: Fall 2024
 status: live
 kind: project
 public_state: featured
-homepage_placement: making
+homepage_placement: work
 catalog_group: past
 homepage_order: 70
 card_copy: a campus quiz that spread through NYU group chats overnight.
-detail_path: /projects/nyu-purity-test
+detail_path: /work/nyu-purity-test
 identity:
   logo_src: /images/brand/nyu-purity-test-favicon.png
   logo_alt: nyu purity test

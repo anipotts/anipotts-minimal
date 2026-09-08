@@ -130,7 +130,7 @@ export interface CmsProjectContent {
   order: number;
   kind: "experience" | "project";
   public_state: "featured" | "listed" | "hidden";
-  homepage_placement: "experience" | "making" | "none";
+  homepage_placement: "experience" | "work" | "none";
   catalog_group: "active" | "past" | "taken_down";
   homepage_order: number;
   card_copy: string;

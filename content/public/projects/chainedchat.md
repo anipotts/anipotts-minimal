@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: taken_down
 homepage_order: 0
 card_copy: shared multi-model chat with one preserved context.
-detail_path: /projects/chainedchat
+detail_path: /work/chainedchat
 identity:
   logo_src: /images/brand/chainedchat-logo.png
   logo_alt: chainedchat

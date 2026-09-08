@@ -180,7 +180,7 @@ function normalizeHomepagePlacement(
   value: unknown,
 ): CmsProjectContent["homepage_placement"] {
   if (value === "experience") return "experience";
-  if (value === "making") return "making";
+  if (value === "making" || value === "work") return "work";
   return "none";
 }
 
@@ -253,8 +253,10 @@ export function normalizeCmsProject(
     detail_path: coerceString(
       source.detail_path,
       fallback?.detail_path ??
-        `/projects/${normalizeSlug(source.slug, fallback?.slug ?? "project")}`,
-    ).trim(),
+        `/work/${normalizeSlug(source.slug, fallback?.slug ?? "project")}`,
+    )
+      .trim()
+      .replace(/^\/projects\//u, "/work/"),
     identity:
       source.identity && typeof source.identity === "object"
         ? (source.identity as CmsProjectContent["identity"])
@@ -296,7 +298,7 @@ export function validateCmsProject(project: CmsProjectContent): {
       CMS_TEXT_LIMITS.linkUrl,
     ) ??
     validateCmsLinks(project.links, "Project") ??
-    (!/^\/projects\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(project.detail_path)
+    (!/^\/work\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(project.detail_path)
       ? "Project detail path must be an internal project route"
       : null) ??
     (!project.identity.logo_src && !project.identity.icon
@@ -317,8 +319,8 @@ export function validateCmsProject(project: CmsProjectContent): {
             : null,
       )
       .find(Boolean) ??
-    (project.kind === "experience" && project.homepage_placement === "making"
-      ? "Experience records cannot use the making placement"
+    (project.kind === "experience" && project.homepage_placement === "work"
+      ? "Experience records cannot use the work placement"
       : null) ??
     (project.kind === "project" && project.homepage_placement === "experience"
       ? "Project records cannot use the experience placement"

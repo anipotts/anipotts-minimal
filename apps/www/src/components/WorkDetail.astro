@@ -1,18 +1,15 @@
 ---
 import { render } from "astro:content";
 import { Icon } from "astro-icon/components";
-import CmsMarkdown from "../../components/CmsMarkdown.astro";
-import ProjectMediaStage from "../../components/ProjectMediaStage.astro";
-import Shell from "../../layouts/Shell.astro";
-import { projectSlug, visibleProjects } from "../../lib/content";
+import CmsMarkdown from "./CmsMarkdown.astro";
+import ProjectMediaStage from "./ProjectMediaStage.astro";
+import Shell from "../layouts/Shell.astro";
+import { projectSlug, type Project } from "../lib/content";
 
-export const prerender = false;
-
-const requestedSlug = Astro.params.slug ?? "";
-const project = (await visibleProjects()).find(
-  (candidate) => projectSlug(candidate) === requestedSlug,
-);
-if (!project) return Astro.redirect("/projects", 302);
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
 
 const slug = projectSlug(project);
 const rendered =
@@ -35,14 +32,14 @@ const uniqueMedia = Array.from(
 <Shell
   title={d.title}
   description={d.description}
-  path={`/projects/${slug}`}
+  path={`/work/${slug}`}
   mood="alert"
 >
   <article class="project-page">
     <header data-rise class="project-head">
       <div class="project-topline">
-        <a href="/making" class="quiet-link back">
-          <Icon name="ph:arrow-left" /> making
+        <a href="/work" class="quiet-link back">
+          <Icon name="ph:arrow-left" /> work
         </a>
 
         <div class="project-actions">

@@ -13,7 +13,7 @@ homepage_placement: experience
 catalog_group: past
 homepage_order: 100
 card_copy: real-time agent interaction with citations and visible execution.
-detail_path: /projects/structured-ai
+detail_path: /work/structured-ai
 preview_media:
   kind: image
   src: /images/work/structured-drawing-chat.webp

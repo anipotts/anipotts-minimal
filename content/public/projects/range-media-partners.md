@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: active
 homepage_order: 70
 card_copy: client A&R research and artist monitoring.
-detail_path: /projects/range-media-partners
+detail_path: /work/range-media-partners
 identity:
   icon: waveform
 sort_order: 70

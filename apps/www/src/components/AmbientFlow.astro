@@ -1,6 +1,6 @@
 ---
 interface Props {
-  kind: "making" | "writing";
+  kind: "work" | "writing";
   seed: string;
   variant?: number;
 }
@@ -11,7 +11,7 @@ const stableHash = [...seed].reduce(
   7,
 );
 
-const makingPaths = [
+const workPaths = [
   [
     "M70 300c42-70 103-81 167-41 58 36 105 32 153-16 54-54 119-63 210-18v75H70Z",
     "M224 300c45-52 95-57 145-24 50 32 95 27 143-17 28-25 58-32 88-21v62H224Z",
@@ -101,7 +101,7 @@ const writingPaths = [
   ],
 ];
 
-const makingDeepPaths = [
+const workDeepPaths = [
   "M488 300c34-18 70-17 112 5v-5H488Z",
   "M-28 300v-31c29-12 58-3 91 31H-28Z",
   "M500 300c29-19 62-18 100 5v-5H500Z",
@@ -121,9 +121,9 @@ const writingDeepPaths = [
   "M824 194c36-18 87-20 152-6v6H824Z",
 ];
 
-const library = kind === "making" ? makingPaths : writingPaths;
+const library = kind === "work" ? workPaths : writingPaths;
 const variant = Math.abs(requestedVariant ?? stableHash) % library.length;
-const deepLibrary = kind === "making" ? makingDeepPaths : writingDeepPaths;
+const deepLibrary = kind === "work" ? workDeepPaths : writingDeepPaths;
 const paths = [...library[variant], deepLibrary[variant]];
 ---
 
@@ -136,7 +136,7 @@ const paths = [...library[variant], deepLibrary[variant]];
   aria-hidden="true"
 >
   <svg
-    viewBox={kind === "making" ? "0 0 600 300" : "0 0 960 194"}
+    viewBox={kind === "work" ? "0 0 600 300" : "0 0 960 194"}
     preserveAspectRatio="none"
   >
     {

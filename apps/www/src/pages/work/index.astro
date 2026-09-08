@@ -1,0 +1,127 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import WorkCard from "../../components/WorkCard.astro";
+import PageHero from "../../components/PageHero.astro";
+import { visibleProjects } from "../../lib/content";
+import {
+  DEFAULT_WORK_INDEX_CONTENT,
+  normalizeListingPageContent,
+} from "@anipotts/content/public";
+
+export const prerender = true;
+const projects = await visibleProjects();
+const copy = normalizeListingPageContent(
+  DEFAULT_WORK_INDEX_CONTENT,
+  DEFAULT_WORK_INDEX_CONTENT,
+);
+const groups = [
+  {
+    id: "experience",
+    items: projects.filter((p) => p.data.kind === "experience"),
+  },
+  {
+    id: "selected",
+    items: projects.filter(
+      (p) => p.data.kind === "project" && p.data.public_state === "featured",
+    ),
+  },
+  {
+    id: "archive",
+    items: projects.filter(
+      (p) => p.data.kind === "project" && p.data.public_state === "listed",
+    ),
+  },
+];
+---
+
+<Shell
+  title={copy.title}
+  description={copy.description}
+  path="/work"
+  mood="alert"
+>
+  <PageHero title={copy.hero_title} summary={copy.hero_summary} />
+  <div class="catalog">
+    {
+      groups
+        .filter((group) => group.items.length)
+        .map((group) => (
+          <section id={group.id} aria-labelledby={`heading-${group.id}`}>
+            <h2 id={`heading-${group.id}`}>
+              {copy.buckets?.find((bucket) => bucket.id === group.id)?.label ??
+                group.id}
+            </h2>
+            {group.id === "archive" ? (
+              <div class="archive-list">
+                {group.items.map((project) => (
+                  <a
+                    class="archive-item row-link"
+                    href={project.data.detail_path}
+                  >
+                    <span class="archive-heading">
+                      <span>{project.data.title}</span>
+                      <span class="archive-meta">{project.data.year}</span>
+                    </span>
+                    <span class="archive-copy">{project.data.card_copy}</span>
+                    <span class="archive-meta">
+                      {project.data.status === "wip"
+                        ? "in progress"
+                        : project.data.status}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div class="work-grid">
+                {group.items.map((project, index) => (
+                  <WorkCard project={project} flowVariant={index} />
+                ))}
+              </div>
+            )}
+          </section>
+        ))
+    }
+  </div>
+</Shell>
+
+<style>
+  .catalog {
+    display: grid;
+    gap: var(--s-7);
+  }
+  section {
+    min-width: 0;
+    scroll-margin-top: 6rem;
+  }
+  h2 {
+    font-size: var(--d-section);
+    margin: 0 0 var(--s-5);
+  }
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--s-4);
+  }
+  .archive-list {
+    display: grid;
+  }
+  .archive-item {
+    display: grid;
+    gap: var(--s-2);
+    padding-block: var(--s-4);
+  }
+  .archive-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-2);
+  }
+  .archive-copy,
+  .archive-meta {
+    color: var(--ink-muted);
+    font-size: var(--p-small);
+  }
+  .archive-copy {
+    max-width: var(--measure);
+  }
+</style>

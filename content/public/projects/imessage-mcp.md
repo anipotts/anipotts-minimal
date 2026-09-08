@@ -9,11 +9,11 @@ duration: Ongoing
 status: live
 kind: project
 public_state: featured
-homepage_placement: making
+homepage_placement: work
 catalog_group: active
 homepage_order: 90
 card_copy: private, read-only search and stats for Apple Messages.
-detail_path: /projects/imessage-mcp
+detail_path: /work/imessage-mcp
 identity:
   logo_src: /images/brand/npm-icon.svg
   logo_alt: npm

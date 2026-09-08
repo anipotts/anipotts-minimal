@@ -296,10 +296,11 @@ function cleanOptional(value: unknown, maxLength: number): string {
 }
 
 function routeForPageKey(pageKey: string): string {
+  if (pageKey === "making" || pageKey === "projects") return "/work";
   if (pageKey === "home") return "/";
   if (pageKey === "newsletter_archive") return "/newsletter/archive";
   if (pageKey.startsWith("project:")) {
-    return `/projects/${pageKey.slice("project:".length)}`;
+    return `/work/${pageKey.slice("project:".length)}`;
   }
   if (pageKey.startsWith("writing:")) {
     return `/writing/${pageKey.slice("writing:".length)}`;

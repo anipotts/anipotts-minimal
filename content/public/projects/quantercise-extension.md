@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: past
 homepage_order: 0
 card_copy: keyboard-first browser drills for faster mental math.
-detail_path: /projects/quantercise-extension
+detail_path: /work/quantercise-extension
 identity:
   logo_src: /images/brand/google-chrome-logo.svg
   logo_alt: Google Chrome

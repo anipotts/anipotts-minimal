@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import "./work-migration.test.mjs";
 import { execFileSync } from "node:child_process";
 import {
   cpSync,
@@ -108,7 +109,7 @@ assert.equal(
 );
 
 const homepageMentionFixture = {
-  build: { label: "build", href: "/making" },
+  build: { label: "build", href: "/work" },
   agent: { label: "agent", href: "/systems" },
   agents: { label: "agents", href: "/systems" },
   businessInsider: { label: "business insider", href: "/writing" },
@@ -360,7 +361,7 @@ assert.equal(
 );
 
 const projectDetailSource = readFileSync(
-  "apps/www/src/pages/projects/[slug].astro",
+  "apps/www/src/components/WorkDetail.astro",
   "utf8",
 );
 assert.match(
@@ -525,7 +526,7 @@ const sourceRecords = sourceContentRecordsFromProjection([
     surface: "projects",
     slug: "hidden-lab",
     title: "Hidden Lab",
-    route: "/projects/hidden-lab",
+    route: "/work/hidden-lab",
     status: "hidden",
     source_ref: "content/public/projects/hidden-lab.md",
     summary: "Internal project page",
@@ -628,7 +629,7 @@ const orchestratingContent = normalizeOrchestratingPageContent({
   public_tools: [
     {
       title: "claude code tips",
-      href: "/projects/claude-code-tips",
+      href: "/work/claude-code-tips",
       detail: "agent notes from actual sessions.",
     },
   ],
@@ -637,7 +638,7 @@ assert.equal(orchestratingContent.sections.loop, "operator loop");
 assert.equal(orchestratingContent.loop_cards.length, 1);
 assert.equal(
   orchestratingContent.public_tools[0]?.href,
-  "/projects/claude-code-tips",
+  "/work/claude-code-tips",
 );
 assert.deepEqual(validateOrchestratingPageContent(orchestratingContent), {
   ok: true,

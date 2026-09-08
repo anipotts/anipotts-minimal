@@ -57,11 +57,16 @@ const projects = defineCollection({
     status: z.enum(["live", "wip", "archived"]),
     kind: z.enum(["experience", "project"]),
     public_state: z.enum(["featured", "listed", "hidden"]),
-    homepage_placement: z.enum(["experience", "making", "none"]),
+    homepage_placement: z
+      .enum(["experience", "work", "making", "none"])
+      .transform((value) => (value === "making" ? ("work" as const) : value)),
     catalog_group: z.enum(["active", "past", "taken_down"]),
     homepage_order: z.number().default(0),
     card_copy: z.string().min(1).max(180),
-    detail_path: z.string().regex(/^\/projects\/[a-z0-9-]+$/),
+    detail_path: z
+      .string()
+      .regex(/^\/(?:work|projects)\/[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .transform((value) => value.replace(/^\/projects\//u, "/work/")),
     identity: z.object({
       logo_src: z.string().startsWith("/").optional(),
       logo_alt: z.string().min(1).optional(),

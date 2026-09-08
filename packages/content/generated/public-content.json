@@ -1,28 +1,28 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "bc0d10c510eab92b44067679fad74cb9f11c4866331c901440fe64408b308137",
+  "source_hash": "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94",
   "sources": {
-    "content/public/pages/home.md": "8d6c7458d55011cef014d639d2cc87fd4dbc0e03749bcbb599d500c535787bbe",
-    "content/public/pages/making.md": "5e848d2f8ecb54d874f79197439433865128813b19ecb4d8c4b19c90fc19475d",
+    "content/public/pages/home.md": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
     "content/public/pages/newsletter_archive.md": "ff9f37fe4e6c3c18d91f5d98dbe38c8c043722aa0d9045675f9353853cd76f0e",
-    "content/public/pages/orchestrating.md": "6259a86f09662fbd341b7504910faf933f6554f1365776f17322107d875ec714",
-    "content/public/pages/projects.md": "3fbd16ec46c50a7556adc9b711ba0f3b08817a9cbf3dff4262c1a622529f5b48",
-    "content/public/pages/systems.md": "cf7c80033bcae73cb7bf21986829ed493f8920e874c56bd32b3f91d707d5e88a",
+    "content/public/pages/orchestrating.md": "1ab1b6d3afbba692de7431cde15684eea9f300b4c1597244abff238d206958c9",
+    "content/public/pages/projects.md": "c4e752155a1d91d1ace7e998ce3577eeb03f6c88c01cf5aa75f7290e958ffadb",
+    "content/public/pages/systems.md": "69edc2bb4ffcb2449a4cbbee42029a9ec8e1ed8bf7e759eceb83c864dce2001c",
+    "content/public/pages/work.md": "7ef9d0f39f3fd8e0a7b980a003e5a2a6449ab3ca2fde7ea734efb67ef10fd36c",
     "content/public/pages/writing.md": "2be2f20ddd0277bc9f1f0e60468ce9a5576240dae0c4a04cdef5b9e038d06f3e",
-    "content/public/projects/chainedchat.md": "2fe160412514b5c714131e275f94ebda10e2e77c2bba55e41f18ae3fb96c0a9b",
-    "content/public/projects/claude-code-tips.md": "187746649476952e6e555cdc7228e3cbb85f580fa7d88b89178bb66dba816a3d",
-    "content/public/projects/habittracker-obh.md": "67d8bda6161fd480b071b9887844e07c20d4e9ddc6babda21dc8e7f53ea5bcc5",
-    "content/public/projects/imessage-mcp.md": "f26a57362289dd5985b9f46f1546cd6d8dfa8044921186b8bc69aaf604633b24",
-    "content/public/projects/nyu-purity-test.md": "551bde74e1eef0969fb5f60835db93c4f01e695616d3822a177016a999f094d8",
-    "content/public/projects/options-pricing-sensitivity.md": "2109c90b34898f9252ae9a9889f1ee8a1f420f8f5549d12dc5723b109e07e403",
-    "content/public/projects/pgi-research-platform.md": "6915e7ce85c84ccd6165bb42041ddbd074ec3c105ff85f0d7cee060d44013c41",
-    "content/public/projects/quantercise-extension.md": "32e85dbc0201541288d6259df902539407e4ebe1a35feca37c522665825b69e1",
-    "content/public/projects/quantercise.md": "67f8abfd3b064eea04b7950cb94371160c84237355e2005389c55e03b350ebb8",
-    "content/public/projects/range-media-partners.md": "18b39d6c9fb1405ea7e03f464d696a4633ff3069a0148bbddf7584603ce19faa",
-    "content/public/projects/saeshify.md": "eae3ba93fc010ffae8ae87093f430a4c69d3c9ae015c78ab1fc13721a60589c4",
-    "content/public/projects/structured-ai.md": "dca69a3a36e3d463b6c05d8776ff215cc7fae0c166e629f2f939b2c85f52f636",
+    "content/public/projects/chainedchat.md": "da0db3e9bbb0f3c4b379600c147315ec0f26488e361db826fd68ed1268e570d6",
+    "content/public/projects/claude-code-tips.md": "d05003f7cf6757424cc1dc64f9b86d7dffeb2f58558b45c5acbaacd7a5e444ee",
+    "content/public/projects/habittracker-obh.md": "41b54b507e03571676112a5918575eac9cf6c739ebbcf463601489f95990337c",
+    "content/public/projects/imessage-mcp.md": "64625b0b1819b493f087da8dc24ec4e95ef7d053de023a710e66f5224606b432",
+    "content/public/projects/nyu-purity-test.md": "5e180c18ba5d4a1ae6ae149bc16c1949fc4dae673a09d10af674f0f58fe0112f",
+    "content/public/projects/options-pricing-sensitivity.md": "d11b8d7322581f92cb2ffaa6bcc438206c1a5c34738e36d220a27f8795880158",
+    "content/public/projects/pgi-research-platform.md": "e5579bdf6ea0e8fbc83e7c7633edf9858d45533b3ab8180d842e6141a89ba6f7",
+    "content/public/projects/quantercise-extension.md": "f6bdfd9fdadbf8d482d5be6db9ee3125b7b65b676b11ae746c2fdb1fb709b1cc",
+    "content/public/projects/quantercise.md": "7193819d3b82d770b4b2bcdbffe82eb263004ff3d8db8a259bb1f4ea05f87418",
+    "content/public/projects/range-media-partners.md": "9b95ebe22cc8d264a469010a51465add499f386250a8c7a70c9a5c9db4b2ba15",
+    "content/public/projects/saeshify.md": "541b9d3bb08e2df067ca5c7641db0a5d3541de0bc6ad1ebfe01cdc484b7cb8c9",
+    "content/public/projects/structured-ai.md": "36938be0287282a0b42384c5cdc4d5954c3e3ed44c39c48e1eb3378cb1d0291f",
     "content/public/writing/awareness-is-alpha.md": "e9ab6503661215b2804b0e1cbd56200bff67cb089aba2fff32a779745c44de0f",
     "content/public/writing/i-built-a-monitor-for-my-claude-code-sessions.md": "c823d0927d46064c91a5a9911051a6711692be95731ce6b47fb543bde8a26ea3",
     "content/public/writing/jpegmafia-is-our-kanye-west.md": "0ac6d41567dbf05edfb148636a34660446941d741b98d1fbb0c1ad6c3cae2361",
@@ -48,11 +48,11 @@
         },
         "past_work": {
           "visible": true,
-          "label": "making",
+          "label": "work",
           "heading": "",
           "limit": 4,
-          "links": [{ "label": "view all", "href": "/making" }],
-          "view_all": "/making"
+          "links": [{ "label": "view all", "href": "/work" }],
+          "view_all": "/work"
         },
         "latest_thoughts": {
           "visible": true,
@@ -70,11 +70,7 @@
       },
       "section_order": ["intro", "past_work", "latest_thoughts"],
       "mentions": {
-        "build": {
-          "label": "build",
-          "href": "/making",
-          "presentation": "facet"
-        },
+        "build": { "label": "build", "href": "/work", "presentation": "facet" },
         "agents": {
           "label": "agents",
           "href": "/systems",
@@ -126,21 +122,6 @@
           "logoAlt": "business insider"
         }
       }
-    },
-    "making": {
-      "title": "making",
-      "description": "projects, experiments, weekly traces, and small utilities from ani potts.",
-      "hero_title": "making",
-      "hero_summary": "work i built or helped developed.",
-      "buckets": [
-        {
-          "id": "active",
-          "label": "active",
-          "note": "developing and maintaining"
-        },
-        { "id": "past", "label": "past", "note": "past projects" },
-        { "id": "taken-down", "label": "archive", "note": "taken down" }
-      ]
     },
     "newsletter": {
       "headline": "notes from the build loop",
@@ -211,12 +192,12 @@
       "public_tools": [
         {
           "title": "claude code tips",
-          "href": "/projects/claude-code-tips",
+          "href": "/work/claude-code-tips",
           "detail": "hooks, agents, plugin notes, and working patterns from actual agent sessions."
         },
         {
           "title": "imessage mcp",
-          "href": "/projects/imessage-mcp",
+          "href": "/work/imessage-mcp",
           "detail": "local-first mcp for searching message history without turning private data into a cloud product."
         }
       ]
@@ -226,8 +207,8 @@
       "description": "every project with a page. flat list.",
       "hero_title": "archive",
       "hero_summary": "every project with a page. the curated story is at",
-      "hero_link_label": "/making",
-      "hero_link_href": "/making"
+      "hero_link_label": "/work",
+      "hero_link_href": "/work"
     },
     "systems": {
       "title": "systems",
@@ -1195,9 +1176,20 @@
         },
         {
           "title": "imessage mcp",
-          "href": "/projects/imessage-mcp",
+          "href": "/work/imessage-mcp",
           "detail": "a private, read-only way to explore message history while the data stays local."
         }
+      ]
+    },
+    "work": {
+      "title": "work",
+      "description": "projects, professional experience, and experiments from ani potts.",
+      "hero_title": "work",
+      "hero_summary": "work i've built or contributed to",
+      "buckets": [
+        { "id": "experience", "label": "experience", "note": "" },
+        { "id": "selected", "label": "selected projects", "note": "" },
+        { "id": "archive", "label": "archive", "note": "" }
       ]
     },
     "writing": {
@@ -1234,7 +1226,7 @@
       "catalog_group": "taken_down",
       "homepage_order": 0,
       "card_copy": "shared multi-model chat with one preserved context.",
-      "detail_path": "/projects/chainedchat",
+      "detail_path": "/work/chainedchat",
       "identity": {
         "logo_src": "/images/brand/chainedchat-logo.png",
         "logo_alt": "chainedchat"
@@ -1260,11 +1252,11 @@
       "order": 92,
       "kind": "project",
       "public_state": "featured",
-      "homepage_placement": "making",
+      "homepage_placement": "work",
       "catalog_group": "active",
       "homepage_order": 80,
       "card_copy": "practical patterns from running coding agents in real repositories.",
-      "detail_path": "/projects/claude-code-tips",
+      "detail_path": "/work/claude-code-tips",
       "identity": {
         "logo_src": "/images/brand/claude-code-tips-favicon.svg",
         "logo_alt": "claude code tips"
@@ -1289,7 +1281,7 @@
       "catalog_group": "past",
       "homepage_order": 80,
       "card_copy": "discovery and growth in one scouting workflow.",
-      "detail_path": "/projects/habittracker-obh",
+      "detail_path": "/work/habittracker-obh",
       "identity": {
         "logo_src": "/images/brand/bad-habit-favicon.png",
         "logo_alt": "our bad habit"
@@ -1316,11 +1308,11 @@
       "order": 91,
       "kind": "project",
       "public_state": "featured",
-      "homepage_placement": "making",
+      "homepage_placement": "work",
       "catalog_group": "active",
       "homepage_order": 90,
       "card_copy": "private, read-only search and stats for Apple Messages.",
-      "detail_path": "/projects/imessage-mcp",
+      "detail_path": "/work/imessage-mcp",
       "identity": {
         "logo_src": "/images/brand/npm-icon.svg",
         "logo_alt": "npm"
@@ -1341,11 +1333,11 @@
       "order": 84,
       "kind": "project",
       "public_state": "featured",
-      "homepage_placement": "making",
+      "homepage_placement": "work",
       "catalog_group": "past",
       "homepage_order": 70,
       "card_copy": "a campus quiz that spread through NYU group chats overnight.",
-      "detail_path": "/projects/nyu-purity-test",
+      "detail_path": "/work/nyu-purity-test",
       "identity": {
         "logo_src": "/images/brand/nyu-purity-test-favicon.png",
         "logo_alt": "nyu purity test"
@@ -1375,7 +1367,7 @@
       "catalog_group": "past",
       "homepage_order": 0,
       "card_copy": "options pricing with Black-Scholes, binomial models, and volatility sweeps.",
-      "detail_path": "/projects/options-pricing-sensitivity",
+      "detail_path": "/work/options-pricing-sensitivity",
       "identity": { "icon": "chart-line-up" },
       "preview_media": null,
       "story": []
@@ -1406,7 +1398,7 @@
       "catalog_group": "past",
       "homepage_order": 90,
       "card_copy": "research platform for an intercollegiate quant fund.",
-      "detail_path": "/projects/pgi-research-platform",
+      "detail_path": "/work/pgi-research-platform",
       "identity": {
         "logo_src": "/images/brand/paragon-favicon.png",
         "logo_alt": "paragon global investments"
@@ -1488,7 +1480,7 @@
       "catalog_group": "past",
       "homepage_order": 0,
       "card_copy": "keyboard-first browser drills for faster mental math.",
-      "detail_path": "/projects/quantercise-extension",
+      "detail_path": "/work/quantercise-extension",
       "identity": {
         "logo_src": "/images/brand/google-chrome-logo.svg",
         "logo_alt": "Google Chrome"
@@ -1516,11 +1508,11 @@
       "order": 100,
       "kind": "project",
       "public_state": "featured",
-      "homepage_placement": "making",
+      "homepage_placement": "work",
       "catalog_group": "past",
       "homepage_order": 100,
       "card_copy": "quant interview practice with mental math and sandboxed Python execution.",
-      "detail_path": "/projects/quantercise",
+      "detail_path": "/work/quantercise",
       "identity": {
         "logo_src": "/images/brand/quantercise-legacy-icon.png",
         "logo_alt": "quantercise"
@@ -1545,7 +1537,7 @@
       "catalog_group": "active",
       "homepage_order": 70,
       "card_copy": "client A&R research and artist monitoring.",
-      "detail_path": "/projects/range-media-partners",
+      "detail_path": "/work/range-media-partners",
       "identity": { "icon": "waveform" },
       "preview_media": null,
       "story": []
@@ -1570,7 +1562,7 @@
       "catalog_group": "active",
       "homepage_order": 0,
       "card_copy": "real-time rhyme visualization for lyrics and audio.",
-      "detail_path": "/projects/saeshify",
+      "detail_path": "/work/saeshify",
       "identity": { "icon": "waveform" },
       "preview_media": null,
       "story": []
@@ -1592,7 +1584,7 @@
       "catalog_group": "past",
       "homepage_order": 100,
       "card_copy": "real-time agent interaction with citations and visible execution.",
-      "detail_path": "/projects/structured-ai",
+      "detail_path": "/work/structured-ai",
       "identity": {
         "logo_src": "/images/brand/structured-ai-mark.svg",
         "logo_alt": "structured ai",

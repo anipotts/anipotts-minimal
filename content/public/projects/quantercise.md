@@ -9,11 +9,11 @@ duration: Launched 2024
 status: live
 kind: project
 public_state: featured
-homepage_placement: making
+homepage_placement: work
 catalog_group: past
 homepage_order: 100
 card_copy: quant interview practice with mental math and sandboxed Python execution.
-detail_path: /projects/quantercise
+detail_path: /work/quantercise
 identity:
   logo_src: /images/brand/quantercise-legacy-icon.png
   logo_alt: quantercise

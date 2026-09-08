@@ -892,6 +892,6 @@ public_tools:
     href: https://github.com/anipotts/coding-agent-tips
     detail: patterns i keep after seeing how agents behave in real repositories.
   - title: imessage mcp
-    href: /projects/imessage-mcp
+    href: /work/imessage-mcp
     detail: a private, read-only way to explore message history while the data stays local.
 ---

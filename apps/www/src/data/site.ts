@@ -15,7 +15,7 @@ export const siteConfig = {
 } as const;
 
 export const navItems = [
-  { name: "making", path: "/making" },
+  { name: "work", path: "/work" },
   { name: "writing", path: "/writing" },
   { name: "systems", path: "/systems" },
 ] as const;

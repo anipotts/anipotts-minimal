@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "bc0d10c510eab92b44067679fad74cb9f11c4866331c901440fe64408b308137";
+  "5e5c70ac76c3ae894afab6ccde201812c7fa747d7d0a5707ae00417211d73f94";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -30,16 +30,16 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
     },
     past_work: {
       visible: true,
-      label: "making",
+      label: "work",
       heading: "",
       limit: 4,
       links: [
         {
           label: "view all",
-          href: "/making",
+          href: "/work",
         },
       ],
-      view_all: "/making",
+      view_all: "/work",
     },
     latest_thoughts: {
       visible: true,
@@ -64,7 +64,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   mentions: {
     build: {
       label: "build",
-      href: "/making",
+      href: "/work",
       presentation: "facet",
     },
     agents: {
@@ -120,27 +120,27 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   },
 };
 
-export const DEFAULT_MAKING_INDEX_CONTENT: ListingPageContent = {
-  title: "making",
+export const DEFAULT_WORK_INDEX_CONTENT: ListingPageContent = {
+  title: "work",
   description:
-    "projects, experiments, weekly traces, and small utilities from ani potts.",
-  hero_title: "making",
-  hero_summary: "work i built or helped developed.",
+    "projects, professional experience, and experiments from ani potts.",
+  hero_title: "work",
+  hero_summary: "work i've built or contributed to",
   buckets: [
     {
-      id: "active",
-      label: "active",
-      note: "developing and maintaining",
+      id: "experience",
+      label: "experience",
+      note: "",
     },
     {
-      id: "past",
-      label: "past",
-      note: "past projects",
+      id: "selected",
+      label: "selected projects",
+      note: "",
     },
     {
-      id: "taken-down",
+      id: "archive",
       label: "archive",
-      note: "taken down",
+      note: "",
     },
   ],
 };
@@ -150,8 +150,8 @@ export const DEFAULT_PROJECTS_INDEX_CONTENT: ListingPageContent = {
   description: "every project with a page. flat list.",
   hero_title: "archive",
   hero_summary: "every project with a page. the curated story is at",
-  hero_link_label: "/making",
-  hero_link_href: "/making",
+  hero_link_label: "/work",
+  hero_link_href: "/work",
 };
 
 export const DEFAULT_WRITING_INDEX_CONTENT: ListingPageContent = {
@@ -240,13 +240,13 @@ export const DEFAULT_ORCHESTRATING_CONTENT: OrchestratingPageContent = {
   public_tools: [
     {
       title: "claude code tips",
-      href: "/projects/claude-code-tips",
+      href: "/work/claude-code-tips",
       detail:
         "hooks, agents, plugin notes, and working patterns from actual agent sessions.",
     },
     {
       title: "imessage mcp",
-      href: "/projects/imessage-mcp",
+      href: "/work/imessage-mcp",
       detail:
         "local-first mcp for searching message history without turning private data into a cloud product.",
     },
@@ -1303,12 +1303,15 @@ export const DEFAULT_SYSTEMS_CONTENT: SystemsPageContent = {
     },
     {
       title: "imessage mcp",
-      href: "/projects/imessage-mcp",
+      href: "/work/imessage-mcp",
       detail:
         "a private, read-only way to explore message history while the data stays local.",
     },
   ],
 };
+
+/** Compatibility export for stored making-page consumers. */
+export const DEFAULT_MAKING_INDEX_CONTENT = DEFAULT_WORK_INDEX_CONTENT;
 
 export const HOME_SECTION_ORDER: HomepageContent["section_order"] =
   DEFAULT_HOMEPAGE_CONTENT.section_order;
@@ -1343,7 +1346,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "taken_down",
     homepage_order: 0,
     card_copy: "shared multi-model chat with one preserved context.",
-    detail_path: "/projects/chainedchat",
+    detail_path: "/work/chainedchat",
     identity: {
       logo_src: "/images/brand/chainedchat-logo.png",
       logo_alt: "chainedchat",
@@ -1369,12 +1372,12 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     order: 92,
     kind: "project",
     public_state: "featured",
-    homepage_placement: "making",
+    homepage_placement: "work",
     catalog_group: "active",
     homepage_order: 80,
     card_copy:
       "practical patterns from running coding agents in real repositories.",
-    detail_path: "/projects/claude-code-tips",
+    detail_path: "/work/claude-code-tips",
     identity: {
       logo_src: "/images/brand/claude-code-tips-favicon.svg",
       logo_alt: "claude code tips",
@@ -1399,7 +1402,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "past",
     homepage_order: 80,
     card_copy: "discovery and growth in one scouting workflow.",
-    detail_path: "/projects/habittracker-obh",
+    detail_path: "/work/habittracker-obh",
     identity: {
       logo_src: "/images/brand/bad-habit-favicon.png",
       logo_alt: "our bad habit",
@@ -1429,11 +1432,11 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     order: 91,
     kind: "project",
     public_state: "featured",
-    homepage_placement: "making",
+    homepage_placement: "work",
     catalog_group: "active",
     homepage_order: 90,
     card_copy: "private, read-only search and stats for Apple Messages.",
-    detail_path: "/projects/imessage-mcp",
+    detail_path: "/work/imessage-mcp",
     identity: {
       logo_src: "/images/brand/npm-icon.svg",
       logo_alt: "npm",
@@ -1459,11 +1462,11 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     order: 84,
     kind: "project",
     public_state: "featured",
-    homepage_placement: "making",
+    homepage_placement: "work",
     catalog_group: "past",
     homepage_order: 70,
     card_copy: "a campus quiz that spread through NYU group chats overnight.",
-    detail_path: "/projects/nyu-purity-test",
+    detail_path: "/work/nyu-purity-test",
     identity: {
       logo_src: "/images/brand/nyu-purity-test-favicon.png",
       logo_alt: "nyu purity test",
@@ -1494,7 +1497,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     homepage_order: 0,
     card_copy:
       "options pricing with Black-Scholes, binomial models, and volatility sweeps.",
-    detail_path: "/projects/options-pricing-sensitivity",
+    detail_path: "/work/options-pricing-sensitivity",
     identity: {
       icon: "chart-line-up",
     },
@@ -1530,7 +1533,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "past",
     homepage_order: 90,
     card_copy: "research platform for an intercollegiate quant fund.",
-    detail_path: "/projects/pgi-research-platform",
+    detail_path: "/work/pgi-research-platform",
     identity: {
       logo_src: "/images/brand/paragon-favicon.png",
       logo_alt: "paragon global investments",
@@ -1612,7 +1615,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "past",
     homepage_order: 0,
     card_copy: "keyboard-first browser drills for faster mental math.",
-    detail_path: "/projects/quantercise-extension",
+    detail_path: "/work/quantercise-extension",
     identity: {
       logo_src: "/images/brand/google-chrome-logo.svg",
       logo_alt: "Google Chrome",
@@ -1639,12 +1642,12 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     order: 100,
     kind: "project",
     public_state: "featured",
-    homepage_placement: "making",
+    homepage_placement: "work",
     catalog_group: "past",
     homepage_order: 100,
     card_copy:
       "quant interview practice with mental math and sandboxed Python execution.",
-    detail_path: "/projects/quantercise",
+    detail_path: "/work/quantercise",
     identity: {
       logo_src: "/images/brand/quantercise-legacy-icon.png",
       logo_alt: "quantercise",
@@ -1669,7 +1672,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "active",
     homepage_order: 70,
     card_copy: "client A&R research and artist monitoring.",
-    detail_path: "/projects/range-media-partners",
+    detail_path: "/work/range-media-partners",
     identity: {
       icon: "waveform",
     },
@@ -1702,7 +1705,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     catalog_group: "active",
     homepage_order: 0,
     card_copy: "real-time rhyme visualization for lyrics and audio.",
-    detail_path: "/projects/saeshify",
+    detail_path: "/work/saeshify",
     identity: {
       icon: "waveform",
     },
@@ -1732,7 +1735,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     homepage_order: 100,
     card_copy:
       "real-time agent interaction with citations and visible execution.",
-    detail_path: "/projects/structured-ai",
+    detail_path: "/work/structured-ai",
     identity: {
       logo_src: "/images/brand/structured-ai-mark.svg",
       logo_alt: "structured ai",

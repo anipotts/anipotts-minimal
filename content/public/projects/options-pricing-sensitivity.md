@@ -13,7 +13,7 @@ homepage_placement: none
 catalog_group: past
 homepage_order: 0
 card_copy: options pricing with Black-Scholes, binomial models, and volatility sweeps.
-detail_path: /projects/options-pricing-sensitivity
+detail_path: /work/options-pricing-sensitivity
 identity:
   icon: chart-line-up
 sort_order: 40

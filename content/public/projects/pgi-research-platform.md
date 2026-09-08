@@ -13,7 +13,7 @@ homepage_placement: experience
 catalog_group: past
 homepage_order: 90
 card_copy: research platform for an intercollegiate quant fund.
-detail_path: /projects/pgi-research-platform
+detail_path: /work/pgi-research-platform
 preview_media:
   kind: image
   src: /images/work/paragon-portal-directory.png

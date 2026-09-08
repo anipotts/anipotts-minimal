@@ -13,13 +13,13 @@ sections:
       - businessInsider
   past_work:
     visible: true
-    label: making
+    label: work
     heading: ""
     limit: 4
     links:
       - label: view all
-        href: /making
-    view_all: /making
+        href: /work
+    view_all: /work
   latest_thoughts:
     visible: true
     label: writing
@@ -40,7 +40,7 @@ section_order:
 mentions:
   build:
     label: build
-    href: /making
+    href: /work
     presentation: facet
   agents:
     label: agents

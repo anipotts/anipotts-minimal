@@ -33,9 +33,9 @@ loop_cards:
     detail: if an action matters twice, it becomes a command, dashboard, admin field, or tiny page.
 public_tools:
   - title: claude code tips
-    href: /projects/claude-code-tips
+    href: /work/claude-code-tips
     detail: hooks, agents, plugin notes, and working patterns from actual agent sessions.
   - title: imessage mcp
-    href: /projects/imessage-mcp
+    href: /work/imessage-mcp
     detail: local-first mcp for searching message history without turning private data into a cloud product.
 ---
