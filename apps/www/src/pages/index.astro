@@ -11,6 +11,8 @@ import {
   DEFAULT_HOMEPAGE_CONTENT,
   homepageSummaryText,
   normalizeHomepageContent,
+  siteConfig,
+  siteLinks,
 } from "@anipotts/content/public";
 
 export const prerender = true;
@@ -26,6 +28,9 @@ const homeWritingOrder = new Map<string, number>(
   selectedWritingSlugs.map((slug, index) => [slug, index]),
 );
 const allWork = await visibleProjects();
+const codingAgentGuide = allWork.find(
+  (project) => project.slug === "claude-code-tips",
+);
 const experiences = allWork
   .filter((project) => project.data.homepage_placement === "experience")
   .sort((a, b) => b.data.homepage_order - a.data.homepage_order);
@@ -49,20 +54,25 @@ const profileLd = {
   "@type": "ProfilePage",
   mainEntity: {
     "@type": "Person",
-    name: "Ani Potts",
-    url: "https://anipotts.com",
-    jobTitle: "builder and writer working with agents",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    jobTitle: siteConfig.title,
     sameAs: [
-      "https://github.com/anipotts",
-      "https://www.linkedin.com/in/anipotts",
-      "https://x.com/anipottsbuilds",
-      "https://news.anipotts.com",
+      siteLinks.github.href,
+      siteLinks.linkedin.href,
+      siteLinks.x.href,
+      siteLinks.newsletter.href,
     ],
   },
 };
 ---
 
-<Shell title="ani potts" description={summaryText} path="/" jsonLd={profileLd}>
+<Shell
+  title={siteConfig.displayName}
+  description={summaryText}
+  path="/"
+  jsonLd={profileLd}
+>
   <section data-rise>
     <h1 class="home-hero">
       {heading}
@@ -133,7 +143,7 @@ const profileLd = {
   }
 
   <section data-rise>
-    <CodingAgentTipsCard />
+    {codingAgentGuide && <CodingAgentTipsCard project={codingAgentGuide} />}
   </section>
 </Shell>
 

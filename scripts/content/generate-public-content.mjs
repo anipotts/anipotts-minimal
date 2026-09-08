@@ -10,7 +10,16 @@ import {
 } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { format } from "prettier";
-import { parse, stringify } from "yaml";
+import { parse } from "yaml";
+import {
+  isPublicProject,
+  isPublishedWriting,
+} from "../../packages/content/src/public/visibility.ts";
+import {
+  projectSchema,
+  publicSlugSchema,
+  writingSchema,
+} from "../../packages/content/src/public/schema.ts";
 
 const ROOT = process.cwd();
 const SOURCE_ROOT = join(ROOT, "content/public");
@@ -18,35 +27,23 @@ const PROJECTS_ROOT = join(SOURCE_ROOT, "projects");
 const WRITING_ROOT = join(SOURCE_ROOT, "writing");
 const PAGES_ROOT = join(SOURCE_ROOT, "pages");
 const GENERATED_TS = join(ROOT, "packages/content/src/public/generated.ts");
-const VALIDATION_JSON = join(
-  ROOT,
-  "packages/content/generated/public-content.json",
-);
 const ADMIN_JSON = join(
   ROOT,
   "packages/content/generated/admin-public-content.json",
 );
-const D1_JSON = join(ROOT, "drizzle/seeds/public-content.json");
 const CHECK = process.argv.includes("--check");
-const BOOTSTRAP = process.argv.includes("--bootstrap-pages");
 
 const pageExports = {
   home: ["DEFAULT_HOMEPAGE_CONTENT", "HomepageContent"],
   work: ["DEFAULT_WORK_INDEX_CONTENT", "ListingPageContent"],
-  projects: ["DEFAULT_PROJECTS_INDEX_CONTENT", "ListingPageContent"],
   writing: ["DEFAULT_WRITING_INDEX_CONTENT", "ListingPageContent"],
   newsletter: ["DEFAULT_NEWSLETTER_CONTENT", "NewsletterContent"],
   newsletter_archive: [
     "DEFAULT_NEWSLETTER_ARCHIVE_CONTENT",
     "ListingPageContent",
   ],
-  orchestrating: ["DEFAULT_ORCHESTRATING_CONTENT", "OrchestratingPageContent"],
   systems: ["DEFAULT_SYSTEMS_CONTENT", "SystemsPageContent"],
 };
-
-if (BOOTSTRAP) {
-  await bootstrapPages();
-}
 
 const projectEntries = markdownFiles(PROJECTS_ROOT).map((file) => ({
   content: projectRecord(file),
@@ -60,6 +57,18 @@ const writingEntries = markdownFiles(WRITING_ROOT).map((file) => ({
 }));
 const projects = projectEntries.map(({ content }) => content);
 const writing = writingEntries.map(({ content }) => content);
+for (const [surface, entries] of Object.entries({ projects, writing })) {
+  const slugs = new Set();
+  for (const entry of entries) {
+    publicSlugSchema.parse(entry.slug);
+    if (slugs.has(entry.slug))
+      throw new Error(`duplicate ${surface} slug: ${entry.slug}`);
+    slugs.add(entry.slug);
+    if (surface === "projects" && entry.detail_path !== `/work/${entry.slug}`) {
+      throw new Error(`project detail_path must match slug: ${entry.slug}`);
+    }
+  }
+}
 const pages = Object.fromEntries(
   markdownFiles(PAGES_ROOT).map((file) => {
     const key = basename(file, ".md");
@@ -87,16 +96,6 @@ const sourceHash = sha256(
   ),
 );
 
-const canonical = {
-  schema_version: 1,
-  source_root: "content/public",
-  source_hash: sourceHash,
-  sources: sourceManifest,
-  pages,
-  projects,
-  writing,
-};
-
 const adminProjection = {
   schema_version: 1,
   source_hash: sourceHash,
@@ -123,33 +122,6 @@ const adminProjection = {
   ],
 };
 
-const d1Seeds = {
-  schema_version: 1,
-  source_hash: sourceHash,
-  policy: "future_additive_seed_input_only",
-  rows: [
-    ...Object.entries(pages).map(([key, content]) =>
-      seedRow(
-        key === "work" ? "making" : key,
-        content,
-        true,
-        `content/public/pages/${key}.md`,
-      ),
-    ),
-    ...projectEntries.map(({ content, source }) =>
-      seedRow(
-        `project:${content.slug}`,
-        content,
-        content.public_state !== "hidden",
-        source,
-      ),
-    ),
-    ...writingEntries.map(({ content, source }) =>
-      seedRow(`writing:${content.slug}`, content, content.visible, source),
-    ),
-  ],
-};
-
 const outputs = new Map([
   [
     GENERATED_TS,
@@ -157,9 +129,7 @@ const outputs = new Map([
       parser: "typescript",
     }),
   ],
-  [VALIDATION_JSON, await formatJson(canonical)],
   [ADMIN_JSON, await formatJson(adminProjection)],
-  [D1_JSON, await formatJson(d1Seeds)],
 ]);
 
 let drift = false;
@@ -182,21 +152,6 @@ async function formatJson(value) {
   return format(JSON.stringify(value), { parser: "json" });
 }
 
-async function bootstrapPages() {
-  const defaults = await import(
-    new URL("../../packages/content/dist/public/defaults.js", import.meta.url)
-  );
-  mkdirSync(PAGES_ROOT, { recursive: true });
-  for (const [key, [exportName]] of Object.entries(pageExports)) {
-    const value = defaults[exportName];
-    if (!value) throw new Error(`missing bootstrap export: ${exportName}`);
-    writeFileSync(
-      join(PAGES_ROOT, `${key}.md`),
-      `---\n${stringify(value, { lineWidth: 0 }).trimEnd()}\n---\n`,
-    );
-  }
-}
-
 function markdownFiles(dir) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
@@ -213,7 +168,8 @@ function parseMarkdown(file) {
 }
 
 function projectRecord(file) {
-  const { frontmatter, body } = parseMarkdown(file);
+  const { frontmatter: raw, body } = parseMarkdown(file);
+  const frontmatter = projectSchema.parse(raw);
   const slug = frontmatter.slug ?? basename(file, ".md");
   return {
     slug,
@@ -247,7 +203,8 @@ function projectRecord(file) {
 }
 
 function writingRecord(file) {
-  const { frontmatter, body } = parseMarkdown(file);
+  const { frontmatter: raw, body } = parseMarkdown(file);
+  const frontmatter = writingSchema.parse(raw);
   const slug = frontmatter.slug ?? basename(file, ".md");
   const date = isoDate(frontmatter.published_at);
   return {
@@ -269,7 +226,7 @@ function writingRecord(file) {
           },
         ]
       : [],
-    visible: String(frontmatter.status ?? "draft") === "published",
+    visible: isPublishedWriting(frontmatter),
     order: Number(date.replaceAll("-", "")) || 0,
   };
 }
@@ -380,7 +337,9 @@ function projectionRecord(kind, content, source) {
     title: content.title,
     status:
       kind === "project"
-        ? content.status
+        ? isPublicProject(content)
+          ? content.status
+          : "hidden"
         : content.visible
           ? "published"
           : "draft",
@@ -390,21 +349,11 @@ function projectionRecord(kind, content, source) {
   };
 }
 
-function seedRow(pageKey, content, published, source) {
-  return {
-    page_key: pageKey,
-    published,
-    content,
-    source_ref: source,
-    source_hash: sourceManifest[source],
-  };
-}
-
 function generatedTypescript(pages, projects, writing, hash) {
   const exports = Object.entries(pageExports)
     .map(([key, [name, type]]) => typedExport(name, pages[key], type))
     .join("\n\n");
-  return `/* generated by scripts/content/generate-public-content.mjs */\nimport type {\n  CmsProjectContent,\n  CmsWritingContent,\n  HomepageContent,\n  ListingPageContent,\n  NewsletterContent,\n  OrchestratingPageContent,\n  SystemsPageContent,\n} from "@anipotts/types";\n\nexport const PUBLIC_CONTENT_SOURCE_HASH = ${JSON.stringify(hash)};\n\n${exports}\n\n/** Compatibility export for stored making-page consumers. */\nexport const DEFAULT_MAKING_INDEX_CONTENT = DEFAULT_WORK_INDEX_CONTENT;\n\nexport const HOME_SECTION_ORDER: HomepageContent["section_order"] = DEFAULT_HOMEPAGE_CONTENT.section_order;\n\n${typedExport("DEFAULT_CMS_PROJECTS", projects, "CmsProjectContent[]")}\n\n${typedExport("DEFAULT_CMS_WRITING", writing, "CmsWritingContent[]")}\n`;
+  return `/* generated by scripts/content/generate-public-content.mjs */\nimport type {\n  CmsProjectContent,\n  CmsWritingContent,\n  HomepageContent,\n  ListingPageContent,\n  NewsletterContent,\n  SystemsPageContent,\n} from "@anipotts/types";\n\nexport const PUBLIC_CONTENT_SOURCE_HASH = ${JSON.stringify(hash)};\n\n${exports}\n\nexport const HOME_SECTION_ORDER: HomepageContent["section_order"] = DEFAULT_HOMEPAGE_CONTENT.section_order;\n\n${typedExport("DEFAULT_CMS_PROJECTS", projects, "CmsProjectContent[]")}\n\n${typedExport("DEFAULT_CMS_WRITING", writing, "CmsWritingContent[]")}\n`;
 }
 
 function typedExport(name, value, type) {

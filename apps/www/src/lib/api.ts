@@ -1,5 +1,6 @@
 /** shared guards for the POST endpoints: origin allowlist + d1 sliding-window
  *  rate limit (5 requests / 10 min per ip, table rate_limits). */
+import { siteConfig } from "@anipotts/content/public";
 
 export function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -9,8 +10,8 @@ export function json(data: unknown, status = 200): Response {
 }
 
 const CANONICAL_ORIGINS = new Set([
-  "https://anipotts.com",
-  "https://www.anipotts.com",
+  siteConfig.url,
+  `${new URL(siteConfig.url).protocol}//www.${new URL(siteConfig.url).host}`,
 ]);
 
 /** reject cross-origin posts. same-origin (the serving host, so previews and

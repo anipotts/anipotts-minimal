@@ -1,6 +1,6 @@
 ---
 title: structured ai
-subtitle: real-time agent i/o for architectural work.
+subtitle: helping people follow an agent's work as it happens
 description: Worked on the real-time interaction layer for an agent product that turned architectural source material into cited answers and visible work.
 year: "2025"
 category: ai
@@ -12,7 +12,7 @@ public_state: featured
 homepage_placement: experience
 catalog_group: past
 homepage_order: 100
-card_copy: real-time agent interaction with citations and visible execution.
+card_copy: helping people follow an agent's work and check its answers against architectural drawings
 detail_path: /work/structured-ai
 preview_media:
   kind: image

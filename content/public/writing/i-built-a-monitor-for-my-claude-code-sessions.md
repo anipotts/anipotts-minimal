@@ -1,7 +1,7 @@
 ---
 slug: i-built-a-monitor-for-my-claude-code-sessions
 title: i built a monitor for my claude code sessions
-summary: claudemon makes parallel claude code sessions visible from one dashboard.
+summary: a dashboard i built to see what my Claude Code sessions are doing across projects
 tags: [claude-code, claudemon, observability, building]
 status: published
 published_at: 2026-04-07

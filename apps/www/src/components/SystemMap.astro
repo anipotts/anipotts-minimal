@@ -251,7 +251,7 @@ const { workflow } = Astro.props;
       justify-content: flex-start;
     }
   }
-  @media (max-width: 879px) {
+  @media (width < 880px) {
     .workflow {
       --step-inset: 4rem;
     }
@@ -441,7 +441,7 @@ const { workflow } = Astro.props;
     bottom: 0;
     border-left: 1px solid var(--border-strong);
   }
-  @media (max-width: 879px) {
+  @media (width < 880px) {
     .intake-line {
       left: calc(var(--step-inset) + 2.2rem);
     }

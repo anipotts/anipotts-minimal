@@ -1,6 +1,6 @@
 ---
 title: mental math extension
-subtitle: browser drills for fast mental math reps.
+subtitle: quick mental math practice in the browser
 description: Built a self-contained Chrome extension for keyboard-driven mental math practice. Includes sound feedback, progress tracking, and Manifest V3 packaging. Everything runs in the browser.
 year: "2026"
 category: product
@@ -12,7 +12,7 @@ public_state: listed
 homepage_placement: none
 catalog_group: past
 homepage_order: 0
-card_copy: keyboard-first browser drills for faster mental math.
+card_copy: quick mental math drills you can work through from your keyboard
 detail_path: /work/quantercise-extension
 identity:
   logo_src: /images/brand/google-chrome-logo.svg

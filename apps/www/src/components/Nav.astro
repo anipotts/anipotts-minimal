@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { navItems } from "../data/site";
+import { navItems } from "@anipotts/content/public";
 import BrandMark from "./BrandMark.astro";
 
 const current = Astro.url.pathname;
@@ -55,6 +55,100 @@ const current = Astro.url.pathname;
     <span></span>
   </button>
 </header>
+
+<!-- Runs before paint so a home-link navigation keeps the hovered mark open. -->
+<script is:inline>
+  (() => {
+    const mark = document.querySelector(".wordmark");
+    if (!mark) return;
+    const key = "ap-hover-continuity";
+    const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
+    let pointer = null;
+    let inside = null;
+    const contains = (point) => {
+      const rect = mark.getBoundingClientRect();
+      return (
+        point &&
+        point.x >= rect.left &&
+        point.x <= rect.right &&
+        point.y >= rect.top &&
+        point.y <= rect.bottom
+      );
+    };
+    const show = (open) => {
+      inside = open;
+      if (open) mark.setAttribute("data-hover-continuity", "");
+      else mark.removeAttribute("data-hover-continuity");
+    };
+    const save = () => {
+      try {
+        if (!finePointer.matches || !pointer) return;
+        sessionStorage.setItem(
+          key,
+          JSON.stringify({
+            ...pointer,
+            width: innerWidth,
+            height: innerHeight,
+            time: Date.now(),
+          }),
+        );
+      } catch {
+        /* Pointer feedback never depends on storage access. */
+      }
+    };
+    let restored = false;
+    try {
+      const previous = JSON.parse(sessionStorage.getItem(key) || "null");
+      sessionStorage.removeItem(key);
+      if (
+        finePointer.matches &&
+        previous &&
+        Date.now() - previous.time < 30000 &&
+        previous.width === innerWidth &&
+        previous.height === innerHeight
+      ) {
+        pointer = previous;
+        show(contains(previous));
+        if (inside) mark.setAttribute("data-hover-restored", "");
+        restored = true;
+      }
+    } catch {
+      /* Storage is optional; native CSS hover remains available. */
+    }
+    // Embedded browsers may not recompute :hover until the mouse moves.
+    // With no usable position on reload, start open until a real pointer event.
+    if (
+      !restored &&
+      finePointer.matches &&
+      performance.getEntriesByType("navigation")[0]?.type === "reload"
+    ) {
+      show(true);
+      mark.setAttribute("data-hover-restored", "");
+    }
+    const track = (event) => {
+      if (!finePointer.matches || event.pointerType === "touch") return;
+      pointer = { x: event.clientX, y: event.clientY };
+      mark.removeAttribute("data-hover-restored");
+      const next = contains(pointer);
+      const changed = next !== inside;
+      show(next);
+      // Save on boundary crossing and before a click, not on every mouse frame.
+      if (changed || event.type === "pointerdown") save();
+    };
+    document.addEventListener("pointermove", track, { passive: true });
+    document.addEventListener("pointerdown", track, {
+      passive: true,
+      capture: true,
+    });
+    window.addEventListener("resize", () => {
+      show(finePointer.matches && !!contains(pointer));
+      save();
+    });
+    finePointer.addEventListener("change", () => show(false));
+    // Blur/leave events during document replacement are not pointer movement.
+    window.addEventListener("pagehide", save);
+  })();
+</script>
 
 <style>
   .nav {
@@ -151,14 +245,22 @@ const current = Astro.url.pathname;
     color: var(--interactive);
   }
 
+  :is(.wordmark, .theme-toggle, .nav-toggle, .nav-link):focus-visible {
+    outline: 2px solid var(--interactive);
+    outline-offset: 4px;
+    border-radius: 0.5rem;
+  }
+
   @media (max-width: 720px) {
     .nav {
       position: sticky;
       top: 0;
       z-index: 20;
-      flex-wrap: wrap;
-      gap: var(--s-2);
-      padding-block: var(--s-3);
+      display: grid;
+      grid-template-columns: 1fr 44px 44px;
+      column-gap: var(--s-2);
+      row-gap: 0;
+      padding-block: 0.5rem;
       margin-bottom: var(--s-5);
       background: color-mix(in srgb, var(--bg) 92%, transparent);
       backdrop-filter: blur(16px);
@@ -166,12 +268,18 @@ const current = Astro.url.pathname;
     }
 
     .wordmark {
-      width: 3.5rem;
-      height: 3.5rem;
+      width: 3.25rem;
+      height: 3.25rem;
     }
 
     .theme-toggle {
       margin-left: 0;
+      border-radius: 0.5rem;
+    }
+
+    :is(.theme-toggle, .nav-toggle):active {
+      color: var(--ink);
+      background: color-mix(in srgb, var(--ink) 10%, transparent);
     }
 
     .nav-toggle {
@@ -179,7 +287,8 @@ const current = Astro.url.pathname;
     }
 
     .primary-nav {
-      order: 4;
+      grid-column: 1 / -1;
+      grid-row: 2;
       display: grid;
       grid-template-rows: 0fr;
       width: 100%;
@@ -214,7 +323,18 @@ const current = Astro.url.pathname;
     }
 
     .nav-link {
-      min-height: 42px;
+      min-height: 52px;
+      padding-inline: var(--s-3);
+      border-radius: 0.5rem;
+    }
+
+    .nav-link[aria-current="page"],
+    .nav-link:active {
+      background: color-mix(in srgb, var(--ink) 7%, transparent);
+    }
+
+    .primary-nav[data-open="true"] .nav-links {
+      padding-block: var(--s-2);
       border-top: 1px solid var(--border);
     }
 
@@ -242,6 +362,10 @@ const current = Astro.url.pathname;
   const setNavOpen = (open: boolean) => {
     nav?.setAttribute("data-open", String(open));
     navToggle?.setAttribute("aria-expanded", String(open));
+    navToggle?.setAttribute(
+      "aria-label",
+      open ? "close navigation" : "open navigation",
+    );
   };
   const sync = () => {
     btn?.setAttribute(
@@ -254,7 +378,11 @@ const current = Astro.url.pathname;
     const next =
       document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    localStorage.setItem("theme", next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // Theme changes remain usable without persistent browser storage.
+    }
     sync();
   });
   navToggle?.addEventListener("click", () => {
@@ -267,6 +395,19 @@ const current = Astro.url.pathname;
     }
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setNavOpen(false);
+    if (
+      event.key === "Escape" &&
+      navToggle?.getAttribute("aria-expanded") === "true"
+    ) {
+      setNavOpen(false);
+      navToggle.focus();
+    }
   });
+  document.addEventListener("click", (event) => {
+    if (event.target instanceof Element && !event.target.closest("header.nav"))
+      setNavOpen(false);
+  });
+  matchMedia("(max-width: 720px)").addEventListener("change", () =>
+    setNavOpen(false),
+  );
 </script>

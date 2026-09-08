@@ -1,7 +1,6 @@
 ---
 import { render } from "astro:content";
 import { Icon } from "astro-icon/components";
-import CmsMarkdown from "./CmsMarkdown.astro";
 import ProjectMediaStage from "./ProjectMediaStage.astro";
 import Shell from "../layouts/Shell.astro";
 import { projectSlug, type Project } from "../lib/content";
@@ -12,11 +11,7 @@ interface Props {
 const { project } = Astro.props;
 
 const slug = projectSlug(project);
-const rendered =
-  project.source === "markdown" && project.entry
-    ? await render(project.entry)
-    : null;
-const Content = rendered?.Content;
+const { Content } = await render(project.entry);
 const hasBody = Boolean(project.body?.trim());
 const d = project.data;
 const displayYear = d.year.replace(/-$/u, "–present");
@@ -125,7 +120,7 @@ const uniqueMedia = Array.from(
       hasBody && (
         <section data-rise class="project-overview">
           <div class="article-body project-prose">
-            {Content ? <Content /> : <CmsMarkdown body={project.body} />}
+            <Content />
           </div>
         </section>
       )

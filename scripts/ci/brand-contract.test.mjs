@@ -4,6 +4,9 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import "./landscape.test.mjs";
+import "./navigation.test.mjs";
+import "./workflow-motion.test.mjs";
 
 const ROOT = "packages/brand";
 const PACKET = join(ROOT, "ap-structural-v0.2.0-candidate.1");

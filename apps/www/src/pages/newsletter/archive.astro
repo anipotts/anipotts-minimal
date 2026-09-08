@@ -1,4 +1,5 @@
 ---
+import { siteConfig } from "@anipotts/content/public";
 import Shell from "../../layouts/Shell.astro";
 import {
   DEFAULT_NEWSLETTER_ARCHIVE_CONTENT,
@@ -17,7 +18,7 @@ const copy = normalizeListingPageContent(
   title={copy.title}
   description={copy.description}
   path="/newsletter/archive"
-  canonicalUrl="https://news.anipotts.com/archive"
+  canonicalUrl={`${siteConfig.newsletterUrl}/archive`}
 >
   <section data-rise class="stack">
     <p class="section-label">{copy.section_label || "archive"}</p>

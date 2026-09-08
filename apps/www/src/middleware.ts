@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { siteConfig } from "@anipotts/content/public";
 
 /** flat redirect map: pathname (exact or prefix) -> destination. */
 const REDIRECTS: Record<string, string> = {
@@ -14,7 +15,7 @@ const REDIRECTS: Record<string, string> = {
   "/labs": "/systems",
 };
 
-const NEWS_HOST = "news.anipotts.com";
+const NEWS_HOST = new URL(siteConfig.newsletterUrl).hostname;
 
 /** segment renames (noun -> verb). preserve subpaths and query. these are
  *  external link-equity redirects: every old anipotts.com/thoughts/* url
@@ -96,10 +97,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // /admin moved to the admin subdomain
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const adminPath = pathname.replace(/^\/admin/, "") || "/";
-    return context.redirect(
-      `https://admin.anipotts.com${adminPath}${search}`,
-      308,
-    );
+    return context.redirect(`${siteConfig.adminUrl}${adminPath}${search}`, 308);
   }
 
   const response = await next();

@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { siteConfig } from "@anipotts/content/public";
 import {
   projectSlug,
   publishedWriting,
@@ -8,7 +9,7 @@ import {
 
 export const prerender = false;
 
-const BASE = "https://anipotts.com";
+const BASE = siteConfig.url;
 
 interface Entry {
   path: string;

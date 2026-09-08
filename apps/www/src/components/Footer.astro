@@ -1,51 +1,38 @@
 ---
 import { Icon } from "astro-icon/components";
+import { siteConfig, siteLinks } from "@anipotts/content/public";
+const footerLinks = (
+  ["github", "x", "linkedin", "newsletter", "rss", "admin"] as const
+).map((key) => ({ key, link: siteLinks[key] }));
 ---
 
 <footer id="contact" class="frame foot">
   <div class="contact-copy">
     <span>have a question?</span>
-    <a href="mailto:contact@anipotts.com" class="quiet-link mono"
-      >contact@anipotts.com</a
+    <a href={siteLinks.email.href} class="quiet-link mono">{siteConfig.email}</a
     >
   </div>
   <nav class="glyphs" aria-label="Social and site links">
-    <a
-      href="https://github.com/anipotts"
-      class="glyph"
-      aria-label="github"
-      title="GitHub"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:github-logo" /></a
-    >
-    <a
-      href="https://x.com/anipottsbuilds"
-      class="glyph"
-      aria-label="x"
-      title="X"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:x-logo" /></a
-    >
-    <a
-      href="https://www.linkedin.com/in/anipotts"
-      class="glyph"
-      aria-label="linkedin"
-      title="LinkedIn"
-      target="_blank"
-      rel="noopener noreferrer"><Icon name="ph:linkedin-logo" /></a
-    >
-    <a
-      href="https://news.anipotts.com"
-      class="glyph"
-      aria-label="newsletter"
-      title="Newsletter"><Icon name="ph:envelope-open" /></a
-    >
-    <a href="/feed.xml" class="glyph" aria-label="rss feed" title="RSS feed"
-      ><Icon name="ph:rss-simple" /></a
-    >
-    <a href="/admin" class="glyph admin-glyph" aria-label="admin" title="Admin"
-      ><Icon name="ph:lock-key" /></a
-    >
+    {
+      footerLinks.map(({ key, link }) => (
+        <a
+          href={link.href}
+          class:list={["glyph", { "admin-glyph": key === "admin" }]}
+          aria-label={link.label}
+          title={link.title}
+          target={
+            ["github", "x", "linkedin"].includes(key) ? "_blank" : undefined
+          }
+          rel={
+            ["github", "x", "linkedin"].includes(key)
+              ? "noopener noreferrer"
+              : undefined
+          }
+        >
+          <Icon name={link.icon} />
+        </a>
+      ))
+    }
   </nav>
 </footer>
 
@@ -93,7 +80,7 @@ import { Icon } from "astro-icon/components";
     opacity: 0.78;
   }
 
-  @media (max-width: 879px) {
+  @media (width < 880px) {
     .foot {
       position: relative;
       display: grid;

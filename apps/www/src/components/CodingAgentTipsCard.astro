@@ -1,50 +1,26 @@
 ---
 import { Icon } from "astro-icon/components";
+import AmbientFlow from "./AmbientFlow.astro";
+import type { Project } from "../lib/content";
 
-const href = "https://agents.anipotts.com";
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
 ---
 
 <a
   class="coding-agent-card card"
-  href={href}
-  aria-label="Open Coding Agent Tips"
+  href={project.data.link_live ?? project.data.detail_path}
+  aria-label={`Open ${project.data.title}`}
 >
   <span class="copy">
-    <span class="label mono">coding agent tips</span>
-    <span class="lede">
-      patterns from working with coding agents under real world constraints
-    </span>
+    <span class="label mono">{project.data.title}</span>
+    <span class="lede">{project.data.subtitle}</span>
   </span>
 
-  <span class="visual" aria-hidden="true">
-    <svg
-      class="visual-geometry"
-      viewBox="0 0 520 220"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <defs>
-        <linearGradient id="agent-tips-sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#8fd3ff"></stop>
-          <stop offset="0.52" stop-color="#61abea"></stop>
-          <stop offset="1" stop-color="#174ee8"></stop>
-        </linearGradient>
-        <linearGradient id="agent-tips-fold" x1="0" y1="0" x2="0.88" y2="1">
-          <stop offset="0" stop-color="#4b7cff"></stop>
-          <stop offset="1" stop-color="#082faf"></stop>
-        </linearGradient>
-      </defs>
-      <rect width="520" height="220" fill="url(#agent-tips-sky)"></rect>
-      <path
-        d="M-34 197 88 20c10-14 29-20 45-13l118 50-98 165H-34Z"
-        fill="#1247e6"></path>
-      <path
-        d="m117 220 98-175c8-14 25-21 41-16l134 44-79 147H117Z"
-        fill="url(#agent-tips-fold)"></path>
-      <path d="M290 220 371 64c7-14 24-22 39-17l144 44v129H290Z" fill="#174ee8"
-      ></path>
-      <path d="m49 194 91-132 56 24-79 134H49Z" fill="#7094ef"></path>
-      <path d="m313 198 67-113 65 20-61 115h-71Z" fill="#3c7ee9"></path>
-    </svg>
+  <span class="visual landscape-frame" aria-hidden="true">
+    <AmbientFlow kind="work" seed="coding-agent-tips" />
 
     <Icon class="visual-arrow" name="ph:arrow-up-right" />
 
@@ -106,15 +82,6 @@ const href = "https://agents.anipotts.com";
     isolation: isolate;
     border-radius: 0.7rem;
     background: #61abea;
-  }
-
-  .visual > .visual-geometry {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
   }
 
   .visual > .visual-arrow {

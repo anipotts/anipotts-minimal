@@ -1,4 +1,5 @@
 ---
+import { siteConfig } from "@anipotts/content/public";
 import Shell from "../layouts/Shell.astro";
 import NewsletterSubscribe from "../components/NewsletterSubscribe.astro";
 import {
@@ -15,7 +16,7 @@ const copy = normalizeNewsletterContent(DEFAULT_NEWSLETTER_CONTENT);
   title="newsletter"
   description="ani's notes on building with agents, software, and the small systems around them."
   path="/newsletter"
-  canonicalUrl="https://news.anipotts.com"
+  canonicalUrl={siteConfig.newsletterUrl}
 >
   <section data-rise class="hero">
     <p class="section-label">newsletter</p>

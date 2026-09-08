@@ -1,6 +1,6 @@
 ---
 title: range media partners
-subtitle: client A&R research and artist monitoring.
+subtitle: artist research for the A&R team
 description: Client A&R work for Range Media Partners, supporting artist research and monitoring.
 year: current
 category: music
@@ -12,7 +12,7 @@ public_state: featured
 homepage_placement: none
 catalog_group: active
 homepage_order: 70
-card_copy: client A&R research and artist monitoring.
+card_copy: researching artists and following their growth for the A&R team
 detail_path: /work/range-media-partners
 identity:
   icon: waveform

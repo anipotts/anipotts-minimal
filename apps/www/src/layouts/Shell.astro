@@ -4,7 +4,7 @@ import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import CursorPet from "../components/CursorPet.astro";
 import PageCurrent from "../components/PageCurrent.astro";
-import { siteConfig } from "../data/site";
+import { siteConfig } from "@anipotts/content/public";
 
 interface Props {
   title: string;
@@ -29,13 +29,16 @@ const {
 } = Astro.props;
 const canonical =
   canonicalUrl ?? `${siteConfig.url}${path === "/" ? "" : path}`;
-const fullTitle = path === "/" ? "ani potts" : `${title} / ani potts`;
+const fullTitle =
+  path === "/"
+    ? siteConfig.displayName
+    : `${title} / ${siteConfig.displayName}`;
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 
 const siteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "ani potts",
+  name: siteConfig.displayName,
   url: siteConfig.url,
 };
 const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
@@ -115,7 +118,12 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     />
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem("theme");
+        let stored;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch {
+          // Storage can be disabled; the default theme still renders normally.
+        }
         const theme = stored === "dark" ? "dark" : "light";
         document.documentElement.dataset.theme = theme;
       })();

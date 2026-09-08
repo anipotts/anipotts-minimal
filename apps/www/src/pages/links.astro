@@ -1,26 +1,25 @@
 ---
 import Shell from "../layouts/Shell.astro";
+import { navItems, siteLinks, siteConfig } from "@anipotts/content/public";
 
 const links = [
-  { label: "work", href: "/work" },
-  { label: "writing", href: "/writing" },
-  { label: "systems", href: "/systems" },
-  { label: "email", href: "mailto:contact@anipotts.com" },
-  { label: "github", href: "https://github.com/anipotts" },
-  { label: "linkedin", href: "https://www.linkedin.com/in/anipotts" },
-  { label: "x", href: "https://x.com/anipottsbuilds" },
-  { label: "newsletter", href: "https://news.anipotts.com" },
+  ...navItems.map(({ name, path }) => ({ label: name, href: path })),
+  siteLinks.email,
+  siteLinks.github,
+  siteLinks.linkedin,
+  siteLinks.x,
+  siteLinks.newsletter,
 ];
 ---
 
 <Shell
   title="links"
-  description="useful links for ani potts."
+  description={`useful links for ${siteConfig.displayName}.`}
   path="/links"
   robots="noindex,follow"
 >
   <section data-rise class="links-page">
-    <p class="mono">ani potts</p>
+    <p class="mono">{siteConfig.displayName}</p>
     <h1>links</h1>
     <nav aria-label="profile links">
       {

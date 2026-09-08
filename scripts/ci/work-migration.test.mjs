@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   DEFAULT_CMS_PROJECTS,
-  DEFAULT_MAKING_INDEX_CONTENT,
   DEFAULT_WORK_INDEX_CONTENT,
   normalizeCmsProject,
   validateCmsProject,
@@ -10,7 +9,6 @@ import {
 } from "../../packages/content/dist/public/index.js";
 import { PUBLIC_SMOKE_ROUTES } from "./public-route-inventory.mjs";
 
-assert.deepEqual(DEFAULT_MAKING_INDEX_CONTENT, DEFAULT_WORK_INDEX_CONTENT);
 assert.equal(DEFAULT_WORK_INDEX_CONTENT.hero_title, "work");
 assert.deepEqual(validateListingPageContent(DEFAULT_WORK_INDEX_CONTENT), {
   ok: true,
@@ -45,13 +43,6 @@ const workPage = projection.records.find(
 );
 assert.equal(workPage.route, "/work");
 assert.equal(workPage.source_ref, "content/public/pages/work.md");
-const seeds = JSON.parse(
-  readFileSync("drizzle/seeds/public-content.json", "utf8"),
-);
-assert.ok(
-  seeds.rows.some((row) => row.page_key === "making"),
-  "existing stored page identity survives rename",
-);
 const middleware = readFileSync("apps/www/src/middleware.ts", "utf8");
 for (const from of ["making", "projects", "shipping", "running"])
   assert.ok(middleware.includes(`"/${from}": "/work"`));
