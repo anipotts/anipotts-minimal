@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { ADMIN_PROTECTED_SMOKE_ROUTES } from "../ci/admin-route-inventory.mjs";
 
 const REPO_ROOT = new URL("../../", import.meta.url);
-execFileSync("pnpm", ["--filter", "@anipotts/content", "build"], {
+execFileSync("pnpm", ["turbo", "build", "--filter=@anipotts/content..."], {
   cwd: REPO_ROOT,
   stdio: "ignore",
 });

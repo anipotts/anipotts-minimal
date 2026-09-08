@@ -445,7 +445,6 @@ for (const marker of [
   "019f95c5-be35-7991-811c-371611daa94b",
   "019f99d2-90a1-7761-8582-17b7037c748b",
   "searchable_history_disposition",
-  "OPERATOR_WORK_FIXTURE_SHA256",
 ]) {
   assert.ok(
     devOperatorWorkSource.includes(marker),

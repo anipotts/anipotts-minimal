@@ -19,7 +19,7 @@ function refreshPublicContent(callback) {
 
       execFile(
         PNPM,
-        ["--filter", "@anipotts/content", "build"],
+        ["turbo", "build", "--filter=@anipotts/content..."],
         { cwd: REPO_ROOT },
         (buildError, _buildStdout, buildStderr) => {
           callback(buildError, `${generateStderr}${buildStderr}`);
