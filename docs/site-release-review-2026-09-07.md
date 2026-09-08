@@ -8,6 +8,8 @@ This is an internal editorial and release ledger, not published page copy. The r
 
 The direction is thoughtful systems and products, engineering depth demonstrated by the work, and Ani's own taste across technical and creative interests. Systems protect attention and preserve context. Personal integrations are not a launch prerequisite.
 
+Engineering checkpoint: the final `pnpm check:changed` run passed for `33a8f5a`, including full workspace validation after the unavailable-source correction. `3711bfa` only normalizes Obsidian SVG line endings; its diff is empty when end-of-line whitespace is ignored, and the full branch passes `git diff --check`. The branch was pushed and its remote SHA verified. There is no PR, merge, or deployment yet. The public preview is running; the manager reports an unrelated stale admin process, which was left unchanged.
+
 Substantive replacement copy needs section-by-section approval. Existing selections, publication dates, project IDs, hidden records, and draft state remain unchanged. No invented contributions, metrics, client permissions, or first-person anecdotes.
 
 ### Implemented commit groups
@@ -171,6 +173,8 @@ All 21 issues remain open. These are proposed dispositions, not posted comments 
 
 ### Dependency PRs
 
+Additional release gate discovered during push: GitHub reports 102 open dependency alerts on default main, including one critical. Read-only inspection identifies [alert #143](https://github.com/anipotts/anipotts.com/security/dependabot/143): `tar`, decompression/parse denial of service, patched in 7.5.19. The current lockfile contains 7.5.15; `pnpm why tar -r --depth 3` shows `www → astro-icon → @iconify/tools → tar`. That confirms the dependency chain, not public-request reachability. Before production, assess actual exposure and apply/reverify the narrow patch in the dependency lane. Do not equate green application tests with a cleared dependency-security gate.
+
 Read-only snapshot 2026-09-07: #302 CLEAN; #306 BEHIND; #292–#295 draft/BLOCKED. No dependency branch was changed or merged.
 
 - #302: refresh exact head, diff and checks against latest main after public integration; separate maintenance release.
@@ -201,4 +205,4 @@ Outstanding gates:
 6. Record PR, merged SHA, release run, executed/skipped targets, production routes and rollback SHA. Current known-good baseline: `2451782dfe1599c642b1f75d39623e4ec9e592ce`, deployment run `34153601249`.
 7. Return the canonical checkout to updated main after integration. Retire only verified integrated or recoverably preserved agent worktrees. Leave remaining maintenance with priority and next action.
 
-There has been no production deployment, remote migration, issue comment/closure, dependency merge, or destructive workspace cleanup in this implementation batch.
+There has been no production deployment, remote migration, issue comment/closure, dependency merge, or destructive workspace cleanup in this implementation batch. The review branch is backed up remotely; main and production remain on the previous release.
