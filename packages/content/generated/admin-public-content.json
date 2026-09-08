@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "2493c79477393106faf5130d302d342797da2d9a2304ed5f5e0de073bc7f01c8",
+  "source_hash": "9366385c14d7dbd48d3b6e4faf5645bfa4d80d8b150a8ac6e3ad2ac3638554ce",
   "source_records": [
     {
       "id": "projects.quantercise",
@@ -794,11 +794,6 @@
         },
         { "path": "sort_order", "value": "40", "kind": "number" },
         {
-          "path": "link_repo",
-          "value": "https://github.com/anipotts/Options-Pricing-and-Sensitivity-Analysis-Tool",
-          "kind": "string"
-        },
-        {
           "path": "tags",
           "value": "Python, NumPy, Pandas, Quantitative Finance",
           "kind": "array"
@@ -1160,7 +1155,7 @@
       "status": "live",
       "route": "/work/options-pricing-sensitivity",
       "source_ref": "content/public/projects/options-pricing-sensitivity.md",
-      "source_hash": "9c9aa89b996d71a23f217ba7ebc4e2313765ac248c7e0735a11892c3a87588d3"
+      "source_hash": "a775f615ec252952a592e1a537058d809dcb360c21b43bd62a62c909c78452d8"
     },
     {
       "entity_id": "public-project:pgi-research-platform",

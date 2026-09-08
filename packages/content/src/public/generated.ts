@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "2493c79477393106faf5130d302d342797da2d9a2304ed5f5e0de073bc7f01c8";
+  "9366385c14d7dbd48d3b6e4faf5645bfa4d80d8b150a8ac6e3ad2ac3638554ce";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -1483,12 +1483,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     tags: ["python", "numpy", "pandas", "quantitative finance"],
     summary: "black-scholes and binomial pricing with volatility sweeps.",
     body: "Wrote a Python tool for pricing European options with Black-Scholes and binomial models, then swept volatility to show how model behavior changes.",
-    links: [
-      {
-        label: "source",
-        url: "https://github.com/anipotts/Options-Pricing-and-Sensitivity-Analysis-Tool",
-      },
-    ],
+    links: [],
     order: 40,
     kind: "project",
     public_state: "listed",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_root": "content/public",
-  "source_hash": "2493c79477393106faf5130d302d342797da2d9a2304ed5f5e0de073bc7f01c8",
+  "source_hash": "9366385c14d7dbd48d3b6e4faf5645bfa4d80d8b150a8ac6e3ad2ac3638554ce",
   "sources": {
     "content/public/pages/home.md": "6d757866a1733883b84af068875ebe27b1b39ee57a61a98ad5bfa56d3cc0b607",
     "content/public/pages/newsletter.md": "edd6f443abc86dfbd1989ce07a8f6c81fdc9c9319a6ace9976d69ae50a364084",
@@ -16,7 +16,7 @@
     "content/public/projects/habittracker-obh.md": "41b54b507e03571676112a5918575eac9cf6c739ebbcf463601489f95990337c",
     "content/public/projects/imessage-mcp.md": "64625b0b1819b493f087da8dc24ec4e95ef7d053de023a710e66f5224606b432",
     "content/public/projects/nyu-purity-test.md": "5e180c18ba5d4a1ae6ae149bc16c1949fc4dae673a09d10af674f0f58fe0112f",
-    "content/public/projects/options-pricing-sensitivity.md": "9c9aa89b996d71a23f217ba7ebc4e2313765ac248c7e0735a11892c3a87588d3",
+    "content/public/projects/options-pricing-sensitivity.md": "a775f615ec252952a592e1a537058d809dcb360c21b43bd62a62c909c78452d8",
     "content/public/projects/pgi-research-platform.md": "e5579bdf6ea0e8fbc83e7c7633edf9858d45533b3ab8180d842e6141a89ba6f7",
     "content/public/projects/quantercise-extension.md": "f6bdfd9fdadbf8d482d5be6db9ee3125b7b65b676b11ae746c2fdb1fb709b1cc",
     "content/public/projects/quantercise.md": "7193819d3b82d770b4b2bcdbffe82eb263004ff3d8db8a259bb1f4ea05f87418",
@@ -1362,12 +1362,7 @@
       "tags": ["python", "numpy", "pandas", "quantitative finance"],
       "summary": "black-scholes and binomial pricing with volatility sweeps.",
       "body": "Wrote a Python tool for pricing European options with Black-Scholes and binomial models, then swept volatility to show how model behavior changes.",
-      "links": [
-        {
-          "label": "source",
-          "url": "https://github.com/anipotts/Options-Pricing-and-Sensitivity-Analysis-Tool"
-        }
-      ],
+      "links": [],
       "order": 40,
       "kind": "project",
       "public_state": "listed",

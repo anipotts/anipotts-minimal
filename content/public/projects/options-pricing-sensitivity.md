@@ -17,6 +17,5 @@ detail_path: /work/options-pricing-sensitivity
 identity:
   icon: chart-line-up
 sort_order: 40
-link_repo: https://github.com/anipotts/Options-Pricing-and-Sensitivity-Analysis-Tool
 tags: [Python, NumPy, Pandas, Quantitative Finance]
 ---
