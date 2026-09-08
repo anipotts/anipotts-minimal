@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source_hash": "00ff482ae347cd252b635c75b44b86bc45c6b1f6502db0bcc2790b9cb8c47f9a",
+  "source_hash": "f332662a7e9736a467f045b4282c510ec80aa6e0c377e9dbb8c1c6d02ee16b24",
   "policy": "future_additive_seed_input_only",
   "rows": [
     {
@@ -1292,7 +1292,7 @@
       "published": true,
       "content": {
         "slug": "claude-code-tips",
-        "title": "claude code tips",
+        "title": "coding agent tips",
         "status": "live",
         "year": "2025–present",
         "range": "Ongoing",
@@ -1302,7 +1302,7 @@
         "links": [
           {
             "label": "source",
-            "url": "https://github.com/anipotts/claude-code-tips"
+            "url": "https://github.com/anipotts/coding-agent-tips"
           }
         ],
         "order": 92,
@@ -1315,13 +1315,13 @@
         "detail_path": "/work/claude-code-tips",
         "identity": {
           "logo_src": "/images/brand/claude-code-tips-favicon.svg",
-          "logo_alt": "claude code tips"
+          "logo_alt": "coding agent tips"
         },
         "preview_media": null,
         "story": []
       },
       "source_ref": "content/public/projects/claude-code-tips.md",
-      "source_hash": "d05003f7cf6757424cc1dc64f9b86d7dffeb2f58558b45c5acbaacd7a5e444ee"
+      "source_hash": "e10e7cc3a79ac727c700e3ed6ae393a74b0baac7cc4252aa1e078f640d058f39"
     },
     {
       "page_key": "project:habittracker-obh",

@@ -10,7 +10,7 @@ import type {
 } from "@anipotts/types";
 
 export const PUBLIC_CONTENT_SOURCE_HASH =
-  "00ff482ae347cd252b635c75b44b86bc45c6b1f6502db0bcc2790b9cb8c47f9a";
+  "f332662a7e9736a467f045b4282c510ec80aa6e0c377e9dbb8c1c6d02ee16b24";
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   sections: {
@@ -1356,7 +1356,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
   },
   {
     slug: "claude-code-tips",
-    title: "claude code tips",
+    title: "coding agent tips",
     status: "live",
     year: "2025–present",
     range: "Ongoing",
@@ -1366,7 +1366,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     links: [
       {
         label: "source",
-        url: "https://github.com/anipotts/claude-code-tips",
+        url: "https://github.com/anipotts/coding-agent-tips",
       },
     ],
     order: 92,
@@ -1380,7 +1380,7 @@ export const DEFAULT_CMS_PROJECTS: CmsProjectContent[] = [
     detail_path: "/work/claude-code-tips",
     identity: {
       logo_src: "/images/brand/claude-code-tips-favicon.svg",
-      logo_alt: "claude code tips",
+      logo_alt: "coding agent tips",
     },
     preview_media: null,
     story: [],
