@@ -2,7 +2,7 @@
 
 ## September 8 cleanup execution
 
-Status: local implementation and verification in progress. No PR, merge or production deployment has been completed for this cleanup.
+Status: cleanup merged through protected PR [#308](https://github.com/anipotts/anipotts.com/pull/308) and verified in production. Release SHA: `7dc131d19706569e545f93f5a31ef8d4f405bb1f`. Admin promotion and two dirty historical worktree removals remain independently held as described below.
 
 Starting release head: `98d2d8292c0bf95c1d66edfd605c8e4d14e365fa`.
 The initial review scope includes 32 modified files, two untracked tests and 15 release-branch commits beyond main.
@@ -54,13 +54,26 @@ The primary checkout and running previews remain intact. The other four worktree
 | `anipotts-com-public-site-review-batch-2026-08-28`      | Committed base integrated; older card/hero changes superseded by current components; tracked recovery at `refs/cleanup-recovery/card-review-2026-09-08`, untracked component in `card-review-untracked.tar.gz` beside the other recovery files |
 | `anipotts-com-public-work-canonical-records-2026-08-26` | Record/artwork patches are equivalent to integrated changes; obsolete Portless-removal commit intentionally not merged; dirty work retained at `refs/cleanup-recovery/canonical-records-2026-09-08`                                            |
 
-All archives were listed and checked. Worktree retirement still requires confirming no running process owns those directories.
+All archives were listed and checked. The inactive discovery worktree was removed after preserving its unique commit. The systems experiment has active preview and Claude processes and remains in place. The card-review and canonical-records worktrees have no processes with a working directory inside them, and their tracked diffs match their recovery snapshots exactly. Native policy blocked forced removal of the dirty card-review tree; no alternative deletion path was attempted. Both dirty historical directories remain preserved pending native approval. Canonical-records screenshots, preview metadata and local Miniflare database are also retained in `.local/cleanup-recovery/2026-09-08/canonical-records-local-state.tar.gz`.
 
 Read-only production inspection found the current Astro admin worker `anipotts-admin`; its listed deployment uses version `a1825b84-b47b-4b5a-8a9b-7df8f32cccc3`. Probes of admin health, inbox, content and passkey routes redirect to Cloudflare Access. This proves the edge gate is still present, not authenticated app-native access. No auth, secret, production data or worker-resource mutation was made.
 
 The four retained worker configs still declare a state domain/DO bindings, ingest cron, newsletter queue, and weekly cron. Their active operational roles are distinct from public rendering. Final provider and release-target evidence is still required.
 
-Protected production release remains unfinished. The checked release configuration holds authenticated admin smoke at `held_identity_required`; this is an external identity gate, not permission to weaken authentication. Shared changes classify www, admin and state, while removal of the legacy target alone does not deploy unrelated workers. Older checkpoints below describe earlier trees and must not be treated as proof for this cleanup.
+### Protected release receipt
+
+- Exact PR head: `27e2ac2b4176e0da781e174739c722ab8b5b72a2`; merged with the merge method so focused commits remain intact.
+- [CI run](https://github.com/anipotts/anipotts.com/actions/runs/34202164227): classification and full build/lint/typecheck/test passed. [Security Review](https://github.com/anipotts/anipotts.com/actions/runs/34202164190) passed. PR was ready for review, not a draft with reduced checks.
+- Live main protection was reread immediately before merge: required PR, strict exact-head checks from GitHub Actions, admin enforcement, no ruleset bypass actors, no force push or deletion, and no unresolved review threads.
+- Final local `pnpm check:changed` passed on the committed release diff, as did `git diff --check` and forced clean affected builds. The merged tree is identical to the checked PR head.
+- [Deployment run](https://github.com/anipotts/anipotts.com/actions/runs/34202417739) succeeded for www and state. Admin, ingest, newsletter and weekly email jobs were skipped. Classification recorded `d1_changed=false`; migration steps were skipped. No production database migration or auth/resource mutation occurred.
+- Cloudflare versions: www `b041c404-eabf-467b-b966-d3375fc462fd`; state `ac4bd133-1368-4124-99e5-9b3ada408fc5`.
+- Independent production smoke passed all 23 public routes. Public health reports the exact release SHA, database connected and schema `0043`; state health reports `ok: true`. Old work redirects preserve query strings; hidden and unknown work and the JPEGMAFIA draft return genuine 404s. Feed, sitemap and robots return 200. Cloudflare adds its existing managed content-signal block to robots while retaining the canonical sitemap and API exclusion.
+- Production Browser checks at 319 and 1440px in both themes passed on all four shared pages after waiting for document readiness. One h1, no document overflow, no missing completed images and no production console errors were observed. The initial too-early samples were discarded and rerun after DOM readiness. Browser viewport overrides were reset and the tab left on the production homepage.
+- Primary checkout returned to main. Previous known-good public release: `2451782dfe1599c642b1f75d39623e4ec9e592ce`; the deployment workflow captured the previous Cloudflare version before promotion for app-only rollback. Rollback was not needed.
+- Switching through the old local main tree interrupted Astro's module graph during the shared-content rebuild. The final local check caught a 502; only the recognized broken www process was restarted through the existing manager, after which the same canonical URL returned 200. The shared proxy, managed admin fallback and active experimental preview were left untouched. The pre-existing stale admin Portless record remains separate from this public preview repair.
+
+The checked release configuration holds authenticated admin smoke at `held_identity_required`; this is an external identity gate, not permission to weaken authentication. Shared changes classify www, admin and state, while removal of the legacy target alone does not deploy unrelated workers. Older checkpoints below describe earlier trees and must not be treated as proof for this cleanup.
 
 Updated: 2026-09-07. Owner: Ani, with Codex implementing the public-site lane.
 
